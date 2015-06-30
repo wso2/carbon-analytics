@@ -26,6 +26,7 @@ public class InputEventAdapterConfiguration {
     private String name;
     private String type;
     private String messageFormat;
+    private String inputStreamIdOfWso2eventMessageFormat;
     private Map<String, String> properties;
 
     public String getName() {
@@ -58,6 +59,14 @@ public class InputEventAdapterConfiguration {
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
+    }
+
+    public String getInputStreamIdOfWso2eventMessageFormat() {
+        return inputStreamIdOfWso2eventMessageFormat;
+    }
+
+    public void setInputStreamIdOfWso2eventMessageFormat(String inputStreamIdOfWso2eventMessageFormat) {
+        this.inputStreamIdOfWso2eventMessageFormat = inputStreamIdOfWso2eventMessageFormat;
     }
 
     @Override

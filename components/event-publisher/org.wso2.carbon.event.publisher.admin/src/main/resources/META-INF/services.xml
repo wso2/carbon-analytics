@@ -139,11 +139,14 @@
                 /permission/admin/manage/event-publish
             </parameter>
         </operation>
+        <operation name="testPublisherConnection">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
 
 
     </service>
-    <!--<parameter name="adminService" locked="true">true</parameter>-->
-    <parameter name="adminService" locked="true">false</parameter>
-    <!--<parameter name="hiddenService" locked="true">true</parameter>-->
-    <parameter name="hiddenService" locked="true">false</parameter>
+    <parameter name="adminService" locked="true">true</parameter>
+    <parameter name="hiddenService" locked="true">true</parameter>
 </serviceGroup>

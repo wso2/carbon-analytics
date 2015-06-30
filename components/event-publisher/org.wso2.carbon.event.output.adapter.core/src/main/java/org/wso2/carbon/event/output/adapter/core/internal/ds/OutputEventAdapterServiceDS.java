@@ -100,7 +100,7 @@ public class OutputEventAdapterServiceDS {
     }
 
     protected void unSetEventAdapterType(OutputEventAdapterFactory outputEventAdapterFactory) {
-        OutputEventAdapterServiceValueHolder.getCarbonOutputEventAdapterService().unRegisterEventAdapter(outputEventAdapterFactory);
+        OutputEventAdapterServiceValueHolder.getCarbonOutputEventAdapterService().unRegisterEventAdapterFactory(outputEventAdapterFactory);
     }
 
     private AdapterConfigs loadGlobalConfigs() {

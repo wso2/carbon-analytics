@@ -23,6 +23,7 @@ import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfiguratio
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
+import org.wso2.siddhi.core.event.Event;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -103,23 +104,23 @@ public class TextOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToMappedInputEvent(Object[] eventData)
+    public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
         StringBuilder eventText = new StringBuilder(mappingTextList.get(0));
         for (int i = 1; i < mappingTextList.size(); i++) {
             if (i % 2 == 0) {
                 eventText.append(mappingTextList.get(i));
             } else {
-                eventText.append(getPropertyValue(eventData, mappingTextList.get(i)));
+                eventText.append(getPropertyValue(event.getData(), mappingTextList.get(i)));
             }
         }
         return eventText.toString();
     }
 
     @Override
-    public Object convertToTypedInputEvent(Object[] eventData)
+    public Object convertToTypedInputEvent(Event event)
             throws EventPublisherConfigurationException {
-        return convertToMappedInputEvent(eventData);
+        return convertToMappedInputEvent(event);
     }
 
 

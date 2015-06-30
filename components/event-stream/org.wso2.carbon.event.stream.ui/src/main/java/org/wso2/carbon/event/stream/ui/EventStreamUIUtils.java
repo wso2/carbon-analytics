@@ -23,6 +23,8 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.wso2.carbon.CarbonConstants;
+import org.wso2.carbon.analytics.stream.persistence.stub.EventStreamPersistenceAdminServiceStub;
+import org.wso2.carbon.analytics.stream.persistence.stub.dto.AnalyticsTableRecord;
 import org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub;
 import org.wso2.carbon.event.stream.stub.types.EventStreamAttributeDto;
 import org.wso2.carbon.event.stream.stub.types.EventStreamDefinitionDto;
@@ -31,6 +33,7 @@ import org.wso2.carbon.ui.CarbonUIUtil;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +58,31 @@ public class EventStreamUIUtils {
         option.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
 
         return stub;
+    }
+
+    public static EventStreamPersistenceAdminServiceStub getEventStreamPersistenceAdminService(ServletConfig config,
+                                                                                               HttpSession session,
+                                                                                               HttpServletRequest request)
+            throws AxisFault {
+        ConfigurationContext configContext = (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
+        //Server URL which is defined in the server.xml
+        String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session) + "EventStreamPersistenceAdminService";
+        EventStreamPersistenceAdminServiceStub stub = new EventStreamPersistenceAdminServiceStub(configContext, serverURL);
+        String cookie = (String) session.getAttribute(org.wso2.carbon.utils.ServerConstants.ADMIN_SERVICE_COOKIE);
+        ServiceClient client = stub._getServiceClient();
+        Options option = client.getOptions();
+        option.setManageSession(true);
+        option.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
+        return stub;
+    }
+
+    public static boolean isEventStreamPersistenceAdminServiceAvailable(
+            EventStreamPersistenceAdminServiceStub eventStreamPersistenceAdminServiceStub) {
+        try {
+            return eventStreamPersistenceAdminServiceStub.isBackendServicePresent();
+        } catch (RemoteException e) {
+            return false;
+        }
     }
 
     public static EventStreamDefinitionDto getEventStreamInfoDtoFrom(String jsonStreamDef) {
@@ -105,5 +133,35 @@ public class EventStreamUIUtils {
         return eventStreamInfoDto;
     }
 
+    public static List<AnalyticsTableRecord> getArbitraryRecordList(String[] properties) {
+        List<AnalyticsTableRecord> analyticsTableColumns = new ArrayList<AnalyticsTableRecord>();
+        for (String property : properties) {
+            String[] propertyConfiguration = property.split("\\^=");
+            AnalyticsTableRecord analyticsTableColumn = new AnalyticsTableRecord();
+            analyticsTableColumn.setPersist(true);
+            analyticsTableColumn.setColumnName("_" + propertyConfiguration[0]);
+            analyticsTableColumn.setColumnType(propertyConfiguration[1]);
+            analyticsTableColumn.setPrimaryKey(Boolean.parseBoolean(propertyConfiguration[2]));
+            analyticsTableColumn.setIndexed(Boolean.parseBoolean(propertyConfiguration[3]));
+            analyticsTableColumn.setScoreParam(Boolean.parseBoolean(propertyConfiguration[4]));
+            analyticsTableColumns.add(analyticsTableColumn);
+        }
+        return analyticsTableColumns;
+    }
 
+    public static List<AnalyticsTableRecord> getAnalyticsRecordList(String[] properties, String type) {
+        List<AnalyticsTableRecord> analyticsTableColumns = new ArrayList<AnalyticsTableRecord>();
+        for (String property : properties) {
+            String[] propertyConfiguration = property.split("\\^=");
+            AnalyticsTableRecord analyticsTableColumn = new AnalyticsTableRecord();
+            analyticsTableColumn.setPersist(Boolean.parseBoolean(propertyConfiguration[0]));
+            analyticsTableColumn.setColumnName(type + propertyConfiguration[1]);
+            analyticsTableColumn.setColumnType(propertyConfiguration[2]);
+            analyticsTableColumn.setPrimaryKey(Boolean.parseBoolean(propertyConfiguration[3]));
+            analyticsTableColumn.setIndexed(Boolean.parseBoolean(propertyConfiguration[4]));
+            analyticsTableColumn.setScoreParam(Boolean.parseBoolean(propertyConfiguration[5]));
+            analyticsTableColumns.add(analyticsTableColumn);
+        }
+        return analyticsTableColumns;
+    }
 }

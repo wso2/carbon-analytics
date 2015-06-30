@@ -17,6 +17,7 @@ package org.wso2.carbon.event.input.adapter.core.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSubscription;
@@ -39,35 +40,61 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
     private DecayTimer timer = new DecayTimer();
     private volatile long nextConnectionTime;
     private ExecutorService executorService;
-
+    private boolean startedTriggered = false;
+    private boolean startPollingTriggered = false;
+    private int tenantId;
 
     public InputAdapterRuntime(InputEventAdapter inputEventAdapter, String name,
                                InputEventAdapterSubscription inputEventAdapterSubscription) throws InputEventAdapterException {
         this.inputEventAdapter = inputEventAdapter;
         this.name = name;
         this.inputEventAdapterSubscription = inputEventAdapterSubscription;
+        this.tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         executorService = Executors.newSingleThreadExecutor();
         synchronized (this) {
             inputEventAdapter.init(this);
-            try {
-                inputEventAdapter.connect();
-                connected = true;
-            } catch (ConnectionUnavailableException e) {
-                connectionUnavailable(e);
-            } catch (InputEventAdapterRuntimeException e) {
-                connected = false;
-                inputEventAdapter.disconnect();
-                log.error("Error initializing " + this.name + ", hence this will be suspended indefinitely", e);
+        }
+    }
+
+    public void startPolling() {
+        startPollingTriggered = true;
+        if (!connected && startedTriggered && isPolling()) {
+            start();
+        }
+    }
+
+    public void start() {
+        try {
+            startedTriggered = true;
+            if (!isPolling() || startPollingTriggered) {
+                if (!connected) {
+                    log.info("Connecting receiver " + this.name);
+                    inputEventAdapter.connect();
+                    connected = true;
+                }
+            } else {
+                log.info("Waiting to connect receiver " + this.name);
             }
+        } catch (ConnectionUnavailableException e) {
+            connectionUnavailable(e);
+        } catch (InputEventAdapterRuntimeException e) {
+            connected = false;
+            inputEventAdapter.disconnect();
+            log.error("Error initializing Input Adopter '" + this.name + ", hence this will be suspended indefinitely, " + e.getMessage(), e);
         }
     }
 
     public void destroy() {
         if (inputEventAdapter != null) {
             try {
-                inputEventAdapter.disconnect();
-            } finally {
-                inputEventAdapter.destroy();
+                try {
+                    inputEventAdapter.disconnect();
+                } finally {
+                    inputEventAdapter.destroy();
+                }
+            } catch (Throwable e) {
+                log.error("Error when destroying Input Adapter '" + name + "'," +
+                        e.getMessage(), e);
             }
         }
     }
@@ -86,7 +113,7 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
     public synchronized void connectionUnavailable(ConnectionUnavailableException connectionUnavailableException) {
         try {
             try {
-                if (!connected) {
+                if (!connected && connectionUnavailableException == null) {
                     if (nextConnectionTime <= System.currentTimeMillis()) {
                         inputEventAdapter.connect();
                         connected = true;
@@ -98,19 +125,25 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
                     timer.incrementPosition();
                     nextConnectionTime = System.currentTimeMillis() + timer.returnTimeToWait();
                     if (timer.returnTimeToWait() == 0) {
-                        log.error("Connection unavailable on " + name + " reconnecting.", connectionUnavailableException);
+                        log.error("Connection unavailable for Input Adopter '" + name + "' reconnecting.", connectionUnavailableException);
                         inputEventAdapter.connect();
                     } else {
-                        log.error("Connection unavailable on " + name + " reconnection will be retried in" + (timer.returnTimeToWait()) + " milliseconds.", connectionUnavailableException);
+                        log.error("Connection unavailable for Input Adopter '" + name + "' . Reconnection will be retried in " + (timer.returnTimeToWait()) + " milliseconds.", connectionUnavailableException);
                         executorService.execute(new Runnable() {
                             @Override
                             public void run() {
                                 try {
-                                    Thread.sleep(timer.returnTimeToWait());
-                                } catch (InterruptedException e) {
-                                    //nothing to be done
+                                    PrivilegedCarbonContext.startTenantFlow();
+                                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+                                    try {
+                                        Thread.sleep(timer.returnTimeToWait());
+                                    } catch (InterruptedException e) {
+                                        //nothing to be done
+                                    }
+                                    connectionUnavailable(null);
+                                } finally {
+                                    PrivilegedCarbonContext.endTenantFlow();
                                 }
-                                connectionUnavailable(null);
                             }
                         });
                     }
@@ -120,8 +153,20 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
             }
         } catch (InputEventAdapterRuntimeException e) {
             connected = false;
-            log.error("Error in connecting at " + this.name + ", hence this will be suspended indefinitely", e);
+            log.error("Error in connecting Input Adapter '" + this.name + "', hence this will be suspended indefinitely, " + e.getMessage(), e);
         }
 
+    }
+
+    public boolean isEventDuplicatedInCluster() {
+        return inputEventAdapter.isEventDuplicatedInCluster();
+    }
+
+    public boolean isPolling() {
+        return inputEventAdapter.isPolling();
+    }
+
+    public String getName() {
+        return name;
     }
 }

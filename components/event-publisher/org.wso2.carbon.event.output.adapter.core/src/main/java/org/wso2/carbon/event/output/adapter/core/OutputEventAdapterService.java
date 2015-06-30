@@ -63,4 +63,6 @@ public interface OutputEventAdapterService {
     void testConnection(OutputEventAdapterConfiguration outputEventAdapterConfiguration) throws OutputEventAdapterException, TestConnectionNotSupportedException;
 
     void destroy(String name);
+
+    boolean isPolled(String outputAdapterName) throws OutputEventAdapterException;
 }

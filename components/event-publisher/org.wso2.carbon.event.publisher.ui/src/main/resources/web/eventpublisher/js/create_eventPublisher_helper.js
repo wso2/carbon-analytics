@@ -35,7 +35,7 @@ function fillTextIn(obj) {
 
 
 function loadEventAdapterProperties(messageProperty, eventPublisherInputTable, propertyLoop,
-                                           propertyValue, requiredValue, insertRowCount) {
+                                    propertyValue, requiredValue, insertRowCount) {
 
     var tableRow = eventPublisherInputTable.insertRow(insertRowCount);
     var textLabel = tableRow.insertCell(0);
@@ -43,7 +43,7 @@ function loadEventAdapterProperties(messageProperty, eventPublisherInputTable, p
     textLabel.innerHTML = displayName;
     var requiredElementId = propertyValue;
     var textPasswordType = "text";
-    var hint = ""  ;
+    var hint = "";
     var defaultValue = "";
 
     if (messageProperty.localRequired) {
@@ -101,20 +101,39 @@ function loadEventAdapterProperties(messageProperty, eventPublisherInputTable, p
 function showEventStreamDefinition() {
 
     var selectedIndex = document.getElementById("streamIdFilter").selectedIndex;
-    var selected_text = document.getElementById("streamIdFilter").options[selectedIndex].text;
+    var streamNameWithVersion = document.getElementById("streamIdFilter").options[selectedIndex].text;
+    jQuery.ajax({
+        type: "POST",
+        url: "../eventpublisher/get_streamdefinition_ajaxprocessor.jsp?streamName=" + streamNameWithVersion + "",
+        data: {},
+        contentType: "application/json; charset=utf-8",
+        dataType: "text",
+        async: true,
+        success: function (streamDefinition) {
+
+            jQuery('#streamDefinitionText').val(streamDefinition.trim());
+        }
+    });
+
+    selectedIndex = document.getElementById("mappingTypeFilter").selectedIndex;
+    var inputMappingType = document.getElementById("mappingTypeFilter").options[selectedIndex].text;
+
+    var outerDiv = document.getElementById("outerDiv");
+    outerDiv.innerHTML = "";
 
     jQuery.ajax({
-                    type:"POST",
-                    url:"../eventpublisher/get_streamdefinition_ajaxprocessor.jsp?streamName=" + selected_text + "",
-                    data:{},
-                    contentType:"application/json; charset=utf-8",
-                    dataType:"text",
-                    async:true,
-                    success:function (streamDefinition) {
+        type: "POST",
+        url: "../eventpublisher/get_mapping_ui_ajaxprocessor.jsp?mappingType=" + inputMappingType + "&streamNameWithVersion=" + streamNameWithVersion,
+        data: {},
+        contentType: "text/html; charset=utf-8",
+        dataType: "text",
+        success: function (ui_content) {
+            if (ui_content != null) {
+                outerDiv.innerHTML = ui_content;
+            }
+        }
+    });
 
-                        jQuery('#streamDefinitionText').val(streamDefinition.trim());
-                    }
-                });
 }
 
 
@@ -127,14 +146,23 @@ function loadEventAdapterData(adapterSchema) {
     }
 
     var eventPublisherInputTable = document.getElementById("eventPublisherInputTable");
+    var eventPublisherUsageTipsRow = document.getElementById("eventPublisherUsageTipsRowId");
+
+    //adapter usage tips
+    if (adapterSchema.localUsageTips != null) {
+        eventPublisherUsageTipsRow.innerHTML = '<td>Usage Tips</td><td>' + adapterSchema.localUsageTips + '</td>';
+    } else {
+        eventPublisherUsageTipsRow.innerHTML = '<td hidden></td><td hidden></td>';
+    }
+
     // delete message properties related fields
-    for (i = eventPublisherInputTable.rows.length - 5; i > 5; i--) {
+    for (i = eventPublisherInputTable.rows.length - 5; i > 6; i--) {
         eventPublisherInputTable.deleteRow(i);
     }
     var inputProperty = "property_";
     var inputRequiredProperty = "property_Required_";
-    var initialRowValue = 6;
-    var index=0;
+    var initialRowValue = 7;
+    var index = 0;
     if (adapterSchema.localOutputEventAdapterStaticProperties != undefined) {
 
         var tableRow = eventPublisherInputTable.insertRow(initialRowValue);
@@ -171,13 +199,13 @@ function loadEventAdapterRelatedProperties(toPropertyHeader) {
     var selected_text = document.getElementById("eventAdapterTypeFilter").options[selectedIndex].text;
 
     jQuery.ajax({
-        type:"POST",
-        url:"../eventpublisher/get_adapter_properties_ajaxprocessor.jsp?eventAdapterType=" + selected_text + "",
-        data:{},
-        contentType:"application/json; charset=utf-8",
-        dataType:"text",
-        async:false,
-        success:function (propertiesString) {
+        type: "POST",
+        url: "../eventpublisher/get_adapter_properties_ajaxprocessor.jsp?eventAdapterType=" + selected_text + "",
+        data: {},
+        contentType: "application/json; charset=utf-8",
+        dataType: "text",
+        async: false,
+        success: function (propertiesString) {
 
             if (propertiesString != null) {
                 var jsonObject = JSON.parse(propertiesString);
@@ -187,7 +215,7 @@ function loadEventAdapterRelatedProperties(toPropertyHeader) {
         }
     });
 
-    showMappingContext();
+    showEventStreamDefinition();
 }
 
 
@@ -200,58 +228,6 @@ function handleAdvancedMapping() {
         outerDiv.style.display = "none";
     }
     advancedMappingCounter = advancedMappingCounter + 1;
-
-}
-
-function showMappingContext() {
-
-    var selectedIndex = document.getElementById("mappingTypeFilter").selectedIndex;
-    var selected_text = document.getElementById("mappingTypeFilter").options[selectedIndex].text;
-
-    var innerDiv1 = document.getElementById("innerDiv1");
-    var innerDiv2 = document.getElementById("innerDiv2");
-    var innerDiv3 = document.getElementById("innerDiv3");
-    var innerDiv4 = document.getElementById("innerDiv4");
-    var innerDiv5 = document.getElementById("innerDiv5");
-
-    if (selected_text == 'wso2event') {
-        innerDiv1.style.display = "";
-        innerDiv2.style.display = "none";
-        innerDiv3.style.display = "none";
-        innerDiv4.style.display = "none";
-        innerDiv5.style.display = "none";
-    }
-
-    else if (selected_text == 'text') {
-        innerDiv1.style.display = "none";
-        innerDiv2.style.display = "";
-        innerDiv3.style.display = "none";
-        innerDiv4.style.display = "none";
-        innerDiv5.style.display = "none";
-    }
-
-    else if (selected_text == 'xml') {
-        innerDiv1.style.display = "none";
-        innerDiv2.style.display = "none";
-        innerDiv3.style.display = "";
-        innerDiv4.style.display = "none";
-        innerDiv5.style.display = "none";
-    }
-
-    else if (selected_text == 'map') {
-        innerDiv1.style.display = "none";
-        innerDiv2.style.display = "none";
-        innerDiv3.style.display = "none";
-        innerDiv4.style.display = "";
-        innerDiv5.style.display = "none";
-    }
-    else if (selected_text == 'json') {
-        innerDiv1.style.display = "none";
-        innerDiv2.style.display = "none";
-        innerDiv3.style.display = "none";
-        innerDiv4.style.display = "none";
-        innerDiv5.style.display = "";
-    }
 
 }
 

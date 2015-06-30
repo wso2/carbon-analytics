@@ -17,13 +17,13 @@ package org.wso2.carbon.event.input.adapter.wso2event;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.input.adapter.core.EventAdapterConstants;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
 import org.wso2.carbon.event.input.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.input.adapter.wso2event.internal.ds.WSO2EventAdapterServiceValueHolder;
-import org.wso2.carbon.event.input.adapter.wso2event.internal.util.WSO2EventAdapterConstants;
 
 import java.util.Map;
 
@@ -52,18 +52,30 @@ public final class WSO2EventAdapter implements InputEventAdapter {
     @Override
     public void connect() {
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
-        WSO2EventAdapterServiceValueHolder.registerAdapterService(tenantDomain, this);
+        String streamId = eventAdapterConfiguration.getInputStreamIdOfWso2eventMessageFormat();
+        WSO2EventAdapterServiceValueHolder.registerAdapterService(tenantDomain,streamId, this);
     }
 
     @Override
     public void disconnect() {
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
-        WSO2EventAdapterServiceValueHolder.unregisterAdapterService(tenantDomain, this);
+        String streamId = eventAdapterConfiguration.getInputStreamIdOfWso2eventMessageFormat();
+        WSO2EventAdapterServiceValueHolder.unregisterAdapterService(tenantDomain, streamId, this);
     }
 
     @Override
     public void destroy() {
 
+    }
+
+    @Override
+    public boolean isEventDuplicatedInCluster() {
+        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER));
+    }
+
+    @Override
+    public boolean isPolling() {
+        return false;
     }
 
     public String getEventAdapterName() {

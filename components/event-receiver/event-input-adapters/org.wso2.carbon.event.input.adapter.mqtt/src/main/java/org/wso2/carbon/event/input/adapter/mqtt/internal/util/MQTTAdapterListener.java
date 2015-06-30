@@ -48,8 +48,12 @@ public class MQTTAdapterListener implements MqttCallback, Runnable {
                                String topic, String mqttClientId,
                                InputEventAdapterListener inputEventAdapterListener, int tenantId) {
 
-        this.mqttBrokerConnectionConfiguration = mqttBrokerConnectionConfiguration;
+        if(mqttClientId == null || mqttClientId.trim().isEmpty()){
+            mqttClientId = MqttClient.generateClientId();
+        }
+
         this.mqttClientId = mqttClientId;
+        this.mqttBrokerConnectionConfiguration = mqttBrokerConnectionConfiguration;
         this.cleanSession = mqttBrokerConnectionConfiguration.isCleanSession();
         this.keepAlive = mqttBrokerConnectionConfiguration.getKeepAlive();
         this.topic = topic;
@@ -107,14 +111,14 @@ public class MQTTAdapterListener implements MqttCallback, Runnable {
 
     }
 
-    public void stopListener(String adapterName) throws InputEventAdapterRuntimeException {
+    public void stopListener(String adapterName) {
         if (connectionSucceeded) {
             try {
                 // Disconnect to the MQTT server
                 mqttClient.unsubscribe(topic);
                 mqttClient.disconnect(3000);
             } catch (MqttException e) {
-                throw new InputEventAdapterRuntimeException("Can not unsubscribe from the destination " + topic
+                log.error("Can not unsubscribe from the destination " + topic
                         + " with the event adapter " + adapterName, e);
             }
         }
@@ -167,9 +171,9 @@ public class MQTTAdapterListener implements MqttCallback, Runnable {
                 connectionSucceeded = true;
                 log.info("MQTT Connection successful");
             } catch (InterruptedException e) {
-                log.error(e.getMessage(), e);
+                log.error("Interruption occurred while waiting for reconnection", e);
             } catch (MqttException e) {
-                log.error(e.getMessage(), e);
+                log.error("MQTT Exception occurred when starting listener", e);
 
             }
 

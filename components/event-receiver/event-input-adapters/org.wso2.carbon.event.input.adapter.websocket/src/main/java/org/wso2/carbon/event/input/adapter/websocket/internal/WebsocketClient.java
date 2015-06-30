@@ -27,6 +27,7 @@ import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
+import java.io.IOException;
 
 /**
  * An instance of this class is used, when we connect to a user-given socket-server, as a client - to send events.
@@ -35,21 +36,20 @@ public class WebsocketClient extends Endpoint {
 
     private static final Log log = LogFactory.getLog(WebsocketClient.class);
     private InputEventAdapterListener inputEventAdapterListener;
-    private int tenantID;
+    private int tenantId;
 
-    public WebsocketClient(InputEventAdapterListener inputEventAdapterListener) {
+    public WebsocketClient(InputEventAdapterListener inputEventAdapterListener, int tenantId) {
         this.inputEventAdapterListener = inputEventAdapterListener;
-        this.tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        this.tenantId = tenantId;
     }
 
     @Override
-    public void onOpen(Session session, EndpointConfig EndpointConfig) {
-        final EndpointConfig endpointConfig = EndpointConfig;
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
         session.addMessageHandler(new MessageHandler.Whole<String>() {
             @Override
             public void onMessage(String message) {
                 PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantID);
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
                     if (log.isDebugEnabled()){
                         log.debug("Received message: '" + message);
                     }
@@ -64,12 +64,22 @@ public class WebsocketClient extends Endpoint {
         if (log.isDebugEnabled()){
             log.debug("Input ws-adaptor: WebsocketClient Endpoint closed: "+closeReason.toString()+"for request URI - "+session.getRequestURI());
         }
+        try {
+            session.close();
+        } catch (IOException e) {
+            log.error("Error occurred during closing session. Session ID:"+session.getId()+", for request URI - "+session.getRequestURI()+", Reason: "+e.getMessage(), e);
+        }
     }
 
 
     @Override
     public void onError(Session session, Throwable thr) {
-        log.error("Error occured during session ID:"+session.getId()+", for request URI - "+session.getRequestURI()+", Reason: "+thr);
+        log.error("Error occurred during session ID:"+session.getId()+", for request URI - "+session.getRequestURI()+", Reason: "+thr, thr);
+        try {
+            session.close();
+        } catch (IOException e) {
+            log.error("Error occurred during closing session. Session ID:"+session.getId()+", for request URI - "+session.getRequestURI()+", Reason: "+e.getMessage(), e);
+        }
     }
 
 }

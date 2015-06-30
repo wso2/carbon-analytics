@@ -18,8 +18,6 @@
 package org.wso2.carbon.event.input.adapter.email;
 
 import org.wso2.carbon.event.input.adapter.core.*;
-import org.wso2.carbon.event.input.adapter.core.MessageType;
-import org.wso2.carbon.event.input.adapter.core.Property;
 import org.wso2.carbon.event.input.adapter.email.internal.util.EmailEventAdapterConstants;
 
 import java.util.*;
@@ -40,7 +38,6 @@ public class EmailEventAdapterFactory extends InputEventAdapterFactory {
 
         supportInputMessageTypes.add(MessageType.XML);
         supportInputMessageTypes.add(MessageType.JSON);
-        supportInputMessageTypes.add(MessageType.MAP);
         supportInputMessageTypes.add(MessageType.TEXT);
 
         return supportInputMessageTypes;
@@ -58,6 +55,52 @@ public class EmailEventAdapterFactory extends InputEventAdapterFactory {
         emailAddress.setHint(resourceBundle.getString(
                 EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_ADDRESS_HINT));
         propertyList.add(emailAddress);
+
+        // set receiving mail username
+        Property userName = new Property(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_USERNAME);
+        userName.setDisplayName(
+                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_USERNAME));
+        userName.setRequired(true);
+        userName.setHint(
+                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_USERNAME_HINT));
+        propertyList.add(userName);
+
+        // set receiving mail password
+        Property password = new Property(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PASSWORD);
+        password.setDisplayName(
+                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PASSWORD));
+        password.setRequired(true);
+        password.setSecured(true);
+        password.setHint(
+                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PASSWORD_HINT));
+        propertyList.add(password);
+
+        // set incoming email subject
+        Property subject = new Property(EmailEventAdapterConstants.ADAPTER_MESSAGE_RECEIVING_EMAIL_SUBJECT);
+        subject.setDisplayName(
+                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_MESSAGE_RECEIVING_EMAIL_SUBJECT));
+        subject.setRequired(true);
+        subject.setHint(resourceBundle.getString(
+                EmailEventAdapterConstants.ADAPTER_MESSAGE_RECEIVING_EMAIL_SUBJECT_HINT));
+        propertyList.add(subject);
+
+        // set receiving mail host
+        Property host = new Property(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_HOST);
+        host.setDisplayName(
+                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_HOST));
+        host.setRequired(true);
+        host.setHint(
+                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_HOST_HINT));
+        propertyList.add(host);
+
+        // set receiving mail host
+        Property port = new Property(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_PORT);
+        port.setDisplayName(
+                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_PORT));
+        port.setRequired(true);
+        port.setHint(
+                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_PORT_HINT));
+        propertyList.add(port);
 
         // set receiving mail protocol
         Property protocol = new Property(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL);
@@ -79,75 +122,12 @@ public class EmailEventAdapterFactory extends InputEventAdapterFactory {
                 EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_POLL_INTERVAL_HINT));
         propertyList.add(pollInterval);
 
-        // set receiving mail host
-        Property host = new Property(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_HOST);
-        host.setDisplayName(
-                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_HOST));
-        host.setRequired(true);
-        host.setHint(
-                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_HOST_HINT));
-        propertyList.add(host);
-
-        // set receiving mail host
-        Property port = new Property(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_PORT);
-        port.setDisplayName(
-                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_PORT));
-        port.setRequired(true);
-        port.setHint(
-                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_PORT_HINT));
-        propertyList.add(port);
-
-        // set receiving mail username
-        Property userName = new Property(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_USERNAME);
-        userName.setDisplayName(
-                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_USERNAME));
-        userName.setRequired(true);
-        userName.setHint(
-                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_USERNAME_HINT));
-        propertyList.add(userName);
-
-        // set receiving mail password
-        Property password = new Property(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PASSWORD);
-        password.setDisplayName(
-                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PASSWORD));
-        password.setRequired(true);
-        password.setSecured(true);
-        password.setHint(
-                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PASSWORD_HINT));
-        propertyList.add(password);
-
-        // set receiving mail socket factory class
-        Property socketFactoryClass = new Property(
-                EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_SOCKET_FACTORY_CLASS);
-        socketFactoryClass.setDisplayName(
-                resourceBundle.getString(
-                        EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_SOCKET_FACTORY_CLASS));
-        socketFactoryClass.setRequired(true);
-        propertyList.add(socketFactoryClass);
-
-        // set receiving mail socket factory fallback
-        Property socketFactoryFallback = new Property(
-                EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_SOCKET_FACTORY_FALLBACK);
-        socketFactoryFallback.setDisplayName(
-                resourceBundle.getString(
-                        EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_SOCKET_FACTORY_FALLBACK));
-        socketFactoryFallback.setRequired(true);
-        socketFactoryFallback.setOptions(new String[]{"true", "false"});
-        socketFactoryFallback.setDefaultValue("false");
-        propertyList.add(socketFactoryFallback);
-
-        // set incoming email subject
-        Property subject = new Property(EmailEventAdapterConstants.ADAPTER_MESSAGE_RECEIVING_EMAIL_SUBJECT);
-        subject.setDisplayName(
-                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_MESSAGE_RECEIVING_EMAIL_SUBJECT));
-        subject.setRequired(true);
-        subject.setHint(resourceBundle.getString(
-                EmailEventAdapterConstants.ADAPTER_MESSAGE_RECEIVING_EMAIL_SUBJECT_HINT));
-
-        propertyList.add(subject);
-
-
         return propertyList;
+    }
+
+    @Override
+    public String getUsageTips() {
+        return null;
     }
 
     @Override
@@ -155,4 +135,5 @@ public class EmailEventAdapterFactory extends InputEventAdapterFactory {
                                                 Map<String, String> globalProperties) {
         return new EmailEventAdapter(eventAdapterConfiguration, globalProperties);
     }
+
 }

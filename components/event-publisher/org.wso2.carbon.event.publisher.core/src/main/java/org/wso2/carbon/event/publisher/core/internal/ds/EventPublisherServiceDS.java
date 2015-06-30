@@ -19,9 +19,11 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
+import org.wso2.carbon.event.processor.manager.core.EventManagementService;
 import org.wso2.carbon.event.publisher.core.EventPublisherService;
 import org.wso2.carbon.event.publisher.core.EventStreamListenerImpl;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
+import org.wso2.carbon.event.publisher.core.internal.CarbonEventPublisherManagementService;
 import org.wso2.carbon.event.publisher.core.internal.CarbonEventPublisherService;
 import org.wso2.carbon.event.statistics.EventStatisticsService;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
@@ -30,8 +32,7 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -42,6 +43,9 @@ import java.util.List;
  * @scr.reference name="output.event.adapter.tracker.service"
  * interface="org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory" cardinality="0..n"
  * policy="dynamic" bind="setEventAdapterType" unbind="unSetEventAdapterType"
+ * @scr.reference name="eventManagement.service"
+ * interface="org.wso2.carbon.event.processor.manager.core.EventManagementService" cardinality="1..1"
+ * policy="dynamic" bind="setEventManagementService" unbind="unsetEventManagementService"
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService"
  * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
@@ -58,12 +62,15 @@ import java.util.List;
 public class EventPublisherServiceDS {
     private static final Log log = LogFactory.getLog(EventPublisherServiceDS.class);
 
-    public static List<String> outputEventAdapterTypes = new ArrayList<String>();
-
     protected void activate(ComponentContext context) {
         try {
             CarbonEventPublisherService carbonEventPublisherService = new CarbonEventPublisherService();
             EventPublisherServiceValueHolder.registerPublisherService(carbonEventPublisherService);
+
+            CarbonEventPublisherManagementService carbonEventPublisherManagementService = new CarbonEventPublisherManagementService();
+            EventPublisherServiceValueHolder.getEventManagementService().subscribe(carbonEventPublisherManagementService);
+            EventPublisherServiceValueHolder.registerPublisherManagementService(carbonEventPublisherManagementService);
+
             context.getBundleContext().registerService(EventPublisherService.class.getName(), carbonEventPublisherService, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed EventPublisherService");
@@ -79,6 +86,7 @@ public class EventPublisherServiceDS {
     }
 
     private void activateInactiveEventPublisherConfigurations(CarbonEventPublisherService carbonEventPublisherService) {
+        Set<String> outputEventAdapterTypes = EventPublisherServiceValueHolder.getOutputEventAdapterTypes();
         outputEventAdapterTypes.addAll(EventPublisherServiceValueHolder.getOutputEventAdapterService().getOutputEventAdapterTypes());
         for (String type : outputEventAdapterTypes) {
             try {
@@ -87,7 +95,6 @@ public class EventPublisherServiceDS {
                 log.error(e.getMessage(), e);
             }
         }
-        outputEventAdapterTypes.clear();
     }
 
     protected void setEventAdapterService(
@@ -96,7 +103,8 @@ public class EventPublisherServiceDS {
     }
 
     protected void unsetEventAdapterService(
-            OutputEventAdapterService eventAdapterService) {
+            OutputEventAdapterService outputEventAdapterService) {
+        EventPublisherServiceValueHolder.getOutputEventAdapterTypes().clear();
         EventPublisherServiceValueHolder.registerEventAdapterService(null);
     }
 
@@ -125,21 +133,18 @@ public class EventPublisherServiceDS {
     }
 
     protected void setEventAdapterType(OutputEventAdapterFactory outputEventAdapterFactory) {
-
+        EventPublisherServiceValueHolder.addOutputEventAdapterType(outputEventAdapterFactory.getType());
         if (EventPublisherServiceValueHolder.getCarbonEventPublisherService() != null) {
             try {
                 EventPublisherServiceValueHolder.getCarbonEventPublisherService().activateInactiveEventPublisherConfigurationsForAdapter(outputEventAdapterFactory.getType());
             } catch (EventPublisherConfigurationException e) {
                 log.error(e.getMessage(), e);
             }
-        } else {
-            outputEventAdapterTypes.add(outputEventAdapterFactory.getType());
         }
-
     }
 
     protected void unSetEventAdapterType(OutputEventAdapterFactory outputEventAdapterFactory) {
-
+        EventPublisherServiceValueHolder.removeOutputEventAdapterType(outputEventAdapterFactory.getType());
         if (EventPublisherServiceValueHolder.getCarbonEventPublisherService() != null) {
             try {
                 EventPublisherServiceValueHolder.getCarbonEventPublisherService().deactivateActiveEventPublisherConfigurationsForAdapter(outputEventAdapterFactory.getType());
@@ -160,5 +165,17 @@ public class EventPublisherServiceDS {
         EventPublisherServiceValueHolder.setConfigurationContextService(null);
 
     }
+
+    protected void setEventManagementService(EventManagementService eventManagementService) {
+        EventPublisherServiceValueHolder.registerEventManagementService(eventManagementService);
+
+    }
+
+    protected void unsetEventManagementService(EventManagementService eventManagementService) {
+        EventPublisherServiceValueHolder.registerEventManagementService(null);
+        eventManagementService.unsubscribe(EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService());
+
+    }
+
 
 }

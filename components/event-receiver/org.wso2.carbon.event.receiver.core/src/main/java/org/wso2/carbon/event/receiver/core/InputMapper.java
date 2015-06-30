@@ -20,11 +20,11 @@ import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingExce
 
 public interface InputMapper {
     /**
-     * Converts the passed in object and returns an object array(s) with attributes as array elements.
+     * Converts the passed in object and returns Siddhi Event or an array of Siddhi events.
      * The conversion will happen according to a predefined mapping
      *
      * @param obj the object to be converted
-     * @return the converted object. This can be an object array or an array of object arrays
+     * @return the converted object. This can be a Siddhi Event or an array of Siddhi events
      *         in the case of the mapper supporting processing of batched events
      * @throws EventReceiverConfigurationException
      *
@@ -32,12 +32,12 @@ public interface InputMapper {
     public Object convertToMappedInputEvent(Object obj) throws EventReceiverProcessingException;
 
     /**
-     * Converts the passed in object and returns an object array(s) with attributes as array elements.
+     * Converts the passed in object and returns Siddhi Event or an array of Siddhi events.
      * The conversion will happen based on the mapping type where all incoming attributes of an event
      * will be passed directly to consumers of event receiver without any mapping happening.
      *
      * @param obj the object to be converted
-     * @return the converted object. This can be an object array or an array of object arrays
+     * @return the converted object. This can be a Siddhi Event or an array of Siddhi events
      *         in the case of the mapper supporting processing of batched events
      * @throws EventReceiverConfigurationException
      *

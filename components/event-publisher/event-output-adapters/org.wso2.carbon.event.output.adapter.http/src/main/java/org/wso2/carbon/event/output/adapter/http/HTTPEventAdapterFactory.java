@@ -42,7 +42,32 @@ public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
 
     @Override
     public List<Property> getStaticPropertyList() {
-        return null;
+
+        List<Property> staticPropertyList = new ArrayList<Property>();
+
+        Property proxyHostProp = new Property(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
+        proxyHostProp.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST));
+        proxyHostProp.setHint(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST_HINT));
+        proxyHostProp.setRequired(false);
+
+        Property proxyPortProp = new Property(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
+        proxyPortProp.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT));
+        proxyPortProp.setHint(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT_HINT));
+        proxyPortProp.setRequired(false);
+
+        Property clientMethod = new Property(HTTPEventAdapterConstants.ADAPTER_HTTP_CLIENT_METHOD);
+        clientMethod.setDisplayName(
+                resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_HTTP_CLIENT_METHOD));
+        clientMethod.setRequired(true);
+        clientMethod.setOptions(new String[]{HTTPEventAdapterConstants.CONSTANT_HTTP_POST, HTTPEventAdapterConstants.CONSTANT_HTTP_PUT});
+        clientMethod.setDefaultValue(HTTPEventAdapterConstants.CONSTANT_HTTP_POST);
+
+        staticPropertyList.add(proxyHostProp);
+        staticPropertyList.add(proxyPortProp);
+        staticPropertyList.add(clientMethod);
+
+        return staticPropertyList;
+
     }
 
     @Override
@@ -70,24 +95,17 @@ public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
         headersProp.setHint(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_HEADERS_HINT));
         headersProp.setRequired(false);
 
-        Property proxyHostProp = new Property(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
-        proxyHostProp.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST));
-        proxyHostProp.setHint(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST_HINT));
-        proxyHostProp.setRequired(false);
-
-        Property proxyPortProp = new Property(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
-        proxyPortProp.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT));
-        proxyPortProp.setHint(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT_HINT));
-        proxyPortProp.setRequired(false);
-
         dynamicPropertyList.add(urlProp);
         dynamicPropertyList.add(usernameProp);
         dynamicPropertyList.add(passwordProp);
         dynamicPropertyList.add(headersProp);
-        dynamicPropertyList.add(proxyHostProp);
-        dynamicPropertyList.add(proxyPortProp);
 
         return dynamicPropertyList;
+    }
+
+    @Override
+    public String getUsageTips() {
+        return null;
     }
 
     @Override

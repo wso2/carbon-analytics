@@ -32,7 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class UIEventAdapterFactory extends OutputEventAdapterFactory{
+public class UIEventAdapterFactory extends OutputEventAdapterFactory {
 
     private ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.ui.i18n" +
             ".Resources", Locale.getDefault());
@@ -51,21 +51,7 @@ public class UIEventAdapterFactory extends OutputEventAdapterFactory{
 
     @Override
     public List<Property> getStaticPropertyList() {
-        List<Property> staticPropertyList = new ArrayList<Property>();
-
-        Property outputStreamName = new Property(UIEventAdapterConstants.ADAPTER_UI_OUTPUT_STREAM_NAME);
-        outputStreamName.setDisplayName(
-                resourceBundle.getString(UIEventAdapterConstants.ADAPTER_UI_OUTPUT_STREAM_NAME));
-        outputStreamName.setRequired(true);
-        staticPropertyList.add(outputStreamName);
-
-        Property outputStreamVersion = new Property(UIEventAdapterConstants.ADAPTER_UI_OUTPUT_STREAM_VERSION);
-        outputStreamVersion.setDisplayName(
-                resourceBundle.getString(UIEventAdapterConstants.ADAPTER_UI_OUTPUT_STREAM_VERSION));
-        outputStreamVersion.setRequired(false);
-        staticPropertyList.add(outputStreamVersion);
-
-        return staticPropertyList;
+        return null;
     }
 
     @Override
@@ -74,8 +60,13 @@ public class UIEventAdapterFactory extends OutputEventAdapterFactory{
     }
 
     @Override
+    public String getUsageTips() {
+        return resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_UI);
+    }
+
+    @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
-            Map<String, String> globalProperties) {
-        return new UIEventAdapter(eventAdapterConfiguration,globalProperties);
+                                                 Map<String, String> globalProperties) {
+        return new UIEventAdapter(eventAdapterConfiguration, globalProperties);
     }
 }

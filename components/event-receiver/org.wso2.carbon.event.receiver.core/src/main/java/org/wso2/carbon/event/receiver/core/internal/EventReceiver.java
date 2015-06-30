@@ -19,29 +19,37 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSubscription;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
+import org.wso2.carbon.event.processor.manager.core.EventManagementUtil;
+import org.wso2.carbon.event.processor.manager.core.EventSync;
+import org.wso2.carbon.event.processor.manager.core.Manager;
+import org.wso2.carbon.event.processor.manager.core.config.Mode;
+import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
-import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingException;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
+import org.wso2.carbon.event.receiver.core.internal.management.AbstractInputEventDispatcher;
+import org.wso2.carbon.event.receiver.core.internal.management.InputEventDispatcher;
+import org.wso2.carbon.event.receiver.core.internal.management.QueueInputEventDispatcher;
 import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
 import org.wso2.carbon.event.statistics.EventStatisticsMonitor;
 import org.wso2.carbon.event.stream.core.EventProducer;
 import org.wso2.carbon.event.stream.core.EventProducerCallback;
+import org.wso2.siddhi.core.event.Event;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 public class EventReceiver implements EventProducer {
 
     private static final Log log = LogFactory.getLog(EventReceiver.class);
+    private boolean isEventDuplicatedInCluster;
     private boolean traceEnabled = false;
     private boolean statisticsEnabled = false;
     private boolean customMappingEnabled = false;
@@ -52,10 +60,11 @@ public class EventReceiver implements EventProducer {
     private EventStatisticsMonitor statisticsMonitor;
     private String beforeTracerPrefix;
     private String afterTracerPrefix;
-    private EventProducerCallback callBack;
+    private AbstractInputEventDispatcher inputEventDispatcher;
+    private Mode mode;
 
     public EventReceiver(EventReceiverConfiguration eventReceiverConfiguration,
-                         StreamDefinition exportedStreamDefinition)
+                         StreamDefinition exportedStreamDefinition, Mode mode)
             throws EventReceiverConfigurationException {
         this.eventReceiverConfiguration = eventReceiverConfiguration;
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -85,26 +94,42 @@ public class EventReceiver implements EventProducer {
                         tenantId, EventReceiverConstants.EVENT_RECEIVER, eventReceiverConfiguration.getEventReceiverName(), null);
             }
             if (traceEnabled) {
-                this.beforeTracerPrefix = "TenantId=" + tenantId + " : " + EventReceiverConstants.EVENT_RECEIVER + " : "
+                this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventReceiverConstants.EVENT_RECEIVER + " : "
                         + eventReceiverConfiguration.getEventReceiverName() + ", before processing " + System.getProperty("line.separator");
-                this.afterTracerPrefix = "TenantId=" + tenantId + " : " + EventReceiverConstants.EVENT_RECEIVER + " : "
-                        + eventReceiverConfiguration.getEventReceiverName() + " : " + EventReceiverConstants.EVENT_STREAM + " : "
-                        + EventReceiverUtil.getExportedStreamIdFrom(eventReceiverConfiguration) + " , after processing " + System.getProperty("line.separator");
+                this.afterTracerPrefix = "TenantId : " + tenantId + ", " + EventReceiverConstants.EVENT_RECEIVER + " : "
+                        + eventReceiverConfiguration.getEventReceiverName() + ", " + EventReceiverConstants.EVENT_STREAM + " : "
+                        + EventReceiverUtil.getExportedStreamIdFrom(eventReceiverConfiguration) + ", after processing " + System.getProperty("line.separator");
             }
 
             String inputEventAdapterName = eventReceiverConfiguration.getFromAdapterConfiguration().getName();
             try {
+                InputEventAdapterSubscription inputEventAdapterSubscription;
                 if (this.customMappingEnabled) {
-                    EventReceiverServiceValueHolder.getInputEventAdapterService().create(
-                            eventReceiverConfiguration.getFromAdapterConfiguration(), new MappedEventSubscription());
+                    inputEventAdapterSubscription = new MappedEventSubscription();
                 } else {
-                    EventReceiverServiceValueHolder.getInputEventAdapterService().create(
-                            eventReceiverConfiguration.getFromAdapterConfiguration(), new TypedEventSubscription());
+                    inputEventAdapterSubscription = new TypedEventSubscription();
                 }
+                EventReceiverServiceValueHolder.getInputEventAdapterService().create(
+                        eventReceiverConfiguration.getFromAdapterConfiguration(), inputEventAdapterSubscription);
+
+                isEventDuplicatedInCluster = EventReceiverServiceValueHolder.getInputEventAdapterService().isEventDuplicatedInCluster(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
             } catch (InputEventAdapterException e) {
-                throw new EventReceiverConfigurationException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error in configuration.", e);
+                throw new EventReceiverConfigurationException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error in configuration. " + e.getMessage(), e);
             } catch (InputEventAdapterRuntimeException e) {
-                throw new EventReceiverProcessingException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error while connecting by adapter.", e);
+                throw new EventReceiverProcessingException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error while connecting by adapter. " + e.getMessage(), e);
+            }
+            this.mode = mode;
+            if (mode == Mode.HA) {
+                Lock readLock = EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().getReadLock();
+                inputEventDispatcher = new QueueInputEventDispatcher(tenantId, EventManagementUtil.constructEventSyncId(tenantId, eventReceiverConfiguration.getEventReceiverName(), Manager.ManagerType.Receiver), readLock, exportedStreamDefinition);
+                inputEventDispatcher.setSendToOther(!isEventDuplicatedInCluster);
+                EventReceiverServiceValueHolder.getEventManagementService().registerEventSync((EventSync) inputEventDispatcher);
+            } else {
+                inputEventDispatcher = new InputEventDispatcher();
+            }
+
+            if (mode == Mode.HA && isEventDuplicatedInCluster) {
+                EventReceiverServiceValueHolder.getInputEventAdapterService().start(inputEventAdapterName);
             }
         }
     }
@@ -139,26 +164,36 @@ public class EventReceiver implements EventProducer {
             trace.info(beforeTracerPrefix + object.toString());
         }
 
-        try {
-            if (object instanceof List) {
-                sendEventList((List<Event>) object);
-            } else {
-                Object convertedEvent = this.inputMapper.convertToMappedInputEvent(object);
-                if (convertedEvent != null) {
-                    if (convertedEvent instanceof Object[][]) {
-                        Object[][] arrayOfEvents = (Object[][]) convertedEvent;
-                        for (Object[] outObjArray : arrayOfEvents) {
-                            sendEvent(outObjArray);
-                        }
-                    } else {
-                        sendEvent((Object[]) convertedEvent);
-                    }
-                } else {
-                    log.warn("Dropping the empty/null event, Event does not matched with mapping");
+        if (object instanceof List) {
+            for (Object obj : (List) object) {
+                try {
+                    processMappedEvent(obj);
+                } catch (EventReceiverProcessingException e) {
+                    log.error("Dropping event. Error processing event : ", e);
                 }
             }
-        } catch (EventReceiverProcessingException e) {
-            log.error("Dropping event, Error processing event : " + e.getMessage(), e);
+        } else {
+            try {
+                Object convertedEvent = this.inputMapper.convertToMappedInputEvent(object);
+                if (convertedEvent != null) {
+                    if (convertedEvent instanceof Event[]) {
+                        Event[] arrayOfEvents = (Event[]) convertedEvent;
+                        for (Event event : arrayOfEvents) {
+                            if (event != null) {
+                                sendEvent(event);
+                            }
+                        }
+                    } else {
+                        sendEvent((Event) convertedEvent);
+                    }
+                } else {
+                    log.warn("Dropping the empty/null event, Event does not match with mapping");
+                }
+            } catch (EventReceiverProcessingException e) {
+                log.error("Dropping event. Error processing event : ", e);
+            } catch (RuntimeException e) {
+                log.error("Dropping event. Unexpected error while processing event : " + e.getMessage(), e);
+            }
         }
 
     }
@@ -167,44 +202,51 @@ public class EventReceiver implements EventProducer {
         if (traceEnabled) {
             trace.info(beforeTracerPrefix + obj.toString());
         }
-        Object convertedEvent = null;
-        try {
-            if (obj instanceof List) {
-                sendEventList((List<Event>) obj);
-            } else {
-                convertedEvent = this.inputMapper.convertToTypedInputEvent(obj);
-                if (convertedEvent instanceof Object[][]) {
-                    Object[][] arrayOfEvents = (Object[][]) convertedEvent;
-                    for (Object[] outObjArray : arrayOfEvents) {
-                        sendEvent(outObjArray);
-                    }
-                } else {
-                    sendEvent((Object[]) convertedEvent);
+        if (obj instanceof List) {
+            for (Object object : (List) obj) {
+                try {
+                    processTypedEvent(object);
+                } catch (EventReceiverProcessingException e) {
+                    log.error("Dropping event. Error processing event: " + e.getMessage(), e);
                 }
             }
-        } catch (EventReceiverProcessingException e) {
-            log.error("Dropping event, Error processing event: " + e.getMessage(), e);
+        } else {
+            try {
+                Object convertedEvent = this.inputMapper.convertToTypedInputEvent(obj);
+                if (convertedEvent != null) {
+                    if (convertedEvent instanceof Event[]) {
+                        Event[] arrayOfEvents = (Event[]) convertedEvent;
+                        for (Event event : arrayOfEvents) {
+                            if (event != null) {
+                                sendEvent(event);
+                            }
+                        }
+                    } else {
+                        sendEvent((Event) convertedEvent);
+                    }
+                }
+            } catch (EventReceiverProcessingException e) {
+                log.error("Dropping event. Error processing event: " + e.getMessage(), e);
+            }
         }
     }
 
-    protected void sendEvent(Object[] outObjArray) {
+    protected void sendEvent(Event event) {
         if (traceEnabled) {
-            trace.info(afterTracerPrefix + Arrays.toString(outObjArray));
+            trace.info(afterTracerPrefix + event);
         }
         if (statisticsEnabled) {
             statisticsMonitor.incrementRequest();
         }
-        this.callBack.sendEventData(outObjArray);
+        //in distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator
+        if (!(mode == Mode.Distributed) || !isEventDuplicatedInCluster || EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator()) {
+            this.inputEventDispatcher.onEvent(event);
+        }
+
     }
 
-    protected void sendEventList(List<Event> events) {
-        if (traceEnabled) {
-            trace.info(afterTracerPrefix + events);
-        }
-        if (statisticsEnabled) {
-            statisticsMonitor.incrementRequest();
-        }
-        this.callBack.sendEvents(events);
+    public AbstractInputEventDispatcher getInputEventDispatcher() {
+        return inputEventDispatcher;
     }
 
     protected void defineEventStream(Object definition) throws EventReceiverConfigurationException {
@@ -232,13 +274,18 @@ public class EventReceiver implements EventProducer {
 
     @Override
     public void setCallBack(EventProducerCallback callBack) {
-        this.callBack = callBack;
+        this.inputEventDispatcher.setCallBack(callBack);
     }
 
     public void destroy() {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         EventReceiverServiceValueHolder.getInputEventAdapterService().destroy(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
+        if (inputEventDispatcher instanceof EventSync) {
+            EventReceiverServiceValueHolder.getEventManagementService().unregisterEventSync(((EventSync) inputEventDispatcher).getStreamDefinition().getId());
+        }
+    }
 
+    public boolean isEventDuplicatedInCluster() {
+        return isEventDuplicatedInCluster;
     }
 
     private class MappedEventSubscription implements InputEventAdapterSubscription {

@@ -23,6 +23,7 @@ import org.wso2.carbon.event.publisher.core.config.OutputMapping;
 import org.wso2.carbon.event.publisher.core.config.mapping.WSO2EventOutputMapping;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherValidationException;
+import org.wso2.carbon.event.publisher.core.internal.EventPublisher;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -53,6 +54,11 @@ public class WSO2EventOutputMapperConfigurationBuilder {
                 throw new EventPublisherConfigurationException("WS02Event Mapping is not valid, check the output mapping");
             }
             wso2EventOutputMapping.setCustomMappingEnabled(true);
+
+            OMElement toOMElement = mappingElement.getFirstChildWithName(new QName(EventPublisherConstants.EF_CONF_NS, EventPublisherConstants.EF_ELEMENT_TO));
+            wso2EventOutputMapping.setToEventName(toOMElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_STREAM_NAME)));
+            wso2EventOutputMapping.setToEventVersion(toOMElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_VERSION)));
+
 
             OMElement metaMappingElement = mappingElement.getFirstChildWithName(
                     new QName(EventPublisherConstants.EF_CONF_NS, EventPublisherConstants.EF_ELE_TO_METADATA_PROPERTY));
@@ -121,6 +127,8 @@ public class WSO2EventOutputMapperConfigurationBuilder {
         supportedChildTags.add(EventPublisherConstants.EF_ELE_TO_METADATA_PROPERTY);
         supportedChildTags.add(EventPublisherConstants.EF_ELE_TO_CORRELATION_PROPERTY);
         supportedChildTags.add(EventPublisherConstants.EF_ELE_TO_PAYLOAD_PROPERTY);
+        supportedChildTags.add(EventPublisherConstants.EF_ELE_TO_PAYLOAD_PROPERTY);
+        supportedChildTags.add(EventPublisherConstants.EF_ELEMENT_TO);
 
         int count = 0;
         Iterator<OMElement> mappingIterator = omElement.getChildElements();
@@ -156,6 +164,11 @@ public class WSO2EventOutputMapperConfigurationBuilder {
         if (wso2EventOutputMapping.isCustomMappingEnabled()) {
             mappingOMElement.addAttribute(EventPublisherConstants.EF_ATTR_CUSTOM_MAPPING, EventPublisherConstants.ENABLE_CONST, null);
 
+            OMElement toOMElement = factory.createOMElement(new QName(EventPublisherConstants.EF_ELEMENT_TO));
+            toOMElement.setNamespace(mappingOMElement.getDefaultNamespace());
+            toOMElement.addAttribute(EventPublisherConstants.EF_ATTR_STREAM_NAME, wso2EventOutputMapping.getToEventName(), null);
+            toOMElement.addAttribute(EventPublisherConstants.EF_ATTR_VERSION, wso2EventOutputMapping.getToEventVersion(), null);
+            mappingOMElement.addChild(toOMElement);
 
             if (metaWSO2EventPropertyConfiguration.size() > 0) {
                 OMElement metaOMElement = factory.createOMElement(new QName(EventPublisherConstants.EF_ELE_TO_METADATA_PROPERTY));

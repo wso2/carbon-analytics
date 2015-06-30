@@ -61,8 +61,13 @@ public class SMSEventAdapterFactory extends OutputEventAdapterFactory {
     }
 
     @Override
+    public String getUsageTips() {
+        return null;
+    }
+
+    @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
-        return new SMSEventAdapter(eventAdapterConfiguration,globalProperties);
+        return new SMSEventAdapter(eventAdapterConfiguration, globalProperties);
     }
 
 }

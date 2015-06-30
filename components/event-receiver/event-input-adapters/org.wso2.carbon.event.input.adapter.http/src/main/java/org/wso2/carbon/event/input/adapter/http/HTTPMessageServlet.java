@@ -20,8 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
-import org.wso2.carbon.event.input.adapter.http.internal.HTTPEventAdapterManager;
 import org.wso2.carbon.event.input.adapter.http.internal.ds.HTTPEventAdapterServiceValueHolder;
+import org.wso2.carbon.event.input.adapter.http.internal.util.HTTPEventAdapterConstants;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 public class HTTPMessageServlet extends HttpServlet {
 
@@ -44,12 +43,14 @@ public class HTTPMessageServlet extends HttpServlet {
 
     private static Log log = LogFactory.getLog(HTTPMessageServlet.class);
 
-    private String endpoint = "";
+    private InputEventAdapterListener eventAdaptorListener;
     private int tenantId;
+    private String exposedTransports;
 
-    public HTTPMessageServlet(String endpoint, int tenantId) {
-        this.endpoint = endpoint;
+    public HTTPMessageServlet(InputEventAdapterListener eventAdaptorListener, int tenantId, String exposedTransports) {
+        this.eventAdaptorListener = eventAdaptorListener;
         this.tenantId = tenantId;
+        this.exposedTransports = exposedTransports;
     }
 
     private String[] getUserPassword(HttpServletRequest req) {
@@ -126,57 +127,61 @@ public class HTTPMessageServlet extends HttpServlet {
             log.warn("Event Object is empty/null");
             return;
         }
-        if (req.isSecure()) {
-            int tenantId = this.checkAuthentication(req);
-            if (tenantId == -1) {
-                res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
-                log.error("Authentication failed for the request");
+
+        if(exposedTransports.equalsIgnoreCase(HTTPEventAdapterConstants.HTTPS)){
+            if(! req.isSecure()){
+                res.setStatus(403);
+                log.error("Only Secured endpoint is enabled for requests");
                 return;
-            } else if (tenantId != this.tenantId) {
-                res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
-                log.error("Authentication failed for the request");
+            }else {
+                int tenantId = this.checkAuthentication(req);
+                if (tenantId == -1) {
+                    res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
+                    res.setStatus(401);
+                    log.error("Authentication failed for the request");
+                    return;
+                } else if (tenantId != this.tenantId) {
+                    res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
+                    res.setStatus(401);
+                    log.error("Authentication failed for the request");
+                    return;
+                }
+            }
+        }else if(exposedTransports.equalsIgnoreCase(HTTPEventAdapterConstants.HTTP)){
+            if(req.isSecure()){
+                res.setStatus(403);
+                log.error("Only unsecured endpoint is enabled for requests");
                 return;
             }
+        }else {
+            if(req.isSecure()){
+                int tenantId = this.checkAuthentication(req);
+                if (tenantId == -1) {
+                    res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
+                    res.setStatus(401);
+                    log.error("Authentication failed for the request");
+                    return;
+                } else if (tenantId != this.tenantId) {
+                    res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
+                    res.setStatus(401);
+                    log.error("Authentication failed for the request");
+                    return;
+                }
+            }
+
         }
 
-        List<HTTPEventAdapter> eventAdapters = HTTPEventAdapterManager.ADAPTER_MAP.get(endpoint);
-        if (eventAdapters != null) {
-            for (HTTPEventAdapter eventAdapter : eventAdapters) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Message : " + data);
-                }
-                HTTPEventAdapter.executorService.submit(new HTTPRequestProcessor(eventAdapter.getEventAdaptorListener(), data, tenantId));
-            }
+        if (log.isDebugEnabled()) {
+            log.debug("Message : " + data);
         }
+        HTTPEventAdapter.executorService.submit(new HTTPRequestProcessor(eventAdaptorListener, data, tenantId));
+
     }
 
     @Override
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse res) throws IOException {
-
-        String data = this.inputStreamToString(req.getInputStream());
-        if (data == null) {
-            log.warn("Event Object is empty/null");
-            return;
-        }
-        if (req.isSecure()) {
-            int tenantId = this.checkAuthentication(req);
-            if (tenantId == -1) {
-                res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
-                log.error("Authentication failed for the request");
-                return;
-            }
-        }
-
-        List<HTTPEventAdapter> eventAdapters = HTTPEventAdapterManager.ADAPTER_MAP.get(endpoint);
-        if (eventAdapters != null) {
-            for (HTTPEventAdapter eventAdapter : eventAdapters) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Message : " + data);
-                }
-                HTTPEventAdapter.executorService.submit(new HTTPRequestProcessor(eventAdapter.getEventAdaptorListener(), data, tenantId));
-            }
-        }
+        doPost(req,res);
     }
 
     public class HTTPRequestProcessor implements Runnable {

@@ -39,15 +39,10 @@ public final class EmailEventAdapterConstants {
     public static final String ADAPTER_CONF_RECEIVING_EMAIL_USERNAME_HINT = "mail.protocol.user.hint";
     public static final String ADAPTER_CONF_RECEIVING_EMAIL_PASSWORD = "mail.protocol.password";
     public static final String ADAPTER_CONF_RECEIVING_EMAIL_PASSWORD_HINT = "mail.protocol.password.hint";
-    public static final String ADAPTER_CONF_RECEIVING_EMAIL_SOCKET_FACTORY_CLASS = "mail.protocol.socketFactory.class";
-    public static final String ADAPTER_CONF_RECEIVING_EMAIL_SOCKET_FACTORY_FALLBACK =
-            "mail.protocol.socketFactory.fallback";
-    public static final String ADAPTER_CONF_RECEIVING_EMAIL_TRANSPORT_NAME = "mailto";
     public static final String ADAPTER_MESSAGE_RECEIVING_EMAIL_SUBJECT = "email.in.subject";
     public static final String ADAPTER_MESSAGE_RECEIVING_EMAIL_SUBJECT_HINT = "email.in.subject.hint";
 
-    public static final String BROKER_CONF_EMAIL_PROTOCOL = "transport.mail.Protocol";
-    public static final int AXIS_TIME_INTERVAL_IN_MILLISECONDS = 10000;
-
+    public static final long DEFAULT_EMAIL_POLL_INTERVAL_IN_MINS = 5;
+    public static final String ADAPTER_CONF_MOVE_TO_FOLDER_NAME = "moveToFolderName";
 
 }

@@ -20,8 +20,8 @@ public final class EventPublisherUIConstants {
     }
 
     public static final String STRING_LITERAL_ENABLE = "enable";
-
     public static final String PROPERTY_META_PREFIX = "meta_";
     public static final String PROPERTY_CORRELATION_PREFIX = "correlation_";
+    public static final String STREAM_VERSION_DELIMITER = ":";
 
 }

@@ -53,7 +53,7 @@ public final class EventPublisherConstants {
     public static final String ATTR_TYPE_INTEGER = "int";
     public static final String ATTR_TYPE_LONG = "long";
     public static final String ATTR_TYPE_STRING = "string";
-    public static final String ATTR_TYPE_BOOL = "boolean";
+    public static final String ATTR_TYPE_BOOL = "bool";
     public static final String PROPERTY_META_PREFIX = "meta_";
     public static final String PROPERTY_CORRELATION_PREFIX = "correlation_";
 
@@ -73,6 +73,7 @@ public final class EventPublisherConstants {
     public static final String ENABLE_CONST = "enable";
     public static final String TM_VALUE_DISABLE = "disable";
     public static final String EVENT_PUBLISHER = "Event Publisher";
+    public static final String EVENT_STREAM = "Event Stream";
     public static final String STREAM_ID_SEPERATOR = ":";
     public static final String EF_CONFIG_FILE_EXTENSION_WITH_DOT = ".xml";
     public static final String EF_ATTR_CUSTOM_MAPPING = "customMapping";
@@ -97,6 +98,9 @@ public final class EventPublisherConstants {
     public static final String DEFAULT_STREAM_VERSION = "1.0.0";
 
     public static final String EF_ATTR_ENCRYPTED = "encrypted";
+    public static final String DOUBLE_QUOTE = "\"";
+
+    public static final String EVENT_TRACE_LOGGER = "EVENT_TRACE_LOGGER";
 
 
     private EventPublisherConstants() {

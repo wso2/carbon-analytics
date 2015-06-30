@@ -41,11 +41,28 @@ public class SOAPEventAdapterFactory extends InputEventAdapterFactory {
 
     @Override
     public List<Property> getPropertyList() {
-        return null;
+
+        List<Property> propertyList = new ArrayList<Property>();
+
+        // Transport Exposed
+        Property exposedTransportsProperty = new Property(SOAPEventAdapterConstants.EXPOSED_TRANSPORTS);
+        exposedTransportsProperty.setRequired(true);
+        exposedTransportsProperty.setDisplayName(
+                resourceBundle.getString(SOAPEventAdapterConstants.EXPOSED_TRANSPORTS));
+        exposedTransportsProperty.setOptions(new String[]{SOAPEventAdapterConstants.HTTPS, SOAPEventAdapterConstants.HTTP, SOAPEventAdapterConstants.LOCAL, SOAPEventAdapterConstants.ALL});
+        exposedTransportsProperty.setDefaultValue(SOAPEventAdapterConstants.ALL);
+        propertyList.add(exposedTransportsProperty);
+
+        return propertyList;
+    }
+
+    @Override
+    public String getUsageTips() {
+        return resourceBundle.getString(SOAPEventAdapterConstants.ADAPTER_USAGE_TIPS_SOAP);
     }
 
     @Override
     public InputEventAdapter createEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
-        return new SOAPEventAdapter(eventAdapterConfiguration,globalProperties);
+        return new SOAPEventAdapter(eventAdapterConfiguration, globalProperties);
     }
 }

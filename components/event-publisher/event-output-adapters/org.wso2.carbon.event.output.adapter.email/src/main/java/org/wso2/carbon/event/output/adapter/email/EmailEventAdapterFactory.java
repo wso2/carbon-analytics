@@ -17,8 +17,9 @@
 */
 package org.wso2.carbon.event.output.adapter.email;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.output.adapter.core.*;
-import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants;
 
 import java.util.*;
@@ -26,6 +27,9 @@ import java.util.*;
 public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
     private ResourceBundle resourceBundle =
             ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.email.i18n.Resources", Locale.getDefault());
+
+
+    private static final Log log = LogFactory.getLog(EmailEventAdapterFactory.class);
 
     @Override
     public String getType() {
@@ -55,7 +59,7 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
         emailAddress.setDisplayName(
                 resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_MESSAGE_EMAIL_ADDRESS));
         emailAddress.setRequired(true);
-
+        emailAddress.setHint(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_MESSAGE_EMAIL_ADDRESS_HINT));
 
         // set email subject
         Property subject = new Property(EmailEventAdapterConstants.ADAPTER_MESSAGE_EMAIL_SUBJECT);
@@ -63,15 +67,33 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
                 resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_MESSAGE_EMAIL_SUBJECT));
         subject.setRequired(true);
 
+
+        //set format of the email
+        Property format = new Property(EmailEventAdapterConstants.APAPTER_MESSAGE_EMAIL_TYPE);
+        format.setDisplayName
+                (resourceBundle.getString(EmailEventAdapterConstants.APAPTER_MESSAGE_EMAIL_TYPE));
+        format.setRequired(false);
+        format.setOptions(new String[]{EmailEventAdapterConstants.MAIL_TEXT_PLAIN, EmailEventAdapterConstants.MAIL_TEXT_HTML});
+        format.setDefaultValue(EmailEventAdapterConstants.MAIL_TEXT_PLAIN);
+        format.setHint(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_MESSAGE_EMAIL_TYPE_HINT));
+
+
         dynamicPropertyList.add(emailAddress);
         dynamicPropertyList.add(subject);
+        dynamicPropertyList.add(format);
 
         return dynamicPropertyList;
+    }
+
+    @Override
+    public String getUsageTips() {
+        return null;
     }
 
     @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
             String> globalProperties) {
         return new EmailEventAdapter(eventAdapterConfiguration, globalProperties);
+
     }
 }

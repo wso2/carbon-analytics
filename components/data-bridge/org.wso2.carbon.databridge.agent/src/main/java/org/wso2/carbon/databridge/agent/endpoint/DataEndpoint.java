@@ -28,11 +28,11 @@ import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.SessionTimeoutException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.exception.UndefinedEventTypeException;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeThreadFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Abstract class for DataEndpoint, and this is a main class that needs to be implemented
@@ -50,13 +50,13 @@ public abstract class DataEndpoint {
 
     private int batchSize;
 
-    private AtomicBoolean isPublishing;
-
-    private EventPublisher eventPublisher;
+    private ThreadPoolExecutor threadPoolExecutor;
 
     private DataEndpointFailureCallback dataEndpointFailureCallback;
 
     private ExecutorService connectionService;
+
+    private int maxPoolSize;
 
     private List<Event> events;
 
@@ -69,27 +69,37 @@ public abstract class DataEndpoint {
     public DataEndpoint() {
         this.batchSize = DataEndpointConstants.DEFAULT_DATA_AGENT_BATCH_SIZE;
         this.state = State.UNAVAILABLE;
-        this.isPublishing = new AtomicBoolean(false);
-        eventPublisher = new EventPublisher();
         connectionService = Executors.newSingleThreadExecutor();
-        events = new ArrayList<Event>();
+        events = new ArrayList<>();
     }
 
     void collectAndSend(Event event) {
         events.add(event);
         if (events.size() == batchSize) {
-            this.state = State.BUSY;
-            Thread thread = new Thread(eventPublisher);
-            thread.start();
+            int currentNoOfThreads = threadPoolExecutor.getActiveCount();
+            if (currentNoOfThreads < this.maxPoolSize) {
+                threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
+                events = new ArrayList<>();
+                if (currentNoOfThreads == this.maxPoolSize - 1) {
+                    this.state = State.BUSY;
+                } else {
+                    this.state = State.ACTIVE;
+                }
+            } else {
+                this.state = State.BUSY;
+            }
         }
     }
 
     void flushEvents() {
         if (events.size() != 0) {
-            if (isPublishing.compareAndSet(false, true)) {
-                state = State.BUSY;
-                Thread thread = new Thread(eventPublisher);
-                thread.start();
+            int currentNoOfThreads = threadPoolExecutor.getActiveCount();
+            threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
+            events = new ArrayList<>();
+            if (currentNoOfThreads >= maxPoolSize - 1) {
+                this.state = State.BUSY;
+            } else {
+                this.state = State.ACTIVE;
             }
         }
     }
@@ -110,8 +120,13 @@ public abstract class DataEndpoint {
             TransportException {
         this.transportPool = dataEndpointConfiguration.getTransportPool();
         this.batchSize = dataEndpointConfiguration.getBatchSize();
-        connectionWorker = new DataEndpointConnectionWorker();
-        connectionWorker.initialize(this, dataEndpointConfiguration);
+        this.connectionWorker = new DataEndpointConnectionWorker();
+        this.connectionWorker.initialize(this, dataEndpointConfiguration);
+        this.threadPoolExecutor = new ThreadPoolExecutor(dataEndpointConfiguration.getCorePoolSize(),
+                dataEndpointConfiguration.getMaxPoolSize(), dataEndpointConfiguration.getKeepAliveTimeInPool(),
+                TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DataBridgeThreadFactory
+                (dataEndpointConfiguration.getReceiverURL()));
+        this.maxPoolSize = dataEndpointConfiguration.getCorePoolSize();
         connect();
     }
 
@@ -197,6 +212,12 @@ public abstract class DataEndpoint {
      * Event Publisher worker thread to actually sends the events to the endpoint.
      */
     class EventPublisher implements Runnable {
+        List<Event> events;
+
+        public EventPublisher(List<Event> events) {
+            this.events = events;
+        }
+
         @Override
         public void run() {
             try {
@@ -220,18 +241,17 @@ public abstract class DataEndpoint {
         private void handleFailedEvents() {
             deactivate();
             dataEndpointFailureCallback.tryResendEvents(events);
-            isPublishing.set(false);
         }
 
         private void publish() throws DataEndpointException,
                 SessionTimeoutException,
                 UndefinedEventTypeException {
             Object client = getClient();
-            send(client, events);
-            events.clear();
-            state = State.ACTIVE;
-            isPublishing.set(false);
+            send(client, this.events);
             returnClient(client);
+            if (threadPoolExecutor.getActiveCount() <= maxPoolSize) {
+                state = State.ACTIVE;
+            }
         }
     }
 
@@ -248,7 +268,8 @@ public abstract class DataEndpoint {
      * Graceful shutdown until publish all the events given to the endpoint.
      */
     public void shutdown() {
-        while (state.equals(State.BUSY)) {
+        log.info("Shutting down the data publisher endpoint URL - "+ getDataEndpointConfiguration().getReceiverURL());
+        while (threadPoolExecutor.getActiveCount() != 0) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ignored) {
@@ -256,6 +277,7 @@ public abstract class DataEndpoint {
         }
         connectionWorker.disconnect(getDataEndpointConfiguration());
         connectionService.shutdown();
+        threadPoolExecutor.shutdown();
     }
 
     /**

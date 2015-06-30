@@ -34,6 +34,7 @@ import org.wso2.carbon.event.publisher.core.config.OutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherValidationException;
+import org.wso2.carbon.event.publisher.core.internal.EventPublisher;
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
 import org.wso2.carbon.event.publisher.core.internal.util.helper.EventPublisherConfigurationHelper;
 import org.wso2.carbon.event.publisher.core.internal.util.helper.XmlFormatter;
@@ -187,6 +188,22 @@ public class EventPublisherConfigurationBuilder {
             } else {
                 log.warn("To property " + propertyName + " with value " + propertyValue + " is dropped as its irrelevant of output adapter type:" + toEventAdapterType);
             }
+        }
+
+        String toStreamName = "";
+        String toStreamVersion = "";
+
+        String customMappingEnabledAttribute = mappingElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_CUSTOM_MAPPING));
+        if (mappingType.equalsIgnoreCase(EventPublisherConstants.EF_WSO2EVENT_MAPPING_TYPE) && customMappingEnabledAttribute != null && customMappingEnabledAttribute.equalsIgnoreCase(EventPublisherConstants.ENABLE_CONST)) {
+            OMElement toOMElement = mappingElement.getFirstChildWithName(new QName(EventPublisherConstants.EF_CONF_NS, EventPublisherConstants.EF_ELEMENT_TO));
+            toStreamName = toOMElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_STREAM_NAME));
+            toStreamVersion = toOMElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_VERSION));
+        }
+
+        if(toStreamName == null || toStreamName.isEmpty() || toStreamVersion == null ||toStreamVersion.isEmpty()){
+            outputEventAdapterConfiguration.setOutputStreamIdOfWso2eventMessageFormat(fromStreamName + EventPublisherConstants.STREAM_ID_SEPERATOR + fromStreamVersion);
+        }else{
+            outputEventAdapterConfiguration.setOutputStreamIdOfWso2eventMessageFormat(toStreamName + EventPublisherConstants.STREAM_ID_SEPERATOR + toStreamVersion);
         }
 
         if (mappingType.equalsIgnoreCase(EventPublisherConstants.EF_WSO2EVENT_MAPPING_TYPE)) {

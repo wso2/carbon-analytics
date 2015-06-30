@@ -120,11 +120,6 @@ public class EventStreamRuntime {
 
     }
 
-    public void subscribe(RawEventConsumer rawEventConsumer) throws EventStreamConfigurationException {
-        EventJunction eventJunction = getOrConstructEventJunction(rawEventConsumer.getStreamId());
-        eventJunction.addConsumer(rawEventConsumer);
-    }
-
     public void subscribe(EventProducer eventProducer) throws EventStreamConfigurationException {
         EventJunction eventJunction = getOrConstructEventJunction(eventProducer.getStreamId());
         eventJunction.addProducer(eventProducer);
@@ -147,17 +142,6 @@ public class EventStreamRuntime {
             EventJunction eventJunction = eventJunctionMap.get(siddhiEventConsumer.getStreamId());
             if (eventJunction != null) {
                 eventJunction.removeConsumer(siddhiEventConsumer);
-            }
-        }
-    }
-
-    public void unsubscribe(RawEventConsumer rawEventConsumer) {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        Map<String, EventJunction> eventJunctionMap = tenantSpecificEventJunctions.get(tenantId);
-        if (eventJunctionMap != null) {
-            EventJunction eventJunction = eventJunctionMap.get(rawEventConsumer.getStreamId());
-            if (eventJunction != null) {
-                eventJunction.removeConsumer(rawEventConsumer);
             }
         }
     }

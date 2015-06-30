@@ -25,7 +25,9 @@ import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
  */
 public interface WebsocketLocalInputCallbackRegisterService {
 
-    public void updateAdapterListenerMap(String adaptorName, InputEventAdapterListener eventAdapterListener);
+    public void subscribeAdapterListener(String adaptorName, InputEventAdapterListener eventAdapterListener);
+
+    public void unsubscribeAdapterListener(String adaptorName);
 
     public InputEventAdapterListener getAdapterListener(String adaptorName);
 }

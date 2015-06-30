@@ -50,20 +50,24 @@ public class LoggerEventAdapterFactory extends OutputEventAdapterFactory {
     public List<Property> getDynamicPropertyList() {
         List<Property> dynamicPropertyList = new ArrayList<Property>();
 
-        // set stream definition
-        Property streamDefinitionProperty = new Property(LoggerEventAdapterConstants.ADAPTER_MESSAGE_UNIQUE_ID);
-        streamDefinitionProperty.setDisplayName(
+        // set unique identification
+        Property uniqueIdentifierProperty = new Property(LoggerEventAdapterConstants.ADAPTER_MESSAGE_UNIQUE_ID);
+        uniqueIdentifierProperty.setDisplayName(
                 resourceBundle.getString(LoggerEventAdapterConstants.ADAPTER_MESSAGE_UNIQUE_ID));
-        streamDefinitionProperty.setHint(resourceBundle.getString(LoggerEventAdapterConstants.ADAPTER_MESSAGE_UNIQUE_ID_HINT));
-        streamDefinitionProperty.setRequired(true);
+        uniqueIdentifierProperty.setHint(resourceBundle.getString(LoggerEventAdapterConstants.ADAPTER_MESSAGE_UNIQUE_ID_HINT));
 
-        dynamicPropertyList.add(streamDefinitionProperty);
+        dynamicPropertyList.add(uniqueIdentifierProperty);
 
         return dynamicPropertyList;
     }
 
     @Override
+    public String getUsageTips() {
+        return null;
+    }
+
+    @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
-        return new LoggerEventAdapter(eventAdapterConfiguration,globalProperties);
+        return new LoggerEventAdapter(eventAdapterConfiguration, globalProperties);
     }
 }

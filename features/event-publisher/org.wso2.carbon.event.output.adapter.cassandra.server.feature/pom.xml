@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>event-publisher-feature</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>2.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -30,7 +30,8 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Event Output Cassandra Adapter Server Feature</name>
     <url>http://wso2.org</url>
-    <description>This feature contains the bundles required for Output Cassandra Event Adapter functionality</description>
+    <description>This feature contains the bundles required for Output Cassandra Event Adapter functionality
+    </description>
 
     <dependencies>
         <dependency>
@@ -57,10 +58,8 @@
                             <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <adviceFile>
                                 <properties>
-                                    <propertyDef>org.wso2.carbon.p2.category.type:server
-                                    </propertyDef>
-                                    <propertyDef>org.eclipse.equinox.p2.type.group:false
-                                    </propertyDef>
+                                    <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
+                                    <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
                                 </properties>
                             </adviceFile>
                             <bundles>
@@ -70,9 +69,16 @@
                                 <bundleDef>
                                     org.hectorclient.wso2:hector-core:${hector.wso2.version}
                                 </bundleDef>
+                                <bundleDef>
+                                    libthrift.wso2:libthrift:${libthrift.wso2.version.hector}
+                                </bundleDef>
+                                <bundleDef>
+                                    org.apache.cassandra.wso2:cassandra-thrift:${cassandra.thrift.wso2.version}
+                                </bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}
+                                <importFeatureDef>
+                                    org.wso2.carbon.core.server:${carbon.kernel.version}
                                 </importFeatureDef>
                             </importFeatures>
                         </configuration>

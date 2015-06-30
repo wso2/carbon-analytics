@@ -24,6 +24,7 @@ import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -68,37 +69,37 @@ public final class ThriftEventConverter {
 
                 if (object instanceof Integer) {
                     if (!thriftEventBundle.isSetIntAttributeList()) {
-                        thriftEventBundle.setIntAttributeList(new LinkedList<Integer>());
+                        thriftEventBundle.setIntAttributeList(new ArrayList<Integer>());
                     }
                     thriftEventBundle.addToIntAttributeList((Integer) object);
                 } else if (object instanceof Float) {
                     if (!thriftEventBundle.isSetDoubleAttributeList()) {
-                        thriftEventBundle.setDoubleAttributeList(new LinkedList<Double>());
+                        thriftEventBundle.setDoubleAttributeList(new ArrayList<Double>());
                     }
                     thriftEventBundle.addToDoubleAttributeList(((Float) object).doubleValue());
                 } else if (object instanceof Long) {
                     if (!thriftEventBundle.isSetLongAttributeList()) {
-                        thriftEventBundle.setLongAttributeList(new LinkedList<Long>());
+                        thriftEventBundle.setLongAttributeList(new ArrayList<Long>());
                     }
                     thriftEventBundle.addToLongAttributeList((Long) object);
                 } else if (object instanceof String) {
                     if (!thriftEventBundle.isSetStringAttributeList()) {
-                        thriftEventBundle.setStringAttributeList(new LinkedList<String>());
+                        thriftEventBundle.setStringAttributeList(new ArrayList<String>());
                     }
                     thriftEventBundle.addToStringAttributeList((String) object);
                 } else if (object instanceof Boolean) {
                     if (!thriftEventBundle.isSetBoolAttributeList()) {
-                        thriftEventBundle.setBoolAttributeList(new LinkedList<Boolean>());
+                        thriftEventBundle.setBoolAttributeList(new ArrayList<Boolean>());
                     }
                     thriftEventBundle.addToBoolAttributeList((Boolean) object);
                 } else if (object instanceof Double) {
                     if (!thriftEventBundle.isSetDoubleAttributeList()) {
-                        thriftEventBundle.setDoubleAttributeList(new LinkedList<Double>());
+                        thriftEventBundle.setDoubleAttributeList(new ArrayList<Double>());
                     }
                     thriftEventBundle.addToDoubleAttributeList((Double) object);
                 } else if (object == null) {
                     if (!thriftEventBundle.isSetStringAttributeList()) {
-                        thriftEventBundle.setStringAttributeList(new LinkedList<String>());
+                        thriftEventBundle.setStringAttributeList(new ArrayList<String>());
                     }
                     thriftEventBundle.addToStringAttributeList(EventDefinitionConverterUtils.nullString);
                 } else {

@@ -46,12 +46,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CarbonEventReceiverService implements EventReceiverService {
 
     private static final Log log = LogFactory.getLog(CarbonEventReceiverService.class);
     private Map<Integer, Map<String, EventReceiver>> tenantSpecificEventReceiverConfigurationMap;
     private Map<Integer, List<EventReceiverConfigurationFile>> tenantSpecificEventReceiverConfigurationFileMap;
+    //  private boolean started = false;
 
     public CarbonEventReceiverService() {
         tenantSpecificEventReceiverConfigurationMap = new ConcurrentHashMap<Integer, Map<String, EventReceiver>>();
@@ -146,7 +148,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
 
     @Override
     public EventReceiverConfiguration getActiveEventReceiverConfiguration(String eventReceiverName) {
-        int tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         EventReceiverConfiguration eventReceiverConfiguration = null;
         Map<String, EventReceiver> tenantSpecificEventReceiverMap = this.tenantSpecificEventReceiverConfigurationMap.get(tenantId);
         if (tenantSpecificEventReceiverMap != null && tenantSpecificEventReceiverMap.size() > 0) {
@@ -160,7 +162,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
 
     @Override
     public List<EventReceiverConfiguration> getAllActiveEventReceiverConfigurations() {
-        int tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         List<EventReceiverConfiguration> eventReceiverConfigurations = new ArrayList<EventReceiverConfiguration>();
         Map<String, EventReceiver> tenantSpecificEventReceiverMap = this.tenantSpecificEventReceiverConfigurationMap.get(tenantId);
         if (tenantSpecificEventReceiverMap != null) {
@@ -174,7 +176,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
     @Override
     public List<EventReceiverConfiguration> getAllActiveEventReceiverConfigurations(
             String streamId) {
-        int tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         List<EventReceiverConfiguration> eventReceiverConfigurations = new ArrayList<EventReceiverConfiguration>();
         Map<String, EventReceiver> tenantSpecificEventReceiverMap = this.tenantSpecificEventReceiverConfigurationMap.get(tenantId);
         if (tenantSpecificEventReceiverMap != null) {
@@ -278,7 +280,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
     public void addEventReceiverConfigurationFile(EventReceiverConfigurationFile eventReceiverConfigurationFile, int tenantId) {
         List<EventReceiverConfigurationFile> eventReceiverConfigurationFiles = tenantSpecificEventReceiverConfigurationFileMap.get(tenantId);
         if (eventReceiverConfigurationFiles == null) {
-            eventReceiverConfigurationFiles = new ArrayList<EventReceiverConfigurationFile>();
+            eventReceiverConfigurationFiles = new CopyOnWriteArrayList<>();
         } else {
             for (EventReceiverConfigurationFile anEventReceiverConfigurationFileList : eventReceiverConfigurationFiles) {
                 if (anEventReceiverConfigurationFileList.getFileName().equals(eventReceiverConfigurationFile.getFileName())) {
@@ -317,7 +319,9 @@ public class CarbonEventReceiverService implements EventReceiverService {
         }
 
         // End; Checking preconditions to add the event receiver
-        EventReceiver eventReceiver = new EventReceiver(eventReceiverConfiguration, exportedStreamDefinition);
+        EventReceiver eventReceiver = new EventReceiver(eventReceiverConfiguration, exportedStreamDefinition,
+                EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode());
+
         try {
             EventReceiverServiceValueHolder.getEventStreamService().subscribe(eventReceiver);
         } catch (EventStreamConfigurationException e) {
@@ -330,7 +334,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
 
     public void removeEventReceiverConfigurationFile(String fileName)
             throws EventReceiverConfigurationException {
-        int tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         List<EventReceiverConfigurationFile> eventReceiverConfigurationFileList =
                 tenantSpecificEventReceiverConfigurationFileMap.get(tenantId);
         if (eventReceiverConfigurationFileList != null) {
@@ -507,7 +511,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
     }
 
     private String getFileName(String eventReceiverName) {
-        int tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         if (tenantSpecificEventReceiverConfigurationFileMap.size() > 0) {
             List<EventReceiverConfigurationFile> eventReceiverConfigurationFiles = tenantSpecificEventReceiverConfigurationFileMap.get(tenantId);
             if (eventReceiverConfigurationFiles != null) {
@@ -602,6 +606,25 @@ public class CarbonEventReceiverService implements EventReceiverService {
         }
         return encryptedProperties;
     }
+
+    public Map<Integer, Map<String, EventReceiver>> getTenantSpecificEventReceiverMap() {
+        return tenantSpecificEventReceiverConfigurationMap;
+    }
+
+    public void start() {
+        EventReceiverServiceValueHolder.getInputEventAdapterService().start();
+    }
+
+    public void startPolling() {
+        EventReceiverServiceValueHolder.getInputEventAdapterService().startPolling();
+    }
+
+    public EventReceiver getEventReceiver(int tenantId, String eventReceiverName) {
+        if (tenantSpecificEventReceiverConfigurationMap.containsKey(tenantId)) {
+            return tenantSpecificEventReceiverConfigurationMap.get(tenantId).get(eventReceiverName);
+        }
+        return null;
+    }
 //
 //    public void removeEventReceiver(String eventReceiverName,
 //                                    int tenantId)
@@ -618,7 +641,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
 //                EventReceiver eventReceiver = eventReceiverIterator.next();
 //                if (eventReceiver.getEventReceiverConfiguration().getEventReceiverName().equals(eventReceiverConfiguration.getEventReceiverName())) {
 //                    eventReceiver.unsubscribeFromEventAdapter(null);
-//                    EventReceiverServiceValueHolder.getEventStreamService().unsubscribe(eventReceiver, tenantId);
+//                    EventReceiverServiceValueHolder.getEventStreamService().removeStreamDefinition(eventReceiver, tenantId);
 //                    eventReceiverIterator.remove();
 //                    removedCount++;
 //                }

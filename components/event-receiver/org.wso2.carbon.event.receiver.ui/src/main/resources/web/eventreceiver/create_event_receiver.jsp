@@ -124,6 +124,11 @@
         </table>
     </td>
 </tr>
+
+<tr id="eventReceiverUsageTipsRowId"><td hidden><fmt:message key="event.adapter.usage.tips"/></td>
+    <td hidden></td>
+</tr>
+
 <%
     InputAdapterConfigurationDto inputAdapterConfigurationDto = eventReceiverAdminServiceStub.getInputAdapterConfigurationSchema(firstEventAdapterType);
     if (inputAdapterConfigurationDto != null) {
@@ -132,6 +137,7 @@
     DetailInputAdapterPropertyDto[] eventAdapterProperties = inputAdapterConfigurationDto.getInputEventAdapterProperties();
     if (eventAdapterProperties != null && eventAdapterProperties.length > 0) {
 %>
+
 <tr>
     <td>
         <b><i><span style="color: #666666; "><fmt:message key="properties.heading"/></span></i></b>
@@ -279,6 +285,9 @@
             <%
                 if (firstMappingTypeName != null) {
                     if (firstMappingTypeName.equals("wso2event")) {
+
+
+
             %>
             <jsp:include page="wso2event_mapping_ui.jsp" flush="true">
                 <jsp:param name="streamNameWithVersion"

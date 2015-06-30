@@ -14,6 +14,7 @@
  */
 package org.wso2.carbon.event.output.adapter.core;
 
+import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 
@@ -25,16 +26,47 @@ import java.util.Map;
  */
 public interface OutputEventAdapter {
 
+    /**
+     * The init of the adapter, this will be called only once be for connect() and testConnect()
+     * @throws OutputEventAdapterException if there are any configuration errors
+     */
     void init() throws OutputEventAdapterException;
 
-    void testConnect() throws TestConnectionNotSupportedException;
+    /**
+     * Used to test the connection
+     * @throws TestConnectionNotSupportedException if test connection is not supported by the adapter
+     * @throws ConnectionUnavailableException if it cannot connect to the backend
+     */
+    void testConnect() throws TestConnectionNotSupportedException, ConnectionUnavailableException;
 
-    void connect();
+    /**
+     * Will be called to connect to the backend before events are published
+     * @throws ConnectionUnavailableException if it cannot connect to the backend
+     */
+    void connect() throws ConnectionUnavailableException;
 
-    void publish(Object message, Map<String, String> dynamicProperties);
+    /**
+     * To publish the events
+     * @param message event to be published, it can be Map,OMElement or String
+     * @param dynamicProperties  the dynamic properties of the event
+     * @throws ConnectionUnavailableException if it cannot connect to the backend
+     */
+    void publish(Object message, Map<String, String> dynamicProperties) throws ConnectionUnavailableException;
 
+    /**
+     * Will be called after all publishing is done, or when ConnectionUnavailableException is thrown
+     */
     void disconnect();
 
+    /**
+     * Will be called at the end to clean all the resources consumed
+     */
     void destroy();
+
+    /**
+     * Whether events get accumulated at the adopter and clients connect to it to collect events
+     * @return is polled
+     */
+    boolean isPolled();
 
 }

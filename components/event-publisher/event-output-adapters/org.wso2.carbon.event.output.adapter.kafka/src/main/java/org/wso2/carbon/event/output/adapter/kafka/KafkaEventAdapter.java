@@ -17,25 +17,24 @@
 */
 package org.wso2.carbon.event.output.adapter.kafka;
 
-import kafka.admin.AdminUtils;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
-import org.I0Itec.zkclient.ZkClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
-import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
+import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.kafka.internal.util.KafkaEventAdapterConstants;
 
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import kafka.utils.ZKStringSerializer$;
 
 public class KafkaEventAdapter implements OutputEventAdapter {
 
@@ -45,6 +44,7 @@ public class KafkaEventAdapter implements OutputEventAdapter {
     private Map<String, String> globalProperties;
     private ProducerConfig config;
     private Producer<String, Object> producer;
+    private int tenantId;
 
     public KafkaEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                              Map<String, String> globalProperties) {
@@ -55,64 +55,73 @@ public class KafkaEventAdapter implements OutputEventAdapter {
     @Override
     public void init() throws OutputEventAdapterException {
 
+        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+
         //ThreadPoolExecutor will be assigned  if it is null
         if (threadPoolExecutor == null) {
             int minThread;
             int maxThread;
+            int jobQueSize;
             long defaultKeepAliveTime;
 
             //If global properties are available those will be assigned else constant values will be assigned
-            if (globalProperties.get(KafkaEventAdapterConstants.MIN_THREAD_NAME) != null) {
-                minThread = Integer.parseInt(globalProperties.get(KafkaEventAdapterConstants.MIN_THREAD_NAME));
+            if (globalProperties.get(KafkaEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME) != null) {
+                minThread = Integer.parseInt(globalProperties.get(KafkaEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME));
             } else {
-                minThread = KafkaEventAdapterConstants.MIN_THREAD;
+                minThread = KafkaEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE;
             }
 
-            if (globalProperties.get(KafkaEventAdapterConstants.MAX_THREAD_NAME) != null) {
-                maxThread = Integer.parseInt(globalProperties.get(KafkaEventAdapterConstants.MAX_THREAD_NAME));
+            if (globalProperties.get(KafkaEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME) != null) {
+                maxThread = Integer.parseInt(globalProperties.get(KafkaEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME));
             } else {
-                maxThread = KafkaEventAdapterConstants.MAX_THREAD;
+                maxThread = KafkaEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE;
             }
 
-            if (globalProperties.get(KafkaEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME) != null) {
+            if (globalProperties.get(KafkaEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME) != null) {
                 defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
-                        KafkaEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME));
+                        KafkaEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
             } else {
-                defaultKeepAliveTime = KafkaEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME;
+                defaultKeepAliveTime = KafkaEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS;
+            }
+
+            if (globalProperties.get(KafkaEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME) != null) {
+                jobQueSize = Integer.parseInt(globalProperties.get(
+                        KafkaEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME));
+            } else {
+                jobQueSize = KafkaEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE;
             }
 
             threadPoolExecutor = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime,
-                    TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(1000));
+                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(jobQueSize));
         }
 
     }
 
     @Override
-    public void testConnect() {
-        connect();
+    public void testConnect() throws TestConnectionNotSupportedException {
+        throw new TestConnectionNotSupportedException("Test connection is not available");
     }
 
     @Override
     public void connect() {
         Map<String, String> staticProperties = eventAdapterConfiguration.getStaticProperties();
-        String kafkaConnect = staticProperties.get(KafkaEventAdapterConstants.ADAPTOR_META_BROKER_LIST);
-        log.info(kafkaConnect);
 
+        String kafkaConnect = staticProperties.get(KafkaEventAdapterConstants.ADAPTOR_META_BROKER_LIST);
         String optionalConfigs = staticProperties.get(KafkaEventAdapterConstants.ADAPTOR_OPTIONAL_CONFIGURATION_PROPERTIES);
         Properties props = new Properties();
         props.put("metadata.broker.list", kafkaConnect);
         props.put("serializer.class", "kafka.serializer.StringEncoder");
 
         if (optionalConfigs != null) {
-            String[] optionalProperties = optionalConfigs.split(",");
+            String[] optionalProperties = optionalConfigs.split(KafkaEventAdapterConstants.HEADER_SEPARATOR);
 
             if (optionalProperties != null && optionalProperties.length > 0) {
                 for (String header : optionalProperties) {
-                    String[] configPropertyWithValue = header.split(":");
-                    if(configPropertyWithValue.length == 2){
+                    try {
+                        String[] configPropertyWithValue = header.split(KafkaEventAdapterConstants.ENTRY_SEPARATOR, 2);
                         props.put(configPropertyWithValue[0], configPropertyWithValue[1]);
-                    }else {
-                        log.warn("Optional configuration property not defined in the correct format");
+                    } catch (Exception e) {
+                        log.warn("Optional property '" + header + "' is not defined in the correct format.", e);
                     }
                 }
             }
@@ -120,38 +129,25 @@ public class KafkaEventAdapter implements OutputEventAdapter {
 
         config = new ProducerConfig(props);
         producer = new Producer<String, Object>(config);
-       try {
-           String testTopic = "org.wso2.carbon.event.output.adapter.kafka.test";
-
-           ZkClient zkClient = new ZkClient("localhost:2181", 10000, 10000, ZKStringSerializer$.MODULE$);
-           AdminUtils.createTopic(zkClient, testTopic, 10, 1, new Properties());
-
-           KeyedMessage<String, Object> data = new KeyedMessage<String, Object>(testTopic,"Successfully connected to kafka server");
-           producer.send(data);
-
-        }catch(kafka.common.TopicExistsException e){
-           log.info("test topic already created.");
-        }catch (Exception e){
-           throw new OutputEventAdapterRuntimeException("The adaptor "+eventAdapterConfiguration.getName()+" failed to connect to the kafka server "
-                   ,e);
-       }
-
 
     }
 
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
 
+        //By default auto.create.topics.enable is true, then no need to create topic explicitly
         String topic = dynamicProperties.get(KafkaEventAdapterConstants.ADAPTOR_PUBLISH_TOPIC);
-
-        KeyedMessage<String, Object> data = new KeyedMessage<String, Object>(topic,message.toString());
-        producer.send(data);
+        try {
+            threadPoolExecutor.submit(new KafkaSender(topic, message));
+        } catch (RejectedExecutionException e) {
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
+        }
     }
 
     @Override
     public void disconnect() {
         //close producer
-        if(producer != null){
+        if (producer != null) {
             producer.close();
         }
     }
@@ -159,6 +155,29 @@ public class KafkaEventAdapter implements OutputEventAdapter {
     @Override
     public void destroy() {
         //not required
+    }
+
+    @Override
+    public boolean isPolled() {
+        return false;
+    }
+
+
+    class KafkaSender implements Runnable {
+
+        String topic;
+        Object message;
+
+        KafkaSender(String topic, Object message) {
+            this.topic = topic;
+            this.message = message;
+        }
+
+        @Override
+        public void run() {
+            KeyedMessage<String, Object> data = new KeyedMessage<String, Object>(topic, message.toString());
+            producer.send(data);
+        }
     }
 
 }

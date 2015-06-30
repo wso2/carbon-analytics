@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy
@@ -15,20 +15,26 @@
 
 package org.wso2.carbon.event.input.adapter.http;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.osgi.service.http.HttpService;
+import org.osgi.service.http.NamespaceException;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
+import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
 import org.wso2.carbon.event.input.adapter.core.exception.TestConnectionNotSupportedException;
-import org.wso2.carbon.event.input.adapter.http.internal.HTTPEventAdapterManager;
+import org.wso2.carbon.event.input.adapter.http.internal.ds.HTTPEventAdapterServiceValueHolder;
 import org.wso2.carbon.event.input.adapter.http.internal.util.HTTPEventAdapterConstants;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+import javax.servlet.ServletException;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public final class HTTPEventAdapter implements InputEventAdapter {
 
@@ -36,8 +42,9 @@ public final class HTTPEventAdapter implements InputEventAdapter {
     private final Map<String, String> globalProperties;
     private InputEventAdapterListener eventAdaptorListener;
     private final String id = UUID.randomUUID().toString();
-
     public static ExecutorService executorService;
+    private static final Log log = LogFactory.getLog(HTTPEventAdapter.class);
+
     public HTTPEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
                             Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
@@ -70,11 +77,11 @@ public final class HTTPEventAdapter implements InputEventAdapter {
                 maxThread = HTTPEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE;
             }
 
-            if (globalProperties.get(HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME) != null) {
+            if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME) != null) {
                 defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME));
+                        HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
             } else {
-                defaultKeepAliveTime = HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME;
+                defaultKeepAliveTime = HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLS;
             }
 
             if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME) != null) {
@@ -84,8 +91,21 @@ public final class HTTPEventAdapter implements InputEventAdapter {
                 jobQueueSize = HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE;
             }
 
+            RejectedExecutionHandler rejectedExecutionHandler = new RejectedExecutionHandler() {
+                @Override
+                public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                    try {
+                        executor.getQueue().put(r);
+                    } catch (InterruptedException e) {
+                        log.error("Exception while adding event to executor queue : " + e.getMessage(), e);
+                    }
+                }
+
+            };
+
             executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime,
-                    TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(jobQueueSize));
+                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(jobQueueSize), rejectedExecutionHandler);
+
         }
     }
 
@@ -96,20 +116,16 @@ public final class HTTPEventAdapter implements InputEventAdapter {
 
     @Override
     public void connect() {
-        HTTPEventAdapterManager.registerDynamicEndpoint(eventAdapterConfiguration.getName(), this);
+        registerDynamicEndpoint(eventAdapterConfiguration.getName());
     }
 
     @Override
     public void disconnect() {
-        HTTPEventAdapterManager.unregisterDynamicEndpoint(eventAdapterConfiguration.getName(), this);
+        unregisterDynamicEndpoint(eventAdapterConfiguration.getName());
     }
 
     @Override
     public void destroy() {
-    }
-
-    public InputEventAdapterListener getEventAdaptorListener() {
-        return eventAdaptorListener;
     }
 
     @Override
@@ -119,13 +135,68 @@ public final class HTTPEventAdapter implements InputEventAdapter {
 
         HTTPEventAdapter that = (HTTPEventAdapter) o;
 
-        if (!id.equals(that.id)) return false;
+        return id.equals(that.id);
 
-        return true;
     }
 
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    @Override
+    public boolean isEventDuplicatedInCluster() {
+        return false;
+    }
+
+    @Override
+    public boolean isPolling() {
+        return false;
+    }
+
+    private void registerDynamicEndpoint(String adapterName) {
+
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+
+        String endpoint;
+        if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            endpoint = HTTPEventAdapterConstants.ENDPOINT_PREFIX + adapterName;
+        } else {
+            endpoint = HTTPEventAdapterConstants.ENDPOINT_PREFIX + HTTPEventAdapterConstants.ENDPOINT_TENANT_KEY
+                    + HTTPEventAdapterConstants.ENDPOINT_URL_SEPARATOR + tenantDomain
+                    + HTTPEventAdapterConstants.ENDPOINT_URL_SEPARATOR + adapterName;
+        }
+
+        try {
+            HttpService httpService = HTTPEventAdapterServiceValueHolder.getHTTPService();
+            if (httpService == null) {
+                throw new InputEventAdapterRuntimeException("HttpService not available, Error in registering endpoint " + endpoint);
+            }
+            httpService.registerServlet(endpoint,
+                    new HTTPMessageServlet(eventAdaptorListener, tenantId, eventAdapterConfiguration.getProperties().get(HTTPEventAdapterConstants.EXPOSED_TRANSPORTS)),
+                    new Hashtable(),
+                    httpService.createDefaultHttpContext());
+        } catch (ServletException | NamespaceException e) {
+            throw new InputEventAdapterRuntimeException("Error in registering endpoint " + endpoint, e);
+        }
+
+    }
+
+    private void unregisterDynamicEndpoint(String adapterName) {
+        HttpService httpService = HTTPEventAdapterServiceValueHolder.getHTTPService();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        String endpoint;
+        if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            endpoint = HTTPEventAdapterConstants.ENDPOINT_PREFIX + adapterName;
+        } else {
+            endpoint = HTTPEventAdapterConstants.ENDPOINT_PREFIX + HTTPEventAdapterConstants.ENDPOINT_TENANT_KEY
+                    + HTTPEventAdapterConstants.ENDPOINT_URL_SEPARATOR
+                    + tenantDomain + HTTPEventAdapterConstants.ENDPOINT_URL_SEPARATOR + adapterName;
+        }
+        if (httpService != null) {
+            httpService.unregister(endpoint);
+        }
+
     }
 }

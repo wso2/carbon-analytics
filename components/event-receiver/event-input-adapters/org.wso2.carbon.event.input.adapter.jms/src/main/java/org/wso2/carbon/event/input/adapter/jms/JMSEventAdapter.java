@@ -18,38 +18,57 @@
 package org.wso2.carbon.event.input.adapter.jms;
 
 import org.apache.axis2.transport.base.threads.NativeWorkerPool;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
-import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
 import org.wso2.carbon.event.input.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.input.adapter.jms.internal.util.*;
 
-import javax.jms.JMSException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.UUID;
 
 public class JMSEventAdapter implements InputEventAdapter {
 
     private final InputEventAdapterConfiguration eventAdapterConfiguration;
     private final Map<String, String> globalProperties;
-    private InputEventAdapterListener eventAdapterListener;
     private final String id = UUID.randomUUID().toString();
+    private InputEventAdapterListener eventAdapterListener;
+    private JMSConnectionFactory jmsConnectionFactory;
+    private JMSListener jmsListener;
+    private Logger log = Logger.getLogger(JMSEventAdapter.class);
+    private String destination;
+    private int minThreadPoolSize;
+    private int maxThreadPoolSize;
+    private int KeepAliveTimeInMillis;
+    private int jobQueueSize;
 
-    private ConcurrentHashMap<Integer, ConcurrentHashMap<String,
-            ConcurrentHashMap<String, ConcurrentHashMap<String,
-                    SubscriptionDetails>>>> tenantAdaptorDestinationSubscriptionsMap = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, SubscriptionDetails>>>>();
-//    public static ExecutorService executorService = new ThreadPoolExecutor(
-//                                                      SOAPEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE,
-//            SOAPEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE, SOAPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME,
-//      TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(SOAPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE));
 
     public JMSEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
                            Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
+
+        if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME) != null) {
+            KeepAliveTimeInMillis = Integer.parseInt(globalProperties.get(
+                    JMSEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
+        } else {
+            KeepAliveTimeInMillis = JMSEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_INTERVAL;
+        }
+
+        if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME) != null) {
+            jobQueueSize = Integer.parseInt(globalProperties.get(
+                    JMSEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME));
+        } else {
+            jobQueueSize = JMSEventAdapterConstants.DEFAULT_JOB_IN_QUEUE_SIZE;
+        }
+
+        minThreadPoolSize = JMSEventAdapterConstants.DEFAULT_MIN_THREAD_POOL_SIZE;
+        maxThreadPoolSize = JMSEventAdapterConstants.DEFAULT_MAX__THREAD_POOL_SIZE;
+
     }
 
 
@@ -65,74 +84,36 @@ public class JMSEventAdapter implements InputEventAdapter {
 
     @Override
     public void connect() {
-
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        createJMSAdaptorListener(eventAdapterListener, "1", tenantId);
-
+        createJMSAdaptorListener(eventAdapterListener);
     }
 
     @Override
     public void disconnect() {
-
-        String destination = eventAdapterConfiguration.getProperties()
-                .get(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION);
-
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-
-        ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, SubscriptionDetails>>>
-                adaptorDestinationSubscriptionsMap = tenantAdaptorDestinationSubscriptionsMap.get(tenantId);
-        if (adaptorDestinationSubscriptionsMap == null) {
-            throw new InputEventAdapterRuntimeException("There is no subscription for " + destination + " for tenant "
-                    + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true));
+        if (jmsListener != null) {
+            jmsListener.stopListener();
         }
 
-        ConcurrentHashMap<String, ConcurrentHashMap<String, SubscriptionDetails>> destinationSubscriptionsMap =
-                adaptorDestinationSubscriptionsMap.get(eventAdapterConfiguration.getName());
-        if (destinationSubscriptionsMap == null) {
-            throw new InputEventAdapterRuntimeException("There is no subscription for " + destination
-                    + " for event adaptor " + eventAdapterConfiguration.getName());
+        if (jmsConnectionFactory != null) {
+            jmsConnectionFactory.stop();
         }
 
-        ConcurrentHashMap<String, SubscriptionDetails> subscriptionsMap = destinationSubscriptionsMap.get(destination);
-        if (subscriptionsMap == null) {
-            throw new InputEventAdapterRuntimeException("There is no subscription for " + destination);
+        if (log.isDebugEnabled()) {
+            log.debug("JMS consumer " + eventAdapterConfiguration.getName() + " disconnected from destination : " + destination);
         }
 
-        SubscriptionDetails subscriptionDetails = subscriptionsMap.get(id);
-        if (subscriptionDetails == null) {
-            throw new InputEventAdapterRuntimeException("There is no subscription for " + destination
-                    + " for the subscriptionId:" + id);
-        } else {
-
-            try {
-                subscriptionDetails.close();
-                subscriptionsMap.remove(id);
-            } catch (JMSException e) {
-                throw new InputEventAdapterRuntimeException("Can not unsubscribe from the destination " + destination
-                        + " with the event adaptor " + eventAdapterConfiguration.getName(), e);
-            }
-
-        }
     }
 
     @Override
     public void destroy() {
     }
 
-    public InputEventAdapterListener getEventAdaptorListener() {
-        return eventAdapterListener;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof JMSEventAdapter)) return false;
-
         JMSEventAdapter that = (JMSEventAdapter) o;
+        return id.equals(that.id);
 
-        if (!id.equals(that.id)) return false;
-
-        return true;
     }
 
     @Override
@@ -141,77 +122,61 @@ public class JMSEventAdapter implements InputEventAdapter {
     }
 
     private void createJMSAdaptorListener(
-            InputEventAdapterListener inputEventAdaptorListener, String subscriptionId, int tenantId) {
+            InputEventAdapterListener inputEventAdaptorListener) {
 
+        Map<String, String> adapterProperties = new HashMap<String, String>();
+        adapterProperties.putAll(eventAdapterConfiguration.getProperties());
 
-        ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, SubscriptionDetails>>>
-                adaptorDestinationSubscriptionsMap = tenantAdaptorDestinationSubscriptionsMap.get(tenantId);
-        if (adaptorDestinationSubscriptionsMap == null) {
-            adaptorDestinationSubscriptionsMap = new ConcurrentHashMap<String,
-                    ConcurrentHashMap<String, ConcurrentHashMap<String, SubscriptionDetails>>>();
+        Map<String, String> jmsProperties = this.extractProperties(eventAdapterConfiguration.getProperties().get(
+                JMSEventAdapterConstants.ADAPTER_PROPERTIES));
 
-            if (null != tenantAdaptorDestinationSubscriptionsMap.putIfAbsent(tenantId,
-                    adaptorDestinationSubscriptionsMap)) {
-                adaptorDestinationSubscriptionsMap = tenantAdaptorDestinationSubscriptionsMap.get(tenantId);
+        if (jmsProperties != null) {
+            adapterProperties.remove(JMSEventAdapterConstants.ADAPTER_PROPERTIES);
+            adapterProperties.putAll(jmsProperties);
+
+            if (adapterProperties.containsKey(JMSEventAdapterConstants.ADAPTER_JMS_CONCURRENT_CONSUMERS)) {
+                try {
+                    minThreadPoolSize = Integer.parseInt(adapterProperties.get(JMSEventAdapterConstants.ADAPTER_JMS_CONCURRENT_CONSUMERS));
+                } catch (NumberFormatException e) {
+                    log.error("Invalid JMS Property: " + JMSEventAdapterConstants.ADAPTER_JMS_CONCURRENT_CONSUMERS + ", "
+                            + "ignoring configuration and using default for JMS output event adaptor...");
+                }
             }
-        }
 
-        ConcurrentHashMap<String, ConcurrentHashMap<String, SubscriptionDetails>> destinationSubscriptionsMap =
-                adaptorDestinationSubscriptionsMap.get(eventAdapterConfiguration.getName());
-        if (destinationSubscriptionsMap == null) {
-            destinationSubscriptionsMap = new ConcurrentHashMap<String,
-                    ConcurrentHashMap<String, SubscriptionDetails>>();
-
-            if (null != adaptorDestinationSubscriptionsMap.putIfAbsent(eventAdapterConfiguration.getName(),
-                    destinationSubscriptionsMap)) {
-                destinationSubscriptionsMap = adaptorDestinationSubscriptionsMap.get(
-                        eventAdapterConfiguration.getName());
-            }
-        }
-
-        String destination = eventAdapterConfiguration.getProperties().get(
-                JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION);
-
-        ConcurrentHashMap<String, SubscriptionDetails> subscriptionsMap = destinationSubscriptionsMap.get(destination);
-        if (subscriptionsMap == null) {
-            subscriptionsMap = new ConcurrentHashMap<String, SubscriptionDetails>();
-            if (null != destinationSubscriptionsMap.putIfAbsent(destination, subscriptionsMap)) {
-                subscriptionsMap = destinationSubscriptionsMap.get(destination);
+            if (adapterProperties.containsKey(JMSEventAdapterConstants.ADAPTER_JMS_MAX_CONCURRENT_CONSUMERS)) {
+                try {
+                    maxThreadPoolSize = Integer.parseInt(adapterProperties.get(JMSEventAdapterConstants.ADAPTER_JMS_MAX_CONCURRENT_CONSUMERS));
+                } catch (NumberFormatException e) {
+                    log.error("Invalid JMS Property: " + JMSEventAdapterConstants.ADAPTER_JMS_MAX_CONCURRENT_CONSUMERS + ", "
+                            + "ignoring configuration and using default for JMS output event adaptor...");
+                }
             }
         }
 
 
-        Map<String, String> adaptorProperties = new HashMap<String, String>();
+        destination = eventAdapterConfiguration.getProperties().get(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION);
 
-
-        adaptorProperties.putAll(eventAdapterConfiguration.getProperties());
-
-        JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(convertMapToHashTable(adaptorProperties),
+        jmsConnectionFactory = new JMSConnectionFactory(convertMapToHashTable(adapterProperties),
                 eventAdapterConfiguration.getName());
-
 
         Map<String, String> messageConfig = new HashMap<String, String>();
         messageConfig.put(JMSConstants.PARAM_DESTINATION, destination);
         JMSTaskManager jmsTaskManager = JMSTaskManagerFactory.createTaskManagerForService(jmsConnectionFactory,
-                eventAdapterConfiguration.getName(), new NativeWorkerPool(4, 100, 1000, 1000, "JMS Threads",
-                        "JMSThreads" + UUID.randomUUID().toString()), messageConfig);
+                eventAdapterConfiguration.getName(), new NativeWorkerPool(minThreadPoolSize, maxThreadPoolSize, KeepAliveTimeInMillis, jobQueueSize, "JMS Threads",
+                "JMSThreads" + UUID.randomUUID().toString()), messageConfig);
         jmsTaskManager.setJmsMessageListener(new JMSMessageListener(inputEventAdaptorListener));
 
-        JMSListener jmsListener = new JMSListener(eventAdapterConfiguration.getName() + "#" + destination,
+        jmsListener = new JMSListener(eventAdapterConfiguration.getName() + "#" + destination,
                 jmsTaskManager);
         jmsListener.startListener();
-        SubscriptionDetails subscriptionDetails = new SubscriptionDetails(jmsConnectionFactory, jmsListener);
-        subscriptionsMap.put(subscriptionId, subscriptionDetails);
 
     }
 
 
     private Hashtable<String, String> convertMapToHashTable(Map<String, String> map) {
-        Hashtable<String, String> table = new Hashtable();
-        Iterator it = map.entrySet().iterator();
-        //Iterate through the hash map
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
+        Hashtable<String, String> table = new Hashtable<>();
+        for (Map.Entry<String, String> stringStringEntry : map.entrySet()) {
+            Map.Entry pair = (Map.Entry) stringStringEntry;
             //null values will be removed
             if (pair.getValue() != null) {
                 table.put(pair.getKey().toString(), pair.getValue().toString());
@@ -220,31 +185,35 @@ public class JMSEventAdapter implements InputEventAdapter {
         return table;
     }
 
-
-    class SubscriptionDetails {
-
-        private final JMSConnectionFactory jmsConnectionFactory;
-        private final JMSListener jmsListener;
-
-        public SubscriptionDetails(JMSConnectionFactory jmsConnectionFactory,
-                                   JMSListener jmsListener) {
-            this.jmsConnectionFactory = jmsConnectionFactory;
-            this.jmsListener = jmsListener;
+    private Map<String, String> extractProperties(String properties) {
+        if (properties == null || properties.trim().length() == 0) {
+            return null;
         }
 
-        public void close() throws JMSException {
-            this.jmsListener.stopListener();
-            this.jmsConnectionFactory.stop();
+        String[] entries = properties.split(JMSEventAdapterConstants.PROPERTY_SEPARATOR);
+        String[] keyValue;
+        Map<String, String> result = new HashMap<String, String>();
+        for (String property : entries) {
+            try {
+                keyValue = property.split(JMSEventAdapterConstants.ENTRY_SEPARATOR, 2);
+                result.put(keyValue[0].trim(), keyValue[1].trim());
+            } catch (Exception e) {
+                log.warn("JMS property '" + property + "' is not defined in the correct format.", e);
+            }
         }
+        return result;
 
-        public JMSConnectionFactory getJmsConnectionFactory() {
-            return jmsConnectionFactory;
-        }
-
-        public JMSListener getJmsListener() {
-            return jmsListener;
-        }
     }
 
+    @Override
+    public boolean isEventDuplicatedInCluster() {
+        String destinationType = eventAdapterConfiguration.getProperties().get(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION_TYPE);
+        return destinationType.equalsIgnoreCase(JMSEventAdapterConstants.DESTINATION_TOPIC);
+    }
+
+    @Override
+    public boolean isPolling() {
+        return true;
+    }
 
 }

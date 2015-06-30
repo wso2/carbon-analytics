@@ -30,7 +30,7 @@ public class EventReceiverAdminConstants {
     public static final String ATTR_TYPE_INTEGER = "int";
     public static final String ATTR_TYPE_LONG = "long";
     public static final String ATTR_TYPE_STRING = "string";
-    public static final String ATTR_TYPE_BOOL = "boolean";
+    public static final String ATTR_TYPE_BOOL = "bool";
 
 
     public static final Map<String, AttributeType> STRING_ATTRIBUTE_TYPE_MAP = Collections.unmodifiableMap(new HashMap<String, AttributeType>() {{

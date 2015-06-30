@@ -49,9 +49,18 @@ public interface InputEventAdapterService {
 
     /**
      * publish testConnect message using the given event adapter.
+     *
      * @param inputEventAdapterConfiguration - Configuration Details of the event adapter
      */
     void testConnection(InputEventAdapterConfiguration inputEventAdapterConfiguration) throws InputEventAdapterException, TestConnectionNotSupportedException;
 
     void destroy(String name);
+
+    public void start();
+
+    public void startPolling();
+
+    boolean isEventDuplicatedInCluster(String inputEventAdapterName) throws InputEventAdapterException;
+
+    void start(String inputEventAdapterName);
 }

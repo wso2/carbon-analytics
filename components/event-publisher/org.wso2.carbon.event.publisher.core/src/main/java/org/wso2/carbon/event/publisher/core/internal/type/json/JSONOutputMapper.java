@@ -26,6 +26,7 @@ import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfiguratio
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
+import org.wso2.siddhi.core.event.Event;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -83,23 +84,25 @@ public class JSONOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToMappedInputEvent(Object[] eventData)
+    public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
         StringBuilder eventText = new StringBuilder(mappingTextList.get(0));
         for (int i = 1, size = mappingTextList.size(); i < size; i++) {
             if (i % 2 == 0) {
                 eventText.append(mappingTextList.get(i));
             } else {
-                eventText.append(getPropertyValue(eventData, mappingTextList.get(i)));
+                Object propertyValue = getPropertyValue(event.getData(), mappingTextList.get(i));
+                if (propertyValue!=null && propertyValue instanceof String) {
+                    eventText.append(EventPublisherConstants.DOUBLE_QUOTE)
+                            .append(propertyValue)
+                            .append(EventPublisherConstants.DOUBLE_QUOTE);
+                } else {
+                    eventText.append(propertyValue);
+                }
             }
         }
 
         String jsonEvent = eventText.toString();
-
-        if(jsonEvent.contains("\"null\"")){
-            jsonEvent = jsonEvent.replaceAll("\"null\"","null");
-        }
-
         try {
             JsonParser jsonParser = new JsonParser();
             return jsonParser.parse(jsonEvent).toString();
@@ -109,9 +112,9 @@ public class JSONOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToTypedInputEvent(Object[] eventData)
+    public Object convertToTypedInputEvent(Event event)
             throws EventPublisherConfigurationException {
-        return convertToMappedInputEvent(eventData);
+        return convertToMappedInputEvent(event);
     }
 
     private void validateStreamDefinitionWithOutputProperties(int tenantId)
@@ -136,13 +139,10 @@ public class JSONOutputMapper implements OutputMapper {
 
     }
 
-    private String getPropertyValue(Object[] eventData, String mappingProperty) {
+    private Object getPropertyValue(Object[] eventData, String mappingProperty) {
         if (eventData.length != 0) {
             int position = propertyPositionMap.get(mappingProperty);
-            Object data = eventData[position];
-            if (data != null) {
-                return data.toString();
-            }
+            return eventData[position];
         }
         return null;
     }
@@ -168,7 +168,12 @@ public class JSONOutputMapper implements OutputMapper {
         }
 
         jsonEventObject.add(EventPublisherConstants.EVENT_PARENT_TAG, innerParentObject);
-        setMappingTextList(jsonEventObject.toString());
+
+        String defaultMapping = jsonEventObject.toString();
+        defaultMapping = defaultMapping.replaceAll("\"\\{\\{", "{{");
+        defaultMapping = defaultMapping.replaceAll("\\}\\}\"", "}}");
+
+        setMappingTextList(defaultMapping);
 
     }
 

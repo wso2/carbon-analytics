@@ -24,7 +24,6 @@ import java.util.*;
 public class WSO2EventEventAdapterFactory extends InputEventAdapterFactory {
     ResourceBundle  resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.input.adapter.wso2event.i18n.Resources", Locale.getDefault());
 
-
     @Override
     public String getType() {
         return WSO2EventAdapterConstants.ADAPTER_TYPE_WSO2EVENT;
@@ -40,7 +39,21 @@ public class WSO2EventEventAdapterFactory extends InputEventAdapterFactory {
     @Override
     public List<Property> getPropertyList() {
         List<Property> propertyList = new ArrayList<Property>();
+
+        Property isDuplicatedInCluster = new Property(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER);
+        isDuplicatedInCluster.setDisplayName(
+                resourceBundle.getString(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER));
+        isDuplicatedInCluster.setRequired(false);
+        isDuplicatedInCluster.setHint(resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_IS_EVENTS_DUPLICATED_IN_CLUSTER_HINT));
+        isDuplicatedInCluster.setOptions(new String[]{"true", "false"});
+        isDuplicatedInCluster.setDefaultValue("false");
+        propertyList.add(isDuplicatedInCluster);
         return propertyList;
+    }
+
+    @Override
+    public String getUsageTips() {
+        return resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_USAGE_TIPS_WSO2EVENT);
     }
 
     @Override

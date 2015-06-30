@@ -135,9 +135,12 @@ var STAT = "statistics";
 var TRACE = "Tracing";
 
 function deleteEventPublisher(eventPublisherName) {
-    var theform = document.getElementById('deleteForm');
-    theform.eventPublisher.value = eventPublisherName;
-    theform.submit();
+    CARBON.showConfirmationDialog(
+        "Are you sure want to delete event publisher: " + eventPublisherName + "?", function () {
+            var theform = document.getElementById('deleteForm');
+            theform.eventPublisher.value = eventPublisherName;
+            theform.submit();
+        }, null, null);
 }
 
 function disablePublisherStat(eventPublisherName) {
@@ -303,6 +306,15 @@ function addEventPublisher(form, streamNameWithVersion) {
         var customMappingEnabled = "disable";
 
         if (((advancedMappingCounter % 2) != 0)) {
+
+            var toStreamName = document.getElementById("property_Required_stream_name").value;
+            var toStreamVersion = document.getElementById("property_Required_stream_version").value;
+
+            if (toStreamName.localeCompare("") == 0 || toStreamVersion.localeCompare("") == 0) {
+                CARBON.showErrorDialog("Empty output event stream detail fields are not allowed.");
+                return;
+            }
+
             var metaDataTable = document.getElementById("outputMetaDataTable");
             if (metaDataTable.rows.length > 1) {
                 metaData = getWSO2EventDataValues(metaDataTable);
@@ -325,9 +337,18 @@ function addEventPublisher(form, streamNameWithVersion) {
             new Ajax.Request('../eventpublisher/add_event_publisher_ajaxprocessor.jsp', {
                 method:'POST',
                 asynchronous:false,
-                parameters:{eventPublisher:eventPublisherName, streamNameWithVersion:streamNameWithVersion,
-                    eventAdapterInfo:eventAdapterInfo, mappingType:"wso2event", outputParameters:outputPropertyParameterString,
-                    metaData:metaData, correlationData:correlationData, payloadData:payloadData, customMappingValue:customMappingEnabled},
+                parameters:{
+                    eventPublisher:eventPublisherName,
+                    streamNameWithVersion:streamNameWithVersion,
+                    eventAdapterInfo:eventAdapterInfo,
+                    mappingType:"wso2event",
+                    outputParameters:outputPropertyParameterString,
+                    metaData:metaData,
+                    correlationData:correlationData,
+                    payloadData:payloadData,
+                    customMappingValue:customMappingEnabled,
+                    toStreamName:toStreamName,
+                    toStreamVersion:toStreamVersion},
                 onSuccess:function (response) {
                     if ("true" == response.responseText.trim()) {
                         CARBON.showInfoDialog("Event publisher added successfully!!", function () {
@@ -581,4 +602,81 @@ function showCustomPopupDialog(message, title, windowHight, okButton, callback, 
         func();
     }
 
+}
+
+function testPublisherConnection() {
+
+    var eventPublisherName = document.getElementById("eventPublisherId").value.trim();
+    var eventAdapterInfo = document.getElementById("eventAdapterTypeFilter")[document.getElementById("eventAdapterTypeFilter").selectedIndex].value;
+    var propertyCount = 0;
+    var outputPropertyParameterString = "";
+    var isFieldEmpty = false;
+    var messageFormat = [document.getElementById("mappingTypeFilter").selectedIndex].text;
+
+    var reWhiteSpace = new RegExp("^[a-zA-Z0-9_\.]+$");
+    // Check for white space
+    if (!reWhiteSpace.test(eventPublisherName)) {
+        CARBON.showErrorDialog("Invalid character found in event publisher name.");
+        return;
+    }
+    if (isFieldEmpty || (eventPublisherName == "")) {
+        // empty fields are encountered.
+        CARBON.showErrorDialog("Empty inputs fields are not allowed.");
+        return;
+    }
+
+    // all properties, not required and required are checked
+    while (document.getElementById("property_Required_" + propertyCount) != null ||
+        document.getElementById("property_" + propertyCount) != null) {
+        // if required fields are empty
+        if (document.getElementById("property_Required_" + propertyCount) != null) {
+            if (document.getElementById("property_Required_" + propertyCount).value.trim() == "") {
+                // values are empty in fields
+                isFieldEmpty = true;
+                outputPropertyParameterString = "";
+                break;
+            } else {
+                // values are stored in parameter string to send to backend
+                var propertyValue = document.getElementById("property_Required_" + propertyCount).value.trim();
+                var propertyName = document.getElementById("property_Required_" + propertyCount).name;
+                outputPropertyParameterString = outputPropertyParameterString + propertyName + "$=" + propertyValue + "|=";
+
+            }
+        } else if (document.getElementById("property_" + propertyCount) != null) {
+            var notRequriedPropertyValue = document.getElementById("property_" + propertyCount).value.trim();
+            var notRequiredPropertyName = document.getElementById("property_" + propertyCount).name;
+            if (notRequriedPropertyValue == "") {
+                notRequriedPropertyValue = "  ";
+            }
+            outputPropertyParameterString = outputPropertyParameterString + notRequiredPropertyName + "$=" + notRequriedPropertyValue + "|=";
+
+
+        }
+        propertyCount++;
+    }
+
+    if (isFieldEmpty) {
+        // empty fields are encountered.
+        CARBON.showErrorDialog("Empty inputs fields are not allowed.");
+        return;
+    }
+
+    new Ajax.Request('../eventpublisher/test_event_publisher_ajaxprocessor.jsp', {
+        method:'POST',
+        asynchronous:false,
+        parameters:{
+            eventPublisher:eventPublisherName,
+            eventAdapterInfo:eventAdapterInfo,
+            messageFormat:messageFormat,
+            outputParameters:outputPropertyParameterString
+        },
+        onSuccess:function (response) {
+            if ("true" == response.responseText.trim()) {
+                CARBON.showInfoDialog("Testing publisher connection was successful", function () {
+                }, null);
+            } else {
+                CARBON.showErrorDialog(response.responseText.trim());
+            }
+        }
+    })
 }

@@ -1,0 +1,87 @@
+<!--
+  ~ Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy
+  ~ of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed
+  ~ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+  ~ CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations under the License.
+  -->
+
+<eventProcessorConfiguration>
+
+    <mode name="SingleNode"  enable="true">
+        <persistence enable="false">
+            <persistenceIntervalInMinutes>15</persistenceIntervalInMinutes>
+            <persisterSchedulerPoolSize>10</persisterSchedulerPoolSize>
+            <persister class="org.wso2.carbon.event.processor.core.internal.persistence.FileSystemPersistenceStore">
+                <property key="persistenceLocation">cep_persistence</property>
+            </persister>
+        </persistence>
+    </mode>
+
+
+    <!-- HA Mode Config -->
+    <mode name="HA" enable="false">
+        <eventSync>
+            <hostName>localhost</hostName>
+            <port>11224</port>
+            <reconnectionInterval>20000</reconnectionInterval>
+            <serverThreads>20000</serverThreads>
+        </eventSync>
+        <management>
+            <hostName>localhost</hostName>
+            <port>10005</port>
+        </management>
+    </mode>
+
+
+    <!-- Distributed Mode Config -->
+
+    <mode name="Distributed" enable="false">
+
+        <nodeType>
+            <worker enable="true"/>
+            <manager enable="true">
+                <hostName>localhost</hostName>
+                <port>8904</port>
+            </manager>
+        </nodeType>
+
+        <management>
+            <managers>
+                <manager>
+                    <hostName>localhost</hostName>
+                    <port>8904</port>
+                </manager>
+                <manager>
+                    <hostName>localhost</hostName>
+                    <port>8905</port>
+                </manager>
+            </managers>
+            <reconnectionInterval>20000</reconnectionInterval>
+            <heartbeatInterval>5000</heartbeatInterval>
+            <topologyResubmitInterval>10000</topologyResubmitInterval>
+        </management>
+
+        <transport>
+            <portRange>
+                <min>15000</min>
+                <max>15100</max>
+            </portRange>
+            <reconnectionInterval>20000</reconnectionInterval>
+        </transport>
+
+        <stormJar>org.wso2.carbon.event.processor.storm.jar</stormJar>
+
+        <distributedUIUrl></distributedUIUrl>
+
+    </mode>
+
+</eventProcessorConfiguration>
+

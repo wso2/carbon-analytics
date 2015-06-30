@@ -19,6 +19,7 @@ import kafka.consumer.ConsumerConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.input.adapter.core.EventAdapterConstants;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
@@ -36,13 +37,9 @@ public final class KafkaEventAdapter implements InputEventAdapter {
     private final Map<String, String> globalProperties;
     private InputEventAdapterListener eventAdaptorListener;
     private final String id = UUID.randomUUID().toString();
-    private boolean readyToPoll = true;
-    ConcurrentHashMap<Integer, ConcurrentHashMap<String, ConsumerKafkaAdaptor>> consumerAdaptorMap = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, ConsumerKafkaAdaptor>>();
+    private int tenantId;
+    private ConsumerKafkaAdaptor consumerKafkaAdaptor;
 
-
-    public static ExecutorService executorService = new ThreadPoolExecutor(KafkaEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE,
-            KafkaEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE, KafkaEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(KafkaEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE));
 
     public KafkaEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
@@ -61,23 +58,15 @@ public final class KafkaEventAdapter implements InputEventAdapter {
 
     @Override
     public void connect() {
-        String topic = eventAdapterConfiguration.getProperties().get(KafkaEventAdapterConstants.ADAPTER_MESSAGE_TOPIC);
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
-        String subscriptionId = UUID.randomUUID().toString();
-        if (!readyToPoll) {
-           readyToPoll = true;
-           log.debug("Adapter " + eventAdapterConfiguration.getName() + " readyToPoll " + topic );
-        } else {
-            createKafkaAdaptorListener(eventAdaptorListener, eventAdapterConfiguration, subscriptionId, tenantId);
-        }
+        tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+        createKafkaAdaptorListener(eventAdaptorListener, eventAdapterConfiguration);
     }
 
     @Override
     public void disconnect() {
-        String topic = eventAdapterConfiguration.getProperties().get(KafkaEventAdapterConstants.ADAPTER_MESSAGE_TOPIC);
-        if (consumerAdaptorMap != null) {
-            consumerAdaptorMap = null;
-            readyToPoll = false;
+        if (consumerKafkaAdaptor != null) {
+            consumerKafkaAdaptor.shutdown();
+            String topic = eventAdapterConfiguration.getProperties().get(KafkaEventAdapterConstants.ADAPTER_MESSAGE_TOPIC);
             log.debug("Adapter " + eventAdapterConfiguration.getName() + " disconnected " + topic);
         }
     }
@@ -118,11 +107,9 @@ public final class KafkaEventAdapter implements InputEventAdapter {
         return new ConsumerConfig(props);
     }
 
-
     private void createKafkaAdaptorListener(
             InputEventAdapterListener inputEventAdapterListener,
-            InputEventAdapterConfiguration inputEventAdapterConfiguration,
-            String subscriptionId, int tenantId) {
+            InputEventAdapterConfiguration inputEventAdapterConfiguration) {
 
         Map<String, String> brokerProperties = new HashMap<String, String>();
         brokerProperties.putAll(inputEventAdapterConfiguration.getProperties());
@@ -134,14 +121,19 @@ public final class KafkaEventAdapter implements InputEventAdapter {
 
         String topic = inputEventAdapterConfiguration.getProperties().get(KafkaEventAdapterConstants.ADAPTOR_SUSCRIBER_TOPIC);
 
-        ConsumerKafkaAdaptor consumerAdaptor = new ConsumerKafkaAdaptor(topic, tenantId,
+        consumerKafkaAdaptor = new ConsumerKafkaAdaptor(topic, tenantId,
                 KafkaEventAdapter.createConsumerConfig(zkConnect, groupID, optionalConfiguration));
-        ConcurrentHashMap<String, ConsumerKafkaAdaptor> tenantSpecificConsumerMap = consumerAdaptorMap.get(tenantId);
-        if (tenantSpecificConsumerMap == null) {
-            tenantSpecificConsumerMap = new ConcurrentHashMap<String, ConsumerKafkaAdaptor>();
-            consumerAdaptorMap.put(tenantId, tenantSpecificConsumerMap);
-        }
-        tenantSpecificConsumerMap.put(subscriptionId, consumerAdaptor);
-        consumerAdaptor.run(threads, inputEventAdapterListener);
+        consumerKafkaAdaptor.run(threads, inputEventAdapterListener);
     }
+
+    @Override
+    public boolean isEventDuplicatedInCluster() {
+        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER));
+    }
+
+    @Override
+    public boolean isPolling() {
+        return true;
+    }
+
 }

@@ -51,6 +51,7 @@ public class KafkaEventAdapterFactory extends OutputEventAdapterFactory {
         //set Kafka Connect of broker
         Property webKafkaConnect = new Property(KafkaEventAdapterConstants.ADAPTOR_META_BROKER_LIST);
         webKafkaConnect.setDisplayName(resourceBundle.getString(KafkaEventAdapterConstants.ADAPTOR_META_BROKER_LIST));
+        webKafkaConnect.setHint(resourceBundle.getString(KafkaEventAdapterConstants.ADAPTOR_META_BROKER_LIST_HINT));
         webKafkaConnect.setRequired(true);
         propertyList.add(webKafkaConnect);
 
@@ -75,6 +76,11 @@ public class KafkaEventAdapterFactory extends OutputEventAdapterFactory {
         propertyList.add(webTopic);
 
         return propertyList;
+    }
+
+    @Override
+    public String getUsageTips() {
+        return null;
     }
 
     @Override

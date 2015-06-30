@@ -19,6 +19,8 @@ public class OutputAdapterConfigurationDto {
 
     private String eventAdapterType;
 
+    private String usageTips;
+
     private String[] supportedMessageFormats;
 
     private DetailOutputAdapterPropertyDto[] outputEventAdapterStaticProperties;
@@ -56,5 +58,13 @@ public class OutputAdapterConfigurationDto {
 
     public void setOutputEventAdapterDynamicProperties(DetailOutputAdapterPropertyDto[] outputEventAdapterDynamicProperties) {
         this.outputEventAdapterDynamicProperties = outputEventAdapterDynamicProperties;
+    }
+
+    public String getUsageTips() {
+        return usageTips;
+    }
+
+    public void setUsageTips(String usageTips) {
+        this.usageTips = usageTips;
     }
 }

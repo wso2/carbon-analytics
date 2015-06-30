@@ -19,9 +19,9 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
-import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.InputMappingAttribute;
 import org.wso2.carbon.event.receiver.core.config.mapping.TextInputMapping;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
@@ -29,12 +29,11 @@ import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingExce
 import org.wso2.carbon.event.receiver.core.internal.type.text.config.RegexData;
 import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
+import org.wso2.siddhi.core.event.Event;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.PatternSyntaxException;
 
 public class TextInputMapper implements InputMapper {
@@ -45,13 +44,12 @@ public class TextInputMapper implements InputMapper {
     private int noMetaData;
     private int noCorrelationData;
     private int noPayloadData;
-    private StreamDefinition streamDefinition;
+    private Map<String, AttributeType> attributeDescriptionMap = new LinkedHashMap<>();
 
     public TextInputMapper(EventReceiverConfiguration eventReceiverConfiguration,
                            StreamDefinition streamDefinition)
             throws EventReceiverConfigurationException {
         this.eventReceiverConfiguration = eventReceiverConfiguration;
-        this.streamDefinition = streamDefinition;
 
         if (eventReceiverConfiguration != null && eventReceiverConfiguration.getInputMapping() instanceof TextInputMapping) {
             if (eventReceiverConfiguration.getInputMapping().isCustomMappingEnabled()) {
@@ -94,9 +92,25 @@ public class TextInputMapper implements InputMapper {
                 this.noMetaData = streamDefinition.getMetaData() != null ? streamDefinition.getMetaData().size() : 0;
                 this.noCorrelationData += streamDefinition.getCorrelationData() != null ? streamDefinition.getCorrelationData().size() : 0;
                 this.noPayloadData += streamDefinition.getPayloadData() != null ? streamDefinition.getPayloadData().size() : 0;
+
+                if (noMetaData > 0) {
+                    for (Attribute metaData : streamDefinition.getMetaData()) {
+                        attributeDescriptionMap.put(EventReceiverConstants.META_DATA_PREFIX + metaData.getName(), metaData.getType());
+                    }
+                }
+
+                if (noCorrelationData > 0) {
+                    for (Attribute correlationData : streamDefinition.getCorrelationData()) {
+                        attributeDescriptionMap.put(EventReceiverConstants.CORRELATION_DATA_PREFIX + correlationData.getName(), correlationData.getType());
+                    }
+                }
+
+                if (noPayloadData > 0) {
+                    for (Attribute payloadData : streamDefinition.getPayloadData()) {
+                        attributeDescriptionMap.put(payloadData.getName(), payloadData.getType());
+                    }
+                }
             }
-
-
         }
 
     }
@@ -124,25 +138,19 @@ public class TextInputMapper implements InputMapper {
                             } else {
                                 returnedAttribute = value;
                             }
-                        } catch (ClassNotFoundException e) {
+                        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
                             throw new EventReceiverProcessingException("Cannot convert " + value + " to type " + type, e);
                         } catch (InvocationTargetException e) {
                             log.warn("Cannot convert " + value + " to type " + type + ": " + e.getMessage() + "; Sending null value.");
-                            returnedAttribute = null;
-                        } catch (NoSuchMethodException e) {
-                            throw new EventReceiverProcessingException("Cannot convert " + value + " to type " + type, e);
-                        } catch (IllegalAccessException e) {
-                            throw new EventReceiverProcessingException("Cannot convert " + value + " to type " + type, e);
                         }
                     }
                     attributeArray[attributePositions[attributeCount++]] = returnedAttribute;
                 }
             }
         }
-        return attributeArray;
+        return new Event(System.currentTimeMillis(), attributeArray);
     }
 
-    //TODO use = for default text mapping  use a map instead of multiple for loops
     @Override
     public Object convertToTypedInputEvent(Object obj) throws EventReceiverProcessingException {
 
@@ -154,39 +162,29 @@ public class TextInputMapper implements InputMapper {
             String[] eventAttributes = inputString.trim().split(",");
 
             for (String eventAttribute : eventAttributes) {
-                boolean setFlag = false;
+                String[] textEvent = eventAttribute.split(EventReceiverConstants.EVENT_ATTRIBUTE_SEPARATOR);
 
-                if(noMetaData>0) {
-                    for (Attribute metaData : streamDefinition.getMetaData()) {
-                        if (eventAttribute.trim().startsWith(EventReceiverConstants.META_DATA_PREFIX + metaData.getName())) {
-                            attributeArray[attributeCount++] = getPropertyValue(eventAttribute.split(EventReceiverConstants.EVENT_ATTRIBUTE_SEPARATOR)[1], metaData.getType());
-                            setFlag = true;
-                            break;
+                try {
+                    if (textEvent.length == 2) {
+                        AttributeType attributeType = attributeDescriptionMap.get(textEvent[0].trim());
+                        if (attributeType != null) {
+                            attributeArray[attributeCount++] = getPropertyValue(textEvent[1], attributeType);
+                        } else {
+                            throw new EventReceiverProcessingException("Event attributes are not matching with the stream, hence dropping event attribute " + eventAttribute);
+                        }
+                    } else if (textEvent.length == 0) {
+                        throw new EventReceiverProcessingException("Invalid attribute value found for event ,hence dropping the event " + eventAttribute);
+                    } else if (textEvent.length == 1) {
+                        AttributeType attributeType = attributeDescriptionMap.get(textEvent[0].trim());
+                        if (AttributeType.STRING.equals(attributeType)) {
+                            attributeArray[attributeCount++] = "";
+                        } else {
+                            throw new EventReceiverProcessingException("Attribute value not found in the event, hence dropping event " + eventAttribute);
                         }
                     }
-                }
-
-                if(noCorrelationData>0) {
-                    if (!setFlag) {
-                        for (Attribute correlationData : streamDefinition.getCorrelationData()) {
-                            if (eventAttribute.trim().startsWith(EventReceiverConstants.CORRELATION_DATA_PREFIX + correlationData.getName())) {
-                                attributeArray[attributeCount++] = getPropertyValue(eventAttribute.split(EventReceiverConstants.EVENT_ATTRIBUTE_SEPARATOR)[1], correlationData.getType());
-                                setFlag = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if(noPayloadData>0) {
-                    if (!setFlag) {
-                        for (Attribute payloadData : streamDefinition.getPayloadData()) {
-                            if (eventAttribute.trim().startsWith(payloadData.getName())) {
-                                attributeArray[attributeCount++] = getPropertyValue(eventAttribute.split(EventReceiverConstants.EVENT_ATTRIBUTE_SEPARATOR)[1], payloadData.getType());
-                                break;
-                            }
-                        }
-                    }
+                } catch (NumberFormatException e) {
+                    throw new EventReceiverProcessingException("Unable to cast the input data to required type for attribute "
+                            + eventAttribute + ", hence dropping the event.", e);
                 }
             }
 
@@ -194,7 +192,7 @@ public class TextInputMapper implements InputMapper {
                 throw new EventReceiverProcessingException("Event attributes are not matching with the stream : " + this.eventReceiverConfiguration.getToStreamName() + ":" + eventReceiverConfiguration.getToStreamVersion());
             }
         }
-        return attributeArray;
+        return new Event(System.currentTimeMillis(), attributeArray);
     }
 
     @Override
@@ -205,19 +203,19 @@ public class TextInputMapper implements InputMapper {
 
     }
 
-    private Object getPropertyValue(Object propertyValue, AttributeType attributeType) {
+    private Object getPropertyValue(String propertyValue, AttributeType attributeType) {
         if (AttributeType.BOOL.equals(attributeType)) {
-            return Boolean.parseBoolean(propertyValue.toString());
+            return Boolean.parseBoolean(propertyValue);
         } else if (AttributeType.DOUBLE.equals(attributeType)) {
-            return Double.parseDouble(propertyValue.toString());
+            return Double.parseDouble(propertyValue);
         } else if (AttributeType.FLOAT.equals(attributeType)) {
-            return Float.parseFloat(propertyValue.toString());
+            return Float.parseFloat(propertyValue);
         } else if (AttributeType.INT.equals(attributeType)) {
-            return Integer.parseInt(propertyValue.toString());
+            return Integer.parseInt(propertyValue);
         } else if (AttributeType.LONG.equals(attributeType)) {
-            return Long.parseLong(propertyValue.toString());
+            return Long.parseLong(propertyValue);
         } else {
-            return propertyValue.toString();
+            return propertyValue;
         }
     }
 

@@ -39,7 +39,7 @@ public class CarbonEventStreamService implements EventStreamService {
 
     private static final Log log = LogFactory.getLog(CarbonEventStreamService.class);
     private Map<Integer, ConcurrentHashMap<String, EventStreamConfiguration>> tenantSpecificEventStreamConfigs = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, EventStreamConfiguration>>();
-    private List<StreamDefinition> pendingStreams = new ArrayList<StreamDefinition>();
+    private final List<StreamDefinition> pendingStreams = new ArrayList<StreamDefinition>();
 
     public void removeEventStreamConfigurationFromMap(String fileName) {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -67,12 +67,15 @@ public class CarbonEventStreamService implements EventStreamService {
      * Pending streams will be added
      */
     public void addPendingStreams() {
-        for (StreamDefinition stream : pendingStreams) {
-            try {
-                addEventStreamDefinition(stream);
-            } catch (EventStreamConfigurationException e) {
-                log.error("Error occurred when adding stream " + stream.getName(), e);
+        synchronized (pendingStreams) {
+            for (StreamDefinition stream : pendingStreams) {
+                try {
+                    addEventStreamDefinition(stream);
+                } catch (EventStreamConfigurationException e) {
+                    log.error("Error occurred when adding stream " + stream.getName(), e);
+                }
             }
+            pendingStreams.clear();
         }
     }
 
@@ -185,7 +188,13 @@ public class CarbonEventStreamService implements EventStreamService {
             }
             EventStreamConfigurationFileSystemInvoker.save(streamDefinition, filePath, axisConfig);
         } else {
-            pendingStreams.add(streamDefinition);
+            synchronized (pendingStreams) {
+                if (EventStreamServiceValueHolder.getConfigurationContextService() != null) {
+                    addEventStreamDefinition(streamDefinition);
+                } else {
+                    pendingStreams.add(streamDefinition);
+                }
+            }
         }
     }
 
@@ -254,11 +263,6 @@ public class CarbonEventStreamService implements EventStreamService {
     }
 
     @Override
-    public void subscribe(RawEventConsumer rawEventConsumer) throws EventStreamConfigurationException {
-        EventStreamServiceValueHolder.getEventStreamRuntime().subscribe(rawEventConsumer);
-    }
-
-    @Override
     public void subscribe(EventProducer eventProducer) throws EventStreamConfigurationException {
         EventStreamServiceValueHolder.getEventStreamRuntime().subscribe(eventProducer);
     }
@@ -276,11 +280,6 @@ public class CarbonEventStreamService implements EventStreamService {
     @Override
     public void unsubscribe(SiddhiEventConsumer siddhiEventConsumer) {
         EventStreamServiceValueHolder.getEventStreamRuntime().unsubscribe(siddhiEventConsumer);
-    }
-
-    @Override
-    public void unsubscribe(RawEventConsumer rawEventConsumer) {
-        EventStreamServiceValueHolder.getEventStreamRuntime().unsubscribe(rawEventConsumer);
     }
 
     @Override

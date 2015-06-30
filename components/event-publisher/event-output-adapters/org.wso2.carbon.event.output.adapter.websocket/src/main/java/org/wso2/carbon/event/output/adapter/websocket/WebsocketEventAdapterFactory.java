@@ -41,6 +41,7 @@ public class WebsocketEventAdapterFactory extends OutputEventAdapterFactory {
         return supportedMessageFormats;
     }
 
+    //TODO, check websocket security feature
     @Override
     public List<Property> getStaticPropertyList() {
         List<Property> staticPropertyList = new ArrayList<Property>();
@@ -60,17 +61,15 @@ public class WebsocketEventAdapterFactory extends OutputEventAdapterFactory {
         return null;
     }
 
-    public static void validateOutputEventAdapterConfigurations(OutputEventAdapterConfiguration eventAdapterConfiguration) throws OutputEventAdapterException {
-        String socketServerUrl = eventAdapterConfiguration.getStaticProperties().get(WebsocketEventAdapterConstants.ADAPTER_SERVER_URL);
-        if (!socketServerUrl.startsWith("ws://")){
-            throw new OutputEventAdapterException("Provided websocket URL - "+socketServerUrl+" is invalid for websocket output adaptor with name"+
-            eventAdapterConfiguration.getName()+". The websocket URL should start with 'ws://' prefix.");
-        }
+    @Override
+    public String getUsageTips() {
+        return null;
     }
+
 
     @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
-        return new WebsocketEventAdapter(eventAdapterConfiguration,globalProperties);
+        return new WebsocketEventAdapter(eventAdapterConfiguration, globalProperties);
     }
 
 }

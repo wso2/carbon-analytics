@@ -101,7 +101,6 @@ public class Event {
         this.payloadData = payloadData;
     }
 
-
     public Map<String, String> getArbitraryDataMap() {
         return arbitraryDataMap;
     }
@@ -130,5 +129,34 @@ public class Event {
                "  " + EBCommonsConstants.PAYLOAD_DATA + "=" + (payloadData == null ? null : Arrays.asList(payloadData)) + ",\n" +
                "  " + EBCommonsConstants.ARBITRARY_DATA_MAP + "=" + arbitraryDataMap + ",\n" +
                "}\n";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Event)) return false;
+
+        Event event = (Event) o;
+
+        if (timeStamp != event.timeStamp) return false;
+        if (arbitraryDataMap != null ? !arbitraryDataMap.equals(event.arbitraryDataMap) : event.arbitraryDataMap != null)
+            return false;
+        if (!Arrays.deepEquals(correlationData, event.correlationData)) return false;
+        if (!Arrays.deepEquals(metaData, event.metaData)) return false;
+        if (!Arrays.deepEquals(payloadData, event.payloadData)) return false;
+        if (streamId != null ? !streamId.equals(event.streamId) : event.streamId != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = streamId != null ? streamId.hashCode() : 0;
+        result = 31 * result + (int) (timeStamp ^ (timeStamp >>> 32));
+        result = 31 * result + (metaData != null ? Arrays.hashCode(metaData) : 0);
+        result = 31 * result + (correlationData != null ? Arrays.hashCode(correlationData) : 0);
+        result = 31 * result + (payloadData != null ? Arrays.hashCode(payloadData) : 0);
+        result = 31 * result + (arbitraryDataMap != null ? arbitraryDataMap.hashCode() : 0);
+        return result;
     }
 }

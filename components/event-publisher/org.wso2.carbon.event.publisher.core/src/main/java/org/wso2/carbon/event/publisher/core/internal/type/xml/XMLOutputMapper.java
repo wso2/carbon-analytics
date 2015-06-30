@@ -31,6 +31,7 @@ import org.wso2.carbon.event.publisher.core.exception.EventPublisherProcessingEx
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
+import org.wso2.siddhi.core.event.Event;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -94,8 +95,7 @@ public class XMLOutputMapper implements OutputMapper {
         }
     }
 
-    private String getPropertyValue(Object obj, String mappingProperty) {
-        Object[] inputObjArray = (Object[]) obj;
+    private String getPropertyValue(Object[] inputObjArray, String mappingProperty) {
         if (inputObjArray.length != 0) {
             int position = propertyPositionMap.get(mappingProperty);
             Object data = inputObjArray[position];
@@ -106,7 +106,7 @@ public class XMLOutputMapper implements OutputMapper {
         return "";
     }
 
-    private OMElement buildOuputOMElement(Object event, OMElement omElement)
+    private OMElement buildOuputOMElement(Object[] eventData, OMElement omElement)
             throws EventPublisherConfigurationException {
         Iterator<OMElement> iterator = omElement.getChildElements();
         if (iterator.hasNext()) {
@@ -119,7 +119,7 @@ public class XMLOutputMapper implements OutputMapper {
                     if (text != null) {
                         if (text.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0) {
                             String propertyToReplace = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) + 2, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX));
-                            String value = getPropertyValue(event, propertyToReplace);
+                            String value = getPropertyValue(eventData, propertyToReplace);
                             omAttribute.setAttributeValue(value);
                         }
                     }
@@ -129,19 +129,19 @@ public class XMLOutputMapper implements OutputMapper {
                 if (text != null) {
                     if (text.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0) {
                         String propertyToReplace = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) + 2, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX));
-                        String value = getPropertyValue(event, propertyToReplace);
+                        String value = getPropertyValue(eventData, propertyToReplace);
                         childElement.setText(value);
                     }
                 }
 
-                buildOuputOMElement(event, childElement);
+                buildOuputOMElement(eventData, childElement);
             }
         } else {
             String text = omElement.getText();
             if (text != null) {
                 if (text.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0) {
                     String propertyToReplace = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) + 2, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX));
-                    String value = getPropertyValue(event, propertyToReplace);
+                    String value = getPropertyValue(eventData, propertyToReplace);
                     omElement.setText(value);
                 }
             }
@@ -150,11 +150,11 @@ public class XMLOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToMappedInputEvent(Object[] eventData)
+    public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
-        if (eventData.length > 0) {
+        if (event.getData().length > 0) {
             try {
-                return buildOuputOMElement(eventData, AXIOMUtil.stringToOM(outputXMLText));
+                return buildOuputOMElement(event.getData(), AXIOMUtil.stringToOM(outputXMLText));
             } catch (XMLStreamException e) {
                 throw new EventPublisherConfigurationException("XML mapping is not in XML format :" + outputXMLText, e);
             }
@@ -164,9 +164,9 @@ public class XMLOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToTypedInputEvent(Object[] eventData)
+    public Object convertToTypedInputEvent(Event event)
             throws EventPublisherConfigurationException {
-        return convertToMappedInputEvent(eventData);
+        return convertToMappedInputEvent(event);
     }
 
 

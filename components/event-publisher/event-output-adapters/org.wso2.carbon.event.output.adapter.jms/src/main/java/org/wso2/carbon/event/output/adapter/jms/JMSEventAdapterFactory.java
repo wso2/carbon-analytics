@@ -36,6 +36,7 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
     public List<String> getSupportedMessageFormats() {
         List<String> supportedMessageFormats = new ArrayList<String>();
         supportedMessageFormats.add(MessageType.TEXT);
+        supportedMessageFormats.add(MessageType.MAP);
         supportedMessageFormats.add(MessageType.XML);
         supportedMessageFormats.add(MessageType.JSON);
         return supportedMessageFormats;
@@ -52,6 +53,15 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
         initialContextProperty.setRequired(true);
         initialContextProperty.setHint(resourceBundle.getString(
                 JMSEventAdapterConstants.JNDI_INITIAL_CONTEXT_FACTORY_CLASS_HINT));
+
+        // Connection Factory JNDI Name
+        Property connectionFactoryNameProperty = new Property(
+                JMSEventAdapterConstants.ADAPTER_JMS_CONNECTION_FACTORY_JNDINAME);
+        connectionFactoryNameProperty.setRequired(true);
+        connectionFactoryNameProperty.setDisplayName(
+                resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_CONNECTION_FACTORY_JNDINAME));
+        connectionFactoryNameProperty.setHint(resourceBundle.getString(
+                JMSEventAdapterConstants.ADAPTER_JMS_CONNECTION_FACTORY_JNDINAME_HINT));
 
         // JNDI Provider URL
         Property javaNamingProviderUrlProperty = new Property(JMSEventAdapterConstants.JAVA_NAMING_PROVIDER_URL);
@@ -72,14 +82,6 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
         passwordProperty.setDisplayName(
                 resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_PASSWORD));
 
-        // Connection Factory JNDI Name
-        Property connectionFactoryNameProperty = new Property(
-                JMSEventAdapterConstants.ADAPTER_JMS_CONNECTION_FACTORY_JNDINAME);
-        connectionFactoryNameProperty.setRequired(true);
-        connectionFactoryNameProperty.setDisplayName(
-                resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_CONNECTION_FACTORY_JNDINAME));
-        connectionFactoryNameProperty.setHint(resourceBundle.getString(
-                JMSEventAdapterConstants.ADAPTER_JMS_CONNECTION_FACTORY_JNDINAME_HINT));
 
         // Destination Type
         Property destinationTypeProperty = new Property(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION_TYPE);
@@ -97,6 +99,12 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
                 resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION));
         topicProperty.setRequired(true);
 
+        Property concurrentPublishers = new Property(JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS);
+        concurrentPublishers.setDisplayName(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS));
+        concurrentPublishers.setOptions(new String[]{JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_ALLOWED, JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_NOT_ALLOWED});
+        concurrentPublishers.setHint(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_HINT));
+
+
         staticPropertyList.add(initialContextProperty);
         staticPropertyList.add(javaNamingProviderUrlProperty);
         staticPropertyList.add(userNameProperty);
@@ -104,6 +112,7 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
         staticPropertyList.add(connectionFactoryNameProperty);
         staticPropertyList.add(destinationTypeProperty);
         staticPropertyList.add(topicProperty);
+        staticPropertyList.add(concurrentPublishers);
 
         return staticPropertyList;
 
@@ -121,6 +130,11 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
         dynamicPropertyList.add(headerProperty);
 
         return dynamicPropertyList;
+    }
+
+    @Override
+    public String getUsageTips() {
+        return null;
     }
 
     @Override

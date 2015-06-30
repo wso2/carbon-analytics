@@ -81,6 +81,7 @@ public class WSO2EventAdapterFactory extends OutputEventAdapterFactory {
                 resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_PROTOCOL));
         protocolProperty.setHint(resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_HINT_PROTOCOL));
 
+        //TODO verify the hint
         // set publishingMode as property
         Property publishingModeProperty = new Property(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_PUBLISHING_MODE);
         publishingModeProperty.setDefaultValue(WSO2EventAdapterConstants.ADAPTER_PUBLISHING_MODE_NON_BLOCKING);
@@ -91,24 +92,10 @@ public class WSO2EventAdapterFactory extends OutputEventAdapterFactory {
 
         // set publishTimeout as property
         Property publishTimeoutProperty = new Property(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_PUBLISH_TIMEOUT_MS);
-        publishingModeProperty.setDefaultValue("0");
-        publishingModeProperty.setDisplayName(
+        publishTimeoutProperty.setDefaultValue("0");
+        publishTimeoutProperty.setDisplayName(
                 resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_PUBLISH_TIMEOUT_MS));
-        publishingModeProperty.setHint(resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_HINT_PUBLISH_TIMEOUT_MS));
-
-        // set stream name
-        Property streamNameProperty = new Property(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_NAME);
-        streamNameProperty.setDisplayName(
-                resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_NAME));
-        streamNameProperty.setRequired(true);
-
-
-        // set stream version
-        Property streamVersionProperty = new Property(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_VERSION);
-        streamVersionProperty.setDisplayName(
-                resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_VERSION));
-        streamVersionProperty.setDefaultValue("1.0.0");
-        streamVersionProperty.setRequired(true);
+        publishTimeoutProperty.setHint(resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_HINT_PUBLISH_TIMEOUT_MS));
 
         propertyList.add(ipProperty);
         propertyList.add(authenticatorIpProperty);
@@ -116,8 +103,7 @@ public class WSO2EventAdapterFactory extends OutputEventAdapterFactory {
         propertyList.add(passwordProperty);
         propertyList.add(protocolProperty);
         propertyList.add(publishingModeProperty);
-        propertyList.add(streamNameProperty);
-        propertyList.add(streamVersionProperty);
+        propertyList.add(publishTimeoutProperty);
 
         return propertyList;
     }
@@ -128,7 +114,12 @@ public class WSO2EventAdapterFactory extends OutputEventAdapterFactory {
     }
 
     @Override
+    public String getUsageTips() {
+        return resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_USAGE_TIPS_WSO2EVENT);
+    }
+
+    @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
-        return new WSO2EventAdapter(eventAdapterConfiguration,globalProperties);
+        return new WSO2EventAdapter(eventAdapterConfiguration, globalProperties);
     }
 }

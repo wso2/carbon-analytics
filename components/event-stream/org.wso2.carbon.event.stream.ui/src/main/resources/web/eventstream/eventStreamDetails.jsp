@@ -13,13 +13,16 @@
   ~ specific language governing permissions and limitations under the License.
   --%>
 <%@ page
-	import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub"%>
+		import="org.wso2.carbon.analytics.stream.persistence.stub.EventStreamPersistenceAdminServiceStub" %>
 <%@ page
-	import="org.wso2.carbon.event.stream.ui.EventStreamUIUtils"%>
+		import="org.wso2.carbon.analytics.stream.persistence.stub.dto.AnalyticsTable" %>
 <%@ page
-	import="org.wso2.carbon.event.stream.stub.types.EventStreamAttributeDto"%>
+		import="org.wso2.carbon.analytics.stream.persistence.stub.dto.AnalyticsTableRecord" %>
 <%@ page
-	import="org.wso2.carbon.event.stream.stub.types.EventStreamDefinitionDto"%>
+		import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub" %>
+<%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamAttributeDto" %>
+<%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamDefinitionDto" %>
+<%@ page import="org.wso2.carbon.event.stream.ui.EventStreamUIUtils" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar"
 	prefix="carbon"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
@@ -53,6 +56,10 @@
 	    				.getEventStreamAdminService(config, session, request);
 	    		EventStreamDefinitionDto streamDefinitionDto = eventStreamAdminServiceStub
 	    				.getStreamDefinitionDto(eventStreamWithVersion);
+
+		EventStreamPersistenceAdminServiceStub
+				streamPersistenceAdminServiceStub = EventStreamUIUtils.getEventStreamPersistenceAdminService(config,
+																											 session, request);
 	%>
 
 	<script type="text/javascript">
@@ -377,6 +384,107 @@
 												</div>
 											</td>
 										</tr>
+										<%
+											if (EventStreamUIUtils.isEventStreamPersistenceAdminServiceAvailable(streamPersistenceAdminServiceStub)) {
+										%>
+										<tr>
+											<td colspan="2">
+												<div id="analyticsIndexDiv">
+													<table class="styledLeft noBorders spacer-bot" style="width: 100%">
+														<tbody>
+														<tr>
+															<td colspan="5" class="middle-header">
+																<span style="float: left; position: relative; margin-top: 2px;">
+																	<fmt:message key="event.stream.persistence.config"/>
+																</span>
+															</td>
+														</tr>
+														<%
+															try {
+																AnalyticsTable analyticsTable =
+																		streamPersistenceAdminServiceStub.getAnalyticsTable(streamDefinitionDto.getName(), streamDefinitionDto.getVersion());
+																if (analyticsTable != null &&
+																	analyticsTable.getAnalyticsTableRecords() != null) {
+														%>
+														<tr>
+															<td>
+																<table class="styledLeft noBorders spacer-bot">
+																	<thead>
+																	<tr>
+																		<th class="leftCol-med">
+																			<fmt:message key="attribute.name"/>
+																		</th>
+																		<th class="leftCol-med">
+																			<fmt:message key="attribute.type"/>
+																		</th>
+																		<th class="leftCol-med">
+																			<fmt:message key="attribute.primay"/>
+																		</th>
+																		<th class="leftCol-med">
+																			<fmt:message key="attribute.index"/>
+																		</th>
+																		<th class="leftCol-med">
+																			<fmt:message key="attribute.scoreParam"/>
+																		</th>
+																	</tr>
+																	</thead>
+																	<tbody>
+																	<%
+																		for (AnalyticsTableRecord analyticsTableRecord : analyticsTable.getAnalyticsTableRecords()) {
+																	%>
+																	<tr>
+																		<td class="property-names"><%=analyticsTableRecord.getColumnName()%>
+																		</td>
+																		<td class="property-names"><%=analyticsTableRecord.getColumnType()%>
+																		</td>
+																		<td class="property-names">
+																			<input type="checkbox" onclick="return false"
+																					<% if (analyticsTableRecord.getPrimaryKey()) { %>
+																				   checked   <% } %>
+																					>
+																		</td>
+																		<td class="property-names">
+																			<input type="checkbox" onclick="return false"
+																					<% if (analyticsTableRecord.getIndexed())
+																					{ %>
+																				   checked   <% } %>
+																					>
+																		</td>
+																		<td class="property-names">
+																			<input type="checkbox" onclick="return false"
+																					<% if (analyticsTableRecord.getScoreParam())
+																					{ %>
+																				   checked   <% } %>
+																					>
+																		</td>
+																	</tr>
+																	<%
+																		}
+																	%>
+																	</tbody>
+																</table>
+															</td>
+														</tr>
+														<%
+															}
+														} catch (Exception e) {
+														%>
+														<tr>
+															<td> Unable to display index
+																 information: <%= e.getMessage()%>
+															</td>
+														</tr>
+														<%
+															}
+														%>
+														</tbody>
+													</table>
+												</div>
+											</td>
+										</tr>
+										<%
+											}
+										%>
 										<tr>
 											<td colspan="2">
 												<div id="sampleEventGenerater">

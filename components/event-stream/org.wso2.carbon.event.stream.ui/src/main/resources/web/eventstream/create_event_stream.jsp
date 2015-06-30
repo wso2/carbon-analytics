@@ -15,6 +15,7 @@
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar"
 	prefix="carbon"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <fmt:bundle
 	basename="org.wso2.carbon.event.stream.ui.i18n.Resources">
@@ -32,6 +33,7 @@
 	<script type="text/javascript"
 		src="../yui/build/connection/connection-min.js"></script>
 	<script type="text/javascript" src="js/event_stream.js"></script>
+	<script type="text/javascript" src="js/event_stream_persistence.js"></script>
 	<script type="text/javascript" src="js/create_eventStream_helper.js"></script>
 	<script type="text/javascript"
 		src="../eventbuilder/js/create_event_builder_helper.js"></script>
@@ -50,6 +52,22 @@
 				convertStringToEventStreamInfoDto();
 			}
 		}
+		function nextPersistView() {
+			var eventStreamName = document.getElementById("eventStreamNameId").value.trim();
+			var eventStreamVersion = document.getElementById("eventStreamVersionId").value.trim();
+			if ((eventStreamName == "") || (eventStreamVersion == "")) {
+				// empty fields are encountered.
+				CARBON.showErrorDialog("Empty inputs fields are not allowed.");
+			} else {
+				document.getElementById("stream").style.display = 'none';
+				document.getElementById("persist").style.display = 'block';
+				populateAnalyticsIndexTable(eventStreamName, eventStreamVersion);
+			}
+		}
+		function back() {
+			document.getElementById("stream").style.display = 'block';
+			document.getElementById("persist").style.display = 'none';
+		}
 	</script>
 
 
@@ -61,40 +79,73 @@
 		<div id="custom_dcontainer" style="display: none"></div>
 			<div id="designWorkArea">
 				<div id="workArea">
-	
-				<form name="inputForm" action="index.jsp?ordinal=1" method="post"
-					id="addEventStreamDesign">
-					<table style="width: 100%" id="eventStreamAdd" class="styledLeft">
-						<thead>
-							<tr>
-								<th colspan="2" class="middle-header"><span
-									style="float: left; position: relative; margin-top: 2px;">
-										<fmt:message key="title.event.stream.details" />
-								</span> <a href="#" onclick="changeView('source');" class="icon-link"
-									style="background-image: url(images/design-view.gif); font-weight: normal">
+					<div id="stream">
+						<form name="inputForm" action="index.jsp?ordinal=1" method="post" id="addEventStreamDesign">
+							<table style="width: 100%" id="eventStreamAdd" class="styledLeft">
+								<thead>
+								<tr>
+									<th colspan="2" class="middle-header"><span
+											style="float: left; position: relative; margin-top: 2px;">
+													<fmt:message key="title.event.stream.details"/>
+											</span> <a href="#" onclick="changeView('source');" class="icon-link"
+													   style="background-image: url(images/design-view.gif); font-weight: normal">
 										switch to source view</a></th>
-							</tr>
-						</thead>
-						<tbody>
+								</tr>
+								</thead>
+								<tbody>
+								<tr>
+									<td class="formRaw">
+										<%@include file="inner_event_stream_ui.jsp" %>
+									</td>
+								</tr>
+								<tr>
+									<td class="buttonRow">
+										<input type="button" value="<fmt:message key="add.event.stream"/>"
+											   onclick="addEventStream(document.getElementById('addEventStreamDesign'),'add')"/>
+										<c:if test="${isAnalyticsPersistenceBackendAvailable}">
+											<input type="button" value="<fmt:message key="next.persist.stream"/>"
+												   onclick="nextPersistView()"/>
+										</c:if>
+									</td>
+								</tr>
+								</tbody>
+							</table>
+						</form>
+					</div>
+					<div id="persist" style="display: none;">
+						<table style="width: 100%" id="eventStreamPersistenceAdd" class="styledLeft">
+							<thead>
 							<tr>
-								<td class="formRaw"><%@include
-										file="inner_event_stream_ui.jsp"%></td>
+								<th colspan="2" class="middle-header">
+									<span style="float: left; position: relative; margin-top: 2px;">
+													<fmt:message key="title.event.stream.persistence.details"/>
+											</span>
+								</th>
 							</tr>
+							</thead>
+							<tbody>
 							<tr>
-								<td class="buttonRow"><input type="button"
-									value="<fmt:message key="add.event.stream"/>"
-									onclick="addEventStream(document.getElementById('addEventStreamDesign'),'add')" />
+								<td class="formRaw">
+									<%@include file="inner_event_stream_persistence_ui.jsp" %>
 								</td>
 							</tr>
-						</tbody>
-					</table>
-				</form>
+							<tr>
+								<td class="buttonRow">
+									<input type="button" value="<fmt:message key="back"/>" onclick="back()"/>
+									<input id="eventPersistButton" type="button" value="<fmt:message
+									key="save.event.stream"/>"
+										   onclick="addEventStream(document.getElementById('addEventStreamDesign'),'add')"/>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
 			</div>
 		</div>
 		
 		<div id="sourceWorkArea" style="border-style: none;">
 			<div id="workArea">
-
 				<form name="inputForm2" action="index.jsp?ordinal=1" method="post"
 					id="addEventStreamSource">
 					<table style="width: 100%" id="eventStreamAdd2" class="styledLeft">
@@ -116,8 +167,8 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="buttonRow"><input type="button"
-									value="<fmt:message key="add.event.stream"/>"
+								<td class="buttonRow">
+									<input type="button" value="<fmt:message key="add.event.stream"/>"
 									onclick="addEventStreamByString(document.getElementById('addEventStreamSource'))" />
 								</td>
 							</tr>
@@ -126,6 +177,5 @@
 				</form>
 			</div>
 		</div>
-
 	</div>
 </fmt:bundle>

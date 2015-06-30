@@ -26,6 +26,8 @@ public class WSO2EventOutputMapping extends OutputMapping {
     private List<EventOutputProperty> metaWSO2EventOutputPropertyConfiguration;
     private List<EventOutputProperty> correlationWSO2EventOutputPropertyConfiguration;
     private List<EventOutputProperty> payloadWSO2EventOutputPropertyConfiguration;
+    private String toEventName;
+    private String toEventVersion;
 
 
     public WSO2EventOutputMapping() {
@@ -80,4 +82,18 @@ public class WSO2EventOutputMapping extends OutputMapping {
     public String getMappingType() {
         return EventPublisherConstants.EF_WSO2EVENT_MAPPING_TYPE;
     }
+
+    public void setToEventName(String toEventName){
+        this.toEventName = toEventName;
+    }
+    public String getToEventName(){
+        return toEventName;
+    }
+    public void setToEventVersion(String toEventVersion){
+        this.toEventVersion = toEventVersion;
+    }
+    public String getToEventVersion(){
+        return toEventVersion;
+    }
+
 }

@@ -30,6 +30,10 @@ function addEventStream(form, option, eventStreamId) {
         var metaData = "";
         var correlationData = "";
         var payloadData = "";
+        var metaIndex = "";
+        var correlationIndex = "";
+        var payloadIndex = "";
+        var arbitraryIndex = "";
         var newEventStreamId = eventStreamName + ":" + eventStreamVersion;
 
         var metaDataTable = document.getElementById("outputMetaDataTable");
@@ -44,6 +48,26 @@ function addEventStream(form, option, eventStreamId) {
         var payloadDataTable = document.getElementById("outputPayloadDataTable");
         if (payloadDataTable != null && payloadDataTable.rows.length > 1) {
             payloadData = getWSO2EventDataValues(payloadDataTable);
+        }
+
+        var metaIndexTable = document.getElementById("metaIndexTable");
+        if (metaIndexTable != null && metaIndexTable.rows.length > 1) {
+            metaIndex = getAnalyticsIndexDataValues(metaIndexTable);
+        }
+
+        var correlationIndexTable = document.getElementById("correlationIndexTable");
+        if (correlationIndexTable != null && correlationIndexTable.rows.length > 1) {
+            correlationIndex = getAnalyticsIndexDataValues(correlationIndexTable);
+        }
+
+        var payloadIndexTable = document.getElementById("payloadIndexTable");
+        if (payloadIndexTable != null && payloadIndexTable.rows.length > 1) {
+            payloadIndex = getAnalyticsIndexDataValues(payloadIndexTable);
+        }
+
+        var arbitraryIndexTable = document.getElementById("arbitraryIndexTable");
+        if (arbitraryIndexTable != null && arbitraryIndexTable.rows.length > 1) {
+            arbitraryIndex = getArbitraryIndexDataValues(arbitraryIndexTable);
         }
 
         if (metaData == "" && correlationData == "" && payloadData == "") {
@@ -61,12 +85,18 @@ function addEventStream(form, option, eventStreamId) {
                         metaData: metaData,
                         correlationData: correlationData,
                         payloadData: payloadData,
+                        metaIndex: metaIndex,
+                        correlationIndex: correlationIndex,
+                        payloadIndex: payloadIndex,
+                        arbitraryIndex: arbitraryIndex,
+                        eventPersist: document.getElementById("eventPersistCheckbox").checked,
                         eventStreamDescription: eventStreamDescription,
-                        eventStreamNickName: eventStreamNickName
+                        eventStreamNickName: eventStreamNickName,
+                        recordStream: document.getElementById("recordStoreSelect").value
                     },
                     onSuccess: function (event) {
                         if ("true" == event.responseText.trim()) {
-                            CARBON.showInfoDialog("Stream definition added successfully!!",function () {
+                            CARBON.showInfoDialog("Stream definition added successfully!!", function () {
                                 form.submit();
                             });
                         } else {
@@ -75,10 +105,9 @@ function addEventStream(form, option, eventStreamId) {
                     }
                 })
         } else if (option == "edit") {
-
             CARBON.showConfirmationDialog("If event stream is edited then related configuration files will be also affected! Are you sure want to edit?",
-            function () {
-                new Ajax.Request('../eventstream/edit_event_stream_ajaxprocessor.jsp',{
+                function () {
+                    new Ajax.Request('../eventstream/edit_event_stream_ajaxprocessor.jsp', {
                         method: 'POST',
                         asynchronous: false,
                         parameters: {
@@ -88,9 +117,15 @@ function addEventStream(form, option, eventStreamId) {
                             metaData: metaData,
                             correlationData: correlationData,
                             payloadData: payloadData,
+                            metaIndex: metaIndex,
+                            correlationIndex: correlationIndex,
+                            payloadIndex: payloadIndex,
+                            arbitraryIndex: arbitraryIndex,
+                            eventPersist: document.getElementById("eventPersistCheckbox").checked,
                             eventStreamDescription: eventStreamDescription,
-                            eventStreamNickName: eventStreamNickName
-                        },onSuccess: function (event) {
+                            eventStreamNickName: eventStreamNickName,
+                            recordStream: document.getElementById("recordStoreSelect").value
+                        }, onSuccess: function (event) {
                             if ("true" == event.responseText.trim()) {
                                 form.submit();
                             } else {
@@ -98,7 +133,7 @@ function addEventStream(form, option, eventStreamId) {
                             }
                         }
                     })
-            }, null, null);
+                }, null, null);
 
         }
     }
@@ -147,7 +182,7 @@ function addEventStreamViaPopup(form, callback) {
             CARBON.showErrorDialog("Mapping parameters cannot be empty.");
             return;
         } else {
-            new Ajax.Request('../eventstream/add_event_stream_ajaxprocessor.jsp',{
+            new Ajax.Request('../eventstream/add_event_stream_ajaxprocessor.jsp', {
                 method: 'POST',
                 asynchronous: false,
                 parameters: {
@@ -158,22 +193,22 @@ function addEventStreamViaPopup(form, callback) {
                     payloadData: payloadData,
                     eventStreamDescription: eventStreamDescription,
                     eventStreamNickName: eventStreamNickName
-                },onSuccess: function (event) {
+                }, onSuccess: function (event) {
                     if ("true" == event.responseText.trim()) {
-                        CARBON.showInfoDialog("Stream definition added successfully!!",
-                            function () {
-                                if (callback == "inflow") {
-                                    onSuccessCreateInflowStreamDefinition(streamId);
-                                } else if (callback == "outflow") {
+                        if (callback == "inflow") {
+                            CARBON.showInfoDialog("Stream definition added successfully!!", function () {
+                                form.submit();
+                            });
+
+                        } else {
+                            CARBON.showInfoDialog("Stream definition added successfully!!",
+                                function () {
                                     onSuccessCreateOutflowStreamDefinition(streamId);
-                                }
-                            },function () {
-                                if (callback == "inflow") {
-                                    onSuccessCreateInflowStreamDefinition(streamId);
-                                } else if (callback == "outflow") {
+                                }, function () {
                                     onSuccessCreateOutflowStreamDefinition(streamId);
-                                }
-                            });customCarbonWindowClose();
+                                });
+                            customCarbonWindowClose();
+                        }
                     } else {
                         CARBON.showErrorDialog("Failed to add event stream, Exception: " + event.responseText.trim());
                     }
@@ -286,38 +321,38 @@ CARBON.customConfirmDialogBox = function (message, option1, option2, callback, c
         jQuery("#dcontainer").html(strDialog);
 
         jQuery("#dialog").dialog({ close: function () {
+            jQuery(this).dialog('destroy').remove();
+            jQuery("#dcontainer").empty();
+            if (closeCallback
+                && typeof closeCallback == "function") {
+                closeCallback();
+            }
+            return false;
+        },
+
+            buttons: { "OK": function () {
+                var value = jQuery('input[name=dialogRadio]:checked').val();
+                jQuery(this).dialog("destroy").remove();
+                jQuery("#dcontainer").empty();
+                if (callback && typeof callback == "function") {
+                    callback(value);
+                }
+                return false;
+            }, "Create Later": function () {
                 jQuery(this).dialog('destroy').remove();
                 jQuery("#dcontainer").empty();
-                if (closeCallback
-                    && typeof closeCallback == "function") {
+                if (closeCallback && typeof closeCallback == "function") {
                     closeCallback();
                 }
                 return false;
+            }
             },
 
-            buttons: { "OK": function () {
-                    var value = jQuery('input[name=dialogRadio]:checked').val();
-                    jQuery(this).dialog("destroy").remove();
-                    jQuery("#dcontainer").empty();
-                    if (callback && typeof callback == "function") {
-                        callback(value);
-                    }
-                    return false;
-                },"Create Later": function () {
-                        jQuery(this).dialog('destroy').remove();
-                        jQuery("#dcontainer").empty();
-                        if (closeCallback && typeof closeCallback == "function") {
-                            closeCallback();
-                        }
-                        return false;
-                    }
-            },
-
-                height: 200,
-                width: 500,
-                minHeight: 200,
-                minWidth: 330,
-                modal: true
+            height: 200,
+            width: 500,
+            minHeight: 200,
+            minWidth: 330,
+            modal: true
         });
     };
     if (!pageLoaded) {
@@ -358,7 +393,7 @@ function convertEventStreamInfoDtoToString() {
         payloadData = getWSO2EventDataValues(payloadDataTable);
     }
 
-    new Ajax.Request('../eventstream/transform_to_string_ajaxprocessor.jsp',{
+    new Ajax.Request('../eventstream/transform_to_string_ajaxprocessor.jsp', {
         method: 'POST',
         asynchronous: false,
         dataType: "text",
@@ -370,18 +405,18 @@ function convertEventStreamInfoDtoToString() {
             payloadData: payloadData,
             eventStreamDescription: eventStreamDescription,
             eventStreamNickName: eventStreamNickName
-        },onSuccess: function (data) {
-                var eventStreamDefinitionString = JSON.parse(data.responseText.trim());
+        }, onSuccess: function (data) {
+            var eventStreamDefinitionString = JSON.parse(data.responseText.trim());
 
-                if (eventStreamDefinitionString.success.localeCompare("fail") == 0) {
-                    CARBON.showErrorDialog(eventStreamDefinitionString.message);
-                }else {
-                    document.getElementById("streamDefinitionText").value = eventStreamDefinitionString.message;
-                    document.getElementById("designWorkArea").style.display = "none";
-                    document.getElementById("sourceWorkArea").style.display = "inline";
-                }
+            if (eventStreamDefinitionString.success.localeCompare("fail") == 0) {
+                CARBON.showErrorDialog(eventStreamDefinitionString.message);
+            } else {
+                document.getElementById("streamDefinitionText").value = eventStreamDefinitionString.message;
+                document.getElementById("designWorkArea").style.display = "none";
+                document.getElementById("sourceWorkArea").style.display = "inline";
             }
-        });
+        }
+    });
 
 }
 
@@ -390,8 +425,7 @@ function convertStringToEventStreamInfoDto() {
         .getElementById("streamDefinitionText").value.trim();
 
 
-
-    new Ajax.Request('../eventstream/transform_to_dto_ajaxprocessor.jsp',{
+    new Ajax.Request('../eventstream/transform_to_dto_ajaxprocessor.jsp', {
         method: 'POST',
         asynchronous: false,
         dataType: "text",
@@ -414,7 +448,6 @@ function convertStringToEventStreamInfoDto() {
 
                 //var source =  document.getElementById("sourceWorkArea");
                 //var design =  document.getElementById("designWorkArea");
-
 
 
                 if (0 == eventStreamDefinitionDtoJSON.message.metaAttributes.length) {
@@ -512,18 +545,18 @@ function addEventStreamByString(form) {
     var eventStreamDefinitionString = document.getElementById("streamDefinitionText").value.trim();
 
 
-    new Ajax.Request('../eventstream/add_event_stream_by_string_ajaxprocessor.jsp',{
+    new Ajax.Request('../eventstream/add_event_stream_by_string_ajaxprocessor.jsp', {
         method: 'POST',
         asynchronous: false,
         parameters: {
             eventStreamDefinitionString: eventStreamDefinitionString
-        },onSuccess: function (event) {
+        }, onSuccess: function (event) {
 
             var addStreamResposeJSON = JSON.parse(event.responseText.trim());
             if (addStreamResposeJSON.success.localeCompare("fail") == 0) {
                 CARBON.showErrorDialog("Failed to add event stream, Exception: " + addStreamResposeJSON.message);
             } else {
-                CARBON.showInfoDialog("Stream definition added successfully!!",function () {
+                CARBON.showInfoDialog("Stream definition added successfully!!", function () {
                     form.submit();
                 });
             }
@@ -540,13 +573,13 @@ function editEventStreamByString(form, eventStreamId) {
         function () {
 
             var eventStreamDefinitionString = document.getElementById("streamDefinitionText").value.trim();
-            new Ajax.Request('../eventstream/edit_event_stream_by_string_ajaxprocessor.jsp',{
+            new Ajax.Request('../eventstream/edit_event_stream_by_string_ajaxprocessor.jsp', {
                 method: 'POST',
                 asynchronous: false,
                 parameters: {
                     eventStreamDefinitionString: eventStreamDefinitionString,
                     oldEventStreamId: eventStreamId
-                },onSuccess: function (event) {
+                }, onSuccess: function (event) {
 
                     var addStreamResposeJSON = JSON.parse(event.responseText.trim());
                     if (addStreamResposeJSON.success.localeCompare("fail") == 0) {

@@ -31,7 +31,7 @@ public final class KafkaEventAdapterConstants {
     public final static String ADAPTOR_SUSCRIBER_TOPIC = "topic";
     public final static String ADAPTOR_SUSCRIBER_GROUP_ID = "group.id";
     public final static String ADAPTOR_SUSCRIBER_GROUP_ID_hint = "group.id.hint";
-    public final static String ADAPTOR_SUSCRIBER_ZOOKEEPER_CONNECT = "zookeeper.id";
+    public final static String ADAPTOR_SUSCRIBER_ZOOKEEPER_CONNECT = "zookeeper.connect";
     public final static String ADAPTOR_SUSCRIBER_ZOOKEEPER_CONNECT_HINT = "zookeeper.id.hint";
     public final static String ADAPTOR_SUSCRIBER_THREADS = "threads";
     public final static String ADAPTOR_SUSCRIBER_THREADS_HINT = "threads.hint";

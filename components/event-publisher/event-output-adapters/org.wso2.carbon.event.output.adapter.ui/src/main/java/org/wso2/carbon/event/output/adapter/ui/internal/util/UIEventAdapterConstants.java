@@ -28,12 +28,23 @@ public class UIEventAdapterConstants {
     }
 
     public static final String ADAPTER_TYPE_UI = "ui";
-    public static final String ADAPTER_UI_OUTPUT_STREAM_NAME = "output.event.stream.name";
-    public static final String ADAPTER_UI_OUTPUT_STREAM_VERSION = "output.event.stream.version";
+    public static final String ADAPTER_USAGE_TIPS_UI = "ui.usage.tips";
     public static final String ADAPTER_UI_DEFAULT_OUTPUT_STREAM_VERSION = "1.0.0";
     public static final String ADAPTER_UI_COLON = ":";
-    public static final int EVENTS_QUEUE_SIZE = 30;
     public static final int INDEX_ZERO = 0;
     public static final int INDEX_ONE = 1;
     public static final int INDEX_TWO = 2;
+
+    public static final int ADAPTER_MIN_THREAD_POOL_SIZE = 8;
+    public static final int ADAPTER_MAX_THREAD_POOL_SIZE = 100;
+    public static final int ADAPTER_EXECUTOR_JOB_QUEUE_SIZE = 2000;
+    public static final long DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS = 20000;
+    public static final String ADAPTER_MIN_THREAD_POOL_SIZE_NAME = "minThread";
+    public static final String ADAPTER_MAX_THREAD_POOL_SIZE_NAME = "maxThread";
+    public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
+    public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
+
+    public static final String ADAPTER_EVENT_QUEUE_SIZE_NAME = "eventQueueSize";
+    public static final int EVENTS_QUEUE_SIZE = 30;
+
 }

@@ -182,6 +182,11 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
                     mappingType = mappingType.toLowerCase();
                     EventReceiverConfiguration eventReceiverConfiguration = EventReceiverConfigurationBuilder.getEventReceiverConfiguration(eventReceiverOMElement, mappingType, isEditable, tenantId);
                     eventReceiverName = eventReceiverConfiguration.getEventReceiverName();
+                    String type = eventReceiverConfiguration.getFromAdapterConfiguration().getType();
+                    if (!EventReceiverServiceValueHolder.getInputEventAdapterTypes().contains(type)) {
+                        throw new EventReceiverValidationException("Event Adapter with type: " + type + " does not exist", type);
+                    }
+
                     if (!carbonEventReceiverService.isEventReceiverAlreadyExists(tenantId, eventReceiverName)) {
                         carbonEventReceiverService.addEventReceiverConfiguration(eventReceiverConfiguration);
                         carbonEventReceiverService.addEventReceiverConfigurationFile(createEventReceiverConfigurationFile(eventReceiverName,
@@ -224,7 +229,7 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
             String eventReceiverName,
             File file,
             EventReceiverConfigurationFile.Status status,
-            int  tenantId,
+            int tenantId,
             String deploymentStatusMessage,
             String dependency) {
         EventReceiverConfigurationFile eventReceiverConfigurationFile = new EventReceiverConfigurationFile();
@@ -242,7 +247,6 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
     public void processUndeployment(String filePath) throws EventReceiverConfigurationException {
         String fileName = new File(filePath).getName();
         log.info("Event Receiver undeployed successfully : " + fileName);
-        int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         CarbonEventReceiverService carbonEventReceiverService = EventReceiverServiceValueHolder.getCarbonEventReceiverService();
         carbonEventReceiverService.removeEventReceiverConfigurationFile(fileName);
     }

@@ -15,16 +15,18 @@
 package org.wso2.carbon.event.receiver.core.internal.type.map;
 
 import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
-import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.InputMappingAttribute;
 import org.wso2.carbon.event.receiver.core.config.mapping.MapInputMapping;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingException;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverStreamValidationException;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
+import org.wso2.siddhi.core.event.Event;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,7 +56,7 @@ public class MapInputMapper implements InputMapper {
                     positionKeyMap.put(inputMappingAttribute.getToStreamPosition(), inputMappingAttribute.getFromElementKey());
                     if (positionKeyMap.get(inputMappingAttribute.getToStreamPosition()) == null) {
                         this.attributePositionKeyMap = null;
-                        throw new EventReceiverStreamValidationException("Error creating map mapping. '"+inputMappingAttribute.getToElementKey()+"' position not found.",streamDefinition.getStreamId());
+                        throw new EventReceiverStreamValidationException("Error creating map mapping. '" + inputMappingAttribute.getToElementKey() + "' position not found.", streamDefinition.getStreamId());
                     }
                 }
                 this.attributePositionKeyMap = new Object[positionKeyMap.size()];
@@ -87,7 +89,7 @@ public class MapInputMapper implements InputMapper {
             throw new EventReceiverProcessingException("Received event object is not of type map." + this.getClass() + " cannot convert this event.");
         }
 
-        return outObjArray;
+        return new Event(System.currentTimeMillis(), outObjArray);
     }
 
     @Override
@@ -98,38 +100,39 @@ public class MapInputMapper implements InputMapper {
         if (obj instanceof Map) {
             Map<Object, Object> eventMap = (Map<Object, Object>) obj;
 
-            for (Map.Entry<Object, Object> eventAttribute : eventMap.entrySet()) {
-                boolean setFlag = false;
-
-                if (noMetaData > 0) {
-                    for (Attribute metaData : streamDefinition.getMetaData()) {
-                        if (eventAttribute.getKey().equals(EventReceiverConstants.META_DATA_PREFIX + metaData.getName())) {
-                            attributeArray[attributeCount++] = eventAttribute.getValue();
-                            setFlag = true;
-                            break;
-                        }
+            if (noMetaData > 0) {
+                for (Attribute metaData : streamDefinition.getMetaData()) {
+                    Object mapAttribute = eventMap.get(EventReceiverConstants.META_DATA_PREFIX + metaData.getName());
+                    if (mapAttribute != null || AttributeType.STRING.equals(metaData.getType())) {
+                        attributeArray[attributeCount++] = mapAttribute;
+                    } else {
+                        throw new EventReceiverProcessingException("Non-string meta attribute '" + metaData.getName()
+                                + "' of type " + metaData.getType() + " is null.");
                     }
                 }
+            }
 
-                if (noCorrelationData > 0 && !setFlag) {
-                    for (Attribute correlationData : streamDefinition.getCorrelationData()) {
-                        if (eventAttribute.getKey().equals(EventReceiverConstants.CORRELATION_DATA_PREFIX + correlationData.getName())) {
-                            attributeArray[attributeCount++] = eventAttribute.getValue();
-                            setFlag = true;
-                            break;
-                        }
+            if (noCorrelationData > 0) {
+                for (Attribute correlationData : streamDefinition.getCorrelationData()) {
+                    Object mapAttribute = eventMap.get(EventReceiverConstants.CORRELATION_DATA_PREFIX + correlationData.getName());
+                    if (mapAttribute != null || AttributeType.STRING.equals(correlationData.getType())) {
+                        attributeArray[attributeCount++] = mapAttribute;
+                    } else {
+                        throw new EventReceiverProcessingException("Non-string correlation attribute '" + correlationData.getName()
+                                + "' of type " + correlationData.getType() + " is null.");
                     }
                 }
+            }
 
-                if (noPayloadData > 0 && !setFlag) {
-                    for (Attribute payloadData : streamDefinition.getPayloadData()) {
-                        if (eventAttribute.getKey().equals(payloadData.getName())) {
-                            attributeArray[attributeCount++] = eventAttribute.getValue();
-                            break;
-                        }
+            if (noPayloadData > 0) {
+                for (Attribute payloadData : streamDefinition.getPayloadData()) {
+                    Object mapAttribute = eventMap.get(payloadData.getName());
+                    if (mapAttribute != null || AttributeType.STRING.equals(payloadData.getType())) {
+                        attributeArray[attributeCount++] = mapAttribute;
+                    } else {
+                        throw new EventReceiverProcessingException("Non-string payload attribute '" + payloadData.getName() + "' of type " + payloadData.getType() + " is null.");
                     }
                 }
-
             }
 
             if (noMetaData + noCorrelationData + noPayloadData != attributeCount) {
@@ -140,7 +143,7 @@ public class MapInputMapper implements InputMapper {
             throw new EventReceiverProcessingException("Received event object is not of type map." + this.getClass() + " cannot convert this event.");
         }
 
-        return attributeArray;
+        return new Event(System.currentTimeMillis(), attributeArray);
 
     }
 

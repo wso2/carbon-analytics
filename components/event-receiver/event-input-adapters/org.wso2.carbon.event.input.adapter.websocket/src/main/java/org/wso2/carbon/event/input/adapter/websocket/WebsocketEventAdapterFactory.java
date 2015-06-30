@@ -48,7 +48,21 @@ public class WebsocketEventAdapterFactory extends InputEventAdapterFactory {
         urlProperty.setHint(resourceBundle.getString(WebsocketEventAdapterConstants.ADAPTER_SERVER_URL_HINT));
         urlProperty.setRequired(true);
         propertyList.add(urlProperty);
+
+        Property isDuplicatedInCluster = new Property(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER);
+        isDuplicatedInCluster.setDisplayName(
+                resourceBundle.getString(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER));
+        isDuplicatedInCluster.setRequired(false);
+        isDuplicatedInCluster.setOptions(new String[]{"true", "false"});
+        isDuplicatedInCluster.setDefaultValue("false");
+        propertyList.add(isDuplicatedInCluster);
+
         return propertyList;
+    }
+
+    @Override
+    public String getUsageTips() {
+        return null;
     }
 
     @Override

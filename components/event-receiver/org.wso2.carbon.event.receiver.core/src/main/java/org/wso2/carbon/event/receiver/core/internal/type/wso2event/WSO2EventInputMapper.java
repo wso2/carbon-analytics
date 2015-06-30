@@ -19,6 +19,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
 import org.wso2.carbon.event.receiver.core.config.InputMappingAttribute;
@@ -26,7 +27,6 @@ import org.wso2.carbon.event.receiver.core.config.mapping.WSO2EventInputMapping;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingException;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverStreamValidationException;
-import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
 import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
@@ -57,14 +57,13 @@ public class WSO2EventInputMapper implements InputMapper {
 
         if (fromStreamName == null || fromStreamVersion == null || (fromStreamName.isEmpty()) || (fromStreamVersion.isEmpty())) {
             importedStreamDefinition = exportedStreamDefinition;
-        }else{
+        } else {
             try {
                 this.importedStreamDefinition = eventStreamService.getStreamDefinition(fromStreamName, fromStreamVersion);
             } catch (EventStreamConfigurationException e) {
                 throw new EventReceiverStreamValidationException("Error while retrieving stream definition : " + e.getMessage(), fromStreamName + ":" + fromStreamVersion);
             }
         }
-
         validateInputStreamAttributes();
 
         if (importedStreamDefinition != null && eventReceiverConfiguration.getInputMapping().isCustomMappingEnabled()) {
@@ -191,62 +190,58 @@ public class WSO2EventInputMapper implements InputMapper {
     //TODO Profile performance of this method
     @Override
     public Object convertToMappedInputEvent(Object obj) throws EventReceiverProcessingException {
-        Object[] outObjArray = null;
+        Object[] outObjArray;
         if (obj instanceof Event) {
             Event event = (Event) obj;
-            if(event.getStreamId().equalsIgnoreCase(importedStreamDefinition.getStreamId())){
-                Map<String, String> arbitraryMap = event.getArbitraryDataMap();
-                if (arbitraryMap != null && !arbitraryMap.isEmpty()) {
-                    outObjArray = processArbitraryMap(event);
-                } else if (inputDataTypeSpecificPositionMap != null) {
-                    List<Object> outObjList = new ArrayList<Object>();
-                    Object[] inEventArray = new Object[0];
-                    if (event.getMetaData() != null) {
-                        inEventArray = ObjectArrays.concat(inEventArray, event.getMetaData(), Object.class);
-                    }
-                    if (event.getCorrelationData() != null) {
-                        inEventArray = ObjectArrays.concat(inEventArray, event.getCorrelationData(), Object.class);
-                    }
-                    if (event.getPayloadData() != null) {
-                        inEventArray = ObjectArrays.concat(inEventArray, event.getPayloadData(), Object.class);
-                    }
-                    int[] metaPositions = inputDataTypeSpecificPositionMap.get(InputDataType.META_DATA);
-                    for (int metaPosition : metaPositions) {
-                        outObjList.add(inEventArray[metaPosition]);
-                    }
-                    int[] correlationPositions = inputDataTypeSpecificPositionMap.get(InputDataType.CORRELATION_DATA);
-                    for (int correlationPosition : correlationPositions) {
-                        outObjList.add(inEventArray[correlationPosition]);
-                    }
-                    int[] payloadPositions = inputDataTypeSpecificPositionMap.get(InputDataType.PAYLOAD_DATA);
-                    for (int payloadPosition : payloadPositions) {
-                        outObjList.add(inEventArray[payloadPosition]);
-                    }
-                    outObjArray = outObjList.toArray();
+            Map<String, String> arbitraryMap = event.getArbitraryDataMap();
+            if (arbitraryMap != null && !arbitraryMap.isEmpty()) {
+                outObjArray = processArbitraryMap(event);
+            } else if (inputDataTypeSpecificPositionMap != null) {
+                List<Object> outObjList = new ArrayList<Object>();
+                Object[] inEventArray = new Object[0];
+                if (event.getMetaData() != null) {
+                    inEventArray = ObjectArrays.concat(inEventArray, event.getMetaData(), Object.class);
                 }
-            }else{
+                if (event.getCorrelationData() != null) {
+                    inEventArray = ObjectArrays.concat(inEventArray, event.getCorrelationData(), Object.class);
+                }
+                if (event.getPayloadData() != null) {
+                    inEventArray = ObjectArrays.concat(inEventArray, event.getPayloadData(), Object.class);
+                }
+                int[] metaPositions = inputDataTypeSpecificPositionMap.get(InputDataType.META_DATA);
+                for (int metaPosition : metaPositions) {
+                    outObjList.add(inEventArray[metaPosition]);
+                }
+                int[] correlationPositions = inputDataTypeSpecificPositionMap.get(InputDataType.CORRELATION_DATA);
+                for (int correlationPosition : correlationPositions) {
+                    outObjList.add(inEventArray[correlationPosition]);
+                }
+                int[] payloadPositions = inputDataTypeSpecificPositionMap.get(InputDataType.PAYLOAD_DATA);
+                for (int payloadPosition : payloadPositions) {
+                    outObjList.add(inEventArray[payloadPosition]);
+                }
+                outObjArray = outObjList.toArray();
+            } else {
                 return null;
             }
-
+            return new org.wso2.siddhi.core.event.Event(event.getTimeStamp(), outObjArray);
         }
-        return outObjArray;
+        return null;
     }
 
     @Override
     public Object convertToTypedInputEvent(Object obj) throws EventReceiverProcessingException {
-        Object[] outObjArray = null;
+        org.wso2.siddhi.core.event.Event event = null;
         if (obj instanceof Event) {
+            event = new org.wso2.siddhi.core.event.Event();
             Event inputEvent = (Event) obj;
-            if(inputEvent.getStreamId().equalsIgnoreCase(importedStreamDefinition.getStreamId())){
-                Object[] metaCorrArray = ObjectArrays.concat(inputEvent.getMetaData() != null ? inputEvent.getMetaData() : new Object[0]
-                        , inputEvent.getCorrelationData() != null ? inputEvent.getCorrelationData() : new Object[0], Object.class);
-                outObjArray = ObjectArrays.concat
-                        (metaCorrArray, inputEvent.getPayloadData() != null ? inputEvent.getPayloadData() : new Object[0], Object.class);
-            }else{
-                return null;
-            }
+            Object[] metaCorrArray = ObjectArrays.concat(inputEvent.getMetaData() != null ? inputEvent.getMetaData() : new Object[0]
+                    , inputEvent.getCorrelationData() != null ? inputEvent.getCorrelationData() : new Object[0], Object.class);
+            event.setData(ObjectArrays.concat
+                    (metaCorrArray, inputEvent.getPayloadData() != null ? inputEvent.getPayloadData() : new Object[0], Object.class));
+            event.setTimestamp(inputEvent.getTimeStamp());
         }
-        return outObjArray;
+        return event;
     }
 
     @Override

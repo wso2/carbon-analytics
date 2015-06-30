@@ -35,8 +35,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CarbonOutputEventAdapterService implements OutputEventAdapterService {
 
     private static Log log = LogFactory.getLog(CarbonOutputEventAdapterService.class);
-    private static final String EVENT_TRACE_LOGGER = "EVENT_TRACE_LOGGER";
-    private Logger trace = Logger.getLogger(EVENT_TRACE_LOGGER);
 
     private final Map<String, OutputEventAdapterFactory> eventAdapterFactoryMap;
     private final ConcurrentHashMap<Integer, ConcurrentHashMap<String, OutputAdapterRuntime>> tenantSpecificEventAdapters;
@@ -52,7 +50,7 @@ public class CarbonOutputEventAdapterService implements OutputEventAdapterServic
         this.eventAdapterFactoryMap.put(outputEventAdapterSchema.getType(), outputEventAdapterFactory);
     }
 
-    public void unRegisterEventAdapter(OutputEventAdapterFactory outputEventAdapterFactory) {
+    public void unRegisterEventAdapterFactory(OutputEventAdapterFactory outputEventAdapterFactory) {
         OutputEventAdapterSchema outputEventAdapterSchema = outputEventAdapterFactory.getOutputEventAdapterSchema();
         this.eventAdapterFactoryMap.remove(outputEventAdapterSchema.getType());
     }
@@ -190,6 +188,19 @@ public class CarbonOutputEventAdapterService implements OutputEventAdapterServic
         if (outputAdapterRuntime != null) {
             outputAdapterRuntime.destroy();
         }
+    }
+
+    @Override
+    public boolean isPolled(String outputAdapterName) throws OutputEventAdapterException {
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            ConcurrentHashMap<String, OutputAdapterRuntime> inputRuntimeMap = tenantSpecificEventAdapters.get(tenantId);
+            if (inputRuntimeMap != null) {
+                OutputAdapterRuntime outputAdapterRuntime = inputRuntimeMap.get(outputAdapterName);
+                if (outputAdapterRuntime != null) {
+                    return outputAdapterRuntime.isPolled();
+                }
+            }
+            throw new OutputEventAdapterException("Adopter with name'" + outputAdapterName + "' not found");
     }
 
 }

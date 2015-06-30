@@ -47,7 +47,7 @@ public final class LoggerEventAdapter implements OutputEventAdapter {
 
     @Override
     public void testConnect() throws TestConnectionNotSupportedException {
-        throw new TestConnectionNotSupportedException("not-available");
+        throw new TestConnectionNotSupportedException("Test connection is not available");
     }
 
     @Override
@@ -57,10 +57,15 @@ public final class LoggerEventAdapter implements OutputEventAdapter {
 
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
+        String uniqueIdentification = dynamicProperties.get(LoggerEventAdapterConstants.ADAPTER_MESSAGE_UNIQUE_ID);
+        if (uniqueIdentification == null || uniqueIdentification.trim().isEmpty()) {
+            uniqueIdentification = eventAdapterConfiguration.getName();
+        }
+
         if (message instanceof Object[]) {
-            log.info("Unique ID: " + dynamicProperties.get(LoggerEventAdapterConstants.ADAPTER_MESSAGE_UNIQUE_ID) + ", Event: " + Arrays.deepToString((Object[]) message));
+            log.info("Unique ID: " + uniqueIdentification + ",\n Event: " + Arrays.deepToString((Object[]) message));
         } else {
-            log.info("Unique ID: " + dynamicProperties.get(LoggerEventAdapterConstants.ADAPTER_MESSAGE_UNIQUE_ID) + ", Event: " + message);
+            log.info("Unique ID: " + uniqueIdentification + ",\n Event: " + message);
         }
     }
 
@@ -72,5 +77,10 @@ public final class LoggerEventAdapter implements OutputEventAdapter {
     @Override
     public void destroy() {
         //not required
+    }
+
+    @Override
+    public boolean isPolled() {
+        return false;
     }
 }

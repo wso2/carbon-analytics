@@ -45,4 +45,93 @@
         <property key="h2.selectAllColumnsDataTypeInTable">SHOW COLUMNS FROM $TABLE_NAME</property>
     </adapterConfig>
 
+    <adapterConfig type="http">
+        <!-- Thread Pool Related Properties -->
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+        <!-- HTTP Client Pool Related Properties -->
+        <property key="defaultMaxConnectionsPerHost">50</property>
+        <property key="maxTotalConnections">1000</property>
+    </adapterConfig>
+
+    <adapterConfig type="jms">
+        <!-- Thread Pool Related Properties -->
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+    </adapterConfig>
+
+    <adapterConfig type="mqtt">
+        <!-- Thread Pool Related Properties -->
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+        <property key="connectionKeepAliveInterval">60</property>
+    </adapterConfig>
+
+    <adapterConfig type="kafka">
+        <!-- Thread Pool Related Properties -->
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+    </adapterConfig>
+
+    <adapterConfig type="email">
+        <property key="mail.smtp.from">abcd@gmail.com</property>
+        <property key="mail.smtp.user">abcd</property>
+        <property key="mail.smtp.password">xxxx</property>
+        <property key="mail.smtp.host">smtp.gmail.com</property>
+        <property key="mail.smtp.port">587</property>
+        <property key="mail.smtp.starttls.enable">true</property>
+        <property key="mail.smtp.auth">true</property>
+        <!-- Thread Pool Related Properties -->
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+    </adapterConfig>
+
+    <adapterConfig type="ui">
+        <property key="eventQueueSize">30</property>
+        <!-- Thread Pool Related Properties -->
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+    </adapterConfig>
+
+    <adapterConfig type="websocket-local">
+        <!-- Thread Pool Related Properties -->
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+    </adapterConfig>
+
+    <adapterConfig type="websocket">
+        <!-- Thread Pool Related Properties -->
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+    </adapterConfig>
+
+    <adapterConfig type="soap">
+        <!-- Thread Pool Related Properties -->
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+        <!-- Axis2 Client Connection Related Properties -->
+        <property key="axis2ClientConnectionTimeout">10000</property>
+        <property key="reuseHTTPClient">true</property>
+        <property key="autoReleaseConnection">true</property>
+        <property key="maxConnectionsPerHost">50</property>
+    </adapterConfig>
+
 </outputEventAdaptersConfig>
