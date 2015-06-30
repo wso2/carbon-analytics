@@ -46,6 +46,12 @@ import java.util.List;
 public class AnalyticsEventStoreDeployer extends AbstractDeployer {
     private static Log log = LogFactory.getLog(AnalyticsEventStoreDeployer.class);
     private static List<DeploymentFileData> pausedDeployments = new ArrayList<>();
+    private boolean eventSinkEnabled;
+
+    public AnalyticsEventStoreDeployer(){
+        String disableEventSink = System.getProperty(AnalyticsEventSinkConstants.DISABLE_EVENT_SINK_JVM_OPTION);
+        this.eventSinkEnabled = !(disableEventSink != null && Boolean.parseBoolean(disableEventSink));
+    }
 
     @Override
     public void init(ConfigurationContext configurationContext) {
@@ -88,22 +94,28 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
         }
     }
 
+
     private void addEventStore(int tenantId, AnalyticsEventStore eventStore)
             throws AnalyticsEventStoreException {
         try {
             AnalyticsEventStoreManager.getInstance().addEventStoreConfiguration(tenantId, eventStore);
-            if (eventStore.getRecordStore() == null) {
-                ServiceHolder.getAnalyticsDataAPI().createTable(tenantId, eventStore.getName());
-            } else {
-                ServiceHolder.getAnalyticsDataAPI().createTable(tenantId, eventStore.getRecordStore(),
-                        eventStore.getName());
-            }
-            ServiceHolder.getAnalyticsDataAPI().setTableSchema(tenantId, eventStore.getName(),
-                    AnalyticsEventSinkUtil.getAnalyticsSchema(eventStore.getAnalyticsTableSchema()));
-            for (String streamId : eventStore.getEventSource().getStreamIds()) {
-                if (ServiceHolder.getStreamDefinitionStoreService().getStreamDefinition(streamId, tenantId) != null) {
-                    ServiceHolder.getAnalyticsEventStreamListener().subscribeForStream(tenantId, streamId);
+            if (this.eventSinkEnabled) {
+                if (eventStore.getRecordStore() == null) {
+                    ServiceHolder.getAnalyticsDataAPI().createTable(tenantId, eventStore.getName());
+                } else {
+                    ServiceHolder.getAnalyticsDataAPI().createTable(tenantId, eventStore.getRecordStore(),
+                            eventStore.getName());
                 }
+                ServiceHolder.getAnalyticsDataAPI().setTableSchema(tenantId, eventStore.getName(),
+                        AnalyticsEventSinkUtil.getAnalyticsSchema(eventStore.getAnalyticsTableSchema()));
+                for (String streamId : eventStore.getEventSource().getStreamIds()) {
+                    if (ServiceHolder.getStreamDefinitionStoreService().getStreamDefinition(streamId, tenantId) != null) {
+                        ServiceHolder.getAnalyticsEventStreamListener().subscribeForStream(tenantId, streamId);
+                    }
+                }
+            } else {
+                    log.info("Event store is disabled in this node, hence ignoring the event sink configuration - "
+                            + eventStore.getName());
             }
         } catch (AnalyticsException e) {
             String errorMsg = "Error while creating the table Or setting the schema for table :" + eventStore.getName();
@@ -122,10 +134,14 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
         String eventStoreName = AnalyticsEventSinkUtil.getAnalyticsEventStoreName(new File(fileName).getName());
         AnalyticsEventStore existingEventStore = AnalyticsEventStoreManager.getInstance().removeEventStoreConfiguration(tenantId,
                 eventStoreName);
-        if (existingEventStore != null) {
-            for (String streamId : existingEventStore.getEventSource().getStreamIds()) {
-                ServiceHolder.getAnalyticsEventStreamListener().unsubscribeFromStream(tenantId, streamId);
+        if (eventSinkEnabled) {
+            if (existingEventStore != null) {
+                for (String streamId : existingEventStore.getEventSource().getStreamIds()) {
+                    ServiceHolder.getAnalyticsEventStreamListener().unsubscribeFromStream(tenantId, streamId);
+                }
             }
+        }else {
+            log.info("Ignored event sink configuration - "+ fileName+ " since the event sink is disabled in this node.");
         }
         log.info("Undeployed successfully analytics event store : " + fileName);
     }
