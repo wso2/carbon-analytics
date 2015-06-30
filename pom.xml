@@ -1157,7 +1157,7 @@
 		<org.jboss.netty.version>3.9.0.Final</org.jboss.netty.version>
 		<commons.io.version>2.4.0.wso2v1</commons.io.version>
 		<orbit.version.htrace>3.1.0-incubating.wso2v1</orbit.version.htrace>
-		<commons.math.version>3.1.1</commons.math.version>
+		<commons.math.version>3.2</commons.math.version>
 		<commons-lang3.version>3.3.2</commons-lang3.version>
 		<orbit.version.netty-all>4.0.23.wso2v1</orbit.version.netty-all>
 		<compress.lzf.version>1.0.0</compress.lzf.version>
