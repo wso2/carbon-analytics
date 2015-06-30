@@ -32,6 +32,9 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.*;
 
+/**
+ * Input FileTailEventAdapter will be used to receive events from specified event file.
+ */
 public class FileTailEventAdapter implements InputEventAdapter {
 
     private final InputEventAdapterConfiguration eventAdapterConfiguration;

@@ -111,14 +111,14 @@ public class MQTTAdapterListener implements MqttCallback, Runnable {
 
     }
 
-    public void stopListener(String adapterName) throws InputEventAdapterRuntimeException {
+    public void stopListener(String adapterName) {
         if (connectionSucceeded) {
             try {
                 // Disconnect to the MQTT server
                 mqttClient.unsubscribe(topic);
                 mqttClient.disconnect(3000);
             } catch (MqttException e) {
-                throw new InputEventAdapterRuntimeException("Can not unsubscribe from the destination " + topic
+                log.error("Can not unsubscribe from the destination " + topic
                         + " with the event adapter " + adapterName, e);
             }
         }
