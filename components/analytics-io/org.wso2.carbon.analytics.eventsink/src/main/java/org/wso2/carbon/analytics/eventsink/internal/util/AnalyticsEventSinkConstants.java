@@ -29,4 +29,5 @@ public class AnalyticsEventSinkConstants {
 
     public static final String DEPLOYMENT_DIR_NAME = "eventsink";
     public static final String DEPLOYMENT_FILE_EXT = ".xml";
+    public static final String DISABLE_EVENT_SINK_JVM_OPTION = "disableEventSink";
 }

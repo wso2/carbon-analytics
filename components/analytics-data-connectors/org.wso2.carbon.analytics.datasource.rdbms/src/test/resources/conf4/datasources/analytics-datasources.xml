@@ -11,9 +11,9 @@
             <description>The datasource used for analytics file system</description>
             <definition type="RDBMS">
                 <configuration>
-                    <url>jdbc:oracle:thin:@localhost:1521:analytics_fs_db</url>
-                    <username>root</username>
-                    <password>root</password>
+                    <url>jdbc:oracle:thin:@192.168.52.183:1521:ORA11G</url>
+                    <username>analytics_fs_db</username>
+                    <password>system</password>
                     <driverClassName>oracle.jdbc.OracleDriver</driverClassName>
                     <maxActive>50</maxActive>
                     <maxWait>60000</maxWait>
@@ -30,9 +30,9 @@
             <description>The datasource used for analytics record store</description>
             <definition type="RDBMS">
                 <configuration>
-                    <url>jdbc:oracle:thin:@localhost:1521:analytics_rs_db</url>
-                    <username>root</username>
-                    <password>root</password>
+                    <url>jdbc:oracle:thin:@192.168.52.183:1521:ORA11G</url>
+                    <username>analytics_rs_db</username>
+                    <password>system</password>
                     <driverClassName>oracle.jdbc.OracleDriver</driverClassName>
                     <maxActive>50</maxActive>
                     <maxWait>60000</maxWait>

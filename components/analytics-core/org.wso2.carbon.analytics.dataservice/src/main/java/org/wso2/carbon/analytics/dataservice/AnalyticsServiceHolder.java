@@ -34,7 +34,7 @@ import org.wso2.carbon.user.core.service.RealmService;
  */
 public class AnalyticsServiceHolder {
 
-    public static final String FORCE_INDEXING_ENV_PROP = "forceIndexing";
+    public static final String FORCE_INDEXING_ENV_PROP = "force.indexing";
     
     private static HazelcastInstance hazelcastInstance;
     
