@@ -560,7 +560,7 @@
             <dependency>
                 <groupId>org.wso2.orbit.org.apache.spark</groupId>
                 <artifactId>spark-streaming_2.10</artifactId>
-                <version>1.3.0.wso2v1</version>
+                <version>${spark.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.scala-lang</groupId>
