@@ -185,11 +185,6 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>
         </dependency>
@@ -276,10 +271,11 @@
                                 <bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>
                                 <bundleDef>javax.servlet.jsp:javax.servlet.jsp-api</bundleDef>
                                 <bundleDef>io.netty:netty</bundleDef>
+                                <!--new bundles with spa4k 1.4.0 update-->
                                 <bundleDef>org.wso2.orbit.com.thoughtworks.paranamer:paranamer</bundleDef>
-                                <bundleDef>javax.ws.rs:jsr311-api</bundleDef>
                                 <bundleDef>com.sun.jersey:jersey-core</bundleDef>
                                 <bundleDef>com.sun.jersey:jersey-server</bundleDef>
+                                <!--slf4j 5.10 is needed for akka in spark cluster mode-->
                                 <bundleDef>slf4j.wso2:slf4j</bundleDef>
                             </bundles>
                         </configuration>
