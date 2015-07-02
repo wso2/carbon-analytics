@@ -67,8 +67,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -134,7 +132,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.udfConfiguration = this.loadUDFConfiguration();
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
-            this.initSparkDataListener();
             acm.joinGroup(CLUSTER_GROUP_NAME, this);
         } else {
             this.initLocalClient();
@@ -249,13 +246,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
         conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
         return conf;
-    }
-
-    private void initSparkDataListener() {
-        this.validateSparkScriptPathPermission();
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        SparkDataListener listener = new SparkDataListener();
-        executor.execute(listener);
     }
 
     private void validateSparkScriptPathPermission() {
