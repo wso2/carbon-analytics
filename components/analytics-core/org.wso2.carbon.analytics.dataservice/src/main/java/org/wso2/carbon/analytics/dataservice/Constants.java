@@ -34,4 +34,5 @@ public class Constants {
     public static final String RETENTION_PERIOD = "retentionPeriod";
     public static final String INCLUDE_TABLES = "includeTables";
     public static final String INCLUDE_CLASS_SPLITTER = "###";
+    public static final String DISABLE_ANALYTICS_DATA_PURGING_JVM_OPTION = "disableDataPurging";
 }
