@@ -1,4 +1,4 @@
-<!--
+<%--
   ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
   ~ WSO2 Inc. licenses this file to you under the Apache License,
@@ -14,21 +14,12 @@
   ~ KIND, either express or implied.  See the License for the
   ~ specific language governing permissions and limitations
   ~ under the License.
-  -->
+  --%>
 
-<component xmlns="http://products.wso2.org/carbon">
-
-    <menus>
-        <menu>
-            <id>dashboard_menu_1</id>
-            <i18n-key>Analytics Dashboard</i18n-key>
-            <i18n-bundle>org.wso2.carbon.analytics.dashboard.ui.i18n.Resources</i18n-bundle>
-            <parent-menu>dashboard_main_menu</parent-menu>
-            <link>../analytics-dashboard/index.jsp</link>
-            <region>region1</region>
-            <order>20</order>
-            <style-class>tools</style-class>
-            <icon>../analytics-dashboard/assets/img/dashboard.png</icon>
-        </menu>
-    </menus>
-</component>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        var url = window.location.origin + "/portal";
+        var win = window.open(url, '_blank');
+        win.focus();
+    });
+</script>
