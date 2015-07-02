@@ -29,6 +29,7 @@ import org.wso2.carbon.event.input.adapter.email.internal.util.EmailEventAdapter
 import javax.mail.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EmailEventAdapter implements InputEventAdapter {
 
@@ -40,16 +41,16 @@ public class EmailEventAdapter implements InputEventAdapter {
     private long pollIntervalInSeconds = EmailEventAdapterConstants.DEFAULT_EMAIL_POLL_INTERVAL_IN_MINS;
     private String moveToFolderName;
     private Timer timer;
-    private volatile boolean isThreadOccupied;
+    private AtomicBoolean isThreadOccupied = new AtomicBoolean(false);
     private int tenantId;
 
     public EmailEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
                              Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
-        timer = new Timer("PollTimer");
-        moveToFolderName = globalProperties.get(EmailEventAdapterConstants.ADAPTER_CONF_MOVE_TO_FOLDER_NAME);
-        tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        this.timer = new Timer("PollTimer");
+        this.moveToFolderName = globalProperties.get(EmailEventAdapterConstants.ADAPTER_CONF_MOVE_TO_FOLDER_NAME);
+        this.tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
     }
 
 
@@ -65,7 +66,6 @@ public class EmailEventAdapter implements InputEventAdapter {
 
     @Override
     public void connect() {
-
         String interval = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_POLL_INTERVAL);
         if (interval != null) {
             try {
@@ -77,12 +77,15 @@ public class EmailEventAdapter implements InputEventAdapter {
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                PollForMails();
+                try {
+                    pollForMail();
+                } catch (Throwable e) {
+                    log.error("Unexpected error when running polling task for email adapter.", e);
+                }
             }
         };
 
         timer.scheduleAtFixedRate(timerTask, pollIntervalInSeconds * 1000, pollIntervalInSeconds * 1000);
-
     }
 
     @Override
@@ -149,129 +152,115 @@ public class EmailEventAdapter implements InputEventAdapter {
         return properties;
     }
 
-    private void PollForMails() {
-
-        if (!isThreadOccupied) {
-
-            isThreadOccupied = true;
-
-            String emailAddress = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_ADDRESS);
-            String userName = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_USERNAME);
-            String password = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PASSWORD);
-            String subject = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_MESSAGE_RECEIVING_EMAIL_SUBJECT);
-            String host = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_HOST);
-            String port = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_PORT);
-            String protocol = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL);
-
-            Properties properties = getServerProperties(protocol, host, port);
-
-
-            boolean connected = false;
+    private void pollForMail() {
+        if (isThreadOccupied.compareAndSet(false, true)) {
+            String userName;
+            String password;
+            String host;
+            String port;
+            Session session;
+            String subject;
+            String protocol;
+            String emailAddress = null;
             Store store = null;
             Folder folder = null;
-            boolean mailProcessingStarted = false;
-            Session session = Session.getDefaultInstance(properties);
+            boolean connected = false;
 
             try {
-                if (log.isDebugEnabled()) {
-                    log.debug("Attempting to connect to POP3/IMAP server for : " +
-                            emailAddress + " using " + session.getProperties());
-                }
+                emailAddress = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_ADDRESS);
+                userName = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_USERNAME);
+                password = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PASSWORD);
+                subject = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_MESSAGE_RECEIVING_EMAIL_SUBJECT);
+                host = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_HOST);
+                port = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_PORT);
+                protocol = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL);
 
-                store = session.getStore(protocol);
-
-                if (userName != null && password != null) {
-                    store.connect(userName, password);
-                } else {
-                    log.error("Unable to locate username and password for mail login");
-                }
-
-                // were we able to connect?
-                connected = store.isConnected();
-
-                if (connected) {
-                    folder = store.getFolder("INBOX");
-                }
-
-            } catch (Exception e) {
-                log.error("Error connecting to mail server for address : " + emailAddress, e);
-            }
-
-            if (!connected) {
-                log.warn("Connection to mail server for account : " + emailAddress +
-                        " failed. Retrying in : " + pollIntervalInSeconds + " seconds");
-            }
-
-            if (connected && folder != null) {
-                Runnable onCompletion = new MailCheckCompletionTask(folder, store, emailAddress);
+                Properties properties = getServerProperties(protocol, host, port);
 
                 try {
+                    session = Session.getDefaultInstance(properties);
                     if (log.isDebugEnabled()) {
-                        log.debug("Connecting to folder : " + folder.getName() +
-                                " of email account : " + emailAddress);
+                        log.debug("Attempting to connect to POP3/IMAP server for : " +
+                                emailAddress + " using " + session.getProperties());
                     }
 
-                    folder.open(Folder.READ_WRITE);
-                    int total = folder.getMessageCount();
-                    Message[] messages = folder.getMessages();
-
-                    if (log.isDebugEnabled()) {
-                        log.debug(messages.length + " messages in folder : " + folder);
+                    store = session.getStore(protocol);
+                    if (userName != null && password != null) {
+                        store.connect(userName, password);
+                    } else {
+                        log.error("Unable to locate username and password for mail login");
                     }
-
-                    for (int i = 0; i < total; i++) {
-
-                        try {
-                            String[] status = messages[i].getHeader("Status");
-                            if (status != null && status.length == 1 && status[0].equals("RO")) {
-                                // some times the mail server sends a special mail message which is
-                                // not relavent in processing. ignore this message.
-                                if (log.isDebugEnabled()) {
-                                    log.debug("Skipping message # : " + messages[i].getMessageNumber()
-                                            + " : " + messages[i].getSubject() + " - Status: RO");
-                                }
-
-                            } else if (messages[i].isSet(Flags.Flag.SEEN)) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug("Skipping message # : " + messages[i].getMessageNumber()
-                                            + " : " + messages[i].getSubject() + " - already marked SEEN");
-                                }
-
-                            } else if (messages[i].isSet(Flags.Flag.DELETED)) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug("Skipping message # : " + messages[i].getMessageNumber()
-                                            + " : " + messages[i].getSubject() + " - already marked DELETED");
-                                }
-
-                            } else {
-                                processMessage(messages[i], subject);
-                                moveOrDeleteAfterProcessing(moveToFolderName, store, folder, messages[i]);
-                                mailProcessingStarted = true;
-                            }
-                        } catch (MessageRemovedException ignore) {
-                            // while reading the meta information, this mail was deleted, thats ok
-                            if (log.isDebugEnabled()) {
-                                log.debug("Skipping message # : " + messages[i].getMessageNumber() +
-                                        " as it has been DELETED by another thread after processing");
-                            }
-                        }
+                    // were we able to connect?
+                    connected = store.isConnected();
+                    if (connected) {
+                        folder = store.getFolder("INBOX");
                     }
-
-                    if (!mailProcessingStarted) {
-                        // if we didn't process any mail in this run, the onCompletion will not
-                        // run from the mail processor by default
-                        onCompletion.run();
-                    }
-
-                } catch (MessagingException me) {
-                    log.error("Error checking mail for account : " + emailAddress + " :: " + me.getMessage(), me);
+                } catch (Exception e) {
+                    log.error("Error connecting to mail server for address : " + emailAddress, e);
                 }
 
-                onCompletion.run();
-            }
-            isThreadOccupied = false;
-        }
+                if (!connected) {
+                    log.warn("Connection to mail server for account : " + emailAddress +
+                            " failed. Retrying in : " + pollIntervalInSeconds + " seconds");
+                } else {
+                    if (folder != null) {
+                        try {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Connecting to folder : " + folder.getName() +
+                                        " of email account : " + emailAddress);
+                            }
 
+                            folder.open(Folder.READ_WRITE);
+                            int total = folder.getMessageCount();
+                            Message[] messages = folder.getMessages();
+                            if (log.isDebugEnabled()) {
+                                log.debug(messages.length + " messages in folder : " + folder);
+                            }
+
+                            for (int i = 0; i < total; i++) {
+                                try {
+                                    String[] status = messages[i].getHeader("Status");
+                                    if (status != null && status.length == 1 && status[0].equals(EmailEventAdapterConstants.RO)) {
+                                        // some times the mail server sends a special mail message which is
+                                        // not relevant in processing. ignore this message.
+                                        if (log.isDebugEnabled()) {
+                                            log.debug("Skipping message # : " + messages[i].getMessageNumber()
+                                                    + " : " + messages[i].getSubject() + " - Status: RO");
+                                        }
+                                    } else if (messages[i].isSet(Flags.Flag.SEEN)) {
+                                        if (log.isDebugEnabled()) {
+                                            log.debug("Skipping message # : " + messages[i].getMessageNumber()
+                                                    + " : " + messages[i].getSubject() + " - already marked SEEN");
+                                        }
+                                    } else if (messages[i].isSet(Flags.Flag.DELETED)) {
+                                        if (log.isDebugEnabled()) {
+                                            log.debug("Skipping message # : " + messages[i].getMessageNumber()
+                                                    + " : " + messages[i].getSubject() + " - already marked DELETED");
+                                        }
+                                    } else {
+                                        processMessage(messages[i], subject);
+                                        if (EmailEventAdapterConstants.PROTOCOL_IMAP.equalsIgnoreCase(protocol)) {
+                                            moveOrDeleteAfterProcessing(moveToFolderName, store, folder, messages[i]);
+                                        }
+                                    }
+                                } catch (MessageRemovedException ignore) {
+                                    // while reading the meta information, this mail was deleted, thats ok
+                                    if (log.isDebugEnabled()) {
+                                        log.debug("Skipping message # : " + messages[i].getMessageNumber() +
+                                                " as it has been DELETED by another thread after processing");
+                                    }
+                                }
+                            }
+                        } catch (MessagingException me) {
+                            log.error("Error checking mail for account : " + emailAddress + " :: " + me.getMessage(), me);
+                        }
+                    }
+                }
+            } finally {
+                cleanupResources(folder, store, emailAddress);
+                isThreadOccupied.set(false);
+            }
+        }
     }
 
 
@@ -279,60 +268,32 @@ public class EmailEventAdapter implements InputEventAdapter {
      * Handle optional logic of the mail transport, that needs to happen once all messages in
      * a check mail cycle has ended.
      */
-    private class MailCheckCompletionTask implements Runnable {
-        private final Folder folder;
-        private final Store store;
-        private final String emailAddress;
-        private boolean taskStarted = false;
-
-        public MailCheckCompletionTask(Folder folder, Store store,
-                                       String emailAddress) {
-            this.folder = folder;
-            this.store = store;
-            this.emailAddress = emailAddress;
+    private void cleanupResources(final Folder folder, final Store store, final String emailAddress) {
+        if (log.isDebugEnabled()) {
+            log.debug("Executing onCompletion task for the mail download of : " + emailAddress);
+        }
+        if (folder != null) {
+            try {
+                folder.close(true /** expunge messages flagged as DELETED*/);
+                if (log.isDebugEnabled()) {
+                    log.debug("Mail folder closed, and deleted mail expunged");
+                }
+            } catch (MessagingException e) {
+                log.warn("Error closing mail folder : " +
+                        folder + " for account : " + emailAddress + " :: " + e.getMessage());
+            }
         }
 
-        public void run() {
-            synchronized (this) {
-                if (taskStarted) {
-                    return;
-                } else {
-                    taskStarted = true;
+        if (store != null) {
+            try {
+                store.close();
+                if (log.isDebugEnabled()) {
+                    log.debug("Mail store closed for : " + emailAddress);
                 }
+            } catch (MessagingException e) {
+                log.warn("Error closing mail store for account : " +
+                        emailAddress + " :: " + e.getMessage(), e);
             }
-
-            if (log.isDebugEnabled()) {
-                log.debug("Executing onCompletion task for the mail download of : " + emailAddress);
-            }
-
-            if (folder != null) {
-                try {
-                    folder.close(true /** expunge messages flagged as DELETED*/);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Mail folder closed, and deleted mail expunged");
-                    }
-                } catch (MessagingException e) {
-                    log.warn("Error closing mail folder : " +
-                            folder + " for account : " + emailAddress + " :: " + e.getMessage());
-                }
-            }
-
-            if (store != null) {
-                try {
-                    store.close();
-                    if (log.isDebugEnabled()) {
-                        log.debug("Mail store closed for : " + emailAddress);
-                    }
-                } catch (MessagingException e) {
-                    log.warn("Error closing mail store for account : " +
-                            emailAddress + " :: " + e.getMessage(), e);
-                }
-            }
-
-            if (log.isDebugEnabled()) {
-                log.debug("Scheduling next poll for : " + emailAddress);
-            }
-
         }
     }
 
@@ -353,9 +314,7 @@ public class EmailEventAdapter implements InputEventAdapter {
             if (log.isDebugEnabled()) {
                 log.debug("Deleting email :" + message.getMessageNumber());
             }
-
             message.setFlag(Flags.Flag.DELETED, true);
-
         } catch (MessagingException e) {
             log.error("Error deleting or resolving folder to move after processing : "
                     + moveToFolder, e);
@@ -366,20 +325,20 @@ public class EmailEventAdapter implements InputEventAdapter {
         try {
             String mailSubject = msg.getSubject();
             if (mailSubject.equalsIgnoreCase(expectedSubject)) {
-                Object content = msg.getContent();
-                if (content instanceof String) {
+                String contentType = msg.getContentType();
+                if (contentType != null && contentType.toLowerCase().startsWith("text/plain")) {
+                    Object content = msg.getContent();
                     pushEvent(content);
                 } else {
                     if (log.isDebugEnabled()) {
-                        log.debug("Skipping message because content type is not accepted " + msg);
+                        log.debug("Skipping message because content type " + msg.getContentType() + " is not accepted");
                     }
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("Skipping message because subject not matches " + msg);
+                    log.debug("Skipping message because subject does not match expected value:" + expectedSubject);
                 }
             }
-
         } catch (MessagingException e) {
             log.error("Exception when trying to identify the content type", e);
         } catch (IOException e) {

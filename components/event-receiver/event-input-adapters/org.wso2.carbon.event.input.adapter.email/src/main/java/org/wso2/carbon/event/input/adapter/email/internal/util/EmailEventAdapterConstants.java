@@ -44,5 +44,6 @@ public final class EmailEventAdapterConstants {
 
     public static final long DEFAULT_EMAIL_POLL_INTERVAL_IN_MINS = 5;
     public static final String ADAPTER_CONF_MOVE_TO_FOLDER_NAME = "moveToFolderName";
-
+    public static final String RO = "RO";
+    public static final String PROTOCOL_IMAP = "imap";
 }
