@@ -1154,7 +1154,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     * @throws AnalyticsException
     */
     public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
-       this.scheduleIndexDelete(tenantId, tableName, ids);
+        this.scheduleIndexDelete(tenantId, tableName, ids);
     }
     
     private void delete(int shardIndex, List<IndexOperation> deleteOpBatch) throws AnalyticsException {

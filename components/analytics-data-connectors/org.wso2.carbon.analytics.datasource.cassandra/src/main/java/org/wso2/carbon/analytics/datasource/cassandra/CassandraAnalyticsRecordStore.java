@@ -87,9 +87,9 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
                         timeTo == Long.MAX_VALUE ? timeTo : timeTo * TS_MULTIPLIER);
         List<String> ids = this.resultSetToIds(rs);
         this.delete(tenantId, tableName, ids);
-        /** this.session.execute("DELETE FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
-                tenantId, tableName, timeFrom == Long.MAX_VALUE ? timeFrom : timeFrom * TS_MULTIPLIER, 
-                        timeTo == Long.MIN_VALUE ? timeTo : timeTo * TS_MULTIPLIER); **/
+//        this.session.execute("DELETE FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
+//                tenantId, tableName, timeFrom == Long.MAX_VALUE ? timeFrom : timeFrom * TS_MULTIPLIER, 
+//                        timeTo == Long.MIN_VALUE ? timeTo : timeTo * TS_MULTIPLIER); 
     }
 
     @Override
@@ -213,8 +213,10 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         return result;
     }
     
-    private long toTSTableTimestamp(long timestamp) {
-        return timestamp * TS_MULTIPLIER + (int) (Math.random() * TS_MULTIPLIER);
+    private long toTSTableTimestamp(long timestamp, String id) {
+        //System.out.println("** X: " + (timestamp * TS_MULTIPLIER + id.hashCode() % TS_MULTIPLIER));
+        //return timestamp * TS_MULTIPLIER + id.hashCode() % TS_MULTIPLIER;
+        return timestamp * TS_MULTIPLIER + (long) (Math.random() * TS_MULTIPLIER);
     }
     
     private void addBatch(List<Record> batch) throws AnalyticsException, AnalyticsTableNotAvailableException {
@@ -223,7 +225,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         String tableName = firstRecord.getTableName();
         try {                
             String dataTable = this.generateTargetDataTableName(tenantId, tableName);
-            PreparedStatement ps = session.prepare("INSERT INTO ARS." + dataTable +" (id, timestamp, data) VALUES (?, ?, ?)");
+            PreparedStatement ps = session.prepare("INSERT INTO ARS." + dataTable + " (id, timestamp, data) VALUES (?, ?, ?)");
             BatchStatement stmt = new BatchStatement();
             for (Record record : batch) {
                 stmt.add(ps.bind(record.getId(), record.getTimestamp(), this.getDataMapFromValues(record.getValues())));
@@ -232,7 +234,8 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             ps = session.prepare("INSERT INTO ARS.TS (tenantId, tableName, timestamp, id) VALUES (?, ?, ?, ?)");
             stmt = new BatchStatement();
             for (Record record : batch) {
-                stmt.add(ps.bind(tenantId, tableName, this.toTSTableTimestamp(record.getTimestamp()), record.getId()));
+                stmt.add(ps.bind(tenantId, tableName, this.toTSTableTimestamp(record.getTimestamp(), 
+                        record.getId()), record.getId()));
             }
             this.session.execute(stmt);
         } catch (Exception e) {

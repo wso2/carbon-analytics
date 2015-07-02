@@ -681,13 +681,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         Iterator<Record> recordIterator = GenericUtils.recordGroupsToIterator(ars, this.get(tenantId, tableName, 
                 1, null, timeFrom, timeTo, 0, -1).getRecordGroups());
         while (recordIterator.hasNext()) {
-            this.getIndexer().delete(tenantId, tableName, this.getRecordIdsBatch(recordIterator));
+            this.delete(tenantId, tableName, this.getRecordIdsBatch(recordIterator));
         }
-        ars.delete(tenantId, tableName, timeFrom, timeTo);
     }
     
     private List<String> getRecordIdsBatch(Iterator<Record> recordIterator) throws AnalyticsException {
-        List<String> result = new ArrayList<>();
+        List<String> result = new ArrayList<>(DELETE_BATCH_SIZE);
         for (int i = 0; i < DELETE_BATCH_SIZE & recordIterator.hasNext(); i++) {
             result.add(recordIterator.next().getId());
         }
@@ -702,8 +701,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (arsName == null) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
-        this.getIndexer().delete(tenantId, tableName, ids);
+        /* the below ordering is important, the raw records should be deleted first */
         this.getAnalyticsRecordStore(arsName).delete(tenantId, tableName, ids);
+        this.getIndexer().delete(tenantId, tableName, ids);
     }
 
     @Override
