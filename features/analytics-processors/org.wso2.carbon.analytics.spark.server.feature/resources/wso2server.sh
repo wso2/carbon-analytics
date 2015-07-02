@@ -269,6 +269,9 @@ fi
 START_EXIT_STATUS=121
 status=$START_EXIT_STATUS
 
+#load spark environment variables
+. $CARBON_HOME/bin/load-spark-env-vars.sh
+
 #To monitor a Carbon server in remote JMX mode on linux host machines, set the below system property.
 #   -Djava.rmi.server.hostname="your.IP.goes.here"
 

@@ -29,11 +29,8 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.spark.utils</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.spark.patch</artifactId>
-        </dependency>
-        <!--spark -->
+
+       <!--spark -->
         <dependency>
             <groupId>org.wso2.orbit.org.apache.spark</groupId>
             <artifactId>spark-core_2.10</artifactId>
@@ -261,7 +258,6 @@
             <resource>
                 <directory>resources</directory>
                 <includes>
-                    <include>compute-classpath.sh</include>
                     <include>p2.inf</include>
                     <include>build.properties</include>
                     <include>protobuf-java-2.5.0.jar</include>
@@ -301,12 +297,6 @@
                                 <bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.admin
                                 </bundleDef>
-                                <!--<bundleDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.utils
-                                </bundleDef>
-                                <bundleDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.patch
-                                </bundleDef>-->
                                 <bundleDef>org.roaringbitmap:RoaringBitmap</bundleDef>
                             </bundles>
                             <importFeatures>
