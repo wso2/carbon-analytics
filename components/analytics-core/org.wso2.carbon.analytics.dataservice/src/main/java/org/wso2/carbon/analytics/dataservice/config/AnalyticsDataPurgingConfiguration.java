@@ -26,7 +26,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  */
 public class AnalyticsDataPurgingConfiguration {
     private boolean enable;
-    private boolean purgeNode;
     private String cronExpression;
     private int retentionDays;
     private AnalyticsDataPurgingIncludeTable[] purgingIncludeTables;
@@ -38,15 +37,6 @@ public class AnalyticsDataPurgingConfiguration {
 
     public void setEnable(boolean enable) {
         this.enable = enable;
-    }
-
-    @XmlElement(name = "purge-node", nillable = false)
-    public boolean isPurgeNode() {
-        return purgeNode;
-    }
-
-    public void setPurgeNode(boolean purgeNode) {
-        this.purgeNode = purgeNode;
     }
 
     @XmlElement(name = "cron-expression", nillable = false)

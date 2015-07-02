@@ -22,7 +22,7 @@ import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.eventsink.internal.AnalyticsEventSinkConfiguration;
+import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
 import org.wso2.carbon.databridge.commons.Event;
 
 import java.util.concurrent.Executors;
@@ -44,18 +44,17 @@ public class AnalyticsEventQueue {
 
     @SuppressWarnings("unchecked")
     public AnalyticsEventQueue(int tenantId) {
-        Disruptor<Event> eventQueue = new Disruptor<Event>(EVENT_FACTORY, AnalyticsEventSinkConfiguration.
-                getInstance().getQueueSize(), Executors.newCachedThreadPool());
+        Disruptor<Event> eventQueue = new Disruptor<Event>(EVENT_FACTORY, ServiceHolder.
+                getAnalyticsEventSinkConfiguration().getQueueSize(), Executors.newCachedThreadPool());
         eventQueue.handleEventsWith(new AnalyticsEventQueueWorker(tenantId));
         this.ringBuffer = eventQueue.start();
         if (log.isDebugEnabled()) {
-            log.debug("Event Queue Size = " + AnalyticsEventSinkConfiguration.
-                    getInstance().getQueueSize());
+            log.debug("Event Queue Size = " + ServiceHolder.getAnalyticsEventSinkConfiguration().getQueueSize());
         }
     }
 
     public void put(Event event) {
-        if (log.isDebugEnabled()){
+        if (log.isDebugEnabled()) {
             log.debug("Adding an event to the event queue");
         }
         long sequence = this.ringBuffer.next();

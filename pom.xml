@@ -391,6 +391,11 @@
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.processor.manager.core</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.github.stephenc</groupId>
                 <artifactId>jamm</artifactId>
                 <version>0.2.5</version>

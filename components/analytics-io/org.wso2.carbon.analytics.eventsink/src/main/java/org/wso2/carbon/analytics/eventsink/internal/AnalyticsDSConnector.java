@@ -49,7 +49,11 @@ public class AnalyticsDSConnector {
 
     public void insertEvents(int tenantId, List<Event> events) throws StreamDefinitionStoreException,
             AnalyticsException {
-        ServiceHolder.getAnalyticsDataAPI().put(convertEventsToRecord(tenantId, events));
+        if (!ServiceHolder.getEventSinkManagementService().isDrop()) {
+            //In CEP HA setup the same event will be sent along the cluster, and hence only the leader
+            // will need to store the event to avoid the duplicate events stored..
+            ServiceHolder.getAnalyticsDataAPI().put(convertEventsToRecord(tenantId, events));
+        }
     }
 
 
@@ -88,8 +92,8 @@ public class AnalyticsDSConnector {
             }
 
             Record record = new Record(tenantId, tableName, eventAttributes, timestamp);
-            if (log.isDebugEnabled()){
-                log.debug("Record being added: "+ record);
+            if (log.isDebugEnabled()) {
+                log.debug("Record being added: " + record);
             }
             records.add(record);
         }
@@ -150,12 +154,12 @@ public class AnalyticsDSConnector {
                         return Long.parseLong(fieldStrValue);
                 }
                 return fieldValue;
-            }else {
+            } else {
                 return fieldValue;
             }
-        }else if (mandatoryValue){
+        } else if (mandatoryValue) {
             return fieldValue;
-        }else {
+        } else {
             return null;
         }
     }

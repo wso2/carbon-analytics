@@ -99,13 +99,17 @@ public class MessageConsoleService extends AbstractAdmin {
     public void scheduleDataPurging(String table, String cronString, int retentionPeriod)
             throws MessageConsoleException {
         try {
+            TaskInfo taskInfo = createDataPurgingTask(table, cronString, retentionPeriod);
             TaskManager taskManager = ServiceHolder.getTaskService().getTaskManager(org.wso2.carbon.analytics.messageconsole.Constants
                                                                                             .ANALYTICS_DATA_PURGING);
-            TaskInfo taskInfo = createDataPurgingTask(table, cronString, retentionPeriod);
-            taskManager.deleteTask(taskInfo.getName());
-            if (cronString != null) {
-                taskManager.registerTask(taskInfo);
-                taskManager.scheduleTask(taskInfo.getName());
+            if (taskManager != null) {
+                taskManager.deleteTask(taskInfo.getName());
+                if (cronString != null) {
+                    taskManager.registerTask(taskInfo);
+                    taskManager.scheduleTask(taskInfo.getName());
+                }
+            } else {
+                log.warn("TaskManager instance is null");
             }
         } catch (TaskException e) {
             throw new MessageConsoleException("Unable to schedule a purging task for " + table + " with corn " +
@@ -125,7 +129,7 @@ public class MessageConsoleService extends AbstractAdmin {
         try {
             TaskManager taskManager = ServiceHolder.getTaskService().getTaskManager(org.wso2.carbon.analytics.messageconsole.Constants
                                                                                             .ANALYTICS_DATA_PURGING);
-            if (taskManager.isTaskScheduled(getDataPurgingTaskName(table))) {
+            if (taskManager != null && taskManager.isTaskScheduled(getDataPurgingTaskName(table))) {
                 TaskInfo task = taskManager.getTask(getDataPurgingTaskName(table));
                 if (task != null) {
                     taskInfo.setCronString(task.getProperties().get(org.wso2.carbon.analytics.messageconsole.Constants.CRON_STRING));
