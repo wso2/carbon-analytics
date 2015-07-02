@@ -21,13 +21,13 @@ package org.wso2.carbon.analytics.eventsink.internal.queue;
 import com.lmax.disruptor.EventHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.eventsink.internal.AnalyticsEventSinkConfiguration;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Event;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.*;
 
 /**
  * This is the queue worker which listens to analytics queue, and once the batch size si reached it will
@@ -38,33 +38,47 @@ public class AnalyticsEventQueueWorker implements EventHandler<Event> {
 
     private List<Event> events;
     private int tenantId;
+    private ExecutorService threadPoolExecutor;
 
     public AnalyticsEventQueueWorker(int tenantId) {
         this.tenantId = tenantId;
-        this.events = new ArrayList<Event>();
+        this.events = new ArrayList<>();
+        this.threadPoolExecutor = Executors.newFixedThreadPool(ServiceHolder.getAnalyticsEventSinkConfiguration().
+                getWorkerPoolSize());
     }
+
 
     @Override
     public void onEvent(Event event, long sequence, boolean endOfBatch) throws Exception {
         events.add(event);
-        if (endOfBatch) {
-            insertEventList(events);
-            events.clear();
-        } else if (events.size() == AnalyticsEventSinkConfiguration.getInstance().getBundleSize()) {
-            insertEventList(events);
-            events.clear();
+        if (endOfBatch || events.size() == ServiceHolder.getAnalyticsEventSinkConfiguration().getBundleSize()) {
+            submitJob();
         }
     }
 
-    private void insertEventList(List<Event> eventList) {
-        try {
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId, true);
-            ServiceHolder.getAnalyticsDSConnector().insertEvents(tenantId, eventList);
-            PrivilegedCarbonContext.endTenantFlow();
-        } catch (Exception e) {
-            String errorMsg = "Error processing event. ";
-            log.error(errorMsg, e);
+    private void submitJob() {
+        this.threadPoolExecutor.submit(new AnalyticsEventProcessor(events));
+        events = new ArrayList<>();
+    }
+
+    public class AnalyticsEventProcessor extends Thread {
+
+        private List<Event> events;
+
+        private AnalyticsEventProcessor(List<Event> events) {
+            this.events = events;
+        }
+
+        public void run() {
+            try {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId, true);
+                ServiceHolder.getAnalyticsDSConnector().insertEvents(tenantId, this.events);
+                PrivilegedCarbonContext.endTenantFlow();
+            } catch (Exception e) {
+                String errorMsg = "Error processing event. ";
+                log.error(errorMsg, e);
+            }
         }
     }
 }
