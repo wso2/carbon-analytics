@@ -29,6 +29,7 @@ import org.wso2.carbon.analytics.eventsink.subscriber.AnalyticsEventStreamListen
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
 import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
+import org.wso2.carbon.event.processor.manager.core.EventManagementService;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 
@@ -46,6 +47,9 @@ import org.wso2.carbon.event.stream.core.EventStreamService;
  * cardinality="1..1" policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.api.AnalyticsDataAPI"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataAPI" unbind="unsetAnalyticsDataAPI"
+ * @scr.reference name="eventManagement.service"
+ * interface="org.wso2.carbon.event.processor.manager.core.EventManagementService" cardinality="1..1"
+ * policy="dynamic" bind="setEventManagementService" unbind="unsetEventManagementService"
  */
 
 public class AnalyticsEventSinkComponent {
@@ -57,6 +61,7 @@ public class AnalyticsEventSinkComponent {
                 log.debug("Started the Analytics Event Sink component");
             }
             ServiceHolder.setAnalyticsEventSinkService(new AnalyticsEventSinkServiceImpl());
+            ServiceHolder.setEventSinkManagementService(new CarbonEventSinkManagementService());
             componentContext.getBundleContext().registerService(EventStreamListener.class.getName(),
                     ServiceHolder.getAnalyticsEventStreamListener(), null);
             componentContext.getBundleContext().registerService(AnalyticsEventSinkService.class.getName(),
@@ -64,7 +69,8 @@ public class AnalyticsEventSinkComponent {
             componentContext.getBundleContext().registerService(ServerStartupObserver.class.getName(),
                     AnalyticsEventSinkServerStartupObserver.getInstance(), null);
             componentContext.getBundleContext().registerService(
-                    AppDeploymentHandler.class.getName(),  new AnalyticsEventStoreCAppDeployer(), null);
+                    AppDeploymentHandler.class.getName(), new AnalyticsEventStoreCAppDeployer(), null);
+            ServiceHolder.getEventManagementService().subscribe(ServiceHolder.getEventSinkManagementService());
             ServiceHolder.setAnalyticsDSConnector(new AnalyticsDSConnector());
         } catch (Throwable e) {
             log.error("Error while activating the AnalyticsEventSinkComponent.", e);
@@ -100,5 +106,13 @@ public class AnalyticsEventSinkComponent {
 
     protected void unsetAnalyticsDataAPI(AnalyticsDataAPI analyticsDataAPI) {
         ServiceHolder.setAnalyticsDataAPI(null);
+    }
+
+    protected void setEventManagementService(EventManagementService eventManagementService) {
+        ServiceHolder.setEventManagementService(eventManagementService);
+    }
+
+    protected void unsetEventManagementService(EventManagementService eventManagementService) {
+        ServiceHolder.setEventManagementService(null);
     }
 }

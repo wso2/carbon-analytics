@@ -23,6 +23,8 @@ import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.analytics.eventsink.internal.AnalyticsDSConnector;
 import org.wso2.carbon.analytics.eventsink.subscriber.AnalyticsEventStreamListener;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
+import org.wso2.carbon.event.processor.manager.core.EventManagementService;
+import org.wso2.carbon.event.processor.manager.core.EventPublisherManagementService;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 
 /**
@@ -35,6 +37,8 @@ public class ServiceHolder {
     private static AnalyticsDataAPI analyticsDataAPI;
     private static AbstractStreamDefinitionStore streamDefinitionStoreService;
     private static AnalyticsEventSinkService analyticsEventSinkService;
+    private static EventManagementService eventManagementService;
+    private static EventPublisherManagementService eventSinkManagementService;
 
     private ServiceHolder(){}
 
@@ -84,5 +88,21 @@ public class ServiceHolder {
 
     public static void setAnalyticsEventSinkService(AnalyticsEventSinkService analyticsEventSinkService) {
         ServiceHolder.analyticsEventSinkService = analyticsEventSinkService;
+    }
+
+    public static EventManagementService getEventManagementService() {
+        return eventManagementService;
+    }
+
+    public static void setEventManagementService(EventManagementService eventManagementService) {
+        ServiceHolder.eventManagementService = eventManagementService;
+    }
+
+    public static EventPublisherManagementService getEventSinkManagementService() {
+        return eventSinkManagementService;
+    }
+
+    public static void setEventSinkManagementService(EventPublisherManagementService eventSinkManagementService) {
+        ServiceHolder.eventSinkManagementService = eventSinkManagementService;
     }
 }
