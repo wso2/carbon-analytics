@@ -191,7 +191,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     private boolean checkIfIndexingNode() {
-        return System.getProperty(DISABLE_INDEXING_ENV_PROP) == null;
+        String indexDisableProp =  System.getProperty(DISABLE_INDEXING_ENV_PROP);
+        return !(indexDisableProp != null && Boolean.parseBoolean(indexDisableProp));
     }
     
     private void initializeIndexingSchedules() throws AnalyticsException {
