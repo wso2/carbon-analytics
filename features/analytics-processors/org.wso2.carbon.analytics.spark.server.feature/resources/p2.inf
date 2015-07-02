@@ -1,4 +1,6 @@
 instructions.configure = \
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.spark.server_${feature.version}/load-spark-env-vars.sh,target:${installFolder}/../../../bin/load-spark-env-vars.sh,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.spark.server_${feature.version}/wso2server.sh,target:${installFolder}/../../../bin/wso2server.sh,overwrite:true);\
 org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/spark);\
 org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.spark.server_${feature.version}/spark-defaults.conf,target:${installFolder}/../../conf/spark/spark-defaults.conf,overwrite:true);\
 org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.spark.server_${feature.version}/spark-udf-config.xml,target:${installFolder}/../../conf/spark/spark-udf-config.xml,overwrite:true);\

@@ -267,6 +267,8 @@
                     <include>protobuf-java-2.5.0.jar</include>
                     <include>spark-defaults.conf</include>
                     <include>spark-udf-config.xml</include>
+                    <include>wso2server.sh</include>
+                    <include>load-spark-env-vars.sh</include>
                 </includes>
             </resource>
         </resources>
