@@ -34,6 +34,8 @@ public class AnalyticsDataConfiguration {
     private int maxConnectionsPerRoute;
     private int socketConnectionTimeoutMS;
     private int connectionTimeoutMS;
+    private String trustStoreLocation;
+    private String trustStorePassword;
 
     @XmlElement(name = "Mode")
     public String getMode() {
@@ -126,5 +128,23 @@ public class AnalyticsDataConfiguration {
 
     public enum Mode {
         LOCAL, REMOTE
+    }
+
+    @XmlElement(name = "TrustStoreLocation")
+    public String getTrustStoreLocation() {
+        return trustStoreLocation;
+    }
+
+    public void setTrustStoreLocation(String trustStoreLocation) {
+        this.trustStoreLocation = trustStoreLocation;
+    }
+
+    @XmlElement(name = "TrustStorePassword")
+    public String getTrustStorePassword() {
+        return trustStorePassword;
+    }
+
+    public void setTrustStorePassword(String trustStorePassword) {
+        this.trustStorePassword = trustStorePassword;
     }
 }

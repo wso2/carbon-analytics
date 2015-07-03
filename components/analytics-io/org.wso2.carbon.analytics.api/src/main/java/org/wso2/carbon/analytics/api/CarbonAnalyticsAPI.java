@@ -206,7 +206,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().getRecordGroup(tenantId, null, tableName, numPartitionsHint,
-                  columns, timeFrom, timeTo, recordsFrom, recordsCount, false);
+                    columns, timeFrom, timeTo, recordsFrom, recordsCount, false);
         }
     }
 
@@ -653,12 +653,15 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
                 OMElement configElement = builder.getDocumentElement();
                 SecretResolver secretResolver = SecretResolverFactory.create(configElement, true);
                 if (secretResolver != null && secretResolver.isInitialized()) {
-                    if (secretResolver.isTokenProtected(AnalyticsDataConstants.ANALYTICS_API_CONF_PASSWORD_ALIAS)) {
-                        String resolvedPassword = secretResolver.
-                                resolve(AnalyticsDataConstants.ANALYTICS_API_CONF_PASSWORD_ALIAS);
-                        if (resolvedPassword != null && !resolvedPassword.isEmpty()) {
-                            this.analyticsDataConfiguration.setPassword(resolvedPassword);
-                        }
+                    String resolvedPassword = getResolvedPassword(secretResolver,
+                            AnalyticsDataConstants.ANALYTICS_API_CONF_PASSWORD_ALIAS);
+                    if (resolvedPassword != null) {
+                        this.analyticsDataConfiguration.setPassword(resolvedPassword);
+                    }
+                    resolvedPassword = getResolvedPassword(secretResolver,
+                            AnalyticsDataConstants.ANALYTICS_API_TRUST_STORE_PASSWORD_ALIAS);
+                    if (resolvedPassword != null) {
+                        this.analyticsDataConfiguration.setTrustStorePassword(resolvedPassword);
                     }
                 }
             } finally {
@@ -672,13 +675,24 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
         }
     }
 
+    private String getResolvedPassword(SecretResolver secretResolver, String alias) {
+        if (secretResolver.isTokenProtected(alias)) {
+            String resolvedPassword = secretResolver.
+                    resolve(alias);
+            if (resolvedPassword != null && !resolvedPassword.isEmpty()) {
+                return resolvedPassword;
+            }
+        }
+        return null;
+    }
+
     @Override
     public String getRecordStoreNameByTable(int tenantId, String tableName) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().getRecordStoreNameByTable(tenantId, tableName);
         } else {
-          return AnalyticsAPIHttpClient.getInstance().getRecordStoreNameByTable(tenantId, null, tableName, false);
+            return AnalyticsAPIHttpClient.getInstance().getRecordStoreNameByTable(tenantId, null, tableName, false);
         }
     }
 

@@ -49,4 +49,16 @@
     <!--The connection timeout when trying to connect the remote service-->
     <ConnectionTimeout>60000</ConnectionTimeout>
 
+    <!--The path of the trust store location, it will be used if the connection URL is in HTTPS protocol.
+    If it is not configured, and the client is running from wso2 carbon environment, then by default the trust
+    store configured from carbon.xml will be picked.-->
+
+    <!--<TrustStoreLocation>repository/resources/security/client-truststore.jks</TrustStoreLocation>-->
+
+    <!-- The password of the above mentioned trust store, it will be used if the connection URL is in HTTPS protocol.
+    If it is not configured,and the client is running from wso2 carbon environment, then by default the trust store
+    configured from carbon.xml will be picked.-->
+
+    <!--<TrustStorePassword>wso2carbon</TrustStorePassword>-->
+
 </AnalyticsDataConfiguration>
