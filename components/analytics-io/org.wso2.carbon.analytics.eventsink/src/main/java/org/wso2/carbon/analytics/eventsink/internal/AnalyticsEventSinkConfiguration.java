@@ -19,24 +19,26 @@ package org.wso2.carbon.analytics.eventsink.internal;
 
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * This is the configuration class which specifies about actual queue length and bundle size of the events
- * that needs to be pushed immediatly to the data store.
+ * that needs to be pushed immediately to the data store.
  */
+@XmlRootElement(name = "AnalyticsEventSinkConfiguration")
 public class AnalyticsEventSinkConfiguration {
     private int queueSize;
     private int bundleSize;
-    private static AnalyticsEventSinkConfiguration instance = new AnalyticsEventSinkConfiguration();
+    private int workerPoolSize;
 
-    private AnalyticsEventSinkConfiguration() {
-        queueSize = AnalyticsEventSinkConstants.DEFAULT_EVENT_QUEUE_SIZE;
-        bundleSize = AnalyticsEventSinkConstants.DEFAULT_BUNDLE_SIZE;
+    public AnalyticsEventSinkConfiguration() {
+        this.queueSize = AnalyticsEventSinkConstants.DEFAULT_EVENT_QUEUE_SIZE;
+        this.bundleSize = AnalyticsEventSinkConstants.DEFAULT_BUNDLE_SIZE;
+        this.workerPoolSize = AnalyticsEventSinkConstants.DEFAULT_WORKER_POOL_SIZE;
     }
 
-    public static AnalyticsEventSinkConfiguration getInstance() {
-        return instance;
-    }
-
+    @XmlElement(name = "QueueSize")
     public int getQueueSize() {
         return queueSize;
     }
@@ -45,11 +47,21 @@ public class AnalyticsEventSinkConfiguration {
         this.queueSize = queueSize;
     }
 
+    @XmlElement(name = "BundleSize")
     public int getBundleSize() {
         return bundleSize;
     }
 
     public void setBundleSize(int bundleSize) {
         this.bundleSize = bundleSize;
+    }
+
+    @XmlElement(name = "WorkerPoolSize")
+    public int getWorkerPoolSize() {
+        return workerPoolSize;
+    }
+
+    public void setWorkerPoolSize(int workerPoolSize) {
+        this.workerPoolSize = workerPoolSize;
     }
 }

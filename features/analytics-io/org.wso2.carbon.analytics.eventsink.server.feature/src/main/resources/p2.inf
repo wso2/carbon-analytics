@@ -1,0 +1,3 @@
+instructions.configure = \
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/analytics/);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.eventsink.server_${feature.version}/conf/analytics/analytics-eventsink-config.xml,target:${installFolder}/../../conf/analytics/analytics-eventsink-config.xml,overwrite:true);\

@@ -64,11 +64,6 @@
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.spark.patch</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.fasterxml.jackson.jaxrs</groupId>
                 <artifactId>jackson-jaxrs-json-provider</artifactId>
                 <version>2.4.2</version>
@@ -348,6 +343,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.stream.core</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.processor.manager.core</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
@@ -1278,7 +1278,7 @@
         <carbon.analytics.imp.pkg.version>[1.0.3-SNAPSHOT, 1.1.0)</carbon.analytics.imp.pkg.version>
 
         <!--analytics processors -->
-        <spark.orbit.version>1.3.0.wso2v1</spark.orbit.version>
+        <spark.orbit.version>1.4.0.wso2v1</spark.orbit.version>
         <hadoop.client.orbit.version>2.2.0.wso2v1</hadoop.client.orbit.version>
         <typesafe.version>1.2.0</typesafe.version>
         <akka.version>2.3.4-spark</akka.version>
@@ -1300,15 +1300,15 @@
         <uncommons.math.orbit.version>1.2.2.wso2v1</uncommons.math.orbit.version>
         <chill.orbit.version>0.5.0.wso2v1</chill.orbit.version>
         <stream.orbit.version>2.2.0.wso2v1</stream.orbit.version>
-        <guava.version>14.0.1</guava.version>
+        <guava.version>15.0</guava.version>
         <servelet.api.version>7.0.52.wso2v1</servelet.api.version>
         <servelet.jsp.version>2.2.1</servelet.jsp.version>
         <com.datastax.cassandra.driver.verison>2.1.5</com.datastax.cassandra.driver.verison>
 
         <!--spark additional dependencies --> <!--todo: clean these up-->
-        <exp.pkg.version.spark>1.3.0.wso2v1</exp.pkg.version.spark>
-        <spark.version>1.3.0</spark.version>
-        <spark.import.version>[1.3.0, 1.4.0)</spark.import.version>
+        <exp.pkg.version.spark>1.4.0.wso2v1</exp.pkg.version.spark>
+        <spark.version>1.4.0</spark.version>
+        <spark.import.version>[1.4.0, 1.5.0)</spark.import.version>
         <hadoop.client.import.version>[2.2.0, 2.7.0)</hadoop.client.import.version>
         <typesafe.version>1.2.1</typesafe.version>
         <typesafe.import.version>[1.2.1, 1.3.0)</typesafe.import.version>
@@ -1325,7 +1325,7 @@
         <commons-lang3.import.version>[3.3.2, 3.3.3)</commons-lang3.import.version>
         <compress.lzf.import.version>[1.0.0, 1.0.1)</compress.lzf.import.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <guava.import.version>[14.0.0,15.0.0)</guava.import.version>
+        <guava.import.version>[15.0.0,16.0.0)</guava.import.version>
         <slf4j.import.version>[1.7.0, 1.8.0)</slf4j.import.version>
         <servlet-api.import.version>[2.5, 3.0)</servlet-api.import.version>
         <chill.import.version>[0.5.0, 0.6.0)</chill.import.version>

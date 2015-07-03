@@ -67,8 +67,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -134,7 +132,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.udfConfiguration = this.loadUDFConfiguration();
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
-            this.initSparkDataListener();
             acm.joinGroup(CLUSTER_GROUP_NAME, this);
         } else {
             this.initLocalClient();
@@ -161,10 +158,12 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private void initClient(String masterUrl, String appName) {
-        this.sparkConf = initSparkConf(masterUrl, appName);
-        this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
-//        this.sqlCtx = new SQLContext(this.javaSparkCtx);
-        initSqlContext(this.javaSparkCtx);
+        if (this.sparkConf==null) {
+            this.sparkConf = initSparkConf(masterUrl, appName);
+        }
+//        this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
+////        this.sqlCtx = new SQLContext(this.javaSparkCtx);
+        initSqlContext(new JavaSparkContext(this.sparkConf));
     }
 
     private void initLocalClient() {
@@ -244,14 +243,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         conf.setIfMissing("spark.master", masterUrl);
         conf.setIfMissing("spark.app.name", appName);
         conf.set("spark.ui.port", String.valueOf(DEFAULT_SPARK_UI_PORT + portOffset));
+        conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
+        conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
         return conf;
-    }
-
-    private void initSparkDataListener() {
-        this.validateSparkScriptPathPermission();
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        SparkDataListener listener = new SparkDataListener();
-        executor.execute(listener);
     }
 
     private void validateSparkScriptPathPermission() {
@@ -276,7 +270,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     public void stop() {
         if (this.sqlCtx != null) {
             this.sqlCtx.sparkContext().stop();
-            this.javaSparkCtx.close();
+//            this.javaSparkCtx.close();
         }
     }
 

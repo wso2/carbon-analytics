@@ -40,7 +40,10 @@ public class MessageConsoleServiceComponent {
 
     protected void activate(ComponentContext ctx) {
         try {
-            ServiceHolder.getTaskService().registerTaskType(Constants.ANALYTICS_DATA_PURGING);
+            boolean dataPurgingEnable = !Boolean.getBoolean(org.wso2.carbon.analytics.dataservice.Constants.DISABLE_ANALYTICS_DATA_PURGING_JVM_OPTION);
+            if (dataPurgingEnable) {
+                ServiceHolder.getTaskService().registerTaskType(Constants.ANALYTICS_DATA_PURGING);
+            }
         } catch (TaskException e) {
             log.error("Unable to register analytics data purging task type", e);
         }

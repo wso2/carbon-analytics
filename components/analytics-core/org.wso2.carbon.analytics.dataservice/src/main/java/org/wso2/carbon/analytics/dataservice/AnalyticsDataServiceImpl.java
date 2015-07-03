@@ -22,7 +22,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
-import org.wso2.carbon.analytics.dataservice.commons.*;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataPurgingConfiguration;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataPurgingIncludeTable;
@@ -31,7 +36,11 @@ import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfigur
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsRecordStoreConfiguration;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.dataservice.tasks.AnalyticsGlobalDataPurgingTask;
-import org.wso2.carbon.analytics.datasource.commons.*;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
@@ -47,7 +56,6 @@ import org.wso2.carbon.ntask.core.service.TaskService;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -127,42 +135,44 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             acm.joinGroup(ANALYTICS_DATASERVICE_GROUP, null);
         } 
         this.indexer.init();
-        if (config.getAnalyticsDataPurgingConfiguration() != null) {
-            final AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration = config.getAnalyticsDataPurgingConfiguration();
-            TaskService taskService = AnalyticsServiceHolder.getTaskService();
-            if (taskService != null) {
-                if (analyticsDataPurgingConfiguration.isEnable()) {
-                    try {
-                        if (analyticsDataPurgingConfiguration.isPurgeNode()) {
-                            taskService.registerTaskType(ANALYTICS_DATA_PURGING_GLOBAL);
-                        }
-                        TaskManager dataPurgingTaskManager = taskService.getTaskManager(ANALYTICS_DATA_PURGING_GLOBAL);
-                        if (dataPurgingTaskManager.isTaskScheduled(GLOBAL_DATA_PURGING)) {
-                            dataPurgingTaskManager.deleteTask(GLOBAL_DATA_PURGING);
-                        }
-                        dataPurgingTaskManager.registerTask(createDataPurgingTask(analyticsDataPurgingConfiguration));
-                        dataPurgingTaskManager.scheduleTask(GLOBAL_DATA_PURGING);
-
-                    } catch (TaskException e) {
-                        logger.error("Unable to schedule global data purging task: " + e.getMessage(), e);
-                    }
-                } else {
-                    Set<String> registeredTaskTypes = taskService.getRegisteredTaskTypes();
-                    if (registeredTaskTypes != null && registeredTaskTypes.contains(ANALYTICS_DATA_PURGING_GLOBAL)) {
+        boolean dataPurgingEnable = !Boolean.getBoolean(Constants.DISABLE_ANALYTICS_DATA_PURGING_JVM_OPTION);
+        logger.info("Data purging is " + (dataPurgingEnable ? "enable" : "disable") + " in this node");
+        if (dataPurgingEnable) {
+            if (config.getAnalyticsDataPurgingConfiguration() != null) {
+                final AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration = config.getAnalyticsDataPurgingConfiguration();
+                TaskService taskService = AnalyticsServiceHolder.getTaskService();
+                if (taskService != null) {
+                    if (analyticsDataPurgingConfiguration.isEnable()) {
                         try {
+                            taskService.registerTaskType(ANALYTICS_DATA_PURGING_GLOBAL);
                             TaskManager dataPurgingTaskManager = taskService.getTaskManager(ANALYTICS_DATA_PURGING_GLOBAL);
                             if (dataPurgingTaskManager.isTaskScheduled(GLOBAL_DATA_PURGING)) {
                                 dataPurgingTaskManager.deleteTask(GLOBAL_DATA_PURGING);
-                                logger.info("Global data purging task removed.");
                             }
+                            dataPurgingTaskManager.registerTask(createDataPurgingTask(analyticsDataPurgingConfiguration));
+                            dataPurgingTaskManager.scheduleTask(GLOBAL_DATA_PURGING);
+
                         } catch (TaskException e) {
-                            logger.error("Unable to get purging task related information: " + e.getMessage(), e);
+                            logger.error("Unable to schedule global data purging task: " + e.getMessage(), e);
+                        }
+                    } else {
+                        Set<String> registeredTaskTypes = taskService.getRegisteredTaskTypes();
+                        if (registeredTaskTypes != null && registeredTaskTypes.contains(ANALYTICS_DATA_PURGING_GLOBAL)) {
+                            try {
+                                TaskManager dataPurgingTaskManager = taskService.getTaskManager(ANALYTICS_DATA_PURGING_GLOBAL);
+                                if (dataPurgingTaskManager.isTaskScheduled(GLOBAL_DATA_PURGING)) {
+                                    dataPurgingTaskManager.deleteTask(GLOBAL_DATA_PURGING);
+                                    logger.info("Global data purging task removed.");
+                                }
+                            } catch (TaskException e) {
+                                logger.error("Unable to get purging task related information: " + e.getMessage(), e);
+                            }
                         }
                     }
+                } else {
+                    logger.warn("Ignoring the data purging related operation," +
+                                " since the task service is not registered in this context.");
                 }
-            }else {
-                logger.warn("Ignoring the data purging related operation," +
-                        " since the task service is not registered in this context.");
             }
         }
     }
@@ -356,7 +366,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         }
     }
     
-    private void invalidateAnalyticsTableInfo(int tenantId, String tableName) {
+    public void invalidateAnalyticsTableInfo(int tenantId, String tableName) {
+        tableName = GenericUtils.normalizeTableName(tableName);
         this.tableInfoMap.remove(GenericUtils.calculateTableIdentity(tenantId, tableName));
     }
 
@@ -472,7 +483,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
      * This method preprocesses the records before adding to the record store,
      * e.g. update the record ids if its not already set by using the table
      * schema's primary keys.
-     * @param records
+     * @param recordBatches
      */
     private void preprocessRecords(Collection<List<Record>> recordBatches) throws AnalyticsException {
         for (List<Record> recordBatch : recordBatches) {
@@ -681,13 +692,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         Iterator<Record> recordIterator = GenericUtils.recordGroupsToIterator(ars, this.get(tenantId, tableName, 
                 1, null, timeFrom, timeTo, 0, -1).getRecordGroups());
         while (recordIterator.hasNext()) {
-            this.getIndexer().delete(tenantId, tableName, this.getRecordIdsBatch(recordIterator));
+            this.delete(tenantId, tableName, this.getRecordIdsBatch(recordIterator));
         }
-        ars.delete(tenantId, tableName, timeFrom, timeTo);
     }
     
     private List<String> getRecordIdsBatch(Iterator<Record> recordIterator) throws AnalyticsException {
-        List<String> result = new ArrayList<>();
+        List<String> result = new ArrayList<>(DELETE_BATCH_SIZE);
         for (int i = 0; i < DELETE_BATCH_SIZE & recordIterator.hasNext(); i++) {
             result.add(recordIterator.next().getId());
         }
@@ -702,8 +712,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (arsName == null) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
-        this.getIndexer().delete(tenantId, tableName, ids);
+        /* the below ordering is important, the raw records should be deleted first */
         this.getAnalyticsRecordStore(arsName).delete(tenantId, tableName, ids);
+        this.getIndexer().delete(tenantId, tableName, ids);
     }
 
     @Override

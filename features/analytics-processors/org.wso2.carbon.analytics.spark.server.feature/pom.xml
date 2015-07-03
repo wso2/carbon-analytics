@@ -29,11 +29,8 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.spark.utils</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.spark.patch</artifactId>
-        </dependency>
-        <!--spark -->
+
+       <!--spark -->
         <dependency>
             <groupId>org.wso2.orbit.org.apache.spark</groupId>
             <artifactId>spark-core_2.10</artifactId>
@@ -261,12 +258,13 @@
             <resource>
                 <directory>resources</directory>
                 <includes>
-                    <include>compute-classpath.sh</include>
                     <include>p2.inf</include>
                     <include>build.properties</include>
                     <include>protobuf-java-2.5.0.jar</include>
                     <include>spark-defaults.conf</include>
                     <include>spark-udf-config.xml</include>
+                    <include>wso2server.sh</include>
+                    <include>load-spark-env-vars.sh</include>
                 </includes>
             </resource>
         </resources>
@@ -293,16 +291,19 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.core</bundleDef>
-                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.admin</bundleDef>
-                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.utils</bundleDef>
-                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.patch</bundleDef>
+                                <bundleDef>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.core
+                                </bundleDef>
+                                <bundleDef>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.admin
+                                </bundleDef>
                                 <bundleDef>org.roaringbitmap:RoaringBitmap</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}
                                 </importFeatureDef>
-				                <importFeatureDef>org.wso2.carbon.spark.commons:${carbon.analytics.common.version}
+                                <importFeatureDef>
+                                    org.wso2.carbon.spark.commons:${carbon.analytics.common.version}
                                 </importFeatureDef>
                             </importFeatures>
                         </configuration>

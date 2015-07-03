@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+~
+~ WSO2 Inc. licenses this file to you under the Apache License,
+~ Version 2.0 (the "License"); you may not use this file except
+~ in compliance with the License.
+~ You may obtain a copy of the License at
+~
+~    http://www.apache.org/licenses/LICENSE-2.0
+~
+~ Unless required by applicable law or agreed to in writing,
+~ software distributed under the License is distributed on an
+~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~ KIND, either express or implied.  See the License for the
+~ specific language governing permissions and limitations
+~ under the License.
+-->
+
+
 <analytics-dataservice-configuration>
    <!-- The name of the primary record store -->
    <primaryRecordStore>EVENT_STORE</primaryRecordStore>
@@ -35,13 +54,6 @@
       <!-- Below entry will indicate purging is enable or not. If user wants to enable data purging for cluster then this property
        need to be enable in all nodes -->
       <purging-enable>false</purging-enable>
-      <!-- Below entry will specify a given node is participating in purging operation.
-      i.e: if the cluster has 3 DAS nodes and if user want to enable purging for this DAS cluster,
-      then first user needs to duplicate analytics-data-purging configuration in all the cluster nodes.
-      But again the user can decide whether which nodes are participating in data purging
-      task( only one node will do purging operation and other 2 nodes will not participate).
-      Using below entry user can decide whether this node is performing the purging task or not.  -->
-      <purge-node>true</purge-node>
       <cron-expression>0 0 0 * * ?</cron-expression>
       <!-- Tables that need include to purging. Use regex expression to specify the table name that need include to purging.-->
       <purge-include-table-patterns>

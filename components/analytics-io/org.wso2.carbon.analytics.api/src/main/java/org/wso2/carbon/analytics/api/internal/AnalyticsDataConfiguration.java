@@ -22,7 +22,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * This class JAXB configuration object which represents the configuration from analytics-data-config.xml.
- *
  */
 @XmlRootElement(name = "AnalyticsDataConfiguration")
 public class AnalyticsDataConfiguration {
@@ -65,7 +64,6 @@ public class AnalyticsDataConfiguration {
 
     @XmlElement(name = "Password")
     public String getPassword() {
-        //TODO: secure vault
         return password;
     }
 

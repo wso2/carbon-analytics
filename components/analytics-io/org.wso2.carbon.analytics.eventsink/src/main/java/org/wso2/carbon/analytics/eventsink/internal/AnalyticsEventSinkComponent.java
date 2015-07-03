@@ -24,13 +24,21 @@ import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkServiceImpl;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventStoreCAppDeployer;
+import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
 import org.wso2.carbon.analytics.eventsink.subscriber.AnalyticsEventStreamListener;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
 import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
+import org.wso2.carbon.event.processor.manager.core.EventManagementService;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.wso2.carbon.utils.CarbonUtils;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
 
 /**
  * This is the declarative service component which registers the required osgi
@@ -46,6 +54,9 @@ import org.wso2.carbon.event.stream.core.EventStreamService;
  * cardinality="1..1" policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.api.AnalyticsDataAPI"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataAPI" unbind="unsetAnalyticsDataAPI"
+ * @scr.reference name="eventManagement.service"
+ * interface="org.wso2.carbon.event.processor.manager.core.EventManagementService" cardinality="1..1"
+ * policy="dynamic" bind="setEventManagementService" unbind="unsetEventManagementService"
  */
 
 public class AnalyticsEventSinkComponent {
@@ -57,6 +68,7 @@ public class AnalyticsEventSinkComponent {
                 log.debug("Started the Analytics Event Sink component");
             }
             ServiceHolder.setAnalyticsEventSinkService(new AnalyticsEventSinkServiceImpl());
+            ServiceHolder.setEventSinkManagementService(new CarbonEventSinkManagementService());
             componentContext.getBundleContext().registerService(EventStreamListener.class.getName(),
                     ServiceHolder.getAnalyticsEventStreamListener(), null);
             componentContext.getBundleContext().registerService(AnalyticsEventSinkService.class.getName(),
@@ -64,10 +76,32 @@ public class AnalyticsEventSinkComponent {
             componentContext.getBundleContext().registerService(ServerStartupObserver.class.getName(),
                     AnalyticsEventSinkServerStartupObserver.getInstance(), null);
             componentContext.getBundleContext().registerService(
-                    AppDeploymentHandler.class.getName(),  new AnalyticsEventStoreCAppDeployer(), null);
+                    AppDeploymentHandler.class.getName(), new AnalyticsEventStoreCAppDeployer(), null);
+            ServiceHolder.getEventManagementService().subscribe(ServiceHolder.getEventSinkManagementService());
+            this.loadAnalyticsEventSinkConfiguration();
             ServiceHolder.setAnalyticsDSConnector(new AnalyticsDSConnector());
         } catch (Throwable e) {
             log.error("Error while activating the AnalyticsEventSinkComponent.", e);
+        }
+    }
+
+    private void loadAnalyticsEventSinkConfiguration() {
+        File analyticsConfFile = new File(CarbonUtils.getCarbonConfigDirPath() + File.separator +
+                AnalyticsEventSinkConstants.ANALYTICS_CONF_DIR + File.separator +
+                AnalyticsEventSinkConstants.EVENT_SINK_CONFIGURATION_FILE_NAME);
+        if (analyticsConfFile.exists()) {
+            try {
+                JAXBContext context = JAXBContext.newInstance(AnalyticsEventSinkConfiguration.class);
+                Unmarshaller un = context.createUnmarshaller();
+                ServiceHolder.setAnalyticsEventSinkConfiguration((AnalyticsEventSinkConfiguration)
+                        un.unmarshal(analyticsConfFile));
+            } catch (JAXBException e) {
+                log.error("Error while unmarshalling the file : " + analyticsConfFile.getName() + ". Therefore getting the " +
+                        "default configuration.", e);
+                ServiceHolder.setAnalyticsEventSinkConfiguration(new AnalyticsEventSinkConfiguration());
+            }
+        } else {
+            ServiceHolder.setAnalyticsEventSinkConfiguration(new AnalyticsEventSinkConfiguration());
         }
     }
 
@@ -100,5 +134,13 @@ public class AnalyticsEventSinkComponent {
 
     protected void unsetAnalyticsDataAPI(AnalyticsDataAPI analyticsDataAPI) {
         ServiceHolder.setAnalyticsDataAPI(null);
+    }
+
+    protected void setEventManagementService(EventManagementService eventManagementService) {
+        ServiceHolder.setEventManagementService(eventManagementService);
+    }
+
+    protected void unsetEventManagementService(EventManagementService eventManagementService) {
+        ServiceHolder.setEventManagementService(null);
     }
 }

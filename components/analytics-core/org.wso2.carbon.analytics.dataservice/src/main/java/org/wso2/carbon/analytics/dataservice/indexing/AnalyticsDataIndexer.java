@@ -190,7 +190,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     private boolean checkIfIndexingNode() {
-        return System.getProperty(DISABLE_INDEXING_ENV_PROP) == null;
+        String indexDisableProp =  System.getProperty(DISABLE_INDEXING_ENV_PROP);
+        return !(indexDisableProp != null && Boolean.parseBoolean(indexDisableProp));
     }
     
     private void initializeIndexingSchedules() throws AnalyticsException {
@@ -1153,7 +1154,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     * @throws AnalyticsException
     */
     public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
-       this.scheduleIndexDelete(tenantId, tableName, ids);
+        this.scheduleIndexDelete(tenantId, tableName, ids);
     }
     
     private void delete(int shardIndex, List<IndexOperation> deleteOpBatch) throws AnalyticsException {
