@@ -223,7 +223,6 @@ public class AnalyticsDataBackupTool {
             for (RecordGroup rg : resp.getRecordGroups()) {
                 recordItr = service.readRecords(resp.getRecordStoreName(), rg);
                 List<Record> records;
-                Record record;
                 while (recordItr.hasNext()) {
                     if (count % 5000 == 0) {
                         System.out.print(".");
