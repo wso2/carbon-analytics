@@ -24,6 +24,7 @@ import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
+import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
 import org.wso2.carbon.event.input.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.input.adapter.kafka.internal.util.KafkaEventAdapterConstants;
 
@@ -86,25 +87,29 @@ public final class KafkaEventAdapter implements InputEventAdapter {
 
     private static ConsumerConfig createConsumerConfig(String zookeeper, String groupId,
                                                        String optionalConfigs) {
-        Properties props = new Properties();
-        props.put(KafkaEventAdapterConstants.ADAPTOR_SUSCRIBER_ZOOKEEPER_CONNECT, zookeeper);
-        props.put(KafkaEventAdapterConstants.ADAPTOR_SUSCRIBER_GROUP_ID, groupId);
+        try {
+            Properties props = new Properties();
+            props.put(KafkaEventAdapterConstants.ADAPTOR_SUSCRIBER_ZOOKEEPER_CONNECT, zookeeper);
+            props.put(KafkaEventAdapterConstants.ADAPTOR_SUSCRIBER_GROUP_ID, groupId);
 
-        if (optionalConfigs != null) {
-            String[] optionalProperties = optionalConfigs.split(",");
+            if (optionalConfigs != null) {
+                String[] optionalProperties = optionalConfigs.split(",");
 
-            if (optionalProperties != null && optionalProperties.length > 0) {
-                for (String header : optionalProperties) {
-                    String[] configPropertyWithValue = header.split(":");
-                    if (configPropertyWithValue.length == 2) {
-                        props.put(configPropertyWithValue[0], configPropertyWithValue[1]);
-                    } else {
-                        log.warn("Optional configuration property not defined in the correct format.\nRequired - property_name1:property_value1,property_name2:property_value2\nFound - " + optionalConfigs);
+                if (optionalProperties != null && optionalProperties.length > 0) {
+                    for (String header : optionalProperties) {
+                        String[] configPropertyWithValue = header.split(":");
+                        if (configPropertyWithValue.length == 2) {
+                            props.put(configPropertyWithValue[0], configPropertyWithValue[1]);
+                        } else {
+                            log.warn("Optional configuration property not defined in the correct format.\nRequired - property_name1:property_value1,property_name2:property_value2\nFound - " + optionalConfigs);
+                        }
                     }
                 }
             }
+            return new ConsumerConfig(props);
+        } catch (Throwable t) {
+            throw new InputEventAdapterRuntimeException("Cannot access kafka context due to missing jars", t);
         }
-        return new ConsumerConfig(props);
     }
 
     private void createKafkaAdaptorListener(
