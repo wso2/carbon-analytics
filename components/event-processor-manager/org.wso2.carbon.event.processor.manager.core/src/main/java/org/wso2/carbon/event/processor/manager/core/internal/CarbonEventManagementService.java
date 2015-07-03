@@ -163,8 +163,12 @@ public class CarbonEventManagementService implements EventManagementService {
         executorService.schedule(new Runnable() {
             @Override
             public void run() {
-                log.info("Starting polling event adapters");
-                getEventReceiverManagementService().startPolling();
+                try {
+                    log.info("Starting polling event adapters");
+                    getEventReceiverManagementService().startPolling();
+                } catch (Exception e) {
+                    log.error("Unexpected error occurred when start polling event adapters", e);
+                }
             }
         }, ConfigurationConstants.AXIS_TIME_INTERVAL_IN_MILLISECONDS * 4, TimeUnit.MILLISECONDS);
 
