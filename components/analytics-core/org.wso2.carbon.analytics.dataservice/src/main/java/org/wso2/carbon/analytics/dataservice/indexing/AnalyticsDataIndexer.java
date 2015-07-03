@@ -1554,8 +1554,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             } catch (AnalyticsTableNotAvailableException e) {
                 /* ignore */
             }
-        }            
-        return true;        
+        }
+        return true;
     }
     
     private void planIndexingWorkersInCluster() throws AnalyticsException {
@@ -1719,10 +1719,13 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             while (!this.stop) {
                 try {
                     processIndexOperations(this.getShardIndex());
-                    Thread.sleep(INDEX_WORKER_SLEEP_TIME);
                 } catch (AnalyticsException e) {
+                    e.printStackTrace();
                     log.error("Error in processing index batch operations: " + e.getMessage(), e);
-                } catch (InterruptedException e) { 
+                }
+                try {
+                    Thread.sleep(INDEX_WORKER_SLEEP_TIME);
+                } catch (InterruptedException e) {
                     break;
                 }
             }

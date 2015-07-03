@@ -50,9 +50,6 @@ import java.util.Map;
  */
 public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     
-    /** One time set empty data chunk value */
-    private byte[] FS_EMPTY_DATA_CHUNK;
-    
     private RDBMSQueryConfigurationEntry rdbmsQueryConfigurationEntry;
     
     private DataSource dataSource;
@@ -74,7 +71,6 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
         if (this.rdbmsQueryConfigurationEntry == null) {
             this.rdbmsQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
         }
-        this.FS_EMPTY_DATA_CHUNK = new byte[this.getQueryConfiguration().getFsDataChunkSize()];
         /* create the system tables */
         this.checkAndCreateSystemTables();
     }
@@ -459,7 +455,8 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             if (rs.next()) {
                 return this.inputStreamToByteArray(rs.getBinaryStream(1));
             } else {
-                return FS_EMPTY_DATA_CHUNK;
+                throw new IOException("The data chunk for path: " + path + 
+                        " at sequence: " + n + " does not exist.");
             }
         } catch (SQLException e) {
             throw new IOException("Error in file read chunk: " + path + ": " + e.getMessage(), e);

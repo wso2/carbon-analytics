@@ -197,7 +197,8 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
                     this.path, index);
             Row row = rs.one();
             if (row == null) {
-                return null;
+                throw new IOException("The data chunk for path: " + this.path + 
+                        " at sequence: " + index + " does not exist.");
             }
             ByteBuffer byteBuffer = row.getBytes(0);
             byte[] data = new byte[byteBuffer.remaining()];
