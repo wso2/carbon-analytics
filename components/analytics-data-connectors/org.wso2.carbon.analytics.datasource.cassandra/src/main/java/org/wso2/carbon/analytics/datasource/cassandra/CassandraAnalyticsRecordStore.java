@@ -17,6 +17,20 @@
 */
 package org.wso2.carbon.analytics.datasource.cassandra;
 
+import com.datastax.driver.core.BatchStatement;
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.PreparedStatement;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -26,30 +40,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
-import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-
-import com.datastax.driver.core.BatchStatement;
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.PreparedStatement;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
-
 /**
  * This class represents the Cassandra implementation of {@link AnalyticsRecordStore}.
  */
 public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
     private static final int TS_MULTIPLIER = 100000;
-    
+
     private Session session;
-    
+
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
         String servers = properties.get(CassandraUtils.CASSANDRA_SERVERS);

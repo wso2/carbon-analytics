@@ -168,5 +168,4 @@ public class AnalyticsQueryParser extends QueryParser {
             return super.newTermQuery(term);
         }
     }
-
 }
