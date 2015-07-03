@@ -171,73 +171,8 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.org.apache.lucene</groupId>
-                <artifactId>lucene-core</artifactId>
+                <artifactId>lucene</artifactId>
                 <version>${lucene.orbit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.orbit.org.apache.lucene</groupId>
-                <artifactId>lucene-analyzers-common</artifactId>
-                <version>${lucene.orbit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.orbit.org.apache.lucene</groupId>
-                <artifactId>lucene-queryparser</artifactId>
-                <version>${lucene.orbit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.orbit.org.apache.lucene</groupId>
-                <artifactId>lucene-queries</artifactId>
-                <version>${lucene.orbit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.orbit.org.apache.lucene</groupId>
-                <artifactId>lucene-facet</artifactId>
-                <version>${lucene.orbit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.orbit.org.apache.lucene</groupId>
-                <artifactId>lucene-expressions</artifactId>
-                <version>${lucene.orbit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.orbit.asm4</groupId>
-                <artifactId>asm-all</artifactId>
-                <version>${asm4.orbit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-core</artifactId>
-                <version>${lucene.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-analyzers-common</artifactId>
-                <version>${lucene.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-queryparser</artifactId>
-                <version>${lucene.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-queries</artifactId>
-                <version>${lucene.version}</version>
-            </dependency>
-            <!--<dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-regex</artifactId>
-                <version>${lucene.regex.version}</version>
-            </dependency>-->
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-facet</artifactId>
-                <version>${lucene.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-expressions</artifactId>
-                <version>${lucene.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
@@ -875,6 +810,12 @@
                 <version>${servelet.jsp.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.wso2.orbit.org.ow2.asm</groupId>
+                <artifactId>asm-all</artifactId>
+                <version>${asm4.orbit.version}</version>
+            </dependency>
+
             <!--spark 130 additional dependancies -->
             <dependency>
                 <groupId>org.roaringbitmap</groupId>
@@ -1324,10 +1265,9 @@
         <!-- Javax-->
         <javax.servelet.version>3.0.1</javax.servelet.version>
 
-        <lucene.version>5.2.1</lucene.version>
-        <lucene.regex.version>3.0.3</lucene.regex.version>
         <lucene.orbit.version>5.2.1.wso2v1</lucene.orbit.version>
-        <asm4.orbit.version>4.0.0.wso2v1</asm4.orbit.version>
+        <lucene.imp.pkg.version>[5.2.1, 5.3.0)</lucene.imp.pkg.version>
+        <asm4.orbit.version>4.1.0.wso2v1</asm4.orbit.version>
         <carbon.commons.version>4.4.3</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.4.3, 4.5.0)</carbon.commons.imp.pkg.version>
         <carbon.event-processing.version>2.0.4-SNAPSHOT</carbon.event-processing.version>

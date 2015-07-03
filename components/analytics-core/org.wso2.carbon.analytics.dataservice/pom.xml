@@ -31,36 +31,20 @@
             <version>6.3.1</version>
         </dependency>
        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queryparser</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queries</artifactId>
-        </dependency>
-       <!-- <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-regex</artifactId>
-        </dependency>-->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-expressions</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-facet</artifactId>
-        </dependency>
+            <groupId>org.wso2.orbit.org.apache.lucene</groupId>
+            <artifactId>lucene</artifactId>
+       </dependency>
         <dependency>
             <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.ntask.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr.wso2</groupId>
+            <artifactId>antlr-runtime</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.ow2.asm</groupId>
+            <artifactId>asm-all</artifactId>
         </dependency>
     </dependencies>
     <build>
@@ -78,7 +62,7 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>org.wso2.carbon.analytics.dataservice.*</Export-Package>
                         <Import-Package>
-                            org.apache.lucene.*;version="[5.2.1, 5.3.0)",
+                            org.apache.lucene.*;version="${lucene.imp.pkg.version}",
                             org.wso2.carbon.ntask.core.*;version="${carbon.commons.imp.pkg.version}"
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

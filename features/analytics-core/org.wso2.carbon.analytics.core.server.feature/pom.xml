@@ -60,32 +60,11 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
+            <artifactId>lucene</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.org.apache.lucene</groupId>
-            <artifactId>lucene-queryparser</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.org.apache.lucene</groupId>
-            <artifactId>lucene-queries</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.org.apache.lucene</groupId>
-            <artifactId>lucene-expressions</artifactId>
-        </dependency>
-        <dependency>
-        <groupId>org.wso2.orbit.org.apache.lucene</groupId>
-        <artifactId>lucene-facet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.asm4</groupId>
-            <artifactId>asm4-all</artifactId>
-            <version>${asm4.orbit.version}</version>
+            <groupId>org.wso2.orbit.org.ow2.asm</groupId>
+            <artifactId>asm-all</artifactId>
         </dependency>
         <dependency>
             <groupId>com.esotericsoftware.kryo</groupId>
@@ -102,10 +81,6 @@
         <dependency>
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.noggit</groupId>
-            <artifactId>noggit</artifactId>
         </dependency>
     </dependencies>
 
@@ -136,19 +111,14 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.orbit.org.apache.lucene:lucene-core</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.lucene:lucene-analyzers-common</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.lucene:lucene-queries</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.lucene:lucene-queryparser</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.lucene:lucene-expressions</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.lucene:lucene-facet</bundleDef>
-                                <bundleDef>org.wso2.orbit.asm4:asm4-all</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.lucene:lucene</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.ow2.asm:asm-all</bundleDef>
+                                <bundleDef>org.antlr.wso2:antlr-runtime</bundleDef>
                                 <bundleDef>com.datastax.cassandra:cassandra-driver-core</bundleDef>
                                 <bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>
                                 <bundleDef>io.dropwizard.metrics:metrics-core</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef>
                                 <!--<bundleDef>com.esotericsoftware.kryo:kryo</bundleDef>-->
-                                <bundleDef>org.antlr.wso2:antlr-runtime</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.core
                                 </bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice</bundleDef>
@@ -158,9 +128,6 @@
                                 </bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.commons
                                 </bundleDef>
-                                <!--TODO Temporary added noggit bundle to resolve server shutdown issue. This need for registry indexing that comes with
-                                jaggery server feature-->
-                                <bundleDef>org.wso2.noggit:noggit</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
