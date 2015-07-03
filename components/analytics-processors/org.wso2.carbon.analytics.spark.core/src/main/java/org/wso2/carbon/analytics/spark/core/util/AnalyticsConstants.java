@@ -88,12 +88,6 @@ public class AnalyticsConstants {
     public static final String TENANT_ID_AND_TABLES_MAP = "tenantIdTablesMap";
     public static final int MAX_RECORDS = 1000;
 
-    //EventStream relation constants
-    public static final String VERSION = "version";
-    public static final String DESCRIPTION = "description";
-    public static final String NICKNAME = "nickname";
-    public static final String PAYLOAD = "payload";
-
     //Spark default properties strings
     public static final String SPARK_MASTER_IP = "spark.master.ip";
     public static final String SPARK_MASTER_PORT = "spark.master.port";

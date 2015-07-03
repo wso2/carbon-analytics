@@ -27,7 +27,6 @@ import org.wso2.carbon.analytics.spark.core.CarbonAnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.SparkScriptCAppDeployer;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
-import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -47,8 +46,6 @@ import org.wso2.carbon.utils.NetworkUtils;
  * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
  * @scr.reference name="tenant.registryloader" interface="org.wso2.carbon.registry.core.service.TenantRegistryLoader"
  * cardinality="1..1" policy="dynamic" bind="setTenantRegistryLoader" unbind="unsetTenantRegistryLoader"
- * @scr.reference name="event.streamService" interface="org.wso2.carbon.event.stream.core.EventStreamService"
- * cardinality="1..1" policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  */
 public class AnalyticsComponent {
 
@@ -133,14 +130,6 @@ public class AnalyticsComponent {
 
     protected void unsetTenantRegistryLoader(TenantRegistryLoader tenantRegistryLoader) {
         ServiceHolder.setTenantRegistryLoader(null);
-    }
-
-    protected void setEventStreamService(EventStreamService eventStreamService) {
-        ServiceHolder.setEventStreamService(eventStreamService);
-    }
-
-    protected void unsetEventStreamService(EventStreamService eventStreamService) {
-        ServiceHolder.setEventStreamService(null);
     }
 
     private void checkAnalyticsEnabled() {
