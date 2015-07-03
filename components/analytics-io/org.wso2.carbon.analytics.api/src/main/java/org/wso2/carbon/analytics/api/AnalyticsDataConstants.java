@@ -26,4 +26,11 @@ public class AnalyticsDataConstants {
     public static final String ANALYTICS_DATA_CONFIGURATION_FILE_NAME = "analytics-data-config.xml";
     public static final String ANALYTICS_CONFIG_DIR = "analytics";
     public static final String ANALYTICS_API_CONF_PASSWORD_ALIAS = "Analytics.Data.Config.Password";
+    public static final String ANALYTICS_API_TRUST_STORE_PASSWORD_ALIAS = "Analytics.Data.Config.TrustStorePassword";
+    public static final String SSL_TRUST_STORE_SYS_PROP = "javax.net.ssl.trustStore";
+    public static final String SSL_TRUST_STORE_PASSWORD_SYS_PROP = "javax.net.ssl.trustStorePassword";
+    public static final String HTTP_PROTOCOL = "http";
+    public static final String TRUST_STORE_CARBON_CONFIG = "Security.TrustStore.Location";
+    public static final String TRUST_STORE_PASSWORD_CARBON_CONFIG = "Security.TrustStore.Password";
+    public static final int MAXIMUM_NUMBER_OF_RETRY = 5;
 }

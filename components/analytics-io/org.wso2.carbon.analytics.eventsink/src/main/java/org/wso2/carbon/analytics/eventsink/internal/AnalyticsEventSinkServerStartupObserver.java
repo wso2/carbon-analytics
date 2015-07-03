@@ -74,12 +74,6 @@ public class AnalyticsEventSinkServerStartupObserver implements ServerStartupObs
                         CarbonUtils.getDeployer(AnalyticsEventStoreDeployer.class.getName());
                 if (AnalyticsEventStoreDeployer.getPausedDeployments() != null) {
                     List<DeploymentFileData> pausedDeployment = AnalyticsEventStoreDeployer.getPausedDeployments();
-                    if (pausedDeployment.size() > 0) {
-                        try {
-                            Thread.sleep(10000);
-                        } catch (InterruptedException e) {
-                        }
-                    }
                     started.set(true);
                     PrivilegedCarbonContext.startTenantFlow();
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(MultitenantConstants.SUPER_TENANT_ID);

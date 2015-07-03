@@ -34,15 +34,18 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.util.EntityUtils;
+import org.wso2.carbon.analytics.api.AnalyticsDataConstants;
 import org.wso2.carbon.analytics.api.RemoteRecordIterator;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceAuthenticationException;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
+import org.wso2.carbon.analytics.api.exception.AnalyticsServiceRemoteException;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -57,10 +60,12 @@ import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
+import org.wso2.carbon.base.ServerConfiguration;
 
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -88,13 +93,21 @@ public class AnalyticsAPIHttpClient {
 
     private AnalyticsAPIHttpClient(String protocol, String hostname, int port,
                                    int maxPerRoute, int maxConnection,
-                                   int socketTimeout, int connectionTimeout) {
+                                   int socketTimeout, int connectionTimeout,
+                                   String trustStoreLocation, String trustStorePassword) {
         this.hostname = hostname;
         this.port = port;
         this.protocol = protocol;
         SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(
-                new Scheme(this.protocol, port, PlainSocketFactory.getSocketFactory()));
+        if (this.protocol.equalsIgnoreCase(AnalyticsDataConstants.HTTP_PROTOCOL)) {
+            schemeRegistry.register(
+                    new Scheme(this.protocol, port, PlainSocketFactory.getSocketFactory()));
+        } else {
+            System.setProperty(AnalyticsDataConstants.SSL_TRUST_STORE_SYS_PROP, trustStoreLocation);
+            System.setProperty(AnalyticsDataConstants.SSL_TRUST_STORE_PASSWORD_SYS_PROP, trustStorePassword);
+            schemeRegistry.register(
+                    new Scheme(this.protocol, port, SSLSocketFactory.getSocketFactory()));
+        }
         PoolingClientConnectionManager connectionManager = new PoolingClientConnectionManager(schemeRegistry);
         connectionManager.setDefaultMaxPerRoute(maxPerRoute);
         connectionManager.setMaxTotal(maxConnection);
@@ -110,10 +123,36 @@ public class AnalyticsAPIHttpClient {
             URL url = new URL(dataConfiguration.getEndpoint());
             instance = new AnalyticsAPIHttpClient(url.getProtocol(), url.getHost(), url.getPort(),
                     dataConfiguration.getMaxConnectionsPerRoute(), dataConfiguration.getMaxConnections(),
-                    dataConfiguration.getSocketConnectionTimeoutMS(), dataConfiguration.getConnectionTimeoutMS());
+                    dataConfiguration.getSocketConnectionTimeoutMS(), dataConfiguration.getConnectionTimeoutMS(),
+                    getTrustStoreLocation(dataConfiguration.getTrustStoreLocation()),
+                    getTrustStorePassword(dataConfiguration.getTrustStorePassword()));
         } catch (MalformedURLException e) {
             throw new AnalyticsServiceException("Error while initializing the analytics http client. " + e.getMessage(), e);
         }
+    }
+
+    private static String getTrustStoreLocation(String trustStoreLocation) {
+        if (trustStoreLocation == null || trustStoreLocation.trim().isEmpty()) {
+            ServerConfiguration serverConfig = ServerConfiguration.getInstance();
+            String trustStore = serverConfig.getFirstProperty(AnalyticsDataConstants.TRUST_STORE_CARBON_CONFIG);
+            if (trustStore == null) {
+                trustStore = System.getProperty(AnalyticsDataConstants.TRUST_STORE_CARBON_CONFIG);
+            }
+            return trustStore;
+        }
+        return new File(trustStoreLocation).getAbsolutePath();
+    }
+
+    private static String getTrustStorePassword(String trustStorePassword) {
+        if (trustStorePassword == null || trustStorePassword.trim().isEmpty()) {
+            ServerConfiguration serverConfig = ServerConfiguration.getInstance();
+            String trustStorePw = serverConfig.getFirstProperty(AnalyticsDataConstants.TRUST_STORE_PASSWORD_CARBON_CONFIG);
+            if (trustStorePw == null) {
+                trustStorePw = System.getProperty(AnalyticsDataConstants.TRUST_STORE_PASSWORD_CARBON_CONFIG);
+            }
+            return trustStorePw;
+        }
+        return trustStorePassword;
     }
 
     public static AnalyticsAPIHttpClient getInstance() {
@@ -133,8 +172,13 @@ public class AnalyticsAPIHttpClient {
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = httpResponse.getStatusLine().toString();
                 EntityUtils.consume(httpResponse.getEntity());
-                throw new AnalyticsServiceAuthenticationException("Authentication failed for user : " + username + " ."
-                        + "Response received from remote instance : " + response);
+                if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_NOT_FOUND) {
+                    throw new AnalyticsServiceAuthenticationException("Authentication failed for user : " + username + " ."
+                            + "Response received from remote instance : " + response);
+                } else {
+                    throw new AnalyticsServiceRemoteException("Unable to reach the endpoint : " +
+                            builder.build().toString() + ". " + response);
+                }
             }
             String response = getResponseString(httpResponse);
             if (response.startsWith(AnalyticsAPIConstants.SESSION_ID)) {
@@ -153,14 +197,31 @@ public class AnalyticsAPIHttpClient {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided for authentication. "
                     + e.getMessage(), e);
         } catch (IOException e) {
-            throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. "
+            throw new AnalyticsServiceRemoteException("Error while connecting to the remote service. "
                     + e.getMessage(), e);
         }
     }
 
     public void validateAndAuthenticate(String username, String password) throws AnalyticsServiceException {
         if (sessionId == null) {
-            authenticate(username, password);
+            int numberOfRetry = 0;
+            while (numberOfRetry < AnalyticsDataConstants.MAXIMUM_NUMBER_OF_RETRY) {
+                try {
+                    numberOfRetry++;
+                    authenticate(username, password);
+                    return;
+                } catch (AnalyticsServiceRemoteException ex) {
+                    if (numberOfRetry == AnalyticsDataConstants.MAXIMUM_NUMBER_OF_RETRY - 1) {
+                        log.error("Unable to connect to remote service, have retried "
+                                + AnalyticsDataConstants.MAXIMUM_NUMBER_OF_RETRY + " times, but unable to reach. ", ex);
+                    }else {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+                }
+            }
         }
     }
 

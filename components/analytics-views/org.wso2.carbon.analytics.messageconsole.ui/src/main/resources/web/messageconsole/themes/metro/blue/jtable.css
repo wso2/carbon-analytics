@@ -534,7 +534,7 @@ div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-pa
 div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-disabled {
   opacity: 0.75;
   filter: alpha(opacity=50);
-  color: #ccc;
+  /*color: #ccc;*/
   cursor: default;
 }
 div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-disabled:hover {

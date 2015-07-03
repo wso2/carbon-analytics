@@ -22,6 +22,8 @@ import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
+import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field.Store;
@@ -640,7 +642,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             reader = this.getCombinedIndexReader(tenantId, tableName);
             IndexSearcher searcher = new IndexSearcher(reader, searchExecutor);
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, tableName);
-            Query indexQuery = new AnalyticsQueryParser(this.luceneAnalyzer, indices).parse(query);
+            Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
+            Query indexQuery = new AnalyticsQueryParser(analyzer, indices).parse(query);
             if (count <= 0) {
                 log.warn("Record Count/Page size is ZERO!. Please set Record count/Page size.");
             }
@@ -667,13 +670,31 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
+    private Analyzer getPerFieldAnalyzerWrapper(Map<String, ColumnDefinition> indices)
+            throws AnalyticsIndexException {
+        Analyzer perFieldAnalyzerWrapper;
+        Map<String, Analyzer> analyzersPerField = new HashMap<>();
+        for (Map.Entry<String, ColumnDefinition> index : indices.entrySet()) {
+            if (index.getValue().getType() == AnalyticsSchema.ColumnType.STRING) {
+                analyzersPerField.put(Constants.NON_TOKENIZED_FIELD_PREFIX + index.getKey(), new KeywordAnalyzer());
+            }
+        }
+        if (analyzersPerField.isEmpty()) {
+            perFieldAnalyzerWrapper = new PerFieldAnalyzerWrapper(this.luceneAnalyzer);
+        } else {
+            perFieldAnalyzerWrapper = new PerFieldAnalyzerWrapper(this.luceneAnalyzer, analyzersPerField);
+        }
+        return perFieldAnalyzerWrapper;
+    }
+
     public int searchCount(int tenantId, String tableName, String query) throws AnalyticsIndexException {
         IndexReader reader = null;
         try {
             reader = this.getCombinedIndexReader(tenantId, tableName);
             IndexSearcher searcher = new IndexSearcher(reader);
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, tableName);
-            Query indexQuery = new AnalyticsQueryParser(this.luceneAnalyzer, indices).parse(query);
+            Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
+            Query indexQuery = new AnalyticsQueryParser(analyzer, indices).parse(query);
             TotalHitCountCollector collector = new TotalHitCountCollector();
             searcher.search(indexQuery, collector);
             return collector.getTotalHits();
@@ -733,7 +754,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         Query indexQuery = new MatchAllDocsQuery();
         FacetsCollector fc = new FacetsCollector();
         if (drillDownRequest.getQuery() != null) {
-            indexQuery = new AnalyticsQueryParser(this.luceneAnalyzer,
+            Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
+            indexQuery = new AnalyticsQueryParser(analyzer,
                                                   indices).parse(drillDownRequest.getQuery());
         }
         FacetsCollector.search(searcher, indexQuery, Integer.MAX_VALUE, fc);
@@ -858,7 +880,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             DrillSideways drillSideways = new DrillSideways(indexSearcher, config, taxonomyReader);
             Query queryObj = new MatchAllDocsQuery();
             if (drillDownRequest.getQuery() != null && !drillDownRequest.getQuery().isEmpty()) {
-                queryObj = (new AnalyticsQueryParser(this.luceneAnalyzer, indices)).parse(drillDownRequest.getQuery());
+                Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
+                queryObj = (new AnalyticsQueryParser(analyzer, indices)).parse(drillDownRequest.getQuery());
             }
             DrillDownQuery drillDownQuery = new DrillDownQuery(config, queryObj);
             String[] path = drillDownRequest.getPath();
@@ -965,7 +988,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         Query languageQuery = new MatchAllDocsQuery();
         try {
             if (drillDownRequest.getQuery() != null) {
-                languageQuery = new AnalyticsQueryParser(this.luceneAnalyzer,
+                Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
+                languageQuery = new AnalyticsQueryParser(analyzer,
                          indices).parse(drillDownRequest.getQuery());
             }
             DrillDownQuery drillDownQuery = new DrillDownQuery(config, languageQuery);
