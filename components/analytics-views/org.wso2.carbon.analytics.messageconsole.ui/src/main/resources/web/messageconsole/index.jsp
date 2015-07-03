@@ -104,11 +104,13 @@
                         {tableName: $("#tableSelect").val()},
                        function (result) {
                            var resultObj = jQuery.parseJSON(result);
-                           $('#dataPurgingScheudleTime').val(resultObj.cronString);
-                           $('#dataPurgingScheudleTime').prop('disabled', false);
-                           $('#dataPurgingDay').val(resultObj.retentionPeriod);
-                           $('#dataPurgingDay').prop('disabled', false);
-                           $('#dataPurgingCheckBox').prop("checked", true);
+                           if (resultObj.retentionPeriod > 0) {
+                               $('#dataPurgingScheudleTime').val(resultObj.cronString);
+                               $('#dataPurgingScheudleTime').prop('disabled', false);
+                               $('#dataPurgingDay').val(resultObj.retentionPeriod);
+                               $('#dataPurgingDay').prop('disabled', false);
+                               $('#dataPurgingCheckBox').prop("checked", true);
+                           }
                            $("#purgeRecordDialog").dialog("open");
                        });
                 return true;
