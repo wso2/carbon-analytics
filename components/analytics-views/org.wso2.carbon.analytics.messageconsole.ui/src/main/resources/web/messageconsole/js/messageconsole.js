@@ -151,8 +151,8 @@ function tableSelectChange() {
     if (table != '-1') {
         document.getElementById('searchControl').style.display = '';
         $("#purgeRecordButton").show();
-        loadFacetNames();
         loadPrimaryKeys();
+        loadFacetNames();
     } else {
         $("#purgeRecordButton").hide();
         $('#facetListSelect').find('option:gt(0)').remove();
@@ -160,8 +160,8 @@ function tableSelectChange() {
         document.getElementById('searchControl').style.display = 'none';
     }
     document.getElementById('dataRangeSearch').style.display = 'none';
-    document.getElementById('querySearch').style.display = 'none';
     document.getElementById('primaryKeySearch').style.display = 'none';
+    document.getElementById('querySearch').style.display = 'none';
     document.getElementById('facetSearchCombo').style.display = 'none';
     document.getElementById('facetSearchTableRow').style.display = 'none';
 
@@ -195,24 +195,23 @@ function scheduleDataPurge() {
                label.innerHTML = result;
            }
     );
-    return false;
 }
 
 function updateSearchOption(ele) {
     switch (ele.value) {
         case 'time':
             document.getElementById('dataRangeSearch').style.display = '';
+            document.getElementById('primaryKeySearch').style.display = 'none';
             document.getElementById('querySearch').style.display = 'none';
             document.getElementById('facetSearchCombo').style.display = 'none';
             document.getElementById('facetSearchTableRow').style.display = 'none';
-            document.getElementById('primaryKeySearch').style.display = 'none';
             break;
         case 'primary':
             document.getElementById('primaryKeySearch').style.display = '';
-            document.getElementById('querySearch').style.display = 'none';
-            document.getElementById('facetSearchCombo').style.display = 'none';
-            document.getElementById('facetSearchTableRow').style.display = 'none';
             document.getElementById('dataRangeSearch').style.display = 'none';
+            document.getElementById('querySearch').style.display = 'none';
+            document.getElementById('facetSearchTableRow').style.display = 'none';
+            document.getElementById('facetSearchCombo').style.display = 'none';
             break;
         case 'query':
             document.getElementById('querySearch').style.display = '';
@@ -237,11 +236,7 @@ function loadFacetNames() {
               $(resultObj).each(function (key, tableName) {
                   facetNames += "<option value=" + tableName + ">" + tableName + "</option>";
               });
-              if (resultObj.length > 0) {
-                  facetAvailable = true;
-              } else {
-                  facetAvailable = false;
-              }
+              facetAvailable = resultObj.length > 0;
               $("#facetListSelect").append(facetNames);
           }
     );
