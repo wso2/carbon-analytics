@@ -60,6 +60,8 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     private AnalyticsDataConfiguration analyticsDataConfiguration;
 
+    private AnalyticsDataConfiguration.Mode mode;
+
     public CarbonAnalyticsAPI(String configFilePath) {
         try {
             JAXBContext context = JAXBContext.newInstance(AnalyticsDataConfiguration.class);
@@ -81,9 +83,28 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
                 + File.separator + AnalyticsDataConstants.ANALYTICS_DATA_CONFIGURATION_FILE_NAME);
     }
 
+    private AnalyticsDataConfiguration.Mode getOperationMode() {
+        if (mode == null) {
+            synchronized (this) {
+                if (mode == null) {
+                    AnalyticsDataConfiguration.Mode mode = analyticsDataConfiguration.getOperationMode();
+                    if (mode == AnalyticsDataConfiguration.Mode.AUTO) {
+                        if (ServiceHolder.getAnalyticsDataService() != null) {
+                            this.mode= AnalyticsDataConfiguration.Mode.LOCAL;
+                        }
+                        this.mode =  AnalyticsDataConfiguration.Mode.REMOTE;
+                    }else {
+                        this.mode = mode;
+                    }
+                }
+            }
+        }
+        return mode;
+    }
+
     @Override
     public void createTable(int tenantId, String tableName) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getAnalyticsDataService().createTable(tenantId, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -95,7 +116,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public void createTable(int tenantId, String recordStoreName, String tableName)
             throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getAnalyticsDataService().createTable(tenantId, recordStoreName, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -106,7 +127,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void clearIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getAnalyticsDataService().clearIndexData(tenantId, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -118,7 +139,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema) throws
             AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, tableName, schema);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -130,7 +151,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws
             AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().getTableSchema(tenantId, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -141,7 +162,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().tableExists(tenantId, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -152,7 +173,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getAnalyticsDataService().deleteTable(tenantId, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -163,7 +184,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public List<String> listTables(int tenantId) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().listTables(tenantId);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -175,7 +196,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) throws
             AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().getRecordCount(tenantId, tableName, timeFrom, timeTo);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -187,7 +208,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void put(List<Record> records) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getAnalyticsDataService().put(records);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -199,7 +220,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public AnalyticsDataResponse get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
                                      long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().get(tenantId, tableName, numPartitionsHint, columns,
                     timeFrom, timeTo, recordsFrom, recordsCount);
         } else {
@@ -213,7 +234,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public AnalyticsDataResponse get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, List<String> ids)
             throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().get(tenantId, tableName, numPartitionsHint, columns, ids);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -225,7 +246,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void createTable(String username, String tableName) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getSecureAnalyticsDataService().createTable(username, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -237,7 +258,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void createTable(String username, String recordStoreName, String tableName) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getSecureAnalyticsDataService().createTable(username, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -249,7 +270,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void clearIndexData(String username, String tableName) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getSecureAnalyticsDataService().clearIndexData(username, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -261,7 +282,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void setTableSchema(String username, String tableName, AnalyticsSchema schema) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getSecureAnalyticsDataService().setTableSchema(username, tableName, schema);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -274,7 +295,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public AnalyticsSchema getTableSchema(String username, String tableName) throws AnalyticsTableNotAvailableException,
             AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().getTableSchema(username, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -286,7 +307,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public boolean tableExists(String username, String tableName) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().tableExists(username, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -298,7 +319,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void deleteTable(String username, String tableName) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getSecureAnalyticsDataService().deleteTable(username, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -310,7 +331,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public List<String> listTables(String username) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().listTables(username);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -322,7 +343,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public long getRecordCount(String username, String tableName, long timeFrom, long timeTo) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().getRecordCount(username, tableName, timeFrom, timeTo);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -334,7 +355,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void put(String username, List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getSecureAnalyticsDataService().put(username, records);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -346,7 +367,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public AnalyticsDataResponse get(String username, String tableName, int numPartitionsHint, List<String> columns,
                                      long timeFrom, long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().get(username, tableName, numPartitionsHint, columns,
                     timeFrom, timeTo, recordsFrom, recordsCount);
         } else {
@@ -360,7 +381,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public AnalyticsDataResponse get(String username, String tableName, int numPartitionsHint, List<String> columns,
                                      List<String> ids) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().get(username, tableName, numPartitionsHint, columns, ids);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -375,7 +396,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
                                                   List<String> columns,
                                                   List<Map<String, Object>> valuesBatch)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().getWithKeyValues(username, tableName, numPartitionsHint,
                     columns, valuesBatch);
         } else {
@@ -388,7 +409,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public boolean isPaginationSupported(String recordStoreName) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().isPaginationSupported(recordStoreName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -399,7 +420,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void delete(String username, String tableName, long timeFrom, long timeTo) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getSecureAnalyticsDataService().delete(username, tableName, timeFrom, timeTo);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -411,7 +432,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void delete(String username, String tableName, List<String> ids) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getSecureAnalyticsDataService().delete(username, tableName, ids);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -424,7 +445,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public List<SearchResultEntry> search(String username, String tableName, String query, int start, int count)
             throws AnalyticsIndexException, AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().search(username, tableName, query, start, count);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -436,7 +457,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public int searchCount(String username, String tableName, String query) throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().searchCount(username, tableName, query);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -449,7 +470,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public List<SearchResultEntry> drillDownSearch(String username, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().drillDownSearch(username, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -462,7 +483,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public double drillDownSearchCount(String username, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().drillDownSearchCount(username, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -476,7 +497,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     public SubCategories drillDownCategories(String username,
                                              CategoryDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().drillDownCategories(username, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -490,7 +511,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     public List<AnalyticsDrillDownRange> drillDownRangeCount(String username,
                                                              AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().drillDownRangeCount(username, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -502,7 +523,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public AnalyticsIterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().readRecords(recordStoreName, recordGroup);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -513,7 +534,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getAnalyticsDataService().delete(tenantId, tableName, timeFrom, timeTo);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -524,7 +545,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getAnalyticsDataService().delete(tenantId, tableName, ids);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -536,7 +557,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public List<SearchResultEntry> search(int tenantId, String tableName, String query, int start,
                                           int count) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().search(tenantId, tableName, query, start, count);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -547,7 +568,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public int searchCount(int tenantId, String tableName, String query) throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().searchCount(tenantId, tableName, query);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -559,7 +580,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public List<SearchResultEntry> drillDownSearch(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().drillDownSearch(tenantId, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -571,7 +592,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public double drillDownSearchCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().drillDownSearchCount(tenantId, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -584,7 +605,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     public SubCategories drillDownCategories(int tenantId,
                                              CategoryDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().drillDownCategories(tenantId, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -597,7 +618,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     public List<AnalyticsDrillDownRange> drillDownRangeCount(int tenantId,
                                                              AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().drillDownRangeCount(tenantId, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -608,7 +629,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void waitForIndexing(long maxWait) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getAnalyticsDataService().waitForIndexing(maxWait);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -619,7 +640,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void destroy() throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getAnalyticsDataService().destroy();
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
@@ -632,7 +653,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     public AnalyticsDataResponse getWithKeyValues(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
                                                   List<Map<String, Object>> valuesBatch)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().getWithKeyValues(tenantId, tableName, numPartitionsHint,
                     columns, valuesBatch);
         } else {
@@ -689,7 +710,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public String getRecordStoreNameByTable(int tenantId, String tableName) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().getRecordStoreNameByTable(tenantId, tableName);
         } else {
             return AnalyticsAPIHttpClient.getInstance().getRecordStoreNameByTable(tenantId, null, tableName, false);
@@ -698,7 +719,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public List<String> listRecordStoreNames() {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().listRecordStoreNames();
         } else {
             return AnalyticsAPIHttpClient.getInstance().listRecordStoreNames();
@@ -708,7 +729,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public String getRecordStoreNameByTable(String username, String tableName) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().getRecordStoreNameByTable(username, tableName);
         } else {
             return AnalyticsAPIHttpClient.getInstance().getRecordStoreNameByTable(MultitenantConstants.INVALID_TENANT_ID,
