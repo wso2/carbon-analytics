@@ -54,7 +54,6 @@ public class AnalyticsDirectory extends Directory {
         this.analyticsFileSystem = analyticsFileSystem;
         this.path = GenericUtils.normalizePath(path);
         this.lockFactory = lockFactory;
-    //    this.getLockFactory().setLockPrefix(this.getPath());
     }
     
     public AnalyticsFileSystem getFileSystem() {
