@@ -45,6 +45,7 @@ import org.wso2.carbon.analytics.api.AnalyticsDataConstants;
 import org.wso2.carbon.analytics.api.RemoteRecordIterator;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceAuthenticationException;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
+import org.wso2.carbon.analytics.api.exception.AnalyticsServiceRemoteException;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -171,8 +172,13 @@ public class AnalyticsAPIHttpClient {
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = httpResponse.getStatusLine().toString();
                 EntityUtils.consume(httpResponse.getEntity());
-                throw new AnalyticsServiceAuthenticationException("Authentication failed for user : " + username + " ."
-                        + "Response received from remote instance : " + response);
+                if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_NOT_FOUND) {
+                    throw new AnalyticsServiceAuthenticationException("Authentication failed for user : " + username + " ."
+                            + "Response received from remote instance : " + response);
+                } else {
+                    throw new AnalyticsServiceRemoteException("Unable to reach the endpoint : " +
+                            builder.build().toString() + ". " + response);
+                }
             }
             String response = getResponseString(httpResponse);
             if (response.startsWith(AnalyticsAPIConstants.SESSION_ID)) {
@@ -191,14 +197,31 @@ public class AnalyticsAPIHttpClient {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided for authentication. "
                     + e.getMessage(), e);
         } catch (IOException e) {
-            throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. "
+            throw new AnalyticsServiceRemoteException("Error while connecting to the remote service. "
                     + e.getMessage(), e);
         }
     }
 
     public void validateAndAuthenticate(String username, String password) throws AnalyticsServiceException {
         if (sessionId == null) {
-            authenticate(username, password);
+            int numberOfRetry = 0;
+            while (numberOfRetry < AnalyticsDataConstants.MAXIMUM_NUMBER_OF_RETRY) {
+                try {
+                    numberOfRetry++;
+                    authenticate(username, password);
+                    return;
+                } catch (AnalyticsServiceRemoteException ex) {
+                    if (numberOfRetry == AnalyticsDataConstants.MAXIMUM_NUMBER_OF_RETRY - 1) {
+                        log.error("Unable to connect to remote service, have retried "
+                                + AnalyticsDataConstants.MAXIMUM_NUMBER_OF_RETRY + " times, but unable to reach. ", ex);
+                    }else {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+                }
+            }
         }
     }
 
