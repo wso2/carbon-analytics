@@ -1,2 +1,3 @@
 instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.event.processor.manager.core_${feature.version}/conf/event-processor.xml,target:${installFolder}/../../conf/event-processor.xml,overwrite:true);
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.event.processor.manager.core_${feature.version}/conf/event-processor.xml,target:${installFolder}/../../conf/event-processor.xml,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.event.processor.manager.core_${feature.version}/conf/hazelcast.properties,target:${installFolder}/../../conf/hazelcast.properties,overwrite:true);\
