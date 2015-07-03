@@ -32,4 +32,5 @@ public class AnalyticsDataConstants {
     public static final String HTTP_PROTOCOL = "http";
     public static final String TRUST_STORE_CARBON_CONFIG = "Security.TrustStore.Location";
     public static final String TRUST_STORE_PASSWORD_CARBON_CONFIG = "Security.TrustStore.Password";
+    public static final int MAXIMUM_NUMBER_OF_RETRY = 5;
 }
