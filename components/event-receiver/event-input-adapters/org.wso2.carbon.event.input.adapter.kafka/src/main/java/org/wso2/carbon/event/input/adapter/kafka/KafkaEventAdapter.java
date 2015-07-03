@@ -97,7 +97,7 @@ public final class KafkaEventAdapter implements InputEventAdapter {
 
                 if (optionalProperties != null && optionalProperties.length > 0) {
                     for (String header : optionalProperties) {
-                        String[] configPropertyWithValue = header.split(":");
+                        String[] configPropertyWithValue = header.split(":", 2);
                         if (configPropertyWithValue.length == 2) {
                             props.put(configPropertyWithValue[0], configPropertyWithValue[1]);
                         } else {
@@ -107,8 +107,8 @@ public final class KafkaEventAdapter implements InputEventAdapter {
                 }
             }
             return new ConsumerConfig(props);
-        } catch (Throwable t) {
-            throw new InputEventAdapterRuntimeException("Cannot access kafka context due to missing jars", t);
+        } catch (NoClassDefFoundError e) {
+            throw new InputEventAdapterRuntimeException("Cannot access kafka context due to missing jars", e);
         }
     }
 
