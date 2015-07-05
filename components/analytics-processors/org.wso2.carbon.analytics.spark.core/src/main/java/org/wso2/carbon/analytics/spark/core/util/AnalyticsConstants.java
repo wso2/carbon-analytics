@@ -127,20 +127,27 @@ public class AnalyticsConstants {
     public static final String SPARK_LOGCONF = "spark.logConf";
     public static final String SPARK_MASTER = "spark.master";
 
+    public static final String SPARK_SCHEDULER_MODE = "spark.scheduler.mode";
+
+    public static final String SPARK_SERIALIZER = "spark.serializer";
+    public static final String SPARK_KRYOSERIALIZER_BUFFER_MAX = "spark.kryoserializer.buffer.max";
+    public static final String SPARK_KRYOSERIALIZER_BUFFER = "spark.kryoserializer.buffer";
+
     public static final String SPARK_UI_PORT = "spark.ui.port";
 
     public static final String SPARK_RECOVERY_MODE = "spark.deploy.recoveryMode";
 
     public static final String SPARK_RECOVERY_MODE_FACTORY = "spark.deploy.recoveryMode.factory";
 
-    //Extra constants available for Spark
-/*  public static final String SPARK_DRIVER_EXTRACLASSPATH = "spark.driver.extraClassPath";
+    public static final String SPARK_DRIVER_EXTRACLASSPATH = "spark.driver.extraClassPath";
     public static final String SPARK_DRIVER_EXTRAJAVAOPTIONS = "spark.driver.extraJavaOptions";
-    public static final String SPARK_DRIVER_EXTRALIBRARYPATH = "spark.driver.extraLibraryPath";
-    public static final String SPARK_DRIVER_USERCLASSPATHFIRST = "spark.driver.userClassPathFirst";
     public static final String SPARK_EXECUTOR_EXTRACLASSPATH = "spark.executor.extraClassPath";
     public static final String SPARK_EXECUTOR_EXTRAJAVAOPTIONS = "spark.executor.extraJavaOptions";
     public static final String SPARK_EXECUTOR_EXTRALIBRARYPATH = "spark.executor.extraLibraryPath";
+
+    //Extra constants available for Spark
+/*  public static final String SPARK_DRIVER_EXTRALIBRARYPATH = "spark.driver.extraLibraryPath";
+    public static final String SPARK_DRIVER_USERCLASSPATHFIRST = "spark.driver.userClassPathFirst";
     public static final String SPARK_EXECUTOR_LOGS_ROLLING_MAXRETAINEDFILES = "spark.executor.logs.rolling.maxRetainedFiles";
     public static final String SPARK_EXECUTOR_LOGS_ROLLING_SIZE_MAXBYTES = "spark.executor.logs.rolling.size.maxBytes";
     public static final String SPARK_EXECUTOR_LOGS_ROLLING_STRATEGY = "spark.executor.logs.rolling.strategy";
@@ -175,10 +182,7 @@ public class AnalyticsConstants {
     public static final String SPARK_KRYO_REFERENCETRACKING = "spark.kryo.referenceTracking";
     public static final String SPARK_KRYO_REGISTRATIONREQUIRED = "spark.kryo.registrationRequired";
     public static final String SPARK_KRYO_REGISTRATOR = "spark.kryo.registrator";
-    public static final String SPARK_KRYOSERIALIZER_BUFFER_MAX_MB = "spark.kryoserializer.buffer.max.mb";
-    public static final String SPARK_KRYOSERIALIZER_BUFFER_MB = "spark.kryoserializer.buffer.mb";
     public static final String SPARK_RDD_COMPRESS = "spark.rdd.compress";
-    public static final String SPARK_SERIALIZER = "spark.serializer";
     public static final String SPARK_SERIALIZER_OBJECTSTREAMRESET = "spark.serializer.objectStreamReset";
     public static final String SPARK_BROADCAST_BLOCKSIZE = "spark.broadcast.blockSize";
     public static final String SPARK_BROADCAST_FACTORY = "spark.broadcast.factory";
@@ -218,7 +222,6 @@ public class AnalyticsConstants {
     public static final String SPARK_LOCALITY_WAIT_RACK = "spark.locality.wait.rack";
     public static final String SPARK_SCHEDULER_MAXREGISTEREDRESOURCESWAITINGTIME = "spark.scheduler.maxRegisteredResourcesWaitingTime";
     public static final String SPARK_SCHEDULER_MINREGISTEREDRESOURCESRATIO = "spark.scheduler.minRegisteredResourcesRatio";
-    public static final String SPARK_SCHEDULER_MODE = "spark.scheduler.mode";
     public static final String SPARK_SCHEDULER_REVIVE_INTERVAL = "spark.scheduler.revive.interval";
     public static final String SPARK_SPECULATION = "spark.speculation";
     public static final String SPARK_SPECULATION_INTERVAL = "spark.speculation.interval";

@@ -29,18 +29,22 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.deploy.master.LeaderElectable;
 import org.apache.spark.deploy.master.Master;
 import org.apache.spark.deploy.worker.Worker;
+import org.apache.spark.serializer.KryoSerializer;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.api.java.UDF3;
-import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.util.Utils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionCall;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
+import org.wso2.carbon.analytics.spark.core.udf.AnalyticsUDFsRegister;
+import org.wso2.carbon.analytics.spark.core.udf.config.UDFConfiguration;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
@@ -51,11 +55,14 @@ import org.wso2.carbon.utils.CarbonUtils;
 import scala.None$;
 import scala.Option;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
@@ -69,8 +76,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,10 +91,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private static final int BASE_WORKER_PORT = 4501;
 
     private static final int DEFAULT_SPARK_UI_PORT = 4040;
-
-    private static final String MASTER_PORT_GROUP_PROP = "MASTER_PORT";
-
-    private static final String MASTER_HOST_GROUP_PROP = "MASTER_HOST";
 
     private static final String MASTER_URL_PROP = "MASTER_HOST";
 
@@ -134,12 +135,12 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private ListMultimap<Integer, String> inMemSparkTableNames;
 
     private Map<String, String> propertiesMap;
-    
-    private boolean isClustered = false;
 
     private UDFConfiguration udfConfiguration;
 
     private boolean clientMode = false;
+
+    private boolean isClustered = false;
 
     private int membershipNumber = 1; // membership number starts from 1
 
@@ -149,17 +150,14 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private AnalyticsClusterManager acm;
 
-    private Object workerActorSystem;
-    private Object masterActorSystem;
-
     private boolean executorStarted = false;
 
-    public SparkAnalyticsExecutor(String myHost, int portOffset) throws AnalyticsClusterException {
+    public SparkAnalyticsExecutor(String myHost, int portOffset) throws AnalyticsException {
         this(myHost, portOffset, CarbonUtils.getCarbonConfigDirPath());
     }
 
     public SparkAnalyticsExecutor(String myHost, int portOffset, String confPath)
-            throws AnalyticsClusterException {
+            throws AnalyticsException {
         this.myHost = myHost;
         this.portOffset = portOffset;
         this.udfConfiguration = this.loadUDFConfiguration();
@@ -191,6 +189,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             if (!clientMode) {
                 log.info("Using Carbon clustering for Spark");
                 if (acm.isClusteringEnabled()) {
+                    this.isClustered = true;
                     // if clustering enabled, use the ACM
                     this.membershipNumber = acm.joinGroup(CLUSTER_GROUP_NAME, this);
                     log.info("Member joined the cluster with MEMBERSHIP NUMBER : " + this.membershipNumber);
@@ -198,50 +197,40 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     String propsFile = confPath + File.separator
                                        + AnalyticsConstants.SPARK_DEFAULTS_PATH;
 
-                    this.sparkConf = initSparkConf(this.myHost, BASE_MASTER_PORT, this.portOffset,
-                                                   CARBON_ANALYTICS_SPARK_APP_NAME, propsFile);
+                    this.sparkConf = initializeSparkConf(this.myHost, BASE_MASTER_PORT,
+                                                         this.portOffset, propsFile);
 
                     if (this.membershipNumber < this.masterCount) {
                         // start master and register the master URL in an ACM property
                         log.info("Members are less than the REDUNDANT MASTER COUNT");
                         startMaster();
-
                     } else if (this.membershipNumber == this.masterCount) {
                         log.info("Members are equal to the REDUNDANT MASTER COUNT");
                         // start master and register the master URL in an ACM property
                         startMaster();
-                        // creating masters are done! send a cluster message to all masters to start workers
 
-                        // send a cluster message to masters to start workers
+                        // creating masters are done! send a cluster message to all masters to start workers
                         log.info("Sending a message to masters to start workers");
                         this.acm.executeAll(CLUSTER_GROUP_NAME, new StartWorkerExecutionCall());
                     } else {
                         Utils.loadDefaultSparkProperties(this.sparkConf, propsFile);
 
-                    // if it was a previous master, start master
-                    if (Arrays.asList(masterURLs).contains(thisMasterURL)) {
-                        startMaster(this.myHost, BASE_MASTER_PORT, BASE_WEBUI_PORT,
-                                    this.sparkConf, this.acm);
-                    }
-
                         String[] masterURLs = this.getSparkMastersFromCluster(acm);
 
+                        String thisMasterURL = "spark://" + this.myHost + ":" + (this.myHost + this.portOffset);
                         // if it was a previous master, start master
                         if (Arrays.asList(masterURLs).contains(thisMasterURL)) {
-                            startMaster(this.myHost, BASE_MASTER_PORT, BASE_WEBUI_PORT,
-                                        this.sparkConf, this.acm);
+                            startMaster();
                         }
 
                         //start Worker;
                         startWorker();
 
                         // todo: initClient (); in the active leader using a cluster message
-
                     }
-
                 } else {
                     // else start the node in the local mode
-                    this.initLocalClient();
+                    this.initializeLocalClient();
                 }
             } else {
                 //clients points to an external spark master and makes the spark conf accordingly
@@ -267,7 +256,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private UDFConfiguration loadUDFConfiguration() throws AnalyticsException {
         try {
-            File confFile = new File(GenericUtils.getAnalyticsConfDirectory() +
+            File confFile = new File(GenericUtils.getAnalyticsConfDirectory() + // todo: check if this conflicts with non- osgi env
                                      File.separator + AnalyticsConstants.SPARK_CONF_DIR +
                                      File.separator + AnalyticsConstants.SPARK_UDF_CONF_FILE);
             if (!confFile.exists()) {
@@ -285,13 +274,13 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private void initClient(String masterUrl, String appName) {
-//        initSparkConf(masterUrl, this.portOffset, appName);
+//        initializeSparkConf(masterUrl, this.portOffset, appName);
 //        this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
 //        this.sqlCtx = new SQLContext(this.javaSparkCtx);
 //        initSqlContext(this.javaSparkCtx);
     }
 
-    private void initLocalClient() {
+    private void initializeLocalClient() {
         this.sparkConf = new SparkConf();
         this.sparkConf.setMaster(LOCAL_MASTER_URL)
                 .setAppName(CARBON_ANALYTICS_SPARK_APP_NAME)
@@ -352,26 +341,23 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             port = Integer.parseInt(System.getProperty(AnalyticsConstants.SPARK_MASTER_PORT));
         }
 
-        // spark master is explicitly set here because, when we are reading the data from the
-        // spark defaults file, it might have a master port. so, this overrides the spark master url
-        String masterURL = "spark://" + host + ":" + port;
-        sc.setMaster(masterURL);
-
         if (System.getProperty(AnalyticsConstants.SPARK_MASTER_WEBUI_PORT) != null) {
             webUIport = Integer.parseInt(System.getProperty(AnalyticsConstants.SPARK_MASTER_WEBUI_PORT));
         }
 
-        this.masterActorSystem = Master.startSystemAndActor(host, port, webUIport, sc)._1();
-        log.info("Started SPARK MASTER in " + masterURL + " with webUI port : " + webUIport);
+        Master.startSystemAndActor(host, port, webUIport, sc);
 
+        String masterURL = "spark://" + host + ":" + port;
         acm.setProperty(CLUSTER_GROUP_NAME, MASTER_URL_PROP + "_" + this.membershipNumber
                 , masterURL);
+
+        log.info("Started SPARK MASTER in " + masterURL + " with webUI port : " + webUIport);
 
         updateMaster(acm, sc);
     }
 
     public void startMaster() {
-        this.startMaster(this.myHost, BASE_MASTER_PORT, BASE_WEBUI_PORT,
+        this.startMaster(this.myHost, BASE_MASTER_PORT + portOffset, BASE_WEBUI_PORT + portOffset,
                          this.sparkConf, this.acm);
     }
 
@@ -395,7 +381,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      * @param sc
      * @param portOffset
      */
-    private void sparkPropertiesWithPortOffset(SparkConf sc, int portOffset) {
+    private void addSparkPropertiesPortOffset(SparkConf sc, int portOffset) {
         Properties properties = System.getProperties();
 
         Enumeration e = properties.propertyNames();
@@ -457,15 +443,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             workerDir = System.getProperty(AnalyticsConstants.SPARK_WORKER_DIR);
         }
 
-        this.workerActorSystem = Worker.startSystemAndActor(workerHost,
-                                                            workerPort,
-                                                            workerUiPort,
-                                                            workerCores,
-                                                            Utils.memoryStringToMb(workerMemory),
-                                                            masters,
-                                                            workerDir,
-                                                            (Option) None$.MODULE$,
-                                                            sc)._1();
+        Worker.startSystemAndActor(workerHost, workerPort, workerUiPort, workerCores,
+                                   Utils.memoryStringToMb(workerMemory), masters, workerDir,
+                                   (Option) None$.MODULE$, sc);
 
         log.info("Started SPARK WORKER in " + workerHost + ":" + workerPort + " with webUI port "
                  + workerUiPort
@@ -474,8 +454,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     public void startWorker() {
-        this.startWorker(this.myHost, BASE_WORKER_PORT, BASE_WORKER_UI_PORT, WORKER_CORES,
-                         WORKER_MEMORY, this.getSparkMastersFromCluster(this.acm), WORK_DIR, this.sparkConf);
+        this.startWorker(this.myHost, BASE_WORKER_PORT + portOffset, BASE_WORKER_UI_PORT + portOffset,
+                         WORKER_CORES, WORKER_MEMORY, this.getSparkMastersFromCluster(this.acm),
+                         WORK_DIR, this.sparkConf);
     }
 
     /**
@@ -487,33 +468,53 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      * @param masterHost
      * @param masterPort
      * @param portOffset
-     * @param appName
      */
-    private SparkConf initSparkConf(String masterHost, int masterPort, int portOffset,
-                                    String appName, String propsFile) {
+    private SparkConf initializeSparkConf(String masterHost, int masterPort, int portOffset,
+                                          String propsFile) {
         SparkConf conf = new SparkConf();
-        // setting defaults for analytics
-        conf.setIfMissing(AnalyticsConstants.SPARK_MASTER, "spark://" + masterHost + ":" + (masterPort + portOffset));
-
-        // todo: check these parameters!!!
-        conf.set("spark.ui.port", String.valueOf(DEFAULT_SPARK_UI_PORT + portOffset));
-        conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
-        conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
-        conf.set(AnalyticsConstants.CARBON_TENANT_ID, String.valueOf(SPARK_TENANT));
+        conf.set(AnalyticsConstants.SPARK_MASTER, "spark://" + masterHost + ":" + (masterPort + portOffset));
 
         log.info("Spark defaults loaded from " + propsFile);
         // this will read configs from the file and export as system props
         // NOTE: if properties are mentioned in the file, they take precedence over the defaults, except spark masterURL
         Utils.loadDefaultSparkProperties(conf, propsFile);
-        sparkPropertiesWithPortOffset(conf, portOffset);
+        setDefaultsIfMissing(conf);
+        addSparkPropertiesPortOffset(conf, portOffset);
+        return conf;
+    }
 
-        conf.setIfMissing(AnalyticsConstants.SPARK_APP_NAME, appName);
+    private void setDefaultsIfMissing(SparkConf conf) {
+        // setting defaults for analytics W/O port offset
+        conf.setIfMissing(AnalyticsConstants.SPARK_APP_NAME, CARBON_ANALYTICS_SPARK_APP_NAME);
+        conf.setIfMissing(AnalyticsConstants.SPARK_UI_PORT, String.valueOf(DEFAULT_SPARK_UI_PORT));
+
+        conf.setIfMissing(AnalyticsConstants.SPARK_SCHEDULER_MODE, "FAIR");
         conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE, CUSTOM_RECOVERY_MODE);
         conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE_FACTORY, ANALYTICS_RECOVERY_FACTORY);
 
-        conf.set(AnalyticsConstants.CARBON_TENANT_ID, String.valueOf(SPARK_TENANT));
+        //serialization
+        conf.setIfMissing(AnalyticsConstants.SPARK_SERIALIZER, KryoSerializer.class.getName());
+        conf.setIfMissing(AnalyticsConstants.SPARK_KRYOSERIALIZER_BUFFER, "256k");
+        conf.setIfMissing(AnalyticsConstants.SPARK_KRYOSERIALIZER_BUFFER_MAX, "256m");
 
-        return conf;
+        //master, worker, drivers and executors todo: replace these with constants strings
+        conf.setIfMissing("spark.executor.memory", "1g");
+        conf.setIfMissing("spark.master.port", "7077");
+        conf.setIfMissing("spark.master.rest.port", "6066");
+        conf.setIfMissing("spark.master.webui.port", "8081");
+        conf.setIfMissing("spark.worker.cores", "2");
+        conf.setIfMissing("spark.worker.memory", "2g");
+        conf.setIfMissing("spark.worker.port ", "14501");
+        conf.setIfMissing("spark.worker.webui.port", "18090");
+        conf.setIfMissing("spark.driver.port", "5000");
+        conf.setIfMissing("spark.executor.port", "16000");
+        conf.setIfMissing("spark.fileserver.port", "17000");
+
+        //executor constants for spark env
+        conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
+        conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
+
+        conf.set(AnalyticsConstants.CARBON_TENANT_ID, String.valueOf(SPARK_TENANT));
     }
 
     private void validateSparkScriptPathPermission() {
@@ -581,8 +582,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         // add the table names to the hz cluster map with tenantId -> table Name (put if absent)
         // iterate through the dist map and replace the relevant table names
         HazelcastInstance hz = AnalyticsServiceHolder.getHazelcastInstance();
-        if (hz != null) {
-            this.clientMode = true; // todo: CHECK THIS!!!!
+        if (hz != null && this.isClustered) {
             this.sparkTableNames = hz.getMultiMap(AnalyticsConstants.TENANT_ID_AND_TABLES_MAP);
         } else if (this.inMemSparkTableNames == null) {
             this.inMemSparkTableNames = ArrayListMultimap.create();
@@ -661,7 +661,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         String result = query;
 
         Collection<String> tableNames;
-        if (this.clientMode) { // todo: CHECK THIS!!!!
+        if (this.isClustered) {
             tableNames = this.sparkTableNames.get(tenantId);
         } else {
             tableNames = this.inMemSparkTableNames.get(tenantId);
@@ -700,92 +700,12 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         for (LeaderElectable le : leaderElectable) {
             le.electedLeader();
         }
-//        String propsFile = CarbonUtils.getCarbonHome() + File.separator
-//                           + AnalyticsConstants.SPARK_DEFAULTS_PATH;
-//        Utils.loadDefaultSparkProperties(new SparkConf(), propsFile);
-//        log.info("Spark defaults loaded from " + propsFile);
-//
-//        String masterPort = System.getProperty(AnalyticsConstants.SPARK_MASTER_PORT);
-//        if (masterPort == null) {
-//            masterPort = Integer.toString(BASE_MASTER_PORT + this.portOffset);
-//        }
-//        String webuiPort = System.getProperty(AnalyticsConstants.SPARK_MASTER_WEBUI_PORT);
-//        if (webuiPort == null) {
-//            webuiPort = Integer.toString(BASE_WEBUI_PORT + this.portOffset);
-//        }
-//
-//        String master = System.getProperty(AnalyticsConstants.SPARK_MASTER);
-//        if (master == null) {
-//            master = "spark://" + this.myHost + ":" + masterPort;
-//        }
-//        String appName = System.getProperty(AnalyticsConstants.SPARK_APP_NAME);
-//        if (appName == null) {
-//            appName = CARBON_ANALYTICS_SPARK_APP_NAME;
-//        }
-//        this.sparkConf = initSparkConf(master, appName);
-//
-//        this.startMaster(this.myHost, masterPort, webuiPort, propsFile, this.sparkConf);
-//
-//        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
-//        acm.setProperty(CLUSTER_GROUP_NAME, MASTER_HOST_GROUP_PROP, this.myHost);
-//        acm.setProperty(CLUSTER_GROUP_NAME, MASTER_PORT_GROUP_PROP, masterPort);
-//        log.info("Analytics master started: [" + master + "]");
     }
 
     @Override
     public void onLeaderUpdate() {
+        //nothing to do here
         System.out.println("########### leader updated!!!!!!!! : ");
-//        String propsFile = CarbonUtils.getCarbonHome() + File.separator
-//                           + AnalyticsConstants.SPARK_DEFAULTS_PATH;
-//        Utils.loadDefaultSparkProperties(new SparkConf(), propsFile);
-//        log.info("Spark defaults loaded from " + propsFile);
-//
-//        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
-//        //take master information from the cluster
-//        String masterHost = (String) acm.getProperty(CLUSTER_GROUP_NAME, MASTER_HOST_GROUP_PROP);
-//        String masterPort = (String) acm.getProperty(CLUSTER_GROUP_NAME, MASTER_PORT_GROUP_PROP);
-//
-//        String workerPort = System.getProperty(AnalyticsConstants.SPARK_WORKER_PORT);
-//        if (workerPort == null) {
-//            workerPort = Integer.toString(BASE_WORKER_PORT + this.portOffset);
-//        }
-//
-//        String workerUiPort = System.getProperty(AnalyticsConstants.SPARK_WORKER_WEBUI_PORT);
-//        if (workerUiPort == null) {
-//            workerUiPort = Integer.toString(BASE_WORKER_UI_PORT + this.portOffset);
-//        }
-//
-//        String workerCores = System.getProperty(AnalyticsConstants.SPARK_WORKER_CORES);
-//        if (workerCores == null) {
-//            workerCores = WORKER_CORES;
-//        }
-//
-//        String workerMem = System.getProperty(AnalyticsConstants.SPARK_WORKER_MEMORY);
-//        if (workerMem == null) {
-//            workerMem = WORKER_MEMORY;
-//        }
-//
-//        String workerDir = System.getProperty(AnalyticsConstants.SPARK_WORKER_DIR);
-//        if (workerDir == null) {
-//            workerDir = CarbonUtils.getCarbonHome() + File.separator + WORK_DIR;
-//        }
-//
-//        String appName = System.getProperty(AnalyticsConstants.SPARK_APP_NAME);
-//        if (appName == null) {
-//            appName = CARBON_ANALYTICS_SPARK_APP_NAME;
-//        }
-//
-//        this.startWorker(this.myHost, masterHost, masterPort, workerPort, workerUiPort, workerCores,
-//                         workerMem, workerDir, propsFile, this.sparkConf);
-//
-//        log.info("Analytics worker started: [" + this.myHost + ":" + workerPort + ":" + workerUiPort + "] "
-//                 + "Master [" + masterHost + ":" + masterPort + "]");
-//
-//        if (acm.isLeader(CLUSTER_GROUP_NAME)) {
-//            this.initClient("spark://" + masterHost + ":" + masterPort, appName);
-//        }
-//
-//        log.info("Analytics client started: App Name [" + appName + "] Master [" + masterHost + ":" + masterPort + "]");
     }
 
     public int getWorkerCount() {

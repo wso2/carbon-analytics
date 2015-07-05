@@ -23,6 +23,7 @@ import akka.serialization.Serializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.SparkConf;
+import org.apache.spark.deploy.master.PersistenceEngine;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
@@ -30,7 +31,6 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
-import org.wso2.carbon.analytics.spark.master.AbstractPersistenceEngine;
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
@@ -44,7 +44,7 @@ import java.util.Map;
 /**
  * Created by niranda on 6/9/15.
  */
-public class AnalyticsPersistenceEngine extends AbstractPersistenceEngine {
+public class AnalyticsPersistenceEngine extends PersistenceEngine {
 
     private static final Log log = LogFactory.getLog(AnalyticsPersistenceEngine.class);
     private SparkConf conf;
