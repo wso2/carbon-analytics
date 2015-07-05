@@ -49,8 +49,9 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelationProvider;
-import org.wso2.carbon.analytics.spark.core.util.master.AnalyticsStandaloneRecoveryModeFactory;
+import org.wso2.carbon.analytics.spark.core.util.master.AnalyticsRecoveryModeFactoryScala;
 import org.wso2.carbon.analytics.spark.core.util.master.StartWorkerExecutionCall;
+import org.wso2.carbon.analytics.spark.core.util.master.testRMF;
 import org.wso2.carbon.utils.CarbonUtils;
 import scala.None$;
 import scala.Option;
@@ -114,7 +115,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private static final String CUSTOM_RECOVERY_MODE = "CUSTOM";
 
-    private static final String ANALYTICS_RECOVERY_FACTORY = AnalyticsStandaloneRecoveryModeFactory.class.getName();
+    private static final String ANALYTICS_RECOVERY_FACTORY = AnalyticsRecoveryModeFactoryScala.class.getCanonicalName();
 
     private static final Log log = LogFactory.getLog(SparkAnalyticsExecutor.class);
 
@@ -199,6 +200,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
                     this.sparkConf = initializeSparkConf(this.myHost, BASE_MASTER_PORT,
                                                          this.portOffset, propsFile);
+
+                    testRMF.testThis();
 
                     if (this.membershipNumber < this.masterCount) {
                         // start master and register the master URL in an ACM property
@@ -490,8 +493,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                                                                            + portOffset));
 
         conf.setIfMissing(AnalyticsConstants.SPARK_SCHEDULER_MODE, "FAIR");
-//        conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE, CUSTOM_RECOVERY_MODE);
-//        conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE_FACTORY, ANALYTICS_RECOVERY_FACTORY);
+        conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE, CUSTOM_RECOVERY_MODE);
+        conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE_FACTORY, ANALYTICS_RECOVERY_FACTORY);
 
         //serialization
         conf.setIfMissing(AnalyticsConstants.SPARK_SERIALIZER, KryoSerializer.class.getName());

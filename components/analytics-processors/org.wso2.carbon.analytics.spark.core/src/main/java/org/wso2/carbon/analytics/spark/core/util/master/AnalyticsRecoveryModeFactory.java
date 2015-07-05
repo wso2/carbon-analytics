@@ -28,12 +28,12 @@ import org.apache.spark.deploy.master.StandaloneRecoveryModeFactory;
 /**
  * Created by niranda on 6/9/15.
  */
-public class AnalyticsStandaloneRecoveryModeFactory extends StandaloneRecoveryModeFactory {
+public class AnalyticsRecoveryModeFactory extends StandaloneRecoveryModeFactory {
 
     private SparkConf conf;
     private Serialization serializer;
 
-    public AnalyticsStandaloneRecoveryModeFactory(SparkConf conf, Serialization serializer) {
+    public AnalyticsRecoveryModeFactory(SparkConf conf, Serialization serializer) {
         super(conf, serializer);
         this.conf =  conf;
         this.serializer = serializer;

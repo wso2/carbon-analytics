@@ -20,12 +20,12 @@ package org.wso2.carbon.analytics.spark.core.util.master
 
 import akka.serialization.Serialization
 import org.apache.spark.SparkConf
-import org.apache.spark.deploy.master.{LeaderElectionAgent, PersistenceEngine, LeaderElectable, StandaloneRecoveryModeFactory}
+import org.apache.spark.deploy.master._
 
 /**
  * Created by niranda on 6/25/15.
  */
-class AnalyticsStandaloneRecoveryModeFactoryScala(conf: SparkConf, serializer: Serialization)
+class AnalyticsRecoveryModeFactoryScala(conf: SparkConf, serializer: Serialization)
   extends StandaloneRecoveryModeFactory(conf, serializer) {
 
   override def createPersistenceEngine(): PersistenceEngine = new
@@ -35,6 +35,6 @@ class AnalyticsStandaloneRecoveryModeFactoryScala(conf: SparkConf, serializer: S
       AnalyticsLeaderElectionAgent(master)
 }
 
-object AnalyticsStandaloneRecoveryModeFactoryScala {
+object AnalyticsRecoveryModeFactoryScala {
 
 }
