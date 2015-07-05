@@ -51,7 +51,6 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelationProvider;
 import org.wso2.carbon.analytics.spark.core.util.master.AnalyticsRecoveryModeFactory;
 import org.wso2.carbon.analytics.spark.core.util.master.StartWorkerExecutionCall;
-import org.wso2.carbon.analytics.spark.core.util.master.testRMF;
 import org.wso2.carbon.utils.CarbonUtils;
 import scala.None$;
 import scala.Option;
@@ -200,8 +199,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
                     this.sparkConf = initializeSparkConf(this.myHost, BASE_MASTER_PORT,
                                                          this.portOffset, propsFile);
-
-                    testRMF.testThis();
 
                     if (this.membershipNumber < this.masterCount) {
                         // start master and register the master URL in an ACM property
@@ -474,7 +471,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      */
     private SparkConf initializeSparkConf(String masterHost, int masterPort, int portOffset,
                                           String propsFile) {
-        SparkConf conf = new SparkConf();
+        SparkConf conf = new SparkConf(false);
         conf.set(AnalyticsConstants.SPARK_MASTER, "spark://" + masterHost + ":" + (masterPort + portOffset));
 
         log.info("Spark defaults loaded from " + propsFile);
