@@ -217,7 +217,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
                         String[] masterURLs = this.getSparkMastersFromCluster(acm);
 
-                        String thisMasterURL = "spark://" + this.myHost + ":" + (this.myHost + this.portOffset);
+                        String thisMasterURL = "spark://" + this.myHost + ":" + (BASE_MASTER_PORT + this.portOffset);
                         // if it was a previous master, start master
                         if (Arrays.asList(masterURLs).contains(thisMasterURL)) {
                             startMaster();
@@ -244,7 +244,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
 
     private String[] getSparkMastersFromCluster(AnalyticsClusterManager acm) {
-        List<String> masters = new ArrayList<>(this.masterCount);
+        List<String> masters = new ArrayList<>(this.masterCount); // todo: change this!!!
         for (int i = 1; i <= this.masterCount; i++) {
             String url = (String) acm.getProperty(CLUSTER_GROUP_NAME, MASTER_URL_PROP + "_" + i);
             if (url != null) {
@@ -478,19 +478,20 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         // this will read configs from the file and export as system props
         // NOTE: if properties are mentioned in the file, they take precedence over the defaults, except spark masterURL
         Utils.loadDefaultSparkProperties(conf, propsFile);
-        setDefaultsIfMissing(conf);
+        setDefaultsIfMissing(conf, portOffset);
         addSparkPropertiesPortOffset(conf, portOffset);
         return conf;
     }
 
-    private void setDefaultsIfMissing(SparkConf conf) {
+    private void setDefaultsIfMissing(SparkConf conf, int portOffset) {
         // setting defaults for analytics W/O port offset
         conf.setIfMissing(AnalyticsConstants.SPARK_APP_NAME, CARBON_ANALYTICS_SPARK_APP_NAME);
-        conf.setIfMissing(AnalyticsConstants.SPARK_UI_PORT, String.valueOf(DEFAULT_SPARK_UI_PORT));
+        conf.setIfMissing(AnalyticsConstants.SPARK_UI_PORT, String.valueOf(DEFAULT_SPARK_UI_PORT
+                                                                           + portOffset));
 
         conf.setIfMissing(AnalyticsConstants.SPARK_SCHEDULER_MODE, "FAIR");
-        conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE, CUSTOM_RECOVERY_MODE);
-        conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE_FACTORY, ANALYTICS_RECOVERY_FACTORY);
+//        conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE, CUSTOM_RECOVERY_MODE);
+//        conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE_FACTORY, ANALYTICS_RECOVERY_FACTORY);
 
         //serialization
         conf.setIfMissing(AnalyticsConstants.SPARK_SERIALIZER, KryoSerializer.class.getName());
@@ -499,16 +500,16 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         //master, worker, drivers and executors todo: replace these with constants strings
         conf.setIfMissing("spark.executor.memory", "1g");
-        conf.setIfMissing("spark.master.port", "7077");
-        conf.setIfMissing("spark.master.rest.port", "6066");
-        conf.setIfMissing("spark.master.webui.port", "8081");
+        conf.setIfMissing("spark.master.port", String.valueOf(7077 + portOffset));
+        conf.setIfMissing("spark.master.rest.port", String.valueOf(6066+ portOffset));
+        conf.setIfMissing("spark.master.webui.port", String.valueOf(8081 + portOffset));
         conf.setIfMissing("spark.worker.cores", "2");
         conf.setIfMissing("spark.worker.memory", "2g");
-        conf.setIfMissing("spark.worker.port ", "14501");
-        conf.setIfMissing("spark.worker.webui.port", "18090");
-        conf.setIfMissing("spark.driver.port", "5000");
-        conf.setIfMissing("spark.executor.port", "16000");
-        conf.setIfMissing("spark.fileserver.port", "17000");
+        conf.setIfMissing("spark.worker.port ", String.valueOf(14501 + portOffset));
+        conf.setIfMissing("spark.worker.webui.port", String.valueOf(18090 + portOffset));
+        conf.setIfMissing("spark.driver.port", String.valueOf(5000 + portOffset));
+        conf.setIfMissing("spark.executor.port", String.valueOf(16000 + portOffset));
+        conf.setIfMissing("spark.fileserver.port", String.valueOf(17000 + portOffset));
 
         //executor constants for spark env
         conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
