@@ -33,8 +33,6 @@
 # OS specific support.  $var _must_ be set to either true or false.
 #ulimit -n 100000
 
-unzip -o ../repository/components/plugins/lucene_4.10.3.wso2v2.jar -d ../bin/ > /dev/null
-
 cygwin=false;
 darwin=false;
 os400=false;
@@ -288,7 +286,7 @@ for t in "$CARBON_HOME"/repository/components/plugins/*pool*.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done
-for t in "$CARBON_HOME"/repository/components/plugins/*lucene*.jar
+for t in "$CARBON_HOME"/repository/components/plugins/lucene_5.2.1.wso2v1.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done
