@@ -77,11 +77,14 @@
             <artifactId>org.wso2.carbon.ndatasource.rdbms</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.spark-project.akka</groupId>
+            <artifactId>akka-actor_2.10</artifactId>
+        </dependency>
+
         <!--extra dependancies -->
-        <!--        <dependency>
-                    <groupId>org.spark-project.akka</groupId>
-                    <artifactId>akka-actor_2.10</artifactId>
-                </dependency>
+        <!--
 
                 <dependency>
                     <groupId>org.apache.commons</groupId>

@@ -75,7 +75,7 @@ public class AnalyticsConstants {
     public static final String OBJECT = "OBJECT";
     public static final String DEFAULT_CHARSET = "UTF8";
     public static final String SCRIPT_DEPLOYMENT_DIR = "spark-scripts";
-    public static final String SPARK_DEFAULTS_PATH = "repository/conf/spark/spark-defaults.conf";
+    public static final String SPARK_DEFAULTS_PATH = "spark/spark-defaults.conf";
     public static final int SPARK_DEFAULT_PARTITION_COUNT = 6;
 
     //Analytics relation strings
@@ -85,8 +85,21 @@ public class AnalyticsConstants {
     public static final String STREAM_NAME = "streamName";
     public static final String PRIMARY_KEYS = "primaryKeys";
     public static final String SPARK_SHORTHAND_STRING = "CarbonAnalytics";
+    public static final String CARBON_STRING = "carbon";
     public static final String TENANT_ID_AND_TABLES_MAP = "tenantIdTablesMap";
     public static final int MAX_RECORDS = 1000;
+
+    //EventStream relation constants
+    public static final String VERSION = "version";
+    public static final String DESCRIPTION = "description";
+    public static final String NICKNAME = "nickname";
+    public static final String PAYLOAD = "payload";
+
+    //Carbon Spark properties strings
+    public static final String CARBON_SPARK_MASTER_COUNT = "carbon.spark.master.count";
+    public static final String CARBON_SPARK_CLIENT_MODE = "carbon.spark.client.mode";
+
+    public static final String CARBON_TENANT_ID = "carbon.tenant.id";
 
     //Spark default properties strings
     public static final String SPARK_MASTER_IP = "spark.master.ip";
@@ -114,14 +127,27 @@ public class AnalyticsConstants {
     public static final String SPARK_LOGCONF = "spark.logConf";
     public static final String SPARK_MASTER = "spark.master";
 
-    //Extra constants available for Spark
-/*  public static final String SPARK_DRIVER_EXTRACLASSPATH = "spark.driver.extraClassPath";
+    public static final String SPARK_SCHEDULER_MODE = "spark.scheduler.mode";
+
+    public static final String SPARK_SERIALIZER = "spark.serializer";
+    public static final String SPARK_KRYOSERIALIZER_BUFFER_MAX = "spark.kryoserializer.buffer.max";
+    public static final String SPARK_KRYOSERIALIZER_BUFFER = "spark.kryoserializer.buffer";
+
+    public static final String SPARK_UI_PORT = "spark.ui.port";
+
+    public static final String SPARK_RECOVERY_MODE = "spark.deploy.recoveryMode";
+
+    public static final String SPARK_RECOVERY_MODE_FACTORY = "spark.deploy.recoveryMode.factory";
+
+    public static final String SPARK_DRIVER_EXTRACLASSPATH = "spark.driver.extraClassPath";
     public static final String SPARK_DRIVER_EXTRAJAVAOPTIONS = "spark.driver.extraJavaOptions";
-    public static final String SPARK_DRIVER_EXTRALIBRARYPATH = "spark.driver.extraLibraryPath";
-    public static final String SPARK_DRIVER_USERCLASSPATHFIRST = "spark.driver.userClassPathFirst";
     public static final String SPARK_EXECUTOR_EXTRACLASSPATH = "spark.executor.extraClassPath";
     public static final String SPARK_EXECUTOR_EXTRAJAVAOPTIONS = "spark.executor.extraJavaOptions";
     public static final String SPARK_EXECUTOR_EXTRALIBRARYPATH = "spark.executor.extraLibraryPath";
+
+    //Extra constants available for Spark
+/*  public static final String SPARK_DRIVER_EXTRALIBRARYPATH = "spark.driver.extraLibraryPath";
+    public static final String SPARK_DRIVER_USERCLASSPATHFIRST = "spark.driver.userClassPathFirst";
     public static final String SPARK_EXECUTOR_LOGS_ROLLING_MAXRETAINEDFILES = "spark.executor.logs.rolling.maxRetainedFiles";
     public static final String SPARK_EXECUTOR_LOGS_ROLLING_SIZE_MAXBYTES = "spark.executor.logs.rolling.size.maxBytes";
     public static final String SPARK_EXECUTOR_LOGS_ROLLING_STRATEGY = "spark.executor.logs.rolling.strategy";
@@ -145,7 +171,6 @@ public class AnalyticsConstants {
     public static final String SPARK_EVENTLOG_DIR = "spark.eventLog.dir";
     public static final String SPARK_EVENTLOG_ENABLED = "spark.eventLog.enabled";
     public static final String SPARK_UI_KILLENABLED = "spark.ui.killEnabled";
-    public static final String SPARK_UI_PORT = "spark.ui.port";
     public static final String SPARK_UI_RETAINEDJOBS = "spark.ui.retainedJobs";
     public static final String SPARK_UI_RETAINEDSTAGES = "spark.ui.retainedStages";
     public static final String SPARK_BROADCAST_COMPRESS = "spark.broadcast.compress";
@@ -157,10 +182,7 @@ public class AnalyticsConstants {
     public static final String SPARK_KRYO_REFERENCETRACKING = "spark.kryo.referenceTracking";
     public static final String SPARK_KRYO_REGISTRATIONREQUIRED = "spark.kryo.registrationRequired";
     public static final String SPARK_KRYO_REGISTRATOR = "spark.kryo.registrator";
-    public static final String SPARK_KRYOSERIALIZER_BUFFER_MAX_MB = "spark.kryoserializer.buffer.max.mb";
-    public static final String SPARK_KRYOSERIALIZER_BUFFER_MB = "spark.kryoserializer.buffer.mb";
     public static final String SPARK_RDD_COMPRESS = "spark.rdd.compress";
-    public static final String SPARK_SERIALIZER = "spark.serializer";
     public static final String SPARK_SERIALIZER_OBJECTSTREAMRESET = "spark.serializer.objectStreamReset";
     public static final String SPARK_BROADCAST_BLOCKSIZE = "spark.broadcast.blockSize";
     public static final String SPARK_BROADCAST_FACTORY = "spark.broadcast.factory";
@@ -200,7 +222,6 @@ public class AnalyticsConstants {
     public static final String SPARK_LOCALITY_WAIT_RACK = "spark.locality.wait.rack";
     public static final String SPARK_SCHEDULER_MAXREGISTEREDRESOURCESWAITINGTIME = "spark.scheduler.maxRegisteredResourcesWaitingTime";
     public static final String SPARK_SCHEDULER_MINREGISTEREDRESOURCESRATIO = "spark.scheduler.minRegisteredResourcesRatio";
-    public static final String SPARK_SCHEDULER_MODE = "spark.scheduler.mode";
     public static final String SPARK_SCHEDULER_REVIVE_INTERVAL = "spark.scheduler.revive.interval";
     public static final String SPARK_SPECULATION = "spark.speculation";
     public static final String SPARK_SPECULATION_INTERVAL = "spark.speculation.interval";
