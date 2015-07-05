@@ -1172,7 +1172,7 @@
         <!-- Spark dependency versions start-->
         <spark.version>1.4.0.wso2v1</spark.version>
         <spark.imp.pkg.version>[1.4.0,1.5.0)</spark.imp.pkg.version>
-        <spark.core.version>1.4.0.wso2v1</spark.core.version>
+        <spark.core.version>1.4.0.wso2v2</spark.core.version>
         <hadoop.client.version>2.6.0.wso2v1</hadoop.client.version>
         <json4s.jackson.version>3.2.10.wso2v1</json4s.jackson.version>
         <twitter.chill.version>0.5.0.wso2v1</twitter.chill.version>
