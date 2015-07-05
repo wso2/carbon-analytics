@@ -22,7 +22,6 @@ import akka.serialization.Serialization;
 import akka.serialization.Serializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.spark.SparkConf;
 import org.apache.spark.deploy.master.PersistenceEngine;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
@@ -47,20 +46,16 @@ import java.util.Map;
 public class AnalyticsPersistenceEngine extends PersistenceEngine {
 
     private static final Log log = LogFactory.getLog(AnalyticsPersistenceEngine.class);
-    private SparkConf conf;
     private Serialization serialization;
     private AnalyticsDataService ads;
 
     private static final String SPARK_META_TABLE = "__spark_meta_table";
     private static final String OBJ_COLUMN = "obj_col";
-    private static int SPARK_TENANT;
+    private int SPARK_TENANT = AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID;
 
-    public AnalyticsPersistenceEngine(SparkConf conf, Serialization serialization) {
+    public AnalyticsPersistenceEngine(Serialization serialization) {
         this.serialization = serialization;
-        this.conf = conf;
         this.ads = AnalyticsServiceHolder.getAnalyticsDataService();
-
-        SPARK_TENANT = Integer.parseInt(conf.get(AnalyticsConstants.CARBON_TENANT_ID));
     }
 
     /**
@@ -127,14 +122,16 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
 
         List<T> objects = new ArrayList<>();
         try {
-            AnalyticsDataResponse results = ads.get(SPARK_TENANT, SPARK_META_TABLE, 1, null,
-                                                    Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
-            for (RecordGroup recordGroup : results.getRecordGroups()) {
-                Iterator<Record> iterator = ads.readRecords(results.getRecordStoreName(), recordGroup);
-                while(iterator.hasNext()){
-                    Record record = iterator.next();
-                    if (record.getId().startsWith(prefix)){
-                        objects.add((T) serializer.fromBinary((byte[]) record.getValue(OBJ_COLUMN),clazz));
+            if (ads.tableExists(SPARK_TENANT, SPARK_META_TABLE)) {
+                AnalyticsDataResponse results = ads.get(SPARK_TENANT, SPARK_META_TABLE, 1, null,
+                                                        Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
+                for (RecordGroup recordGroup : results.getRecordGroups()) {
+                    Iterator<Record> iterator = ads.readRecords(results.getRecordStoreName(), recordGroup);
+                    while (iterator.hasNext()) {
+                        Record record = iterator.next();
+                        if (record.getId().startsWith(prefix)) {
+                            objects.add((T) serializer.fromBinary((byte[]) record.getValue(OBJ_COLUMN), clazz));
+                        }
                     }
                 }
             }

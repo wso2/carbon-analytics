@@ -698,8 +698,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     @Override
     public void onBecomingLeader() {
         System.out.println("############### became the leader : ");
+        int i=0;
         for (LeaderElectable le : leaderElectable) {
             le.electedLeader();
+            System.out.println("making leader time: " + i);
+            i++;
         }
     }
 
@@ -772,8 +775,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     public void processLeaderElectable(LeaderElectable le) {
         if (AnalyticsServiceHolder.getAnalyticsClusterManager().isLeader(CLUSTER_GROUP_NAME)) {
             le.electedLeader();
+            System.out.println("THIS IS THE FUCKING LEADER!!!!!");
         } else {
             addLeaderElectable(le);
+            System.out.println("NO! not him... ");
         }
     }
 

@@ -31,7 +31,7 @@ class AnalyticsRecoveryModeFactoryScala(conf: SparkConf, serializer: Serializati
   AnalyticsRecoveryModeFactoryScala.instantiationAttempts += 1
 
   override def createPersistenceEngine(): PersistenceEngine = new
-      AnalyticsPersistenceEngine(conf, serializer)
+      AnalyticsPersistenceEngine(serializer)
 
   override def createLeaderElectionAgent(master: LeaderElectable): LeaderElectionAgent = new
       AnalyticsLeaderElectionAgent(master)

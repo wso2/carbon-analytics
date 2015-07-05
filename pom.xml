@@ -542,7 +542,7 @@
             <dependency>
                 <groupId>org.wso2.orbit.org.apache.spark</groupId>
                 <artifactId>spark-core_2.10</artifactId>
-                <version>${spark.orbit.version}</version>
+                <version>${spark.core.orbit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.org.apache.spark</groupId>
@@ -1297,6 +1297,7 @@
         <carbon.analytics.imp.pkg.version>[1.0.3-SNAPSHOT, 1.1.0)</carbon.analytics.imp.pkg.version>
 
         <!--analytics processors -->
+        <spark.core.orbit.version>1.4.0.wso2v2</spark.core.orbit.version>
         <spark.orbit.version>1.4.0.wso2v1</spark.orbit.version>
         <hadoop.client.orbit.version>2.2.0.wso2v1</hadoop.client.orbit.version>
         <typesafe.version>1.2.0</typesafe.version>

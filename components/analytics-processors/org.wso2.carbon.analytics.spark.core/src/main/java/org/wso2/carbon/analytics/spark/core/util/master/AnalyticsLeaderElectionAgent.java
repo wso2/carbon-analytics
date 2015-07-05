@@ -31,6 +31,7 @@ public class AnalyticsLeaderElectionAgent implements LeaderElectionAgent {
 
     public AnalyticsLeaderElectionAgent(LeaderElectable master) {
         this.master = master;
+        System.out.println("################ processing leader");
         ServiceHolder.getAnalyticskExecutor().processLeaderElectable(master);
     }
 

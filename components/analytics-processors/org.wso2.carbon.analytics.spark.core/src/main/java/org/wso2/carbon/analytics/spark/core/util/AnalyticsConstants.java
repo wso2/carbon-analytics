@@ -100,6 +100,7 @@ public class AnalyticsConstants {
     public static final String CARBON_SPARK_CLIENT_MODE = "carbon.spark.client.mode";
 
     public static final String CARBON_TENANT_ID = "carbon.tenant.id";
+    public static final int SPARK_PERSISTENCE_TENANT_ID = -5000;
 
     //Spark default properties strings
     public static final String SPARK_MASTER_IP = "spark.master.ip";
