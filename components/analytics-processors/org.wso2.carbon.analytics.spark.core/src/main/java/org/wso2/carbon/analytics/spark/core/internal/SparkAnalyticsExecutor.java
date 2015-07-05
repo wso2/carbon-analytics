@@ -49,7 +49,7 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelationProvider;
-import org.wso2.carbon.analytics.spark.core.util.master.AnalyticsRecoveryModeFactoryScala;
+import org.wso2.carbon.analytics.spark.core.util.master.AnalyticsRecoveryModeFactory;
 import org.wso2.carbon.analytics.spark.core.util.master.StartWorkerExecutionCall;
 import org.wso2.carbon.analytics.spark.core.util.master.testRMF;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -115,7 +115,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private static final String CUSTOM_RECOVERY_MODE = "CUSTOM";
 
-    private static final String ANALYTICS_RECOVERY_FACTORY = AnalyticsRecoveryModeFactoryScala.class.getCanonicalName();
+    private static final String ANALYTICS_RECOVERY_FACTORY = AnalyticsRecoveryModeFactory.class.getCanonicalName();
 
     private static final Log log = LogFactory.getLog(SparkAnalyticsExecutor.class);
 
