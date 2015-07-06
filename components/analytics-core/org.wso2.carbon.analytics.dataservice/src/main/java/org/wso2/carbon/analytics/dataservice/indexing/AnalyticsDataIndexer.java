@@ -1622,7 +1622,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
 
     @Override
-    public void onMembersChangeForLeader() {
+    public void onMembersChangeForLeader(boolean removed) {
         try {
             this.planIndexingWorkersInCluster();
         } catch (AnalyticsException e) {

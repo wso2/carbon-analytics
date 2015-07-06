@@ -100,5 +100,7 @@ public interface AnalyticsClusterManager {
      * @return True if in clustered mode
      */
     boolean isClusteringEnabled();
+
+    Object getLocalMember();
     
 }

@@ -253,6 +253,11 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     }
 
     @Override
+    public Object getLocalMember() {
+        return this.hz.getCluster().getLocalMember();
+    }
+
+    @Override
     public void memberAdded(MembershipEvent event) {
         /* nothing to do */
     }
@@ -272,7 +277,7 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             /* if I'm already the leader, notify of the membership change */
             GroupEventListener listener = this.groups.get(groupId);
             if (listener != null) {
-                listener.onMembersChangeForLeader();
+                listener.onMembersChangeForLeader(true);
             }
         } else if (this.checkLeader(this.hz.getCluster().getLocalMember(), groupId)) {
             /* check if I'm already not the leader, and if I just became the leader */
@@ -290,7 +295,7 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     private void leaderMemberAdditionNotificationReceived(String groupId) {
         GroupEventListener listener = this.groups.get(groupId);
         if (listener != null) {
-            listener.onMembersChangeForLeader();
+            listener.onMembersChangeForLeader(false);
         }
     }
 

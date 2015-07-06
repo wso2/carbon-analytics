@@ -39,7 +39,9 @@ public interface GroupEventListener {
      * Called when the group members change by either a new member arriving or departing. This is executed
      * only for the group leader. This is not called in the instance of myself becoming the leader, because
      * of another node has departed.
+     *
+     * @param removed True if the change was a member being removed, false if a new member arrives
      */
-    void onMembersChangeForLeader();
+    void onMembersChangeForLeader(boolean removed);
     
 }
