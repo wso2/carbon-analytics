@@ -34,7 +34,6 @@ import org.wso2.carbon.analytics.datasource.hbase.util.HBaseRuntimeException;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -127,11 +126,11 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
         try {
             Result[] results = this.table.get(gets);
             for (Result currentResult : results) {
-                Record record = HBaseUtils.constructRecord(currentResult, tenantId, tableName, colSet);
-                if (record != null) {
-                    fetchedRecords.add(record);
-                } else {
-                    log.warn("Record " + new String(currentResult.getRow(), StandardCharsets.UTF_8) + " did not have valid data!");
+                if (!currentResult.isEmpty()) {
+                    Record record = HBaseUtils.constructRecord(currentResult, tenantId, tableName, colSet);
+                    if (record != null) {
+                        fetchedRecords.add(record);
+                    }
                 }
             }
             this.subIterator = fetchedRecords.iterator();
