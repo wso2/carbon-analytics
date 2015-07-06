@@ -37,11 +37,9 @@ public class HBaseAnalyticsDSConstants {
     }
 
     public static final byte[] ANALYTICS_DATA_COLUMN_FAMILY_NAME = "carbon-analytics-data".getBytes(StandardCharsets.UTF_8);
-    public static final byte[] ANALYTICS_META_COLUMN_FAMILY_NAME = "carbon-analytics-meta".getBytes(StandardCharsets.UTF_8);
     public static final byte[] ANALYTICS_INDEX_COLUMN_FAMILY_NAME = "carbon-analytics-index".getBytes(StandardCharsets.UTF_8);
 
     public static final byte[] ANALYTICS_ROWDATA_QUALIFIER_NAME = "row-values".getBytes(StandardCharsets.UTF_8);
-    public static final byte[] ANALYTICS_SCHEMA_QUALIFIER_NAME = "database-schema".getBytes(StandardCharsets.UTF_8);
     public static final byte[] ANALYTICS_TS_QUALIFIER_NAME = "timestamp".getBytes(StandardCharsets.UTF_8);
 
     public static final int DEFAULT_QUERY_BATCH_SIZE = 7000;

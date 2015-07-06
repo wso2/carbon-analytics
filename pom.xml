@@ -953,6 +953,12 @@
                 <artifactId>protobuf-java-fragment</artifactId>
                 <version>${protobuf.fragment.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.data</groupId>
+                <artifactId>org.wso2.carbon.datasource.reader.hadoop</artifactId>
+                <version>${carbon.data.version}</version>
+                <scope>test</scope>
+            </dependency>
             <!-- END hbase + hadoop client dependencies -->
 
             <!-- START Analytics Dashboard  -->
@@ -1284,6 +1290,8 @@
         <carbon.event-processing.version>2.0.4-SNAPSHOT</carbon.event-processing.version>
         <carbon.analytics.common.version>2.0.0-SNAPSHOT</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[2.0.0-SNAPSHOT, 2.1.0)</carbon.analytics.common.imp.pkg.version>
+
+        <carbon.data.version>4.3.1-SNAPSHOT</carbon.data.version>
 
         <carbon.analytics.version>1.0.3-SNAPSHOT</carbon.analytics.version>
         <carbon.analytics.imp.pkg.version>[1.0.3-SNAPSHOT, 1.1.0)</carbon.analytics.imp.pkg.version>

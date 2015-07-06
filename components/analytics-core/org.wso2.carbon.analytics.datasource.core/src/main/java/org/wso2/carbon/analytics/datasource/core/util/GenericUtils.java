@@ -328,7 +328,7 @@ public class GenericUtils {
                 }
             }
         } catch (Exception e) {
-            throw new AnalyticsException("Error in decoding record values: " + e.getMessage());
+            throw new AnalyticsException("Error in decoding record values: " + e.getMessage(), e);
         }
         return result;
     }
