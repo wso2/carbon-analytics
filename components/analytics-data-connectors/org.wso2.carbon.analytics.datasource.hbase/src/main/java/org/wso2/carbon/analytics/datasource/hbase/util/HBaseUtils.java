@@ -27,13 +27,12 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.hbase.HBaseAnalyticsConfigurationEntry;
-import org.wso2.carbon.utils.CarbonUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -110,7 +109,12 @@ public class HBaseUtils {
             Cell dataCell = currentResult.getColumnLatestCell
                     (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
                             HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME);
-            values = GenericUtils.decodeRecordValues(CellUtil.cloneValue(dataCell), colSet);
+            byte[] data = CellUtil.cloneValue(dataCell);
+            if (data.length > 0) {
+                values = GenericUtils.decodeRecordValues(data, colSet);
+            } else {
+                values = new HashMap<>();
+            }
             timestamp = dataCell.getTimestamp();
             return new Record(new String(rowId), tenantId, tableName, values, timestamp);
         }
@@ -119,7 +123,7 @@ public class HBaseUtils {
 
     public static HBaseAnalyticsConfigurationEntry lookupConfiguration() throws AnalyticsException {
         try {
-            File confFile = new File(CarbonUtils.getCarbonConfigDirPath() +
+            File confFile = new File(GenericUtils.getAnalyticsConfDirectory() +
                     File.separator + AnalyticsDataSourceConstants.ANALYTICS_CONF_DIR + File.separator +
                     HBaseAnalyticsDSConstants.HBASE_ANALYTICS_CONFIG_FILE);
             if (!confFile.exists()) {
