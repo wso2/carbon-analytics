@@ -34,7 +34,6 @@ import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.base.MultitenantConstants;
 
@@ -1017,7 +1016,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     }
 
     @Override
-    public void onMembersChangeForLeader() {
+    public void onMembersChangeForLeader(boolean removed) {
         /* nothing to do */
     }
     

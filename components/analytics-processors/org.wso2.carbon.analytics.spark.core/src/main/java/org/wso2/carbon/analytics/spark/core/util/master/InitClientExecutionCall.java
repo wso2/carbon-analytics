@@ -18,31 +18,27 @@
 
 package org.wso2.carbon.analytics.spark.core.util.master;
 
-import org.apache.spark.deploy.master.LeaderElectable;
-import org.apache.spark.deploy.master.LeaderElectionAgent;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
+import scala.Tuple2;
+
+import java.io.Serializable;
+import java.util.concurrent.Callable;
 
 /**
- * this class elects the new leader if the current leader goes down
+ * Created by niranda on 6/24/15.
  */
-public class AnalyticsLeaderElectionAgent implements LeaderElectionAgent {
+public class InitClientExecutionCall implements Callable<Integer>, Serializable{
 
-    private LeaderElectable master;
+    private static final long serialVersionUID = -155083315280606063L;
 
-    public AnalyticsLeaderElectionAgent(LeaderElectable master) {
-        this.master = master;
-        System.out.println("################ processing leader");
-        ServiceHolder.getAnalyticskExecutor().registerLeaderElectable(master);
+    private Tuple2<String, String>[] confs;
+    public InitClientExecutionCall(Tuple2<String, String>[] confs) {
+        this.confs= confs;
     }
 
     @Override
-    public LeaderElectable masterActor() {
-        System.out.println("################ returning master");
-        return master;
-    }
-
-    @Override
-    public void stop() {
-        System.out.println("################ stopping agent");
+    public Integer call() throws Exception {
+        ServiceHolder.getAnalyticskExecutor().initializeClient(this.confs);
+        return 0;
     }
 }

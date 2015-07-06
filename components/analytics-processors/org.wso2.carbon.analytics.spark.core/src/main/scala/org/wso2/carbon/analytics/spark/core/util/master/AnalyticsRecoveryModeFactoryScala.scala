@@ -23,18 +23,20 @@ import org.apache.spark.SparkConf
 import org.apache.spark.deploy.master._
 
 /**
- * Created by niranda on 6/25/15.
+ * Scala version of Recovery mode factory
  */
 class AnalyticsRecoveryModeFactoryScala(conf: SparkConf, serializer: Serialization)
   extends StandaloneRecoveryModeFactory(conf, serializer) {
 
+  AnalyticsRecoveryModeFactoryScala.instantiationAttempts += 1
+
   override def createPersistenceEngine(): PersistenceEngine = new
-      AnalyticsPersistenceEngine(conf, serializer)
+      AnalyticsPersistenceEngine(serializer)
 
   override def createLeaderElectionAgent(master: LeaderElectable): LeaderElectionAgent = new
       AnalyticsLeaderElectionAgent(master)
 }
 
 object AnalyticsRecoveryModeFactoryScala {
-
+  @volatile var instantiationAttempts = 0
 }
