@@ -19,10 +19,13 @@ package org.wso2.carbon.analytics.datasource.cassandra;
 
 import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Host;
+import com.datastax.driver.core.Metadata;
 import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.TokenRange;
 
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -41,13 +44,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class represents the Cassandra implementation of {@link AnalyticsRecordStore}.
  */
 public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
-    private static final int DELETE_BATCH_SIZE = 1000;
+    private static final int STREAMING_BATCH_SIZE = 1000;
 
     private static final int TS_MULTIPLIER = (int) Math.pow(2, 30);
 
@@ -65,6 +69,44 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
                 + "{'class':'SimpleStrategy', 'replication_factor':3};");
         this.session.execute("CREATE TABLE IF NOT EXISTS ARS.TS (tenantId INT, "
                 + "tableName VARCHAR, timestamp VARINT, id VARCHAR, PRIMARY KEY ((tenantId, tableName), timestamp))");
+    }
+    
+    private TokenRangeRecordGroup[] calculateTokenRangeGroups(int tenantId, String tableName, List<String> columns, 
+            int numPartitionsHint) {
+        Metadata md = this.session.getCluster().getMetadata();
+        Set<Host> hosts = md.getAllHosts();
+        int partitionsPerHost = (int) Math.ceil(numPartitionsHint / (double) hosts.size());
+        List<TokenRangeRecordGroup> result = new ArrayList<CassandraAnalyticsRecordStore.TokenRangeRecordGroup>(
+                partitionsPerHost * hosts.size());
+        for (Host host : hosts) {
+            result.addAll(this.calculateTokenRangeGroupForHost(tenantId, tableName, columns, 
+                    md, host, partitionsPerHost));
+        }
+        return result.toArray(new TokenRangeRecordGroup[0]);
+    }
+    
+    private List<TokenRange> unwrapTR(Set<TokenRange> trs) {
+        List<TokenRange> trsUnwrapped = new ArrayList<TokenRange>();
+        for (TokenRange tr : trs) {
+            trsUnwrapped.addAll(tr.unwrap());
+        }
+        return trsUnwrapped;
+    }
+    
+    private List<TokenRangeRecordGroup> calculateTokenRangeGroupForHost(int tenantId, String tableName, 
+            List<String> columns, Metadata md, Host host, int partitionsPerHost) {
+        String ip = host.getAddress().getHostAddress();
+        List<TokenRange> trs = this.unwrapTR(md.getTokenRanges("ARS", host));
+        int delta = (int) Math.ceil(trs.size() / (double) partitionsPerHost);
+        List<TokenRangeRecordGroup> result = new ArrayList<CassandraAnalyticsRecordStore.TokenRangeRecordGroup>(
+                partitionsPerHost);
+        if (delta > 0) {
+            for (int i = 0; i < trs.size(); i += delta) {
+                result.add(new TokenRangeRecordGroup(tenantId, tableName, columns, 
+                        trs.subList(i, i + delta > trs.size() ? trs.size() : i + delta), ip));
+            }
+        }
+        return result;
     }
     
     private String generateTargetDataTableName(int tenantId, String tableName) {
@@ -111,7 +153,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         PreparedStatement ps = session.prepare("DELETE FROM ARS.TS WHERE tenantId = ? AND tableName = ? and timestamp = ?");
         BatchStatement stmt = new BatchStatement();
         Row row;
-        for (int i = 0; i < DELETE_BATCH_SIZE && itr.hasNext(); i++) {
+        for (int i = 0; i < STREAMING_BATCH_SIZE && itr.hasNext(); i++) {
             row = itr.next();
             stmt.add(ps.bind(tenantId, tableName, row.getVarint(1)));
             ids.add(row.getString(0));
@@ -156,7 +198,11 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         if (!this.tableExists(tenantId, tableName)) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
-        return new RecordGroup[] { new CassandraRecordGroup(tenantId, tableName, columns, timeFrom, timeTo) };
+        if (numPartitionsHint == 1 || !(timeFrom == Long.MIN_VALUE && timeTo == Long.MAX_VALUE)) {
+            return new RecordGroup[] { new GlobalCassandraRecordGroup(tenantId, tableName, columns, timeFrom, timeTo) };
+        } else {
+            return this.calculateTokenRangeGroups(tenantId, tableName, columns, numPartitionsHint);
+        }
     }
 
     @Override
@@ -165,20 +211,32 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         if (!this.tableExists(tenantId, tableName)) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
-        return new RecordGroup[] { new CassandraRecordGroup(tenantId, tableName, columns, ids) };
+        return new RecordGroup[] { new GlobalCassandraRecordGroup(tenantId, tableName, columns, ids) };
     }
     
     @Override
     public AnalyticsIterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
-        CassandraRecordGroup crg = (CassandraRecordGroup) recordGroup;
-        if (crg.isByIds()) {
-            return this.readRecordsByIds(crg);
+        if (recordGroup instanceof GlobalCassandraRecordGroup) {
+            GlobalCassandraRecordGroup crg = (GlobalCassandraRecordGroup) recordGroup;
+            if (crg.isByIds()) {
+                return this.readRecordsByIds(crg);
+            } else {
+                return this.readRecordsByRange(crg);
+            }
+        } else if (recordGroup instanceof TokenRangeRecordGroup) {
+            return this.readPartitionedRecords((TokenRangeRecordGroup) recordGroup);
         } else {
-            return this.readRecordsByRange(crg);
+            throw new AnalyticsException("Unknnown Cassandra record group type: " + recordGroup.getClass());
         }
     }
     
-    private AnalyticsIterator<Record> readRecordsByRange(CassandraRecordGroup recordGroup) throws AnalyticsException {
+    private AnalyticsIterator<Record> readPartitionedRecords(TokenRangeRecordGroup recordGroup) 
+            throws AnalyticsException {
+        return this.lookupRecordsByTokenRanges(recordGroup.getTenantId(), recordGroup.getTableName(), 
+                recordGroup.getColumns(), recordGroup.getTokenRanges());        
+    }
+    
+    private AnalyticsIterator<Record> readRecordsByRange(GlobalCassandraRecordGroup recordGroup) throws AnalyticsException {
         int tenantId = recordGroup.getTenantId();
         String tableName = recordGroup.getTableName();
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
@@ -186,26 +244,17 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         ResultSet rs;
         if (recordGroup.getTimeFrom() == Long.MIN_VALUE && recordGroup.getTimeTo() == Long.MAX_VALUE) {
             rs = this.session.execute("SELECT id, timestamp, data FROM ARS." + dataTable);
-            return this.lookupRecordsByRS(tenantId, tableName, rs, columns);
+            return this.lookupRecordsByDirectRS(tenantId, tableName, rs, columns);
         } else {
-            ResultSet tsrs = this.session.execute("SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
-                    tenantId, tableName, BigInteger.valueOf(recordGroup.getTimeFrom()).multiply(BigInteger.valueOf(TS_MULTIPLIER)), 
+            ResultSet tsrs = this.session.execute("SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? "
+                    + "AND timestamp >= ? AND timestamp < ?", tenantId, tableName,
+                    BigInteger.valueOf(recordGroup.getTimeFrom()).multiply(BigInteger.valueOf(TS_MULTIPLIER)),
                     BigInteger.valueOf(recordGroup.getTimeTo()).multiply(BigInteger.valueOf(TS_MULTIPLIER)));
-            List<String> ids = this.resultSetToIds(tsrs);
-            return this.lookupRecordsByIds(tenantId, tableName, ids, columns);
+            return new CassandraRecordIDDataIterator(tenantId, tableName, tsrs.iterator(), columns);
         }
     }
     
-    private List<String> resultSetToIds(ResultSet rs) {
-        List<Row> rows = rs.all();
-        List<String> ids = new ArrayList<String>(rows.size());
-        for (Row row : rows) {
-            ids.add(row.getString(0));
-        }
-        return ids;
-    }
-    
-    private AnalyticsIterator<Record> readRecordsByIds(CassandraRecordGroup recordGroup) throws AnalyticsException {
+    private AnalyticsIterator<Record> readRecordsByIds(GlobalCassandraRecordGroup recordGroup) throws AnalyticsException {
         return this.lookupRecordsByIds(recordGroup.getTenantId(), 
                 recordGroup.getTableName(), recordGroup.getIds(), recordGroup.getColumns());
     }
@@ -213,11 +262,16 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     private AnalyticsIterator<Record> lookupRecordsByIds(int tenantId, String tableName, List<String> ids, List<String> columns) {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
         ResultSet rs = this.session.execute("SELECT id, timestamp, data FROM ARS." + dataTable + " WHERE id IN ?", ids);
-        return this.lookupRecordsByRS(tenantId, tableName, rs, columns);
+        return this.lookupRecordsByDirectRS(tenantId, tableName, rs, columns);
     }
     
-    private AnalyticsIterator<Record> lookupRecordsByRS(int tenantId, String tableName, ResultSet rs, List<String> columns) {
-        return new CassandraDataIterator(tenantId, tableName, rs, columns);
+    private AnalyticsIterator<Record> lookupRecordsByTokenRanges(int tenantId, String tableName, 
+            List<String> columns, List<TokenRange> tokenRanges) {
+        return new CassandraTokenRangeDataIterator(tenantId, tableName, columns, tokenRanges);
+    }
+    
+    private AnalyticsIterator<Record> lookupRecordsByDirectRS(int tenantId, String tableName, ResultSet rs, List<String> columns) {
+        return new CassandraDirectDataIterator(tenantId, tableName, rs.iterator(), columns);
     }
 
     @Override
@@ -291,9 +345,154 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     /**
-     * Cassandra data {@link Iterator} implementation for streaming.
+     * Cassandra data {@link AnalyticsIterator} implementation for streaming, which reads data
+     * using the given token ranges.
      */
-    public static class CassandraDataIterator implements AnalyticsIterator<Record> {
+    public class CassandraTokenRangeDataIterator implements AnalyticsIterator<Record> {
+        
+        private int tenantId;
+        
+        private String tableName;
+        
+        private List<String> columns;
+        
+        private Iterator<TokenRange> tokenRangesItr;
+                
+        private AnalyticsIterator<Record> dataItr;
+        
+        public CassandraTokenRangeDataIterator(int tenantId, String tableName, List<String> columns,
+                List<TokenRange> tokenRanges) {
+            this.tenantId = tenantId;
+            this.tableName = tableName;
+            this.columns = columns;
+            this.tokenRangesItr = tokenRanges.iterator();
+        }
+        
+        private void populateNextTokenRangeData() {
+            String dataTable = generateTargetDataTableName(tenantId, tableName);
+            TokenRange tokenRange = this.tokenRangesItr.next();
+            ResultSet rs = session.execute("SELECT id, timestamp, data FROM ARS." + dataTable + 
+                    " WHERE token(id) > ? and token(id) <= ?", tokenRange.getStart().getValue(), 
+                    tokenRange.getEnd().getValue());
+            this.dataItr = lookupRecordsByDirectRS(this.tenantId, this.tableName, rs, this.columns);
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (this.dataItr == null) {
+                if (this.tokenRangesItr.hasNext()) {
+                    this.populateNextTokenRangeData();
+                } else {
+                    return false;
+                }
+            }
+            if (this.dataItr.hasNext()) {
+                return true;
+            } else {
+                this.dataItr = null;
+                return this.hasNext();
+            }
+        }
+
+        @Override
+        public Record next() {
+            if (this.hasNext()) {
+                return this.dataItr.next();
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void close() throws IOException {
+            /** nothing to do **/
+        }
+        
+    }
+    
+    /**
+     * Cassandra data {@link AnalyticsIterator} implementation for streaming, which reads data
+     * using the record id based lookups.
+     */
+    public class CassandraRecordIDDataIterator implements AnalyticsIterator<Record> {
+
+        private int tenantId;
+        
+        private String tableName;
+                
+        private List<String> columns;
+        
+        private Iterator<Row> resultSetItr;
+        
+        private AnalyticsIterator<Record> dataItr;
+        
+        public CassandraRecordIDDataIterator(int tenantId, String tableName, Iterator<Row> resultSetItr, List<String> columns) {
+            this.tenantId = tenantId;
+            this.tableName = tableName;
+            this.columns = columns;
+            this.resultSetItr = resultSetItr;
+        }
+        
+        private void populateBatch() {
+            List<String> ids = new ArrayList<String>(STREAMING_BATCH_SIZE);
+            Row row;
+            for (int i = 0; i < STREAMING_BATCH_SIZE && this.resultSetItr.hasNext(); i++) {
+                row = this.resultSetItr.next();
+                ids.add(row.getString(0));
+            }
+            String dataTable = generateTargetDataTableName(this.tenantId, this.tableName);
+            ResultSet rs = session.execute("SELECT id, timestamp, data FROM ARS." + dataTable + " WHERE id IN ?", ids);
+            this.dataItr = new CassandraDirectDataIterator(this.tenantId, this.tableName, rs.iterator(), this.columns);
+        }
+        
+        @Override
+        public boolean hasNext() {
+            if (this.dataItr == null) {
+                if (this.resultSetItr.hasNext()) {
+                    this.populateBatch();
+                } else {
+                    return false;
+                }
+            }
+            if (this.dataItr.hasNext()) {
+                return true;
+            } else {
+                this.dataItr = null;
+                return this.hasNext();
+            }
+        }
+
+        @Override
+        public Record next() {
+            if (this.hasNext()) {
+                return this.dataItr.next();
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void close() throws IOException {
+            /** nothing to do **/
+        }
+        
+    }
+    
+    /**
+     * Cassandra data {@link AnalyticsIterator} implementation for streaming, which reads data
+     * directly from the data table.
+     */
+    public static class CassandraDirectDataIterator implements AnalyticsIterator<Record> {
 
         private int tenantId;
         
@@ -303,11 +502,11 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         
         private Iterator<Row> resultSetItr;
         
-        public CassandraDataIterator(int tenantId, String tableName, ResultSet rs, List<String> columns) {
+        public CassandraDirectDataIterator(int tenantId, String tableName, Iterator<Row> resultSetItr, List<String> columns) {
             this.tenantId = tenantId;
             this.tableName = tableName;
             this.columns = columns;
-            this.resultSetItr = rs.iterator();
+            this.resultSetItr = resultSetItr;
         }
         
         @Override
@@ -349,14 +548,15 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
         @Override
         public void close() throws IOException {
-            /** Nothing to do **/
+            /** nothing to do **/
         }
+        
     }
     
     /**
-     * Cassandra {@link RecordGroup} implementation.
+     * Cassandra {@link RecordGroup} implementation to be used without partitioning.
      */
-    public static class CassandraRecordGroup implements RecordGroup {
+    public static class GlobalCassandraRecordGroup implements RecordGroup {
 
         private static final long serialVersionUID = 4922546772273816597L;
         
@@ -373,8 +573,8 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         private long timeTo;
         
         private List<String> ids;
-        
-        public CassandraRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo) {
+                
+        public GlobalCassandraRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo) {
             this.tenantId = tenantId;
             this.tableName = tableName;
             this.columns = columns;
@@ -383,7 +583,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             this.byIds = false;
         }
         
-        public CassandraRecordGroup(int tenantId, String tableName, List<String> columns, List<String> ids) {
+        public GlobalCassandraRecordGroup(int tenantId, String tableName, List<String> columns, List<String> ids) {
             this.tenantId = tenantId;
             this.tableName = tableName;
             this.columns = columns;
@@ -422,6 +622,56 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
         public List<String> getIds() {
             return ids;
+        }
+        
+    }
+    
+    /**
+     * Cassandra {@link RecordGroup} implementation, which is token range aware,
+     * used for partition based record groups.
+     */
+    public static class TokenRangeRecordGroup implements RecordGroup {
+        
+        private static final long serialVersionUID = -8748485743904308191L;
+
+        private int tenantId;
+        
+        private String tableName;
+        
+        private List<String> columns;
+        
+        private List<TokenRange> tokenRanges;
+        
+        private String host;
+        
+        public TokenRangeRecordGroup(int tenantId, String tableName, List<String> columns,
+                List<TokenRange> tokenRanges, String host) {
+            this.tenantId = tenantId;
+            this.tableName = tableName;
+            this.columns = columns;
+            this.tokenRanges = tokenRanges;
+            this.host = host;
+        }
+     
+        @Override
+        public String[] getLocations() throws AnalyticsException {
+            return new String[] { this.host };
+        }
+        
+        public int getTenantId() {
+            return tenantId;
+        }
+        
+        public String getTableName() {
+            return tableName;
+        }
+        
+        public List<String> getColumns() {
+            return columns;
+        }
+        
+        public List<TokenRange> getTokenRanges() {
+            return tokenRanges;
         }
         
     }
