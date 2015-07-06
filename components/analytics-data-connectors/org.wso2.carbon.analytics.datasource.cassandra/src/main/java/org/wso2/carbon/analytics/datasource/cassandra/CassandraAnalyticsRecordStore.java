@@ -23,6 +23,7 @@ import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -32,6 +33,7 @@ import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,7 +47,9 @@ import java.util.Map;
  */
 public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
-    private static final int TS_MULTIPLIER = 100000;
+    private static final int DELETE_BATCH_SIZE = 1000;
+
+    private static final int TS_MULTIPLIER = (int) Math.pow(2, 30);
 
     private Session session;
 
@@ -60,7 +64,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         this.session.execute("CREATE KEYSPACE IF NOT EXISTS ARS WITH REPLICATION = "
                 + "{'class':'SimpleStrategy', 'replication_factor':3};");
         this.session.execute("CREATE TABLE IF NOT EXISTS ARS.TS (tenantId INT, "
-                + "tableName VARCHAR, timestamp BIGINT, id VARCHAR, PRIMARY KEY ((tenantId, tableName), timestamp))");
+                + "tableName VARCHAR, timestamp VARINT, id VARCHAR, PRIMARY KEY ((tenantId, tableName), timestamp))");
     }
     
     private String generateTargetDataTableName(int tenantId, String tableName) {
@@ -81,22 +85,54 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     @Override
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        ResultSet rs = this.session.execute("SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
-                tenantId, tableName, timeFrom == Long.MIN_VALUE ? timeFrom : timeFrom * TS_MULTIPLIER, 
-                        timeTo == Long.MAX_VALUE ? timeTo : timeTo * TS_MULTIPLIER);
-        List<String> ids = this.resultSetToIds(rs);
-        this.delete(tenantId, tableName, ids);
-//        this.session.execute("DELETE FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
-//                tenantId, tableName, timeFrom == Long.MAX_VALUE ? timeFrom : timeFrom * TS_MULTIPLIER, 
-//                        timeTo == Long.MIN_VALUE ? timeTo : timeTo * TS_MULTIPLIER); 
+        ResultSet rs = this.session.execute("SELECT id, timestamp FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
+                tenantId, tableName, BigInteger.valueOf(timeFrom).multiply(BigInteger.valueOf(TS_MULTIPLIER)), 
+                BigInteger.valueOf(timeTo).multiply(BigInteger.valueOf(TS_MULTIPLIER)));
+        Iterator<Row> tsItr = rs.iterator();
+        while (tsItr.hasNext()) {
+            this.deleteWithTSItrBatch(tenantId, tableName, tsItr);
+        }
     }
 
+    private List<BigInteger> extractTSTableTimestampList(ResultSet rs) {
+        List<BigInteger> result = new ArrayList<BigInteger>();
+        Iterator<Row> itr = rs.iterator();
+        Row row;
+        while (itr.hasNext()) {
+            row = itr.next();
+            result.add(this.toTSTableTimestamp(row.getLong(1), row.getString(0)));
+        }
+        return result;
+    }
+    
+    private void deleteWithTSItrBatch(int tenantId, String tableName, Iterator<Row> itr) {
+        String dataTable = this.generateTargetDataTableName(tenantId, tableName);
+        List<String> ids = new ArrayList<String>();
+        PreparedStatement ps = session.prepare("DELETE FROM ARS.TS WHERE tenantId = ? AND tableName = ? and timestamp = ?");
+        BatchStatement stmt = new BatchStatement();
+        Row row;
+        for (int i = 0; i < DELETE_BATCH_SIZE && itr.hasNext(); i++) {
+            row = itr.next();
+            stmt.add(ps.bind(tenantId, tableName, row.getVarint(1)));
+            ids.add(row.getString(0));
+        }
+        this.session.execute(stmt);
+        this.session.execute("DELETE FROM ARS." + dataTable + " WHERE id IN ?", ids);
+    }
+    
     @Override
     public void delete(int tenantId, String tableName, List<String> ids) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
+        ResultSet rs = this.session.execute("SELECT id, timestamp FROM ARS." + dataTable + " WHERE id IN ?", ids);
+        List<BigInteger> tsTableTimestamps = this.extractTSTableTimestampList(rs);        
+        PreparedStatement ps = session.prepare("DELETE FROM ARS.TS WHERE tenantId = ? AND tableName = ? and timestamp = ?");
+        BatchStatement stmt = new BatchStatement();
+        for (BigInteger ts : tsTableTimestamps) {
+            stmt.add(ps.bind(tenantId, tableName, ts));
+        }
+        this.session.execute(stmt);
         this.session.execute("DELETE FROM ARS." + dataTable + " WHERE id IN ?", ids);
-        /* should delete the TS ids also */
     }
 
     @Override
@@ -153,9 +189,8 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             return this.lookupRecordsByRS(tenantId, tableName, rs, columns);
         } else {
             ResultSet tsrs = this.session.execute("SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
-                    tenantId, tableName, 
-                    recordGroup.getTimeFrom() == Long.MIN_VALUE ? recordGroup.getTimeFrom() : recordGroup.getTimeFrom() * TS_MULTIPLIER, 
-                    recordGroup.getTimeTo() == Long.MAX_VALUE ? recordGroup.getTimeTo() : recordGroup.getTimeTo() * TS_MULTIPLIER);
+                    tenantId, tableName, BigInteger.valueOf(recordGroup.getTimeFrom()).multiply(BigInteger.valueOf(TS_MULTIPLIER)), 
+                    BigInteger.valueOf(recordGroup.getTimeTo()).multiply(BigInteger.valueOf(TS_MULTIPLIER)));
             List<String> ids = this.resultSetToIds(tsrs);
             return this.lookupRecordsByIds(tenantId, tableName, ids, columns);
         }
@@ -212,10 +247,9 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         return result;
     }
     
-    private long toTSTableTimestamp(long timestamp, String id) {
-        //System.out.println("** X: " + (timestamp * TS_MULTIPLIER + id.hashCode() % TS_MULTIPLIER));
-        //return timestamp * TS_MULTIPLIER + id.hashCode() % TS_MULTIPLIER;
-        return timestamp * TS_MULTIPLIER + (long) (Math.random() * TS_MULTIPLIER);
+    private BigInteger toTSTableTimestamp(long timestamp, String id) {
+        return (BigInteger.valueOf(timestamp).multiply(BigInteger.valueOf(TS_MULTIPLIER))).add(
+                BigInteger.valueOf(Math.abs(id.hashCode() % TS_MULTIPLIER)));
     }
     
     private void addBatch(List<Record> batch) throws AnalyticsException, AnalyticsTableNotAvailableException {
