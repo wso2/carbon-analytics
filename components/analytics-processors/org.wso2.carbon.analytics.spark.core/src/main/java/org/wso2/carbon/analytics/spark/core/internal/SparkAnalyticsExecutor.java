@@ -53,10 +53,12 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelationProvider;
 import org.wso2.carbon.analytics.spark.core.util.master.AnalyticsRecoveryModeFactory;
 import org.wso2.carbon.analytics.spark.core.util.master.CheckElectedLeaderExecutionCall;
 import org.wso2.carbon.analytics.spark.core.util.master.ElectLeaderExecutionCall;
+import org.wso2.carbon.analytics.spark.core.util.master.InitClientExecutionCall;
 import org.wso2.carbon.analytics.spark.core.util.master.StartWorkerExecutionCall;
 import org.wso2.carbon.utils.CarbonUtils;
 import scala.None$;
 import scala.Option;
+import scala.Tuple2;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -155,6 +157,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private boolean workerActive = false;
 
+    private boolean clientActive = false;
+
     private boolean electedLeader = false;
 
 
@@ -210,17 +214,34 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     Set<String> masterUrls = masterMap.keySet();
 
                     if (masterUrls.contains(thisMasterUrl)) {
+                        System.out.println(" $$$$$$$$$$$$$$$$$$$ previous worker!");
                         this.startMaster();
                         if (masterMap.size() == this.redundantMasterCount) {
+                            System.out.println(" $$$$$$$$$$$$$$$$$$$ map size == == master count");
+
+                            System.out.println("cluster message to start workers");
                             this.acm.executeAll(CLUSTER_GROUP_NAME, new StartWorkerExecutionCall());
+
+                            System.out.println("cluster message to start client");
+                            this.acm.executeOne(CLUSTER_GROUP_NAME, acm.getLeader(CLUSTER_GROUP_NAME),
+                                                new InitClientExecutionCall(this.sparkConf.getAll()));
                         }
                     } else if (masterMap.size() < this.redundantMasterCount) {
+                        System.out.println(" $$$$$$$$$$$$$$$$$$$ map size < master count");
                         this.startMaster();
                         masterMap.put(thisMasterUrl, acm.getLocalMember());
                         if (masterMap.size() == this.redundantMasterCount) {
+                            System.out.println(" $$$$$$$$$$$$$$$$$$$ map size == master count");
+
+                            System.out.println("cluster message to start workers");
                             this.acm.executeAll(CLUSTER_GROUP_NAME, new StartWorkerExecutionCall());
+
+                            System.out.println("cluster message to start client");
+                            this.acm.executeOne(CLUSTER_GROUP_NAME, acm.getLeader(CLUSTER_GROUP_NAME),
+                                                new InitClientExecutionCall(this.sparkConf.getAll()));
                         }
                     } else { // masterMap.size() >= redundantMasterCount
+                        System.out.println(" $$$$$$$$$$$$$$$$$$$ map size > =  master count");
                         this.startWorker();
                     }
 
@@ -268,11 +289,14 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    private void initClient(String masterUrl, String appName) {
-//        initializeSparkConf(masterUrl, this.portOffset, appName);
-//        this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
-//        this.sqlCtx = new SQLContext(this.javaSparkCtx);
-//        initializeSqlContext(this.javaSparkCtx);
+    public void initializeClient(Tuple2<String, String>[] confs) {
+        SparkConf conf = new SparkConf();
+        for (Tuple2<String, String> tuple:confs){
+            conf.set(tuple._1(), tuple._2());
+            System.out.println("conf " + tuple._1() + " : " + tuple._2());
+        }
+        System.out.println("Spark master : " + conf.get(AnalyticsConstants.SPARK_MASTER));
+        initializeSqlContext(new JavaSparkContext(conf));
     }
 
     private void initializeLocalClient() {
@@ -613,7 +637,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 throw new AnalyticsExecutionException("Malformed query: CREATE TEMPORARY TABLE IF NOT " +
                                                       "EXISTS is not supported");
             } else {
-                if (this.clientMode) {
+                if (this.isClustered) {
                     this.sparkTableNames.put(tenantId, tempTableName);
                 } else {
                     this.inMemSparkTableNames.put(tenantId, tempTableName);
