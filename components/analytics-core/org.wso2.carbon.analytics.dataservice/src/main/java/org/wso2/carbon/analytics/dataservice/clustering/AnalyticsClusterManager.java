@@ -34,7 +34,7 @@ public interface AnalyticsClusterManager {
      * do not want to receive group events
      * @throws AnalyticsClusterException
      */
-    int joinGroup(String groupId, GroupEventListener groupEventListener) throws AnalyticsClusterException;
+    void joinGroup(String groupId, GroupEventListener groupEventListener) throws AnalyticsClusterException;
     
     /**
      * Checks if the current node is the leader of the given node.

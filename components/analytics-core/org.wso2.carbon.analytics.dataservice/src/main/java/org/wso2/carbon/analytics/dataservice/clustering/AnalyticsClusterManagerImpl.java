@@ -69,7 +69,7 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     }
 
     @Override
-    public int joinGroup(String groupId, GroupEventListener groupEventListener)
+    public void joinGroup(String groupId, GroupEventListener groupEventListener)
             throws AnalyticsClusterException {
         if (!this.isClusteringEnabled()) {
             throw new AnalyticsClusterException("Clustering is not enabled");
@@ -77,9 +77,6 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         if (this.groups.containsKey(groupId)) {
             throw new AnalyticsClusterException("This node has already joined the group: " + groupId);
         }
-        // when joining the group, get the membership number
-        int membershipNumber = (int) this.hz.getAtomicLong(groupId + "_" + MEMBERSHIP_NUMBER_STRING)
-                .incrementAndGet();
 
         this.checkAndCleanupGroups(groupId);
         this.groups.put(groupId, groupEventListener);
@@ -102,7 +99,6 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             }
             this.sendMemberAddedNotificationToLeader(groupId);
         }
-        return membershipNumber;
     }
 
     private boolean checkLeader(Member member, String groupId) {
