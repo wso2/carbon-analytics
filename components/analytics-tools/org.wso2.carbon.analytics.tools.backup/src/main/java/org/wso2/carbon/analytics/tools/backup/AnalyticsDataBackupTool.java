@@ -52,8 +52,10 @@ import java.util.List;
 public class AnalyticsDataBackupTool {
 
     private static final String TABLE_SCHEMA_FILE_NAME = "__TABLE_SCHEMA__";
-    private static final int INDEX_PROCESS_WAIT_TIME = 5;
-    private static final int RECORD_BATCH_SIZE = 200;
+    private static final int INDEX_PROCESS_WAIT_TIME = -1;
+    private static final int RECORD_BATCH_SIZE = 1000;
+    private static int batchSize = RECORD_BATCH_SIZE;
+    private static boolean forceIndexing = false;
     
     @SuppressWarnings("static-access")
     public static void main(String[] args) throws Exception {
@@ -61,6 +63,7 @@ public class AnalyticsDataBackupTool {
         Options options = new Options();
         options.addOption(new Option("backup", false, "backup analytics data"));
         options.addOption(new Option("restore", false, "restores analytics data"));
+        options.addOption(new Option("enableIndexing", false, "enables indexing while restoring"));
         options.addOption(OptionBuilder.withArgName("directory").hasArg().withDescription(
                 "source/target directory").create("dir"));
         options.addOption(OptionBuilder.withArgName("table list").hasArg().withDescription(
@@ -71,6 +74,8 @@ public class AnalyticsDataBackupTool {
                 "consider records to this time (non-inclusive)").create("timeto"));
         options.addOption(OptionBuilder.withArgName("tenant id (default is super tenant)").hasArg().withDescription(
                 "specify tenant id of the tenant considered").create("tenant_id"));
+        options.addOption(OptionBuilder.withArgName("restore record batch size (default is 1000)").hasArg().withDescription(
+                "specify the number of records per batch for backup").create("batch"));
         CommandLineParser parser = new BasicParser();
         CommandLine line = parser.parse(options, args);
         if (args.length < 2) {
@@ -78,7 +83,18 @@ public class AnalyticsDataBackupTool {
             System.exit(1);
         }
         if (line.hasOption("restore")) {
-            System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
+            if (line.hasOption("enableIndexing")) {
+                System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
+                forceIndexing = true;
+            }
+        }
+        if (line.hasOption("backup")) {
+            if (line.hasOption("batch")) {
+                String batchValue = line.getOptionValue("batch");
+                batchSize = Integer.parseInt(batchValue);
+            } else {
+                batchSize = RECORD_BATCH_SIZE;
+            }
         }
         AnalyticsDataService service = null;
         try {
@@ -165,7 +181,7 @@ public class AnalyticsDataBackupTool {
                 System.out.println(myDir.getAbsolutePath() + " is not a directory to contain table data, skipping.");
                 return;
             }
-            AnalyticsSchema schema = readTableSchema(baseDir.getAbsolutePath());
+            AnalyticsSchema schema = readTableSchema(baseDir.getAbsolutePath() + File.separator + table);
             service.setTableSchema(tenantId, table, schema);
             File[] files = myDir.listFiles();
             int count = 0;
@@ -178,6 +194,7 @@ public class AnalyticsDataBackupTool {
                 }
                 if (file.isDirectory()) {
                     System.out.println(file.getAbsolutePath() + "is a directory, which cannot contain record data, skipping.");
+                    continue;
                 }
                 try {
                     List<Record> records= readRecordFromFile(file);
@@ -191,10 +208,12 @@ public class AnalyticsDataBackupTool {
                             records.remove(record);
                         }
                     }
-                    if (records.size() >= RECORD_BATCH_SIZE) {
-                        service.put(records);
+
+                    service.put(records);
+                    if (forceIndexing) {
                         service.waitForIndexing(INDEX_PROCESS_WAIT_TIME);
                     }
+
                 } catch (IOException e) {
                     System.out.println("Error in reading record data from file: " + file.getAbsoluteFile() + ", skipping.");
                 }
