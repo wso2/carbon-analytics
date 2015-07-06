@@ -608,6 +608,11 @@
                 <version>${akka.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.spark-project.akka</groupId>
+                <artifactId>akka-slf4j_2.10</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.scala-lang</groupId>
                 <artifactId>scala-library</artifactId>
                 <version>${scala.version}</version>
@@ -683,9 +688,9 @@
                 <version>${snappy.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.typesafe</groupId>
+                <groupId>org.wso2.orbit.com.typesafe</groupId>
                 <artifactId>config</artifactId>
-                <version>${typesafe.version}</version>
+                <version>${typesafe.orbit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.com.esotericsoftware.minlog</groupId>
@@ -1172,7 +1177,7 @@
         <!-- Spark dependency versions start-->
         <spark.version>1.4.0.wso2v1</spark.version>
         <spark.imp.pkg.version>[1.4.0,1.5.0)</spark.imp.pkg.version>
-        <spark.core.version>1.4.0.wso2v1</spark.core.version>
+        <spark.core.version>1.4.0.wso2v2</spark.core.version>
         <hadoop.client.version>2.6.0.wso2v1</hadoop.client.version>
         <json4s.jackson.version>3.2.10.wso2v1</json4s.jackson.version>
         <twitter.chill.version>0.5.0.wso2v1</twitter.chill.version>
@@ -1192,7 +1197,7 @@
         <jackson.version>2.4.4</jackson.version>
         <codahale.metrics.version>3.1.2</codahale.metrics.version>
         <scala.version>2.10.4</scala.version>
-        <typesafe.version>1.2.0</typesafe.version>
+        <typesafe.orbit.version>1.2.1.wso2v1</typesafe.orbit.version>
         <minlog.version>1.2.wso2v1</minlog.version>
         <uncommons.maths.version>1.2.2.wso2v1</uncommons.maths.version>
         <spark.protobuf.version>2.5.0-spark</spark.protobuf.version>

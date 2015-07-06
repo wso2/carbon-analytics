@@ -147,7 +147,11 @@
             <artifactId>akka-actor_2.10</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.typesafe</groupId>
+            <groupId>org.spark-project.akka</groupId>
+            <artifactId>akka-slf4j_2.10</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.typesafe</groupId>
             <artifactId>config</artifactId>
         </dependency>
         <dependency>
@@ -240,6 +244,7 @@
                                 <bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef>
                                 <bundleDef>org.spark-project.akka:akka-remote_2.10</bundleDef>
                                 <bundleDef>org.spark-project.akka:akka-actor_2.10</bundleDef>
+                                <bundleDef>org.spark-project.akka:akka-slf4j_2.10</bundleDef>
                                 <bundleDef>org.apache.commons:commons-lang3</bundleDef>
                                 <bundleDef>org.apache.commons:commons-math3</bundleDef>
                                 <bundleDef>org.xerial.snappy:snappy-java</bundleDef>
@@ -259,7 +264,7 @@
                                 </bundleDef>
                                 <bundleDef>com.fasterxml.jackson.module:jackson-module-scala_2.10
                                 </bundleDef>
-                                <bundleDef>com.typesafe:config</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.typesafe:config</bundleDef>
                                 <bundleDef>org.spark-project.protobuf:protobuf-java</bundleDef>
                                 <bundleDef>org.wso2.uncommons.maths:uncommons-maths</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.esotericsoftware.minlog:minlog
