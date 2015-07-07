@@ -37,7 +37,6 @@ import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -113,7 +112,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         Metadata md = this.session.getCluster().getMetadata();
         Set<Host> hosts = md.getAllHosts();
         int partitionsPerHost = (int) Math.ceil(numPartitionsHint / (double) hosts.size());
-        List<TokenRangeRecordGroup> result = new ArrayList<CassandraAnalyticsRecordStore.TokenRangeRecordGroup>(
+        List<TokenRangeRecordGroup> result = new ArrayList<TokenRangeRecordGroup>(
                 partitionsPerHost * hosts.size());
         for (Host host : hosts) {
             result.addAll(this.calculateTokenRangeGroupForHost(tenantId, tableName, columns, 
@@ -137,12 +136,13 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         String ip = host.getAddress().getHostAddress();
         List<CassandraTokenRange> trs = this.unwrapTRAndConvertToLocalTR(md.getTokenRanges("ARS", host));
         int delta = (int) Math.ceil(trs.size() / (double) partitionsPerHost);
-        List<TokenRangeRecordGroup> result = new ArrayList<CassandraAnalyticsRecordStore.TokenRangeRecordGroup>(
+        List<TokenRangeRecordGroup> result = new ArrayList<TokenRangeRecordGroup>(
                 partitionsPerHost);
         if (delta > 0) {
             for (int i = 0; i < trs.size(); i += delta) {
+                /* a new array list is created here, since what sublist returns is not serializable */
                 result.add(new TokenRangeRecordGroup(tenantId, tableName, columns, 
-                        trs.subList(i, i + delta > trs.size() ? trs.size() : i + delta), ip));
+                       new ArrayList<CassandraTokenRange>(trs.subList(i, i + delta > trs.size() ? trs.size() : i + delta)), ip));
             }
         }
         return result;
@@ -524,7 +524,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
      * Cassandra data {@link AnalyticsIterator} implementation for streaming, which reads data
      * directly from the data table.
      */
-    public static class CassandraDirectDataIterator implements AnalyticsIterator<Record> {
+    public class CassandraDirectDataIterator implements AnalyticsIterator<Record> {
 
         private int tenantId;
         
@@ -588,7 +588,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     /**
      * Cassandra {@link RecordGroup} implementation to be used without partitioning.
      */
-    public static class GlobalCassandraRecordGroup implements RecordGroup {
+    public class GlobalCassandraRecordGroup implements RecordGroup {
 
         private static final long serialVersionUID = 4922546772273816597L;
         
@@ -654,82 +654,6 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
         public List<String> getIds() {
             return ids;
-        }
-        
-    }
-    
-    /**
-     * Cassandra {@link RecordGroup} implementation, which is token range aware,
-     * used for partition based record groups.
-     */
-    public static class TokenRangeRecordGroup implements RecordGroup {
-        
-        private static final long serialVersionUID = -8748485743904308191L;
-
-        private int tenantId;
-        
-        private String tableName;
-        
-        private List<String> columns;
-        
-        private List<CassandraTokenRange> tokenRanges;
-        
-        private String host;
-        
-        public TokenRangeRecordGroup(int tenantId, String tableName, List<String> columns,
-                List<CassandraTokenRange> tokenRanges, String host) {
-            this.tenantId = tenantId;
-            this.tableName = tableName;
-            this.columns = columns;
-            this.tokenRanges = tokenRanges;
-            this.host = host;
-        }
-     
-        @Override
-        public String[] getLocations() throws AnalyticsException {
-            return new String[] { this.host };
-        }
-        
-        public int getTenantId() {
-            return tenantId;
-        }
-        
-        public String getTableName() {
-            return tableName;
-        }
-        
-        public List<String> getColumns() {
-            return columns;
-        }
-        
-        public List<CassandraTokenRange> getTokenRanges() {
-            return tokenRanges;
-        }
-        
-    }
-    
-    /**
-     * A {@link Serializable} token range class to be used in record groups.
-     */
-    public class CassandraTokenRange implements Serializable {
-
-        private static final long serialVersionUID = 3371665376647640530L;
-        
-        private Object start;
-        
-        private Object end;
-        
-        public CassandraTokenRange(Object start, Object end) {
-            this.start = start;
-            this.end = end;
-        }
-        
-        public Object getStart() {
-            return start;
-        }
-        
-        public Object getEnd() {
-            return end;
         }
         
     }

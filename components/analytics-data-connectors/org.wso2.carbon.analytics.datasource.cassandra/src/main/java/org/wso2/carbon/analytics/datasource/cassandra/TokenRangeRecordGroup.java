@@ -16,19 +16,20 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.rdbms;
+package org.wso2.carbon.analytics.datasource.cassandra;
+
+import java.util.List;
 
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
-import java.util.List;
-
 /**
- * RDBMS range based implementation of {@link RecordGroup}.
+ * Cassandra {@link RecordGroup} implementation, which is token range aware,
+ * used for partition based record groups.
  */
-public class RDBMSRangeRecordGroup implements RecordGroup {
-
-    private static final long serialVersionUID = -7561378201354396921L;
+public class TokenRangeRecordGroup implements RecordGroup {
+    
+    private static final long serialVersionUID = -8748485743904308191L;
 
     private int tenantId;
     
@@ -36,25 +37,22 @@ public class RDBMSRangeRecordGroup implements RecordGroup {
     
     private List<String> columns;
     
-    private long timeFrom;
+    private List<CassandraTokenRange> tokenRanges;
     
-    private long timeTo;
+    private String host;
     
-    private int recordsFrom;
-    
-    private int recordsCount;
-    
-    public RDBMSRangeRecordGroup() { }
-    
-    public RDBMSRangeRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, 
-            int recordsFrom, int recordsCount) {
+    public TokenRangeRecordGroup(int tenantId, String tableName, List<String> columns,
+            List<CassandraTokenRange> tokenRanges, String host) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.columns = columns;
-        this.timeFrom = timeFrom;
-        this.timeTo = timeTo;
-        this.recordsFrom = recordsFrom;
-        this.recordsCount = recordsCount;
+        this.tokenRanges = tokenRanges;
+        this.host = host;
+    }
+
+    @Override
+    public String[] getLocations() throws AnalyticsException {
+        return new String[] { this.host };
     }
     
     public int getTenantId() {
@@ -69,25 +67,8 @@ public class RDBMSRangeRecordGroup implements RecordGroup {
         return columns;
     }
     
-    public long getTimeFrom() {
-        return timeFrom;
+    public List<CassandraTokenRange> getTokenRanges() {
+        return tokenRanges;
     }
     
-    public long getTimeTo() {
-        return timeTo;
-    }
-    
-    public int getRecordsFrom() {
-        return recordsFrom;
-    }
-    
-    public int getRecordsCount() {
-        return recordsCount;
-    }
-
-    @Override
-    public String[] getLocations() throws AnalyticsException {
-        return new String[] { "localhost" };
-    }
-
 }
