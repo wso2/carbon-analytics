@@ -125,8 +125,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private SparkConf sparkConf;
 
-    private JavaSparkContext javaSparkCtx;
-
     private SQLContext sqlCtx;
 
     private String myHost;
@@ -214,34 +212,34 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     Set<String> masterUrls = masterMap.keySet();
 
                     if (masterUrls.contains(thisMasterUrl)) {
-                        System.out.println(" $$$$$$$$$$$$$$$$$$$ previous worker!");
+                        // System.out.println(" $$$$$$$$$$$$$$$$$$$ previous worker!");
                         this.startMaster();
                         if (masterMap.size() == this.redundantMasterCount) {
-                            System.out.println(" $$$$$$$$$$$$$$$$$$$ map size == == master count");
+                            // System.out.println(" $$$$$$$$$$$$$$$$$$$ map size == == master count");
 
-                            System.out.println("cluster message to start workers");
+                            // System.out.println("cluster message to start workers");
                             this.acm.executeAll(CLUSTER_GROUP_NAME, new StartWorkerExecutionCall());
 
-                            System.out.println("cluster message to start client");
+                            // System.out.println("cluster message to start client");
                             this.acm.executeOne(CLUSTER_GROUP_NAME, acm.getLeader(CLUSTER_GROUP_NAME),
                                                 new InitClientExecutionCall(this.sparkConf.getAll()));
                         }
                     } else if (masterMap.size() < this.redundantMasterCount) {
-                        System.out.println(" $$$$$$$$$$$$$$$$$$$ map size < master count");
+                        // System.out.println(" $$$$$$$$$$$$$$$$$$$ map size < master count");
                         this.startMaster();
                         masterMap.put(thisMasterUrl, acm.getLocalMember());
                         if (masterMap.size() == this.redundantMasterCount) {
-                            System.out.println(" $$$$$$$$$$$$$$$$$$$ map size == master count");
+                            // System.out.println(" $$$$$$$$$$$$$$$$$$$ map size == master count");
 
-                            System.out.println("cluster message to start workers");
+                            // System.out.println("cluster message to start workers");
                             this.acm.executeAll(CLUSTER_GROUP_NAME, new StartWorkerExecutionCall());
 
-                            System.out.println("cluster message to start client");
+                            // System.out.println("cluster message to start client");
                             this.acm.executeOne(CLUSTER_GROUP_NAME, acm.getLeader(CLUSTER_GROUP_NAME),
                                                 new InitClientExecutionCall(this.sparkConf.getAll()));
                         }
                     } else { // masterMap.size() >= redundantMasterCount
-                        System.out.println(" $$$$$$$$$$$$$$$$$$$ map size > =  master count");
+                        // System.out.println(" $$$$$$$$$$$$$$$$$$$ map size > =  master count");
                         this.startWorker();
                     }
 
@@ -249,7 +247,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
                 } else {
                     // start the node in the local mode
-                    this.initializeLocalClient();
+                    this.initializeLocalClient(confPath);
                 }
             } else {
                 //clients points to an external spark master and makes the spark conf accordingly
@@ -291,24 +289,27 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     public void initializeClient(Tuple2<String, String>[] confs) {
         SparkConf conf = new SparkConf();
-        for (Tuple2<String, String> tuple:confs){
+        for (Tuple2<String, String> tuple : confs) {
             conf.set(tuple._1(), tuple._2());
-            System.out.println("conf " + tuple._1() + " : " + tuple._2());
+            // System.out.println("conf " + tuple._1() + " : " + tuple._2());
         }
-        System.out.println("Spark master : " + conf.get(AnalyticsConstants.SPARK_MASTER));
+        // System.out.println("Spark master : " + conf.get(AnalyticsConstants.SPARK_MASTER));
         initializeSqlContext(new JavaSparkContext(conf));
     }
 
-    private void initializeLocalClient() {
-        this.sparkConf = new SparkConf();
+    private void initializeLocalClient(String confPath) {
+
+        String propsFile = confPath + File.separator + AnalyticsConstants.SPARK_DEFAULTS_PATH;
+        this.sparkConf = initializeSparkConf("dummy url", 0, this.portOffset, propsFile);
+
         this.sparkConf.setMaster(LOCAL_MASTER_URL)
                 .setAppName(CARBON_ANALYTICS_SPARK_APP_NAME)
-                .set(AnalyticsConstants.SPARK_UI_PORT, Integer.toString(BASE_UI_PORT + portOffset));
+                .setIfMissing(AnalyticsConstants.SPARK_UI_PORT, Integer.toString(BASE_UI_PORT + portOffset));
         log.info("Started Spark client in the LOCAL mode" +
-                 " with the application name : " + CARBON_ANALYTICS_SPARK_APP_NAME +
-                 " and UI port : " + (BASE_UI_PORT + portOffset));
-        this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
-        initializeSqlContext(this.javaSparkCtx);
+                 " with the application name : " + this.sparkConf.get(AnalyticsConstants.SPARK_APP_NAME) +
+                 " and UI port : " + this.sparkConf.get(AnalyticsConstants.SPARK_UI_PORT));
+        JavaSparkContext javaSparkCtx = new JavaSparkContext(this.sparkConf);
+        initializeSqlContext(javaSparkCtx);
     }
 
     private void initializeSqlContext(JavaSparkContext jsc) {
@@ -507,7 +508,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      */
     private SparkConf initializeSparkConf(String masterHost, int masterPort, int portOffset,
                                           String propsFile) {
-        SparkConf conf = new SparkConf(false);
+        SparkConf conf = new SparkConf();
         conf.set(AnalyticsConstants.SPARK_MASTER, "spark://" + masterHost + ":" + (masterPort + portOffset));
 
         log.info("Spark defaults loaded from " + propsFile);
@@ -548,8 +549,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         conf.setIfMissing("spark.fileserver.port", String.valueOf(17000 + portOffset));
 
         //executor constants for spark env
-        conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
-        conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
+        if (GenericUtils.isCarbonServer()) {
+            conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
+            conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
+        }
 
         conf.set(AnalyticsConstants.CARBON_TENANT_ID, String.valueOf(SPARK_TENANT));
     }
@@ -733,7 +736,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     @Override
     public void onBecomingLeader() {
-        System.out.println("############### became the leader : ");
+        // System.out.println("############### became the leader : ");
         try {
             HazelcastInstance hz = AnalyticsServiceHolder.getHazelcastInstance();
             IMap<String, Object> masterMap = hz.getMap(AnalyticsConstants.SPARK_MASTER_MAP);
@@ -783,7 +786,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     public void electAsLeader() {
         for (LeaderElectable le : this.leaderElectable) {
             le.electedLeader();
-            System.out.println("**************** making leader");
+            // System.out.println("**************** making leader");
         }
         this.electedLeader = true;
     }
@@ -791,7 +794,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     @Override
     public void onLeaderUpdate() {
         //nothing to do here
-        System.out.println("########### leader updated!!!!!!!! : ");
+        // System.out.println("########### leader updated!!!!!!!! : ");
     }
 
     public int getWorkerCount() {
@@ -859,7 +862,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     public void registerLeaderElectable(LeaderElectable le) {
         this.leaderElectable.add(le);
-        System.out.println(" *&&&&&&&&&&&&&&&&&&&&&& leader electable added!");
+        // System.out.println(" *&&&&&&&&&&&&&&&&&&&&&& leader electable added!");
     }
 
 

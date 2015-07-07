@@ -67,7 +67,7 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
      */
     @Override
     public void persist(String name, Object obj) {
-        System.out.println("################ PERSISTING DATA for : " + name);
+        // System.out.println("################ PERSISTING DATA for : " + name);
         Serializer serializer = serialization.findSerializerFor(obj);
         byte[] serialized = serializer.toBinary(obj);
 
@@ -96,7 +96,7 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
      */
     @Override
     public void unpersist(String name) {
-        System.out.println("################ UNPERSISTING DATA for : " + name);
+        // System.out.println("################ UNPERSISTING DATA for : " + name);
         try {
             List<String> recordIds = new ArrayList<>();
             recordIds.add(name);
@@ -115,7 +115,7 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
      */
     @Override
     public <T> Seq<T> read(String prefix, ClassTag<T> evidence$1) {
-        System.out.println("################ READING DATA for : " + prefix);
+        // System.out.println("################ READING DATA for : " + prefix);
 
         Class<T> clazz = (Class<T>) evidence$1.runtimeClass();
         Serializer serializer = serialization.findSerializerFor(clazz);
