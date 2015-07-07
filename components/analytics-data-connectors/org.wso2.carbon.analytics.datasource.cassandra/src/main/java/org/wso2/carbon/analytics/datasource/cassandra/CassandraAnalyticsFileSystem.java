@@ -46,6 +46,10 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
         
     private Session session;
     
+    private PreparedStatement fsDataInsertStmt;
+    
+    private PreparedStatement fsDataSelectStmt;
+    
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
         String servers = properties.get(CassandraUtils.CASSANDRA_SERVERS);
@@ -58,6 +62,8 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
         this.session.execute("CREATE KEYSPACE IF NOT EXISTS AFS WITH REPLICATION = {'class':'SimpleStrategy', 'replication_factor':3};");
         this.session.execute("CREATE TABLE IF NOT EXISTS AFS.PATH (path VARCHAR, child VARCHAR, length BIGINT, PRIMARY KEY (path, child))");
         this.session.execute("CREATE TABLE IF NOT EXISTS AFS.DATA (path VARCHAR, sequence BIGINT, data BLOB, PRIMARY KEY (path, sequence))");
+        this.fsDataInsertStmt = this.session.prepare("INSERT INTO AFS.DATA (path, sequence, data) VALUES (?, ?, ?)");
+        this.fsDataSelectStmt = this.session.prepare("SELECT data FROM AFS.DATA WHERE path = ? and sequence = ?");
     }
     
     @Override
@@ -157,11 +163,10 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
                 dirPath + "/" + nameFrom);
         Iterator<Row> itr = rs.iterator();
         Row row;
-        PreparedStatement ps = session.prepare("INSERT INTO AFS.DATA (path, sequence, data) VALUES (?, ?, ?)");
         BatchStatement stmt = new BatchStatement();
         while (itr.hasNext()) {
             row = itr.next();
-            stmt.add(ps.bind(dirPath + "/" + nameTo, row.getLong(0), row.getBytes(1)));
+            stmt.add(this.fsDataInsertStmt.bind(dirPath + "/" + nameTo, row.getLong(0), row.getBytes(1)));
         }
         session.execute(stmt);
         this.session.execute("DELETE FROM AFS.DATA WHERE path = ?", dirPath + "/" + nameFrom);
@@ -192,9 +197,8 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
         }
 
         @Override
-        public DataChunk readChunk(long index) throws IOException {
-            ResultSet rs = session.execute("SELECT data FROM AFS.DATA WHERE path = ? and sequence = ?", 
-                    this.path, index);
+        public DataChunk readChunk(long index) throws IOException {            
+            ResultSet rs = session.execute(fsDataSelectStmt.bind(this.path, index));
             Row row = rs.one();
             if (row == null) {
                 throw new IOException("The data chunk for path: " + this.path + 
@@ -213,10 +217,9 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
 
         @Override
         public void writeChunks(List<DataChunk> chunks) throws IOException {
-            PreparedStatement ps = session.prepare("INSERT INTO AFS.DATA (path, sequence, data) VALUES (?, ?, ?)");
             BatchStatement stmt = new BatchStatement();
             for (DataChunk chunk : chunks) {
-                stmt.add(ps.bind(this.path, chunk.getChunkNumber(), ByteBuffer.wrap(chunk.getData())));
+                stmt.add(fsDataInsertStmt.bind(this.path, chunk.getChunkNumber(), ByteBuffer.wrap(chunk.getData())));
             }
             session.execute(stmt);
         }
