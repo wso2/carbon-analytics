@@ -20,10 +20,7 @@ package org.wso2.carbon.analytics.datasource.hbase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.*;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
@@ -137,12 +134,8 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
             if (log.isDebugEnabled()) {
                 log.debug("Specified path (" + source + ") already exists in filesystem and has been overwritten.");
             }
-            /* Overwriting target path */
-            return this.fileSystem.create(path, true);
-        } else {
-            /* Create new path */
-            return this.fileSystem.create(path);
         }
+        return new HDFSOutputStream(this.fileSystem, path, true);
     }
 
     @Override
@@ -219,6 +212,43 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
         public DataInput makeCopy() throws IOException {
             return new HDFSDataInput(this.path, this.fileSystem);
         }
+    }
+
+    public class HDFSOutputStream extends OutputStream {
+
+        private FSDataOutputStream stream;
+
+        public HDFSOutputStream(FileSystem fileSystem, Path path, Boolean overwrite) throws IOException {
+            this.stream = fileSystem.create(path, overwrite);
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            this.stream.write(b);
+        }
+
+        @Override
+        public void write(byte b[]) throws IOException {
+            this.stream.write(b);
+        }
+
+        @Override
+        public void write(byte b[], int off, int len) throws IOException {
+            this.stream.write(b, off, len);
+        }
+
+        @Override
+        public void flush() throws IOException {
+            this.stream.hsync();
+            this.stream.hflush();
+        }
+
+        @Override
+        public void close() throws IOException {
+            this.flush();
+            this.stream.close();
+        }
+
     }
 
     public static class HDFSRuntimeException extends RuntimeException {
