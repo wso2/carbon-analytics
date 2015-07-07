@@ -101,8 +101,12 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     private PreparedStatement retrieveRecordInsertStmt(String dataTable) {
         PreparedStatement stmt = this.recordInsertStmtMap.get(dataTable);
         if (stmt == null) {
-            stmt = session.prepare("INSERT INTO ARS." + dataTable + " (id, timestamp, data) VALUES (?, ?, ?)");
-            this.recordInsertStmtMap.put(dataTable, stmt);
+            synchronized (this.recordInsertStmtMap) {
+                if (stmt == null) {
+                    stmt = session.prepare("INSERT INTO ARS." + dataTable + " (id, timestamp, data) VALUES (?, ?, ?)");
+                    this.recordInsertStmtMap.put(dataTable, stmt);
+                }
+            }            
         }
         return stmt;
     }
