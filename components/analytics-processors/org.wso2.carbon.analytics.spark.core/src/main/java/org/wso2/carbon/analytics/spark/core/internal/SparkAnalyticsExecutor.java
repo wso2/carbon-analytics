@@ -549,8 +549,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         conf.setIfMissing("spark.fileserver.port", String.valueOf(17000 + portOffset));
 
         //executor constants for spark env
-        conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
-        conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
+        if (GenericUtils.isCarbonServer()) {
+            conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
+            conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
+        }
 
         conf.set(AnalyticsConstants.CARBON_TENANT_ID, String.valueOf(SPARK_TENANT));
     }
