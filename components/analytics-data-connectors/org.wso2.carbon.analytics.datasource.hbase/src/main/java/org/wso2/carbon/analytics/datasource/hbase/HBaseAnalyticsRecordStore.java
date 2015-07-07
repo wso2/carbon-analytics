@@ -147,8 +147,6 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                 HBaseAnalyticsDSConstants.TableType.INDEX));
         try {
             admin = this.conn.getAdmin();
-            /* delete the corresponding entry in the meta table */
-            this.deleteMetaTableEntry(tenantId, tableName);
             /* delete the data table first */
             admin.disableTable(dataTable);
             admin.deleteTable(dataTable);
@@ -159,28 +157,6 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             throw new AnalyticsException("Error deleting table " + tableName, e);
         } finally {
             GenericUtils.closeQuietly(admin);
-        }
-    }
-
-    private void deleteMetaTableEntry(int tenantId, String tableName) throws AnalyticsException {
-        Table metaTable = null;
-        Admin admin = null;
-        TableName metaTablename = TableName.valueOf(HBaseAnalyticsDSConstants.ANALYTICS_META_TABLE_NAME);
-        try {
-            admin = this.conn.getAdmin();
-            if (!(admin.tableExists(metaTablename))) {
-                log.warn("Analytics Meta Table does not exist in the HBase deployment!");
-                return;
-            }
-            metaTable = this.conn.getTable(metaTablename);
-            byte[] row = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA).
-                    getBytes(StandardCharsets.UTF_8);
-            metaTable.delete(new Delete(row));
-        } catch (IOException e) {
-            throw new AnalyticsException("Error deleting meta entry for table " + tableName + " for tenant " + tenantId, e);
-        } finally {
-            GenericUtils.closeQuietly(admin);
-            GenericUtils.closeQuietly(metaTable);
         }
     }
 
