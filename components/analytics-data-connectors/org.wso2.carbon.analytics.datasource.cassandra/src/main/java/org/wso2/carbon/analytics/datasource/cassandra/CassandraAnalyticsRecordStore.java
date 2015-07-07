@@ -36,6 +36,7 @@ import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -85,10 +86,12 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         return result.toArray(new TokenRangeRecordGroup[0]);
     }
     
-    private List<TokenRange> unwrapTR(Set<TokenRange> trs) {
-        List<TokenRange> trsUnwrapped = new ArrayList<TokenRange>();
+    private List<CassandraTokenRange> unwrapTRAndConvertToLocalTR(Set<TokenRange> trs) {
+        List<CassandraTokenRange> trsUnwrapped = new ArrayList<CassandraTokenRange>();
         for (TokenRange tr : trs) {
-            trsUnwrapped.addAll(tr.unwrap());
+            for (TokenRange utr : tr.unwrap()) {
+                trsUnwrapped.add(new CassandraTokenRange(utr.getStart().getValue(), utr.getEnd().getValue()));
+            }
         }
         return trsUnwrapped;
     }
@@ -96,7 +99,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     private List<TokenRangeRecordGroup> calculateTokenRangeGroupForHost(int tenantId, String tableName, 
             List<String> columns, Metadata md, Host host, int partitionsPerHost) {
         String ip = host.getAddress().getHostAddress();
-        List<TokenRange> trs = this.unwrapTR(md.getTokenRanges("ARS", host));
+        List<CassandraTokenRange> trs = this.unwrapTRAndConvertToLocalTR(md.getTokenRanges("ARS", host));
         int delta = (int) Math.ceil(trs.size() / (double) partitionsPerHost);
         List<TokenRangeRecordGroup> result = new ArrayList<CassandraAnalyticsRecordStore.TokenRangeRecordGroup>(
                 partitionsPerHost);
@@ -266,7 +269,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     private AnalyticsIterator<Record> lookupRecordsByTokenRanges(int tenantId, String tableName, 
-            List<String> columns, List<TokenRange> tokenRanges) {
+            List<String> columns, List<CassandraTokenRange> tokenRanges) {
         return new CassandraTokenRangeDataIterator(tenantId, tableName, columns, tokenRanges);
     }
     
@@ -356,12 +359,12 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         
         private List<String> columns;
         
-        private Iterator<TokenRange> tokenRangesItr;
+        private Iterator<CassandraTokenRange> tokenRangesItr;
                 
         private AnalyticsIterator<Record> dataItr;
         
         public CassandraTokenRangeDataIterator(int tenantId, String tableName, List<String> columns,
-                List<TokenRange> tokenRanges) {
+                List<CassandraTokenRange> tokenRanges) {
             this.tenantId = tenantId;
             this.tableName = tableName;
             this.columns = columns;
@@ -370,10 +373,9 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         
         private void populateNextTokenRangeData() {
             String dataTable = generateTargetDataTableName(tenantId, tableName);
-            TokenRange tokenRange = this.tokenRangesItr.next();
+            CassandraTokenRange tokenRange = this.tokenRangesItr.next();
             ResultSet rs = session.execute("SELECT id, timestamp, data FROM ARS." + dataTable + 
-                    " WHERE token(id) > ? and token(id) <= ?", tokenRange.getStart().getValue(), 
-                    tokenRange.getEnd().getValue());
+                    " WHERE token(id) > ? and token(id) <= ?", tokenRange.getStart(), tokenRange.getEnd());
             this.dataItr = lookupRecordsByDirectRS(this.tenantId, this.tableName, rs, this.columns);
         }
 
@@ -640,12 +642,12 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         
         private List<String> columns;
         
-        private List<TokenRange> tokenRanges;
+        private List<CassandraTokenRange> tokenRanges;
         
         private String host;
         
         public TokenRangeRecordGroup(int tenantId, String tableName, List<String> columns,
-                List<TokenRange> tokenRanges, String host) {
+                List<CassandraTokenRange> tokenRanges, String host) {
             this.tenantId = tenantId;
             this.tableName = tableName;
             this.columns = columns;
@@ -670,8 +672,34 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             return columns;
         }
         
-        public List<TokenRange> getTokenRanges() {
+        public List<CassandraTokenRange> getTokenRanges() {
             return tokenRanges;
+        }
+        
+    }
+    
+    /**
+     * A {@link Serializable} token range class to be used in record groups.
+     */
+    public class CassandraTokenRange implements Serializable {
+
+        private static final long serialVersionUID = 3371665376647640530L;
+        
+        private Object start;
+        
+        private Object end;
+        
+        public CassandraTokenRange(Object start, Object end) {
+            this.start = start;
+            this.end = end;
+        }
+        
+        public Object getStart() {
+            return start;
+        }
+        
+        public Object getEnd() {
+            return end;
         }
         
     }
