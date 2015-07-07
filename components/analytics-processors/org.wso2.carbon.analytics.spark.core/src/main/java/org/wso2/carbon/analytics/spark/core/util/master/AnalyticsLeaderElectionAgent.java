@@ -31,18 +31,18 @@ public class AnalyticsLeaderElectionAgent implements LeaderElectionAgent {
 
     public AnalyticsLeaderElectionAgent(LeaderElectable master) {
         this.master = master;
-        System.out.println("################ processing leader");
+        // System.out.println("################ processing leader");
         ServiceHolder.getAnalyticskExecutor().registerLeaderElectable(master);
     }
 
     @Override
     public LeaderElectable masterActor() {
-        System.out.println("################ returning master");
+        // System.out.println("################ returning master");
         return master;
     }
 
     @Override
     public void stop() {
-        System.out.println("################ stopping agent");
+        // System.out.println("################ stopping agent");
     }
 }
