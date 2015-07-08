@@ -94,6 +94,15 @@ public final class ThriftEventConverter implements EventConverter {
 
     }
 
+    @Override
+    public int getNumberOfEvents(Object eventBundle) {
+        if (eventBundle instanceof ThriftEventBundle) {
+            return ((ThriftEventBundle) eventBundle).getEventNum();
+        } else {
+            throw new EventConversionException("Wrong type event relieved " + eventBundle.getClass());
+        }
+    }
+
     private List<Event> createEventList(ThriftEventBundle thriftEventBundle,
                                         StreamTypeHolder streamTypeHolder) {
 

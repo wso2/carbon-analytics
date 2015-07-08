@@ -75,7 +75,7 @@ public abstract class DataEndpoint {
 
     void collectAndSend(Event event) {
         events.add(event);
-        if (events.size() == batchSize) {
+        if (events.size() >= batchSize) {
             int currentNoOfThreads = threadPoolExecutor.getActiveCount();
             if (currentNoOfThreads < this.maxPoolSize) {
                 threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
@@ -124,8 +124,9 @@ public abstract class DataEndpoint {
         this.connectionWorker.initialize(this, dataEndpointConfiguration);
         this.threadPoolExecutor = new ThreadPoolExecutor(dataEndpointConfiguration.getCorePoolSize(),
                 dataEndpointConfiguration.getMaxPoolSize(), dataEndpointConfiguration.getKeepAliveTimeInPool(),
-                TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DataBridgeThreadFactory
-                (dataEndpointConfiguration.getReceiverURL()));
+                TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
+                new DataBridgeThreadFactory
+                        (dataEndpointConfiguration.getReceiverURL()));
         this.maxPoolSize = dataEndpointConfiguration.getCorePoolSize();
         connect();
     }
@@ -232,6 +233,7 @@ public abstract class DataEndpoint {
                     handleFailedEvents();
                 }
             } catch (DataEndpointException e) {
+                log.error("Unable to send evenets to the endpoint. ", e);
                 handleFailedEvents();
             } catch (UndefinedEventTypeException e) {
                 log.error("Unable to process this event.", e);
@@ -268,7 +270,7 @@ public abstract class DataEndpoint {
      * Graceful shutdown until publish all the events given to the endpoint.
      */
     public void shutdown() {
-        log.info("Shutting down the data publisher endpoint URL - "+ getDataEndpointConfiguration().getReceiverURL());
+        log.info("Shutdown triggered for data publisher endpoint URL - " + getDataEndpointConfiguration().getReceiverURL());
         while (threadPoolExecutor.getActiveCount() != 0) {
             try {
                 Thread.sleep(100);
@@ -278,6 +280,7 @@ public abstract class DataEndpoint {
         connectionWorker.disconnect(getDataEndpointConfiguration());
         connectionService.shutdown();
         threadPoolExecutor.shutdown();
+        log.info("Completed shutdown for data publisher endpoint URL - " + getDataEndpointConfiguration().getReceiverURL());
     }
 
     /**

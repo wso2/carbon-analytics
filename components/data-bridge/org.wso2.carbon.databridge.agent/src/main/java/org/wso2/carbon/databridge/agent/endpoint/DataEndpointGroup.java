@@ -140,11 +140,18 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             }
         }
 
+        //Endless wait if at-least once endpoint is available.
         private void put(Event event) {
-            long sequence = this.ringBuffer.next();
-            Event bufferedEvent = this.ringBuffer.get(sequence);
-            updateEvent(bufferedEvent, event);
-            this.ringBuffer.publish(sequence);
+            do {
+                try {
+                    long sequence = this.ringBuffer.tryNext(1);
+                    Event bufferedEvent = this.ringBuffer.get(sequence);
+                    updateEvent(bufferedEvent, event);
+                    this.ringBuffer.publish(sequence);
+                    return;
+                } catch (InsufficientCapacityException ignored) {
+                }
+            } while (isActiveDataEndpointExists());
         }
 
         private void updateEvent(Event oldEvent, Event newEvent) {
@@ -204,13 +211,13 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             DataEndpoint dataEndpoint = dataEndpoints.get(index);
             if (dataEndpoint.getState().equals(DataEndpoint.State.ACTIVE)) {
                 return dataEndpoint;
-            } else if (haType.equals(HAType.FAILOVER) && dataEndpoint.getState().equals(DataEndpoint.State.BUSY)) {
+            } else if (dataEndpoint.getState().equals(DataEndpoint.State.BUSY) && haType.equals(HAType.FAILOVER)) {
                 /**
                  * Wait for some time until the failover endpoint finish publishing
                  *
                  */
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(1);
                 } catch (InterruptedException ignored) {
                     //ignored
                 }
@@ -227,16 +234,27 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                          * becomes available
                          */
                         try {
-                            Thread.sleep(10);
+                            Thread.sleep(1);
                         } catch (InterruptedException e) {
                             //Ignored
                         }
-                    }else {
+                    } else {
                         return null;
                     }
                 }
             }
         }
+    }
+
+    private boolean isActiveDataEndpointExists() {
+        int index = START_INDEX;
+        while (index < maximumDataPublisherIndex.get()) {
+            DataEndpoint dataEndpoint = dataEndpoints.get(index);
+            if (dataEndpoint.getState() != DataEndpoint.State.UNAVAILABLE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private synchronized int getDataPublisherIndex() {
@@ -247,7 +265,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         return index;
     }
 
-    public void tryResendEvents(List<Event> events){
+    public void tryResendEvents(List<Event> events) {
         List<Event> unsuccessfulEvents = trySendActiveEndpoints(events);
         for (Event event : unsuccessfulEvents) {
             try {
@@ -312,6 +330,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                 return false;
             }
         }
+
     }
 
     public String toString() {

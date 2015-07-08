@@ -31,4 +31,6 @@ public interface EventConverter {
 
     public List<Event> toEventList(Object eventBundle,
                                    StreamTypeHolder streamTypeHolder);
+
+    public int getNumberOfEvents(Object eventBundle);
 }

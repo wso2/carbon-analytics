@@ -37,7 +37,7 @@ import java.util.ArrayList;
 
 public class DataEndpointAgent {
 
-    private ArrayList<DataPublisher> dataPublishers = new ArrayList<DataPublisher>();
+    private ArrayList<DataPublisher> dataPublishers = new ArrayList<>();
 
     private GenericKeyedObjectPool transportPool;
 
@@ -81,19 +81,8 @@ public class DataEndpointAgent {
                     agentConfiguration.getSecureEvictionTimePeriod(),
                     agentConfiguration.getSecureMinIdleTimeInPool());
 
-        } catch (InstantiationException e) {
-            throw new DataEndpointAgentConfigurationException("Error while creating the client pool "
-                    + e.getMessage(), e);
-        } catch (IllegalAccessException e) {
-            throw new DataEndpointAgentConfigurationException("Error while creating the client pool "
-                    + e.getMessage(), e);
-        } catch (ClassNotFoundException e) {
-            throw new DataEndpointAgentConfigurationException("Error while creating the client pool "
-                    + e.getMessage(), e);
-        } catch (NoSuchMethodException e) {
-            throw new DataEndpointAgentConfigurationException("Error while creating the client pool "
-                    + e.getMessage(), e);
-        } catch (InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException
+                | InvocationTargetException e) {
             throw new DataEndpointAgentConfigurationException("Error while creating the client pool "
                     + e.getMessage(), e);
         }
@@ -123,10 +112,7 @@ public class DataEndpointAgent {
         try {
             return (DataEndpoint) (DataEndpointAgent.class.getClassLoader().
                     loadClass(this.getAgentConfiguration().getClassName()).newInstance());
-        } catch (InstantiationException e) {
-            throw new DataEndpointException("Error while instantiating the endpoint class for endpoint name " +
-                    this.getAgentConfiguration().getDataEndpointName() + ". " + e.getMessage(), e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new DataEndpointException("Error while instantiating the endpoint class for endpoint name " +
                     this.getAgentConfiguration().getDataEndpointName() + ". " + e.getMessage(), e);
         } catch (ClassNotFoundException e) {

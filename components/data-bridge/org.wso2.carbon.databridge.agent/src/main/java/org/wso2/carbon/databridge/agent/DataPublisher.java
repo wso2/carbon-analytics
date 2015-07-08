@@ -32,7 +32,7 @@ import java.util.Map;
 
 /**
  * API Used to communicate with Data Receivers WSO2 BAM/CEP. It can be used to send events to
- * multiple BAM/CEP nodes with load balancing and failover logic.
+ * multiple DAS/CEP nodes with load balancing and failover logic.
  */
 
 public class DataPublisher {
@@ -286,10 +286,12 @@ public class DataPublisher {
                 endpointGroup.tryPublish(event);
                 sent = true;
             } catch (EventQueueFullException e) {
-                log.error("Unable to process the event for endpoint group "
-                        + endpointGroup.toString() + ", dropping the event. ", e);
-                if (log.isDebugEnabled()) log.debug("Dropped Event: " + event.toString() + " for the endpoint group " +
-                        endpointGroup.toString());
+                log.warn("Event queue is full, unable to process the event for endpoint group "
+                        + endpointGroup.toString() + ", dropping the event.");
+                if (log.isDebugEnabled()){
+                    log.debug("Dropped Event: " + event.toString() + " for the endpoint group " +
+                            endpointGroup.toString());
+                }
                 sent = false;
             }
         }
@@ -314,10 +316,12 @@ public class DataPublisher {
             try {
                 endpointGroup.tryPublish(event, timeoutMS);
             } catch (EventQueueFullException e) {
-                log.error("Unable to process the event for endpoint group "
-                        + endpointGroup.toString() + ", dropping the event. ", e);
-                if (log.isDebugEnabled()) log.debug("Dropped Event: " + event.toString() + " for the endpoint group " +
-                        endpointGroup.toString());
+                log.warn("Event queue is full, unable to process the event for endpoint group "
+                        + endpointGroup.toString() + ", dropping the event.");
+                if (log.isDebugEnabled()){
+                    log.debug("Dropped Event: " + event.toString() + " for the endpoint group " +
+                            endpointGroup.toString());
+                }
                 sent = false;
             }
         }

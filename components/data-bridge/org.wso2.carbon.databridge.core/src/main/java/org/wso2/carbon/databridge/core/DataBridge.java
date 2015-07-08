@@ -16,7 +16,7 @@
 
 package org.wso2.carbon.databridge.core;
 
-import org.apache.axiom.om.OMElement;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -36,14 +36,18 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.databridge.core.internal.EventDispatcher;
 import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
 import org.wso2.carbon.databridge.core.internal.authentication.Authenticator;
-import org.wso2.carbon.databridge.core.internal.utils.DataBridgeCoreBuilder;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
+import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * this class represents as the interface between the agent server and agent
@@ -56,8 +60,12 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     private EventDispatcher eventDispatcher;
     private Authenticator authenticator;
     private AuthenticationHandler authenticatorHandler;
-    private List<StreamAddRemoveListener> streamAddRemoveListenerList = new ArrayList<StreamAddRemoveListener>();
+    private List<StreamAddRemoveListener> streamAddRemoveListenerList = new ArrayList<>();
     private DataBridgeConfiguration dataBridgeConfiguration;
+    private AtomicInteger eventsReceived;
+    private AtomicInteger totalEventCounter;
+    private long startTime;
+    private boolean isProfileReceiver;
 
     public DataBridge(AuthenticationHandler authenticationHandler,
                       AbstractStreamDefinitionStore streamDefinitionStore,
@@ -66,23 +74,37 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         this.streamDefinitionStore = streamDefinitionStore;
         authenticatorHandler = authenticationHandler;
         authenticator = new Authenticator(authenticationHandler, dataBridgeConfiguration);
+        String profileReceiver = System.getProperty("profileReceiver");
+        if (profileReceiver != null && profileReceiver.equalsIgnoreCase("true")) {
+            isProfileReceiver = true;
+            eventsReceived = new AtomicInteger();
+            totalEventCounter = new AtomicInteger();
+            startTime = 0;
+        }
     }
 
     public DataBridge(AuthenticationHandler authenticationHandler,
                       AbstractStreamDefinitionStore streamDefinitionStore,
                       String dataBridgeConfigPath) {
-       try {
-        File file = new File(dataBridgeConfigPath);
-        JAXBContext jaxbContext = JAXBContext.newInstance(DataBridgeConfiguration.class);
-        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        DataBridgeConfiguration dataBridgeConfiguration = (DataBridgeConfiguration) jaxbUnmarshaller.unmarshal(file);
-        this.eventDispatcher = new EventDispatcher(streamDefinitionStore, dataBridgeConfiguration, authenticationHandler);
-        this.streamDefinitionStore = streamDefinitionStore;
-        authenticatorHandler = authenticationHandler;
-        authenticator = new Authenticator(authenticationHandler, dataBridgeConfiguration);
-       } catch (JAXBException e) {
-           log.error("Error while loading the data bridge configuration file : "+ dataBridgeConfigPath, e);
-       }
+        try {
+            File file = new File(dataBridgeConfigPath);
+            JAXBContext jaxbContext = JAXBContext.newInstance(DataBridgeConfiguration.class);
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            DataBridgeConfiguration dataBridgeConfiguration = (DataBridgeConfiguration) jaxbUnmarshaller.unmarshal(file);
+            this.eventDispatcher = new EventDispatcher(streamDefinitionStore, dataBridgeConfiguration, authenticationHandler);
+            this.streamDefinitionStore = streamDefinitionStore;
+            authenticatorHandler = authenticationHandler;
+            authenticator = new Authenticator(authenticationHandler, dataBridgeConfiguration);
+            String profileReceiver = System.getProperty("profileReceiver");
+            if (profileReceiver != null && profileReceiver.equalsIgnoreCase("true")) {
+                isProfileReceiver = true;
+                eventsReceived = new AtomicInteger();
+                totalEventCounter = new AtomicInteger();
+                startTime = 0;
+            }
+        } catch (JAXBException e) {
+            log.error("Error while loading the data bridge configuration file : " + dataBridgeConfigPath, e);
+        }
     }
 
     public String defineStream(String sessionId, String streamDefinition)
@@ -207,6 +229,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
 
     public void publish(Object eventBundle, String sessionId, EventConverter eventConverter)
             throws UndefinedEventTypeException, SessionTimeoutException {
+        startTimeMeasurement();
         AgentSession agentSession = authenticator.getSession(sessionId);
         if (agentSession.getCredentials() == null) {
             if (log.isDebugEnabled()) {
@@ -217,10 +240,65 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         try {
             authenticatorHandler.initContext(agentSession);
             eventDispatcher.publish(eventBundle, agentSession, eventConverter);
+            endTimeMeasurement(eventConverter.getNumberOfEvents(eventBundle));
         } finally {
             authenticatorHandler.destroyContext(agentSession);
         }
     }
+
+    private void endTimeMeasurement(int eventsNum) {
+        if (isProfileReceiver) {
+            eventsReceived.addAndGet(eventsNum);
+            if (eventsReceived.get() > 100000) {
+                synchronized (this) {
+                    if (eventsReceived.get() > 100000) {
+                        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                        Date date = new Date();
+
+                        long endTime = System.currentTimeMillis();
+                        int currentBatchSize = eventsReceived.getAndSet(0);
+                        totalEventCounter.addAndGet(currentBatchSize);
+
+                        String line = "[" + dateFormat.format(date) + "] # of events : " + currentBatchSize +
+                                " start timestamp : " + startTime +
+                                " end time stamp : " + endTime + " Throughput is (events / sec) : " +
+                                (currentBatchSize * 1000) / (endTime - startTime) + " Total Event Count : " +
+                                totalEventCounter + " \n";
+                        File file = new File(CarbonUtils.getCarbonHome() + File.separator + "receiver-perf.txt");
+                        if (!file.exists()){
+                            log.info("Creating the performance measurement file at : "+ file.getAbsolutePath());
+                        }
+                        try {
+                            appendToFile(IOUtils.toInputStream(line), file);
+                        } catch (IOException e) {
+                            log.error(e.getMessage(), e);
+                        }
+                        startTime = 0;
+                    }
+                }
+            }
+        }
+
+    }
+
+    public void appendToFile(final InputStream in, final File f) throws IOException {
+        OutputStream stream = null;
+        try {
+            stream = new BufferedOutputStream(new FileOutputStream(f, true));
+            IOUtils.copy(in, stream);
+        } finally {
+            IOUtils.closeQuietly(stream);
+        }
+    }
+
+    private void startTimeMeasurement() {
+        if (isProfileReceiver) {
+            if (startTime == 0) {
+                startTime = System.currentTimeMillis();
+            }
+        }
+    }
+
 
     public String login(String username, String password) throws AuthenticationException {
         log.info("user " + username + " connected");
@@ -342,7 +420,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
 
     @Override
     public List<StreamDefinition> getAllStreamDefinitions(int tenantId) {
-        return new ArrayList<StreamDefinition>(streamDefinitionStore.getAllStreamDefinitions(tenantId));
+        return new ArrayList<>(streamDefinitionStore.getAllStreamDefinitions(tenantId));
     }
 
 

@@ -62,6 +62,14 @@ public class BinaryEventConverter implements EventConverter {
         return eventList;
     }
 
+    @Override
+    public int getNumberOfEvents(Object eventBundle) {
+        ByteBuffer byteBuffer = ByteBuffer.wrap((byte[]) eventBundle);
+        int sessionIdSize = byteBuffer.getInt();
+        byteBuffer.get(new byte[sessionIdSize]);
+        return byteBuffer.getInt();
+    }
+
     public Event getEvent(ByteBuffer byteBuffer, StreamTypeHolder streamTypeHolder) throws MalformedEventException {
 
 
