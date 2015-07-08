@@ -104,14 +104,14 @@ public class AnalyticsSparkExecutorTest {
                            "OPTIONS" +
                            "(tableName \"Log2\"," +
                            "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"," +
-                           "primaryKeys \"ip, log\""+
+                           "primaryKeys \"ip, log\"" +
                            ")");
 
         ex.executeQuery(1, "CREATE TEMPORARY TABLE Log2 USING CarbonAnalytics " +
                            "OPTIONS" +
                            "(tableName \"Log2\"," +
                            "schema \"server_name STRING -i, ip STRING, tenant INTEGER -sp, sequence LONG, log STRING\"," +
-                           "primaryKeys \"ip, log\""+
+                           "primaryKeys \"ip, log\"" +
                            ")");
 
         ex.executeQuery(1, "CREATE TEMPORARY TABLE Log3 USING CarbonAnalytics " +
@@ -146,7 +146,7 @@ public class AnalyticsSparkExecutorTest {
     }
 
     @Test
-    public void testMultiTenantQueryExecution() throws AnalyticsException{
+    public void testMultiTenantQueryExecution() throws AnalyticsException {
         System.out.println(testString("start : multi tenancy test "));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
         String commonTableName = "log";
@@ -162,19 +162,19 @@ public class AnalyticsSparkExecutorTest {
 
         //test supertenant queries
         ex.executeQuery(-1234, "CREATE TEMPORARY TABLE log USING CarbonAnalytics " +
-                           "OPTIONS" +
-                           "(tableName \"log\"," +
-                           "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
-                           ")");
+                               "OPTIONS" +
+                               "(tableName \"log\"," +
+                               "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
+                               ")");
         AnalyticsQueryResult result = ex.executeQuery(-1234, "SELECT * FROM log");
         Assert.assertEquals(result.getRows().size(), 10);
 
         //test tenant queries
         ex.executeQuery(2, "CREATE TEMPORARY TABLE log USING CarbonAnalytics " +
-                               "OPTIONS" +
-                               "(tableName \"log\"," +
-                               "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
-                               ")");
+                           "OPTIONS" +
+                           "(tableName \"log\"," +
+                           "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
+                           ")");
         result = ex.executeQuery(2, "SELECT * FROM log");
         Assert.assertEquals(result.getRows().size(), 2000);
 
@@ -199,7 +199,7 @@ public class AnalyticsSparkExecutorTest {
         //test queries with table names and tables alias
         result = ex.executeQuery(-1234, "select * from ( select * from log ) t1 full outer join " +
                                         "( select * from log2 ) t2 on t1.ip = t2.ip");
-        Assert.assertEquals(result.getRows().size(), 10*10);
+        Assert.assertEquals(result.getRows().size(), 10 * 10);
 
         this.service.deleteTable(-1234, "log");
         this.service.deleteTable(-1234, "log2");
@@ -220,7 +220,8 @@ public class AnalyticsSparkExecutorTest {
         System.out.println(result.getRows().get(0).get(0));
         System.out.println(testString("end : spark udf test"));
     }
-    @Test//(expectedExceptions = RuntimeException.class)
+
+    @Test
     public void testCreateTableWithColumnOptions() throws AnalyticsException {
         System.out.println(testString("start : create temp table with column options test"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
@@ -283,6 +284,59 @@ public class AnalyticsSparkExecutorTest {
         System.out.println(testString("end : create temp table with column options test"));
     }
 
+    @Test
+    public void testCreateTableWithMultipleRecordStores() throws AnalyticsException {
+        System.out.println(testString("start : create temp table with multiple record stores test"));
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        this.cleanupTable(1, "Log");
+
+        List<String> recordStoreNames = this.service.listRecordStoreNames();
+        Assert.assertTrue(recordStoreNames.size() > 1, "Only single data store is available");
+
+        String query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                       "OPTIONS" +
+                       "(tableName \"Log\"," +
+                       "schema \"server_name STRING, ip STRING -i, tenant INTEGER -sp, sequence LONG -i, summary STRING\", " +
+                       "primaryKeys \"ip, log\"" +
+                       ")";
+        ex.executeQuery(1, query);
+
+        Assert.assertEquals(this.service.getRecordStoreNameByTable(1, "Log"),"PROCESSED_DATA_STORE",
+                            "Table is not created in PROCESSED_DATA_STORE by default");
+        this.cleanupTable(1, "Log");
+
+
+        query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                       "OPTIONS" +
+                       "(tableName \"Log\"," +
+                       "schema \"server_name STRING, ip STRING -i, tenant INTEGER -sp, sequence LONG -i, summary STRING\", " +
+                       "recordStore \"EVENT_STORE\", " +
+                       "primaryKeys \"ip, log\"" +
+                       ")";
+        ex.executeQuery(1, query);
+
+        Assert.assertEquals(this.service.getRecordStoreNameByTable(1, "Log"),"EVENT_STORE",
+                            "Table is not created in EVENT_STORE");
+        this.cleanupTable(1, "Log");
+
+        query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Log\"," +
+                "schema \"server_name STRING, ip STRING -i, tenant INTEGER -sp, sequence LONG -i, summary STRING\", " +
+                "recordStore \"XXX\", " +
+                "primaryKeys \"ip, log\"" +
+                ")";
+        try {
+            ex.executeQuery(1, query);
+        } catch (Exception e){
+            System.out.println("Query failed with : " + e.getMessage());
+            Assert.assertEquals("Unknown data store name", e.getMessage());
+        }
+        this.cleanupTable(1, "Log");
+
+        System.out.println(testString("end : create temp table with multiple record stores test"));
+    }
+
 //    @Test
 //    public void testCreateTableQuerySchemaInLine() throws AnalyticsException {
 //        System.out.println(testString("start : create temp table test"));
@@ -305,6 +359,13 @@ public class AnalyticsSparkExecutorTest {
 //        this.service.deleteTable(1, "Log");
 //        System.out.println(testString("end : create temp table test"));
 //    }
+
+    private void cleanupTable(int tenantId, String tableName) throws AnalyticsException {
+        if (this.service.tableExists(tenantId, tableName)) {
+            this.service.clearIndexData(tenantId, tableName);
+            this.service.deleteTable(tenantId, tableName);
+        }
+    }
 
 
     @BeforeClass

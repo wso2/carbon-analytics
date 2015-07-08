@@ -61,6 +61,8 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
 
     private String tableName;
 
+    private String recordStore;
+
     public AnalyticsRelation() {
     }
 
@@ -73,9 +75,10 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         this.schema = new StructType(extractFieldsFromString(schemaString));
     }
 
-    public AnalyticsRelation(int tenantId, String tableName,
+    public AnalyticsRelation(int tenantId, String recordStore, String tableName,
                              SQLContext sqlContext) {
         this.tenantId = tenantId;
+        this.recordStore = recordStore;
         this.tableName = tableName;
         this.sqlContext = sqlContext;
 
@@ -117,18 +120,20 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
 
     @Override
     public void insert(final DataFrame data, boolean overwrite) {
-            final AnalyticsDataService dataService = ServiceHolder.getAnalyticsDataService();
+        AnalyticsDataService dataService = ServiceHolder.getAnalyticsDataService();
         try {
             if (overwrite && dataService.tableExists(this.tenantId, this.tableName)) {
                 AnalyticsSchema tempSchema = dataService.getTableSchema(this.tenantId, this.tableName);
                 dataService.deleteTable(this.tenantId, this.tableName);
-                dataService.createTable(this.tenantId, this.tableName);
+                if (!dataService.listRecordStoreNames().contains(this.recordStore)) {
+                    throw new AnalyticsException("Unknown data store name");
+                }
+                dataService.createTable(this.tenantId, this.recordStore, this.tableName);
                 dataService.setTableSchema(this.tenantId, this.tableName, tempSchema);
             }
             data.foreachPartition(new AnalyticsFunction1(tenantId, tableName, data.schema()));
         } catch (AnalyticsException e) {
             log.error("Error while inserting data into table " + tableName, e);
-            
         }
     }
 

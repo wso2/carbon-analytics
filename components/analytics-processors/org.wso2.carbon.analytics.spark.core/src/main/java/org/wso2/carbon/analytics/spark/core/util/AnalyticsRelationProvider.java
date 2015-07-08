@@ -55,6 +55,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
     private String streamName;
     private String primaryKeys;
     private AnalyticsDataService dataService;
+    private String recordStore;
 
     public AnalyticsRelationProvider() {
         this.dataService = ServiceHolder.getAnalyticsDataService();
@@ -66,7 +67,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
      * by the Map that is passed to the function.
      *
      * @param sqlContext sqlContext
-     * @param parameters tenantId, tableName, schema, streamName, streamVersion, primaryKeys
+     * @param parameters tenantId, tableName, schema, streamName, streamVersion, primaryKeys, recordStore
      */
     @Override
     public AnalyticsRelation createRelation(SQLContext sqlContext, Map<String, String> parameters) {
@@ -74,7 +75,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
         createTableIfNotExist();
         setSchemaIfProvided();
 
-        return new AnalyticsRelation(this.tenantId, this.tableName, sqlContext);
+        return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext);
     }
 
     private void setParameters(Map<String, String> parameters) {
@@ -83,6 +84,8 @@ public class AnalyticsRelationProvider implements RelationProvider,
         this.schemaString = extractValuesFromMap(AnalyticsConstants.SCHEMA_STRING, parameters, "");
         this.streamName = extractValuesFromMap(AnalyticsConstants.STREAM_NAME, parameters, "");
         this.primaryKeys = extractValuesFromMap(AnalyticsConstants.PRIMARY_KEYS, parameters, "");
+        this.recordStore = extractValuesFromMap(AnalyticsConstants.RECORD_STORE, parameters,
+                                              AnalyticsConstants.DEFAULT_PROCESSED_DATA_STORE_NAME);
     }
 
     private void createTableIfNotExist() {
@@ -90,17 +93,22 @@ public class AnalyticsRelationProvider implements RelationProvider,
             try {
                 // if table does not exists, create table
                 if (!this.dataService.tableExists(this.tenantId, this.tableName)) {
-                    this.dataService.createTable(this.tenantId, this.tableName);
+                    if (!this.dataService.listRecordStoreNames().contains(this.recordStore)){
+                        throw new RuntimeException("Unknown data store name");
+                    }
+                    this.dataService.createTable(this.tenantId, this.recordStore, this.tableName);
                 }
             } catch (AnalyticsException e) {
                 log.error("Error while accessing tables", e);
-                
             }
         } else if (!this.streamName.isEmpty()) {
             try {
                 this.tableName = AnalyticsCommonUtils.convertStreamNameToTableName(this.streamName);
                 if (!this.dataService.tableExists(this.tenantId, this.tableName)) {
-                    this.dataService.createTable(this.tenantId, this.tableName);
+                    if (!this.dataService.listRecordStoreNames().contains(this.recordStore)){
+                        throw new AnalyticsException("Unknown data store name");
+                    }
+                    this.dataService.createTable(this.tenantId, this.recordStore, this.tableName);
                 }
             } catch (AnalyticsException e) {
                 log.error("Error while accessing tables", e);
