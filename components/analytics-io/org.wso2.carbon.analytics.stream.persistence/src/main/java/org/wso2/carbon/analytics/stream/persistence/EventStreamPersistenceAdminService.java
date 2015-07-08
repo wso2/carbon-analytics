@@ -151,9 +151,6 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                     try {
                         String tableName = getTableName(analyticsTable.getTableName());
                         AnalyticsDataService analyticsDataService = ServiceHolder.getAnalyticsDataService();
-                        if (!analyticsDataService.tableExists(getTenantId(), tableName)) {
-                            analyticsDataService.createTable(getTenantId(), tableName);
-                        }
                         List<ColumnDefinition> columnDefinitions = new ArrayList<>();
                         List<String> primaryKeys = new ArrayList<>();
                         AnalyticsSchema tableSchema = analyticsDataService.getTableSchema(getTenantId(), tableName);
@@ -207,7 +204,6 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                             }
                         }
                         AnalyticsSchema schema = new AnalyticsSchema(columnDefinitions, primaryKeys);
-                        analyticsDataService.setTableSchema(getTenantId(), tableName, schema);
                         ServiceHolder.getAnalyticsEventSinkService().putEventSink(getTenantId(), analyticsTable
                                 .getTableName(), analyticsTable.getStreamVersion(), schema, analyticsTable.getRecordStoreName());
                     } catch (Exception e) {
