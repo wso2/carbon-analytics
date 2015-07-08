@@ -106,7 +106,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
                 this.tableName = AnalyticsCommonUtils.convertStreamNameToTableName(this.streamName);
                 if (!this.dataService.tableExists(this.tenantId, this.tableName)) {
                     if (!this.dataService.listRecordStoreNames().contains(this.recordStore)){
-                        throw new AnalyticsException("Unknown data store name");
+                        throw new RuntimeException("Unknown data store name");
                     }
                     this.dataService.createTable(this.tenantId, this.recordStore, this.tableName);
                 }

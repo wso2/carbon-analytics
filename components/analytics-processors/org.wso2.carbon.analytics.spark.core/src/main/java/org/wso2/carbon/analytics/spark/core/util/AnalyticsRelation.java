@@ -126,7 +126,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
                 AnalyticsSchema tempSchema = dataService.getTableSchema(this.tenantId, this.tableName);
                 dataService.deleteTable(this.tenantId, this.tableName);
                 if (!dataService.listRecordStoreNames().contains(this.recordStore)) {
-                    throw new AnalyticsException("Unknown data store name");
+                    throw new RuntimeException("Unknown data store name");
                 }
                 dataService.createTable(this.tenantId, this.recordStore, this.tableName);
                 dataService.setTableSchema(this.tenantId, this.tableName, tempSchema);
