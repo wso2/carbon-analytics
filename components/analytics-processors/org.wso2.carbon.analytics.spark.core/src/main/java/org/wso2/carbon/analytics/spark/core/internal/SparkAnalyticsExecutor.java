@@ -294,6 +294,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             // System.out.println("conf " + tuple._1() + " : " + tuple._2());
         }
         // System.out.println("Spark master : " + conf.get(AnalyticsConstants.SPARK_MASTER));
+        log.info("Started Spark CLIENT in the cluster pointing to MASTERS " + conf.get(AnalyticsConstants.SPARK_MASTER) +
+                 " with the application name : " + conf.get(AnalyticsConstants.SPARK_APP_NAME) +
+                 " and UI port : " + conf.get(AnalyticsConstants.SPARK_UI_PORT));
         initializeSqlContext(new JavaSparkContext(conf));
     }
 
@@ -305,11 +308,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.sparkConf.setMaster(LOCAL_MASTER_URL)
                 .setAppName(CARBON_ANALYTICS_SPARK_APP_NAME)
                 .setIfMissing(AnalyticsConstants.SPARK_UI_PORT, Integer.toString(BASE_UI_PORT + portOffset));
-        log.info("Started Spark client in the LOCAL mode" +
+        log.info("Started Spark CLIENT in the LOCAL mode" +
                  " with the application name : " + this.sparkConf.get(AnalyticsConstants.SPARK_APP_NAME) +
                  " and UI port : " + this.sparkConf.get(AnalyticsConstants.SPARK_UI_PORT));
-        JavaSparkContext javaSparkCtx = new JavaSparkContext(this.sparkConf);
-        initializeSqlContext(javaSparkCtx);
+        initializeSqlContext(new JavaSparkContext(this.sparkConf));
     }
 
     private void initializeSqlContext(JavaSparkContext jsc) {
