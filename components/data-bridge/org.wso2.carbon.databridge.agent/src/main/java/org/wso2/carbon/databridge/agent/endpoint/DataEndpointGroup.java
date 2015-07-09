@@ -358,8 +358,17 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     }
 
     public void shutdown() {
-        reconnectionService.shutdown();
-        eventQueue.shutdown();
+        if (getDataEndpoint(false) != null) {
+            // There are active endpoints, so we let them consume the events
+            eventQueue.shutdown();
+            reconnectionService.shutdown();
+        } else {
+            // Shutdown the reconnection service first to let  the eventQueue know that
+            // we are in a shutdown state
+            reconnectionService.shutdown();
+            eventQueue.shutdown();
+        }
+
         for (DataEndpoint dataEndpoint : dataEndpoints) {
             dataEndpoint.shutdown();
         }
