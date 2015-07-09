@@ -32,6 +32,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -76,7 +77,7 @@ public class HBaseUtils {
     }
 
     public static int inferTenantId(String genericTableName) {
-        return Integer.valueOf(genericTableName.substring(0,
+        return Integer.parseInt(genericTableName.substring(0,
                 genericTableName.indexOf(HBaseAnalyticsDSConstants.DELIMITER)));
     }
 
@@ -116,7 +117,7 @@ public class HBaseUtils {
                 values = new HashMap<>();
             }
             timestamp = dataCell.getTimestamp();
-            return new Record(new String(rowId), tenantId, tableName, values, timestamp);
+            return new Record(new String(rowId, StandardCharsets.UTF_8), tenantId, tableName, values, timestamp);
         }
         return null;
     }

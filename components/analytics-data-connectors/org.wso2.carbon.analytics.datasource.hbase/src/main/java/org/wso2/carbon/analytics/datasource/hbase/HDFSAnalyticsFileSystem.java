@@ -214,7 +214,7 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
         }
     }
 
-    public class HDFSOutputStream extends OutputStream {
+    public static class HDFSOutputStream extends OutputStream {
 
         private FSDataOutputStream stream;
 

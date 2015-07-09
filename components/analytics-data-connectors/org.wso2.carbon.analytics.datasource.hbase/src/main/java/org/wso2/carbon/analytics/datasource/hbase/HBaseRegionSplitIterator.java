@@ -29,6 +29,7 @@ import org.wso2.carbon.analytics.datasource.hbase.util.HBaseRuntimeException;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -104,7 +105,7 @@ public class HBaseRegionSplitIterator implements AnalyticsIterator<Record> {
             if (record != null) {
                 return record;
             } else {
-                throw new HBaseRuntimeException("Invalid data found on row " + new String(rowId));
+                throw new HBaseRuntimeException("Invalid data found on row " + new String(rowId, StandardCharsets.UTF_8));
             }
         } catch (AnalyticsException e) {
             this.cleanup();
