@@ -213,6 +213,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
                     if (masterUrls.contains(thisMasterUrl)) {
                         // System.out.println(" $$$$$$$$$$$$$$$$$$$ previous worker!");
+                        masterMap.put(thisMasterUrl, acm.getLocalMember());
                         this.startMaster();
                         if (masterMap.size() == this.redundantMasterCount) {
                             // System.out.println(" $$$$$$$$$$$$$$$$$$$ map size == == master count");
@@ -226,8 +227,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                         }
                     } else if (masterMap.size() < this.redundantMasterCount) {
                         // System.out.println(" $$$$$$$$$$$$$$$$$$$ map size < master count");
-                        this.startMaster();
                         masterMap.put(thisMasterUrl, acm.getLocalMember());
+                        this.startMaster();
                         if (masterMap.size() == this.redundantMasterCount) {
                             // System.out.println(" $$$$$$$$$$$$$$$$$$$ map size == master count");
 
@@ -288,16 +289,19 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     public void initializeClient(Tuple2<String, String>[] confs) {
-        SparkConf conf = new SparkConf();
-        for (Tuple2<String, String> tuple : confs) {
-            conf.set(tuple._1(), tuple._2());
-            // System.out.println("conf " + tuple._1() + " : " + tuple._2());
+        if (!this.clientActive) {
+            SparkConf conf = new SparkConf();
+            for (Tuple2<String, String> tuple : confs) {
+                conf.set(tuple._1(), tuple._2());
+                // System.out.println("conf " + tuple._1() + " : " + tuple._2());
+            }
+            // System.out.println("Spark master : " + conf.get(AnalyticsConstants.SPARK_MASTER));
+            log.info("Started Spark CLIENT in the cluster pointing to MASTERS " + conf.get(AnalyticsConstants.SPARK_MASTER) +
+                     " with the application name : " + conf.get(AnalyticsConstants.SPARK_APP_NAME) +
+                     " and UI port : " + conf.get(AnalyticsConstants.SPARK_UI_PORT));
+            initializeSqlContext(new JavaSparkContext(conf));
+            this.clientActive = true;
         }
-        // System.out.println("Spark master : " + conf.get(AnalyticsConstants.SPARK_MASTER));
-        log.info("Started Spark CLIENT in the cluster pointing to MASTERS " + conf.get(AnalyticsConstants.SPARK_MASTER) +
-                 " with the application name : " + conf.get(AnalyticsConstants.SPARK_APP_NAME) +
-                 " and UI port : " + conf.get(AnalyticsConstants.SPARK_UI_PORT));
-        initializeSqlContext(new JavaSparkContext(conf));
     }
 
     private void initializeLocalClient(String confPath) {
