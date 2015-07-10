@@ -19,7 +19,6 @@
 package org.wso2.carbon.analytics.spark.core.util.master;
 
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
-import scala.Tuple2;
 
 import java.io.Serializable;
 import java.util.concurrent.Callable;
@@ -31,14 +30,13 @@ public class InitClientExecutionCall implements Callable<Integer>, Serializable{
 
     private static final long serialVersionUID = -155083315280606063L;
 
-    private Tuple2<String, String>[] confs;
-    public InitClientExecutionCall(Tuple2<String, String>[] confs) {
-        this.confs= confs;
+    public InitClientExecutionCall() {
+
     }
 
     @Override
     public Integer call() throws Exception {
-        ServiceHolder.getAnalyticskExecutor().initializeClient(this.confs);
+        ServiceHolder.getAnalyticskExecutor().initializeClient();
         return 0;
     }
 }
