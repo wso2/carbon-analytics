@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.analytics.spark.core.util.master;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.spark.deploy.master.LeaderElectable;
 import org.apache.spark.deploy.master.LeaderElectionAgent;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
@@ -29,20 +31,20 @@ public class AnalyticsLeaderElectionAgent implements LeaderElectionAgent {
 
     private LeaderElectable master;
 
+    private static final Log log = LogFactory.getLog(AnalyticsLeaderElectionAgent.class);
+
     public AnalyticsLeaderElectionAgent(LeaderElectable master) {
         this.master = master;
-        // System.out.println("################ processing leader");
+        log.info("Registering the leader electable in Analytics Executor");
         ServiceHolder.getAnalyticskExecutor().registerLeaderElectable(master);
     }
 
     @Override
     public LeaderElectable masterActor() {
-        // System.out.println("################ returning master");
         return master;
     }
 
     @Override
     public void stop() {
-        // System.out.println("################ stopping agent");
     }
 }

@@ -136,17 +136,20 @@ public class AnalyticsComponent {
     private void checkAnalyticsEnabled() {
         if (!initialized) {
             initialized = true;
-            if (ServiceHolder.isAnalyticsExecutionEnabled()) {
-                if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_EXECUTION_JVM_OPTION) != null) {
-                    if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_EXECUTION_JVM_OPTION))) {
-                        ServiceHolder.setAnalyticsExecutionEnabled(false);
-                    }
-                }
-            }
             if (ServiceHolder.isAnalyticsEngineEnabled()) {
                 if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_ENGINE_JVM_OPTION) != null) {
                     if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_ENGINE_JVM_OPTION))) {
                         ServiceHolder.setAnalyticsEngineEnabled(false);
+                        ServiceHolder.setAnalyticsExecutionEnabled(false);
+                        //if analytics engine is disabled, execution is also disabled by default
+                    }
+                }
+            }
+
+            if (ServiceHolder.isAnalyticsExecutionEnabled()) {
+                if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_EXECUTION_JVM_OPTION) != null) {
+                    if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_EXECUTION_JVM_OPTION))) {
+                        ServiceHolder.setAnalyticsExecutionEnabled(false);
                     }
                 }
             }

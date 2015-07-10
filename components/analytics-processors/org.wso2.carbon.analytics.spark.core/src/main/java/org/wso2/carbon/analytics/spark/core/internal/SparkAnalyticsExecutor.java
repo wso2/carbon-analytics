@@ -58,7 +58,6 @@ import org.wso2.carbon.analytics.spark.core.util.master.StartWorkerExecutionCall
 import org.wso2.carbon.utils.CarbonUtils;
 import scala.None$;
 import scala.Option;
-import scala.Tuple2;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -212,41 +211,46 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     Set<String> masterUrls = masterMap.keySet();
 
                     if (masterUrls.contains(thisMasterUrl)) {
-                        // System.out.println(" $$$$$$$$$$$$$$$$$$$ previous worker!");
-                        this.startMaster();
-                        if (masterMap.size() == this.redundantMasterCount) {
-                            // System.out.println(" $$$$$$$$$$$$$$$$$$$ map size == == master count");
+                        log.info("This is/ has been a member of the MasterMap");
 
-                            // System.out.println("cluster message to start workers");
+                        masterMap.put(thisMasterUrl, acm.getLocalMember());
+                        log.info("Starting SPARK MASTER...");
+                        this.startMaster();
+
+                        if (masterMap.size() >= this.redundantMasterCount) { //
+                            log.info("Redundant master count reached. Starting workers in all members...");
                             this.acm.executeAll(CLUSTER_GROUP_NAME, new StartWorkerExecutionCall());
 
-                            // System.out.println("cluster message to start client");
+                            log.info("Redundant master count reached. Starting Spark client app in " +
+                                     "the carbon cluster master...");
                             this.acm.executeOne(CLUSTER_GROUP_NAME, acm.getLeader(CLUSTER_GROUP_NAME),
-                                                new InitClientExecutionCall(this.sparkConf.getAll()));
+                                                new InitClientExecutionCall());
                         }
                     } else if (masterMap.size() < this.redundantMasterCount) {
-                        // System.out.println(" $$$$$$$$$$$$$$$$$$$ map size < master count");
-                        this.startMaster();
-                        masterMap.put(thisMasterUrl, acm.getLocalMember());
-                        if (masterMap.size() == this.redundantMasterCount) {
-                            // System.out.println(" $$$$$$$$$$$$$$$$$$$ map size == master count");
+                        log.info("Masters available are less than the redundant master count");
 
-                            // System.out.println("cluster message to start workers");
+                        masterMap.put(thisMasterUrl, acm.getLocalMember());
+                        log.info("Starting SPARK MASTER...");
+                        this.startMaster();
+
+                        if (masterMap.size() >= this.redundantMasterCount) { // greater than/ equal!
+                            log.info("Redundant master count reached. Starting workers in all members...");
                             this.acm.executeAll(CLUSTER_GROUP_NAME, new StartWorkerExecutionCall());
 
-                            // System.out.println("cluster message to start client");
+                            log.info("Redundant master count reached. Starting Spark client app in " +
+                                     "the carbon cluster master...");
                             this.acm.executeOne(CLUSTER_GROUP_NAME, acm.getLeader(CLUSTER_GROUP_NAME),
-                                                new InitClientExecutionCall(this.sparkConf.getAll()));
+                                                new InitClientExecutionCall());
                         }
                     } else { // masterMap.size() >= redundantMasterCount
-                        // System.out.println(" $$$$$$$$$$$$$$$$$$$ map size > =  master count");
-                        this.startWorker();
+                        log.info("Redundant masters are available. Starting SPARK WORKER...");
+                        // here a cluster message sent to all members in the cluster to start workers.
+                        // this is done to add redundancy in worker creation.
+                        this.acm.executeAll(CLUSTER_GROUP_NAME, new StartWorkerExecutionCall());
                     }
-
-                    // todo: initClient (); in the active leader using a cluster message
-
                 } else {
                     // start the node in the local mode
+                    log.info("Starting SPARK in the LOCAL mode...");
                     this.initializeLocalClient(confPath);
                 }
             } else {
@@ -287,14 +291,16 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    public void initializeClient(Tuple2<String, String>[] confs) {
-        SparkConf conf = new SparkConf();
-        for (Tuple2<String, String> tuple : confs) {
-            conf.set(tuple._1(), tuple._2());
-            // System.out.println("conf " + tuple._1() + " : " + tuple._2());
+    public void initializeClient() {
+        if (!this.clientActive) {
+            //master URL needs to be updated according to the spark masters in the cluster
+            updateMaster(this.sparkConf);
+            initializeSqlContext(new JavaSparkContext(this.sparkConf));
+            this.clientActive = true;
+            log.info("Started Spark CLIENT in the cluster pointing to MASTERS " + this.sparkConf.get(AnalyticsConstants.SPARK_MASTER) +
+                     " with the application name : " + this.sparkConf.get(AnalyticsConstants.SPARK_APP_NAME) +
+                     " and UI port : " + this.sparkConf.get(AnalyticsConstants.SPARK_UI_PORT));
         }
-        // System.out.println("Spark master : " + conf.get(AnalyticsConstants.SPARK_MASTER));
-        initializeSqlContext(new JavaSparkContext(conf));
     }
 
     private void initializeLocalClient(String confPath) {
@@ -305,11 +311,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.sparkConf.setMaster(LOCAL_MASTER_URL)
                 .setAppName(CARBON_ANALYTICS_SPARK_APP_NAME)
                 .setIfMissing(AnalyticsConstants.SPARK_UI_PORT, Integer.toString(BASE_UI_PORT + portOffset));
-        log.info("Started Spark client in the LOCAL mode" +
+        log.info("Started Spark CLIENT in the LOCAL mode" +
                  " with the application name : " + this.sparkConf.get(AnalyticsConstants.SPARK_APP_NAME) +
                  " and UI port : " + this.sparkConf.get(AnalyticsConstants.SPARK_UI_PORT));
-        JavaSparkContext javaSparkCtx = new JavaSparkContext(this.sparkConf);
-        initializeSqlContext(javaSparkCtx);
+        initializeSqlContext(new JavaSparkContext(this.sparkConf));
     }
 
     private void initializeSqlContext(JavaSparkContext jsc) {
@@ -317,7 +322,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         try {
             registerUDFs(this.sqlCtx);
         } catch (AnalyticsUDFException e) {
-            log.error("Error while Initializing Spark SQL Context: ", e);
+            log.error("Error while registering the UDFs in Spark SQLContext: ", e);
         }
     }
 
@@ -353,8 +358,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      * @return
      */
     private void startMaster(String host, int port, int webUIport, SparkConf sc) {
-        log.info("Starting SPARK MASTER");
-
         if (System.getProperty(AnalyticsConstants.SPARK_MASTER_PORT) != null) {
             port = Integer.parseInt(System.getProperty(AnalyticsConstants.SPARK_MASTER_PORT));
         }
@@ -400,6 +403,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         return electedLeader;
     }
 
+    /**
+     * updates the spark master string of a given spark context by looking at the spark masters
+     * map in the cluster
+     * @param sc
+     */
     private void updateMaster(SparkConf sc) {
         String[] masters = getSparkMastersFromCluster();
         String url = "spark://";
@@ -453,9 +461,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private void startWorker(String workerHost, int workerPort, int workerUiPort, int workerCores,
                              String workerMemory, String[] masters, String workerDir,
                              SparkConf sc) {
-
-        log.info("Starting SPARK WORKER");
-
         //check worker port prop
         if (System.getProperty(AnalyticsConstants.SPARK_WORKER_PORT) != null) {
             workerPort = Integer.parseInt(System.getProperty(AnalyticsConstants.SPARK_WORKER_PORT));
@@ -511,7 +516,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         SparkConf conf = new SparkConf();
         conf.set(AnalyticsConstants.SPARK_MASTER, "spark://" + masterHost + ":" + (masterPort + portOffset));
 
-        log.info("Spark defaults loaded from " + propsFile);
+        log.info("Loading Spark defaults from " + propsFile);
         // this will read configs from the file and export as system props
         // NOTE: if properties are mentioned in the file, they take precedence over the defaults, except spark masterURL
         Utils.loadDefaultSparkProperties(conf, propsFile);
@@ -734,31 +739,58 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         return result;
     }
 
+    /**
+     * when this cluster message arrives, there are two implications
+     * - current cluster leader is down. this may or may not be the spark leader. so depending on
+     * the situation a suitable spark leader will be elected by this cluster leader
+     * - spark app resides in the cluster leader node, so it has also gone down when this
+     * message arrives. so, a new client needs to be created.
+     */
     @Override
     public void onBecomingLeader() {
-        // System.out.println("############### became the leader : ");
+        log.info("This node is now the CARBON CLUSTERING LEADER");
         try {
             HazelcastInstance hz = AnalyticsServiceHolder.getHazelcastInstance();
             IMap<String, Object> masterMap = hz.getMap(AnalyticsConstants.SPARK_MASTER_MAP);
-            // masterMap empty means that there haven't been any masters in the cluster
-            // so, no electable leader is available
+
             if (masterMap.isEmpty()) {
+                // masterMap empty means that there haven't been any masters in the cluster
+                // so, no electable leader is available.
+                // therefore this node is put to the map as a possible leader
                 String masterUrl = "spark://" + this.myHost + ":" + this.sparkConf.get(AnalyticsConstants.SPARK_MASTER_PORT);
                 masterMap.put(masterUrl, acm.getLocalMember());
+                logDebug("Added " + masterUrl + " to the MasterMap");
             } else {
+                // when becoming leader, this checks if there is an elected spark leader available in the cluster.
+                // if there is, then the cluster is already in a workable state.
+                // else, a suitable leader needs to be elected.
                 if (!electedLeaderAvailability()) {
+                    log.info("No Elected SPARK LEADER in the cluster. Electing a suitable leader...");
                     try {
                         electSuitableLeader();
                     } catch (AnalyticsClusterException e) {
                         log.error("Unable to elect a suitable leader" + e.getMessage(), e);
                     }
                 }
+
+                // new spark client app will be created, pointing to the spark masters
+                log.info("Initializing new spark client app");
+                this.initializeClient();
             }
         } catch (AnalyticsClusterException e) {
             log.error("Error in reading the elected leader availability: " + e.getMessage(), e);
         }
     }
 
+    /**
+     * this method, elected a suitable spark leader from the spark leader map
+     * approach:
+     * takes the spark masters map from the hz cluster. for each of these masters, check if it is
+     * currently active in the cluster. if it is, immediately it will be elected as the spark leader.
+     * this will be done through a cluster message
+     *
+     * @throws AnalyticsClusterException
+     */
     private void electSuitableLeader() throws AnalyticsClusterException {
         HazelcastInstance hz = AnalyticsServiceHolder.getHazelcastInstance();
         IMap<String, Object> masterMap = hz.getMap(AnalyticsConstants.SPARK_MASTER_MAP);
@@ -766,41 +798,51 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         List<Object> groupMembers = acm.getMembers(CLUSTER_GROUP_NAME);
 
-        boolean masterElected = false;
+        boolean foundSuitableMaster = false;
         for (Object masterMember : masterMembers) {
             if (groupMembers.contains(masterMember)) {
                 //this means that this master is active in the cluster
                 acm.executeOne(CLUSTER_GROUP_NAME, masterMember,
                                new ElectLeaderExecutionCall());
-                masterElected = true;
+                foundSuitableMaster = true;
+                log.info("Suitable leader elected");
                 break;
             }
         }
-        if (!masterElected && log.isDebugEnabled()) {
-            log.debug("No Spark master is available in the cluster to be " +
-                      "elected as the leader");
+        if (!foundSuitableMaster) {
+            log.error("No Spark master is available in the cluster to be elected as the leader");
         }
     }
 
-
+    /**
+     * this method makes the LeaderElectable object of this node, as the elected leader
+     */
     public void electAsLeader() {
+        log.info("Elected as the Spark Leader");
         for (LeaderElectable le : this.leaderElectable) {
             le.electedLeader();
-            // System.out.println("**************** making leader");
         }
         this.electedLeader = true;
     }
 
     @Override
     public void onLeaderUpdate() {
-        //nothing to do here
-        // System.out.println("########### leader updated!!!!!!!! : ");
+        // nothing to do here because when the carbon cluster leader is changed, the newly elected
+        // master, performs the relevant operations needed to get the spark cluster up again.
     }
 
     public int getWorkerCount() {
         return workerCount;
     }
 
+    /**
+     * this message arrives, when this node is the leader and some other member's state in the changed.
+     *
+     * @param removedMember true if some member have been removed
+     *                      <p/>
+     *                      if a member has been removed and he was the elected leader of the spark
+     *                      cluster, this means that a new spark leader has to be elected.
+     */
     @Override
     public void onMembersChangeForLeader(boolean removedMember) {
         try {
@@ -809,16 +851,21 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
             if (removedMember) {
                 if (!electedLeaderAvailability()) {
-                    //this means that the active spark master has gone away
+                    //this means that the elected spark master has been removed
+                    log.info("Removed member was the Spark elected leader. Electing a suitable leader...");
                     electSuitableLeader();
                 }
             }
-
         } catch (AnalyticsClusterException e) {
             log.error("Error in extracting the worker count: " + e.getMessage(), e);
         }
     }
 
+    /**
+     * loads carbon specific properties from a spark-default.conf file
+     * @param filePath
+     * @return
+     */
     private Map<String, String> loadCarbonSparkProperties(String filePath) {
         BufferedReader reader = null;
         Map<String, String> propsMap = new HashMap<>();
@@ -860,9 +907,20 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         return propsMap;
     }
 
+    /**
+     * this registers a LeaderElectable object here. this method is invoked from the
+     * AnalyticsLeaderElectionAgent
+     * @param le
+     */
     public void registerLeaderElectable(LeaderElectable le) {
         this.leaderElectable.add(le);
-        // System.out.println(" *&&&&&&&&&&&&&&&&&&&&&& leader electable added!");
+        log.info("Spark leader electable registered");
+    }
+
+    private void logDebug(String msg) {
+        if (log.isDebugEnabled()) {
+            log.debug(msg);
+        }
     }
 
 
