@@ -78,6 +78,10 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             throw new AnalyticsException("Error establishing connection to HBase instance based on data source" +
                     " definition: " + e.getMessage(), e);
         }
+        if (this.conn == null) {
+            throw new AnalyticsException("Error establishing connection to HBase instance : HBase Admin initialization " +
+                    "failed");
+        }
     }
 
     @Override

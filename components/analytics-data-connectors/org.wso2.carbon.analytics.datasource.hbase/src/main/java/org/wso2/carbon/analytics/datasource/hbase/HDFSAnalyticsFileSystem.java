@@ -64,6 +64,10 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
             throw new AnalyticsException("Error creating HDFS Configuration from data source definition: " +
                     e.getMessage(), e);
         }
+        if (this.fileSystem == null) {
+            throw new AnalyticsException("Error establishing connection to HDFS instance : Hadoop FileSystem " +
+                    "initialization failed");
+        }
     }
 
     @Override
