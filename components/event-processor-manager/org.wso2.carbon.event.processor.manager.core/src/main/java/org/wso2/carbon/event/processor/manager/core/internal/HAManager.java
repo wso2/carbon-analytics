@@ -119,7 +119,8 @@ public class HAManager {
     }
 
     public void changeStateAfterSplitBrain(){
-        if(activeLockAcquired && !roleToMembershipMap.get(activeId).getMemberUuid().equalsIgnoreCase(haConfiguration.getMemberUuid())){
+        if(activeLockAcquired &&
+                !roleToMembershipMap.get(activeId).getMemberUuid().equalsIgnoreCase(haConfiguration.getMemberUuid())){
             if(passiveLock.tryLock()){
                 passiveLockAcquired = true;
                 activeLockAcquired = false;
