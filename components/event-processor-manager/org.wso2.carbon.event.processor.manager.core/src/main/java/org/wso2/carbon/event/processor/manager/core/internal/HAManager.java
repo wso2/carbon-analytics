@@ -71,6 +71,7 @@ public class HAManager {
         passiveId = ConfigurationConstants.PASSIVEID;
         activeLock = hazelcastInstance.getLock(activeId);
         passiveLock = hazelcastInstance.getLock(passiveId);
+        this.haConfiguration.setMemberUuid(hazelcastInstance.getCluster().getLocalMember().getUuid());
 
         snapshotServer = new SnapshotServer();
         snapshotServer.start(haConfiguration);
@@ -98,11 +99,8 @@ public class HAManager {
         if (!activeLockAcquired && !passiveLockAcquired) {
             if (passiveLock.tryLock()) {
                 passiveLockAcquired = true;
-                //adding a attribute to the local member so the the other member can identify in which state this member is in
-                EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().setBooleanAttribute(ConfigurationConstants.HA_NODE_ACTIVE_STATE, false);
                 if (activeLock.tryLock()) {
                     activeLockAcquired = true;
-                    EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().setBooleanAttribute(ConfigurationConstants.HA_NODE_ACTIVE_STATE, true);
                     becomeActive();
                     passiveLockAcquired = false;
                     passiveLock.forceUnlock();
@@ -113,7 +111,6 @@ public class HAManager {
         } else if (!activeLockAcquired) {
             if (activeLock.tryLock()) {
                 activeLockAcquired = true;
-                EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().setBooleanAttribute(ConfigurationConstants.HA_NODE_ACTIVE_STATE, true);
                 becomeActive();
                 passiveLockAcquired = false;
                 passiveLock.forceUnlock();
@@ -121,11 +118,14 @@ public class HAManager {
         }
     }
 
-    public void bePassive(){
-        if(passiveLock.tryLock()){
-            passiveLockAcquired = true;
-            activeLockAcquired = false;
-            becomePassive();
+    public void changeStateAfterSplitBrain(){
+        if(activeLockAcquired && !roleToMembershipMap.get(activeId).getMemberUuid().equalsIgnoreCase(haConfiguration.getMemberUuid())){
+            if(passiveLock.tryLock()){
+                passiveLockAcquired = true;
+                activeLockAcquired = false;
+                becomePassive();
+                executorService.execute(new PeriodicStateChanger());
+            }
         }
     }
 

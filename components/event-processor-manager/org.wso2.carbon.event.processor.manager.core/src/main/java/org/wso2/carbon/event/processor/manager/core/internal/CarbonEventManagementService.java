@@ -103,12 +103,8 @@ public class CarbonEventManagementService implements EventManagementService {
             @Override
             public void memberAdded(MembershipEvent membershipEvent) {
                 checkMemberUpdate();
-                Member member = membershipEvent.getMember();
-                Member localMember = EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember();
-                //if both members are in active states, one member who takes the passive lock will become passive
-                if(member.getBooleanAttribute(ConfigurationConstants.HA_NODE_ACTIVE_STATE) != null && member.getBooleanAttribute(ConfigurationConstants.HA_NODE_ACTIVE_STATE) &&
-                        localMember.getBooleanAttribute(ConfigurationConstants.HA_NODE_ACTIVE_STATE)!= null && localMember.getBooleanAttribute(ConfigurationConstants.HA_NODE_ACTIVE_STATE)){
-                    haManager.bePassive();
+                if(haManager!=null){
+                    haManager.changeStateAfterSplitBrain();
                 }
             }
 
