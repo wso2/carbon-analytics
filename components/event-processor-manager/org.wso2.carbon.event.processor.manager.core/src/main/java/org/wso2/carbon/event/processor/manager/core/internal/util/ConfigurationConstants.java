@@ -80,4 +80,6 @@ public final class ConfigurationConstants {
 
     public static final String STORM_EVENT_PUBLISHER_SYNC_MAP = "stormEventPublisherSyncMap";
 
+    public static final String HA_NODE_ACTIVE_STATE = "active";
+
 }

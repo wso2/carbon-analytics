@@ -99,10 +99,10 @@ public class HAManager {
             if (passiveLock.tryLock()) {
                 passiveLockAcquired = true;
                 //adding a attribute to the local member so the the other member can identify in which state this member is in
-                EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().setBooleanAttribute("active", false);
+                EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().setBooleanAttribute(ConfigurationConstants.HA_NODE_ACTIVE_STATE, false);
                 if (activeLock.tryLock()) {
                     activeLockAcquired = true;
-                    EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().setBooleanAttribute("active", true);
+                    EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().setBooleanAttribute(ConfigurationConstants.HA_NODE_ACTIVE_STATE, true);
                     becomeActive();
                     passiveLockAcquired = false;
                     passiveLock.forceUnlock();
@@ -113,7 +113,7 @@ public class HAManager {
         } else if (!activeLockAcquired) {
             if (activeLock.tryLock()) {
                 activeLockAcquired = true;
-                EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().setBooleanAttribute("active", true);
+                EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().setBooleanAttribute(ConfigurationConstants.HA_NODE_ACTIVE_STATE, true);
                 becomeActive();
                 passiveLockAcquired = false;
                 passiveLock.forceUnlock();
