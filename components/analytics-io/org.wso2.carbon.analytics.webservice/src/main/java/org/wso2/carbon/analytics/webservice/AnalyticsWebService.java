@@ -231,7 +231,16 @@ public class AnalyticsWebService extends AbstractAdmin {
     public long getRecordCount(String tableName, long timeFrom, long timeTo)
             throws AnalyticsWebServiceException {
         try {
-            return analyticsDataAPI.getRecordCount(getUsername(), tableName, timeFrom, timeTo);
+            long recordCount = 0;
+            if (isPaginationSupported(analyticsDataAPI.getRecordStoreNameByTable(getUsername(), tableName))) {
+                recordCount = analyticsDataAPI.getRecordCount(getUsername(), tableName, timeFrom, timeTo);
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Pagination not support for table:" + tableName);
+                }
+                recordCount = -1;
+            }
+            return recordCount;
         } catch (Exception e) {
             logger.error("Unable to get record count for table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get record count for table[" + tableName + "] due to " + e
