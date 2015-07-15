@@ -36,7 +36,6 @@ import org.wso2.siddhi.core.event.Event;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.*;
 
 
