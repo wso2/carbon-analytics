@@ -41,7 +41,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by niranda on 6/9/15. //todo: change this
+ *  This class represents the analytics persistence engine which is responsible for persist,
+ *  unpersist and read spark failover recovery related data
  */
 public class AnalyticsPersistenceEngine extends PersistenceEngine {
 

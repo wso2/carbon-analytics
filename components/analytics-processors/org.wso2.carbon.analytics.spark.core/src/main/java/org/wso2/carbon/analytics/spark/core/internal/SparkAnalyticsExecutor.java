@@ -233,7 +233,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private UDFConfiguration loadUDFConfiguration() throws AnalyticsException {
         try {
-            File confFile = new File(GenericUtils.getAnalyticsConfDirectory() + // todo: check if this conflicts with non- osgi env
+            File confFile = new File(GenericUtils.getAnalyticsConfDirectory() +
                                      File.separator + AnalyticsConstants.SPARK_CONF_DIR +
                                      File.separator + AnalyticsConstants.SPARK_UDF_CONF_FILE);
             if (!confFile.exists()) {
