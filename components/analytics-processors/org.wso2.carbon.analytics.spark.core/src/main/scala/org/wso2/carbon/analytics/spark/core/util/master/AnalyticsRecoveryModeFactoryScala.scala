@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.spark.core.util.master
 import akka.serialization.Serialization
 import org.apache.spark.SparkConf
 import org.apache.spark.deploy.master._
+import org.wso2.carbon.analytics.spark.core.deploy.{AnalyticsPersistenceEngine, AnalyticsLeaderElectionAgent}
 
 /**
  * Scala version of Recovery mode factory

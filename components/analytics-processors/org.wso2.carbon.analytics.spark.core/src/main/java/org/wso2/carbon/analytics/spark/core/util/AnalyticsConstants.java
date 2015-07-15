@@ -39,11 +39,11 @@ public class AnalyticsConstants {
                                                             + "components" + RegistryConstants.PATH_SEPARATOR + RegistryConstants.PATH_SEPARATOR
                                                             + "org.wso2.carbon.analytics.spark";
     public static final String ANALYTICS_MEDIA_TYPE = "application/xml";
-    public static final String SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH = "bin/compute-classpath.sh";
     public static final String SPARK_CONF_DIR = "spark";
     public static final String SPARK_UDF_CONF_FILE = "spark-udf-config.xml";
     public static final String DISABLE_ANALYTICS_EXECUTION_JVM_OPTION = "disableAnalyticsExecution";
     public static final String DISABLE_ANALYTICS_ENGINE_JVM_OPTION = "disableAnalyticsEngine";
+    public static final String DISABLE_ANALYTICS_SPARK_CTX_JVM_OPTION = "disableAnalyticsSparkCtx";
 
     // spark DataType strings
     public static final String STRING_TYPE = "string";
@@ -75,7 +75,7 @@ public class AnalyticsConstants {
     public static final String OBJECT = "OBJECT";
     public static final String DEFAULT_CHARSET = "UTF8";
     public static final String SCRIPT_DEPLOYMENT_DIR = "spark-scripts";
-    public static final String SPARK_DEFAULTS_PATH = "spark/spark-defaults.conf";
+    public static final String SPARK_DEFAULTS_FILE = "spark-defaults.conf";
     public static final int SPARK_DEFAULT_PARTITION_COUNT = 6;
 
     //Analytics relation strings

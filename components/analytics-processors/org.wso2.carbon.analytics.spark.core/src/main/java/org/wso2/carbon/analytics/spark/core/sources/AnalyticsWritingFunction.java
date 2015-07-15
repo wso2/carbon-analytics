@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.analytics.spark.core.util;
+package org.wso2.carbon.analytics.spark.core.sources;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,6 +27,7 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import scala.collection.Iterator;
 import scala.runtime.AbstractFunction1;
 import scala.runtime.BoxedUnit;
@@ -37,17 +38,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AnalyticsFunction1 extends AbstractFunction1<Iterator<Row>, BoxedUnit>
+public class AnalyticsWritingFunction extends AbstractFunction1<Iterator<Row>, BoxedUnit>
         implements Serializable {
 
     private static final long serialVersionUID = -1919222653470217466L;
-    private static final Log log = LogFactory.getLog(AnalyticsFunction1.class);
+    private static final Log log = LogFactory.getLog(AnalyticsWritingFunction.class);
 
     private int tId;
     private String tName;
     private StructType sch;
 
-    public AnalyticsFunction1(int tId, String tName, StructType sch) {
+    public AnalyticsWritingFunction(int tId, String tName, StructType sch) {
         this.tId = tId;
         this.tName = tName;
         this.sch = sch;

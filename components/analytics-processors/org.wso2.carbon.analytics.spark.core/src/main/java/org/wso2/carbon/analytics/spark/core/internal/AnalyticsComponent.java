@@ -141,6 +141,7 @@ public class AnalyticsComponent {
                     if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_ENGINE_JVM_OPTION))) {
                         ServiceHolder.setAnalyticsEngineEnabled(false);
                         ServiceHolder.setAnalyticsExecutionEnabled(false);
+                        ServiceHolder.setAnalyticsSparkContextEnabled(false);
                         //if analytics engine is disabled, execution is also disabled by default
                     }
                 }
@@ -150,6 +151,14 @@ public class AnalyticsComponent {
                 if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_EXECUTION_JVM_OPTION) != null) {
                     if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_EXECUTION_JVM_OPTION))) {
                         ServiceHolder.setAnalyticsExecutionEnabled(false);
+                    }
+                }
+            }
+
+            if (ServiceHolder.isAnalyticsSparkContextEnabled()){
+                if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_SPARK_CTX_JVM_OPTION) != null){
+                    if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_SPARK_CTX_JVM_OPTION))) {
+                        ServiceHolder.setAnalyticsSparkContextEnabled(false);
                     }
                 }
             }

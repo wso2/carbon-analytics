@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.analytics.spark.core.util.master;
+package org.wso2.carbon.analytics.spark.core.deploy;
 
 import akka.serialization.Serialization;
 import akka.serialization.Serializer;

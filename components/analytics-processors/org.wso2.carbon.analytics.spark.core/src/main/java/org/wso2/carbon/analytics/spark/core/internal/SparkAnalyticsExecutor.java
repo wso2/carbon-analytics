@@ -48,11 +48,11 @@ import org.wso2.carbon.analytics.spark.core.udf.config.UDFConfiguration;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
-import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelationProvider;
-import org.wso2.carbon.analytics.spark.core.util.master.CheckElectedLeaderExecutionCall;
-import org.wso2.carbon.analytics.spark.core.util.master.ElectLeaderExecutionCall;
-import org.wso2.carbon.analytics.spark.core.util.master.InitClientExecutionCall;
-import org.wso2.carbon.analytics.spark.core.util.master.StartWorkerExecutionCall;
+import org.wso2.carbon.analytics.spark.core.sources.AnalyticsRelationProvider;
+import org.wso2.carbon.analytics.spark.core.deploy.CheckElectedLeaderExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.ElectLeaderExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.InitClientExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.StartWorkerExecutionCall;
 import org.wso2.carbon.utils.CarbonUtils;
 import scala.None$;
 import scala.Option;
@@ -62,11 +62,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -123,11 +119,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
 
     public SparkAnalyticsExecutor(String myHost, int portOffset) throws AnalyticsException {
-        this(myHost, portOffset, CarbonUtils.getCarbonConfigDirPath());
-    }
-
-    public SparkAnalyticsExecutor(String myHost, int portOffset, String confPath)
-            throws AnalyticsException {
         this.myHost = myHost;
         this.portOffset = portOffset;
         this.udfConfiguration = this.loadUDFConfiguration();
@@ -135,7 +126,13 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
 
         // sends this host name and base master port to initialize the spark conf
-        String propsFile = confPath + File.separator + AnalyticsConstants.SPARK_DEFAULTS_PATH;
+        String propsFile = GenericUtils.getAnalyticsConfDirectory() + File.separator +
+                           AnalyticsConstants.SPARK_CONF_DIR + File.separator +
+                           AnalyticsConstants.SPARK_DEFAULTS_FILE;
+        if (!new File(propsFile).exists()){
+            throw new AnalyticsExecutionException("spark-defaults.conf file does not exists in path "
+                                                  + propsFile);
+        }
         this.sparkConf = initializeSparkConf(this.portOffset, propsFile);
 
 //        this.redundantMasterCount = this.sparkConf.getInt(AnalyticsConstants.CARBON_SPARK_MASTER_COUNT, 1);
@@ -254,28 +251,37 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     public synchronized void initializeAnalyticsClient() {
-        if (!this.clientActive) {
-            //master URL needs to be updated according to the spark masters in the cluster
-            updateMaster(this.sparkConf);
-            initializeSqlContext(new JavaSparkContext(this.sparkConf));
-            this.clientActive = true;
-            log.info("Started Spark CLIENT in the cluster pointing to MASTERS " + this.sparkConf.get(AnalyticsConstants.SPARK_MASTER) +
-                     " with the application name : " + this.sparkConf.get(AnalyticsConstants.SPARK_APP_NAME) +
-                     " and UI port : " + this.sparkConf.get(AnalyticsConstants.SPARK_UI_PORT));
+        if (ServiceHolder.isAnalyticsSparkContextEnabled()) {
+            if (!this.clientActive) {
+                //master URL needs to be updated according to the spark masters in the cluster
+                updateMaster(this.sparkConf);
+                initializeSqlContext(new JavaSparkContext(this.sparkConf));
+                this.clientActive = true;
+                log.info("Started Spark CLIENT in the cluster pointing to MASTERS " + this.sparkConf.get(AnalyticsConstants.SPARK_MASTER) +
+                         " with the application name : " + this.sparkConf.get(AnalyticsConstants.SPARK_APP_NAME) +
+                         " and UI port : " + this.sparkConf.get(AnalyticsConstants.SPARK_UI_PORT));
+            } else {
+                logDebug("Client is already active in this node, therefore ignoring client init");
+            }
+        } else {
+            log.warn("Analytics Spark Context is disabled in this node, therefore ignoring the client initiation.");
         }
     }
 
     private void initializeClient(Boolean local) {
-        //todo: use the sys var
-        initializeSqlContext(new JavaSparkContext(this.sparkConf));
-        if (local) {
-            log.info("Started Spark CLIENT in the LOCAL mode" +
-                     " with the application name : " + this.sparkConf.get(AnalyticsConstants.SPARK_APP_NAME) +
-                     " and UI port : " + this.sparkConf.get(AnalyticsConstants.SPARK_UI_PORT));
+        if (ServiceHolder.isAnalyticsSparkContextEnabled()) {
+            initializeSqlContext(new JavaSparkContext(this.sparkConf));
+            if (local) {
+                log.info("Started Spark CLIENT in the LOCAL mode" +
+                         " with the application name : " + this.sparkConf.get(AnalyticsConstants.SPARK_APP_NAME) +
+                         " and UI port : " + this.sparkConf.get(AnalyticsConstants.SPARK_UI_PORT));
+            } else {
+                log.info("Started Spark CLIENT pointing to an external Spark Master: " + this.sparkConf.get(AnalyticsConstants.SPARK_MASTER) +
+                         " with the application name : " + this.sparkConf.get(AnalyticsConstants.SPARK_APP_NAME) +
+                         " and UI port : " + this.sparkConf.get(AnalyticsConstants.SPARK_UI_PORT));
+            }
         } else {
-            log.info("Started Spark CLIENT pointing to an external Spark Master: " + this.sparkConf.get(AnalyticsConstants.SPARK_MASTER) +
-                     " with the application name : " + this.sparkConf.get(AnalyticsConstants.SPARK_APP_NAME) +
-                     " and UI port : " + this.sparkConf.get(AnalyticsConstants.SPARK_UI_PORT));
+            log.warn("Analytics Spark Context is disabled in this node, therefore ignoring the client initiation.");
         }
 
     }
@@ -326,6 +332,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
             updateMaster(this.sparkConf);
             this.masterActive = true;
+        } else {
+            logDebug("Master is already active in this node, therefore ignoring Master startup");
         }
         processLeaderElectable();
     }
@@ -354,7 +362,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      * updates the spark master string of a given spark context by looking at the spark masters
      * map in the cluster
      *
-     * @param conf
+     * @param conf spark conf
      */
     private void updateMaster(SparkConf conf) {
         String[] masters = getSparkMastersFromCluster();
@@ -373,8 +381,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      * this method checks the existing jvm properties and add the port offset to properties which
      * starts with "spark." and ends with ".port". also, sets the relevant spark conf properties
      *
-     * @param conf
-     * @param portOffset
+     * @param conf       spark conf
+     * @param portOffset port offset
      */
     private void addSparkPropertiesPortOffset(SparkConf conf, int portOffset) {
         Tuple2<String, String>[] properties = conf.getAll();
@@ -411,6 +419,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                      + workerUiPort + " with Masters " + Arrays.toString(masters));
 
             this.workerActive = true;
+        } else {
+            logDebug("Worker is already active in this node, therefore ignoring worker startup");
         }
     }
 
@@ -420,8 +430,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      * the given properties file and override parameters accordingly. it also adds the port offset
      * to all the port configurations
      *
-     * @param portOffset
-     * @param propsFile
+     * @param portOffset port offset
+     * @param propsFile  location of the properties file
      */
     private SparkConf initializeSparkConf(int portOffset, String propsFile) {
         // create a spark conf object without loading defaults
@@ -454,24 +464,24 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    private void validateSparkScriptPathPermission() {
-        Set<PosixFilePermission> perms = new HashSet<>();
-        //add owners permission
-        perms.add(PosixFilePermission.OWNER_READ);
-        perms.add(PosixFilePermission.OWNER_WRITE);
-        perms.add(PosixFilePermission.OWNER_EXECUTE);
-        //add group permissions
-        perms.add(PosixFilePermission.GROUP_READ);
-        perms.add(PosixFilePermission.GROUP_WRITE);
-        perms.add(PosixFilePermission.GROUP_EXECUTE);
-        try {
-            Files.setPosixFilePermissions(Paths.get(CarbonUtils.getCarbonHome() + File.separator +
-                                                    AnalyticsConstants.SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH), perms);
-        } catch (IOException e) {
-            log.warn("Error while checking the permission for " + AnalyticsConstants.SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH
-                     + ". " + e.getMessage());
-        }
-    }
+//    private void validateSparkScriptPathPermission() {
+//        Set<PosixFilePermission> perms = new HashSet<>();
+//        //add owners permission
+//        perms.add(PosixFilePermission.OWNER_READ);
+//        perms.add(PosixFilePermission.OWNER_WRITE);
+//        perms.add(PosixFilePermission.OWNER_EXECUTE);
+//        //add group permissions
+//        perms.add(PosixFilePermission.GROUP_READ);
+//        perms.add(PosixFilePermission.GROUP_WRITE);
+//        perms.add(PosixFilePermission.GROUP_EXECUTE);
+//        try {
+//            Files.setPosixFilePermissions(Paths.get(CarbonUtils.getCarbonHome() + File.separator +
+//                                                    AnalyticsConstants.SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH), perms);
+//        } catch (IOException e) {
+//            log.warn("Error while checking the permission for " + AnalyticsConstants.SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH
+//                     + ". " + e.getMessage());
+//        }
+//    }
 
     public void stop() {
         if (this.sqlCtx != null) {
@@ -625,7 +635,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             for (int i = 0; i < row.length(); i++) {
                 objects.add(row.get(i));
             }
-            Set<PosixFilePermission> perms = new HashSet<>();
+//            Set<PosixFilePermission> perms = new HashSet<>();
             result.add(objects);
         }
         return result;
@@ -756,7 +766,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      * this registers a LeaderElectable object here. this method is invoked from the
      * AnalyticsLeaderElectionAgent
      *
-     * @param le
+     * @param le leader electable object
      */
     public void registerLeaderElectable(LeaderElectable le) {
         this.leaderElectable.add(le);

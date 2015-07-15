@@ -57,6 +57,8 @@ public class ServiceHolder {
 
     private static boolean analyticsEngineEnabled = true;
 
+    private static boolean analyticsSparkContextEnabled = true;
+
     public static void setTaskService(TaskService taskService) {
         ServiceHolder.taskService = taskService;
     }
@@ -128,4 +130,13 @@ public class ServiceHolder {
     public static void setAnalyticsEngineEnabled(boolean analyticsEngineEnabled) {
         ServiceHolder.analyticsEngineEnabled = analyticsEngineEnabled;
     }
+
+    public static void setAnalyticsSparkContextEnabled(boolean analyticsSparkContextEnabled) {
+        ServiceHolder.analyticsSparkContextEnabled = analyticsSparkContextEnabled;
+    }
+
+    public static boolean isAnalyticsSparkContextEnabled() {
+        return analyticsSparkContextEnabled;
+    }
+
 }
