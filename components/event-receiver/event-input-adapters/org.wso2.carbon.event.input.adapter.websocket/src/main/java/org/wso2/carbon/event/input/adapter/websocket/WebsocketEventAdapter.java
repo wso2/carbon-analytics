@@ -54,6 +54,7 @@ public class WebsocketEventAdapter implements InputEventAdapter {
 
     @Override
     public void init(InputEventAdapterListener eventAdaptorListener) throws InputEventAdapterException {
+        validateInputEventAdapterConfigurations(eventAdapterConfiguration);
         this.eventAdapterListener = eventAdaptorListener;
         this.tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
     }
@@ -103,5 +104,13 @@ public class WebsocketEventAdapter implements InputEventAdapter {
     @Override
     public boolean isPolling() {
         return true;
+    }
+
+    private void validateInputEventAdapterConfigurations(InputEventAdapterConfiguration eventAdapterConfiguration) throws InputEventAdapterException {
+        String socketServerUrl = eventAdapterConfiguration.getProperties().get(WebsocketEventAdapterConstants.ADAPTER_SERVER_URL);
+        if (!socketServerUrl.startsWith("ws://")) {
+            throw new InputEventAdapterException("Provided websocket URL - " + socketServerUrl + " is invalid for websocket input adaptor with name" +
+                    eventAdapterConfiguration.getName() + ". The websocket URL should start with 'ws://' prefix.");
+        }
     }
 }
