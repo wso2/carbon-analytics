@@ -174,9 +174,13 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         @Override
         public void onEvent(Event event, long sequence, boolean endOfBatch) throws Exception {
             DataEndpoint endpoint = getDataEndpoint(true);
-            endpoint.collectAndSend(event);
-            if (endOfBatch) {
-                flushAllDataEndpoints();
+            if (endpoint != null) {
+                endpoint.collectAndSend(event);
+                if (endOfBatch) {
+                    flushAllDataEndpoints();
+                }
+            } else {
+                log.info("Dropping events due to shutdown");
             }
         }
     }
@@ -227,7 +231,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                     index = START_INDEX;
                 }
                 if (index == startIndex) {
-                    if (busyWait) {
+                    if (busyWait && !reconnectionService.isShutdown()) {
                         /**
                          * Have fully iterated the data publisher list,
                          * and busy wait until data publisher
@@ -354,8 +358,17 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     }
 
     public void shutdown() {
-        eventQueue.shutdown();
-        reconnectionService.shutdown();
+        if (getDataEndpoint(false) != null) {
+            // There are active endpoints, so we let them consume the events
+            eventQueue.shutdown();
+            reconnectionService.shutdown();
+        } else {
+            // Shutdown the reconnection service first to let  the eventQueue know that
+            // we are in a shutdown state
+            reconnectionService.shutdown();
+            eventQueue.shutdown();
+        }
+
         for (DataEndpoint dataEndpoint : dataEndpoints) {
             dataEndpoint.shutdown();
         }
