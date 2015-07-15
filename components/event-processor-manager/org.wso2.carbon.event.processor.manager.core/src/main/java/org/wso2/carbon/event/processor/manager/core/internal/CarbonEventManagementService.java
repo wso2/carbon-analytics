@@ -38,6 +38,7 @@ import org.wso2.siddhi.core.event.Event;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.*;
 
 
@@ -105,6 +106,13 @@ public class CarbonEventManagementService implements EventManagementService {
             @Override
             public void memberAdded(MembershipEvent membershipEvent) {
                 checkMemberUpdate();
+                Member member = membershipEvent.getMember();
+                Member localMember = EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember();
+                //if both members are in active states, one member who takes the passive lock will become passive
+                if(member.getBooleanAttribute("active") != null && member.getBooleanAttribute("active") &&
+                        localMember.getBooleanAttribute("active")!= null && localMember.getBooleanAttribute("active")){
+                    haManager.bePassive();
+                }
             }
 
             @Override
