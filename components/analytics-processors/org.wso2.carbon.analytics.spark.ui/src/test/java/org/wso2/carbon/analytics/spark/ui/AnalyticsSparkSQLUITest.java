@@ -61,7 +61,7 @@ public class AnalyticsSparkSQLUITest {
         System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
         this.service = ServiceHolder.getAnalyticsDataService();
         ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor("localhost", 0, "src/test/resources/conf1"));
-        ServiceHolder.getAnalyticskExecutor().startSparkServer("src/test/resources/conf1");
+        ServiceHolder.getAnalyticskExecutor().initializeSparkServer();
     }
 
     @AfterClass

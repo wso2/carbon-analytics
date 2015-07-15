@@ -36,7 +36,7 @@ public class InitClientExecutionCall implements Callable<Integer>, Serializable{
 
     @Override
     public Integer call() throws Exception {
-        ServiceHolder.getAnalyticskExecutor().initializeClient();
+        ServiceHolder.getAnalyticskExecutor().initializeAnalyticsClient();
         return 0;
     }
 }

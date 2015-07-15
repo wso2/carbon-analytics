@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by niranda on 6/9/15.
+ * Created by niranda on 6/9/15. //todo: change this
  */
 public class AnalyticsPersistenceEngine extends PersistenceEngine {
 
@@ -51,23 +51,15 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
 
     private static final String SPARK_META_TABLE = "__spark_meta_table";
     private static final String OBJ_COLUMN = "obj_col";
-    private int SPARK_TENANT = AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID;
+    private int SPARK_TENANT = AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID; // dont use 2 variables
 
     public AnalyticsPersistenceEngine(Serialization serialization) {
         this.serialization = serialization;
         this.ads = AnalyticsServiceHolder.getAnalyticsDataService();
     }
 
-    /**
-     * Defines how the object is serialized and persisted. Implementation will
-     * depend on the store used.
-     *
-     * @param name
-     * @param obj
-     */
     @Override
     public void persist(String name, Object obj) {
-        // System.out.println("################ PERSISTING DATA for : " + name);
         Serializer serializer = serialization.findSerializerFor(obj);
         byte[] serialized = serializer.toBinary(obj);
 
@@ -76,57 +68,47 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
                 ads.createTable(SPARK_TENANT, SPARK_META_TABLE);
             }
 
-            Map<String, Object> values = new HashMap<>();
+            Map<String, Object> values = new HashMap<>(1);
             values.put(OBJ_COLUMN, serialized);
 
             Record record = new Record(name, SPARK_TENANT, SPARK_META_TABLE, values);
-            List<Record> records = new ArrayList<>();
+            List<Record> records = new ArrayList<>(1);
             records.add(record);
 
             ads.put(records);
         } catch (AnalyticsException e) {
-            log.error("Error in writing data to spark meta table ", e);
+            String msg = "Error in writing data to spark meta table: " + e.getMessage();
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
         }
     }
 
-    /**
-     * Defines how the object referred by its name is removed from the store.
-     *
-     * @param name
-     */
     @Override
     public void unpersist(String name) {
-        // System.out.println("################ UNPERSISTING DATA for : " + name);
         try {
-            List<String> recordIds = new ArrayList<>();
+            List<String> recordIds = new ArrayList<>(1);
             recordIds.add(name);
             ads.delete(SPARK_TENANT, SPARK_META_TABLE, recordIds);
         } catch (AnalyticsException e) {
-            log.error("Error in deleting data from spark meta table ", e);
+            String msg = "Error in deleting data from spark meta table: " + e.getMessage();
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
         }
     }
 
-    /**
-     * Gives all objects, matching a prefix. This defines how objects are
-     * read/deserialized back.
-     *
-     * @param prefix
-     * @param evidence$1
-     */
     @Override
     public <T> Seq<T> read(String prefix, ClassTag<T> evidence$1) {
-        // System.out.println("################ READING DATA for : " + prefix);
-
         Class<T> clazz = (Class<T>) evidence$1.runtimeClass();
         Serializer serializer = serialization.findSerializerFor(clazz);
 
         List<T> objects = new ArrayList<>();
         try {
-            if (ads.tableExists(SPARK_TENANT, SPARK_META_TABLE)) {
+            if (ads.tableExists(SPARK_TENANT, SPARK_META_TABLE)) { //todo: use AnalyticsDataServiceUtils.listRecords method
                 AnalyticsDataResponse results = ads.get(SPARK_TENANT, SPARK_META_TABLE, 1, null,
                                                         Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
                 for (RecordGroup recordGroup : results.getRecordGroups()) {
                     Iterator<Record> iterator = ads.readRecords(results.getRecordStoreName(), recordGroup);
+                    //todo: (later) separate the prefixes in different tables
                     while (iterator.hasNext()) {
                         Record record = iterator.next();
                         if (record.getId().startsWith(prefix)) {
@@ -135,9 +117,10 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
                     }
                 }
             }
-
         } catch (AnalyticsException e) {
-            log.error("Error in reading data from the spark meta table ", e);
+            String msg = "Error in reading data from spark meta table: " + e.getMessage();
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
         }
 
         return JavaConversions.asScalaBuffer(objects).toSeq();
