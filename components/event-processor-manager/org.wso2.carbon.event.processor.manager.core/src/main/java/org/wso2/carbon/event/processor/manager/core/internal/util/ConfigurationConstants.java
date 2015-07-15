@@ -44,6 +44,7 @@ public final class ConfigurationConstants {
     public static final int HA_DEFAULT_TRANSPORT_PORT = 11224;
     public static final int HA_DEFAULT_RECONNECTION_INTERVAL = 20000;
     public static final int HA_DEFAULT_MANAGEMENT_PORT = 11324;
+    public static final String HA_NODE_ACTIVE_STATE = "active";
 
     public static final String PROCESSING_MODE_SN = "SingleNode";
     public static final String SN_PERSISTENCE_ELEMENT = "persistence";
@@ -79,7 +80,4 @@ public final class ConfigurationConstants {
     public static enum HAMode {Active, Passive, Backup}
 
     public static final String STORM_EVENT_PUBLISHER_SYNC_MAP = "stormEventPublisherSyncMap";
-
-    public static final String HA_NODE_ACTIVE_STATE = "active";
-
 }
