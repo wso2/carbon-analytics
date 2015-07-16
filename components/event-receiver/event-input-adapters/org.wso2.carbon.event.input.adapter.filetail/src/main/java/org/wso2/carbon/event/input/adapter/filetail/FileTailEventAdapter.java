@@ -54,6 +54,7 @@ public class FileTailEventAdapter implements InputEventAdapter {
 
     @Override
     public void init(InputEventAdapterListener eventAdapterListener) throws InputEventAdapterException {
+        validateInputEventAdapterConfigurations();
         this.eventAdapterListener = eventAdapterListener;
     }
 
@@ -129,6 +130,15 @@ public class FileTailEventAdapter implements InputEventAdapter {
     @Override
     public boolean isPolling() {
         return true;
+    }
+
+    private void validateInputEventAdapterConfigurations() throws InputEventAdapterException {
+        String delayInMillisProperty = eventAdapterConfiguration.getProperties().get(FileTailEventAdapterConstants.EVENT_ADAPTER_DELAY_MILLIS);
+        try{
+            Integer.parseInt(delayInMillisProperty);
+        } catch (NumberFormatException e){
+            throw new InputEventAdapterException("Invalid value set for property Delay: " + delayInMillisProperty, e);
+        }
     }
 
 }
