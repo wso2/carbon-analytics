@@ -25,6 +25,7 @@ import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.core.Property;
 import org.wso2.carbon.event.output.adapter.ui.internal.util.UIEventAdapterConstants;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,12 +62,29 @@ public class UIEventAdapterFactory extends OutputEventAdapterFactory {
 
     @Override
     public String getUsageTips() {
-        return resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_UI);
+        int defaultHttpPort = 9763;
+        int defaultHttpsPort = 9443;
+        int httpPort;
+        int httpsPort;
+        int portOffset = getPortOffset();
+
+        if (portOffset == 0) {
+            httpPort = defaultHttpPort;
+            httpsPort = defaultHttpsPort;
+        } else {
+            httpPort = defaultHttpPort + portOffset;
+            httpsPort = defaultHttpsPort + portOffset;
+        }
+        return resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_PREFIX) + httpPort + resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_MID1) + httpsPort + resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_MID2) + httpPort + resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_MID3) + httpsPort + resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX);
     }
 
     @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                                                  Map<String, String> globalProperties) {
         return new UIEventAdapter(eventAdapterConfiguration, globalProperties);
+    }
+
+    private int getPortOffset() {
+        return CarbonUtils.getPortFromServerConfig(UIEventAdapterConstants.CARBON_CONFIG_PORT_OFFSET_NODE) + 1;
     }
 }

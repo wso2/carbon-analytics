@@ -26,7 +26,9 @@ public final class WebsocketLocalEventAdapterConstants {
     }
 
     public static final String ADAPTER_TYPE_WEBSOCKET_LOCAL = "websocket-local";
-    public static final String ADAPTER_USAGE_TIPS_WEBSOCKET_LOCAL = "Following url formats are used to publish events:</br>&nbsp;&nbsp;<i>ws://localhost:9763/outputwebsocket/&lt;publisher_name&gt;</i></br>&nbsp;&nbsp;<i>wss://localhost:9443/outputwebsocket/&lt;publisher_name&gt;";
+    public static final String ADAPTOR_USAGE_TIPS_PREFIX = "Following url formats are used to publish events:</br>&nbsp;&nbsp;<i>ws://localhost:";
+    public static final String ADAPTER_USAGE_TIPS_MID = "/outputwebsocket/&lt;publisher_name&gt;</i></br>&nbsp;&nbsp;<i>wss://localhost:";
+    public static final String ADAPTER_USAGE_TIPS_POSTFIX = "/outputwebsocket/&lt;publisher_name&gt;</i>";
 
     public static final int ADAPTER_MIN_THREAD_POOL_SIZE = 8;
     public static final int ADAPTER_MAX_THREAD_POOL_SIZE = 100;
@@ -37,4 +39,5 @@ public final class WebsocketLocalEventAdapterConstants {
     public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
     public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
 
+    public static final String CARBON_CONFIG_PORT_OFFSET_NODE = "Ports.Offset";
 }

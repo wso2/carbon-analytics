@@ -17,6 +17,7 @@ package org.wso2.carbon.event.input.adapter.http;
 
 import org.wso2.carbon.event.input.adapter.core.*;
 import org.wso2.carbon.event.input.adapter.http.internal.util.HTTPEventAdapterConstants;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.*;
 
@@ -58,12 +59,29 @@ public class HTTPEventAdapterFactory extends InputEventAdapterFactory {
 
     @Override
     public String getUsageTips() {
-        return resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_HTTP);
+        int defaultHttpPort = 9763;
+        int defaultHttpsPort = 9443;
+        int httpPort;
+        int httpsPort;
+        int portOffset = getPortOffset();
+
+        if (portOffset == 0) {
+            httpPort = defaultHttpPort;
+            httpsPort = defaultHttpsPort;
+        } else {
+            httpPort = defaultHttpPort + portOffset;
+            httpsPort = defaultHttpsPort + portOffset;
+        }
+        return resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_PREFIX) + httpPort + resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_MID1) + httpsPort + resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_MID2) + httpPort + resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_MID3) + httpsPort + resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX);
     }
 
     @Override
     public InputEventAdapter createEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
                                                 Map<String, String> globalProperties) {
         return new HTTPEventAdapter(eventAdapterConfiguration, globalProperties);
+    }
+
+    private int getPortOffset() {
+        return CarbonUtils.getPortFromServerConfig(HTTPEventAdapterConstants.CARBON_CONFIG_PORT_OFFSET_NODE) + 1;
     }
 }
