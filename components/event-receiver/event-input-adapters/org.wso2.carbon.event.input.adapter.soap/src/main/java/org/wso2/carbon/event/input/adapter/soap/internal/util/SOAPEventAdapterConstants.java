@@ -24,13 +24,19 @@ public final class SOAPEventAdapterConstants {
     }
 
     public static final String ADAPTER_TYPE_SOAP = "soap";
-    public static final String ADAPTER_USAGE_TIPS_SOAP = "soap.usage.tips";
+    public static final String ADAPTER_USAGE_TIPS_PREFIX = "soap.usage.tips_prefix";
+    public static final String ADAPTER_USAGE_TIPS_MID1 = "soap.usage.tips_mid1";
+    public static final String ADAPTER_USAGE_TIPS_MID2 = "soap.usage.tips_mid2";
+    public static final String ADAPTER_USAGE_TIPS_MID3 = "soap.usage.tips_mid3";
+    public static final String ADAPTER_USAGE_TIPS_POSTFIX = "soap.usage.tips_postfix";
     public static final String OPERATION_NAME = "receive";
     public static final String EXPOSED_TRANSPORTS = "transports";
     public static final String HTTPS = "https";
     public static final String HTTP = "http";
     public static final String LOCAL = "local";
     public static final String ALL = "all";
-
+    public static final String CARBON_CONFIG_PORT_OFFSET_NODE = "Ports.Offset";
+    public static final int DEFAULT_HTTP_PORT = 9763;
+    public static final int DEFAULT_HTTPS_PORT = 9443;
 
 }

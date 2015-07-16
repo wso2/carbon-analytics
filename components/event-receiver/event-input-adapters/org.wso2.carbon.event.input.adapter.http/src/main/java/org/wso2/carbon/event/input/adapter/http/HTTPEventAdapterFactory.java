@@ -17,13 +17,24 @@ package org.wso2.carbon.event.input.adapter.http;
 
 import org.wso2.carbon.event.input.adapter.core.*;
 import org.wso2.carbon.event.input.adapter.http.internal.util.HTTPEventAdapterConstants;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.*;
 
 
 public class HTTPEventAdapterFactory extends InputEventAdapterFactory {
+
     private ResourceBundle resourceBundle =
             ResourceBundle.getBundle("org.wso2.carbon.event.input.adapter.http.i18n.Resources", Locale.getDefault());
+    private int httpPort;
+    private int httpsPort;
+    private int portOffset;
+
+    public HTTPEventAdapterFactory() {
+        portOffset = getPortOffset();
+        httpPort = HTTPEventAdapterConstants.DEFAULT_HTTP_PORT + portOffset;
+        httpsPort = HTTPEventAdapterConstants.DEFAULT_HTTPS_PORT + portOffset;
+    }
 
     @Override
     public String getType() {
@@ -58,12 +69,16 @@ public class HTTPEventAdapterFactory extends InputEventAdapterFactory {
 
     @Override
     public String getUsageTips() {
-        return resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_HTTP);
+        return resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_PREFIX) + httpPort + resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_MID1) + httpsPort + resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_MID2) + httpPort + resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_MID3) + httpsPort + resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX);
     }
 
     @Override
     public InputEventAdapter createEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
                                                 Map<String, String> globalProperties) {
         return new HTTPEventAdapter(eventAdapterConfiguration, globalProperties);
+    }
+
+    private int getPortOffset() {
+        return CarbonUtils.getPortFromServerConfig(HTTPEventAdapterConstants.CARBON_CONFIG_PORT_OFFSET_NODE) + 1;
     }
 }

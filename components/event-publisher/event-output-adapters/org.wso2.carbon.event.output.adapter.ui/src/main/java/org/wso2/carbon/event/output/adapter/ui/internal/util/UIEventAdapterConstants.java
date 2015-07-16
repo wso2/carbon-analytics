@@ -28,7 +28,11 @@ public class UIEventAdapterConstants {
     }
 
     public static final String ADAPTER_TYPE_UI = "ui";
-    public static final String ADAPTER_USAGE_TIPS_UI = "ui.usage.tips";
+    public static final String ADAPTER_USAGE_TIPS_PREFIX = "ui.usage.tips_prefix";
+    public static final String ADAPTER_USAGE_TIPS_MID1 = "ui.usage.tips_mid1";
+    public static final String ADAPTER_USAGE_TIPS_MID2 = "ui.usage.tips_mid2";
+    public static final String ADAPTER_USAGE_TIPS_MID3 = "ui.usage.tips_mid3";
+    public static final String ADAPTER_USAGE_TIPS_POSTFIX = "ui.usage.tips_postfix";
     public static final String ADAPTER_UI_DEFAULT_OUTPUT_STREAM_VERSION = "1.0.0";
     public static final String ADAPTER_UI_COLON = ":";
     public static final int INDEX_ZERO = 0;
@@ -47,4 +51,7 @@ public class UIEventAdapterConstants {
     public static final String ADAPTER_EVENT_QUEUE_SIZE_NAME = "eventQueueSize";
     public static final int EVENTS_QUEUE_SIZE = 30;
 
+    public static final String CARBON_CONFIG_PORT_OFFSET_NODE = "Ports.Offset";
+    public static final int DEFAULT_HTTP_PORT = 9763;
+    public static final int DEFAULT_HTTPS_PORT = 9443;
 }

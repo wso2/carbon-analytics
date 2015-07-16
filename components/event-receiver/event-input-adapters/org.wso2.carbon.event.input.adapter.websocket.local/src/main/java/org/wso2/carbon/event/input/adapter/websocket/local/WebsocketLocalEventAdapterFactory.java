@@ -20,10 +20,20 @@ package org.wso2.carbon.event.input.adapter.websocket.local;
 
 import org.wso2.carbon.event.input.adapter.core.*;
 import org.wso2.carbon.event.input.adapter.websocket.local.internal.util.WebsocketLocalEventAdapterConstants;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.*;
 
 public class WebsocketLocalEventAdapterFactory extends InputEventAdapterFactory {
+    private int httpPort;
+    private int httpsPort;
+    private int portOffset;
+
+    public WebsocketLocalEventAdapterFactory() {
+        portOffset = getPortOffset();
+        httpPort = WebsocketLocalEventAdapterConstants.DEFAULT_HTTP_PORT + portOffset;
+        httpsPort = WebsocketLocalEventAdapterConstants.DEFAULT_HTTPS_PORT + portOffset;
+    }
 
     @Override
     public String getType() {
@@ -46,11 +56,15 @@ public class WebsocketLocalEventAdapterFactory extends InputEventAdapterFactory 
 
     @Override
     public String getUsageTips() {
-        return WebsocketLocalEventAdapterConstants.ADAPTOR_USAGE_TIPS_WEBSOCKET_LOCAL;
+        return WebsocketLocalEventAdapterConstants.ADAPTOR_USAGE_TIPS_PREFIX + httpPort + WebsocketLocalEventAdapterConstants.ADAPTER_USAGE_TIPS_MID + httpsPort + WebsocketLocalEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX;
     }
 
     @Override
     public InputEventAdapter createEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
         return new WebsocketLocalEventAdapter(eventAdapterConfiguration, globalProperties);
+    }
+
+    private int getPortOffset() {
+        return CarbonUtils.getPortFromServerConfig(WebsocketLocalEventAdapterConstants.CARBON_CONFIG_PORT_OFFSET_NODE) + 1;
     }
 }

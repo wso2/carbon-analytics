@@ -17,12 +17,26 @@ package org.wso2.carbon.event.input.adapter.wso2event;
 
 import org.wso2.carbon.event.input.adapter.core.*;
 import org.wso2.carbon.event.input.adapter.wso2event.internal.util.WSO2EventAdapterConstants;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.*;
 
 
 public class WSO2EventEventAdapterFactory extends InputEventAdapterFactory {
-    ResourceBundle  resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.input.adapter.wso2event.i18n.Resources", Locale.getDefault());
+    ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.input.adapter.wso2event.i18n.Resources", Locale.getDefault());
+    private int thriftTCPPort;
+    private int thriftSSLPort;
+    private int binaryTCPPort;
+    private int binarySSLPort;
+    private int portOffset;
+
+    public WSO2EventEventAdapterFactory() {
+        portOffset = getPortOffset();
+        thriftTCPPort = WSO2EventAdapterConstants.DEFAULT_THRIFT_TCP_PORT + portOffset;
+        thriftSSLPort = WSO2EventAdapterConstants.DEFAULT_THRIFT_SSL_PORT + portOffset;
+        binaryTCPPort = WSO2EventAdapterConstants.DEFAULT_BINARY_TCP_PORT + portOffset;
+        binarySSLPort = WSO2EventAdapterConstants.DEFAULT_BINARY_SSL_PORT + portOffset;
+    }
 
     @Override
     public String getType() {
@@ -53,11 +67,15 @@ public class WSO2EventEventAdapterFactory extends InputEventAdapterFactory {
 
     @Override
     public String getUsageTips() {
-        return resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_USAGE_TIPS_WSO2EVENT);
+        return resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_USAGE_TIPS_PREFIX) + thriftTCPPort + resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_USAGE_TIPS_IN_BETWEEN) + thriftSSLPort + resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX) + binaryTCPPort + resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_USAGE_TIPS_IN_BETWEEN) + binarySSLPort;
     }
 
     @Override
     public InputEventAdapter createEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
-        return new WSO2EventAdapter(eventAdapterConfiguration,globalProperties);
+        return new WSO2EventAdapter(eventAdapterConfiguration, globalProperties);
+    }
+
+    private int getPortOffset() {
+        return CarbonUtils.getPortFromServerConfig(WSO2EventAdapterConstants.CARBON_CONFIG_PORT_OFFSET_NODE) + 1;
     }
 }
