@@ -174,9 +174,13 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         @Override
         public void onEvent(Event event, long sequence, boolean endOfBatch) throws Exception {
             DataEndpoint endpoint = getDataEndpoint(true);
-            endpoint.collectAndSend(event);
-            if (endOfBatch) {
-                flushAllDataEndpoints();
+            if (endpoint != null) {
+                endpoint.collectAndSend(event);
+                if (endOfBatch) {
+                    flushAllDataEndpoints();
+                }
+            } else {
+                log.info("Dropping events due to shutdown");
             }
         }
     }
