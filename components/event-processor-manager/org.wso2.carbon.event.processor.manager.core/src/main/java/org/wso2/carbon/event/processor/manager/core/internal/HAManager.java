@@ -118,7 +118,7 @@ public class HAManager {
         }
     }
 
-    public void changeStateAfterSplitBrain(){
+    public void verifyState(){
         if(activeLockAcquired &&
                 !roleToMembershipMap.get(activeId).getMemberUuid().equalsIgnoreCase(haConfiguration.getMemberUuid())){
             if(passiveLock.tryLock()){

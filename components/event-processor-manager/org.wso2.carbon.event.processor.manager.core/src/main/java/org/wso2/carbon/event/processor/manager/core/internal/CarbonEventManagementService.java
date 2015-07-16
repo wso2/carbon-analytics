@@ -104,7 +104,7 @@ public class CarbonEventManagementService implements EventManagementService {
             public void memberAdded(MembershipEvent membershipEvent) {
                 checkMemberUpdate();
                 if(haManager!=null){
-                    haManager.changeStateAfterSplitBrain();
+                    haManager.verifyState();
                 }
             }
 
