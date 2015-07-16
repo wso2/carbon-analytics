@@ -118,6 +118,10 @@ function createAnalyticsIndexTable() {
     } else {
         document.getElementById("payloadData").style.display = 'none';
     }
+    var arbitraryIndexTable = document.getElementById('arbitraryIndexTable');
+    for (var i = arbitraryIndexTable.rows.length; i > 1; i--) {
+        arbitraryIndexTable.deleteRow(i - 1);
+    }
 }
 
 function setRowValues(currentCount, indexTable, element, isPayload) {
