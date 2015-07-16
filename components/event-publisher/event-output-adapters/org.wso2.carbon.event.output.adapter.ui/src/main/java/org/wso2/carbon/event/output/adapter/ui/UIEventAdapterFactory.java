@@ -37,6 +37,15 @@ public class UIEventAdapterFactory extends OutputEventAdapterFactory {
 
     private ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.ui.i18n" +
             ".Resources", Locale.getDefault());
+    private int httpPort;
+    private int httpsPort;
+    private int portOffset;
+
+    public UIEventAdapterFactory() {
+        portOffset = getPortOffset();
+        httpPort = UIEventAdapterConstants.DEFAULT_HTTP_PORT + portOffset;
+        httpsPort = UIEventAdapterConstants.DEFAULT_HTTPS_PORT + portOffset;
+    }
 
     @Override
     public String getType() {
@@ -62,19 +71,6 @@ public class UIEventAdapterFactory extends OutputEventAdapterFactory {
 
     @Override
     public String getUsageTips() {
-        int defaultHttpPort = 9763;
-        int defaultHttpsPort = 9443;
-        int httpPort;
-        int httpsPort;
-        int portOffset = getPortOffset();
-
-        if (portOffset == 0) {
-            httpPort = defaultHttpPort;
-            httpsPort = defaultHttpsPort;
-        } else {
-            httpPort = defaultHttpPort + portOffset;
-            httpsPort = defaultHttpsPort + portOffset;
-        }
         return resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_PREFIX) + httpPort + resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_MID1) + httpsPort + resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_MID2) + httpPort + resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_MID3) + httpsPort + resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX);
     }
 

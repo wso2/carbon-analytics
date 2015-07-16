@@ -27,6 +27,16 @@ import java.util.List;
 import java.util.Map;
 
 public class WebsocketLocalEventAdapterFactory extends OutputEventAdapterFactory {
+    private int httpPort;
+    private int httpsPort;
+    private int portOffset;
+
+    public WebsocketLocalEventAdapterFactory() {
+        portOffset = getPortOffset();
+        httpPort = WebsocketLocalEventAdapterConstants.DEFAULT_HTTP_PORT + portOffset;
+        httpsPort = WebsocketLocalEventAdapterConstants.DEFAULT_HTTPS_PORT + portOffset;
+    }
+
     @Override
     public String getType() {
         return WebsocketLocalEventAdapterConstants.ADAPTER_TYPE_WEBSOCKET_LOCAL;
@@ -53,19 +63,6 @@ public class WebsocketLocalEventAdapterFactory extends OutputEventAdapterFactory
 
     @Override
     public String getUsageTips() {
-        int defaultHttpPort = 9763;
-        int defaultHttpsPort = 9443;
-        int httpPort;
-        int httpsPort;
-        int portOffset = getPortOffset();
-
-        if (portOffset == 0) {
-            httpPort = defaultHttpPort;
-            httpsPort = defaultHttpsPort;
-        } else {
-            httpPort = defaultHttpPort + portOffset;
-            httpsPort = defaultHttpsPort + portOffset;
-        }
         return WebsocketLocalEventAdapterConstants.ADAPTOR_USAGE_TIPS_PREFIX + httpPort + WebsocketLocalEventAdapterConstants.ADAPTER_USAGE_TIPS_MID + httpsPort + WebsocketLocalEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX;
     }
 

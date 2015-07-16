@@ -25,6 +25,15 @@ import org.wso2.carbon.utils.CarbonUtils;
 import java.util.*;
 
 public class WebsocketLocalEventAdapterFactory extends InputEventAdapterFactory {
+    private int httpPort;
+    private int httpsPort;
+    private int portOffset;
+
+    public WebsocketLocalEventAdapterFactory() {
+        portOffset = getPortOffset();
+        httpPort = WebsocketLocalEventAdapterConstants.DEFAULT_HTTP_PORT + portOffset;
+        httpsPort = WebsocketLocalEventAdapterConstants.DEFAULT_HTTPS_PORT + portOffset;
+    }
 
     @Override
     public String getType() {
@@ -47,19 +56,6 @@ public class WebsocketLocalEventAdapterFactory extends InputEventAdapterFactory 
 
     @Override
     public String getUsageTips() {
-        int defaultHttpPort = 9763;
-        int defaultHttpsPort = 9443;
-        int httpPort;
-        int httpsPort;
-        int portOffset = getPortOffset();
-
-        if (portOffset == 0) {
-            httpPort = defaultHttpPort;
-            httpsPort = defaultHttpsPort;
-        } else {
-            httpPort = defaultHttpPort + portOffset;
-            httpsPort = defaultHttpsPort + portOffset;
-        }
         return WebsocketLocalEventAdapterConstants.ADAPTOR_USAGE_TIPS_PREFIX + httpPort + WebsocketLocalEventAdapterConstants.ADAPTER_USAGE_TIPS_MID + httpsPort + WebsocketLocalEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX;
     }
 

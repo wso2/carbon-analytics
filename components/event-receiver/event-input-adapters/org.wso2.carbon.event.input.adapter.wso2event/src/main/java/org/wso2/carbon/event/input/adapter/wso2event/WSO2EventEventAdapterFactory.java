@@ -24,6 +24,19 @@ import java.util.*;
 
 public class WSO2EventEventAdapterFactory extends InputEventAdapterFactory {
     ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.input.adapter.wso2event.i18n.Resources", Locale.getDefault());
+    private int thriftTCPPort;
+    private int thriftSSLPort;
+    private int binaryTCPPort;
+    private int binarySSLPort;
+    private int portOffset;
+
+    public WSO2EventEventAdapterFactory() {
+        portOffset = getPortOffset();
+        thriftTCPPort = WSO2EventAdapterConstants.DEFAULT_THRIFT_TCP_PORT + portOffset;
+        thriftSSLPort = WSO2EventAdapterConstants.DEFAULT_THRIFT_SSL_PORT + portOffset;
+        binaryTCPPort = WSO2EventAdapterConstants.DEFAULT_BINARY_TCP_PORT + portOffset;
+        binarySSLPort = WSO2EventAdapterConstants.DEFAULT_BINARY_SSL_PORT + portOffset;
+    }
 
     @Override
     public String getType() {
@@ -54,29 +67,6 @@ public class WSO2EventEventAdapterFactory extends InputEventAdapterFactory {
 
     @Override
     public String getUsageTips() {
-        int thriftTCPPort;
-        int thriftSSLPort;
-        int binaryTCPPort;
-        int binarySSLPort;
-
-        int defaultThriftTCPPort = 7611;
-        int defaultThriftSSLPort = 7711;
-        int defaultBinaryTCPPort = 9611;
-        int defaultBinarySSLPort = 9711;
-
-        int portOffset = getPortOffset();
-
-        if (portOffset == 0) {
-            thriftTCPPort = defaultThriftTCPPort;
-            thriftSSLPort = defaultThriftSSLPort;
-            binaryTCPPort = defaultBinaryTCPPort;
-            binarySSLPort = defaultBinarySSLPort;
-        } else {
-            thriftTCPPort = defaultThriftTCPPort + portOffset;
-            thriftSSLPort = defaultThriftSSLPort + portOffset;
-            binaryTCPPort = defaultBinaryTCPPort + portOffset;
-            binarySSLPort = defaultBinarySSLPort + portOffset;
-        }
         return resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_USAGE_TIPS_PREFIX) + thriftTCPPort + resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_USAGE_TIPS_IN_BETWEEN) + thriftSSLPort + resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX) + binaryTCPPort + resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_USAGE_TIPS_IN_BETWEEN) + binarySSLPort;
     }
 

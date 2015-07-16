@@ -23,8 +23,18 @@ import java.util.*;
 
 
 public class HTTPEventAdapterFactory extends InputEventAdapterFactory {
+
     private ResourceBundle resourceBundle =
             ResourceBundle.getBundle("org.wso2.carbon.event.input.adapter.http.i18n.Resources", Locale.getDefault());
+    private int httpPort;
+    private int httpsPort;
+    private int portOffset;
+
+    public HTTPEventAdapterFactory() {
+        portOffset = getPortOffset();
+        httpPort = HTTPEventAdapterConstants.DEFAULT_HTTP_PORT + portOffset;
+        httpsPort = HTTPEventAdapterConstants.DEFAULT_HTTPS_PORT + portOffset;
+    }
 
     @Override
     public String getType() {
@@ -59,19 +69,6 @@ public class HTTPEventAdapterFactory extends InputEventAdapterFactory {
 
     @Override
     public String getUsageTips() {
-        int defaultHttpPort = 9763;
-        int defaultHttpsPort = 9443;
-        int httpPort;
-        int httpsPort;
-        int portOffset = getPortOffset();
-
-        if (portOffset == 0) {
-            httpPort = defaultHttpPort;
-            httpsPort = defaultHttpsPort;
-        } else {
-            httpPort = defaultHttpPort + portOffset;
-            httpsPort = defaultHttpsPort + portOffset;
-        }
         return resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_PREFIX) + httpPort + resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_MID1) + httpsPort + resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_MID2) + httpPort + resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_MID3) + httpsPort + resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX);
     }
 

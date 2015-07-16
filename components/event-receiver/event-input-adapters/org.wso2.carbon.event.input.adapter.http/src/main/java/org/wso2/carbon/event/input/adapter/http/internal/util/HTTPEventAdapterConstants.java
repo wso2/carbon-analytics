@@ -43,6 +43,7 @@ public final class HTTPEventAdapterConstants {
     public static final String LOCAL = "local";
     public static final String ALL = "all";
     public static final String CARBON_CONFIG_PORT_OFFSET_NODE = "Ports.Offset";
-
+    public static final int DEFAULT_HTTP_PORT = 9763;
+    public static final int DEFAULT_HTTPS_PORT = 9443;
 
 }
