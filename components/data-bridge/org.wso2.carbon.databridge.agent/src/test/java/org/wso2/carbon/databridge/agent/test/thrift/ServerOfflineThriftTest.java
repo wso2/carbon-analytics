@@ -98,7 +98,7 @@ public class ServerOfflineThriftTest extends TestCase{
             throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7631",
+        DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7641",
                 "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
@@ -108,7 +108,7 @@ public class ServerOfflineThriftTest extends TestCase{
 
         thriftTestServer = new ThriftTestServer();
         thriftTestServer.addStreamDefinition(STREAM_DEFN, -1234);
-        thriftTestServer.stopAndStartDuration(7631, 10000, 1000);
+        thriftTestServer.stopAndStartDuration(7641, 10000, 1000);
 
         DataPublisherTestUtil.setKeyStoreParams();
         DataPublisherTestUtil.setTrustStoreParams();
