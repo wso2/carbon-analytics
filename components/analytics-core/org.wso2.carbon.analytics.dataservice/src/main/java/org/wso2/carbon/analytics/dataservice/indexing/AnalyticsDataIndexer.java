@@ -1312,12 +1312,17 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (obj instanceof List && type == AnalyticsSchema.ColumnType.FACET) {
             facetsConfig.setMultiValued(name, true);
             facetsConfig.setHierarchical(name, true);
-            List<String> Path = new ArrayList<>();
-                    Path.addAll((List<String>) obj);
-            if (Path.isEmpty()) {
-                Path.add(EMPTY_FACET_VALUE);
+            List<Object> path = new ArrayList<>();
+                    path.addAll((List<Object>) obj);
+            if (path.isEmpty()) {
+                path.add(EMPTY_FACET_VALUE);
             }
-            doc.add(new FacetField(name, Path.toArray(new String[Path.size()])));
+            List<String> pathAsStrings = new ArrayList<>();
+            Iterator<Object> iterator = path.iterator();
+            while (iterator.hasNext()) {
+                pathAsStrings.add(String.valueOf(iterator.next()));
+            }
+            doc.add(new FacetField(name, pathAsStrings.toArray(new String[pathAsStrings.size()])));
         }
     }
 
