@@ -62,7 +62,7 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
-        validateOutputEventAdapterConfigurations(eventAdapterConfiguration);
+        validateOutputEventAdapterConfigurations();
 
         tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
@@ -165,7 +165,7 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
         return false;
     }
 
-    private void validateOutputEventAdapterConfigurations(OutputEventAdapterConfiguration eventAdapterConfiguration) throws OutputEventAdapterException {
+    private void validateOutputEventAdapterConfigurations() throws OutputEventAdapterException {
         String socketServerUrl = eventAdapterConfiguration.getStaticProperties().get(WebsocketEventAdapterConstants.ADAPTER_SERVER_URL);
         if (!socketServerUrl.startsWith("ws://")) {
             throw new OutputEventAdapterException("Provided websocket URL - " + socketServerUrl + " is invalid for websocket output adaptor with name" +
