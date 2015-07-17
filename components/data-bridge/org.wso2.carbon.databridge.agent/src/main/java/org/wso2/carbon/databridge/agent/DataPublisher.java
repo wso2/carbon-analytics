@@ -288,7 +288,7 @@ public class DataPublisher {
             } catch (EventQueueFullException e) {
                 log.warn("Event queue is full, unable to process the event for endpoint group "
                         + endpointGroup.toString() + ", dropping the event.");
-                if (log.isDebugEnabled()){
+                if (log.isDebugEnabled()) {
                     log.debug("Dropped Event: " + event.toString() + " for the endpoint group " +
                             endpointGroup.toString());
                 }
@@ -318,7 +318,7 @@ public class DataPublisher {
             } catch (EventQueueFullException e) {
                 log.warn("Event queue is full, unable to process the event for endpoint group "
                         + endpointGroup.toString() + ", dropping the event.");
-                if (log.isDebugEnabled()){
+                if (log.isDebugEnabled()) {
                     log.debug("Dropped Event: " + event.toString() + " for the endpoint group " +
                             endpointGroup.toString());
                 }

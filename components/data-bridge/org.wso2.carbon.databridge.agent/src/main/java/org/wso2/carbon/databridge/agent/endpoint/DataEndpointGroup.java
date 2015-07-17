@@ -27,6 +27,7 @@ import org.wso2.carbon.databridge.agent.exception.EventQueueFullException;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.databridge.agent.util.DataPublisherUtil;
 import org.wso2.carbon.databridge.commons.Event;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeThreadFactory;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -57,7 +58,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private AtomicInteger maximumDataPublisherIndex = new AtomicInteger();
 
-    private ScheduledExecutorService reconnectionService = Executors.newScheduledThreadPool(1);
+    private ScheduledExecutorService reconnectionService;
 
     private final Integer START_INDEX = 0;
 
@@ -68,6 +69,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     public DataEndpointGroup(HAType haType, DataEndpointAgent agent) {
         this.dataEndpoints = new ArrayList<>();
         this.haType = haType;
+        this.reconnectionService = Executors.newScheduledThreadPool(1, new DataBridgeThreadFactory("ReconnectionService"));
         this.reconnectionInterval = agent.getAgentConfiguration().getReconnectionInterval();
         this.eventQueue = new EventQueue(agent.getAgentConfiguration().getQueueSize());
         this.reconnectionService.scheduleAtFixedRate(new ReconnectionTask(), reconnectionInterval,
@@ -94,7 +96,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     class EventQueue {
         private RingBuffer<Event> ringBuffer;
-        private Disruptor<Event> eventQueue;
+        private Disruptor<Event> eventQueueDisruptor;
         private ExecutorService eventQueuePool;
 
         public final EventFactory<Event> EVENT_FACTORY = new EventFactory<Event>() {
@@ -104,10 +106,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         };
 
         EventQueue(int queueSize) {
-            eventQueuePool = Executors.newCachedThreadPool();
-            eventQueue = new Disruptor<>(EVENT_FACTORY, queueSize, eventQueuePool);
-            eventQueue.handleEventsWith(new EventQueueWorker());
-            this.ringBuffer = eventQueue.start();
+            eventQueuePool = Executors.newCachedThreadPool(new DataBridgeThreadFactory("EventQueue"));
+            eventQueueDisruptor = new Disruptor<>(EVENT_FACTORY, queueSize, eventQueuePool);
+            eventQueueDisruptor.handleEventsWith(new EventQueueWorker());
+            this.ringBuffer = eventQueueDisruptor.start();
         }
 
         private void tryPut(Event event) throws EventQueueFullException {
@@ -164,8 +166,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         }
 
         private void shutdown() {
-            eventQueue.shutdown();
             eventQueuePool.shutdown();
+            eventQueueDisruptor.shutdown();
         }
     }
 
@@ -180,7 +182,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                     flushAllDataEndpoints();
                 }
             } else {
-                log.info("Dropping events due to shutdown");
+                log.error("Dropping event as DataPublisher is shutting down.");
+                if (log.isDebugEnabled()) {
+                    log.debug("Data publisher is shutting down, dropping event : " + event);
+                }
             }
         }
     }
@@ -317,8 +322,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                 }
             }
             if (!isOneReceiverConnected) {
-                log.info("No receiver is reachable at reconnection, will try to reconnect every "
-                        + reconnectionInterval + " sec");
+                log.info("No receiver is reachable at reconnection, will try to reconnect every " + reconnectionInterval + " sec");
             }
         }
 
@@ -358,17 +362,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     }
 
     public void shutdown() {
-        if (getDataEndpoint(false) != null) {
-            // There are active endpoints, so we let them consume the events
-            eventQueue.shutdown();
-            reconnectionService.shutdown();
-        } else {
-            // Shutdown the reconnection service first to let  the eventQueue know that
-            // we are in a shutdown state
-            reconnectionService.shutdown();
-            eventQueue.shutdown();
-        }
-
+        reconnectionService.shutdownNow();
+        eventQueue.shutdown();
         for (DataEndpoint dataEndpoint : dataEndpoints) {
             dataEndpoint.shutdown();
         }
