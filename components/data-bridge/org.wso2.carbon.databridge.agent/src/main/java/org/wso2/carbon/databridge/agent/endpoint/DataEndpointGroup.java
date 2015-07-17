@@ -181,11 +181,6 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                 if (endOfBatch) {
                     flushAllDataEndpoints();
                 }
-            } else {
-                log.error("Dropping event as DataPublisher is shutting down.");
-                if (log.isDebugEnabled()) {
-                    log.debug("Data publisher is shutting down, dropping event : " + event);
-                }
             }
         }
     }
@@ -236,7 +231,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                     index = START_INDEX;
                 }
                 if (index == startIndex) {
-                    if (busyWait && !reconnectionService.isShutdown()) {
+                    if (busyWait) {
                         /**
                          * Have fully iterated the data publisher list,
                          * and busy wait until data publisher
