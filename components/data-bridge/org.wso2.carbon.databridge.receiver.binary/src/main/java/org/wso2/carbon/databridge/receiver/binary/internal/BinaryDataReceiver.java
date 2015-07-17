@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConstants;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeThreadFactory;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.receiver.binary.BinaryEventConverter;
@@ -54,9 +55,9 @@ public class BinaryDataReceiver {
         this.dataBridgeReceiverService = dataBridgeReceiverService;
         this.binaryDataReceiverConfiguration = binaryDataReceiverConfiguration;
         this.sslReceiverExecutorService = Executors.newFixedThreadPool(binaryDataReceiverConfiguration.
-                getSizeOfSSLThreadPool());
+                getSizeOfSSLThreadPool(), new DataBridgeThreadFactory("Receiver-Binary-SSL"));
         this.tcpReceiverExecutorService = Executors.newFixedThreadPool(binaryDataReceiverConfiguration.
-                getSizeOfTCPThreadPool());
+                getSizeOfTCPThreadPool(), new DataBridgeThreadFactory("Receiver-Binary-TCP"));
     }
 
     public void start() throws IOException, DataBridgeException {
@@ -128,7 +129,7 @@ public class BinaryDataReceiver {
                     OutputStream outputStream = new BufferedOutputStream((socket.getOutputStream()));
 
                     int messageType = inputstream.read();
-                    while (messageType!=-1) {
+                    while (messageType != -1) {
                         int messageSize = ByteBuffer.wrap(loadData(inputstream, new byte[4])).getInt();
                         byte[] message = loadData(inputstream, new byte[messageSize]);
                         processMessage(messageType, message, outputStream);
