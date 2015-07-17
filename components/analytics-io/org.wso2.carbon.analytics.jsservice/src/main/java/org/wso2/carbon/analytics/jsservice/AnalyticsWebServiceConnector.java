@@ -703,7 +703,7 @@ public class AnalyticsWebServiceConnector {
         }
     }
 
-    /*public String setTableSchema(String tableName, String schemaAsString) {
+    public String setTableSchema(String tableName, String schemaAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking setTableSchema for tableName : " + tableName);
         }
@@ -727,7 +727,7 @@ public class AnalyticsWebServiceConnector {
         } else {
             return gson.toJson(handleResponse(ResponseStatus.FAILED,"Table schema is not provided"));
         }
-    }*/
+    }
 
     public ResponseBean getTableSchema(String tableName) {
         if (logger.isDebugEnabled()) {

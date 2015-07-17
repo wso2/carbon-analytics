@@ -192,20 +192,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getTableSchema">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getTableSchemaResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax230:AnalyticsSchemaBean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="tableExists">
                 <xs:complexType>
                     <xs:sequence>
@@ -245,6 +231,36 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:long"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="createTable">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="recordStoreName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setTableSchema">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="schemaBean" nillable="true" type="ax230:AnalyticsSchemaBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableSchema">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableSchemaResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax230:AnalyticsSchemaBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -369,14 +385,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="createTable">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="recordStoreName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="clearIndices">
                 <xs:complexType>
                     <xs:sequence>
@@ -490,6 +498,9 @@
     </wsdl:message>
     <wsdl:message name="getTableSchemaResponse">
         <wsdl:part name="parameters" element="ns:getTableSchemaResponse"/>
+    </wsdl:message>
+    <wsdl:message name="setTableSchemaRequest">
+        <wsdl:part name="parameters" element="ns:setTableSchema"/>
     </wsdl:message>
     <wsdl:message name="getRecordCountRequest">
         <wsdl:part name="parameters" element="ns:getRecordCount"/>
@@ -607,6 +618,10 @@
             <wsdl:input message="ns:getTableSchemaRequest" wsaw:Action="urn:getTableSchema"/>
             <wsdl:output message="ns:getTableSchemaResponse" wsaw:Action="urn:getTableSchemaResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getTableSchemaAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="setTableSchema">
+            <wsdl:input message="ns:setTableSchemaRequest" wsaw:Action="urn:setTableSchema"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:setTableSchemaAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
         <wsdl:operation name="getRecordCount">
             <wsdl:input message="ns:getRecordCountRequest" wsaw:Action="urn:getRecordCount"/>
@@ -777,6 +792,15 @@
             <wsdl:output>
                 <soap:body use="literal"/>
             </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setTableSchema">
+            <soap:operation soapAction="urn:setTableSchema" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
             <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
@@ -1036,6 +1060,15 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="setTableSchema">
+            <soap12:operation soapAction="urn:setTableSchema" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="getById">
             <soap12:operation soapAction="urn:getById" style="document"/>
             <wsdl:input>
@@ -1263,6 +1296,12 @@
             <wsdl:output>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTableSchema">
+            <http:operation location="setTableSchema"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
         </wsdl:operation>
         <wsdl:operation name="getById">
             <http:operation location="getById"/>
