@@ -176,13 +176,13 @@ public class AnalyticsQueryParser extends QueryParser {
             return Long.parseLong(textValue);
         } catch (NumberFormatException ignore) {
             try {
-                return new SimpleDateFormat("yyyy.MM.dd HH:mm:ss z").parse(textValue).getTime();
+                return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").parse(textValue).getTime();
             } catch (java.text.ParseException ignore2) {
                 try {
-                    return new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").parse(textValue).getTime();
+                    return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(textValue).getTime();
                 } catch (java.text.ParseException ignore3) {
                     try {
-                        return new SimpleDateFormat("yyyy.MM.dd").parse(textValue).getTime();
+                        return new SimpleDateFormat("yyyy-MM-dd").parse(textValue).getTime();
                     } catch (java.text.ParseException e) {
                         throw new RuntimeException("Error in parsing long/timestamp field '" + 
                                 textValue + "' : " + e.getMessage());
