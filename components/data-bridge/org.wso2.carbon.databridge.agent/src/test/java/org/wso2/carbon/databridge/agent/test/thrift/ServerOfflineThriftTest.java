@@ -96,6 +96,8 @@ public class ServerOfflineThriftTest extends TestCase{
 
     public void testBlockingEventSendingAndServerStartup()
             throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
+        DataPublisherTestUtil.setKeyStoreParams();
+        DataPublisherTestUtil.setTrustStoreParams();
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7641",
@@ -120,11 +122,11 @@ public class ServerOfflineThriftTest extends TestCase{
             dataPublisher.publish(event);
         }
         try {
-            Thread.sleep(10000);
+            Thread.sleep(60000);
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(numberOfEventsSent, thriftTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(queueSize, thriftTestServer.getNumberOfEventsReceived());
         thriftTestServer.stop();
     }
 
