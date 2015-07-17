@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventStore;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
 import org.wso2.carbon.analytics.stream.persistence.dto.AnalyticsTable;
@@ -151,40 +152,18 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                     try {
                         String tableName = getTableName(analyticsTable.getTableName());
                         AnalyticsDataService analyticsDataService = ServiceHolder.getAnalyticsDataService();
-                        if (!analyticsDataService.tableExists(getTenantId(), tableName)) {
-                            analyticsDataService.createTable(getTenantId(), tableName);
-                        }
                         List<ColumnDefinition> columnDefinitions = new ArrayList<>();
                         List<String> primaryKeys = new ArrayList<>();
-                        AnalyticsSchema tableSchema = analyticsDataService.getTableSchema(getTenantId(), tableName);
-                        if (isStreamExist(analyticsTable.getTableName()) && tableSchema != null) {
-                            Map<String, ColumnDefinition> columns = tableSchema.getColumns();
-                            if (columns != null) {
-                                // Removing all arbitrary fields
-                                Iterator<String> iterator = columns.keySet().iterator();
-                                while (iterator.hasNext()) {
-                                    String key = iterator.next();
-                                    if (key.startsWith("_")) {
-                                        iterator.remove();
+                        try {
+                            AnalyticsSchema tableSchema = analyticsDataService.getTableSchema(getTenantId(), tableName);
+                            if (isStreamExist(analyticsTable.getTableName()) && tableSchema != null) {
+                                Map<String, ColumnDefinition> columns = tableSchema.getColumns();
+                                removeArbitraryField(columns);
+                                AnalyticsTableRecord[] analyticsTableRecords = analyticsTable.getAnalyticsTableRecords();
+                                for (AnalyticsTableRecord analyticsTableRecord : analyticsTableRecords) {
+                                    if (columns != null && columns.containsKey(analyticsTableRecord.getColumnName())) {
+                                        columns.remove(analyticsTableRecord.getColumnName());
                                     }
-                                }
-                            }
-                            AnalyticsTableRecord[] analyticsTableRecords = analyticsTable.getAnalyticsTableRecords();
-                            for (AnalyticsTableRecord analyticsTableRecord : analyticsTableRecords) {
-                                if (columns != null && columns.containsKey(analyticsTableRecord.getColumnName())) {
-                                    ColumnDefinition columnDefinition = columns.remove(analyticsTableRecord.getColumnName());
-                                    if (analyticsTableRecord.isPersist()) {
-                                        columnDefinition.setType(getColumnType(analyticsTableRecord.getColumnType()));
-                                        columnDefinition.setIndexed(analyticsTableRecord.isIndexed());
-                                        columnDefinition.setScoreParam(analyticsTableRecord.isScoreParam());
-                                        columnDefinitions.add(columnDefinition);
-                                    }
-                                    if (analyticsTableRecord.isPrimaryKey() && analyticsTableRecord.isPersist()) {
-                                        primaryKeys.add(analyticsTableRecord.getColumnName());
-                                    } else {
-                                        primaryKeys.remove(analyticsTableRecord.getColumnName());
-                                    }
-                                } else {
                                     if (analyticsTableRecord.isPersist()) {
                                         ColumnDefinition columnDefinition = getColumnDefinition(analyticsTableRecord);
                                         columnDefinitions.add(columnDefinition);
@@ -193,11 +172,11 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                                         }
                                     }
                                 }
+                                if (columns != null) {
+                                    columnDefinitions.addAll(columns.values());
+                                }
                             }
-                            if (columns != null) {
-                                columnDefinitions.addAll(columns.values());
-                            }
-                        } else {
+                        } catch (AnalyticsTableNotAvailableException ex) {
                             for (AnalyticsTableRecord analyticsTableRecord : analyticsTable.getAnalyticsTableRecords()) {
                                 ColumnDefinition columnDefinition = getColumnDefinition(analyticsTableRecord);
                                 columnDefinitions.add(columnDefinition);
@@ -207,7 +186,6 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                             }
                         }
                         AnalyticsSchema schema = new AnalyticsSchema(columnDefinitions, primaryKeys);
-                        analyticsDataService.setTableSchema(getTenantId(), tableName, schema);
                         ServiceHolder.getAnalyticsEventSinkService().putEventSink(getTenantId(), analyticsTable
                                 .getTableName(), analyticsTable.getStreamVersion(), schema, analyticsTable.getRecordStoreName());
                     } catch (Exception e) {
@@ -215,14 +193,32 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                         throw new EventStreamPersistenceAdminServiceException("Unable to save analytics schema", e);
                     }
                 } else {
-                    try {
-                        ServiceHolder.getAnalyticsEventSinkService().removeEventSink(getTenantId(),
-                                                                                     analyticsTable.getTableName(),
-                                                                                     analyticsTable.getStreamVersion());
-                    } catch (AnalyticsEventStoreException e) {
-                        log.error("Unable to save analytics schema[" + analyticsTable.getTableName() + "]: " + e.getMessage(), e);
-                        throw new EventStreamPersistenceAdminServiceException("Unable to save analytics schema", e);
-                    }
+                    removeExistingEventSink(analyticsTable);
+                }
+            }
+        }
+    }
+
+    private void removeExistingEventSink(AnalyticsTable analyticsTable)
+            throws EventStreamPersistenceAdminServiceException {
+        try {
+            ServiceHolder.getAnalyticsEventSinkService().removeEventSink(getTenantId(),
+                                                                         analyticsTable.getTableName(),
+                                                                         analyticsTable.getStreamVersion());
+        } catch (AnalyticsEventStoreException e) {
+            log.error("Unable to save analytics schema[" + analyticsTable.getTableName() + "]: " + e.getMessage(), e);
+            throw new EventStreamPersistenceAdminServiceException("Unable to save analytics schema", e);
+        }
+    }
+
+    private void removeArbitraryField(Map<String, ColumnDefinition> columns) {
+        if (columns != null) {
+            // Removing all arbitrary fields
+            Iterator<String> iterator = columns.keySet().iterator();
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                if (key.startsWith("_")) {
+                    iterator.remove();
                 }
             }
         }
