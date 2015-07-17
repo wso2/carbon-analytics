@@ -63,12 +63,12 @@ public abstract class DataEndpoint {
     private State state;
 
     public enum State {
-        ACTIVE, UNAVAILABLE, BUSY
+        ACTIVE, UNAVAILABLE, BUSY, INITIALIZING
     }
 
     public DataEndpoint() {
         this.batchSize = DataEndpointConstants.DEFAULT_DATA_AGENT_BATCH_SIZE;
-        this.state = State.UNAVAILABLE;
+        this.state = State.INITIALIZING;
         events = new ArrayList<>();
     }
 
@@ -125,7 +125,8 @@ public abstract class DataEndpoint {
                 dataEndpointConfiguration.getMaxPoolSize(), dataEndpointConfiguration.getKeepAliveTimeInPool(),
                 TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
                 new DataBridgeThreadFactory(dataEndpointConfiguration.getReceiverURL()));
-        this.connectionService = Executors.newSingleThreadExecutor(new DataBridgeThreadFactory("ConnectionService-" + dataEndpointConfiguration.getReceiverURL()));
+        this.connectionService = Executors.newSingleThreadExecutor(new DataBridgeThreadFactory("ConnectionService-" +
+                dataEndpointConfiguration.getReceiverURL()));
         this.maxPoolSize = dataEndpointConfiguration.getCorePoolSize();
         connect();
     }

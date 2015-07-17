@@ -181,6 +181,11 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                 if (endOfBatch) {
                     flushAllDataEndpoints();
                 }
+            } else {
+                log.error("Dropping event as DataPublisher is shutting down.");
+                if (log.isDebugEnabled()) {
+                    log.debug("Data publisher is shutting down, dropping event : " + event);
+                }
             }
         }
     }
@@ -199,10 +204,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
      * indefinitely until at least one data endpoint becomes available based
      * on busywait parameter.
      *
-     * @param busyWait waitUntil atleast one endpoint becomes available
+     * @param isBusyWait waitUntil atleast one endpoint becomes available
      * @return DataEndpoint which can accept and send the events.
      */
-    private DataEndpoint getDataEndpoint(boolean busyWait) {
+    private DataEndpoint getDataEndpoint(boolean isBusyWait) {
         int startIndex;
         if (haType.equals(HAType.FAILOVER)) {
             startIndex = getDataPublisherIndex();
@@ -215,32 +220,34 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             DataEndpoint dataEndpoint = dataEndpoints.get(index);
             if (dataEndpoint.getState().equals(DataEndpoint.State.ACTIVE)) {
                 return dataEndpoint;
-            } else if (dataEndpoint.getState().equals(DataEndpoint.State.BUSY) && haType.equals(HAType.FAILOVER)) {
+            } else if (haType.equals(HAType.FAILOVER) && (dataEndpoint.getState().equals(DataEndpoint.State.BUSY) ||
+                    dataEndpoint.getState().equals(DataEndpoint.State.INITIALIZING))) {
                 /**
                  * Wait for some time until the failover endpoint finish publishing
                  *
                  */
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException ignored) {
-                    //ignored
-                }
+                busyWait(1);
             } else {
                 index++;
                 if (index > maximumDataPublisherIndex.get() - 1) {
                     index = START_INDEX;
                 }
                 if (index == startIndex) {
-                    if (busyWait) {
-                        /**
-                         * Have fully iterated the data publisher list,
-                         * and busy wait until data publisher
-                         * becomes available
-                         */
-                        try {
-                            Thread.sleep(1);
-                        } catch (InterruptedException e) {
-                            //Ignored
+                    if (isBusyWait) {
+                        if (!reconnectionService.isShutdown()) {
+
+                            /**
+                             * Have fully iterated the data publisher list,
+                             * and busy wait until data publisher
+                             * becomes available
+                             */
+                            busyWait(1);
+                        } else {
+                            if (!isActiveDataEndpointExists()) {
+                                return null;
+                            }else {
+                                busyWait(1);
+                            }
                         }
                     } else {
                         return null;
@@ -250,13 +257,24 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         }
     }
 
+    private void busyWait(long timeInMilliSec) {
+        try {
+            Thread.sleep(timeInMilliSec);
+        } catch (InterruptedException ignored) {
+        }
+    }
+
     private boolean isActiveDataEndpointExists() {
         int index = START_INDEX;
         while (index < maximumDataPublisherIndex.get()) {
             DataEndpoint dataEndpoint = dataEndpoints.get(index);
             if (dataEndpoint.getState() != DataEndpoint.State.UNAVAILABLE) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Available endpoint : " + dataEndpoint + " existing in state - " + dataEndpoint.getState());
+                }
                 return true;
             }
+            index++;
         }
         return false;
     }

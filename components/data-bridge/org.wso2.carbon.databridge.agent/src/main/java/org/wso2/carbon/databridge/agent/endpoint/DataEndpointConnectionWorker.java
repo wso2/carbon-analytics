@@ -110,13 +110,12 @@ public class DataEndpointConnectionWorker implements Runnable {
 
     public void disconnect(DataEndpointConfiguration dataPublisherConfiguration) {
         Object client = null;
-
         try {
             client = this.dataEndpointConfiguration.getSecuredTransportPool().borrowObject(dataPublisherConfiguration.getAuthKey());
             this.dataEndpoint.logout(client, dataPublisherConfiguration.getSessionId());
         } catch (Exception e) {
             if (log.isDebugEnabled()) {
-                log.error("Cannot connect to the server at " + dataPublisherConfiguration.getAuthKey() + " Authenticator", e);
+                log.debug("Cannot connect to the server at " + dataPublisherConfiguration.getAuthKey() + " Authenticator", e);
             }
             log.warn("Cannot connect to the server at " + dataPublisherConfiguration.getAuthKey() + " Authenticator");
         } finally {

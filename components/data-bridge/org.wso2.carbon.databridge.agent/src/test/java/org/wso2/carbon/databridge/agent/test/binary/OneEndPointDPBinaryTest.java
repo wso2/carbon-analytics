@@ -199,36 +199,36 @@ public class OneEndPointDPBinaryTest extends TestCase {
         Assert.assertTrue("Invalid urls passed for receiver and auth, and hence expected to fail", expected);
     }
 
-//    public void testShutdownDataPublisher() throws DataEndpointAuthenticationException,
-//            DataEndpointAgentConfigurationException, TransportException,
-//            DataEndpointException, DataEndpointConfigurationException,
-//            MalformedStreamDefinitionException, DataBridgeException,
-//            StreamDefinitionStoreException, IOException {
-//        startServer(9641, 9741);
-//        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
-//        String hostName = DataPublisherTestUtil.LOCAL_HOST;
-//        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9641",
-//                "ssl://" + hostName + ":9741", "admin", "admin");
-//        Event event = new Event();
-//        event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
-//        event.setMetaData(new Object[]{"127.0.0.1"});
-//        event.setCorrelationData(null);
-//        event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
-//
-//        int numberOfEventsSent = 100000;
-//        for (int i = 0; i < numberOfEventsSent; i++) {
-//            dataPublisher.publish(event);
-//        }
-//
-//        dataPublisher.shutdown();
-//
-//        try {
-//            Thread.sleep(5000);
-//        } catch (InterruptedException e) {
-//        }
-//        Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
-//        testServer.resetReceivedEvents();
-//        testServer.stop();
-//    }
+    public void testShutdownDataPublisher() throws DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException, TransportException,
+            DataEndpointException, DataEndpointConfigurationException,
+            MalformedStreamDefinitionException, DataBridgeException,
+            StreamDefinitionStoreException, IOException {
+        startServer(9641, 9741);
+        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
+        String hostName = DataPublisherTestUtil.LOCAL_HOST;
+        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9641",
+                "ssl://" + hostName + ":9741", "admin", "admin");
+        Event event = new Event();
+        event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
+        event.setMetaData(new Object[]{"127.0.0.1"});
+        event.setCorrelationData(null);
+        event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
+
+        int numberOfEventsSent = 100000;
+        for (int i = 0; i < numberOfEventsSent; i++) {
+            dataPublisher.publish(event);
+        }
+
+        dataPublisher.shutdown();
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+        }
+        Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
+        testServer.resetReceivedEvents();
+        testServer.stop();
+    }
 
 }
