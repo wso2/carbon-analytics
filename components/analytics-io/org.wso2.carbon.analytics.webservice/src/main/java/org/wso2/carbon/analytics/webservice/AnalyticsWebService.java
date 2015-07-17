@@ -30,6 +30,7 @@ import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -158,6 +159,24 @@ public class AnalyticsWebService extends AbstractAdmin {
         } catch (Exception e) {
             logger.error("unable to publish event: " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("unable to publish event: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Sets the table schema for a table
+     * @param schemaBean The schema bean representing the schema
+     * @throws AnalyticsWebServiceException
+     */
+    public void setTableSchema(String tableName, AnalyticsSchemaBean schemaBean)
+            throws AnalyticsWebServiceException {
+        try {
+
+            AnalyticsSchema schema = Utils.getAnalyticsSchema(schemaBean);
+
+            analyticsDataAPI.setTableSchema(getUsername(), tableName, schema);
+        } catch (Exception e) {
+            logger.error("unable to set the schema for table: " + tableName + ", " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("unable to set the schema: " + tableName + ", " + e.getMessage(), e);
         }
     }
 

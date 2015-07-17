@@ -486,4 +486,45 @@ public class Utils {
         }
         return value;
     }
+
+    public static AnalyticsSchema getAnalyticsSchema(AnalyticsSchemaBean schemaBean) {
+        SchemaColumnBean[] columnBeans = schemaBean.getColumns();
+        String[] primaryKeys = schemaBean.getPrimaryKeys();
+        List<ColumnDefinition> columnDefinitions = new ArrayList<>();
+        List<String> primaryKeyList = new ArrayList<>();
+        if (primaryKeys != null) {
+            primaryKeyList.addAll(Arrays.asList(primaryKeys));
+        }
+        if (columnBeans != null) {
+            for (SchemaColumnBean columnBean : columnBeans) {
+                ColumnDefinition columnDefinition = new ColumnDefinition(columnBean.getColumnName(),
+                    getColumnType(columnBean.getColumnType()), columnBean.isIndex(), columnBean.isScoreParam());
+                columnDefinitions.add(columnDefinition);
+            }
+        }
+        return new AnalyticsSchema(columnDefinitions, primaryKeyList);
+    }
+
+    private static AnalyticsSchema.ColumnType getColumnType(String columnType) {
+        switch (columnType) {
+            case RecordValueEntryBean.STRING:
+                return AnalyticsSchema.ColumnType.STRING;
+            case RecordValueEntryBean.INTEGER:
+                return AnalyticsSchema.ColumnType.INTEGER;
+            case RecordValueEntryBean.LONG:
+                return AnalyticsSchema.ColumnType.LONG;
+            case RecordValueEntryBean.FLOAT:
+                return AnalyticsSchema.ColumnType.FLOAT;
+            case RecordValueEntryBean.DOUBLE:
+                return AnalyticsSchema.ColumnType.DOUBLE;
+            case RecordValueEntryBean.BOOLEAN:
+                return AnalyticsSchema.ColumnType.BOOLEAN;
+            case RecordValueEntryBean.BINARY:
+                return AnalyticsSchema.ColumnType.BINARY;
+            case RecordValueEntryBean.FACET:
+                return AnalyticsSchema.ColumnType.FACET;
+            default:
+                return AnalyticsSchema.ColumnType.STRING;
+        }
+    }
 }
