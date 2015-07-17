@@ -321,10 +321,12 @@ public class RDBMSQueryConfigurationEntry {
      * Pagination mode to be used for a specific RDBMS.
      */
     public static enum PaginationMode {
-        /* MySQL, H2, MSSQL 2012 like */
+        /* MySQL, H2, MSSQL 2012 like, (recordsFrom, recordsCount) */
         MODE1,
-        /* Oracle, MSSQL ROWNUM like */
-        MODE2
+        /* Oracle, MSSQL ROWNUM like, (recordsFrom + recordsCount, recordsFrom) */
+        MODE2,
+        /* inverse MODE2, (recordsFrom, recordsFrom + recordsCount) */
+        MODE3
     }
     
 }

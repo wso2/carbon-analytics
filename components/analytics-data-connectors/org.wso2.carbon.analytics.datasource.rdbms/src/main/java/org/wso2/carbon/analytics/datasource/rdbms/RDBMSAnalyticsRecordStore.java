@@ -366,7 +366,10 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             return new int[] { recordsFrom, recordsCount };
         case MODE2:
             /* Oracle, MSSQL ROWNUM like */
-            return new int[]{recordsFrom + recordsCount, recordsFrom};
+            return new int[] {recordsFrom + recordsCount, recordsFrom};
+        case MODE3:
+            /* inverse MODE2 */
+            return new int[] {recordsFrom, recordsFrom + recordsCount};
         default:
             throw new IllegalArgumentException("Invalid pagination mode: " + 
                     this.rdbmsQueryConfigurationEntry.getPaginationMode());

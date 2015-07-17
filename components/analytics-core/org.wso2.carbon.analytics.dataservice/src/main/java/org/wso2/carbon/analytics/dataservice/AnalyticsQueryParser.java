@@ -31,6 +31,7 @@ import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 /**
@@ -73,7 +74,8 @@ public class AnalyticsQueryParser extends QueryParser {
                 }
             case LONG:
                 try {
-                    return NumericRangeQuery.newLongRange(field, Long.parseLong(part1), Long.parseLong(part2), si, ei);
+                    return NumericRangeQuery.newLongRange(field, this.parseTimestampOrDirectLong(part1), 
+                            this.parseTimestampOrDirectLong(part2), si, ei);
                 } catch (NumberFormatException e) {
                     throw new ParseException("Invalid query, the field '" + field + "' must contain long values");
                 }
@@ -134,7 +136,7 @@ public class AnalyticsQueryParser extends QueryParser {
                 }
             case LONG:
                 try {
-                    long value = Long.parseLong(term.text());
+                    long value = this.parseTimestampOrDirectLong(term.text());
                     BytesRefBuilder bytes = new BytesRefBuilder();
                     NumericUtils.longToPrefixCoded(value, 0, bytes);
                     return new TermQuery(new Term(term.field(), bytes.toBytesRef().utf8ToString()));
@@ -168,4 +170,26 @@ public class AnalyticsQueryParser extends QueryParser {
             return super.newTermQuery(term);
         }
     }
+    
+    private long parseTimestampOrDirectLong(String textValue) throws NumberFormatException {
+        try {
+            return Long.parseLong(textValue);
+        } catch (NumberFormatException ignore) {
+            try {
+                return new SimpleDateFormat("yyyy.MM.dd HH:mm:ss z").parse(textValue).getTime();
+            } catch (java.text.ParseException ignore2) {
+                try {
+                    return new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").parse(textValue).getTime();
+                } catch (java.text.ParseException ignore3) {
+                    try {
+                        return new SimpleDateFormat("yyyy.MM.dd").parse(textValue).getTime();
+                    } catch (java.text.ParseException e) {
+                        throw new RuntimeException("Error in parsing long/timestamp field '" + 
+                                textValue + "' : " + e.getMessage());
+                    }
+                }
+            }
+        }
+    }
+    
 }
