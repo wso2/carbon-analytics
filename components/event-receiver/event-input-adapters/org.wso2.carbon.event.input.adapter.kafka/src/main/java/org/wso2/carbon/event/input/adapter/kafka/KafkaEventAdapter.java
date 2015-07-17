@@ -28,8 +28,10 @@ import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRunti
 import org.wso2.carbon.event.input.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.input.adapter.kafka.internal.util.KafkaEventAdapterConstants;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 
 public final class KafkaEventAdapter implements InputEventAdapter {
 
@@ -49,6 +51,7 @@ public final class KafkaEventAdapter implements InputEventAdapter {
 
     @Override
     public void init(InputEventAdapterListener eventAdaptorListener) throws InputEventAdapterException {
+        validateInputEventAdapterConfigurations();
         this.eventAdaptorListener = eventAdaptorListener;
     }
 
@@ -139,6 +142,15 @@ public final class KafkaEventAdapter implements InputEventAdapter {
     @Override
     public boolean isPolling() {
         return true;
+    }
+
+    private void validateInputEventAdapterConfigurations() throws InputEventAdapterException {
+        String threadsProperty = eventAdapterConfiguration.getProperties().get(KafkaEventAdapterConstants.ADAPTOR_SUSCRIBER_THREADS);
+        try{
+            Integer.parseInt(threadsProperty);
+        } catch (NumberFormatException e){
+            throw new InputEventAdapterException("Invalid value set for property 'Threads': " + threadsProperty, e);
+        }
     }
 
 }

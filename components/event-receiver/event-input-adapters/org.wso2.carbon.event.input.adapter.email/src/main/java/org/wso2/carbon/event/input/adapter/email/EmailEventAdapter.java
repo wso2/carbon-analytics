@@ -27,6 +27,8 @@ import org.wso2.carbon.event.input.adapter.core.exception.TestConnectionNotSuppo
 import org.wso2.carbon.event.input.adapter.email.internal.util.EmailEventAdapterConstants;
 
 import javax.mail.*;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -56,6 +58,7 @@ public class EmailEventAdapter implements InputEventAdapter {
 
     @Override
     public void init(InputEventAdapterListener eventAdaptorListener) throws InputEventAdapterException {
+        validateInputEventAdapterConfigurations();
         this.eventAdaptorListener = eventAdaptorListener;
     }
 
@@ -357,6 +360,33 @@ public class EmailEventAdapter implements InputEventAdapter {
             PrivilegedCarbonContext.endTenantFlow();
         }
 
+    }
+
+    private void validateInputEventAdapterConfigurations() throws InputEventAdapterException {
+        //validate email address
+        String mailAddress = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_ADDRESS);
+        try {
+            InternetAddress emailAddr = new InternetAddress(mailAddress);
+            emailAddr.validate();
+        } catch (AddressException e) {
+            throw new InputEventAdapterException("Invalid value set for property 'Receiving Mail Address': " + mailAddress, e);
+        }
+
+        //validate poll interval
+        String pollIntervalProperty = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_POLL_INTERVAL);
+        try{
+            Integer.parseInt(pollIntervalProperty);
+        } catch (NumberFormatException e){
+            throw new InputEventAdapterException("Invalid value set for property 'Poll Interval': " + pollIntervalProperty, e);
+        }
+
+        //validate port
+        String portProperty = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_PORT);
+        try{
+            Integer.parseInt(portProperty);
+        } catch (NumberFormatException e){
+            throw new InputEventAdapterException("Invalid value set for property 'Mail Protocol Port': " + portProperty, e);
+        }
     }
 
 }

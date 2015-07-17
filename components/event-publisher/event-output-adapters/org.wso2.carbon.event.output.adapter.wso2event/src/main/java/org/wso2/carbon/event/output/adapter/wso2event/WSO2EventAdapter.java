@@ -29,6 +29,7 @@ import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
+import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 
@@ -57,7 +58,8 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
      * Initialises the resource bundle
      */
     @Override
-    public void init() {
+    public void init() throws OutputEventAdapterException {
+        validateOutputEventAdapterConfigurations();
         tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         String configPath = globalProperties.get(ADAPTOR_CONF_PATH);
@@ -89,11 +91,7 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
         if (publishingMode.equalsIgnoreCase(ADAPTER_PUBLISHING_MODE_BLOCKING)) {
             isBlockingMode = true;
         } else {
-            try {
-                timeout = Long.parseLong(timeoutString);
-            } catch (RuntimeException e) {
-                throwRuntimeException(receiverUrl, authUrl, protocol, userName, e);
-            }
+            timeout = Long.parseLong(timeoutString);
         }
 
         try {
@@ -156,6 +154,17 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
     @Override
     public boolean isPolled() {
         return false;
+    }
+
+    private void validateOutputEventAdapterConfigurations() throws OutputEventAdapterException {
+        String timeoutProperty = eventAdapterConfiguration.getStaticProperties().get(ADAPTER_CONF_WSO2EVENT_PROP_PUBLISH_TIMEOUT_MS);
+        if(timeoutProperty != null){
+            try{
+                Long.parseLong(timeoutProperty);
+            } catch (NumberFormatException e){
+                throw new OutputEventAdapterException("Invalid value set for property 'Publishing Timeout': " + timeoutProperty, e);
+            }
+        }
     }
 
     private void throwRuntimeException(String receiverUrl, String authUrl, String protocol, String userName,
