@@ -29,8 +29,6 @@ public class HBaseAnalyticsDSConstants {
     public static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
     public static final String ANALYTICS_INDEX_TABLE_PREFIX = "IDX";
 
-    public static final String ANALYTICS_META_TABLE_NAME = "ANALYTICS_META_TABLE";
-
     public enum TableType {
         DATA,
         INDEX

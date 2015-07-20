@@ -25,24 +25,26 @@ import java.util.List;
 public class HBaseTimestampRecordGroup implements RecordGroup {
 
     private static final long serialVersionUID = -5892873497625619175L;
-    private int tenantId;
+    private int tenantId, recordsCount;
     private String tableName;
     private List<String> columns;
     private long startTime, endTime;
 
-    public HBaseTimestampRecordGroup() { }
-    
-    public HBaseTimestampRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo) {
+    public HBaseTimestampRecordGroup() {
+    }
+
+    public HBaseTimestampRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, int recordsCount) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.columns = columns;
         this.startTime = timeFrom;
         this.endTime = timeTo;
+        this.recordsCount = recordsCount;
     }
 
     @Override
     public String[] getLocations() throws AnalyticsException {
-        return new String[] { "localhost" };
+        return new String[]{"localhost"};
     }
 
     public int getTenantId() {
@@ -63,6 +65,10 @@ public class HBaseTimestampRecordGroup implements RecordGroup {
 
     public long getEndTime() {
         return endTime;
+    }
+
+    public int getRecordsCount() {
+        return recordsCount;
     }
 
 }

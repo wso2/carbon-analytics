@@ -59,11 +59,6 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         this.queryConfig = entry;
     }
 
-    public HBaseAnalyticsRecordStore() {
-        this.conn = null;
-        this.queryConfig = null;
-    }
-
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
         this.queryConfig = HBaseUtils.lookupConfiguration();
@@ -272,17 +267,17 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
                              long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
-        if (recordsCount > 0 || recordsFrom > 0) {
+        if (recordsFrom > 0) {
             throw new HBaseUnsupportedOperationException("Pagination is not supported for HBase Analytics Record Stores");
         }
         if (!this.tableExists(tenantId, tableName)) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
         if ((timeFrom == Long.MIN_VALUE) && (timeTo == Long.MAX_VALUE)) {
-            return this.computeRegionSplits(tenantId, tableName, columns);
+            return this.computeRegionSplits(tenantId, tableName, columns, recordsCount);
         } else {
             return new HBaseTimestampRecordGroup[]{
-                    new HBaseTimestampRecordGroup(tenantId, tableName, columns, timeFrom, timeTo)
+                    new HBaseTimestampRecordGroup(tenantId, tableName, columns, timeFrom, timeTo, recordsCount)
             };
         }
     }
@@ -300,18 +295,22 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public AnalyticsIterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException, AnalyticsTableNotAvailableException {
+
         if (recordGroup instanceof HBaseIDRecordGroup) {
             HBaseIDRecordGroup idRecordGroup = (HBaseIDRecordGroup) recordGroup;
             return this.getRecords(idRecordGroup.getTenantId(), idRecordGroup.getTableName(),
                     idRecordGroup.getColumns(), idRecordGroup.getIds());
+
         } else if (recordGroup instanceof HBaseTimestampRecordGroup) {
             HBaseTimestampRecordGroup tsRecordGroup = (HBaseTimestampRecordGroup) recordGroup;
             return this.getRecords(tsRecordGroup.getTenantId(), tsRecordGroup.getTableName(),
-                    tsRecordGroup.getColumns(), tsRecordGroup.getStartTime(), tsRecordGroup.getEndTime());
+                    tsRecordGroup.getColumns(), tsRecordGroup.getStartTime(), tsRecordGroup.getEndTime(),
+                    tsRecordGroup.getRecordsCount());
+
         } else if (recordGroup instanceof HBaseRegionSplitRecordGroup) {
             HBaseRegionSplitRecordGroup rsRecordGroup = (HBaseRegionSplitRecordGroup) recordGroup;
             return this.getRecords(rsRecordGroup.getTenantId(), rsRecordGroup.getTableName(),
-                    rsRecordGroup.getColumns(), rsRecordGroup.getStartRow(), rsRecordGroup.getEndRow());
+                    rsRecordGroup.getColumns(), rsRecordGroup.getRecordsCount(), rsRecordGroup.getStartRow(), rsRecordGroup.getEndRow());
         } else {
             throw new AnalyticsException("Invalid HBase RecordGroup implementation: " + recordGroup.getClass());
         }
@@ -323,18 +322,19 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         return new HBaseRecordIterator(tenantId, tableName, columns, ids, this.conn, batchSize);
     }
 
-    public AnalyticsIterator<Record> getRecords(int tenantId, String tableName, List<String> columns, long startTime, long endTime)
+    public AnalyticsIterator<Record> getRecords(int tenantId, String tableName, List<String> columns, long startTime,
+                                                long endTime, int recordsCount)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
         int batchSize = this.queryConfig.getBatchSize();
-        return new HBaseTimestampIterator(tenantId, tableName, columns, startTime, endTime, this.conn, batchSize);
+        return new HBaseTimestampIterator(tenantId, tableName, columns, startTime, endTime, recordsCount, this.conn, batchSize);
     }
 
-    public AnalyticsIterator<Record> getRecords(int tenantId, String tableName, List<String> columns, byte[] startRow, byte[] endRow)
+    public AnalyticsIterator<Record> getRecords(int tenantId, String tableName, List<String> columns, int recordsCount, byte[] startRow, byte[] endRow)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return new HBaseRegionSplitIterator(tenantId, tableName, columns, this.conn, startRow, endRow);
+        return new HBaseRegionSplitIterator(tenantId, tableName, columns, recordsCount, this.conn, startRow, endRow);
     }
 
-    private RecordGroup[] computeRegionSplits(int tenantId, String tableName, List<String> columns) throws AnalyticsException {
+    private RecordGroup[] computeRegionSplits(int tenantId, String tableName, List<String> columns, int recordsCount) throws AnalyticsException {
         List<RecordGroup> regionalGroups = new ArrayList<>();
         String formattedTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA);
         try {
@@ -343,8 +343,8 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             byte[][] startKeys = startEndKeys.getFirst();
             byte[][] endKeys = startEndKeys.getSecond();
             for (int i = 0; i < startKeys.length && i < endKeys.length; i++) {
-                RecordGroup regionalGroup = new HBaseRegionSplitRecordGroup(tenantId, tableName, columns, startKeys[i],
-                        endKeys[i], locator.getRegionLocation(startKeys[i]).getHostname());
+                RecordGroup regionalGroup = new HBaseRegionSplitRecordGroup(tenantId, tableName, columns, recordsCount,
+                        startKeys[i], endKeys[i], locator.getRegionLocation(startKeys[i]).getHostname());
                 regionalGroups.add(regionalGroup);
             }
         } catch (IOException e) {

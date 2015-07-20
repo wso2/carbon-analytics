@@ -43,9 +43,13 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
 
     private List<String> columns;
 
-    private int tenantId, batchSize;
+    private int tenantId;
+    private int batchSize;
+    private int recordsCount;
+    private int globalCounter;
 
-    private byte[] latestRow, endRow;
+    private byte[] latestRow;
+    private byte[] endRow;
     private static final long POSTFIX = 1L;
 
     private boolean fullyFetched;
@@ -55,13 +59,13 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
 
     private static final Log log = LogFactory.getLog(HBaseTimestampIterator.class);
 
-    HBaseTimestampIterator(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo,
+    HBaseTimestampIterator(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, int recordsCount,
                            Connection conn, int batchSize) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if ((timeFrom > timeTo) || (batchSize < 0)) {
             throw new AnalyticsException("Invalid parameters specified for reading data from table " + tableName +
                     " for tenant " + tenantId);
         } else {
-            this.init(conn, tenantId, tableName, columns, batchSize);
+            this.init(conn, tenantId, tableName, columns, recordsCount, batchSize);
             /* setting the initial row to start time -1 because it will soon be incremented by 1L. */
             this.latestRow = HBaseUtils.encodeLong(timeFrom - POSTFIX);
             this.endRow = HBaseUtils.encodeLong(timeTo);
@@ -146,6 +150,12 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
 
     private List<String> populateNextRecordBatch() {
         List<String> currentBatch = new ArrayList<>();
+        if (this.recordsCount > 0) {
+            if (this.globalCounter >= this.recordsCount) {
+                this.fullyFetched = true;
+                return currentBatch;
+            }
+        }
         int counter = 0;
         Scan indexScan = new Scan();
         long latestTime = HBaseUtils.decodeLong(this.latestRow);
@@ -156,7 +166,7 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
         try {
             resultScanner = this.indexTable.getScanner(indexScan);
             for (Result rowResult : resultScanner) {
-                if (counter == this.batchSize) {
+                if (counter == this.batchSize || this.globalCounter == this.recordsCount) {
                     break;
                 }
                 Cell[] cells = rowResult.rawCells();
@@ -165,6 +175,7 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
                 }
                 this.latestRow = rowResult.getRow();
                 counter++;
+                this.globalCounter++;
             }
             resultScanner.close();
             indexTable.close();
@@ -179,11 +190,14 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
         return currentBatch;
     }
 
-    private void init(Connection conn, int tenantId, String tableName, List<String> columns, int batchSize) throws AnalyticsException {
+    private void init(Connection conn, int tenantId, String tableName, List<String> columns, int recordsCount,
+                      int batchSize) throws AnalyticsException {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.columns = columns;
+        this.recordsCount = recordsCount;
         this.batchSize = batchSize;
+        this.globalCounter = 0;
         try {
             this.indexTable = conn.getTable(TableName.valueOf(
                     HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.INDEX)));

@@ -30,18 +30,21 @@ public class HBaseRegionSplitRecordGroup implements RecordGroup {
     private byte[] startRow;
     private byte[] endRow;
     private String location;
-
+    private int recordsCount;
     private List<String> columns;
 
-    public HBaseRegionSplitRecordGroup() { }
-    
-    public HBaseRegionSplitRecordGroup(int tenantId, String tableName, List<String> columns, byte[] startRow, byte[] endRow, String location) {
+    public HBaseRegionSplitRecordGroup() {
+    }
+
+    public HBaseRegionSplitRecordGroup(int tenantId, String tableName, List<String> columns, int recordsCount, byte[] startRow, byte[] endRow, String location) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.startRow = startRow;
         this.endRow = endRow;
         this.location = location;
         this.columns = columns;
+
+        this.recordsCount = recordsCount;
     }
 
     @Override
@@ -67,6 +70,10 @@ public class HBaseRegionSplitRecordGroup implements RecordGroup {
 
     public byte[] getEndRow() {
         return endRow;
+    }
+
+    public int getRecordsCount() {
+        return recordsCount;
     }
 
 }

@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.datasource.hbase;
 
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.filter.PageFilter;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -46,7 +47,7 @@ public class HBaseRegionSplitIterator implements AnalyticsIterator<Record> {
 
     Set<String> colSet = null;
 
-    public HBaseRegionSplitIterator(int tenantId, String tableName, List<String> columns, Connection conn,
+    public HBaseRegionSplitIterator(int tenantId, String tableName, List<String> columns, int recordsCount, Connection conn,
                                     byte[] startRow, byte[] endRow) throws AnalyticsException, AnalyticsTableNotAvailableException {
         this.tenantId = tenantId;
         this.tableName = tableName;
@@ -68,7 +69,9 @@ public class HBaseRegionSplitIterator implements AnalyticsIterator<Record> {
         Scan splitScan = new Scan();
         splitScan.setStartRow(startRow);
         splitScan.setStopRow(endRow);
-
+        if (recordsCount > 0) {
+            splitScan.setFilter(new PageFilter(recordsCount));
+        }
         if (columns != null && columns.size() > 0) {
             this.colSet = new HashSet<>(columns);
             splitScan.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
