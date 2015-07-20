@@ -487,6 +487,42 @@ public class AnalyticsRecordStoreTest {
     }
 
     @Test
+    public void testRecordRetrievalWithFixedCount() throws AnalyticsException {
+        this.cleanupT1();
+        this.analyticsRS.createTable(7, "T1");
+        long time = System.currentTimeMillis();
+        int timeOffset = 10;
+        List<Record> records = generateRecords(7, "T1", 1, 100, time, timeOffset);
+        this.analyticsRS.put(records);
+        List<Record> recordsIn;
+        recordsIn = GenericUtils.listRecords(this.analyticsRS,
+                this.analyticsRS.get(7, "T1", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, 500));
+        Assert.assertEquals(recordsIn.size(), 100);
+        recordsIn = GenericUtils.listRecords(this.analyticsRS,
+                this.analyticsRS.get(7, "T1", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, 38));
+        Assert.assertTrue(recordsIn.size() >= 38);
+        recordsIn = GenericUtils.listRecords(this.analyticsRS,
+                this.analyticsRS.get(7, "T1", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, 500));
+        Assert.assertEquals(recordsIn.size(), 100);
+        recordsIn = GenericUtils.listRecords(this.analyticsRS,
+                this.analyticsRS.get(7, "T1", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, 50));
+        Assert.assertEquals(recordsIn.size(), 50);
+        recordsIn = GenericUtils.listRecords(this.analyticsRS,
+                this.analyticsRS.get(7, "T1", 2, null, time + 22, time + timeOffset * 100, 0, 200));
+        Assert.assertEquals(recordsIn.size(), 97);
+        recordsIn = GenericUtils.listRecords(this.analyticsRS,
+                this.analyticsRS.get(7, "T1", 2, null, time + 22, time + timeOffset * 100, 0, 67));
+        Assert.assertEquals(recordsIn.size(), 67);
+        recordsIn = GenericUtils.listRecords(this.analyticsRS,
+                this.analyticsRS.get(7, "T1", 3, null, time, time + timeOffset * 96 - 2, 0, 1000));
+        Assert.assertEquals(recordsIn.size(), 96);
+        recordsIn = GenericUtils.listRecords(this.analyticsRS,
+                this.analyticsRS.get(7, "T1", 3, null, time, time + timeOffset * 96 - 2, 0, 41));
+        Assert.assertEquals(recordsIn.size(), 41);
+        this.cleanupT1();
+    }
+
+    @Test
     public void testDataRecordDeleteWithIds() throws AnalyticsException {
         this.cleanupT1();
         this.analyticsRS.createTable(7, "T1");
