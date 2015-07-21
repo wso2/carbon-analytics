@@ -210,13 +210,9 @@
                         }
                     }
 
-                    try {
-                        stub.deployXmlEventReceiverConfiguration(eventReceiverName, streamNameWithVersion, eventAdapterInfo,
-                                parentSelectorXpath, namespaceProperties, xpathProperties, basicInputAdapterPropertyDtos,
-                                EventReceiverUIConstants.STRING_LITERAL_ENABLE.equalsIgnoreCase(customMapping));
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                    }
+                    stub.deployXmlEventReceiverConfiguration(eventReceiverName, streamNameWithVersion, eventAdapterInfo,
+                            parentSelectorXpath, namespaceProperties, xpathProperties, basicInputAdapterPropertyDtos,
+                            EventReceiverUIConstants.STRING_LITERAL_ENABLE.equalsIgnoreCase(customMapping));
                 } else if (inputMappingType.equals("map")) {
                     String payloadPropertySet = request.getParameter("mapData");
                     EventMappingPropertyDto[] mapEbProperties = null;

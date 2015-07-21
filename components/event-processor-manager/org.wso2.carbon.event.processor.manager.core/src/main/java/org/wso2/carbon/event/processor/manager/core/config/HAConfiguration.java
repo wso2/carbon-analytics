@@ -26,6 +26,7 @@ public class HAConfiguration implements Serializable {
     private HostAndPort management;
     private HostAndPort transport;
     private int reconnectionInterval;
+    private String memberUuid;
 
     public int getReconnectionInterval() {
         return reconnectionInterval;
@@ -52,4 +53,11 @@ public class HAConfiguration implements Serializable {
         this.reconnectionInterval = reconnectionInterval;
     }
 
+    public String getMemberUuid() {
+        return memberUuid;
+    }
+
+    public void setMemberUuid(String memberUuid) {
+        this.memberUuid = memberUuid;
+    }
 }

@@ -96,9 +96,11 @@ public class ServerOfflineThriftTest extends TestCase{
 
     public void testBlockingEventSendingAndServerStartup()
             throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
+        DataPublisherTestUtil.setKeyStoreParams();
+        DataPublisherTestUtil.setTrustStoreParams();
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7631",
+        DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7641",
                 "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
@@ -108,7 +110,7 @@ public class ServerOfflineThriftTest extends TestCase{
 
         thriftTestServer = new ThriftTestServer();
         thriftTestServer.addStreamDefinition(STREAM_DEFN, -1234);
-        thriftTestServer.stopAndStartDuration(7631, 10000, 1000);
+        thriftTestServer.stopAndStartDuration(7641, 10000, 1000);
 
         DataPublisherTestUtil.setKeyStoreParams();
         DataPublisherTestUtil.setTrustStoreParams();
@@ -120,11 +122,11 @@ public class ServerOfflineThriftTest extends TestCase{
             dataPublisher.publish(event);
         }
         try {
-            Thread.sleep(10000);
+            Thread.sleep(60000);
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(numberOfEventsSent, thriftTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(queueSize, thriftTestServer.getNumberOfEventsReceived());
         thriftTestServer.stop();
     }
 

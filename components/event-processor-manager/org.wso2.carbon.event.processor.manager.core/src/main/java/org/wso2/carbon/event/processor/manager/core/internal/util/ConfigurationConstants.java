@@ -79,5 +79,4 @@ public final class ConfigurationConstants {
     public static enum HAMode {Active, Passive, Backup}
 
     public static final String STORM_EVENT_PUBLISHER_SYNC_MAP = "stormEventPublisherSyncMap";
-
 }

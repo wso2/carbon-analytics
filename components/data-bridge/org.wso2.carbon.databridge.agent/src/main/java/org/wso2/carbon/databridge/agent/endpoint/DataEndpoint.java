@@ -63,13 +63,12 @@ public abstract class DataEndpoint {
     private State state;
 
     public enum State {
-        ACTIVE, UNAVAILABLE, BUSY
+        ACTIVE, UNAVAILABLE, BUSY, INITIALIZING
     }
 
     public DataEndpoint() {
         this.batchSize = DataEndpointConstants.DEFAULT_DATA_AGENT_BATCH_SIZE;
-        this.state = State.UNAVAILABLE;
-        connectionService = Executors.newSingleThreadExecutor();
+        this.state = State.INITIALIZING;
         events = new ArrayList<>();
     }
 
@@ -125,8 +124,9 @@ public abstract class DataEndpoint {
         this.threadPoolExecutor = new ThreadPoolExecutor(dataEndpointConfiguration.getCorePoolSize(),
                 dataEndpointConfiguration.getMaxPoolSize(), dataEndpointConfiguration.getKeepAliveTimeInPool(),
                 TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
-                new DataBridgeThreadFactory
-                        (dataEndpointConfiguration.getReceiverURL()));
+                new DataBridgeThreadFactory(dataEndpointConfiguration.getReceiverURL()));
+        this.connectionService = Executors.newSingleThreadExecutor(new DataBridgeThreadFactory("ConnectionService-" +
+                dataEndpointConfiguration.getReceiverURL()));
         this.maxPoolSize = dataEndpointConfiguration.getCorePoolSize();
         connect();
     }
@@ -233,7 +233,7 @@ public abstract class DataEndpoint {
                     handleFailedEvents();
                 }
             } catch (DataEndpointException e) {
-                log.error("Unable to send evenets to the endpoint. ", e);
+                log.error("Unable to send events to the endpoint. ", e);
                 handleFailedEvents();
             } catch (UndefinedEventTypeException e) {
                 log.error("Unable to process this event.", e);
@@ -262,8 +262,7 @@ public abstract class DataEndpoint {
     }
 
     public String toString() {
-        return "( Receiver URL : " + getDataEndpointConfiguration().getReceiverURL() +
-                ", Authentication URL : " + getDataEndpointConfiguration().getAuthURL() + ")";
+        return "( Receiver URL : " + getDataEndpointConfiguration().getReceiverURL() + ", Authentication URL : " + getDataEndpointConfiguration().getAuthURL() + ")";
     }
 
     /**
@@ -278,8 +277,8 @@ public abstract class DataEndpoint {
             }
         }
         connectionWorker.disconnect(getDataEndpointConfiguration());
-        connectionService.shutdown();
-        threadPoolExecutor.shutdown();
+        connectionService.shutdownNow();
+        threadPoolExecutor.shutdownNow();
         log.info("Completed shutdown for data publisher endpoint URL - " + getDataEndpointConfiguration().getReceiverURL());
     }
 

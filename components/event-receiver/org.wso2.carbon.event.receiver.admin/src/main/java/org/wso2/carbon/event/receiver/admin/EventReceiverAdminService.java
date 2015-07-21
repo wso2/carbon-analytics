@@ -1,27 +1,26 @@
 /*
- * Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.wso2.carbon.event.receiver.admin;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
-import org.wso2.carbon.databridge.commons.Attribute;
-import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSchema;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterService;
@@ -110,7 +109,7 @@ public class EventReceiverAdminService extends AbstractAdmin {
                 eventReceiverConfigurationInfoDtoArray[index].setEnableTracing(eventReceiverConfiguration.isTraceEnabled());
                 eventReceiverConfigurationInfoDtoArray[index].setEditable(eventReceiverConfiguration.isEditable());
             }
-            Arrays.sort(eventReceiverConfigurationInfoDtoArray,new Comparator() {
+            Arrays.sort(eventReceiverConfigurationInfoDtoArray, new Comparator() {
 
                 @Override
                 public int compare(Object o1, Object o2) {
@@ -145,7 +144,7 @@ public class EventReceiverAdminService extends AbstractAdmin {
 
                 eventReceiverFileDtoArray[index] = new EventReceiverConfigurationFileDto(fileName, eventReceiverName, statusMsg);
             }
-            Arrays.sort(eventReceiverFileDtoArray,new Comparator() {
+            Arrays.sort(eventReceiverFileDtoArray, new Comparator() {
 
                 @Override
                 public int compare(Object o1, Object o2) {
@@ -292,7 +291,6 @@ public class EventReceiverAdminService extends AbstractAdmin {
     public boolean undeployActiveEventReceiverConfiguration(String eventReceiverName)
             throws AxisFault {
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
-        AxisConfiguration axisConfiguration = getAxisConfig();
         try {
             eventReceiverService.undeployActiveEventReceiverConfiguration(eventReceiverName);
         } catch (EventReceiverConfigurationException e) {
@@ -306,7 +304,6 @@ public class EventReceiverAdminService extends AbstractAdmin {
             throws AxisFault {
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
         try {
-            AxisConfiguration axisConfiguration = getAxisConfig();
             eventReceiverService.undeployInactiveEventReceiverConfiguration(fileName);
         } catch (EventReceiverConfigurationException e) {
             log.error(e.getMessage(), e);
@@ -316,10 +313,9 @@ public class EventReceiverAdminService extends AbstractAdmin {
     }
 
     public boolean editActiveEventReceiverConfiguration(String eventReceiverConfiguration,
-                                                     String eventReceiverName)
+                                                        String eventReceiverName)
             throws AxisFault {
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
-        AxisConfiguration axisConfiguration = getAxisConfig();
         try {
             eventReceiverService.editActiveEventReceiverConfiguration(eventReceiverConfiguration, eventReceiverName);
         } catch (EventReceiverConfigurationException e) {
@@ -335,7 +331,6 @@ public class EventReceiverAdminService extends AbstractAdmin {
             throws AxisFault {
 
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
-        AxisConfiguration axisConfiguration = getAxisConfig();
         try {
             eventReceiverService.editInactiveEventReceiverConfiguration(eventReceiverConfiguration, fileName);
         } catch (EventReceiverConfigurationException e) {
@@ -358,14 +353,14 @@ public class EventReceiverAdminService extends AbstractAdmin {
     }
 
     public boolean deployWso2EventReceiverConfiguration(String eventReceiverName,
-                                                     String streamNameWithVersion,
-                                                     String eventAdapterType,
-                                                     EventMappingPropertyDto[] metaData,
-                                                     EventMappingPropertyDto[] correlationData,
-                                                     EventMappingPropertyDto[] payloadData,
-                                                     BasicInputAdapterPropertyDto[] inputPropertyConfiguration,
-                                                     boolean mappingEnabled,
-                                                     String fromStreamNameWithVersion)
+                                                        String streamNameWithVersion,
+                                                        String eventAdapterType,
+                                                        EventMappingPropertyDto[] metaData,
+                                                        EventMappingPropertyDto[] correlationData,
+                                                        EventMappingPropertyDto[] payloadData,
+                                                        BasicInputAdapterPropertyDto[] inputPropertyConfiguration,
+                                                        boolean mappingEnabled,
+                                                        String fromStreamNameWithVersion)
             throws AxisFault {
 
         if (checkEventReceiverValidity(eventReceiverName)) {
@@ -425,11 +420,11 @@ public class EventReceiverAdminService extends AbstractAdmin {
     }
 
     public boolean deployTextEventReceiverConfiguration(String eventReceiverName,
-                                                     String streamNameWithVersion,
-                                                     String eventAdapterType,
-                                                     EventMappingPropertyDto[] inputMappings,
-                                                     BasicInputAdapterPropertyDto[] inputPropertyConfiguration,
-                                                     boolean mappingEnabled)
+                                                        String streamNameWithVersion,
+                                                        String eventAdapterType,
+                                                        EventMappingPropertyDto[] inputMappings,
+                                                        BasicInputAdapterPropertyDto[] inputPropertyConfiguration,
+                                                        boolean mappingEnabled)
             throws AxisFault {
 
         if (checkEventReceiverValidity(eventReceiverName)) {
@@ -472,13 +467,13 @@ public class EventReceiverAdminService extends AbstractAdmin {
     }
 
     public boolean deployXmlEventReceiverConfiguration(String eventReceiverName,
-                                                    String streamNameWithVersion,
-                                                    String eventAdapterType,
-                                                    String parentXpath,
-                                                    EventMappingPropertyDto[] namespaces,
-                                                    EventMappingPropertyDto[] inputMappings,
-                                                    BasicInputAdapterPropertyDto[] inputPropertyConfiguration,
-                                                    boolean mappingEnabled)
+                                                       String streamNameWithVersion,
+                                                       String eventAdapterType,
+                                                       String parentXpath,
+                                                       EventMappingPropertyDto[] namespaces,
+                                                       EventMappingPropertyDto[] inputMappings,
+                                                       BasicInputAdapterPropertyDto[] inputPropertyConfiguration,
+                                                       boolean mappingEnabled)
             throws AxisFault {
 
         if (checkEventReceiverValidity(eventReceiverName)) {
@@ -530,11 +525,11 @@ public class EventReceiverAdminService extends AbstractAdmin {
     }
 
     public boolean deployMapEventReceiverConfiguration(String eventReceiverName,
-                                                    String streamNameWithVersion,
-                                                    String eventAdapterType,
-                                                    EventMappingPropertyDto[] inputMappings,
-                                                    BasicInputAdapterPropertyDto[] inputPropertyConfiguration,
-                                                    boolean mappingEnabled)
+                                                       String streamNameWithVersion,
+                                                       String eventAdapterType,
+                                                       EventMappingPropertyDto[] inputMappings,
+                                                       BasicInputAdapterPropertyDto[] inputPropertyConfiguration,
+                                                       boolean mappingEnabled)
             throws AxisFault {
 
         if (checkEventReceiverValidity(eventReceiverName)) {
@@ -579,11 +574,11 @@ public class EventReceiverAdminService extends AbstractAdmin {
     }
 
     public boolean deployJsonEventReceiverConfiguration(String eventReceiverName,
-                                                     String streamNameWithVersion,
-                                                     String eventAdapterType,
-                                                     EventMappingPropertyDto[] inputMappings,
-                                                     BasicInputAdapterPropertyDto[] inputPropertyConfiguration,
-                                                     boolean mappingEnabled)
+                                                        String streamNameWithVersion,
+                                                        String eventAdapterType,
+                                                        EventMappingPropertyDto[] inputMappings,
+                                                        BasicInputAdapterPropertyDto[] inputPropertyConfiguration,
+                                                        boolean mappingEnabled)
             throws AxisFault {
 
         if (checkEventReceiverValidity(eventReceiverName)) {
@@ -628,7 +623,6 @@ public class EventReceiverAdminService extends AbstractAdmin {
     public boolean setStatisticsEnabled(String eventReceiverName, boolean flag) throws AxisFault {
 
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
-        AxisConfiguration axisConfiguration = getAxisConfig();
         try {
             eventReceiverService.setStatisticsEnabled(eventReceiverName, flag);
         } catch (EventReceiverConfigurationException e) {
@@ -640,7 +634,6 @@ public class EventReceiverAdminService extends AbstractAdmin {
 
     public boolean setTracingEnabled(String eventReceiverName, boolean flag) throws AxisFault {
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
-        AxisConfiguration axisConfiguration = getAxisConfig();
         try {
             eventReceiverService.setTraceEnabled(eventReceiverName, flag);
         } catch (EventReceiverConfigurationException e) {
@@ -703,90 +696,13 @@ public class EventReceiverAdminService extends AbstractAdmin {
         return new DetailInputAdapterPropertyDto[0];
     }
 
-    private boolean checkStreamAttributeValidity(List<String> inputEventAttributes,
-                                                 StreamDefinition streamDefinition) {
-
-        if (streamDefinition != null) {
-            List<String> inComingStreamAttributes = new ArrayList<String>();
-            final String PROPERTY_META_PREFIX = "meta_";
-            final String PROPERTY_CORRELATION_PREFIX = "correlation_";
-
-            List<Attribute> metaAttributeList = streamDefinition.getMetaData();
-            List<Attribute> correlationAttributeList = streamDefinition.getCorrelationData();
-            List<Attribute> payloadAttributeList = streamDefinition.getPayloadData();
-
-
-            if (metaAttributeList != null) {
-                for (Attribute attribute : metaAttributeList) {
-                    inComingStreamAttributes.add(PROPERTY_META_PREFIX + attribute.getName());
-                }
-            }
-            if (correlationAttributeList != null) {
-                for (Attribute attribute : correlationAttributeList) {
-                    inComingStreamAttributes.add(PROPERTY_CORRELATION_PREFIX + attribute.getName());
-                }
-            }
-            if (payloadAttributeList != null) {
-                for (Attribute attribute : payloadAttributeList) {
-                    inComingStreamAttributes.add(attribute.getName());
-                }
-            }
-
-            if (inputEventAttributes.size() > 0) {
-                if (inComingStreamAttributes.containsAll(inputEventAttributes)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-
-    private String getStreamAttributes(StreamDefinition streamDefinition) {
-        List<Attribute> metaAttributeList = streamDefinition.getMetaData();
-        List<Attribute> correlationAttributeList = streamDefinition.getCorrelationData();
-        List<Attribute> payloadAttributeList = streamDefinition.getPayloadData();
-
-        String attributes = "";
-
-        if (metaAttributeList != null) {
-            for (Attribute attribute : metaAttributeList) {
-                attributes += EventReceiverAdminConstants.PROPERTY_META_PREFIX + attribute.getName() + " " + attribute.getType().toString().toLowerCase() + ", \n";
-            }
-        }
-        if (correlationAttributeList != null) {
-            for (Attribute attribute : correlationAttributeList) {
-                attributes += EventReceiverAdminConstants.PROPERTY_CORRELATION_PREFIX + attribute.getName() + " " + attribute.getType().toString().toLowerCase() + ", \n";
-            }
-        }
-        if (payloadAttributeList != null) {
-            for (Attribute attribute : payloadAttributeList) {
-                attributes += attribute.getName() + " " + attribute.getType().toString().toLowerCase() + ", \n";
-            }
-        }
-
-        if (!attributes.equals("")) {
-            return attributes.substring(0, attributes.lastIndexOf(","));
-        } else {
-            return attributes;
-        }
-    }
-
     private boolean checkEventReceiverValidity(String eventReceiverName) throws AxisFault {
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-
         List<EventReceiverConfiguration> eventReceiverConfigurationList = null;
 
         eventReceiverConfigurationList = eventReceiverService.getAllActiveEventReceiverConfigurations();
         Iterator eventReceiverConfigurationIterator = eventReceiverConfigurationList.iterator();
         while (eventReceiverConfigurationIterator.hasNext()) {
-
             EventReceiverConfiguration eventReceiverConfiguration = (EventReceiverConfiguration) eventReceiverConfigurationIterator.next();
             if (eventReceiverConfiguration.getEventReceiverName().equalsIgnoreCase(eventReceiverName)) {
                 return false;
@@ -794,43 +710,6 @@ public class EventReceiverAdminService extends AbstractAdmin {
         }
 
         return true;
-    }
-
-    private String getPropertyAttributeDataType(String propertyName,
-                                                StreamDefinition streamDefinition)
-            throws AxisFault {
-
-        if (propertyName != null) {
-            List<Attribute> metaDataList = streamDefinition.getMetaData();
-            if (metaDataList != null) {
-                for (Attribute attribute : metaDataList) {
-                    if (propertyName.equalsIgnoreCase(EventReceiverAdminConstants.PROPERTY_META_PREFIX + attribute.getName())) {
-                        return attribute.getType().toString().toLowerCase();
-                    }
-                }
-            }
-
-            List<Attribute> correlationDataList = streamDefinition.getCorrelationData();
-            if (correlationDataList != null) {
-                for (Attribute attribute : correlationDataList) {
-                    if (propertyName.equalsIgnoreCase(EventReceiverAdminConstants.PROPERTY_CORRELATION_PREFIX + attribute.getName())) {
-                        return attribute.getType().toString().toLowerCase();
-                    }
-                }
-            }
-
-            List<Attribute> payloadDataList = streamDefinition.getPayloadData();
-            if (payloadDataList != null) {
-                for (Attribute attribute : payloadDataList) {
-                    if (propertyName.equalsIgnoreCase(attribute.getName())) {
-                        return attribute.getType().toString().toLowerCase();
-                    }
-                }
-            }
-        }
-
-        throw new AxisFault("Input Stream attributes are not matching with input stream definition");
-
     }
 
     private void constructInputAdapterRelatedConfigs(String eventReceiverName, String eventAdapterType,

@@ -21,6 +21,13 @@ public final class WSO2EventAdapterConstants {
     }
 
     public static final String ADAPTER_TYPE_WSO2EVENT = "wso2event";
-    public static final String ADAPTER_USAGE_TIPS_WSO2EVENT = "wso2event.usage.tips";
+    public static final String ADAPTER_USAGE_TIPS_PREFIX = "wso2event.usage.tips_prefix";
+    public static final String ADAPTER_USAGE_TIPS_IN_BETWEEN = "wso2event.usage.tips_in_between";
+    public static final String ADAPTER_USAGE_TIPS_POSTFIX = "wso2event.usage.tips_postfix";
     public static final String ADAPTER_IS_EVENTS_DUPLICATED_IN_CLUSTER_HINT = "events.duplicated.in.cluster.hint";
+    public static final String CARBON_CONFIG_PORT_OFFSET_NODE = "Ports.Offset";
+    public static final int DEFAULT_THRIFT_TCP_PORT = 7611;
+    public static final int DEFAULT_THRIFT_SSL_PORT = 7711;
+    public static final int DEFAULT_BINARY_TCP_PORT = 9611;
+    public static final int DEFAULT_BINARY_SSL_PORT = 9711;
 }

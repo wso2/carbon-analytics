@@ -179,6 +179,11 @@ public class OneEndPointDPThriftTest extends TestCase {
             dataPublisher.publish(event);
         }
 
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+        }
+
         dataPublisher.shutdown();
 
         try {

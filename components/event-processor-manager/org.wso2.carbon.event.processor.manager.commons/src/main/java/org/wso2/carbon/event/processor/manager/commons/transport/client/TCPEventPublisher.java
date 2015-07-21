@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- *  WSO2 Inc. licenses this file to you under the Apache License,
- *  Version 2.0 (the "License"); you may not use this file except
- *  in compliance with the License.
- *  You may obtain a copy of the License at
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an
- *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *  KIND, either express or implied.  See the License for the
- *  specific language governing permissions and limitations
- *  under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.event.processor.manager.commons.transport.client;
@@ -43,8 +43,8 @@ public class TCPEventPublisher {
     public static final String DEFAULT_CHARSET = "UTF-8";
     private static Logger log = Logger.getLogger(TCPEventPublisher.class);
     private final String hostUrl;
-    private Disruptor<BiteArrayHolder> disruptor;
-    private RingBuffer<BiteArrayHolder> ringBuffer;
+    private Disruptor<ByteArrayHolder> disruptor;
+    private RingBuffer<ByteArrayHolder> ringBuffer;
     private Map<String, StreamRuntimeInfo> streamRuntimeInfoMap;
     private OutputStream outputStream;
     private Socket clientSocket;
@@ -163,7 +163,7 @@ public class TCPEventPublisher {
     private void publishToDisruptor(byte[] byteArray) {
         long sequenceNo = ringBuffer.next();
         try {
-            BiteArrayHolder existingHolder = ringBuffer.get(sequenceNo);
+            ByteArrayHolder existingHolder = ringBuffer.get(sequenceNo);
             existingHolder.bytes = byteArray;
         } finally {
             ringBuffer.publish(sequenceNo);
@@ -218,19 +218,19 @@ public class TCPEventPublisher {
     }
 
     private void initializeDisruptor(TCPEventPublisherConfig publisherConfig) {
-        this.disruptor = new Disruptor<BiteArrayHolder>(new EventFactory<BiteArrayHolder>() {
+        this.disruptor = new Disruptor<ByteArrayHolder>(new EventFactory<ByteArrayHolder>() {
             @Override
-            public BiteArrayHolder newInstance() {
-                return new BiteArrayHolder();
+            public ByteArrayHolder newInstance() {
+                return new ByteArrayHolder();
             }
         }, publisherConfig.getBufferSize(), Executors.newSingleThreadExecutor());
 
         this.ringBuffer = disruptor.getRingBuffer();
 
-        this.disruptor.handleEventsWith(new EventHandler<BiteArrayHolder>() {
+        this.disruptor.handleEventsWith(new EventHandler<ByteArrayHolder>() {
             @Override
-            public void onEvent(BiteArrayHolder biteArrayHolder, long sequence, boolean endOfBatch) throws IOException {
-                publishEventAsync(biteArrayHolder.bytes, endOfBatch);
+            public void onEvent(ByteArrayHolder byteArrayHolder, long sequence, boolean endOfBatch) throws IOException {
+                publishEventAsync(byteArrayHolder.bytes, endOfBatch);
             }
         });
 
@@ -285,7 +285,7 @@ public class TCPEventPublisher {
         disconnect();
     }
 
-    class BiteArrayHolder {
+    class ByteArrayHolder {
         byte[] bytes;
     }
 

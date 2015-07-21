@@ -21,7 +21,11 @@ public final class HTTPEventAdapterConstants {
     }
 
     public static final String ADAPTER_TYPE_HTTP = "http";
-    public static final String ADAPTER_USAGE_TIPS_HTTP = "http.usage.tips";
+    public static final String ADAPTER_USAGE_TIPS_PREFIX = "http.usage.tips_prefix";
+    public static final String ADAPTER_USAGE_TIPS_MID1 = "http.usage.tips_mid1";
+    public static final String ADAPTER_USAGE_TIPS_MID2 = "http.usage.tips_mid2";
+    public static final String ADAPTER_USAGE_TIPS_MID3 = "http.usage.tips_mid3";
+    public static final String ADAPTER_USAGE_TIPS_POSTFIX = "http.usage.tips_postfix";
     public static final int ADAPTER_MIN_THREAD_POOL_SIZE = 8;
     public static final int ADAPTER_MAX_THREAD_POOL_SIZE = 100;
     public static final int ADAPTER_EXECUTOR_JOB_QUEUE_SIZE = 10000;
@@ -38,6 +42,8 @@ public final class HTTPEventAdapterConstants {
     public static final String HTTP = "http";
     public static final String LOCAL = "local";
     public static final String ALL = "all";
-
+    public static final String CARBON_CONFIG_PORT_OFFSET_NODE = "Ports.Offset";
+    public static final int DEFAULT_HTTP_PORT = 9763;
+    public static final int DEFAULT_HTTPS_PORT = 9443;
 
 }

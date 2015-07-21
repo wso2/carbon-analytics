@@ -62,21 +62,8 @@ public class CassandraEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
-
+        validateOutputEventAdapterConfigurations();
         tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-
-        Map<String, String> staticProperties = eventAdapterConfiguration.getStaticProperties();
-
-        String username = staticProperties.get(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_USER_NAME);
-        String password = staticProperties.get(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_PASSWORD);
-        if (username != null && password != null) {
-            credentials = new HashMap<String, String>();
-            credentials.put("username", username);
-            credentials.put("password", password);
-        } else if (username != null || password != null) {
-            throw new OutputEventAdapterException("Both username & password properties should be null or not null for Cassandra Output Adapter '" + eventAdapterConfiguration.getName() + "'");
-        }
-
     }
 
     @Override
@@ -218,5 +205,35 @@ public class CassandraEventAdapter implements OutputEventAdapter {
         return false;
     }
 
+    private void validateOutputEventAdapterConfigurations() throws OutputEventAdapterException {
+        Map<String, String> staticProperties = eventAdapterConfiguration.getStaticProperties();
 
+        String username = staticProperties.get(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_USER_NAME);
+        String password = staticProperties.get(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_PASSWORD);
+        if (username != null && password != null) {
+            credentials = new HashMap<String, String>();
+            credentials.put("username", username);
+            credentials.put("password", password);
+        } else if (username != null || password != null) {
+            throw new OutputEventAdapterException("Both username & password properties should be null or not null for Cassandra Output Adapter '" + eventAdapterConfiguration.getName() + "'");
+        }
+
+        String portProperty = staticProperties.get(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_PORT);
+        if(portProperty != null){
+            try{
+                Integer.parseInt(portProperty);
+            } catch (NumberFormatException e){
+                throw new OutputEventAdapterException("Invalid value set for property 'Port': " + portProperty, e);
+            }
+        }
+
+        String replicationFactorProperty = staticProperties.get(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_REPLICATION_FACTOR);
+        if(replicationFactorProperty != null){
+            try{
+                Integer.parseInt(replicationFactorProperty);
+            } catch (NumberFormatException e){
+                throw new OutputEventAdapterException("Invalid value set for property 'Replication Factor': " + replicationFactorProperty, e);
+            }
+        }
+    }
 }

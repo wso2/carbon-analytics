@@ -1,19 +1,17 @@
 /*
- * Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.wso2.carbon.event.processor.manager.core.internal;
 
@@ -105,6 +103,9 @@ public class CarbonEventManagementService implements EventManagementService {
             @Override
             public void memberAdded(MembershipEvent membershipEvent) {
                 checkMemberUpdate();
+                if(haManager!=null){
+                    haManager.verifyState();
+                }
             }
 
             @Override
@@ -149,7 +150,7 @@ public class CarbonEventManagementService implements EventManagementService {
             log.warn("CEP started with clustering enabled, but SingleNode configuration given.");
         }
 
-        if(stormEventPublisherSyncMap == null){
+        if (stormEventPublisherSyncMap == null) {
             stormEventPublisherSyncMap = EventManagementServiceValueHolder.getHazelcastInstance()
                     .getMap(ConfigurationConstants.STORM_EVENT_PUBLISHER_SYNC_MAP);
         }
@@ -165,7 +166,12 @@ public class CarbonEventManagementService implements EventManagementService {
             public void run() {
                 try {
                     log.info("Starting polling event adapters");
-                    getEventReceiverManagementService().startPolling();
+                    EventReceiverManagementService eventReceiverManagementService = getEventReceiverManagementService();
+                    if (eventReceiverManagementService != null) {
+                        eventReceiverManagementService.startPolling();
+                    } else {
+                        log.error("Adapter polling failed as EventReceiverManagementService not available");
+                    }
                 } catch (Exception e) {
                     log.error("Unexpected error occurred when start polling event adapters", e);
                 }
@@ -405,27 +411,27 @@ public class CarbonEventManagementService implements EventManagementService {
     }
 
     @Override
-    public void updateLatestEventSentTime(String publisherName, int tenantId, long timestamp){
+    public void updateLatestEventSentTime(String publisherName, int tenantId, long timestamp) {
 
         stormEventPublisherSyncMap.putAsync(tenantId + "-" + publisherName,
                 EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime());
     }
 
     @Override
-    public long getLatestEventSentTime(String publisherName, int tenantId){
-        if(stormEventPublisherSyncMap == null){
+    public long getLatestEventSentTime(String publisherName, int tenantId) {
+        if (stormEventPublisherSyncMap == null) {
             stormEventPublisherSyncMap = EventManagementServiceValueHolder.getHazelcastInstance()
                     .getMap(ConfigurationConstants.STORM_EVENT_PUBLISHER_SYNC_MAP);
         }
         Object latestTimePublished = stormEventPublisherSyncMap.get(tenantId + "-" + publisherName);
         if (latestTimePublished != null) {
-            return (Long)latestTimePublished;
+            return (Long) latestTimePublished;
         }
         return 0;
     }
 
     @Override
-    public long getClusterTimeInMillis(){
+    public long getClusterTimeInMillis() {
         return EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime();
     }
 }

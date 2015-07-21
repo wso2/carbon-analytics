@@ -20,12 +20,22 @@ package org.wso2.carbon.event.input.adapter.soap;
 
 import org.wso2.carbon.event.input.adapter.core.*;
 import org.wso2.carbon.event.input.adapter.soap.internal.util.SOAPEventAdapterConstants;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.*;
 
 
 public class SOAPEventAdapterFactory extends InputEventAdapterFactory {
     private ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.input.adapter.soap.i18n.Resources", Locale.getDefault());
+    private int httpPort;
+    private int httpsPort;
+    private int portOffset;
+
+    public SOAPEventAdapterFactory() {
+        portOffset = getPortOffset();
+        httpPort = SOAPEventAdapterConstants.DEFAULT_HTTP_PORT + portOffset;
+        httpsPort = SOAPEventAdapterConstants.DEFAULT_HTTPS_PORT + portOffset;
+    }
 
     @Override
     public String getType() {
@@ -58,11 +68,15 @@ public class SOAPEventAdapterFactory extends InputEventAdapterFactory {
 
     @Override
     public String getUsageTips() {
-        return resourceBundle.getString(SOAPEventAdapterConstants.ADAPTER_USAGE_TIPS_SOAP);
+        return resourceBundle.getString(SOAPEventAdapterConstants.ADAPTER_USAGE_TIPS_PREFIX) + httpPort + resourceBundle.getString(SOAPEventAdapterConstants.ADAPTER_USAGE_TIPS_MID1) + httpsPort + resourceBundle.getString(SOAPEventAdapterConstants.ADAPTER_USAGE_TIPS_MID2) + httpPort + resourceBundle.getString(SOAPEventAdapterConstants.ADAPTER_USAGE_TIPS_MID3) + httpsPort + resourceBundle.getString(SOAPEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX);
     }
 
     @Override
     public InputEventAdapter createEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
         return new SOAPEventAdapter(eventAdapterConfiguration, globalProperties);
+    }
+
+    private int getPortOffset() {
+        return CarbonUtils.getPortFromServerConfig(SOAPEventAdapterConstants.CARBON_CONFIG_PORT_OFFSET_NODE) + 1;
     }
 }

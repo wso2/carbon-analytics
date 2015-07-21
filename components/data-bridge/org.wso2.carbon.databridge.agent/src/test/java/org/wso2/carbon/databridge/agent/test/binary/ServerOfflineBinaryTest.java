@@ -114,20 +114,21 @@ public class ServerOfflineBinaryTest extends TestCase {
         } catch (InterruptedException e) {
         }
 
-        startServer(9619, 9719);
-
         int queueSize = AgentHolder.getInstance().getDataEndpointAgent("Binary").
                 getAgentConfiguration().getQueueSize();
         int numberOfEventsSent = queueSize + 1000;
         for (int i = 0; i < numberOfEventsSent; i++) {
             dataPublisher.publish(event);
         }
+
+        startServer(9619, 9719);
+
         try {
-            Thread.sleep(10000);
+            Thread.sleep(40000);
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(numberOfEventsSent, binaryTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(queueSize, binaryTestServer.getNumberOfEventsReceived());
         binaryTestServer.stop();
     }
 
