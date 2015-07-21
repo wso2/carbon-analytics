@@ -53,6 +53,8 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
     private static final long POSTFIX = 1L;
 
     private boolean fullyFetched;
+    private boolean noStartTime = false;
+    private boolean noStopTime = false;
     private String tableName;
     private Table table, indexTable;
     private Iterator<Record> subIterator = Collections.emptyIterator();
@@ -61,14 +63,24 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
 
     HBaseTimestampIterator(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, int recordsCount,
                            Connection conn, int batchSize) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        if ((timeFrom > timeTo) || (batchSize < 0)) {
+        if ((timeFrom > timeTo) || (batchSize <= 0)) {
             throw new AnalyticsException("Invalid parameters specified for reading data from table " + tableName +
                     " for tenant " + tenantId);
         } else {
             this.init(conn, tenantId, tableName, columns, recordsCount, batchSize);
-            /* setting the initial row to start time -1 because it will soon be incremented by 1L. */
-            this.latestRow = HBaseUtils.encodeLong(timeFrom - POSTFIX);
-            this.endRow = HBaseUtils.encodeLong(timeTo);
+            if (timeFrom == Long.MIN_VALUE) {
+                this.noStartTime = true;
+                /* Setting param to null, to recognize the first ever run. It will never become null after the first run. */
+                this.latestRow = null;
+            } else {
+                /* Setting the initial row to start time -1 because it will soon be incremented by 1L. */
+                this.latestRow = HBaseUtils.encodeLong(timeFrom - POSTFIX);
+            }
+            if (timeFrom == Long.MAX_VALUE) {
+                this.noStopTime = true;
+            } else {
+                this.endRow = HBaseUtils.encodeLong(timeTo);
+            }
             /* pre-fetching from HBase and populating records for the first time */
             this.fetchRecords();
         }
@@ -116,7 +128,7 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
         for (String currentId : currentBatch) {
             Get get = new Get(Bytes.toBytes(currentId));
 
-            /* if the list of columns to be retrieved is null, retrieve ALL columns. */
+            /* If the list of columns to be retrieved is null, retrieve ALL columns. */
             if (this.columns != null && this.columns.size() > 0) {
                 colSet = new HashSet<>(this.columns);
                 get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
@@ -158,15 +170,21 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
         }
         int counter = 0;
         Scan indexScan = new Scan();
-        long latestTime = HBaseUtils.decodeLong(this.latestRow);
-        indexScan.setStartRow(HBaseUtils.encodeLong(latestTime + POSTFIX));
-        indexScan.setStopRow(this.endRow);
+        long latestTime;
+        if (!this.noStartTime && (this.latestRow != null)) {
+            latestTime = HBaseUtils.decodeLong(this.latestRow);
+            indexScan.setStartRow(HBaseUtils.encodeLong(latestTime + POSTFIX));
+        }
+        if (!this.noStopTime) {
+            indexScan.setStopRow(this.endRow);
+        }
         indexScan.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_INDEX_COLUMN_FAMILY_NAME);
         ResultScanner resultScanner;
         try {
             resultScanner = this.indexTable.getScanner(indexScan);
             for (Result rowResult : resultScanner) {
                 if (counter == this.batchSize || this.globalCounter == this.recordsCount) {
+                    /* Snap out of further processing, because either the batch end or the client limit has been reached. */
                     break;
                 }
                 Cell[] cells = rowResult.rawCells();
@@ -183,9 +201,15 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
             throw new HBaseRuntimeException("Error reading index data for table " + this.tableName + ", tenant " +
                     this.tenantId, e);
         }
-        if (counter == 0) {
-            this.cleanup();
+        if (counter < this.batchSize) {
+            /* Checking if processing had been interrupted PRIOR TO:
+            * - More results being scanned (counter equals 0 in this case), where there are no more records to be scanned
+            * - Batch size becoming equal to the counter (counter < batchSize case), signifying the scan ran out of records
+            *       where the scan has either exhausted all records on the table or has reached the limit from the client.
+            *  For both of the above cases, we understand that the end of processing for this particular query is at hand
+            *  (i.e. Iterator: I die in peace now, tell my family I love them..) */
             this.fullyFetched = true;
+            this.cleanup();
         }
         return currentBatch;
     }

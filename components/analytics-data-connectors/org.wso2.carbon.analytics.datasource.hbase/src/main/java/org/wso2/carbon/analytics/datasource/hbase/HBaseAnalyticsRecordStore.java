@@ -273,7 +273,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         if (!this.tableExists(tenantId, tableName)) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
-        if ((timeFrom == Long.MIN_VALUE) && (timeTo == Long.MAX_VALUE)) {
+        if ((timeFrom == Long.MIN_VALUE) && (timeTo == Long.MAX_VALUE) && (numPartitionsHint > 1)) {
             return this.computeRegionSplits(tenantId, tableName, columns, recordsCount);
         } else {
             return new HBaseTimestampRecordGroup[]{
