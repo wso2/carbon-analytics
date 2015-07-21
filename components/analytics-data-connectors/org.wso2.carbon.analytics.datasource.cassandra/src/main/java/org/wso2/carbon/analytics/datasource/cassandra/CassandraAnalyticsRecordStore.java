@@ -112,7 +112,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     private TokenRangeRecordGroup[] calculateTokenRangeGroups(int tenantId, String tableName, List<String> columns, 
-            int numPartitionsHint) {
+            int numPartitionsHint, int count) {
         Metadata md = this.session.getCluster().getMetadata();
         Set<Host> hosts = md.getAllHosts();
         int partitionsPerHost = (int) Math.ceil(numPartitionsHint / (double) hosts.size());
@@ -120,7 +120,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
                 partitionsPerHost * hosts.size());
         for (Host host : hosts) {
             result.addAll(this.calculateTokenRangeGroupForHost(tenantId, tableName, columns, 
-                    md, host, partitionsPerHost));
+                    md, host, partitionsPerHost, count));
         }
         return result.toArray(new TokenRangeRecordGroup[0]);
     }
@@ -136,7 +136,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     private List<TokenRangeRecordGroup> calculateTokenRangeGroupForHost(int tenantId, String tableName, 
-            List<String> columns, Metadata md, Host host, int partitionsPerHost) {
+            List<String> columns, Metadata md, Host host, int partitionsPerHost, int count) {
         String ip = host.getAddress().getHostAddress();
         List<CassandraTokenRange> trs = this.unwrapTRAndConvertToLocalTR(md.getTokenRanges("ARS", host));
         int delta = (int) Math.ceil(trs.size() / (double) partitionsPerHost);
@@ -146,7 +146,8 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             for (int i = 0; i < trs.size(); i += delta) {
                 /* a new array list is created here, since what sublist returns is not serializable */
                 result.add(new TokenRangeRecordGroup(tenantId, tableName, columns, 
-                       new ArrayList<CassandraTokenRange>(trs.subList(i, i + delta > trs.size() ? trs.size() : i + delta)), ip));
+                       new ArrayList<CassandraTokenRange>(
+                       trs.subList(i, i + delta > trs.size() ? trs.size() : i + delta)), ip, count));
             }
         }
         return result;
@@ -236,13 +237,16 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom, 
             long timeTo, int recordsFrom, int recordsCount) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
+        if (recordsFrom > 0) {
+            throw new AnalyticsException("The Cassandra connector does not support range queries with an offset: " + recordsFrom);
+        }
         if (!this.tableExists(tenantId, tableName)) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
         if (numPartitionsHint == 1 || !(timeFrom == Long.MIN_VALUE && timeTo == Long.MAX_VALUE)) {
-            return new RecordGroup[] { new GlobalCassandraRecordGroup(tenantId, tableName, columns, timeFrom, timeTo) };
+            return new RecordGroup[] { new GlobalCassandraRecordGroup(tenantId, tableName, columns, timeFrom, timeTo, recordsCount) };
         } else {
-            return this.calculateTokenRangeGroups(tenantId, tableName, columns, numPartitionsHint);
+            return this.calculateTokenRangeGroups(tenantId, tableName, columns, numPartitionsHint, recordsCount);
         }
     }
 
@@ -274,7 +278,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     private AnalyticsIterator<Record> readPartitionedRecords(TokenRangeRecordGroup recordGroup) 
             throws AnalyticsException {
         return this.lookupRecordsByTokenRanges(recordGroup.getTenantId(), recordGroup.getTableName(), 
-                recordGroup.getColumns(), recordGroup.getTokenRanges());        
+                recordGroup.getColumns(), recordGroup.getTokenRanges(), recordGroup.getCount());        
     }
     
     private AnalyticsIterator<Record> readRecordsByRange(GlobalCassandraRecordGroup recordGroup) throws AnalyticsException {
@@ -283,12 +287,25 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
         List<String> columns = recordGroup.getColumns();
         ResultSet rs;
+        String query;
+        int count = recordGroup.getCount();
         if (recordGroup.getTimeFrom() == Long.MIN_VALUE && recordGroup.getTimeTo() == Long.MAX_VALUE) {
-            rs = this.session.execute("SELECT id, timestamp, data FROM ARS." + dataTable);
+            if (count == -1) {
+                query = "SELECT id, timestamp, data FROM ARS." + dataTable;
+            } else {
+                query = "SELECT id, timestamp, data FROM ARS." + dataTable + " LIMIT " + count;
+            }
+            rs = this.session.execute(query);
             return this.lookupRecordsByDirectRS(tenantId, tableName, rs, columns);
         } else {
-            ResultSet tsrs = this.session.execute("SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? "
-                    + "AND timestamp >= ? AND timestamp < ?", tenantId, tableName,
+            if (count == -1) {
+                query = "SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? "
+                        + "AND timestamp >= ? AND timestamp < ?";
+            } else {
+                query = "SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? "
+                        + "AND timestamp >= ? AND timestamp < ? LIMIT " + count;
+            }
+            ResultSet tsrs = this.session.execute(query, tenantId, tableName,
                     BigInteger.valueOf(recordGroup.getTimeFrom()).multiply(BigInteger.valueOf(TS_MULTIPLIER)),
                     BigInteger.valueOf(recordGroup.getTimeTo()).multiply(BigInteger.valueOf(TS_MULTIPLIER)));
             return new CassandraRecordIDDataIterator(tenantId, tableName, tsrs.iterator(), columns);
@@ -307,8 +324,8 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     private AnalyticsIterator<Record> lookupRecordsByTokenRanges(int tenantId, String tableName, 
-            List<String> columns, List<CassandraTokenRange> tokenRanges) {
-        return new CassandraTokenRangeDataIterator(tenantId, tableName, columns, tokenRanges);
+            List<String> columns, List<CassandraTokenRange> tokenRanges, int count) {
+        return new CassandraTokenRangeDataIterator(tenantId, tableName, columns, tokenRanges, count);
     }
     
     private AnalyticsIterator<Record> lookupRecordsByDirectRS(int tenantId, String tableName, ResultSet rs, List<String> columns) {
@@ -397,24 +414,39 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
                 
         private AnalyticsIterator<Record> dataItr;
         
+        private int count;
+        
+        private int dataPointer;
+        
         public CassandraTokenRangeDataIterator(int tenantId, String tableName, List<String> columns,
-                List<CassandraTokenRange> tokenRanges) {
+                List<CassandraTokenRange> tokenRanges, int count) {
             this.tenantId = tenantId;
             this.tableName = tableName;
             this.columns = columns;
             this.tokenRangesItr = tokenRanges.iterator();
+            this.count = count;
         }
         
         private void populateNextTokenRangeData() {
             String dataTable = generateTargetDataTableName(tenantId, tableName);
             CassandraTokenRange tokenRange = this.tokenRangesItr.next();
-            ResultSet rs = session.execute("SELECT id, timestamp, data FROM ARS." + dataTable + 
-                    " WHERE token(id) > ? and token(id) <= ?", tokenRange.getStart(), tokenRange.getEnd());
+            String query;
+            if (this.count == -1) {
+                query = "SELECT id, timestamp, data FROM ARS." + dataTable + 
+                        " WHERE token(id) > ? and token(id) <= ?";
+            } else {
+                query = "SELECT id, timestamp, data FROM ARS." + dataTable + 
+                        " WHERE token(id) > ? and token(id) <= ? LIMIT " + this.count;
+            }
+            ResultSet rs = session.execute(query, tokenRange.getStart(), tokenRange.getEnd());
             this.dataItr = lookupRecordsByDirectRS(this.tenantId, this.tableName, rs, this.columns);
         }
 
         @Override
         public boolean hasNext() {
+            if (this.count != -1 && this.dataPointer >= this.count) {
+                return false;
+            }
             if (this.dataItr == null) {
                 if (this.tokenRangesItr.hasNext()) {
                     this.populateNextTokenRangeData();
@@ -433,6 +465,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         @Override
         public Record next() {
             if (this.hasNext()) {
+                this.dataPointer++;
                 return this.dataItr.next();
             } else {
                 return null;
@@ -609,13 +642,16 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         private long timeTo;
         
         private List<String> ids;
+        
+        private int count;
                 
-        public GlobalCassandraRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo) {
+        public GlobalCassandraRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, int count) {
             this.tenantId = tenantId;
             this.tableName = tableName;
             this.columns = columns;
             this.timeFrom = timeFrom;
             this.timeTo = timeTo;
+            this.count = count;
             this.byIds = false;
         }
         
@@ -658,6 +694,10 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
         public List<String> getIds() {
             return ids;
+        }
+        
+        public int getCount() {
+            return count;
         }
         
     }

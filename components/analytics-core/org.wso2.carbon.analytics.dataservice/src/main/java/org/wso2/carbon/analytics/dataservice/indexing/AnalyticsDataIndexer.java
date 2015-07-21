@@ -153,8 +153,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private static final String DEFAULT_SCORE = "1";
 
-    private static final int INDEX_BATCH_SIZE = 1;
-
     private Map<String, Directory> indexDirs = new HashMap<>();
 
     private Map<String, Directory> indexTaxonomyDirs = new HashMap<>();
@@ -1539,51 +1537,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
         }
     }
-    
-    private Collection<List<Record>> groupRecordsByTable(Iterator<Record> itr, int count) {
-        Map<String, List<Record>> result = new HashMap<String, List<Record>>();
-        String identity;
-        List<Record> group;
-        Record record;
-        for (int i = 0; i < count && itr.hasNext(); i++) {
-            record = itr.next();
-            identity = record.getTenantId() + "_" + record.getTableName();
-            group = result.get(identity);
-            if (group == null) {
-                group = new ArrayList<Record>();
-                result.put(identity, group);
-            }
-            group.add(record);
-        }
-        return result.values();
-    }
 
     private boolean checkRecordsEmpty(Iterator<Record> records) throws AnalyticsException {
-        while (records.hasNext()) {
-            if (!this.checkRecordsEmptyBatch(records)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean checkRecordsEmptyBatch(Iterator<Record> records) throws AnalyticsException {
-        Collection<List<Record>> groups = this.groupRecordsByTable(records, INDEX_BATCH_SIZE);
-        Record firstRecord;
-        for (List<Record> group : groups) {
-            firstRecord = group.get(0);
-            try {
-                if (GenericUtils.listRecords(this.getAnalyticsRecordStore(), 
-                        this.getAnalyticsRecordStore().get(firstRecord.getTenantId(), 
-                        firstRecord.getTableName(), 1, null, 
-                        this.extractRecordIds(group))).size() > 0) {
-                    return false;
-                }
-            } catch (AnalyticsTableNotAvailableException e) {
-                /* ignore */
-            }
-        }
-        return true;
+        return !records.hasNext();
     }
     
     private void planIndexingWorkersInCluster() throws AnalyticsException {

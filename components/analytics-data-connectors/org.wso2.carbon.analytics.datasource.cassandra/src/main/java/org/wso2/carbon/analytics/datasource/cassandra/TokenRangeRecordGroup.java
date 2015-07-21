@@ -41,13 +41,16 @@ public class TokenRangeRecordGroup implements RecordGroup {
     
     private String host;
     
+    private int count;
+    
     public TokenRangeRecordGroup(int tenantId, String tableName, List<String> columns,
-            List<CassandraTokenRange> tokenRanges, String host) {
+            List<CassandraTokenRange> tokenRanges, String host, int count) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.columns = columns;
         this.tokenRanges = tokenRanges;
         this.host = host;
+        this.count = count;
     }
 
     @Override
@@ -69,6 +72,10 @@ public class TokenRangeRecordGroup implements RecordGroup {
     
     public List<CassandraTokenRange> getTokenRanges() {
         return tokenRanges;
+    }
+    
+    public int getCount() {
+        return count;
     }
     
 }
