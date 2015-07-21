@@ -500,13 +500,13 @@ public class AnalyticsRecordStoreTest {
         Assert.assertEquals(recordsIn.size(), 100);
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, 38));
-        Assert.assertTrue(recordsIn.size() >= 38);
+        Assert.assertEquals(recordsIn.size(), 38);
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, 500));
         Assert.assertEquals(recordsIn.size(), 100);
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, 50));
-        Assert.assertEquals(recordsIn.size(), 50);
+        Assert.assertTrue(recordsIn.size() >= 50);
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 2, null, time + 22, time + timeOffset * 100, 0, 200));
         Assert.assertEquals(recordsIn.size(), 97);
