@@ -41,18 +41,18 @@ import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.CheckElectedLeaderExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.ElectLeaderExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.InitClientExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.StartWorkerExecutionCall;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
+import org.wso2.carbon.analytics.spark.core.sources.AnalyticsRelationProvider;
 import org.wso2.carbon.analytics.spark.core.udf.AnalyticsUDFsRegister;
 import org.wso2.carbon.analytics.spark.core.udf.config.UDFConfiguration;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
-import org.wso2.carbon.analytics.spark.core.sources.AnalyticsRelationProvider;
-import org.wso2.carbon.analytics.spark.core.deploy.CheckElectedLeaderExecutionCall;
-import org.wso2.carbon.analytics.spark.core.deploy.ElectLeaderExecutionCall;
-import org.wso2.carbon.analytics.spark.core.deploy.InitClientExecutionCall;
-import org.wso2.carbon.analytics.spark.core.deploy.StartWorkerExecutionCall;
 import org.wso2.carbon.utils.CarbonUtils;
 import scala.None$;
 import scala.Option;
@@ -129,32 +129,32 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         String propsFile = GenericUtils.getAnalyticsConfDirectory() + File.separator +
                            AnalyticsConstants.SPARK_CONF_DIR + File.separator +
                            AnalyticsConstants.SPARK_DEFAULTS_FILE;
-        if (!new File(propsFile).exists()){
+        if (!new File(propsFile).exists()) {
             throw new AnalyticsExecutionException("spark-defaults.conf file does not exists in path "
                                                   + propsFile);
         }
         this.sparkConf = initializeSparkConf(this.portOffset, propsFile);
 
 //        this.redundantMasterCount = this.sparkConf.getInt(AnalyticsConstants.CARBON_SPARK_MASTER_COUNT, 1);
-        this.sparkMaster = getStringFromSparkConf(AnalyticsConstants.SPARK_MASTER, "local");
+        this.sparkMaster = getStringFromSparkConf(AnalyticsConstants.CARBON_SPARK_MASTER, "local");
+        this.redundantMasterCount = this.sparkConf.getInt(AnalyticsConstants.CARBON_SPARK_MASTER_COUNT, 2);
     }
 
     /**
      * @throws AnalyticsClusterException
      */
-    public void initializeSparkServer()
-            throws AnalyticsClusterException {
-
+    public void initializeSparkServer() throws AnalyticsException {
         if (isLocalMode()) {
             log.info("Starting SPARK in the LOCAL mode...");
             this.initializeClient(true);
-        } else if (isClusterMode()) {
-            log.info("Using Carbon clustering for Spark");
-            if (acm.isClusteringEnabled()) {
-                runClusteredSetupLogic();
-            } else {
-                throw new AnalyticsClusterException("Spark started in the cluster mode without " +
-                                                    "enabling Carbon Clustering");
+            if (isClusterMode()) {
+                log.info("Using Carbon clustering for Spark");
+                if (acm.isClusteringEnabled()) {
+                    runClusteredSetupLogic();
+                } else {
+                    throw new AnalyticsClusterException("Spark started in the cluster mode without " +
+                                                        "enabling Carbon Clustering");
+                }
             }
         } else if (isClientMode()) {
             log.info("Client mode enabled for Spark");
@@ -190,7 +190,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             this.startMaster();
         }
 
-        // start worker logic
+        // start worker and client logic
         if (masterMap.size() >= this.redundantMasterCount) { //
             log.info("Redundant master count reached. Starting workers in all members...");
             this.acm.executeAll(CLUSTER_GROUP_NAME, new StartWorkerExecutionCall());
@@ -203,22 +203,28 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private boolean isClientMode() throws AnalyticsClusterException {
-        return (!this.sparkMaster.isEmpty() && !this.isLocalMode() && !this.isClusterMode());
+        if (!this.sparkMaster.isEmpty() && this.sparkMaster.trim().toLowerCase().startsWith("spark")){
+            this.sparkConf.setMaster(this.sparkMaster);
+            return true;
+        }
+        return false;
     }
 
     private boolean isLocalMode() {
-        return this.sparkMaster.trim().toLowerCase().startsWith("local");
+        if ( !this.sparkMaster.isEmpty() && this.sparkMaster.trim().toLowerCase().startsWith("local")){
+            this.sparkConf.setMaster(this.sparkMaster);
+            return true;
+        }
+        return false;
     }
 
     private boolean isClusterMode() throws AnalyticsClusterException {
-        String masterStr = this.sparkMaster.trim().toLowerCase();
-        if (masterStr.startsWith("carbon")) {
-            String[] splits = masterStr.split("\\W+");
-            if (splits.length == 2) {
-                this.redundantMasterCount = Integer.parseInt(splits[1]);
-            } else {
-                throw new AnalyticsClusterException("Malformed carbon master string: " + masterStr);
+        if (acm.isClusteringEnabled()) {
+            if (!isLocalMode()) {
+                log.warn("Carbon clustering enabled without having carbon.spark.master as 'local' ");
             }
+            this.redundantMasterCount = this.sparkConf.getInt(AnalyticsConstants.CARBON_SPARK_MASTER_COUNT, 2);
+            this.sparkConf.setMaster(this.sparkMaster);
             return true;
         }
         return false;
@@ -250,7 +256,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    public synchronized void initializeAnalyticsClient() {
+    public synchronized void initializeAnalyticsClient() throws AnalyticsException {
         if (ServiceHolder.isAnalyticsSparkContextEnabled()) {
             if (!this.clientActive) {
                 //master URL needs to be updated according to the spark masters in the cluster
@@ -268,7 +274,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    private void initializeClient(Boolean local) {
+    private void initializeClient(Boolean local) throws AnalyticsException {
         if (ServiceHolder.isAnalyticsSparkContextEnabled()) {
             initializeSqlContext(new JavaSparkContext(this.sparkConf));
             if (local) {
@@ -286,13 +292,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     }
 
-    private void initializeSqlContext(JavaSparkContext jsc) {
+    private void initializeSqlContext(JavaSparkContext jsc) throws AnalyticsUDFException {
         this.sqlCtx = new SQLContext(jsc);
-        try {
-            registerUDFs(this.sqlCtx);
-        } catch (AnalyticsUDFException e) {
-            log.error("Error while registering the UDFs in Spark SQLContext: ", e);
-        }
+        registerUDFs(this.sqlCtx);
     }
 
     private void registerUDFs(SQLContext sqlCtx)
@@ -671,7 +673,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     try {
                         electSuitableLeader();
                     } catch (AnalyticsClusterException e) {
-                        log.error("Unable to elect a suitable leader" + e.getMessage(), e);
+                        String msg = "Unable to elect a suitable leader" + e.getMessage();
+                        log.error(msg, e);
+                        throw new RuntimeException(msg, e);
                     }
                 }
 
@@ -679,8 +683,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 log.info("Initializing new spark client app");
                 this.initializeAnalyticsClient();
             }
-        } catch (AnalyticsClusterException e) {
-            log.error("Error in reading the elected leader availability: " + e.getMessage(), e);
+        } catch (AnalyticsException e) {
+            String msg = "Error in processing on becoming leader cluster message: " + e.getMessage();
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
         }
     }
 
@@ -758,7 +764,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 }
             }
         } catch (AnalyticsClusterException e) {
-            log.error("Error in extracting the worker count: " + e.getMessage(), e);
+            String msg = "Error in extracting the worker count: " + e.getMessage();
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
         }
     }
 
