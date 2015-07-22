@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.analytics.spark.core.util.master;
+package org.wso2.carbon.analytics.spark.core.deploy;
 
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 
@@ -26,17 +26,13 @@ import java.util.concurrent.Callable;
 /**
  * Created by niranda on 6/24/15.
  */
-public class InitClientExecutionCall implements Callable<Integer>, Serializable{
+public class ElectLeaderExecutionCall implements Callable<Integer>, Serializable{
 
     private static final long serialVersionUID = -155083315280606063L;
 
-    public InitClientExecutionCall() {
-
-    }
-
     @Override
     public Integer call() throws Exception {
-        ServiceHolder.getAnalyticskExecutor().initializeClient();
+        ServiceHolder.getAnalyticskExecutor().electAsLeader();
         return 0;
     }
 }

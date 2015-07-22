@@ -66,7 +66,7 @@ public class AnalyticsComponent {
                     int portOffset = CarbonUtils.getPortFromServerConfig(PORT_OFFSET_SERVER_PROP) + 1;
                     ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor(
                             NetworkUtils.getLocalHostname(), portOffset));
-                    ServiceHolder.getAnalyticskExecutor().startSparkServer(CarbonUtils.getCarbonConfigDirPath());
+                    ServiceHolder.getAnalyticskExecutor().initializeSparkServer();
                 } catch (Throwable e) {
                     String msg = "Error initializing analytics executor: " + e.getMessage();
                     log.error(msg, e);
@@ -141,6 +141,7 @@ public class AnalyticsComponent {
                     if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_ENGINE_JVM_OPTION))) {
                         ServiceHolder.setAnalyticsEngineEnabled(false);
                         ServiceHolder.setAnalyticsExecutionEnabled(false);
+                        ServiceHolder.setAnalyticsSparkContextEnabled(false);
                         //if analytics engine is disabled, execution is also disabled by default
                     }
                 }
@@ -150,6 +151,14 @@ public class AnalyticsComponent {
                 if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_EXECUTION_JVM_OPTION) != null) {
                     if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_EXECUTION_JVM_OPTION))) {
                         ServiceHolder.setAnalyticsExecutionEnabled(false);
+                    }
+                }
+            }
+
+            if (ServiceHolder.isAnalyticsSparkContextEnabled()){
+                if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_SPARK_CTX_JVM_OPTION) != null){
+                    if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_SPARK_CTX_JVM_OPTION))) {
+                        ServiceHolder.setAnalyticsSparkContextEnabled(false);
                     }
                 }
             }

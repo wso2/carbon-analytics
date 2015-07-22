@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.analytics.spark.core.util;
+package org.wso2.carbon.analytics.spark.core.sources;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,6 +35,8 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
+import org.wso2.carbon.analytics.spark.core.rdd.AnalyticsRDD;
 import scala.reflect.ClassTag$;
 
 import java.io.Serializable;
@@ -131,7 +133,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
                 dataService.createTable(this.tenantId, this.recordStore, this.tableName);
                 dataService.setTableSchema(this.tenantId, this.tableName, tempSchema);
             }
-            data.foreachPartition(new AnalyticsFunction1(tenantId, tableName, data.schema()));
+            data.foreachPartition(new AnalyticsWritingFunction(tenantId, tableName, data.schema()));
         } catch (AnalyticsException e) {
             log.error("Error while inserting data into table " + tableName, e);
         }

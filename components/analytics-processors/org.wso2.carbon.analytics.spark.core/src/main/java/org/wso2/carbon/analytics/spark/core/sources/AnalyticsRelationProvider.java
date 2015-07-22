@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.analytics.spark.core.util;
+package org.wso2.carbon.analytics.spark.core.sources;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,6 +30,8 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import scala.collection.immutable.Map;
 import scala.runtime.AbstractFunction0;
 

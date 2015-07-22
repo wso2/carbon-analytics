@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.analytics.spark.core.util;
+package org.wso2.carbon.analytics.spark.core.sources;
 
 import org.apache.spark.Partition;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
