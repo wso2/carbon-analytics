@@ -340,7 +340,7 @@ public class AnalyticsSparkExecutorTest {
     }
 
     @Test
-    public void testTimestampRetrivability() throws AnalyticsException {
+    public void testTimestampRetrivability() throws AnalyticsException, InterruptedException {
         System.out.println(testString("start : Test Time stamp retrievability"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
         List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
@@ -359,8 +359,9 @@ public class AnalyticsSparkExecutorTest {
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
 
+        Thread.sleep(2000);
         String currentTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        result = ex.executeQuery(1, "SELECT * FROM Log where _timestamp < timestamp('"+currentTimeString+"')");
+        result = ex.executeQuery(1, "SELECT * FROM Log where _timestamp < timestamp(\""+currentTimeString+"\")");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
 
