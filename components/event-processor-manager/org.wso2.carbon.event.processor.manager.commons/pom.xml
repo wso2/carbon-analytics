@@ -33,7 +33,7 @@
             <artifactId>org.wso2.carbon.utils</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.lmax.wso2</groupId>
+            <groupId>org.wso2.lmax</groupId>
             <artifactId>disruptor</artifactId>
         </dependency>
         <dependency>
@@ -76,7 +76,7 @@
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
                             org.apache.axis2,
-                            com.lmax.disruptor.*; version=${disruptor.version},
+                            org.wso2.lmax.disruptor.*; version=${disruptor.version},
                             *;resolution:=optional,
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
