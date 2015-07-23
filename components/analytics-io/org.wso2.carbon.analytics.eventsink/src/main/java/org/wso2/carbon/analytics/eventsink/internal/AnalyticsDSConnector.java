@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.eventsink.internal;
 import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkUtil;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
@@ -31,6 +32,7 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
 import java.util.*;
@@ -62,10 +64,21 @@ public class AnalyticsDSConnector {
         List<Record> records = new ArrayList<>();
         for (Event event : events) {
             long timestamp;
-            StreamDefinition streamDefinition = ServiceHolder.getStreamDefinitionStoreService().
-                    getStreamDefinition(event.getStreamId(), tenantId);
+            StreamDefinition streamDefinition;
+            AbstractStreamDefinitionStore streamDefinitionStore = ServiceHolder.getStreamDefinitionStoreService();
+            if (streamDefinitionStore != null) {
+                streamDefinition = streamDefinitionStore.getStreamDefinition(event.getStreamId(), tenantId);
+            } else {
+                throw new AnalyticsException("Stream Definition store is not available. dropping Event");
+            }
             String tableName = AnalyticsEventSinkUtil.generateAnalyticsTableName(streamDefinition.getName());
-            AnalyticsSchema analyticsSchema = ServiceHolder.getAnalyticsDataAPI().getTableSchema(tenantId, tableName);
+            AnalyticsDataAPI analyticsDataAPI = ServiceHolder.getAnalyticsDataAPI();
+            AnalyticsSchema analyticsSchema;
+            if (analyticsDataAPI != null) {
+                analyticsSchema = ServiceHolder.getAnalyticsDataAPI().getTableSchema(tenantId, tableName);
+            } else {
+                throw new AnalyticsException("Analytics Data API is not available. dropping events");
+            }
             Map<String, Object> eventAttributes = new HashMap<>();
             populateCommonAttributes(streamDefinition, analyticsSchema, eventAttributes);
             populateTypedAttributes(analyticsSchema, AnalyticsEventSinkConstants.EVENT_META_DATA_TYPE,
