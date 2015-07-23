@@ -18,6 +18,14 @@
 
 package org.wso2.carbon.analytics.spark.core.internal;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.naming.NamingException;
+
+import org.apache.spark.SparkException;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -29,13 +37,8 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
-
-import javax.naming.NamingException;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 public class AnalyticsSparkExecutorTest {
 
@@ -60,7 +63,10 @@ public class AnalyticsSparkExecutorTest {
      * 6.a super tenant can access other tenants' tables
      * 6.b other tenants can only access their tables
      * 6.c other tenants can NOT access other tables
-     *
+     * <p/>
+     * 7. spark query filtering using timestamps - happy
+     *  <p/>
+     * 8. spark query failing for faulty timestamps - happy
      * @throws AnalyticsException
      */
     @Test
@@ -303,8 +309,8 @@ public class AnalyticsSparkExecutorTest {
                        ")";
         ex.executeQuery(1, query);
 
-        Assert.assertEquals(this.service.getRecordStoreNameByTable(1, "Log"),"PROCESSED_DATA_STORE",
-                            "Table is not created in PROCESSED_DATA_STORE by default");
+        Assert.assertEquals(this.service.getRecordStoreNameByTable(1, "Log"), "PROCESSED_DATA_STORE",
+                "Table is not created in PROCESSED_DATA_STORE by default");
         this.cleanupTable(1, "Log");
 
 
@@ -372,7 +378,28 @@ public class AnalyticsSparkExecutorTest {
         System.out.println(result);
 
         this.service.deleteTable(1, "Log");
-        System.out.println(testString("end : create Time stamp retrievability"));
+        System.out.println(testString("end : test Time stamp retrievability"));
+    }
+
+    @Test(expectedExceptions= SparkException.class)
+    public void testFaultyTimestampUDFException() throws AnalyticsException, InterruptedException {
+        System.out.println(testString("start : Faulty Timestamp exception test"));
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
+        this.service.deleteTable(1, "Log");
+        this.service.createTable(1, "Log");
+        this.service.put(records);
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Log\"," +
+                "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, summary STRING\"" +
+                ")");
+
+        String faultyTimeStamp = "falseTimestamp";
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM Log where _timestamp < timestamp('"+faultyTimeStamp+"')");
+
+        this.service.deleteTable(1, "Log");
+        System.out.println(testString("end : Faulty Timestamp exception test"));
     }
 
 //    @Test
