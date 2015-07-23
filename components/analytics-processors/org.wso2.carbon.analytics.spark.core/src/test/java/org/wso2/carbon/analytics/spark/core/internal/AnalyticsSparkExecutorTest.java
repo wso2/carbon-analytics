@@ -373,7 +373,6 @@ public class AnalyticsSparkExecutorTest {
 
         // create a time difference between the records and the current time
         Thread.sleep(2000);
-        Thread.sleep(2000);
         String currentTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         result = ex.executeQuery(1, "SELECT * FROM Log where _timestamp < timestamp(\""+currentTimeString+"\")");
         Assert.assertEquals(result.getRows().size(), 10);
