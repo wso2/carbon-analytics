@@ -64,16 +64,17 @@ public class AnalyticsDSConnector {
         List<Record> records = new ArrayList<>();
         for (Event event : events) {
             long timestamp;
+            String tableName;
             StreamDefinition streamDefinition;
+            AnalyticsSchema analyticsSchema;
             AbstractStreamDefinitionStore streamDefinitionStore = ServiceHolder.getStreamDefinitionStoreService();
+            AnalyticsDataAPI analyticsDataAPI = ServiceHolder.getAnalyticsDataAPI();
             if (streamDefinitionStore != null) {
                 streamDefinition = streamDefinitionStore.getStreamDefinition(event.getStreamId(), tenantId);
+                tableName = AnalyticsEventSinkUtil.generateAnalyticsTableName(streamDefinition.getName());
             } else {
                 throw new AnalyticsException("Stream Definition store is not available. dropping Event");
             }
-            String tableName = AnalyticsEventSinkUtil.generateAnalyticsTableName(streamDefinition.getName());
-            AnalyticsDataAPI analyticsDataAPI = ServiceHolder.getAnalyticsDataAPI();
-            AnalyticsSchema analyticsSchema;
             if (analyticsDataAPI != null) {
                 analyticsSchema = ServiceHolder.getAnalyticsDataAPI().getTableSchema(tenantId, tableName);
             } else {
