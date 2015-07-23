@@ -33,6 +33,8 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 
 import javax.naming.NamingException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class AnalyticsSparkExecutorTest {
@@ -124,14 +126,14 @@ public class AnalyticsSparkExecutorTest {
         ex.executeQuery(1, "INSERT INTO TABLE Log2 SELECT * FROM Log");
         AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM Log2");
         Assert.assertEquals(result.getRows().size(), 10000);
-        /* with the given composite primary key, it should just update the next insert */
+        //with the given composite primary key, it should just update the next insert
         start = System.currentTimeMillis();
         ex.executeQuery(1, "INSERT INTO TABLE Log2 SELECT * FROM Log");
         end = System.currentTimeMillis();
         System.out.println("* Spark SQL insert/update table time: " + (end - start) + " ms.");
         result = ex.executeQuery(1, "SELECT * FROM Log2");
         Assert.assertEquals(result.getRows().size(), 10000);
-        /* insert to a table without a primary key */
+        //insert to a table without a primary key
         ex.executeQuery(1, "INSERT INTO TABLE Log3 SELECT * FROM Log");
         result = ex.executeQuery(1, "SELECT * FROM Log3");
         Assert.assertEquals(result.getRows().size(), 10000);
@@ -335,6 +337,40 @@ public class AnalyticsSparkExecutorTest {
         this.cleanupTable(1, "Log");
 
         System.out.println(testString("end : create temp table with multiple record stores test"));
+    }
+
+    @Test
+    public void testTimestampRetrivability() throws AnalyticsException {
+        System.out.println(testString("start : Test Time stamp retrievability"));
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
+        this.service.deleteTable(1, "Log");
+        this.service.createTable(1, "Log");
+        this.service.put(records);
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Log\"," +
+                "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, summary STRING\"" +
+                ")");
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT _timestamp FROM Log");
+        Assert.assertEquals(result.getRows().size(), 10);
+        System.out.println(result);
+        result = ex.executeQuery(1, "SELECT * FROM Log");
+        Assert.assertEquals(result.getRows().size(), 10);
+        System.out.println(result);
+
+        String currentTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        result = ex.executeQuery(1, "SELECT * FROM Log where _timestamp < timestamp('"+currentTimeString+"')");
+        Assert.assertEquals(result.getRows().size(), 10);
+        System.out.println(result);
+
+        currentTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz").format(new Date());
+        result = ex.executeQuery(1, "SELECT * FROM Log where _timestamp < timestamp('"+currentTimeString+"')");
+        Assert.assertEquals(result.getRows().size(), 10);
+        System.out.println(result);
+
+        this.service.deleteTable(1, "Log");
+        System.out.println(testString("end : create Time stamp retrievability"));
     }
 
 //    @Test

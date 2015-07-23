@@ -149,8 +149,12 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     }
 
     private StructField[] extractFieldsFromColumns(Map<String, ColumnDefinition> columns) {
-        StructField[] resFields = new StructField[(columns.size())];
-        int i = 0;
+        StructField[] resFields = new StructField[(columns.size())+1];
+
+        //adding the timestamp column
+        resFields[0] = new StructField("_timestamp", AnalyticsCommonUtils.stringToDataType("long"),
+                false, Metadata.empty());
+        int i = 1;
         for (Map.Entry<String, ColumnDefinition> entry : columns.entrySet()) {
             String type = entry.getValue().getType().name();
             resFields[i] = new StructField(entry.getKey(), AnalyticsCommonUtils.stringToDataType(type),
