@@ -25,6 +25,7 @@
      <classes>     
        <!--<class name="org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtilsTest"/>-->
        <class name="org.wso2.carbon.analytics.spark.core.internal.AnalyticsSparkExecutorTest"/>
+       <class name="org.wso2.carbon.analytics.spark.core.udf.DefaultUDFTest"/>
      </classes>
    </test>
 </suite>
