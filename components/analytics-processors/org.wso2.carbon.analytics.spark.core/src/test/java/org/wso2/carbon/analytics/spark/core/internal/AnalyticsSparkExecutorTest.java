@@ -37,7 +37,6 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 
 public class AnalyticsSparkExecutorTest {
@@ -170,10 +169,10 @@ public class AnalyticsSparkExecutorTest {
 
         //test supertenant queries
         ex.executeQuery(-1234, "CREATE TEMPORARY TABLE log USING CarbonAnalytics " +
-                               "OPTIONS" +
-                               "(tableName \"log\"," +
-                               "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
-                               ")");
+                "OPTIONS" +
+                "(tableName \"log\"," +
+                "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
+                ")");
         AnalyticsQueryResult result = ex.executeQuery(-1234, "SELECT * FROM log");
         Assert.assertEquals(result.getRows().size(), 10);
 
