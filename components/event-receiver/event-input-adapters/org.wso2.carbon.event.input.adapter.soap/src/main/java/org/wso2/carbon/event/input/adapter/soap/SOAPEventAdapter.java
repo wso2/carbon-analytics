@@ -28,7 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.input.adapter.core.EventAdapterUtil;
+import org.wso2.carbon.event.input.adapter.core.TenantConfigHolder;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
@@ -73,7 +73,7 @@ public final class SOAPEventAdapter implements InputEventAdapter {
 
         try {
             registerService(eventAdaptorListener, eventAdapterConfiguration.getName(),
-                    EventAdapterUtil.getAxisConfiguration());
+                    TenantConfigHolder.getAxisConfiguration());
         } catch (AxisFault axisFault) {
             throw new InputEventAdapterRuntimeException("Cannot register Input Adapter " +
                     eventAdapterConfiguration.getName() + " on tenant " + tenantId, axisFault);
@@ -86,7 +86,7 @@ public final class SOAPEventAdapter implements InputEventAdapter {
 
         try {
             unregisterService(eventAdapterConfiguration.getName(),
-                    EventAdapterUtil.getAxisConfiguration());
+                    TenantConfigHolder.getAxisConfiguration());
         } catch (AxisFault axisFault) {
             throw new InputEventAdapterRuntimeException("Cannot un-register Input Adapter " +
                     eventAdapterConfiguration.getName() + " on tenant " + tenantId, axisFault);
@@ -162,26 +162,26 @@ public final class SOAPEventAdapter implements InputEventAdapter {
 
     private void unregisterService(String serviceName,
                                    AxisConfiguration axisConfiguration) throws AxisFault {
-
         AxisService axisService = axisConfiguration.getService(serviceName);
-
-        if (axisService == null) {
-            throw new AxisFault("There is no service with the name " + serviceName);
+        try{
+            if (axisService == null) {
+                throw new AxisFault("There is no service with the name " + serviceName);
+            }
+            AxisOperation axisOperation = axisService.getOperation(new QName(SOAPEventAdapterConstants.OPERATION_NAME));
+            if (axisOperation == null) {
+                throw new AxisFault("There is no operation with the name " + SOAPEventAdapterConstants.OPERATION_NAME);
+            }
+            SubscriptionMessageReceiver messageReceiver =
+                    (SubscriptionMessageReceiver) axisOperation.getMessageReceiver();
+            if (messageReceiver == null) {
+                throw new AxisFault("There is no message receiver for operation with name "
+                        + SOAPEventAdapterConstants.OPERATION_NAME);
+            }
+        }finally{
+            if(axisService != null){
+                axisConfiguration.removeService(serviceName);
+            }
         }
-
-        AxisOperation axisOperation = axisService.getOperation(new QName(SOAPEventAdapterConstants.OPERATION_NAME));
-        if (axisOperation == null) {
-            throw new AxisFault("There is no operation with the name " + SOAPEventAdapterConstants.OPERATION_NAME);
-        }
-        SubscriptionMessageReceiver messageReceiver =
-                (SubscriptionMessageReceiver) axisOperation.getMessageReceiver();
-        if (messageReceiver == null) {
-            throw new AxisFault("There is no message receiver for operation with name "
-                    + SOAPEventAdapterConstants.OPERATION_NAME);
-        }
-
-        axisService.removeOperation(new QName(SOAPEventAdapterConstants.OPERATION_NAME));
-
     }
 
 }
