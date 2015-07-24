@@ -15,15 +15,19 @@
  */
 package org.wso2.carbon.event.input.adapter.core;
 
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.event.input.adapter.core.internal.ds.InputEventAdapterServiceValueHolder;
-import org.wso2.carbon.event.stream.core.tenantconfigs.*;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
-public class EventAdapterUtil {
+import java.util.concurrent.ConcurrentHashMap;
+
+public class TenantConfigHolder {
+
+    private static ConcurrentHashMap<Integer, ConfigurationContext> tenantConfigs = new ConcurrentHashMap<>();
 
     public static AxisConfiguration getAxisConfiguration() {
         AxisConfiguration axisConfiguration = null;
@@ -31,12 +35,9 @@ public class EventAdapterUtil {
             axisConfiguration = InputEventAdapterServiceValueHolder.getConfigurationContextService().
                     getServerConfigContext().getAxisConfiguration();
         } else {
-            TenantConfigurationInfo tenantConfigurationInfo = TenantConfigHolder.getThreadLocalTenantConfiguration();
-            if(tenantConfigurationInfo != null){
-                if(tenantConfigurationInfo.getTenantId() == PrivilegedCarbonContext.getThreadLocalCarbonContext().
-                        getTenantId()){
-                    axisConfiguration = tenantConfigurationInfo.getConfigurationContext().getAxisConfiguration();
-                }
+            ConfigurationContext configurationContext = tenantConfigs.get(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            if(configurationContext != null){
+                axisConfiguration = configurationContext.getAxisConfiguration();
             }else{
                 axisConfiguration = TenantAxisUtils.getTenantAxisConfiguration(
                         CarbonContext.getThreadLocalCarbonContext().getTenantDomain(),
@@ -45,4 +46,9 @@ public class EventAdapterUtil {
         }
         return axisConfiguration;
     }
+
+    public static void addTenantConfig(int tenantId, ConfigurationContext configurationContext){
+        tenantConfigs.putIfAbsent(tenantId, configurationContext);
+    }
+
 }

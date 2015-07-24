@@ -21,7 +21,6 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
@@ -29,7 +28,6 @@ import org.wso2.carbon.event.application.deployer.EventProcessingDeployer;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.event.stream.core.internal.CarbonEventStreamService;
 import org.wso2.carbon.event.stream.core.internal.ds.EventStreamServiceValueHolder;
-import org.wso2.carbon.event.stream.core.tenantconfigs.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -62,10 +60,6 @@ public class EventStreamDeployer extends AbstractDeployer implements EventProces
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
         try {
             String path = deploymentFileData.getAbsolutePath();
-
-            //adding a thread local tenant configuration to access and get axis2 configuration when deploying event receivers
-            TenantConfigHolder.setThreadLocalTenantConfiguration(new TenantConfigurationInfo(
-                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(), configurationContext));
 
             if (!deployedEventStreamFilePaths.contains(path)) {
                 processDeployment(deploymentFileData);
