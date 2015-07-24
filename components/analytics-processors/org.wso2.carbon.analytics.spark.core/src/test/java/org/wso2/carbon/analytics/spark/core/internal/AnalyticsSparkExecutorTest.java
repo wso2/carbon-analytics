@@ -18,6 +18,14 @@
 
 package org.wso2.carbon.analytics.spark.core.internal;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.naming.NamingException;
+
+import org.apache.spark.SparkException;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -30,10 +38,6 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
-
-import javax.naming.NamingException;
-import java.io.IOException;
-import java.util.List;
 
 public class AnalyticsSparkExecutorTest {
 
@@ -58,7 +62,10 @@ public class AnalyticsSparkExecutorTest {
      * 6.a super tenant can access other tenants' tables
      * 6.b other tenants can only access their tables
      * 6.c other tenants can NOT access other tables
-     *
+     * <p/>
+     * 7. spark query filtering using timestamps - happy
+     *  <p/>
+     * 8. spark query failing for faulty timestamps - happy
      * @throws AnalyticsException
      */
     @Test
@@ -124,14 +131,14 @@ public class AnalyticsSparkExecutorTest {
         ex.executeQuery(1, "INSERT INTO TABLE Log2 SELECT * FROM Log");
         AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM Log2");
         Assert.assertEquals(result.getRows().size(), 10000);
-        /* with the given composite primary key, it should just update the next insert */
+        //with the given composite primary key, it should just update the next insert
         start = System.currentTimeMillis();
         ex.executeQuery(1, "INSERT INTO TABLE Log2 SELECT * FROM Log");
         end = System.currentTimeMillis();
         System.out.println("* Spark SQL insert/update table time: " + (end - start) + " ms.");
         result = ex.executeQuery(1, "SELECT * FROM Log2");
         Assert.assertEquals(result.getRows().size(), 10000);
-        /* insert to a table without a primary key */
+        //insert to a table without a primary key
         ex.executeQuery(1, "INSERT INTO TABLE Log3 SELECT * FROM Log");
         result = ex.executeQuery(1, "SELECT * FROM Log3");
         Assert.assertEquals(result.getRows().size(), 10000);
@@ -162,10 +169,10 @@ public class AnalyticsSparkExecutorTest {
 
         //test supertenant queries
         ex.executeQuery(-1234, "CREATE TEMPORARY TABLE log USING CarbonAnalytics " +
-                               "OPTIONS" +
-                               "(tableName \"log\"," +
-                               "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
-                               ")");
+                "OPTIONS" +
+                "(tableName \"log\"," +
+                "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
+                ")");
         AnalyticsQueryResult result = ex.executeQuery(-1234, "SELECT * FROM log");
         Assert.assertEquals(result.getRows().size(), 10);
 
@@ -301,8 +308,8 @@ public class AnalyticsSparkExecutorTest {
                        ")";
         ex.executeQuery(1, query);
 
-        Assert.assertEquals(this.service.getRecordStoreNameByTable(1, "Log"),"PROCESSED_DATA_STORE",
-                            "Table is not created in PROCESSED_DATA_STORE by default");
+        Assert.assertEquals(this.service.getRecordStoreNameByTable(1, "Log"), "PROCESSED_DATA_STORE",
+                "Table is not created in PROCESSED_DATA_STORE by default");
         this.cleanupTable(1, "Log");
 
 
@@ -335,6 +342,63 @@ public class AnalyticsSparkExecutorTest {
         this.cleanupTable(1, "Log");
 
         System.out.println(testString("end : create temp table with multiple record stores test"));
+    }
+
+    @Test
+    public void testTimestampRetrivability() throws AnalyticsException, InterruptedException {
+        System.out.println(testString("start : Test Time stamp retrievability"));
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
+        this.service.deleteTable(1, "Log");
+        this.service.createTable(1, "Log");
+        this.service.put(records);
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Log\"," +
+                "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, summary STRING\"" +
+                ")");
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT _timestamp FROM Log");
+        Assert.assertEquals(result.getRows().size(), 10);
+        System.out.println(result);
+        result = ex.executeQuery(1, "SELECT * FROM Log");
+        Assert.assertEquals(result.getRows().size(), 10);
+        System.out.println(result);
+
+        // create a time difference between the records and the current time
+        Thread.sleep(2000);
+        String currentTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        result = ex.executeQuery(1, "SELECT * FROM Log where _timestamp < timestamp(\""+currentTimeString+"\")");
+        Assert.assertEquals(result.getRows().size(), 10);
+        System.out.println(result);
+
+        currentTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz").format(new Date());
+        result = ex.executeQuery(1, "SELECT * FROM Log where _timestamp < timestamp('"+currentTimeString+"')");
+        Assert.assertEquals(result.getRows().size(), 10);
+        System.out.println(result);
+
+        this.service.deleteTable(1, "Log");
+        System.out.println(testString("end : test Time stamp retrievability"));
+    }
+
+    @Test(expectedExceptions= SparkException.class)
+    public void testFaultyTimestampUDFException() throws AnalyticsException, InterruptedException {
+        System.out.println(testString("start : Faulty Timestamp exception test"));
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
+        this.service.deleteTable(1, "Log");
+        this.service.createTable(1, "Log");
+        this.service.put(records);
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Log\"," +
+                "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, summary STRING\"" +
+                ")");
+
+        String faultyTimeStamp = "falseTimestamp";
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM Log where _timestamp < timestamp('"+faultyTimeStamp+"')");
+
+        this.service.deleteTable(1, "Log");
+        System.out.println(testString("end : Faulty Timestamp exception test"));
     }
 
 //    @Test

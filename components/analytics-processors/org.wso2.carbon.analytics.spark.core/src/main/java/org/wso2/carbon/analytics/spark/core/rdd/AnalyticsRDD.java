@@ -157,8 +157,12 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
                 return null;
             }
             Map<String, Object> recordVals = record.getValues();
-            Object[] rowVals = new Object[columns.size()];
-            for (int i = 0; i < columns.size(); i++) {
+            Object[] rowVals = new Object[columns.size()+1];
+
+            //adding the timestamp for the record
+            rowVals[0] = record.getTimestamp();
+
+            for (int i = 1; i < columns.size(); i++) {
                 rowVals[i] = recordVals.get(columns.get(i));
             }
 //            return new GenericRow(rowVals);
