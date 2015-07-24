@@ -17,6 +17,15 @@
 */
 package org.wso2.carbon.analytics.datasource.cassandra;
 
+import com.datastax.driver.core.*;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataInput;
+import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataOutput;
+import org.wso2.carbon.analytics.datasource.core.fs.ChunkedStream;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.ndatasource.common.DataSourceException;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -24,20 +33,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
-import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataInput;
-import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataOutput;
-import org.wso2.carbon.analytics.datasource.core.fs.ChunkedStream;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-
-import com.datastax.driver.core.BatchStatement;
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.PreparedStatement;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
 
 /**
  * This class represents the Cassandra implementation of {@link AnalyticsFileSystem}.
@@ -49,21 +44,32 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
     private PreparedStatement fsDataInsertStmt;
     
     private PreparedStatement fsDataSelectStmt;
-    
+
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
-        String servers = properties.get(CassandraUtils.CASSANDRA_SERVERS);
-        if (servers == null) {
-            throw new AnalyticsException("The Cassandra connector property '" + CassandraUtils.CASSANDRA_SERVERS + 
+        String dsName = properties.get(CassandraUtils.DATASOURCE_NAME);
+        if (dsName == null) {
+            throw new AnalyticsException("The Cassandra connector property '" + CassandraUtils.DATASOURCE_NAME +
                     "' is mandatory");
         }
-        Cluster cluster = Cluster.builder().addContactPoints(servers.split(",")).build();
-        this.session = cluster.connect();
-        this.session.execute("CREATE KEYSPACE IF NOT EXISTS AFS WITH REPLICATION = {'class':'SimpleStrategy', 'replication_factor':3};");
-        this.session.execute("CREATE TABLE IF NOT EXISTS AFS.PATH (path VARCHAR, child VARCHAR, length BIGINT, PRIMARY KEY (path, child))");
-        this.session.execute("CREATE TABLE IF NOT EXISTS AFS.DATA (path VARCHAR, sequence BIGINT, data BLOB, PRIMARY KEY (path, sequence))");
-        this.fsDataInsertStmt = this.session.prepare("INSERT INTO AFS.DATA (path, sequence, data) VALUES (?, ?, ?)");
-        this.fsDataSelectStmt = this.session.prepare("SELECT data FROM AFS.DATA WHERE path = ? and sequence = ?");
+        try {
+            Cluster cluster = (Cluster) GenericUtils.loadGlobalDataSource(dsName);
+            if (cluster == null) {
+                throw new AnalyticsException("Error establishing connection to Cassandra instance: Invalid datasource configuration");
+            }
+            this.session = cluster.connect();
+            if (session == null) {
+                throw new AnalyticsException("Error establishing connection to Cassandra instance: Failed to initialize " +
+                        "client from Datasource");
+            }
+            this.session.execute("CREATE KEYSPACE IF NOT EXISTS AFS WITH REPLICATION = {'class':'SimpleStrategy', 'replication_factor':3};");
+            this.session.execute("CREATE TABLE IF NOT EXISTS AFS.PATH (path VARCHAR, child VARCHAR, length BIGINT, PRIMARY KEY (path, child))");
+            this.session.execute("CREATE TABLE IF NOT EXISTS AFS.DATA (path VARCHAR, sequence BIGINT, data BLOB, PRIMARY KEY (path, sequence))");
+            this.fsDataInsertStmt = this.session.prepare("INSERT INTO AFS.DATA (path, sequence, data) VALUES (?, ?, ?)");
+            this.fsDataSelectStmt = this.session.prepare("SELECT data FROM AFS.DATA WHERE path = ? and sequence = ?");
+        } catch (DataSourceException e) {
+            throw new AnalyticsException("Error establishing connection to Cassandra instance for Analytics File System:" + e.getMessage(), e);
+        }
     }
     
     @Override

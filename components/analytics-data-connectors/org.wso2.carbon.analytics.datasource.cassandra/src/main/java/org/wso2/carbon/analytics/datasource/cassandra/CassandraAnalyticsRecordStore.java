@@ -35,6 +35,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.ndatasource.common.DataSourceException;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -78,17 +79,29 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
-        String servers = properties.get(CassandraUtils.CASSANDRA_SERVERS);
-        if (servers == null) {
-            throw new AnalyticsException("The Cassandra connector property '" + CassandraUtils.CASSANDRA_SERVERS + "' is mandatory");
+        String dsName = properties.get(CassandraUtils.DATASOURCE_NAME);
+        if (dsName == null) {
+            throw new AnalyticsException("The property '" + CassandraUtils.DATASOURCE_NAME +
+                    "' is required");
         }
-        Cluster cluster = Cluster.builder().addContactPoints(servers.split(",")).build();
-        this.session = cluster.connect();
-        this.session.execute("CREATE KEYSPACE IF NOT EXISTS ARS WITH REPLICATION = "
-                + "{'class':'SimpleStrategy', 'replication_factor':3};");
-        this.session.execute("CREATE TABLE IF NOT EXISTS ARS.TS (tenantId INT, "
-                + "tableName VARCHAR, timestamp VARINT, id VARCHAR, PRIMARY KEY ((tenantId, tableName), timestamp))");
-        this.initCommonPreparedStatements();
+        try {
+            Cluster cluster = (Cluster) GenericUtils.loadGlobalDataSource(dsName);
+            if (cluster == null) {
+                throw new AnalyticsException("Error establishing connection to Cassandra instance: Invalid datasource configuration");
+            }
+            this.session = cluster.connect();
+            if (session == null) {
+                throw new AnalyticsException("Error establishing connection to Cassandra instance: Failed to initialize " +
+                        "client from Datasource");
+            }
+            this.session.execute("CREATE KEYSPACE IF NOT EXISTS ARS WITH REPLICATION = "
+                    + "{'class':'SimpleStrategy', 'replication_factor':3};");
+            this.session.execute("CREATE TABLE IF NOT EXISTS ARS.TS (tenantId INT, "
+                    + "tableName VARCHAR, timestamp VARINT, id VARCHAR, PRIMARY KEY ((tenantId, tableName), timestamp))");
+            this.initCommonPreparedStatements();
+        } catch (DataSourceException e) {
+            throw new AnalyticsException("Error establishing connection to Cassandra instance:" + e.getMessage(), e);
+        }
     }
     
     private void initCommonPreparedStatements() {

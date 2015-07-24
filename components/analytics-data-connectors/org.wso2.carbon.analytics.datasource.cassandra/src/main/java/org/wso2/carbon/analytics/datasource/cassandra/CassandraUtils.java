@@ -18,25 +18,20 @@
  */
 package org.wso2.carbon.analytics.datasource.cassandra;
 
+import com.datastax.driver.core.*;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-
-import com.datastax.driver.core.BoundStatement;
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.PreparedStatement;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Session;
 
 /**
  * This class contains utility methods related to the Cassandra data connector.
  */
 public class CassandraUtils {
 
-    public static final String CASSANDRA_SERVERS = "servers";
-    
+    public static final String DATASOURCE_NAME = "datasource";
+
     public static String[] splitParentChild(String path) {
         if (path.equals("/")) {
             return new String[] { ".", "/" };
