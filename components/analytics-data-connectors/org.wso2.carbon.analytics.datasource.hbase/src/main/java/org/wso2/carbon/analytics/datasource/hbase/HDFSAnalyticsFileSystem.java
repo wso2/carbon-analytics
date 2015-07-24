@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.datasource.hbase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
@@ -59,8 +60,9 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
                     "' is required");
         }
         try {
-            this.fileSystem = (FileSystem) GenericUtils.loadGlobalDataSource(dsName);
-        } catch (DataSourceException e) {
+            Configuration config = (Configuration) GenericUtils.loadGlobalDataSource(dsName);
+            this.fileSystem = FileSystem.get(config);
+        } catch (DataSourceException | IOException e) {
             throw new AnalyticsException("Error creating HDFS Configuration from data source definition: " +
                     e.getMessage(), e);
         }

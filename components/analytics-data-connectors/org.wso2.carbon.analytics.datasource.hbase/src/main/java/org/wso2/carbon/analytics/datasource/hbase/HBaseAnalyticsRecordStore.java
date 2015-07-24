@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.datasource.hbase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Pair;
@@ -68,13 +69,14 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                     "' is required");
         }
         try {
-            this.conn = (Connection) GenericUtils.loadGlobalDataSource(dsName);
-        } catch (DataSourceException e) {
+            Configuration config = (Configuration) GenericUtils.loadGlobalDataSource(dsName);
+            this.conn = ConnectionFactory.createConnection(config);
+        } catch (DataSourceException | IOException e) {
             throw new AnalyticsException("Error establishing connection to HBase instance based on data source" +
                     " definition: " + e.getMessage(), e);
         }
         if (this.conn == null) {
-            throw new AnalyticsException("Error establishing connection to HBase instance : HBase Admin initialization " +
+            throw new AnalyticsException("Error establishing connection to HBase instance : HBase Client initialization " +
                     "failed");
         }
     }
@@ -108,7 +110,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             admin.createTable(indexDescriptor);
             admin.createTable(dataDescriptor);
         } catch (IOException e) {
-            throw new AnalyticsException("Error creating table " + tableName + " for tenant " + tenantId, e);
+            throw new AnalyticsException("Error creating table " + tableName + " for tenant " + tenantId + " : " + e.getMessage(), e);
         } finally {
             GenericUtils.closeQuietly(admin);
         }
@@ -122,7 +124,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             isExist = admin.tableExists(TableName.valueOf(
                     HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA)));
         } catch (IOException e) {
-            throw new AnalyticsException("Error checking existence of table " + tableName + " for tenant " + tenantId, e);
+            throw new AnalyticsException("Error checking existence of table " + tableName + " for tenant " + tenantId + " : " + e.getMessage(), e);
         } finally {
             GenericUtils.closeQuietly(admin);
         }
@@ -268,7 +270,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                              long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
         if (recordsFrom > 0) {
-            throw new HBaseUnsupportedOperationException("Pagination is not supported for HBase Analytics Record Stores");
+            throw new HBaseUnsupportedOperationException("Pagination is not supported for HBase Analytics Record Store Implementation");
         }
         if (!this.tableExists(tenantId, tableName)) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
@@ -348,8 +350,8 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                 regionalGroups.add(regionalGroup);
             }
         } catch (IOException e) {
-            throw new AnalyticsException("Error computing region splits for table " + tableName +
-                    " for tenant " + tenantId);
+            throw new AnalyticsException("Error computing region splits for table " + tableName + " for tenant " +
+                    tenantId + " : " + e.getMessage(), e);
         }
         return regionalGroups.toArray(new RecordGroup[regionalGroups.size()]);
     }
@@ -379,7 +381,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                 }
             }
         } catch (IOException e) {
-            throw new AnalyticsException("Index for table " + tableName + " could not be read", e);
+            throw new AnalyticsException("Index for table " + tableName + " could not be read : " + e.getMessage(), e);
         } finally {
             GenericUtils.closeQuietly(resultScanner);
             GenericUtils.closeQuietly(indexTable);
