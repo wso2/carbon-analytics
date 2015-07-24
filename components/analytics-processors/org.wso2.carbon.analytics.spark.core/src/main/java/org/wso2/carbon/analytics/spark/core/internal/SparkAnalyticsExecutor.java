@@ -81,6 +81,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private static final String CLUSTER_GROUP_NAME = "CARBON_ANALYTICS_EXECUTION";
 
+    private static final String DEFAULT_SPARK_APP_NAME = "DefaultCarbonAnalyticsApp";
+
     private static final Log log = LogFactory.getLog(SparkAnalyticsExecutor.class);
 
     private String sparkMaster = "local";
@@ -452,6 +454,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private void setAdditionalConfigs(SparkConf conf) {
         //executor constants for spark env
+        conf.setIfMissing(AnalyticsConstants.SPARK_APP_NAME, DEFAULT_SPARK_APP_NAME);
         if (GenericUtils.isCarbonServer()) {
             conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
             conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
