@@ -86,7 +86,7 @@
                 <version>${orbit.version.axiom}</version>
             </dependency>
             <dependency>
-                <groupId>com.lmax.wso2</groupId>
+                <groupId>org.wso2.lmax</groupId>
                 <artifactId>disruptor</artifactId>
                 <version>${disruptor.orbit.version}</version>
             </dependency>
@@ -273,11 +273,6 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${google.guava.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.googlecode.disruptor.wso2</groupId>
-                <artifactId>disruptor</artifactId>
-                <version>${orbit.version.distruptor}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -1143,7 +1138,7 @@
         <geronimo-jms.version>1.1.1</geronimo-jms.version>
         <hector.wso2.version>1.1.4.wso2v1</hector.wso2.version>
         <junit.version>4.10</junit.version>
-        <disruptor.version>3.2.1</disruptor.version>
+        <disruptor.version>3.3.0</disruptor.version>
         <disruptor.orbit.version>${disruptor.version}.wso2v1</disruptor.orbit.version>
         <kafka.version>0.8.1</kafka.version>
         <org.eclipse.paho.version>0.4.0</org.eclipse.paho.version>
@@ -1160,7 +1155,6 @@
         <version.equinox.osgi.services>3.3.100.v20120522-1822</version.equinox.osgi.services>
         <slf4j.wso2.version>1.5.10.wso2v1</slf4j.wso2.version>
         <google.guava.version>15.0</google.guava.version>
-        <orbit.version.distruptor>2.10.4-wso2v2</orbit.version.distruptor>
         <commons.pool.version>1.5.0.wso2v1</commons.pool.version>
         <cassandra.thrift.wso2.version>1.2.13.wso2v4</cassandra.thrift.wso2.version>
 
