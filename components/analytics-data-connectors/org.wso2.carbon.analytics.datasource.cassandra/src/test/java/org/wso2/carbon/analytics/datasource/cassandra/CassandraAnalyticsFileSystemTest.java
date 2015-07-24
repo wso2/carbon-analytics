@@ -18,18 +18,17 @@
  */
 package org.wso2.carbon.analytics.datasource.cassandra;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.naming.NamingException;
-
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystemTest;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+
+import javax.naming.NamingException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Cassandra analytics file system tests.
@@ -42,7 +41,7 @@ public class CassandraAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");        
         AnalyticsFileSystem afs = new CassandraAnalyticsFileSystem();
         Map<String, String> props = new HashMap<String, String>();
-        props.put("servers", "localhost");
+        props.put("datasource", "WSO2_ANALYTICS_DS_CASSANDRA");
         afs.init(props);
         this.init("CassandraAnalyticsDataSource", afs);
     }

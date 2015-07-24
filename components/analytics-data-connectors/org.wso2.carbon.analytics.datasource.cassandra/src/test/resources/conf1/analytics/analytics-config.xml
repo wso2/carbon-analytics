@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <analytics-dataservice-configuration>
-   <primaryRecordStore>EVENT_STORE</primaryRecordStore>
-   <!-- Analytics File System - properties related to index storage implementation -->
-   <analytics-file-system>
-      <implementation>org.wso2.carbon.analytics.datasource.cassandra.CassandraAnalyticsFileSystem</implementation>
-      <properties>
+    <primaryRecordStore>EVENT_STORE</primaryRecordStore>
+    <!-- Analytics File System - properties related to index storage implementation -->
+    <analytics-file-system>
+        <implementation>org.wso2.carbon.analytics.datasource.cassandra.CassandraAnalyticsFileSystem</implementation>
+        <properties>
             <!-- the comma separated list of Cassandra server node addresses -->
-            <property name="servers">localhost</property>
-      </properties>
-   </analytics-file-system>
-   <!-- Analytics Record Store - properties related to record storage implementation -->
-   <analytics-record-store name="EVENT_STORE">
-      <implementation>org.wso2.carbon.analytics.datasource.cassandra.CassandraAnalyticsRecordStore</implementation>
-      <properties>
-            <property name="servers">localhost</property>
-      </properties>
-   </analytics-record-store>
-   <!-- The data indexing analyzer implementation -->
-   <analytics-lucene-analyzer>
-   		<implementation>org.apache.lucene.analysis.standard.StandardAnalyzer</implementation>
-   </analytics-lucene-analyzer>
-   <!-- The number of index shards, should be equal or higher to the number of indexing nodes that is going to be working,
-        ideal count being 'number of indexing nodes * CPU cores' -->
-   <shardCount>5</shardCount>
+            <property name="datasource">WSO2_ANALYTICS_DS_CASSANDRA</property>
+        </properties>
+    </analytics-file-system>
+    <!-- Analytics Record Store - properties related to record storage implementation -->
+    <analytics-record-store name="EVENT_STORE">
+        <implementation>org.wso2.carbon.analytics.datasource.cassandra.CassandraAnalyticsRecordStore</implementation>
+        <properties>
+            <property name="datasource">WSO2_ANALYTICS_DS_CASSANDRA</property>
+        </properties>
+    </analytics-record-store>
+    <!-- The data indexing analyzer implementation -->
+    <analytics-lucene-analyzer>
+        <implementation>org.apache.lucene.analysis.standard.StandardAnalyzer</implementation>
+    </analytics-lucene-analyzer>
+    <!-- The number of index shards, should be equal or higher to the number of indexing nodes that is going to be working,
+         ideal count being 'number of indexing nodes * CPU cores' -->
+    <shardCount>5</shardCount>
 </analytics-dataservice-configuration>
