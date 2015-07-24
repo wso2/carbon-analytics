@@ -23,7 +23,7 @@ import kafka.producer.ProducerConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
+import org.wso2.carbon.event.output.adapter.core.TenantConfigHolder;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -140,7 +140,7 @@ public class KafkaEventAdapter implements OutputEventAdapter {
         try {
             threadPoolExecutor.submit(new KafkaSender(topic, message));
         } catch (RejectedExecutionException e) {
-            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
+            TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
     }
 

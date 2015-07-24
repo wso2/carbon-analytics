@@ -1,16 +1,17 @@
 /*
- * Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.wso2.carbon.event.receiver.core.internal.util.helper;
 
@@ -21,9 +22,8 @@ import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.CryptoUtil;
-import org.wso2.carbon.event.input.adapter.core.EventAdapterUtil;
+import org.wso2.carbon.event.input.adapter.core.TenantConfigHolder;
 import org.wso2.carbon.event.receiver.core.EventReceiverDeployer;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfigurationFile;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
@@ -82,7 +82,7 @@ public class EventReceiverConfigurationFileSystemInvoker {
 
     public static void saveAndDeploy(String eventReceiverConfigXml, String fileName)
             throws EventReceiverConfigurationException {
-        EventReceiverDeployer eventReceiverDeployer = EventReceiverConfigurationHelper.getEventReceiverDeployer(EventAdapterUtil.getAxisConfiguration());
+        EventReceiverDeployer eventReceiverDeployer = EventReceiverConfigurationHelper.getEventReceiverDeployer(TenantConfigHolder.getAxisConfiguration());
         String filePath = getFilePathFromFilename(fileName);
         try {
             /* save contents to .xml file */
@@ -108,7 +108,7 @@ public class EventReceiverConfigurationFileSystemInvoker {
             File file = new File(filePath);
             String filename = file.getName();
             if (file.exists()) {
-                EventReceiverDeployer eventReceiverDeployer = EventReceiverConfigurationHelper.getEventReceiverDeployer(EventAdapterUtil.getAxisConfiguration());
+                EventReceiverDeployer eventReceiverDeployer = EventReceiverConfigurationHelper.getEventReceiverDeployer(TenantConfigHolder.getAxisConfiguration());
                 eventReceiverDeployer.getUndeployedEventReceiverFilePaths().add(filePath);
                 boolean fileDeleted = file.delete();
                 if (!fileDeleted) {
@@ -159,7 +159,7 @@ public class EventReceiverConfigurationFileSystemInvoker {
     public static void reload(EventReceiverConfigurationFile eventReceiverConfigurationFile)
             throws EventReceiverConfigurationException {
         String filePath = eventReceiverConfigurationFile.getFilePath();
-        AxisConfiguration axisConfiguration = EventAdapterUtil.getAxisConfiguration();
+        AxisConfiguration axisConfiguration = TenantConfigHolder.getAxisConfiguration();
         EventReceiverDeployer deployer = EventReceiverConfigurationHelper.getEventReceiverDeployer(axisConfiguration);
         try {
             deployer.processUndeployment(filePath);
@@ -177,7 +177,7 @@ public class EventReceiverConfigurationFileSystemInvoker {
      * @return the full path
      */
     private static String getFilePathFromFilename(String filename) {
-        return new File(EventAdapterUtil.getAxisConfiguration().getRepository().getPath()).getAbsolutePath()
+        return new File(TenantConfigHolder.getAxisConfiguration().getRepository().getPath()).getAbsolutePath()
                 + File.separator + EventReceiverConstants.ER_CONFIG_DIRECTORY + File.separator + filename;
     }
 }

@@ -1,16 +1,17 @@
 /*
- * Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.wso2.carbon.event.receiver.core.internal;
 
@@ -21,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.event.input.adapter.core.EventAdapterUtil;
+import org.wso2.carbon.event.input.adapter.core.TenantConfigHolder;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSchema;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterService;
 import org.wso2.carbon.event.input.adapter.core.Property;
@@ -70,7 +71,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
         EventReceiverConfigurationHelper.validateEventReceiverConfiguration(omElement);
         String mappingType = EventReceiverConfigurationHelper.getInputMappingType(omElement);
         if (mappingType != null) {
-            String repoPath = EventAdapterUtil.getAxisConfiguration().getRepository().getPath();
+            String repoPath = TenantConfigHolder.getAxisConfiguration().getRepository().getPath();
             EventReceiverUtil.generateFilePath(eventReceiverName, repoPath);
             validateToRemoveInactiveEventReceiverConfiguration(eventReceiverConfiguration.getEventReceiverName());
             EventReceiverConfigurationFileSystemInvoker.encryptAndSave(omElement, eventReceiverName + EventReceiverConstants.ER_CONFIG_FILE_EXTENSION_WITH_DOT);
@@ -93,7 +94,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
         String eventReceiverName = EventReceiverConfigurationHelper.getEventReceiverName(omElement);
         String mappingType = EventReceiverConfigurationHelper.getInputMappingType(omElement);
         if (mappingType != null) {
-            String repoPath = EventAdapterUtil.getAxisConfiguration().getRepository().getPath();
+            String repoPath = TenantConfigHolder.getAxisConfiguration().getRepository().getPath();
             EventReceiverUtil.generateFilePath(eventReceiverName, repoPath);
             validateToRemoveInactiveEventReceiverConfiguration(eventReceiverName);
             EventReceiverConfigurationFileSystemInvoker.encryptAndSave(omElement, eventReceiverName + EventReceiverConstants.ER_CONFIG_FILE_EXTENSION_WITH_DOT);

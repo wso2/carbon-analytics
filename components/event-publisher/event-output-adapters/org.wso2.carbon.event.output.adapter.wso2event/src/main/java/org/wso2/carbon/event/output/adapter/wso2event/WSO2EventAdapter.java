@@ -25,7 +25,7 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationExcep
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
-import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
+import org.wso2.carbon.event.output.adapter.core.TenantConfigHolder;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
@@ -122,7 +122,7 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
             dataPublisher.publish(event);
         } else {
             if (!dataPublisher.tryPublish(event, timeout)) {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send event", log, tenantId);
+                TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send event", log, tenantId);
             }
         }
     }

@@ -24,7 +24,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.core.util.CryptoUtil;
-import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
+import org.wso2.carbon.event.output.adapter.core.TenantConfigHolder;
 import org.wso2.carbon.event.publisher.core.EventPublisherDeployer;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
@@ -186,7 +186,7 @@ public class EventPublisherConfigurationFilesystemInvoker {
 
     private static String getFilePathFromFilename(String filename,
                                                   AxisConfiguration axisConfiguration) {
-        return new File(EventAdapterUtil.getAxisConfiguration().getRepository().getPath()).getAbsolutePath()
+        return new File(TenantConfigHolder.getAxisConfiguration().getRepository().getPath()).getAbsolutePath()
                 + File.separator + EventPublisherConstants.EF_CONFIG_DIRECTORY + File.separator + filename;
     }
 

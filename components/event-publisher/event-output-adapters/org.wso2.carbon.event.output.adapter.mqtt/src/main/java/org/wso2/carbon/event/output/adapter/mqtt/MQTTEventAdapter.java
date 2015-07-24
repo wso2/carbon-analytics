@@ -20,7 +20,7 @@ package org.wso2.carbon.event.output.adapter.mqtt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
+import org.wso2.carbon.event.output.adapter.core.TenantConfigHolder;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -143,7 +143,7 @@ public class MQTTEventAdapter implements OutputEventAdapter {
         try {
             threadPoolExecutor.submit(new MQTTSender(topic, message));
         } catch (RejectedExecutionException e) {
-            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
+            TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
     }
 
@@ -185,7 +185,7 @@ public class MQTTEventAdapter implements OutputEventAdapter {
                     mqttAdapterPublisher.publish(Integer.parseInt(qos), message.toString(), topic);
                 }
             } catch (Throwable t) {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, null, t, log, tenantId);
+                TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), message, null, t, log, tenantId);
 
             }
         }

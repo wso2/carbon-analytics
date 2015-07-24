@@ -27,7 +27,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.conn.params.ConnRoutePNames;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
+import org.wso2.carbon.event.output.adapter.core.TenantConfigHolder;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -152,7 +152,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         try {
             executorService.submit(new HTTPSender(url, payload, username, password, headers, httpClient));
         } catch (RejectedExecutionException e) {
-            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
+            TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
     }
 
@@ -316,10 +316,10 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 this.getHttpClient().executeMethod(hostConfiguration, method);
 
             }catch (UnknownHostException e) {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(),
+                TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(),
                         "Cannot connect to " + this.getUrl(), e, log, tenantId);
             }catch (Throwable e) {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(),
+                TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(),
                         null, e, log, tenantId);
             }finally {
                 if (method != null) {

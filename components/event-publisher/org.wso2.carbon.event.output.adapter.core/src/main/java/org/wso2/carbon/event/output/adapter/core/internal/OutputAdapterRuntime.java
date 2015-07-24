@@ -18,7 +18,7 @@ package org.wso2.carbon.event.output.adapter.core.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
+import org.wso2.carbon.event.output.adapter.core.TenantConfigHolder;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -105,7 +105,7 @@ public class OutputAdapterRuntime {
                 }
             }
         } catch (Throwable e) {
-            EventAdapterUtil.logAndDrop(name, message, null, e, log, PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            TenantConfigHolder.logAndDrop(name, message, null, e, log, PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
         }
     }
 

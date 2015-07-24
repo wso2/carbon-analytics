@@ -21,7 +21,7 @@ package org.wso2.carbon.event.output.adapter.websocket.local;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
-import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
+import org.wso2.carbon.event.output.adapter.core.TenantConfigHolder;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -111,7 +111,7 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
         try {
             executorService.execute(new WebSocketSender(message.toString()));
         } catch (RejectedExecutionException e) {
-            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
+            TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
     }
 
@@ -160,12 +160,12 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
                         try {
                             session.getBasicRemote().sendText(message);
                         } catch (IOException e) {
-                            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to endpoint", e, log, tenantId);
+                            TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to endpoint", e, log, tenantId);
                         }
                     }
                 }
             } else {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send as session not available", log, tenantId);
+                TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send as session not available", log, tenantId);
             }
 
         }
