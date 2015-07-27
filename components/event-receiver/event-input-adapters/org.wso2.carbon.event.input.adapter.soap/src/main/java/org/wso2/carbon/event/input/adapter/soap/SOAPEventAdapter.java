@@ -28,7 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.input.adapter.core.TenantConfigHolder;
+import org.wso2.carbon.event.input.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
@@ -73,7 +73,7 @@ public final class SOAPEventAdapter implements InputEventAdapter {
 
         try {
             registerService(eventAdaptorListener, eventAdapterConfiguration.getName(),
-                    TenantConfigHolder.getAxisConfiguration());
+                    EventAdapterUtil.getAxisConfiguration());
         } catch (AxisFault axisFault) {
             throw new InputEventAdapterRuntimeException("Cannot register Input Adapter " +
                     eventAdapterConfiguration.getName() + " on tenant " + tenantId, axisFault);
@@ -86,7 +86,7 @@ public final class SOAPEventAdapter implements InputEventAdapter {
 
         try {
             unregisterService(eventAdapterConfiguration.getName(),
-                    TenantConfigHolder.getAxisConfiguration());
+                    EventAdapterUtil.getAxisConfiguration());
         } catch (AxisFault axisFault) {
             throw new InputEventAdapterRuntimeException("Cannot un-register Input Adapter " +
                     eventAdapterConfiguration.getName() + " on tenant " + tenantId, axisFault);

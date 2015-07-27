@@ -13,42 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wso2.carbon.event.input.adapter.core;
 
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.wso2.carbon.context.CarbonContext;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
-import org.wso2.carbon.event.input.adapter.core.internal.ds.InputEventAdapterServiceValueHolder;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TenantConfigHolder {
-
     private static ConcurrentHashMap<Integer, ConfigurationContext> tenantConfigs = new ConcurrentHashMap<>();
-
-    public static AxisConfiguration getAxisConfiguration() {
-        AxisConfiguration axisConfiguration = null;
-        if (CarbonContext.getThreadLocalCarbonContext().getTenantId() == MultitenantConstants.SUPER_TENANT_ID) {
-            axisConfiguration = InputEventAdapterServiceValueHolder.getConfigurationContextService().
-                    getServerConfigContext().getAxisConfiguration();
-        } else {
-            ConfigurationContext configurationContext = tenantConfigs.get(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
-            if(configurationContext != null){
-                axisConfiguration = configurationContext.getAxisConfiguration();
-            }else{
-                axisConfiguration = TenantAxisUtils.getTenantAxisConfiguration(
-                        CarbonContext.getThreadLocalCarbonContext().getTenantDomain(),
-                        InputEventAdapterServiceValueHolder.getConfigurationContextService().getServerConfigContext());
-            }
-        }
-        return axisConfiguration;
-    }
 
     public static void addTenantConfig(int tenantId, ConfigurationContext configurationContext){
         tenantConfigs.putIfAbsent(tenantId, configurationContext);
+    }
+
+    public static ConfigurationContext getTenantConfig(int tenantId){
+        return tenantConfigs.get(tenantId);
     }
 
 }

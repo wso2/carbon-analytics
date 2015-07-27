@@ -20,7 +20,7 @@ package org.wso2.carbon.event.output.adapter.jms;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.output.adapter.core.TenantConfigHolder;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -141,7 +141,7 @@ public class JMSEventAdapter implements OutputEventAdapter {
         try {
             executorService.submit(new JMSSender(message, dynamicProperties));
         } catch (RejectedExecutionException e) {
-            TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
     }
 

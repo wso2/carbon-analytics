@@ -34,7 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.output.adapter.cassandra.internal.util.CassandraEventAdapterConstants;
-import org.wso2.carbon.event.output.adapter.core.TenantConfigHolder;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
@@ -178,10 +178,10 @@ public class CassandraEventAdapter implements OutputEventAdapter {
                 }
                 mutator.execute();
             } catch (Throwable t) {
-                TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), message, null, t, log, tenantId);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, null, t, log, tenantId);
             }
         } else {
-            TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), message, "Event is not type of Map.", log, tenantId);
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Event is not type of Map.", log, tenantId);
         }
 
     }

@@ -30,7 +30,7 @@ import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.output.adapter.core.TenantConfigHolder;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -114,7 +114,7 @@ public final class SMSEventAdapter implements OutputEventAdapter {
                 try {
                     threadPoolExecutor.submit(new SMSSender(smsNo, message.toString()));
                 } catch (RejectedExecutionException e) {
-                    TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
+                    EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
                 }
             }
         }
@@ -166,7 +166,7 @@ public final class SMSEventAdapter implements OutputEventAdapter {
                     log.debug("Sending SMS to " + smsNo + " , message : " + message);
                 }
             } catch (Exception ex) {
-                TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to '" + smsNo + "'", ex, log, tenantId);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to '" + smsNo + "'", ex, log, tenantId);
             } finally {
                 if (serviceClient != null) {
                     try {

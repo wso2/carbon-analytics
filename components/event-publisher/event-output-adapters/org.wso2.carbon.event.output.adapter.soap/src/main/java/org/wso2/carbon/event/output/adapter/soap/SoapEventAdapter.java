@@ -38,7 +38,7 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.rampart.RampartMessageData;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.output.adapter.core.TenantConfigHolder;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -194,7 +194,7 @@ public class SoapEventAdapter implements OutputEventAdapter {
         try {
             this.executorService.submit(new SoapSender(url, message, userName, password, soapHeaders, httpHeaders));
         } catch (RejectedExecutionException e) {
-            TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
     }
 
@@ -280,11 +280,11 @@ public class SoapEventAdapter implements OutputEventAdapter {
                 serviceClient.fireAndForget(AXIOMUtil.stringToOM(payload.toString()));
 
             } catch (AxisFault e) {
-                TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), payload, "Cannot send to endpoint '" + url + "'", e, log, tenantId);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), payload, "Cannot send to endpoint '" + url + "'", e, log, tenantId);
             } catch (XMLStreamException e) {
-                TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), payload, "Cannot convert event to XML", e, log, tenantId);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), payload, "Cannot convert event to XML", e, log, tenantId);
             } catch (Exception e) {
-                TenantConfigHolder.logAndDrop(eventAdapterConfiguration.getName(), payload, null, e, log, tenantId);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), payload, null, e, log, tenantId);
             } finally {
                 if (serviceClient != null) {
                     try {

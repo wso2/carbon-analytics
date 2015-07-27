@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.event.input.adapter.core.TenantConfigHolder;
+import org.wso2.carbon.event.input.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSchema;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterService;
 import org.wso2.carbon.event.input.adapter.core.Property;
@@ -71,7 +71,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
         EventReceiverConfigurationHelper.validateEventReceiverConfiguration(omElement);
         String mappingType = EventReceiverConfigurationHelper.getInputMappingType(omElement);
         if (mappingType != null) {
-            String repoPath = TenantConfigHolder.getAxisConfiguration().getRepository().getPath();
+            String repoPath = EventAdapterUtil.getAxisConfiguration().getRepository().getPath();
             EventReceiverUtil.generateFilePath(eventReceiverName, repoPath);
             validateToRemoveInactiveEventReceiverConfiguration(eventReceiverConfiguration.getEventReceiverName());
             EventReceiverConfigurationFileSystemInvoker.encryptAndSave(omElement, eventReceiverName + EventReceiverConstants.ER_CONFIG_FILE_EXTENSION_WITH_DOT);
@@ -94,7 +94,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
         String eventReceiverName = EventReceiverConfigurationHelper.getEventReceiverName(omElement);
         String mappingType = EventReceiverConfigurationHelper.getInputMappingType(omElement);
         if (mappingType != null) {
-            String repoPath = TenantConfigHolder.getAxisConfiguration().getRepository().getPath();
+            String repoPath = EventAdapterUtil.getAxisConfiguration().getRepository().getPath();
             EventReceiverUtil.generateFilePath(eventReceiverName, repoPath);
             validateToRemoveInactiveEventReceiverConfiguration(eventReceiverName);
             EventReceiverConfigurationFileSystemInvoker.encryptAndSave(omElement, eventReceiverName + EventReceiverConstants.ER_CONFIG_FILE_EXTENSION_WITH_DOT);
