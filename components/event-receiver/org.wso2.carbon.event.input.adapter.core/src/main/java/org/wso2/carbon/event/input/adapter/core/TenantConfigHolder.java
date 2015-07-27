@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.event.output.adapter.core.exception;
+package org.wso2.carbon.event.input.adapter.core;
 
-public class OutputEventAdapterRuntimeException extends RuntimeException {
-    public OutputEventAdapterRuntimeException() {
+import org.apache.axis2.context.ConfigurationContext;
+
+import java.util.concurrent.ConcurrentHashMap;
+
+public class TenantConfigHolder {
+    private static ConcurrentHashMap<Integer, ConfigurationContext> tenantConfigs = new ConcurrentHashMap<>();
+
+    public static void addTenantConfig(int tenantId, ConfigurationContext configurationContext){
+        tenantConfigs.putIfAbsent(tenantId, configurationContext);
     }
 
-    public OutputEventAdapterRuntimeException(String message) {
-        super(message);
-    }
-
-    public OutputEventAdapterRuntimeException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public OutputEventAdapterRuntimeException(Throwable cause) {
-        super(cause);
+    public static ConfigurationContext getTenantConfig(int tenantId){
+        return tenantConfigs.get(tenantId);
     }
 
 }

@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.application.deployer.EventProcessingDeployer;
+import org.wso2.carbon.event.input.adapter.core.TenantConfigHolder;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfigurationFile;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
@@ -74,6 +75,7 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
 
         String path = deploymentFileData.getAbsolutePath();
+        TenantConfigHolder.addTenantConfig(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(), configurationContext);
         if (!deployedEventReceiverFilePaths.contains(path)) {
             try {
                 processDeployment(deploymentFileData);
