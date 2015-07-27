@@ -147,8 +147,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      */
     public void initializeSparkServer() throws AnalyticsException {
         if (isLocalMode()) {
-            log.info("Starting SPARK in the LOCAL mode...");
-            this.initializeClient(true);
             if (isClusterMode()) {
                 log.info("Using Carbon clustering for Spark");
                 if (acm.isClusteringEnabled()) {
@@ -157,6 +155,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     throw new AnalyticsClusterException("Spark started in the cluster mode without " +
                                                         "enabling Carbon Clustering");
                 }
+            } else {
+                log.info("Starting SPARK in the LOCAL mode...");
+                this.initializeClient(true);
             }
         } else if (isClientMode()) {
             log.info("Client mode enabled for Spark");
@@ -205,7 +206,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private boolean isClientMode() throws AnalyticsClusterException {
-        if (!this.sparkMaster.isEmpty() && this.sparkMaster.trim().toLowerCase().startsWith("spark")){
+        if (!this.sparkMaster.isEmpty() && this.sparkMaster.trim().toLowerCase().startsWith("spark")) {
             this.sparkConf.setMaster(this.sparkMaster);
             return true;
         }
@@ -213,7 +214,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private boolean isLocalMode() {
-        if ( !this.sparkMaster.isEmpty() && this.sparkMaster.trim().toLowerCase().startsWith("local")){
+        if (!this.sparkMaster.isEmpty() && this.sparkMaster.trim().toLowerCase().startsWith("local")) {
             this.sparkConf.setMaster(this.sparkMaster);
             return true;
         }
