@@ -35,8 +35,8 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
-import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.rdd.AnalyticsRDD;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import scala.reflect.ClassTag$;
 
@@ -90,7 +90,9 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
                     tenantId, tableName);
             this.schema = new StructType(extractFieldsFromColumns(analyticsSchema.getColumns()));
         } catch (AnalyticsException e) {
-            log.error("Failed to load the schema for table " + tableName, e);
+            String msg = "Failed to load the schema for table " + tableName;
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
         }
     }
 
@@ -136,7 +138,9 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             }
             data.foreachPartition(new AnalyticsWritingFunction(tenantId, tableName, data.schema()));
         } catch (AnalyticsException e) {
-            log.error("Error while inserting data into table " + tableName, e);
+            String msg = "Error while inserting data into table " + tableName;
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
         }
     }
 
@@ -150,11 +154,11 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     }
 
     private StructField[] extractFieldsFromColumns(Map<String, ColumnDefinition> columns) {
-        StructField[] resFields = new StructField[(columns.size())+1];
+        StructField[] resFields = new StructField[(columns.size()) + 1];
 
         //adding the timestamp column
         resFields[0] = new StructField("_timestamp", AnalyticsCommonUtils.stringToDataType(AnalyticsConstants.LONG_TYPE),
-                false, Metadata.empty());
+                                       false, Metadata.empty());
         int i = 1;
         for (Map.Entry<String, ColumnDefinition> entry : columns.entrySet()) {
             String type = entry.getValue().getType().name();
