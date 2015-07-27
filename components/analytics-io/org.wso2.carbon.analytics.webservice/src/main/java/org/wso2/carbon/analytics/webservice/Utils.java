@@ -48,6 +48,8 @@ import java.util.Map;
  */
 public class Utils {
 
+    public static final String EMPTY_VALUE = "";
+
     private Utils() {
     }
 
@@ -219,6 +221,9 @@ public class Utils {
                     recordValueEntryBean.setType(RecordValueEntryBean.STRING);
                 }
             }
+        } else {
+            recordValueEntryBean.setStringValue(EMPTY_VALUE);
+            recordValueEntryBean.setType(RecordValueEntryBean.STRING);
         }
         return recordValueEntryBean;
     }
