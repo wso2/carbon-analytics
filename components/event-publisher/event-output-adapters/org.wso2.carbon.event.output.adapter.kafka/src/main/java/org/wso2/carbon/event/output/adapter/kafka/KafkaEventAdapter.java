@@ -1,20 +1,20 @@
 /*
-*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.event.output.adapter.kafka;
 
 import kafka.javaapi.producer.Producer;
@@ -28,9 +28,11 @@ import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
+import org.wso2.carbon.event.output.adapter.core.util.EventOutputAdapterThreadFactory;
 import org.wso2.carbon.event.output.adapter.kafka.internal.util.KafkaEventAdapterConstants;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -55,7 +57,7 @@ public class KafkaEventAdapter implements OutputEventAdapter {
     @Override
     public void init() throws OutputEventAdapterException {
 
-        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         //ThreadPoolExecutor will be assigned  if it is null
         if (threadPoolExecutor == null) {
@@ -92,7 +94,7 @@ public class KafkaEventAdapter implements OutputEventAdapter {
             }
 
             threadPoolExecutor = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime,
-                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(jobQueSize));
+                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(jobQueSize), new EventOutputAdapterThreadFactory("Kafka_" + eventAdapterConfiguration.getName()));
         }
 
     }
@@ -175,8 +177,12 @@ public class KafkaEventAdapter implements OutputEventAdapter {
 
         @Override
         public void run() {
-            KeyedMessage<String, Object> data = new KeyedMessage<String, Object>(topic, message.toString());
-            producer.send(data);
+            try {
+                KeyedMessage<String, Object> data = new KeyedMessage<String, Object>(topic, message.toString());
+                producer.send(data);
+            } catch (Exception e) {
+                log.error("Unexpected error when sending event via Kafka Output Adatper:" + e.getMessage(), e);
+            }
         }
     }
 

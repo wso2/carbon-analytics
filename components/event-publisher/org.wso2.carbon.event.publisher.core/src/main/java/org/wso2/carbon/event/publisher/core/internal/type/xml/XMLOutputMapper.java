@@ -1,16 +1,19 @@
 /*
- * Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.wso2.carbon.event.publisher.core.internal.type.xml;
 
@@ -43,14 +46,14 @@ import java.util.Map;
 public class XMLOutputMapper implements OutputMapper {
 
     private static final Log log = LogFactory.getLog(XMLOutputMapper.class);
-    EventPublisherConfiguration eventPublisherConfiguration = null;
-    Map<String, Integer> propertyPositionMap = null;
+    private EventPublisherConfiguration eventPublisherConfiguration = null;
+    private Map<String, Integer> propertyPositionMap = null;
     private String outputXMLText = "";
 
     public XMLOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                            Map<String, Integer> propertyPositionMap,
                            int tenantId, StreamDefinition streamDefinition) throws
-                                                                                  EventPublisherConfigurationException {
+            EventPublisherConfigurationException {
         this.eventPublisherConfiguration = eventPublisherConfiguration;
         this.propertyPositionMap = propertyPositionMap;
 
@@ -59,7 +62,6 @@ public class XMLOutputMapper implements OutputMapper {
         } else {
             generateTemplateXMLEvent(streamDefinition);
         }
-
     }
 
     private List<String> getOutputMappingPropertyList(String mappingText) {
@@ -109,44 +111,80 @@ public class XMLOutputMapper implements OutputMapper {
     private OMElement buildOuputOMElement(Object[] eventData, OMElement omElement)
             throws EventPublisherConfigurationException {
         Iterator<OMElement> iterator = omElement.getChildElements();
+        int prefixIndex, postfixIndex;
         if (iterator.hasNext()) {
-            for (; iterator.hasNext(); ) {
+            while (iterator.hasNext()) {
                 OMElement childElement = iterator.next();
                 Iterator<OMAttribute> iteratorAttr = childElement.getAllAttributes();
                 while (iteratorAttr.hasNext()) {
                     OMAttribute omAttribute = iteratorAttr.next();
-                    String text = omAttribute.getAttributeValue();
-                    if (text != null) {
-                        if (text.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0) {
-                            String propertyToReplace = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) + 2, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX));
-                            String value = getPropertyValue(eventData, propertyToReplace);
-                            omAttribute.setAttributeValue(value);
+                    String attributeText = omAttribute.getAttributeValue();
+                    if (attributeText != null && !attributeText.isEmpty()) {
+                        prefixIndex = attributeText.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
+                        if (prefixIndex >= 0) {
+                            postfixIndex = attributeText.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX);
+                            if (postfixIndex > 0) {
+                                String propertyToReplace = attributeText.substring(prefixIndex + 2, postfixIndex);
+                                String value = getPropertyValue(eventData, propertyToReplace);
+                                omAttribute.setAttributeValue(value);
+                            }
                         }
                     }
                 }
 
+                //TODO do we need to replace text here? Won't recursion ensure that text is replaced in leaf node?
                 String text = childElement.getText();
-                if (text != null) {
-                    if (text.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0) {
-                        String propertyToReplace = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) + 2, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX));
-                        String value = getPropertyValue(eventData, propertyToReplace);
-                        childElement.setText(value);
+                if (text != null && !text.isEmpty()) {
+                    prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
+                    if (prefixIndex >= 0) {
+                        postfixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX);
+                        if (postfixIndex > 0) {
+                            String propertyToReplace = text.substring(prefixIndex + 2, postfixIndex);
+                            String value = getPropertyValue(eventData, propertyToReplace);
+                            childElement.setText(value);
+                        }
                     }
                 }
-
+                // Since the same OM element is being modified, the modifications will be preserved even if
+                // the returned OM element is explicitly assigned.
                 buildOuputOMElement(eventData, childElement);
             }
         } else {
             String text = omElement.getText();
-            if (text != null) {
-                if (text.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0) {
-                    String propertyToReplace = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) + 2, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX));
-                    String value = getPropertyValue(eventData, propertyToReplace);
-                    omElement.setText(value);
+            if (text != null && !text.isEmpty()) {
+                prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
+                if (prefixIndex >= 0) {
+                    postfixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX);
+                    if (postfixIndex > 0) {
+                        String propertyToReplace = text.substring(prefixIndex + 2, postfixIndex);
+                        String value = getPropertyValue(eventData, propertyToReplace);
+                        omElement.setText(value);
+                    }
                 }
             }
         }
         return omElement;
+    }
+
+    private String buildOuputStringMessage(Object[] eventData)
+            throws EventPublisherConfigurationException {
+        StringBuilder eventText = new StringBuilder(outputXMLText);
+        int postfixIndex, fromIndex = 0;
+        int prefixIndex = eventText.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
+        while (prefixIndex >= 0) {
+            postfixIndex = eventText.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX, fromIndex);
+            if (postfixIndex > 0) {
+                String propertyToReplace = eventText.substring(prefixIndex + 2, postfixIndex);
+                String value = getPropertyValue(eventData, propertyToReplace);
+                eventText.replace(prefixIndex, postfixIndex + 2, value);
+                fromIndex = postfixIndex + 2;
+            } else {
+                throw new EventPublisherProcessingException("Could not find closing tag " + EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX
+                        + " after the opening tag for the attribute variable!");
+            }
+            prefixIndex = eventText.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX, fromIndex);
+        }
+        return eventText.toString();
     }
 
     @Override
@@ -166,7 +204,11 @@ public class XMLOutputMapper implements OutputMapper {
     @Override
     public Object convertToTypedInputEvent(Event event)
             throws EventPublisherConfigurationException {
-        return convertToMappedInputEvent(event);
+        if (event.getData().length > 0) {
+            return buildOuputStringMessage(event.getData());
+        } else {
+            throw new EventPublisherProcessingException("Input Object array is empty!");
+        }
     }
 
 
