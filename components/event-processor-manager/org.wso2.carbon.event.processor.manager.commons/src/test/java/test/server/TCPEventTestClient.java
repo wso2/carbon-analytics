@@ -44,20 +44,16 @@ public class TCPEventTestClient {
         streamDefinition1.attribute("att3", Attribute.Type.STRING);
         streamDefinition1.attribute("att4", Attribute.Type.DOUBLE);
         streamDefinition1.attribute("att5", Attribute.Type.BOOL);
-        TCPEventPublisher TCPEventPublisher = new TCPEventPublisher("localhost:7612", false);
-        TCPEventPublisher.addStreamDefinition(streamDefinition);
-        TCPEventPublisher.addStreamDefinition(streamDefinition1);
+        TCPEventPublisher tcpEventPublisher = new TCPEventPublisher("localhost:7612", false);
+        tcpEventPublisher.addStreamDefinition(streamDefinition);
+        tcpEventPublisher.addStreamDefinition(streamDefinition1);
 
         Thread.sleep(1000);
         System.out.println("Start testing");
         Random random = new Random();
 
-//        for (int i = 0; i < 1000000000; i++) {
-//            eventClient.sendEvent("TestStream", new Object[]{75, 45f, "Abcdefghijklmnop", 89});
-//            eventClient.sendEvent("TestStream1", new Object[]{90l, 77f, "Abcdefghijklmnop", 4.5,true});
-//
-//        }
-        Thread thread = new Thread(new Runner(TCPEventPublisher));
+
+        Thread thread = new Thread(new Runner(tcpEventPublisher));
         thread.start();
 //        Thread thread1 = new Thread(new Runner(TCPEventPublisher));
 //        thread1.start();
@@ -87,26 +83,27 @@ public class TCPEventTestClient {
          */
         @Override
         public void run() {
-//            for (int i = 0; i < 1000000000; i++) {
-            try {
-                tcpEventPublisher.sendEvent("TestStream", System.currentTimeMillis(), new Object[]{75, 45f, "Abcdefghijklmnop", 89,}, true);
-                Thread.sleep(10000);
-                System.out.println("next");
-                tcpEventPublisher.sendEvent("TestStream1", System.currentTimeMillis(), new Object[]{90l, 77f, "Abcdefghijklmnop", 4.5, true}, true);
-                Thread.sleep(1000);
-                System.out.println("next");
-                tcpEventPublisher.sendEvent("TestStream1", System.currentTimeMillis(), new Object[]{90l, 77f, "Abcdefghijklmnop", 4.5, true}, true);
-                Thread.sleep(1000);
-                System.out.println("next");
-                tcpEventPublisher.sendEvent("TestStream1", System.currentTimeMillis(), new Object[]{90l, 77f, "Abcdefghijklmnop", 4.5, true}, true);
+            for (int i = 0; i < 1000000000; i++) {
+                try {
+                    tcpEventPublisher.sendEvent("TestStream", System.currentTimeMillis(), new Object[]{75, 45f, "Abcdefghijklmnop", 89,}, true);
+//                Thread.sleep(10000);
+//                System.out.println("next");
+                    tcpEventPublisher.sendEvent("TestStream1", System.currentTimeMillis(), new Object[]{90l, 77f, "Abcdefghijklmnop", 4.5, true}, true);
+//                Thread.sleep(1000);
+//                System.out.println("next");
+                    tcpEventPublisher.sendEvent("TestStream1", System.currentTimeMillis(), new Object[]{90l, 77f, "Abcdefghijklmnop", 4.5, true}, true);
+//                Thread.sleep(1000);
+//                System.out.println("next");
+                    tcpEventPublisher.sendEvent("TestStream1", System.currentTimeMillis(), new Object[]{90l, 77f, "Abcdefghijklmnop", 4.5, true}, true);
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                } catch (IOException e) {
+                    e.printStackTrace();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+                }
+
 //
-//            }
+            }
         }
     }
 }

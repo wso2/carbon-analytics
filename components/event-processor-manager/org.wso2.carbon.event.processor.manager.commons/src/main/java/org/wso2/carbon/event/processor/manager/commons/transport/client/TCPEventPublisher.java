@@ -40,7 +40,6 @@ import java.util.concurrent.Executors;
 
 public class TCPEventPublisher {
 
-    public static final String DEFAULT_CHARSET = "UTF-8";
     private static Logger log = Logger.getLogger(TCPEventPublisher.class);
     private final String hostUrl;
     private Disruptor<ByteArrayHolder> disruptor;
@@ -49,6 +48,8 @@ public class TCPEventPublisher {
     private OutputStream outputStream;
     private Socket clientSocket;
     private TCPEventPublisherConfig publisherConfig;
+    public  String defaultCharset;
+
     /**
      * Indicate synchronous or asynchronous mode. In asynchronous mode Disruptor pattern is used and in synchronous mode sendEvent call
      * returns only after writing the event to the socket.
@@ -58,6 +59,7 @@ public class TCPEventPublisher {
     public TCPEventPublisher(String hostUrl, TCPEventPublisherConfig publisherConfig, boolean isSynchronous) throws IOException {
         this.hostUrl = hostUrl;
         this.publisherConfig = publisherConfig;
+        this.defaultCharset=publisherConfig.getDefaultCharset();
         this.streamRuntimeInfoMap = new ConcurrentHashMap<String, StreamRuntimeInfo>();
         this.isSynchronous = isSynchronous;
 
@@ -79,6 +81,9 @@ public class TCPEventPublisher {
         int port = Integer.parseInt(hp[1]);
 
         this.clientSocket = new Socket(host, port);
+        this.clientSocket.setKeepAlive(true);
+        this.clientSocket.setTcpNoDelay(true);
+        this.clientSocket.setSendBufferSize(publisherConfig.getTcpSendBufferSize());
         this.outputStream = new BufferedOutputStream(this.clientSocket.getOutputStream());
         log.info("Connecting to " + hostUrl);
     }
@@ -109,10 +114,10 @@ public class TCPEventPublisher {
 
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
 
-        int streamIdSize = (streamRuntimeInfo.getStreamId()).getBytes(DEFAULT_CHARSET).length;
+        int streamIdSize = (streamRuntimeInfo.getStreamId()).getBytes(defaultCharset).length;
         ByteBuffer buf = ByteBuffer.allocate(streamRuntimeInfo.getFixedMessageSize() + streamIdSize + 12);
         buf.putInt(streamIdSize);
-        buf.put((streamRuntimeInfo.getStreamId()).getBytes(DEFAULT_CHARSET));
+        buf.put((streamRuntimeInfo.getStreamId()).getBytes(defaultCharset));
         buf.putLong(timestamp);
 
         int[] stringDataIndex = new int[streamRuntimeInfo.getNoOfStringAttributes()];
@@ -138,7 +143,7 @@ public class TCPEventPublisher {
                     buf.putDouble((Double) eventData[i]);
                     continue;
                 case STRING:
-                    int length = ((String) eventData[i]).getBytes(DEFAULT_CHARSET).length;
+                    int length = ((String) eventData[i]).getBytes(defaultCharset).length;
                     buf.putInt(length);
                     stringDataIndex[stringIndex] = i;
                     stringIndex++;
@@ -149,7 +154,7 @@ public class TCPEventPublisher {
 
         buf = ByteBuffer.allocate(stringSize);
         for (int aStringIndex : stringDataIndex) {
-            buf.put(((String) eventData[aStringIndex]).getBytes(DEFAULT_CHARSET));
+            buf.put(((String) eventData[aStringIndex]).getBytes(defaultCharset));
         }
         arrayOutputStream.write(buf.array());
 
@@ -223,7 +228,7 @@ public class TCPEventPublisher {
             public ByteArrayHolder newInstance() {
                 return new ByteArrayHolder();
             }
-        }, publisherConfig.getBufferSize(), Executors.newSingleThreadExecutor());
+        }, publisherConfig.getBufferSize(), Executors.newCachedThreadPool());
 
         this.ringBuffer = disruptor.getRingBuffer();
 
@@ -273,16 +278,6 @@ public class TCPEventPublisher {
         } catch (IOException e) {
             log.debug("Error while closing socket to " + hostUrl + " : " + e.getMessage(), e);
         }
-    }
-
-    /**
-     * Discard all buffered messages and terminate the connection
-     */
-    public void terminate() {
-        if (!isSynchronous) {
-            disruptor.halt();
-        }
-        disconnect();
     }
 
     class ByteArrayHolder {

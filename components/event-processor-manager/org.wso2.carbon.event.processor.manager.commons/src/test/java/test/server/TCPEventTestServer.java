@@ -24,8 +24,6 @@ import org.wso2.carbon.event.processor.manager.commons.transport.server.TCPEvent
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
-import java.util.Arrays;
-
 public class TCPEventTestServer {
 
 
@@ -59,7 +57,7 @@ public class TCPEventTestServer {
              */
             @Override
             public void receive(String streamId, long timestamp, Object[] event) {
-                    System.out.println(streamId +" :  "+Arrays.deepToString(event));
+//                    System.out.println(streamId +" :  "+Arrays.deepToString(event));
 
                 count++;
                 if (count % 2000000 == 0) {
@@ -81,7 +79,7 @@ public class TCPEventTestServer {
 
         eventServer.start();
 
-        Thread.sleep(10000);
+        Thread.sleep(1000000);
 
         System.out.println("shutdown");
         eventServer.shutdown();
