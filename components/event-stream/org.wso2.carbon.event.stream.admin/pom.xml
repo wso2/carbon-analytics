@@ -66,8 +66,14 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Export-Package>
-                            org.wso2.carbon.event.stream.admin.*,
+                            !org.wso2.carbon.event.stream.admin.internal,
+                            !org.wso2.carbon.event.stream.admin.internal.*,
+                            org.wso2.carbon.event.stream.admin.*
                         </Export-Package>
+                        <Private-Package>
+                            org.wso2.carbon.event.stream.admin.internal,
+                            org.wso2.carbon.event.stream.admin.internal.*
+                        </Private-Package>
                         <Import-Package>
                             org.wso2.carbon.event.stream.core.*,
                             org.wso2.carbon.utils,

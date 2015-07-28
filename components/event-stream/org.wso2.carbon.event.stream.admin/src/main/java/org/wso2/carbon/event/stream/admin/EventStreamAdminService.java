@@ -12,19 +12,18 @@
  * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.wso2.carbon.event.stream.admin.internal;
+package org.wso2.carbon.event.stream.admin;
 
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import org.wso2.carbon.event.stream.admin.internal.util.EventAttributeTypeConstants;
-import org.wso2.carbon.event.stream.admin.internal.util.EventStreamAdminServiceValueHolder;
+import org.wso2.carbon.event.stream.admin.internal.ds.EventStreamAdminServiceValueHolder;
 import org.wso2.carbon.event.stream.admin.internal.util.EventStreamConstants;
 import org.wso2.carbon.event.stream.core.EventStreamConfiguration;
 import org.wso2.carbon.event.stream.core.EventStreamService;

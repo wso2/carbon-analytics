@@ -15,7 +15,6 @@
 package org.wso2.carbon.event.stream.admin.internal.ds;
 
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.event.stream.admin.internal.util.EventStreamAdminServiceValueHolder;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 
 /**

@@ -51,7 +51,7 @@
                                     <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar" />
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg line="-uri src/main/resources/EventStreamAdminService.wsdl -u -uw -o target/generated-code -ns2p http://internal.admin.stream.event.carbon.wso2.org=org.wso2.carbon.event.stream.stub,http://internal.admin.stream.event.carbon.wso2.org/xsd=org.wso2.carbon.event.stream.stub.types" />
+                                    <arg line="-uri src/main/resources/EventStreamAdminService.wsdl -u -uw -o target/generated-code -ns2p http://admin.stream.event.carbon.wso2.org=org.wso2.carbon.event.stream.stub,http://admin.stream.event.carbon.wso2.org/xsd=org.wso2.carbon.event.stream.stub.types" />
                                     <classpath refid="wsdl2java.classpath" />
                                 </java>
                             </tasks>
