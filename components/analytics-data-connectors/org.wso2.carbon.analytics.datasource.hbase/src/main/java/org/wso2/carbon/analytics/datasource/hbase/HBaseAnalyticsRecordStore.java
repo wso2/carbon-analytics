@@ -60,6 +60,11 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         this.queryConfig = entry;
     }
 
+    public HBaseAnalyticsRecordStore() {
+        this.conn = null;
+        this.queryConfig = null;
+    }
+
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
         this.queryConfig = HBaseUtils.lookupConfiguration();
