@@ -96,7 +96,7 @@
         </datasource>-->
 
         <!-- Sample datasource implementation for HBase Analytics RecordStore-->
-<!--        <datasource>
+        <!--<datasource>
             <name>WSO2_ANALYTICS_RS_DB_HBASE</name>
             <description>The datasource used for analytics file system</description>
             <jndiConfig>
@@ -121,7 +121,7 @@
         </datasource>-->
 
         <!-- Sample datasource implementation for Cassandra -->
-<!--        <datasource>
+        <!--<datasource>
             <name>WSO2_ANALYTICS_DS_CASSANDRA</name>
             <description>The Cassandra datasource used for analytics</description>
             <definition type="CASSANDRA">
@@ -143,7 +143,6 @@
                     </queryOptions>
                     <socketOptions>
                         <keepAlive>false</keepAlive>
-                        <tcpNoDelay>true</tcpNoDelay>
                         <sendBufferSize>150000</sendBufferSize>
                         <connectTimeoutMillis>12000</connectTimeoutMillis>
                         <readTimeoutMillis>12000</readTimeoutMillis>
