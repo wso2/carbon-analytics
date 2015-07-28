@@ -1,16 +1,19 @@
 /*
- * Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 var advancedMappingCounter = 0;
@@ -350,6 +353,7 @@ function addInputTextProperty() {
     var newTableRow = tableTBody.insertRow(tableTBody.rows.length);
     var newCell0 = newTableRow.insertCell(0);
     newCell0.innerHTML = regexExpr.value;
+    YAHOO.util.Dom.addClass(newCell0, "property-names");
 
     var newCell1 = newTableRow.insertCell(1);
     newCell1.innerHTML = propName.value;
@@ -357,12 +361,15 @@ function addInputTextProperty() {
 
     var newCell2 = newTableRow.insertCell(2);
     newCell2.innerHTML = propertyType.value;
+    YAHOO.util.Dom.addClass(newCell2, "property-names");
 
     var newCell3 = newTableRow.insertCell(3);
     newCell3.innerHTML = propDefault.value;
+    YAHOO.util.Dom.addClass(newCell3, "property-names");
 
     var newCell4 = newTableRow.insertCell(4);
-    newCell4.innerHTML = ' <a class="icon-link" style="background-image:url(../admin/images/delete.gif)" onclick="removeInputProperty(this,\'' + 'map' + '\')">Delete</a>';
+    newCell4.innerHTML = '<a class="icon-link" style="background-image:url(../admin/images/delete.gif)" onclick="removeInputProperty(this)">Delete</a>';
+    YAHOO.util.Dom.addClass(newCell4, "property-names");
 
     propDefault.value = "";
     noPropertyDiv.style.display = "none";
@@ -877,7 +884,8 @@ function addInputRegexDef() {
     YAHOO.util.Dom.addClass(newCell0, "property-names");
 
     var newCell1 = newTableRow.insertCell(1);
-    newCell1.innerHTML = ' <a class="icon-link" style="background-image:url(../admin/images/delete.gif)" onclick="removeRegexInputProperty(this,\'' + 'xml' + '\')">Delete</a>';
+    YAHOO.util.Dom.addClass(newCell1, "property-names");
+    newCell1.innerHTML = '<a class="icon-link" style="background-image:url(../admin/images/delete.gif)" onclick="removeRegexInputProperty(this)">Delete</a>';
 
 
     if (regexSelect.value == "") {
@@ -893,7 +901,7 @@ function addInputRegexDef() {
 }
 
 function updateAttributeType() {
-    var typeMap = JSON.parse( document.getElementById("streamMapping").getAttribute("mapping"));
+    var typeMap = JSON.parse(document.getElementById("streamMapping").getAttribute("mapping"));
     var selectedIndex = document.getElementById("inputPropertyName").selectedIndex;
     document.getElementById("inputPropertyType").value = typeMap[selectedIndex];
 }
