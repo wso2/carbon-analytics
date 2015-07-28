@@ -60,7 +60,7 @@ public abstract class DataEndpoint {
 
     private List<Event> events;
 
-    private State state;
+    private volatile State state;
 
     public enum State {
         ACTIVE, UNAVAILABLE, BUSY, INITIALIZING
@@ -77,15 +77,15 @@ public abstract class DataEndpoint {
         if (events.size() >= batchSize) {
             int currentNoOfThreads = threadPoolExecutor.getActiveCount();
             if (currentNoOfThreads < this.maxPoolSize) {
-                threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
-                events = new ArrayList<>();
-                if (currentNoOfThreads == this.maxPoolSize - 1) {
-                    this.state = State.BUSY;
+                if (currentNoOfThreads >= this.maxPoolSize - 1) {
+                    this.setState(State.BUSY);
                 } else {
-                    this.state = State.ACTIVE;
+                    this.setState(State.BUSY);
                 }
+                threadPoolExecutor.submit(new Thread(new EventPublisher(events, this)));
+                events = new ArrayList<>();
             } else {
-                this.state = State.BUSY;
+                this.setState(State.BUSY);
             }
         }
     }
@@ -93,14 +93,29 @@ public abstract class DataEndpoint {
     void flushEvents() {
         if (events.size() != 0) {
             int currentNoOfThreads = threadPoolExecutor.getActiveCount();
-            threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
-            events = new ArrayList<>();
             if (currentNoOfThreads >= maxPoolSize - 1) {
-                this.state = State.BUSY;
+                this.setState(State.BUSY);
             } else {
-                this.state = State.ACTIVE;
+                this.setState(State.ACTIVE);
             }
+            threadPoolExecutor.submit(new Thread(new EventPublisher(events, this)));
+            events = new ArrayList<>();
+            if (log.isDebugEnabled()) {
+                log.debug("Flush events from thread  name: " + Thread.currentThread().getName() + " , thread id : "
+                        + Thread.currentThread().getId());
+            }
+
         }
+    }
+
+    private synchronized void setState(State state) {
+        if (!this.state.equals(state)) {
+            this.state = state;
+        }
+    }
+
+    public int getActiveThreads() {
+        return threadPoolExecutor.getActiveCount();
     }
 
 
@@ -154,16 +169,16 @@ public abstract class DataEndpoint {
             throws DataEndpointAuthenticationException;
 
 
-    public State getState() {
+    public synchronized State getState() {
         return state;
     }
 
     void activate() {
-        state = State.ACTIVE;
+        this.setState(State.ACTIVE);
     }
 
     void deactivate() {
-        state = State.UNAVAILABLE;
+        this.setState(State.UNAVAILABLE);
     }
 
     /**
@@ -215,7 +230,7 @@ public abstract class DataEndpoint {
     class EventPublisher implements Runnable {
         List<Event> events;
 
-        public EventPublisher(List<Event> events) {
+        public EventPublisher(List<Event> events, DataEndpoint dataEndpoint) {
             this.events = events;
         }
 
@@ -229,7 +244,9 @@ public abstract class DataEndpoint {
                     publish();
                 } catch (UndefinedEventTypeException ex) {
                     log.error("Unable to process this event.", ex);
+                    deactivate();
                 } catch (Exception ex) {
+                    log.error("Unexpected error occurred while sending the event. ", ex);
                     handleFailedEvents();
                 }
             } catch (DataEndpointException e) {
@@ -237,6 +254,15 @@ public abstract class DataEndpoint {
                 handleFailedEvents();
             } catch (UndefinedEventTypeException e) {
                 log.error("Unable to process this event.", e);
+                deactivate();
+            } catch (Exception ex) {
+                log.error("Unexpected error occurred while sending the event. ", ex);
+                handleFailedEvents();
+            } finally {
+                if (log.isDebugEnabled()) {
+                    log.debug("Current threads count is : " + threadPoolExecutor.getActiveCount() + ", maxPoolSize is : " +
+                            maxPoolSize + ", therefore state is now : " + getState() + "at time : " + System.nanoTime());
+                }
             }
         }
 
@@ -248,21 +274,28 @@ public abstract class DataEndpoint {
         private void publish() throws DataEndpointException,
                 SessionTimeoutException,
                 UndefinedEventTypeException {
-            Object client = getClient();
-            send(client, this.events);
-            returnClient(client);
-            if (threadPoolExecutor.getActiveCount() <= maxPoolSize) {
-                state = State.ACTIVE;
+            try {
+                Object client = getClient();
+                send(client, this.events);
+                returnClient(client);
+            } finally {
+                if (threadPoolExecutor.getActiveCount() <= maxPoolSize) {
+                    activate();
+                }
             }
         }
     }
 
     boolean isConnected() {
-        return !state.equals(State.UNAVAILABLE);
+        return !getState().equals(State.UNAVAILABLE);
     }
 
     public String toString() {
         return "( Receiver URL : " + getDataEndpointConfiguration().getReceiverURL() + ", Authentication URL : " + getDataEndpointConfiguration().getAuthURL() + ")";
+    }
+
+    public String getObjectReference() {
+        return super.toString();
     }
 
     /**
