@@ -65,8 +65,6 @@ function loadEventAdapterProperty(inputAdapterProperty, eventReceiverInputTable,
         defaultValue = inputAdapterProperty.localDefaultValue;
     }
 
-    requiredElementId
-
     var inputField = tableRow.insertCell(1);
     var classType = 'outputFields';
 
@@ -74,20 +72,16 @@ function loadEventAdapterProperty(inputAdapterProperty, eventReceiverInputTable,
 
         if (hint != null && hint.trim() != "") {
             inputField.innerHTML = '<div class="' + classType + '"> <input style="width:75%" type="' + textPasswordType + '" id="' + requiredElementId + propertyLoop + '" name="' + inputAdapterProperty.localKey + '" value="' + defaultValue + '" class="initE"  /> <br/> <div class="sectionHelp">' + hint + '</div></div>';
-        }
-        else {
+        } else {
             inputField.innerHTML = '<div class="' + classType + '"> <input style="width:75%" type="' + textPasswordType + '" id="' + requiredElementId + propertyLoop + '" name="' + inputAdapterProperty.localKey + '" value="' + defaultValue + '" class="initE"  /> </div>';
         }
-    }
-
-    else {
+    } else {
 
         var option = '';
         jQuery.each(inputAdapterProperty.localOptions, function (index, localOption) {
             if (localOption == inputAdapterProperty.localDefaultValue) {
                 option = option + '<option selected=selected>' + localOption + '</option>';
-            }
-            else {
+            } else {
                 option = option + '<option>' + localOption + '</option>';
             }
 
@@ -96,8 +90,7 @@ function loadEventAdapterProperty(inputAdapterProperty, eventReceiverInputTable,
 
         if (hint != null && hint.trim() != "") {
             inputField.innerHTML = '<div class="' + classType + '"> <select   id="' + requiredElementId + propertyLoop + '" name="' + inputAdapterProperty.localKey + '">' + option + '</select><br/> <div class="sectionHelp">' + hint + '</div></div>';
-        }
-        else {
+        } else {
             inputField.innerHTML = '<div class="' + classType + '"> <select  id="' + requiredElementId + propertyLoop + '" name="' + inputAdapterProperty.localKey + '"  />' + option + ' </div>';
         }
 
@@ -161,15 +154,6 @@ function loadEventAdapterRelatedProperties(toPropertyHeader, propertiesHeading) 
             if (propertiesString != null) {
                 var jsonObject = JSON.parse(propertiesString);
                 loadEventAdapterProperties(jsonObject, propertiesHeading);
-
-                //if (jsonObject != undefined) {
-                //    var propertyLoop = 0;
-                //    jQuery.each(jsonObject, function (index, messageProperty) {
-                //        loadEventAdapterMessageProperties(messageProperty, eventReceiverInputTable, propertyLoop, inputProperty, inputRequiredProperty);
-                //        propertyLoop = propertyLoop + 1;
-                //    });
-                //}
-
             }
         }
     });
@@ -187,7 +171,6 @@ function handleAdvancedMapping() {
         outerDiv.style.display = "none";
     }
     advancedMappingCounter = advancedMappingCounter + 1;
-
 }
 
 function loadMappingUiElements() {
@@ -375,8 +358,6 @@ function addInputTextProperty() {
     noPropertyDiv.style.display = "none";
 }
 
-
-var advancedMappingCounter = 0;
 
 //Method that used in jsp files
 
@@ -616,9 +597,7 @@ function addEventReceiverViaPopup(form, toStreamId, redirectPage) {
                 }
             })
         }
-    }
-
-    else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'text') {
+    } else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'text') {
 
         mappingType = "text";
         var textData = "";
@@ -661,9 +640,7 @@ function addEventReceiverViaPopup(form, toStreamId, redirectPage) {
                 }
             })
         }
-    }
-
-    else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'xml') {
+    } else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'xml') {
         var parentSelectorXpath = document.getElementById("parentSelectorXpath").value;
 
         mappingType = "xml";
@@ -716,8 +693,7 @@ function addEventReceiverViaPopup(form, toStreamId, redirectPage) {
                 }
             });
         }
-    }
-    else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'map') {
+    } else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'map') {
 
         mappingType = "map";
         var mapData = "";
@@ -759,8 +735,7 @@ function addEventReceiverViaPopup(form, toStreamId, redirectPage) {
                 }
             });
         }
-    }
-    else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'json') {
+    } else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'json') {
 
         mappingType = "json";
         var jsonData = "";
