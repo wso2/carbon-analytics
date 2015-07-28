@@ -153,7 +153,13 @@ public class SampleEventGenerator {
 
         JsonObject innerObject = new JsonObject();
         for (Attribute attribute : attributeList) {
-            innerObject.addProperty(attribute.getName(), getSampleValue(attribute.getType()));
+            if (attribute.getType().name().toLowerCase().equals(EventStreamConstants.ATTR_TYPE_STRING)) {
+                innerObject.addProperty(attribute.getName(), getSampleValue(attribute.getType()));
+            } else if (attribute.getType().name().toLowerCase().equals(EventStreamConstants.ATTR_TYPE_BOOL)) {
+                innerObject.addProperty(attribute.getName(), Boolean.parseBoolean(getSampleValue(attribute.getType())));
+            } else {
+                innerObject.addProperty(attribute.getName(), Double.parseDouble(getSampleValue(attribute.getType())));
+            }
         }
         return innerObject;
     }
