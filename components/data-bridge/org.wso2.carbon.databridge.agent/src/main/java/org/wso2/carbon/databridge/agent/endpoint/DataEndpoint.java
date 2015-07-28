@@ -60,7 +60,7 @@ public abstract class DataEndpoint {
 
     private List<Event> events;
 
-    private volatile State state;
+    private State state;
 
     public enum State {
         ACTIVE, UNAVAILABLE, BUSY, INITIALIZING
@@ -82,7 +82,7 @@ public abstract class DataEndpoint {
                 } else {
                     this.setState(State.BUSY);
                 }
-                threadPoolExecutor.submit(new Thread(new EventPublisher(events, this)));
+                threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
                 events = new ArrayList<>();
             } else {
                 this.setState(State.BUSY);
@@ -98,7 +98,7 @@ public abstract class DataEndpoint {
             } else {
                 this.setState(State.ACTIVE);
             }
-            threadPoolExecutor.submit(new Thread(new EventPublisher(events, this)));
+            threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
             events = new ArrayList<>();
             if (log.isDebugEnabled()) {
                 log.debug("Flush events from thread  name: " + Thread.currentThread().getName() + " , thread id : "
@@ -108,16 +108,11 @@ public abstract class DataEndpoint {
         }
     }
 
-    private synchronized void setState(State state) {
+    private void setState(State state) {
         if (!this.state.equals(state)) {
             this.state = state;
         }
     }
-
-    public int getActiveThreads() {
-        return threadPoolExecutor.getActiveCount();
-    }
-
 
     void connect()
             throws TransportException,
@@ -169,7 +164,7 @@ public abstract class DataEndpoint {
             throws DataEndpointAuthenticationException;
 
 
-    public synchronized State getState() {
+    public State getState() {
         return state;
     }
 
@@ -230,7 +225,7 @@ public abstract class DataEndpoint {
     class EventPublisher implements Runnable {
         List<Event> events;
 
-        public EventPublisher(List<Event> events, DataEndpoint dataEndpoint) {
+        public EventPublisher(List<Event> events) {
             this.events = events;
         }
 
@@ -244,7 +239,6 @@ public abstract class DataEndpoint {
                     publish();
                 } catch (UndefinedEventTypeException ex) {
                     log.error("Unable to process this event.", ex);
-                    deactivate();
                 } catch (Exception ex) {
                     log.error("Unexpected error occurred while sending the event. ", ex);
                     handleFailedEvents();
@@ -254,7 +248,6 @@ public abstract class DataEndpoint {
                 handleFailedEvents();
             } catch (UndefinedEventTypeException e) {
                 log.error("Unable to process this event.", e);
-                deactivate();
             } catch (Exception ex) {
                 log.error("Unexpected error occurred while sending the event. ", ex);
                 handleFailedEvents();
@@ -274,28 +267,21 @@ public abstract class DataEndpoint {
         private void publish() throws DataEndpointException,
                 SessionTimeoutException,
                 UndefinedEventTypeException {
-            try {
-                Object client = getClient();
-                send(client, this.events);
-                returnClient(client);
-            } finally {
-                if (threadPoolExecutor.getActiveCount() <= maxPoolSize) {
-                    activate();
-                }
+            Object client = getClient();
+            send(client, this.events);
+            returnClient(client);
+            if (threadPoolExecutor.getActiveCount() <= maxPoolSize) {
+                activate();
             }
         }
     }
 
     boolean isConnected() {
-        return !getState().equals(State.UNAVAILABLE);
+        return !state.equals(State.UNAVAILABLE);
     }
 
     public String toString() {
         return "( Receiver URL : " + getDataEndpointConfiguration().getReceiverURL() + ", Authentication URL : " + getDataEndpointConfiguration().getAuthURL() + ")";
-    }
-
-    public String getObjectReference() {
-        return super.toString();
     }
 
     /**

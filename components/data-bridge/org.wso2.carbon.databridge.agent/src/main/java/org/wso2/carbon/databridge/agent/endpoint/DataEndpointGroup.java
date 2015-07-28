@@ -218,13 +218,6 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
         while (true) {
             DataEndpoint dataEndpoint = dataEndpoints.get(index);
-            if (log.isDebugEnabled()){
-                if (!dataEndpoint.getState().equals(DataEndpoint.State.ACTIVE)) {
-                    log.debug(" Data endpoint index -" + index + " , data endpoint - " + dataEndpoint.toString() +
-                            " , state - " + dataEndpoint.getState() + "at time : "+ System.nanoTime() +
-                            ", current available threads in endpoint:"+ dataEndpoint.getActiveThreads());
-                }
-            }
             if (dataEndpoint.getState().equals(DataEndpoint.State.ACTIVE)) {
                 return dataEndpoint;
             } else if (haType.equals(HAType.FAILOVER) && (dataEndpoint.getState().equals(DataEndpoint.State.BUSY) ||
@@ -233,7 +226,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                  * Wait for some time until the failover endpoint finish publishing
                  *
                  */
-                busyWait(10);
+                busyWait(1);
             } else {
                 index++;
                 if (index > maximumDataPublisherIndex.get() - 1) {
@@ -248,12 +241,12 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                              * and busy wait until data publisher
                              * becomes available
                              */
-                            busyWait(10);
+                            busyWait(1);
                         } else {
                             if (!isActiveDataEndpointExists()) {
                                 return null;
                             }else {
-                                busyWait(10);
+                                busyWait(1);
                             }
                         }
                     } else {
