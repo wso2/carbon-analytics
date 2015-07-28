@@ -569,10 +569,20 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
         stmt.setString(1, path);
         stmt.setLong(2, chunk.getChunkNumber());
         stmt.setBinaryStream(3, new ByteArrayInputStream(chunk.getData()));
+//        if (chunk.getData() != null) {
+//            stmt.setBinaryStream(3, new ByteArrayInputStream(chunk.getData()), chunk.getData().length);
+//        } else {
+//            stmt.setBinaryStream(3, new ByteArrayInputStream(chunk.getData()));
+//        }
     }
     
     private void populateStatementWithDataChunkUpdate(PreparedStatement stmt, String path, 
             DataChunk chunk) throws SQLException {
+//        if (chunk.getData() != null) {
+//            stmt.setBinaryStream(1, new ByteArrayInputStream(chunk.getData()), chunk.getData().length);
+//        } else {
+//            stmt.setBinaryStream(1, new ByteArrayInputStream(chunk.getData()));
+//        }
         stmt.setBinaryStream(1, new ByteArrayInputStream(chunk.getData()));
         stmt.setString(2, path);
         stmt.setLong(3, chunk.getChunkNumber());

@@ -18,6 +18,8 @@
  */
 package org.wso2.carbon.analytics.dataservice.config;
 
+import org.wso2.carbon.analytics.dataservice.Constants;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -38,6 +40,8 @@ public class AnalyticsDataServiceConfiguration {
     private String primaryRecordStore;
     
     private int shardCount;
+    
+    private int recordsBatchSize = Constants.RECORDS_BATCH_SIZE;
     
     @XmlElement (name = "analytics-record-store", nillable = false)
     public AnalyticsRecordStoreConfiguration[] getAnalyticsRecordStoreConfigurations() {
@@ -90,6 +94,15 @@ public class AnalyticsDataServiceConfiguration {
     
     public void setShardCount(int shardCount) {
         this.shardCount = shardCount;
+    }
+
+    @XmlElement (name = "recordsBatchSize", defaultValue = "1000")
+    public int getRecordsBatchSize() {
+        return recordsBatchSize;
+    }
+
+    public void setRecordsBatchSize(int recordsBatchSize) {
+        this.recordsBatchSize = recordsBatchSize;
     }
 
     @XmlElement(name = "analytics-data-purging")

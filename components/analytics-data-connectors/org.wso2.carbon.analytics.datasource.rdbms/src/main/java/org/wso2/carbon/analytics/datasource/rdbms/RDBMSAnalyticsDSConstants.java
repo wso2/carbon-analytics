@@ -27,4 +27,6 @@ public class RDBMSAnalyticsDSConstants {
     
     public static final String DEFAULT_CHARSET = "UTF8";
         
+    public static final int RECORD_BATCH_SIZE = 1000;
+
 }

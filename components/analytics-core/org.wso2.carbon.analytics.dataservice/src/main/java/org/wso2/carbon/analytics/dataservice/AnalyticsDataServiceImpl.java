@@ -60,14 +60,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 /**
@@ -102,6 +95,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private static final String TENANT_TABLE_MAPPING_TABLE_PREFIX = "__TENANT_MAPPING";
     
     private static final String TABLE_INFO_DATA_COLUMN = "TABLE_INFO_DATA";
+
+    private int recordsBatchSize;
 
     private Map<String, AnalyticsRecordStore> analyticsRecordStores;
     
@@ -199,6 +194,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (!this.analyticsRecordStores.containsKey(this.primaryARSName)) {
             throw new AnalyticsException("The primary record store with name '" + this.primaryARSName + "' cannot be found.");
         }
+        this.recordsBatchSize = config.getRecordsBatchSize();
     }
     
     private AnalyticsRecordStore getPrimaryAnalyticsRecordStore() {
@@ -666,7 +662,17 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (arsName == null) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
-        RecordGroup[] rgs = this.getAnalyticsRecordStore(arsName).get(tenantId, tableName, numPartitionsHint, columns, ids);
+        List<List<String>> idsSubLists = getChoppedLists(ids, this.recordsBatchSize);
+        List<RecordGroup> recordGroups = new ArrayList<>();
+
+        for(List<String> idSubList : idsSubLists) {
+            ArrayList<RecordGroup> recordGroupSubList = new ArrayList<>(Arrays.asList(
+                    this.getAnalyticsRecordStore(arsName).get(tenantId, tableName, numPartitionsHint, columns, idSubList)));
+            recordGroups.addAll(recordGroupSubList);
+        }
+
+        RecordGroup[] rgs = new RecordGroup[recordGroups.size()];
+        rgs = recordGroups.toArray(rgs);
         return new AnalyticsDataResponse(arsName, rgs);
     }
     
@@ -782,6 +788,15 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         } catch (IOException e) {
             throw new AnalyticsException("Error in analytics data service destroy: " + e.getMessage(), e);
         }
+    }
+
+    private <T> List<List<T>> getChoppedLists(List<T> list, final int L) {
+        List<List<T>> parts = new ArrayList<List<T>>();
+        final int N = list.size();
+        for (int i = 0; i < N; i += L) {
+            parts.add(new ArrayList<T>(list.subList(i, Math.min(N, i + L))));
+        }
+        return parts;
     }
     
     /**

@@ -35,4 +35,5 @@ public class Constants {
     public static final String INCLUDE_TABLES = "includeTables";
     public static final String INCLUDE_CLASS_SPLITTER = "###";
     public static final String DISABLE_ANALYTICS_DATA_PURGING_JVM_OPTION = "disableDataPurging";
+    public static final int RECORDS_BATCH_SIZE = 1000;
 }
