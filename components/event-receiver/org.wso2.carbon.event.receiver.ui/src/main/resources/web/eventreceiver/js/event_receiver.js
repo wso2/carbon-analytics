@@ -23,6 +23,12 @@ var DISABLE = "disable";
 var STAT = "statistics";
 var TRACE = "Tracing";
 
+jQuery(document).ready(function () {
+    // Resetting because firefox will not clear the previous form data on a reset.
+    if (document.getElementById("addEventReceiver") != null) {
+        document.getElementById("addEventReceiver").reset();
+    }
+});
 
 function deleteEventReceiver(eventReceiverName) {
     CARBON.showConfirmationDialog(
