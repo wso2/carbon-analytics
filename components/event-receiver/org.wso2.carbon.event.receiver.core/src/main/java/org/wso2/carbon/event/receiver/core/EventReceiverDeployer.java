@@ -15,6 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.event.receiver.core;
 
 import org.apache.axiom.om.OMElement;
@@ -63,6 +64,7 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
     @Override
     public void init(ConfigurationContext configurationContext) {
         this.configurationContext = configurationContext;
+        TenantConfigHolder.addTenantConfig(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(), configurationContext);
     }
 
     /**
@@ -75,7 +77,6 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
 
         String path = deploymentFileData.getAbsolutePath();
-        TenantConfigHolder.addTenantConfig(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(), configurationContext);
         if (!deployedEventReceiverFilePaths.contains(path)) {
             try {
                 processDeployment(deploymentFileData);
