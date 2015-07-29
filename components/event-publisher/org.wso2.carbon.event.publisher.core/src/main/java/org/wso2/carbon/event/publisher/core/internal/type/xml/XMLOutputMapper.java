@@ -15,6 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.event.publisher.core.internal.type.xml;
 
 import org.apache.axiom.om.OMAbstractFactory;
@@ -132,19 +133,6 @@ public class XMLOutputMapper implements OutputMapper {
                     }
                 }
 
-                //TODO do we need to replace text here? Won't recursion ensure that text is replaced in leaf node?
-                String text = childElement.getText();
-                if (text != null && !text.isEmpty()) {
-                    prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
-                    if (prefixIndex >= 0) {
-                        postfixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX);
-                        if (postfixIndex > 0) {
-                            String propertyToReplace = text.substring(prefixIndex + 2, postfixIndex);
-                            String value = getPropertyValue(eventData, propertyToReplace);
-                            childElement.setText(value);
-                        }
-                    }
-                }
                 // Since the same OM element is being modified, the modifications will be preserved even if
                 // the returned OM element is explicitly assigned.
                 buildOuputOMElement(eventData, childElement);
