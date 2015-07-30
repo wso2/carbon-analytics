@@ -132,7 +132,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     public static final String INDEX_DATA_RECORD_TABLE_NAME = "__INDEX_DATA__";
     
-    private static final int SHARD_INDEX_RECORD_BATCH_SIZE = 1000;
+    private static final int SHARD_INDEX_RECORD_BATCH_SIZE = 200;
     
     private static final String ANALYTICS_INDEXING_GROUP = "__ANALYTICS_INDEXING_GROUP__";
 
@@ -328,24 +328,24 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     private void processIndexOperations(int shardId) throws AnalyticsException {
-        boolean resume = true;
+        int count = SHARD_INDEX_RECORD_BATCH_SIZE;
         /* continue processing operations in this until there aren't any to be processed */
-        while (resume) {
-            resume = false;
+        while (count >= SHARD_INDEX_RECORD_BATCH_SIZE) {
             for (IndexedTableId indexTableId : this.indexedTableStore.getAllIndexedTables()) {
-                resume = resume || this.processIndexOperations(indexTableId.getTenantId(), 
-                        indexTableId.getTableName(), shardId);
+                count = this.processIndexOperations(indexTableId.getTenantId(), 
+                        indexTableId.getTableName(), shardId, SHARD_INDEX_RECORD_BATCH_SIZE);
             }
         }
     }
     
     @SuppressWarnings("unchecked")
-    private boolean processIndexOperations(int tenantId, String tableName, int shardId) throws AnalyticsException {
-        List<Record> indexRecords = this.loadIndexOperationRecords(tenantId, tableName, shardId, 
-                SHARD_INDEX_RECORD_BATCH_SIZE);
+    private int processIndexOperations(int tenantId, String tableName, int shardId, 
+            int count) throws AnalyticsException {
+        List<Record> indexRecords = this.loadIndexOperationRecords(tenantId, tableName, shardId, count);
         if (indexRecords.size() == 0) {
-            return false;
+            return 0;
         }
+        System.out.println("*** INDEX RECORDS: " + indexRecords.size());
         List<Object> indexObjs = this.checkAndExtractInsertDeleteIndexOperationBatches(indexRecords);
         List<Record> records;
         Record firstRecord;
@@ -362,7 +362,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
         }
         this.deleteIndexRecords(indexRecords);
-        return true;
+        return indexRecords.size();
     }
     
     /* The logic in this method that is used to again group the records by table identity is important,
@@ -1543,7 +1543,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
      */
     private class IndexWorker implements Runnable {
 
-        private static final int INDEX_WORKER_SLEEP_TIME = 2000;
+        private static final int INDEX_WORKER_SLEEP_TIME = 1000;
 
         private int shardIndex;
         
