@@ -57,6 +57,8 @@ public class RDBMSQueryConfigurationEntry {
     
     private String recordDeletionWithIdsQuery;
         
+    private int recordBatchSize = RDBMSAnalyticsDSConstants.RECORD_BATCH_SIZE;
+        
     private PaginationMode paginationMode;
     
     private String fsPathRetrievalQuery;
@@ -196,6 +198,14 @@ public class RDBMSQueryConfigurationEntry {
         this.recordDeletionWithIdsQuery = recordDeletionWithIdsQuery;
     }
     
+    public int getRecordBatchSize() {
+        return recordBatchSize;
+    }
+
+    public void setRecordBatchSize(int recordBatchSize) {
+        this.recordBatchSize = recordBatchSize;
+    }
+
     public String getFsPathRetrievalQuery() {
         return fsPathRetrievalQuery;
     }

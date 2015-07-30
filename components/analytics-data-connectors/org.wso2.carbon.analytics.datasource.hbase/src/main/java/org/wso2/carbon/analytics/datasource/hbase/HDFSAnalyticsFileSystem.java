@@ -61,9 +61,13 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
         }
         try {
             Configuration config = (Configuration) GenericUtils.loadGlobalDataSource(dsName);
+            if (config == null) {
+                throw new AnalyticsException("Failed to initialize HDFS configuration based on data source" +
+                        " definition");
+            }
             this.fileSystem = FileSystem.get(config);
         } catch (DataSourceException | IOException e) {
-            throw new AnalyticsException("Error creating HDFS Configuration from data source definition: " +
+            throw new AnalyticsException("Error establishing connection to HDFS instance from data source definition: " +
                     e.getMessage(), e);
         }
         if (this.fileSystem == null) {

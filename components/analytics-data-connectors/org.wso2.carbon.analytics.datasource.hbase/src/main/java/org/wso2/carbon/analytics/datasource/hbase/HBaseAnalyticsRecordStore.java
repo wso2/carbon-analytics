@@ -60,6 +60,11 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         this.queryConfig = entry;
     }
 
+    public HBaseAnalyticsRecordStore() {
+        this.conn = null;
+        this.queryConfig = null;
+    }
+
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
         this.queryConfig = HBaseUtils.lookupConfiguration();
@@ -70,6 +75,10 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         }
         try {
             Configuration config = (Configuration) GenericUtils.loadGlobalDataSource(dsName);
+            if (config == null) {
+                throw new AnalyticsException("Failed to initialize HBase configuration based on data source" +
+                        " definition");
+            }
             this.conn = ConnectionFactory.createConnection(config);
         } catch (DataSourceException | IOException e) {
             throw new AnalyticsException("Error establishing connection to HBase instance based on data source" +
@@ -79,6 +88,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             throw new AnalyticsException("Error establishing connection to HBase instance : HBase Client initialization " +
                     "failed");
         }
+        log.debug("Initialized connection to HBase instance successfully.");
     }
 
     @Override
@@ -109,6 +119,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             admin = this.conn.getAdmin();
             admin.createTable(indexDescriptor);
             admin.createTable(dataDescriptor);
+            log.debug("Table " + tableName + " for tenant " + tenantId + " created");
         } catch (IOException e) {
             throw new AnalyticsException("Error creating table " + tableName + " for tenant " + tenantId + " : " + e.getMessage(), e);
         } finally {
@@ -154,6 +165,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             /* finally, delete the index table */
             admin.disableTable(indexTable);
             admin.deleteTable(indexTable);
+            log.debug("Table " + tableName + " for tenant " + tenantId + " deleted");
         } catch (IOException e) {
             throw new AnalyticsException("Error deleting table " + tableName, e);
         } finally {
@@ -168,8 +180,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     @Override
-    public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException,
-            AnalyticsTableNotAvailableException {
+    public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException {
         throw new HBaseUnsupportedOperationException("Retrieving row count is not supported " +
                 "for HBase Analytics Record Stores");
     }
@@ -198,6 +209,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                 try {
                     indexTable.put(allPuts.get(0));
                     table.put(allPuts.get(1));
+                    log.debug("Processed " + records.size() + " PUT operations for " + tableName + " for tenant " + tenantId);
                 } finally {
                     table.close();
                     indexTable.close();
@@ -276,8 +288,10 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
         if ((timeFrom == Long.MIN_VALUE) && (timeTo == Long.MAX_VALUE) && (numPartitionsHint > 1)) {
+            log.debug("Performing GET on region split contours for table " + tableName + " and tenantID " + tenantId);
             return this.computeRegionSplits(tenantId, tableName, columns, recordsCount);
         } else {
+            log.debug("Performing GET through timestamp slices for table " + tableName + " and tenantID " + tenantId);
             return new HBaseTimestampRecordGroup[]{
                     new HBaseTimestampRecordGroup(tenantId, tableName, columns, timeFrom, timeTo, recordsCount)
             };
@@ -290,6 +304,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         if (!this.tableExists(tenantId, tableName)) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
+        log.debug("Performing GET by direct Record ID lookup for table " + tableName + " and tenantID " + tenantId);
         return new HBaseIDRecordGroup[]{
                 new HBaseIDRecordGroup(tenantId, tableName, columns, ids)
         };
@@ -406,6 +421,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         try {
             dataTable = this.conn.getTable(TableName.valueOf(dataTableName));
             dataTable.delete(dataDeletes);
+            log.debug("Processed deletion of " + dataDeletes.size() + " records from table " + tableName + "for tenant " + tenantId);
             //TODO: HBase bug in delete propagation. WORKAROUND BELOW
 /*            try {
                 Thread.sleep(1000L);
