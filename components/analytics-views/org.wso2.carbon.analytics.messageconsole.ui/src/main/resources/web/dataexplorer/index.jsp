@@ -66,7 +66,7 @@
         function loadTableSelect() {
             $('#tableSelect').find('option:gt(0)').remove();
             <c:if test="${permissions != null && permissions.isListTable()}">
-            $.get('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeListTable,
+            $.get('/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeListTable,
                   function (result) {
                       var resultObj = jQuery.parseJSON(result);
                       var tableNames = "";
@@ -100,7 +100,7 @@
             $("#purgeRecordButton").on("click", function () {
                 var label = document.getElementById('dataPurgingMsgLabel');
                 label.style.display = 'none';
-                $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetPurgingTask,
+                $.post('/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeGetPurgingTask,
                         {tableName: $("#tableSelect").val()},
                        function (result) {
                            var resultObj = jQuery.parseJSON(result);
@@ -143,7 +143,7 @@
                                                           var $container =
                                                                   $('<select class="facetSelect1"></select>');
                                                           $container.append($('<option>').val('-1').text('Select a category'));
-                                                          $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
+                                                          $.post('/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
                                                                   {
                                                                       tableName: $("#tableSelect").val(),
                                                                       categoryPath: "",
@@ -182,7 +182,7 @@
                     $(this).closest("tr").find('td:last').before($('<td>').append(function () {
                         var $container = $('<select class="facetSelect1"></select>');
                         $container.append($('<option>').val('-1').text('Select a category'));
-                        $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
+                        $.post('/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
                                 {
                                     tableName: $("#tableSelect").val(),
                                     categoryPath: JSON.stringify(path),
@@ -239,7 +239,7 @@
 
         function getArbitraryFields(rowData) {
             var $img =
-                    $('<img src="/carbon/messageconsole/themes/metro/list_metro.png" title="Show Arbitrary Fields"/>');
+                    $('<img src="/carbon/dataexplorer/themes/metro/list_metro.png" title="Show Arbitrary Fields"/>');
             $img.click(function () {
                 $('#AnalyticsTableContainer').jtable('openChildTable',
                                                      $img.closest('tr'), //Parent row
@@ -294,7 +294,7 @@
             $("#AnalyticsTableContainer").width(workAreaWidth - 20);
             var table = $("#tableSelect").val();
             if (table != '-1') {
-                $.getJSON("/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=" + typeTableInfo + "&tableName=" + table,
+                $.getJSON("/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=" + typeTableInfo + "&tableName=" + table,
                           function (data, status) {
                               var fields = {
                                   ArbitraryFields: {
@@ -362,7 +362,7 @@
                    resourceBundle="org.wso2.carbon.analytics.messageconsole.ui.i18n.Resources"
                    topPage="true" request="<%=request%>"/>
 <div id="middle">
-    <h2>Message Console</h2>
+    <h2>Data Explorer</h2>
 
     <div id="workArea">
         <c:if test="${permissionError != null}">
