@@ -12,21 +12,36 @@
  * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.wso2.carbon.event.stream.admin.internal.exception;
+package org.wso2.carbon.event.stream.admin;
 
-public class EventStreamAdminServiceException extends Exception {
-    public EventStreamAdminServiceException() {
+/**
+ * This class contains properties of inputs and outputs
+ */
+public class EventStreamAttributeDto {
+
+    /**
+     * Name of the attribute
+     */
+    private String attributeName;
+
+    /**
+     * Type of the attribute
+     */
+    private String attributeType;
+
+    public String getAttributeName() {
+        return attributeName;
     }
 
-    public EventStreamAdminServiceException(String message) {
-        super(message);
+    public void setAttributeName(String attributeName) {
+        this.attributeName = attributeName;
     }
 
-    public EventStreamAdminServiceException(String message, Throwable cause) {
-        super(message, cause);
+    public String getAttributeType() {
+        return attributeType;
     }
 
-    public EventStreamAdminServiceException(Throwable cause) {
-        super(cause);
+    public void setAttributeType(String attributeType) {
+        this.attributeType = attributeType;
     }
 }

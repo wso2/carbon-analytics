@@ -1,16 +1,19 @@
 /*
- * Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 //Method that used in jsp files
@@ -20,6 +23,12 @@ var DISABLE = "disable";
 var STAT = "statistics";
 var TRACE = "Tracing";
 
+jQuery(document).ready(function () {
+    // Resetting because firefox will not clear the previous form data on a reset.
+    if (document.getElementById("addEventReceiver") != null) {
+        document.getElementById("addEventReceiver").reset();
+    }
+});
 
 function deleteEventReceiver(eventReceiverName) {
     CARBON.showConfirmationDialog(
@@ -32,34 +41,34 @@ function deleteEventReceiver(eventReceiverName) {
 
 function disableReceiverStat(eventReceiverName) {
     jQuery.ajax({
-                    type:'POST',
-                    url:'../eventreceiver/stat_tracing-ajaxprocessor.jsp',
-                    data:'eventReceiverName=' + eventReceiverName + '&action=disableStat',
-                    async:false,
-                    success:function (msg) {
-                        handleCallback(eventReceiverName, DISABLE, STAT);
-                    },
-                    error:function (msg) {
-                        CARBON.showErrorDialog('<fmt:message key="stat.disable.error"/>' +
-                                               ' ' + eventReceiverName);
-                    }
-                });
+        type: 'POST',
+        url: '../eventreceiver/stat_tracing-ajaxprocessor.jsp',
+        data: 'eventReceiverName=' + eventReceiverName + '&action=disableStat',
+        async: false,
+        success: function (msg) {
+            handleCallback(eventReceiverName, DISABLE, STAT);
+        },
+        error: function (msg) {
+            CARBON.showErrorDialog('<fmt:message key="stat.disable.error"/>' +
+                ' ' + eventReceiverName);
+        }
+    });
 }
 
 function enableReceiverStat(eventReceiverName) {
     jQuery.ajax({
-                    type:'POST',
-                    url:'../eventreceiver/stat_tracing-ajaxprocessor.jsp',
-                    data:'eventReceiverName=' + eventReceiverName + '&action=enableStat',
-                    async:false,
-                    success:function (msg) {
-                        handleCallback(eventReceiverName, ENABLE, STAT);
-                    },
-                    error:function (msg) {
-                        CARBON.showErrorDialog('<fmt:message key="stat.enable.error"/>' +
-                                               ' ' + eventReceiverName);
-                    }
-                });
+        type: 'POST',
+        url: '../eventreceiver/stat_tracing-ajaxprocessor.jsp',
+        data: 'eventReceiverName=' + eventReceiverName + '&action=enableStat',
+        async: false,
+        success: function (msg) {
+            handleCallback(eventReceiverName, ENABLE, STAT);
+        },
+        error: function (msg) {
+            CARBON.showErrorDialog('<fmt:message key="stat.enable.error"/>' +
+                ' ' + eventReceiverName);
+        }
+    });
 }
 
 function handleCallback(eventReceiverName, action, type) {
@@ -93,42 +102,42 @@ function handleCallback(eventReceiverName, action, type) {
 
 function enableReceiverTracing(eventReceiverName) {
     jQuery.ajax({
-                    type:'POST',
-                    url:'../eventreceiver/stat_tracing-ajaxprocessor.jsp',
-                    data:'eventReceiverName=' + eventReceiverName + '&action=enableTracing',
-                    async:false,
-                    success:function (msg) {
-                        handleCallback(eventReceiverName, ENABLE, TRACE);
-                    },
-                    error:function (msg) {
-                        CARBON.showErrorDialog('<fmt:message key="trace.enable.error"/>' +
-                                               ' ' + eventReceiverName);
-                    }
-                });
+        type: 'POST',
+        url: '../eventreceiver/stat_tracing-ajaxprocessor.jsp',
+        data: 'eventReceiverName=' + eventReceiverName + '&action=enableTracing',
+        async: false,
+        success: function (msg) {
+            handleCallback(eventReceiverName, ENABLE, TRACE);
+        },
+        error: function (msg) {
+            CARBON.showErrorDialog('<fmt:message key="trace.enable.error"/>' +
+                ' ' + eventReceiverName);
+        }
+    });
 }
 
 function disableReceiverTracing(eventReceiverName) {
     jQuery.ajax({
-                    type:'POST',
-                    url:'../eventreceiver/stat_tracing-ajaxprocessor.jsp',
-                    data:'eventReceiverName=' + eventReceiverName + '&action=disableTracing',
-                    async:false,
-                    success:function (msg) {
-                        handleCallback(eventReceiverName, DISABLE, TRACE);
-                    },
-                    error:function (msg) {
-                        CARBON.showErrorDialog('<fmt:message key="trace.disable.error"/>' +
-                                               ' ' + eventReceiverName);
-                    }
-                });
+        type: 'POST',
+        url: '../eventreceiver/stat_tracing-ajaxprocessor.jsp',
+        data: 'eventReceiverName=' + eventReceiverName + '&action=disableTracing',
+        async: false,
+        success: function (msg) {
+            handleCallback(eventReceiverName, DISABLE, TRACE);
+        },
+        error: function (msg) {
+            CARBON.showErrorDialog('<fmt:message key="trace.disable.error"/>' +
+                ' ' + eventReceiverName);
+        }
+    });
 }
 
 function createImportedStreamDefinition() {
     new Ajax.Request('../eventstream/popup_create_event_stream_ajaxprocessor.jsp', {
-        method:'POST',
-        asynchronous:false,
-        parameters:{callback:"inflow"},
-        onSuccess:function (data) {
+        method: 'POST',
+        asynchronous: false,
+        parameters: {callback: "inflow"},
+        onSuccess: function (data) {
             showCustomPopupDialog(data.responseText, "Create Stream Definition", "80%", "", "", "90%");
         }
     });
@@ -151,13 +160,13 @@ function showCustomPopupDialog(message, title, windowHight, okButton, callback, 
         jQuery("#custom_dcontainer").html(strDialog);
         if (okButton) {
             jQuery("#custom_dialog").dialog({
-                close:function () {
+                close: function () {
                     jQuery(this).dialog('destroy').remove();
                     jQuery("#custom_dcontainer").empty();
                     return false;
                 },
-                buttons:{
-                    "OK":function () {
+                buttons: {
+                    "OK": function () {
                         if (callback && typeof callback == "function") {
                             callback();
                         }
@@ -166,16 +175,16 @@ function showCustomPopupDialog(message, title, windowHight, okButton, callback, 
                         return false;
                     }
                 },
-                autoOpen:false,
-                height:windowHight,
-                width:requiredWidth,
-                minHeight:windowHight,
-                minWidth:requiredWidth,
-                modal:true
+                autoOpen: false,
+                height: windowHight,
+                width: requiredWidth,
+                minHeight: windowHight,
+                minWidth: requiredWidth,
+                modal: true
             });
         } else {
             jQuery("#custom_dialog").dialog({
-                close:function () {
+                close: function () {
                     if (callback && typeof callback == "function") {
                         callback();
                     }
@@ -183,12 +192,12 @@ function showCustomPopupDialog(message, title, windowHight, okButton, callback, 
                     jQuery("#custom_dcontainer").empty();
                     return false;
                 },
-                autoOpen:false,
-                height:windowHight,
-                width:requiredWidth,
-                minHeight:windowHight,
-                minWidth:requiredWidth,
-                modal:true
+                autoOpen: false,
+                height: windowHight,
+                width: requiredWidth,
+                minHeight: windowHight,
+                minWidth: requiredWidth,
+                modal: true
             });
         }
 
@@ -207,5 +216,41 @@ function showCustomPopupDialog(message, title, windowHight, okButton, callback, 
     }
 
 }
+
+/* The functions removeInputProperty(link) and removeRegexInputProperty(link) are set to be called
+ within a String constant */
+/**
+ *
+ * @param link the row object to be removed
+ */
+function removeInputProperty(link) {
+    var rowToRemove = link.parentNode.parentNode;
+    rowToRemove.parentNode.removeChild(rowToRemove);
+    CARBON.showInfoDialog("Input Property removed successfully!!");
+}
+
+/**
+ *
+ * @param link the row object to be removed
+ */
+function removeRegexInputProperty(link) {
+    var rowToRemove = link.parentNode.parentNode;
+    var propertyToRemove = rowToRemove.cells[0].innerHTML.trim();
+    propertyToRemove = propertyToRemove.replace(/(\\)/g, '\\$1');
+    propertyToRemove = propertyToRemove.replace(/(:|\.|\[|\])/g, '\\$1');
+    rowToRemove.parentNode.removeChild(rowToRemove);
+    CARBON.showInfoDialog("Regex Property removed successfully!!");
+
+    var regexSelect = document.getElementById("inputPropertyValue");
+    jQuery("#inputPropertyValue option[value='" + propertyToRemove + "']").remove();
+    if (regexSelect.length == 0) {
+        var newRegexOption = document.createElement("option");
+        newRegexOption.value = 'No regular expression defined';
+        newRegexOption.text = 'No regular expression defined';
+        regexSelect.add(newRegexOption, null);
+    }
+
+}
+
 
 

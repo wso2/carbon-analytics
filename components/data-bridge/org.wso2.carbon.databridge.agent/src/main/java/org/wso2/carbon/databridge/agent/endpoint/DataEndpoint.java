@@ -77,15 +77,15 @@ public abstract class DataEndpoint {
         if (events.size() >= batchSize) {
             int currentNoOfThreads = threadPoolExecutor.getActiveCount();
             if (currentNoOfThreads < this.maxPoolSize) {
+                if (currentNoOfThreads >= this.maxPoolSize - 1) {
+                    this.setState(State.BUSY);
+                } else {
+                    this.setState(State.BUSY);
+                }
                 threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
                 events = new ArrayList<>();
-                if (currentNoOfThreads == this.maxPoolSize - 1) {
-                    this.state = State.BUSY;
-                } else {
-                    this.state = State.ACTIVE;
-                }
             } else {
-                this.state = State.BUSY;
+                this.setState(State.BUSY);
             }
         }
     }
@@ -93,16 +93,26 @@ public abstract class DataEndpoint {
     void flushEvents() {
         if (events.size() != 0) {
             int currentNoOfThreads = threadPoolExecutor.getActiveCount();
+            if (currentNoOfThreads >= maxPoolSize - 1) {
+                this.setState(State.BUSY);
+            } else {
+                this.setState(State.ACTIVE);
+            }
             threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
             events = new ArrayList<>();
-            if (currentNoOfThreads >= maxPoolSize - 1) {
-                this.state = State.BUSY;
-            } else {
-                this.state = State.ACTIVE;
+            if (log.isDebugEnabled()) {
+                log.debug("Flush events from thread  name: " + Thread.currentThread().getName() + " , thread id : "
+                        + Thread.currentThread().getId());
             }
+
         }
     }
 
+    private void setState(State state) {
+        if (!this.state.equals(state)) {
+            this.state = state;
+        }
+    }
 
     void connect()
             throws TransportException,
@@ -159,11 +169,11 @@ public abstract class DataEndpoint {
     }
 
     void activate() {
-        state = State.ACTIVE;
+        this.setState(State.ACTIVE);
     }
 
     void deactivate() {
-        state = State.UNAVAILABLE;
+        this.setState(State.UNAVAILABLE);
     }
 
     /**
@@ -230,6 +240,7 @@ public abstract class DataEndpoint {
                 } catch (UndefinedEventTypeException ex) {
                     log.error("Unable to process this event.", ex);
                 } catch (Exception ex) {
+                    log.error("Unexpected error occurred while sending the event. ", ex);
                     handleFailedEvents();
                 }
             } catch (DataEndpointException e) {
@@ -237,6 +248,14 @@ public abstract class DataEndpoint {
                 handleFailedEvents();
             } catch (UndefinedEventTypeException e) {
                 log.error("Unable to process this event.", e);
+            } catch (Exception ex) {
+                log.error("Unexpected error occurred while sending the event. ", ex);
+                handleFailedEvents();
+            } finally {
+                if (log.isDebugEnabled()) {
+                    log.debug("Current threads count is : " + threadPoolExecutor.getActiveCount() + ", maxPoolSize is : " +
+                            maxPoolSize + ", therefore state is now : " + getState() + "at time : " + System.nanoTime());
+                }
             }
         }
 
@@ -252,7 +271,7 @@ public abstract class DataEndpoint {
             send(client, this.events);
             returnClient(client);
             if (threadPoolExecutor.getActiveCount() <= maxPoolSize) {
-                state = State.ACTIVE;
+                activate();
             }
         }
     }

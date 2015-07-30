@@ -12,21 +12,21 @@
  * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.wso2.carbon.event.stream.admin.internal.util;
+package org.wso2.carbon.event.stream.admin.exception;
 
-import org.wso2.carbon.event.stream.core.EventStreamService;
-
-
-public class EventStreamAdminServiceValueHolder {
-
-    private static EventStreamService eventStreamService;
-
-    public static void registerEventStreamService(EventStreamService eventBuilderService) {
-        EventStreamAdminServiceValueHolder.eventStreamService = eventBuilderService;
+public class EventStreamAdminServiceException extends Exception {
+    public EventStreamAdminServiceException() {
     }
 
-    public static EventStreamService getEventStreamService() {
-        return EventStreamAdminServiceValueHolder.eventStreamService;
+    public EventStreamAdminServiceException(String message) {
+        super(message);
     }
 
+    public EventStreamAdminServiceException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public EventStreamAdminServiceException(Throwable cause) {
+        super(cause);
+    }
 }
