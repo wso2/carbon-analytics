@@ -547,7 +547,7 @@
             <dependency>
                 <groupId>org.wso2.orbit.org.apache.spark</groupId>
                 <artifactId>spark-core_2.10</artifactId>
-                <version>${spark.core.orbit.version}</version>
+                <version>${spark.orbit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.org.apache.spark</groupId>
@@ -1302,8 +1302,7 @@
         <carbon.analytics.imp.pkg.version>[1.0.3-SNAPSHOT, 1.1.0)</carbon.analytics.imp.pkg.version>
 
         <!--analytics processors -->
-        <spark.core.orbit.version>1.4.0.wso2v2</spark.core.orbit.version>
-        <spark.orbit.version>1.4.0.wso2v1</spark.orbit.version>
+        <spark.orbit.version>1.4.1.wso2v1</spark.orbit.version>
         <hadoop.client.orbit.version>2.2.0.wso2v1</hadoop.client.orbit.version>
         <typesafe.version>1.2.0</typesafe.version>
         <akka.version>2.3.4-spark</akka.version>
@@ -1331,9 +1330,9 @@
         <com.datastax.cassandra.driver.verison>2.1.5</com.datastax.cassandra.driver.verison>
 
         <!--spark additional dependencies --> <!--todo: clean these up-->
-        <exp.pkg.version.spark>1.4.0.wso2v1</exp.pkg.version.spark>
-        <spark.version>1.4.0</spark.version>
-        <spark.import.version>[1.4.0, 1.5.0)</spark.import.version>
+        <exp.pkg.version.spark>1.4.1.wso2v1</exp.pkg.version.spark>
+        <spark.version>1.4.1</spark.version>
+        <spark.import.version>[1.4.1, 1.5.0)</spark.import.version>
         <hadoop.client.import.version>[2.2.0, 2.7.0)</hadoop.client.import.version>
         <typesafe.version>1.2.1</typesafe.version>
         <typesafe.import.version>[1.2.1, 1.3.0)</typesafe.import.version>
