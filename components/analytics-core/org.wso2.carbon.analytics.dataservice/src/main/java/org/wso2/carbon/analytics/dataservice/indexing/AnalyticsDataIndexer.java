@@ -345,7 +345,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (indexRecords.size() == 0) {
             return 0;
         }
-        System.out.println("*** INDEX RECORDS: " + indexRecords.size());
         List<Object> indexObjs = this.checkAndExtractInsertDeleteIndexOperationBatches(indexRecords);
         List<Record> records;
         Record firstRecord;
