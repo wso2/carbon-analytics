@@ -35,6 +35,7 @@ import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfigPr
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsRecordStoreConfiguration;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
+import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsIndexedTableStore;
 import org.wso2.carbon.analytics.dataservice.tasks.AnalyticsGlobalDataPurgingTask;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -56,6 +57,7 @@ import org.wso2.carbon.ntask.core.service.TaskService;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -113,6 +115,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     private String primaryARSName;
     
+    private AnalyticsIndexedTableStore indexedTableStore;
+    
     public AnalyticsDataServiceImpl() throws AnalyticsException {
         AnalyticsDataServiceConfiguration config = this.loadAnalyticsDataServiceConfig();
         Analyzer luceneAnalyzer;
@@ -127,16 +131,50 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             throw new AnalyticsException("Error in creating analytics data service from configuration: " + 
                     e.getMessage(), e);
         }
+        this.initIndexedTableStore();
         this.indexer = new AnalyticsDataIndexer(this.getPrimaryAnalyticsRecordStore(), this.analyticsFileSystem, this,
-                                                config.getShardCount(), luceneAnalyzer);
+                                                this.indexedTableStore, config.getShardCount(), luceneAnalyzer);
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
             acm.joinGroup(ANALYTICS_DATASERVICE_GROUP, null);
         } 
         this.indexer.init();
+        this.initDataPurging(config);
+    }
+    
+    private void initIndexedTableStore() throws AnalyticsException {
+        this.indexedTableStore = new AnalyticsIndexedTableStore();
+        AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
+        Iterator<Record> records;
+        try {
+            records = GenericUtils.recordGroupsToIterator(ars, ars.get(TABLE_INFO_TENANT_ID, TABLE_INFO_TABLE_NAME, 1, 
+                    null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+            Record record;
+            while (records.hasNext()) {
+                record = records.next();
+                byte[] data = (byte[]) record.getValue(TABLE_INFO_DATA_COLUMN);
+                if (data == null) {
+                    throw new AnalyticsException("Corrupted table info for tenant id: " + 
+                            record.getTenantId() + " table: " + record.getTableName());
+                }
+                AnalyticsTableInfo tableInfo = (AnalyticsTableInfo) GenericUtils.deserializeObject(data);
+                if (this.isTableIndexed(tableInfo)) {
+                    this.indexedTableStore.addIndexedTable(tableInfo.getTenantId(), tableInfo.getTableName());
+                }
+            }
+        } catch (AnalyticsTableNotAvailableException ignore) {
+            /* ignore */
+        }
+    }
+    
+    private boolean isTableIndexed(AnalyticsTableInfo tableInfo) {
+        return tableInfo.getSchema().getIndexedColumns().size() > 0;
+    }
+    
+    private void initDataPurging(AnalyticsDataServiceConfiguration config) {
         boolean dataPurgingEnable = !Boolean.getBoolean(Constants.DISABLE_ANALYTICS_DATA_PURGING_JVM_OPTION);
-        logger.info("Data purging is " + (dataPurgingEnable ? "enable" : "disable") + " in this node");
+        logger.info("Data purging is " + (dataPurgingEnable ? "enabled" : "disabled") + " in this node");
         if (dataPurgingEnable) {
             if (config.getAnalyticsDataPurgingConfiguration() != null) {
                 final AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration = config.getAnalyticsDataPurgingConfiguration();
@@ -151,7 +189,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
                             }
                             dataPurgingTaskManager.registerTask(createDataPurgingTask(analyticsDataPurgingConfiguration));
                             dataPurgingTaskManager.scheduleTask(GLOBAL_DATA_PURGING);
-
                         } catch (TaskException e) {
                             logger.error("Unable to schedule global data purging task: " + e.getMessage(), e);
                         }
@@ -287,7 +324,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             /* ignore */
         }
         if (tableInfo == null || !tableInfo.getRecordStoreName().equals(recordStoreName)) {
-            tableInfo = new AnalyticsTableInfo(recordStoreName, new AnalyticsSchema());
+            tableInfo = new AnalyticsTableInfo(tenantId, tableName, recordStoreName, new AnalyticsSchema());
         }
         this.writeTableInfo(tenantId, tableName, tableInfo);
         this.writeToTenantTableMapping(tenantId, tableName);
@@ -366,9 +403,24 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         }
     }
     
+    private void refreshIndexedTableStoreEntry(int tenantId, String tableName) {
+        try {
+            AnalyticsTableInfo tableInfo = this.readTableInfo(tenantId, tableName);
+            if (this.isTableIndexed(tableInfo)) {
+                this.indexedTableStore.addIndexedTable(tenantId, tableName);
+            }
+        } catch (AnalyticsTableNotAvailableException e) {
+            this.indexedTableStore.removeIndexedTable(tenantId, tableName);
+        } catch (AnalyticsException e) {
+            logger.error("Error in refreshing indexed table store entry for tenant: " + 
+                    tenantId + " table: " + tableName + " : " + e.getMessage(), e);
+        }
+    }
+    
     public void invalidateAnalyticsTableInfo(int tenantId, String tableName) {
         tableName = GenericUtils.normalizeTableName(tableName);
         this.tableInfoMap.remove(GenericUtils.calculateTableIdentity(tenantId, tableName));
+        this.refreshIndexedTableStoreEntry(tenantId, tableName);
     }
 
     private void checkInvalidIndexNames(Map<String, ColumnDefinition> columns) throws AnalyticsIndexException {
@@ -611,20 +663,18 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         Collection<List<Record>> recordBatches = GenericUtils.generateRecordBatches(records, true);
         this.preprocessRecords(recordBatches);
         for (List<Record> recordsBatch : recordBatches) {
-            this.putSimiarRecordBatch(recordsBatch);
+            this.putSimilarRecordBatch(recordsBatch);
         }
     }
     
-    private void putSimiarRecordBatch(List<Record> recordsBatch) 
+    private void putSimilarRecordBatch(List<Record> recordsBatch) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
         Record firstRecord = recordsBatch.get(0);
         int tenantId = firstRecord.getTenantId();
         String tableName = firstRecord.getTableName();
         String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
         this.getAnalyticsRecordStore(arsName).put(recordsBatch);
-        AnalyticsSchema schema = this.lookupTableInfo(tenantId, tableName).getSchema();
-        Map<String, ColumnDefinition> indexedColumns = schema.getIndexedColumns();
-        if (indexedColumns.size() > 0) {
+        if (this.isTableIndexed(this.lookupTableInfo(tenantId, tableName))) {
             this.getIndexer().put(recordsBatch);
         }
     }
@@ -823,13 +873,27 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         
         private static final long serialVersionUID = -9100036429450395707L;
 
+        private int tenantId;
+        
+        private String tableName;
+        
         private String recordStoreName;
         
         private AnalyticsSchema schema;
         
-        public AnalyticsTableInfo(String recordStoreName, AnalyticsSchema schema) {
+        public AnalyticsTableInfo(int tenantId, String tableName, String recordStoreName, AnalyticsSchema schema) {
+            this.tenantId = tenantId;
+            this.tableName = tableName;
             this.recordStoreName = recordStoreName;
             this.schema = schema;
+        }
+        
+        public int getTenantId() {
+            return tenantId;
+        }
+        
+        public String getTableName() {
+            return tableName;
         }
         
         public String getRecordStoreName() {

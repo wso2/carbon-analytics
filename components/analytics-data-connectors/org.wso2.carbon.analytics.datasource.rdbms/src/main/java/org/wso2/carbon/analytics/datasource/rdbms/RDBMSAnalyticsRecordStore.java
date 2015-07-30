@@ -18,7 +18,6 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
-import org.apache.axiom.om.util.Base64;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -30,8 +29,6 @@ import org.wso2.carbon.ndatasource.common.DataSourceException;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -52,8 +49,6 @@ import java.util.Set;
  */
 public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     
-    private static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
-
     private static final String RECORD_IDS_PLACEHOLDER = "{{RECORD_IDS}}";
 
     private static final String TABLE_NAME_PLACEHOLDER = "{{TABLE_NAME}}";
@@ -470,35 +465,8 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
     
-    /**
-     * This method is used to generate an UUID from the target table name, to make sure, it is a compact
-     * name that can be fitted in all the supported RDBMSs. For example, Oracle has a table name
-     * length of 30. So we must translate source table names to hashed strings, which here will have
-     * a very low probability of clashing.
-     */
-    private String generateTableUUID(int tenantId, String tableName) {
-        try {
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            DataOutputStream dout = new DataOutputStream(byteOut);
-            dout.writeInt(tenantId);
-            /* we've to limit it to 64 bits */
-            dout.writeInt(tableName.hashCode());
-            dout.close();
-            byteOut.close();
-            String result = Base64.encode(byteOut.toByteArray());
-            result = result.replace('=', '_');
-            result = result.replace('+', '_');
-            result = result.replace('/', '_');
-            /* a table name must start with a letter */
-            return ANALYTICS_USER_TABLE_PREFIX + result;
-        } catch (IOException e) {
-            /* this will never happen */
-            throw new RuntimeException(e);
-        }
-    }
-    
     private String generateTargetTableName(int tenantId, String tableName) {
-        return this.generateTableUUID(tenantId, tableName);
+        return GenericUtils.generateTableUUID(tenantId, tableName);
     }
     
     private String translateQueryWithTableInfo(String query, int tenantId, String tableName) {
