@@ -18,7 +18,6 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
-import org.apache.axiom.om.util.Base64;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -30,8 +29,6 @@ import org.wso2.carbon.ndatasource.common.DataSourceException;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -39,21 +36,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Abstract RDBMS database backed implementation of {@link AnalyticsRecordStore}.
  */
 public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     
-    private static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
-
     private static final String RECORD_IDS_PLACEHOLDER = "{{RECORD_IDS}}";
 
     private static final String TABLE_NAME_PLACEHOLDER = "{{TABLE_NAME}}";
@@ -168,7 +157,9 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     private void populateStatementForAdd(PreparedStatement stmt, 
             Record record) throws SQLException, AnalyticsException {        
         stmt.setLong(1, record.getTimestamp());
-        stmt.setBinaryStream(2, new ByteArrayInputStream(GenericUtils.encodeRecordValues(record.getValues())));
+        byte [] buf = GenericUtils.encodeRecordValues(record.getValues());
+//        stmt.setBinaryStream(2, new ByteArrayInputStream(buf), buf.length);
+        stmt.setBinaryStream(2, new ByteArrayInputStream(buf));
         stmt.setString(3, record.getId());
     }
     
@@ -381,6 +372,16 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         if (ids.isEmpty()) {
             return new EmptyResultSetAnalyticsIterator();
         }
+        if(ids.size() > this.rdbmsQueryConfigurationEntry.getRecordBatchSize()) {
+            List<List<String>> idsSubLists = getChoppedLists(ids, this.rdbmsQueryConfigurationEntry.getRecordBatchSize());
+            RDBMSIDsRecordGroup [] rdbmsIDsRecordGroups = new RDBMSIDsRecordGroup[idsSubLists.size()];
+            int index = 0;
+            for(List<String> idSubList : idsSubLists) {
+                rdbmsIDsRecordGroups[index] =  new RDBMSIDsRecordGroup(tenantId, tableName, columns, idSubList);
+                index++;
+            }
+            return new RDBMSRecordIDListIterator(this, rdbmsIDsRecordGroups);
+        }
         String recordGetSQL = this.generateGetRecordRetrievalWithIdQuery(tenantId, tableName, ids.size());
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -402,6 +403,15 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
                 throw new AnalyticsException("Error in retrieving records: " + e.getMessage(), e);
             }
         }
+    }
+    
+    private <T> List<List<T>> getChoppedLists(List<T> list, final int L) {
+        List<List<T>> parts = new ArrayList<List<T>>();
+        final int N = list.size();
+        for (int i = 0; i < N; i += L) {
+            parts.add(new ArrayList<T>(list.subList(i, Math.min(N, i + L))));
+        }
+        return parts;
     }
     
     @Override
@@ -434,9 +444,12 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             return;
         }
         Connection conn = null;
+        List<List<String>> idsSubLists = getChoppedLists(ids, this.rdbmsQueryConfigurationEntry.getRecordBatchSize());
         try {
             conn = this.getConnection();
-            this.delete(conn, tenantId, tableName, ids);
+            for(List<String> idSubList : idsSubLists) {
+                this.delete(conn, tenantId, tableName, idSubList);
+            }
         } catch (SQLException e) {
             throw new AnalyticsException("Error in deleting records: " + e.getMessage(), e);
         } finally {
@@ -470,35 +483,8 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
     
-    /**
-     * This method is used to generate an UUID from the target table name, to make sure, it is a compact
-     * name that can be fitted in all the supported RDBMSs. For example, Oracle has a table name
-     * length of 30. So we must translate source table names to hashed strings, which here will have
-     * a very low probability of clashing.
-     */
-    private String generateTableUUID(int tenantId, String tableName) {
-        try {
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            DataOutputStream dout = new DataOutputStream(byteOut);
-            dout.writeInt(tenantId);
-            /* we've to limit it to 64 bits */
-            dout.writeInt(tableName.hashCode());
-            dout.close();
-            byteOut.close();
-            String result = Base64.encode(byteOut.toByteArray());
-            result = result.replace('=', '_');
-            result = result.replace('+', '_');
-            result = result.replace('/', '_');
-            /* a table name must start with a letter */
-            return ANALYTICS_USER_TABLE_PREFIX + result;
-        } catch (IOException e) {
-            /* this will never happen */
-            throw new RuntimeException(e);
-        }
-    }
-    
     private String generateTargetTableName(int tenantId, String tableName) {
-        return this.generateTableUUID(tenantId, tableName);
+        return GenericUtils.generateTableUUID(tenantId, tableName);
     }
     
     private String translateQueryWithTableInfo(String query, int tenantId, String tableName) {
@@ -766,5 +752,72 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             /* Nothing to do */
         }
     }
+
+    /**
+     * This class exposes an array of RecordGroup objects as an Iterator.
+     */
+    private class RDBMSRecordIDListIterator implements AnalyticsIterator<Record> {
+
+        private RDBMSAnalyticsRecordStore reader;
+
+        private RecordGroup[] rgs;
+
+        private Iterator<Record> itr;
+
+        private int index = -1;
+
+        public RDBMSRecordIDListIterator(RDBMSAnalyticsRecordStore reader, RecordGroup[] rgs)
+                throws AnalyticsException {
+            this.reader = reader;
+            this.rgs = rgs;
+        }
+
+        @Override
+        public boolean hasNext() {
+            boolean result;
+            if (this.itr == null) {
+                result = false;
+            } else {
+                result = this.itr.hasNext();
+            }
+            if (result) {
+                return true;
+            } else {
+                if (rgs.length > this.index + 1) {
+                    try {
+                        this.index++;
+                        RDBMSIDsRecordGroup recordIdGroup = (RDBMSIDsRecordGroup) (rgs[index]);
+                        this.itr = this.reader.getRecords(recordIdGroup.getTenantId(), recordIdGroup.getTableName(),
+                                recordIdGroup.getColumns(), recordIdGroup.getIds());
+                    } catch (AnalyticsException e) {
+                        throw new IllegalStateException("Error in traversing record group: " + e.getMessage(), e);
+                    }
+                    return this.hasNext();
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        @Override
+        public Record next() {
+            if (this.hasNext()) {
+                return this.itr.next();
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public void remove() {
+            /* ignored */
+        }
+
+        @Override
+        public void close() throws IOException {
+            /* ignored */
+        }
+    }
+
 
 }

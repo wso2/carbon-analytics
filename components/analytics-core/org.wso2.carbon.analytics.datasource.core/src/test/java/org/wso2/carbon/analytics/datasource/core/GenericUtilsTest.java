@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -62,13 +61,6 @@ public class GenericUtilsTest {
     public void testDecodeCorruptedData() throws AnalyticsException {
         byte[] data = new byte[] { 54 };
         GenericUtils.decodeRecordValues(data, null);
-    }
-    
-    @Test (expectedExceptions = AnalyticsException.class)
-    public void testEncodeInvalidValues() throws AnalyticsException {
-        Map<String, Object> values = new HashMap<String, Object>();
-        values.put("C1", new BigInteger("55353"));
-        GenericUtils.encodeRecordValues(values);
     }
     
     private byte[] generateBinaryData(int size) {

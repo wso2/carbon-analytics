@@ -359,7 +359,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         return clusterElectedLeaders.contains(true);
     }
 
-    public synchronized boolean isElectedLeader() {
+    public boolean isElectedLeader() {
         return electedLeader;
     }
 

@@ -167,15 +167,11 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     private String generateTargetDataTableName(int tenantId, String tableName) {
-        if (tenantId < 0) {
-            return "DATA_X" + Math.abs(tenantId) + "_" + tableName;
-        } else {
-            return "DATA_" + tenantId + "_" + tableName;
-        }
+        return GenericUtils.generateTableUUID(tenantId, tableName);
     }
 
     @Override
-    public void createTable(int tenantId, String tableName) throws AnalyticsException {
+    public synchronized void createTable(int tenantId, String tableName) throws AnalyticsException {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
         this.session.execute("CREATE TABLE IF NOT EXISTS ARS." + dataTable +
                 " (id VARCHAR, timestamp BIGINT, data MAP<VARCHAR, BLOB>, PRIMARY KEY (id))");
@@ -233,7 +229,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     @Override
-    public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
+    public synchronized void deleteTable(int tenantId, String tableName) throws AnalyticsException {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
         this.session.execute("DELETE FROM ARS.TS WHERE tenantId = ? AND tableName = ?", tenantId, tableName);
         this.session.execute("DROP TABLE IF EXISTS ARS." + dataTable);

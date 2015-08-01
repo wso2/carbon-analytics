@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.datasource.core.util;
 
+import org.apache.axiom.om.util.Base64;
 import org.apache.commons.collections.IteratorUtils;
 import org.w3c.dom.Document;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -45,6 +46,7 @@ import javax.xml.bind.JAXBContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
@@ -105,6 +107,8 @@ public class GenericUtils {
     private static final String DEFAULT_CHARSET = "UTF8";
 
     public static final String WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP = "wso2_custom_conf_dir";
+    
+    private static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
 
     private static DataSourceRepository globalCustomRepo;
 
@@ -217,7 +221,6 @@ public class GenericUtils {
         return buffer.array();
     }
 
-    @SuppressWarnings("unchecked")
     private static int calculateBufferSizePerElement(String name, Object value) throws AnalyticsException {
         int count = 0;
          /* column name length value + data type (including null) */
@@ -242,10 +245,9 @@ public class GenericUtils {
             } else if (value instanceof byte[]) {
                 count += Integer.SIZE / 8;
                 count += ((byte[]) value).length;
-            } else if (value instanceof List<?>) {
+            } else if (value instanceof Object) {
                 count += Integer.SIZE / 8;
-                List<String> analyticsCategoryPath = (List<String>) value;
-                count += GenericUtils.serializeObject(analyticsCategoryPath).length;
+                count += GenericUtils.serializeObject(value).length;
             } else if (value != null) {
                 throw new AnalyticsException("Invalid column value type in calculating column "
                                              + "values length: " + value.getClass());
@@ -703,6 +705,33 @@ public class GenericUtils {
         @Override
         public void remove() {
             /* ignored */
+        }
+    }
+    
+    /**
+     * This method is used to generate an UUID from the target table name, to make sure, it is a compact
+     * name that can be fitted in all the supported RDBMSs. For example, Oracle has a table name
+     * length of 30. So we must translate source table names to hashed strings, which here will have
+     * a very low probability of clashing.
+     */
+    public static String generateTableUUID(int tenantId, String tableName) {
+        try {
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            DataOutputStream dout = new DataOutputStream(byteOut);
+            dout.writeInt(tenantId);
+            /* we've to limit it to 64 bits */
+            dout.writeInt(tableName.hashCode());
+            dout.close();
+            byteOut.close();
+            String result = Base64.encode(byteOut.toByteArray());
+            result = result.replace('=', '_');
+            result = result.replace('+', '_');
+            result = result.replace('/', '_');
+            /* a table name must start with a letter */
+            return ANALYTICS_USER_TABLE_PREFIX + result;
+        } catch (IOException e) {
+            /* this will never happen */
+            throw new RuntimeException(e);
         }
     }
 

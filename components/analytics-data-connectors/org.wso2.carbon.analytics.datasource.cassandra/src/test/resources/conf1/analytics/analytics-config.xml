@@ -5,7 +5,6 @@
     <analytics-file-system>
         <implementation>org.wso2.carbon.analytics.datasource.cassandra.CassandraAnalyticsFileSystem</implementation>
         <properties>
-            <!-- the comma separated list of Cassandra server node addresses -->
             <property name="datasource">WSO2_ANALYTICS_DS_CASSANDRA</property>
         </properties>
     </analytics-file-system>
