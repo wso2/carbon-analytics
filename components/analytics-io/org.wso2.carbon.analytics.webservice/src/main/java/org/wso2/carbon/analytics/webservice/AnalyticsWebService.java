@@ -67,7 +67,6 @@ import java.util.Map;
 public class AnalyticsWebService extends AbstractAdmin {
     private static final Log logger = LogFactory.getLog(AnalyticsWebService.class);
     private static final int DEFAULT_NUM_PARTITIONS_HINT = 1;
-    private static final int NON_PAGINATE_PAGE_SIZE = 100;
     private AnalyticsDataAPI analyticsDataAPI;
     private EventStreamService eventStreamService;
     private static final String AT_SIGN = "@";
@@ -250,7 +249,7 @@ public class AnalyticsWebService extends AbstractAdmin {
     public long getRecordCount(String tableName, long timeFrom, long timeTo)
             throws AnalyticsWebServiceException {
         try {
-            long recordCount = 0;
+            long recordCount;
             if (isPaginationSupported(analyticsDataAPI.getRecordStoreNameByTable(getUsername(), tableName))) {
                 recordCount = analyticsDataAPI.getRecordCount(getUsername(), tableName, timeFrom, timeTo);
             } else {
@@ -290,16 +289,13 @@ public class AnalyticsWebService extends AbstractAdmin {
             if (columns != null && columns.length != 0) {
                 columnList = Arrays.asList(columns);
             }
-            List<Record> records;
-            if (isPaginationSupported(analyticsDataAPI.getRecordStoreNameByTable(getUsername(), tableName))) {
-                records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI,
-                                                                analyticsDataAPI.get(getUsername(), tableName, numPartitionsHint, columnList, timeFrom, timeTo, recordsFrom,
-                                                                                     recordsCount));
-            } else {
-                AnalyticsDataResponse resp = analyticsDataAPI.get(getUsername(), tableName, numPartitionsHint, columnList,
-                                                                  timeFrom, timeTo, 0, -1);
-                records = getNonPaginateRecords(resp);
+            if (!isPaginationSupported(analyticsDataAPI.getRecordStoreNameByTable(getUsername(), tableName))) {
+                recordsFrom = 0;
             }
+            List<Record> records = AnalyticsDataServiceUtils.
+                    listRecords(analyticsDataAPI,
+                                analyticsDataAPI.get(getUsername(), tableName, numPartitionsHint, columnList, timeFrom, timeTo, recordsFrom,
+                                                     recordsCount));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
@@ -308,25 +304,6 @@ public class AnalyticsWebService extends AbstractAdmin {
             throw new AnalyticsWebServiceException("Unable to get record from table[" + tableName + "] due to " + e
                     .getMessage(), e);
         }
-    }
-
-    private List<Record> getNonPaginateRecords(AnalyticsDataResponse resp) throws AnalyticsException, IOException {
-        List<Record> records = new ArrayList<>(NON_PAGINATE_PAGE_SIZE);
-        int i = 0;
-        outer:
-        for (RecordGroup rg : resp.getRecordGroups()) {
-            AnalyticsIterator<Record> itr = analyticsDataAPI.readRecords(resp.getRecordStoreName(), rg);
-            while (itr.hasNext()) {
-                records.add(itr.next());
-                i++;
-                if (i == NON_PAGINATE_PAGE_SIZE) {
-                    itr.close();
-                    break outer;
-                }
-            }
-            itr.close();
-        }
-        return records;
     }
 
     /**
