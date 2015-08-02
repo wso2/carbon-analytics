@@ -157,9 +157,12 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     private void populateStatementForAdd(PreparedStatement stmt, 
             Record record) throws SQLException, AnalyticsException {        
         stmt.setLong(1, record.getTimestamp());
-        byte [] buf = GenericUtils.encodeRecordValues(record.getValues());
-//        stmt.setBinaryStream(2, new ByteArrayInputStream(buf), buf.length);
-        stmt.setBinaryStream(2, new ByteArrayInputStream(buf));
+        byte [] bytes = GenericUtils.encodeRecordValues(record.getValues());
+        if (!this.rdbmsQueryConfigurationEntry.isBlobLengthRequired()) {
+            stmt.setBinaryStream(2, new ByteArrayInputStream(bytes));
+        } else {
+            stmt.setBinaryStream(2, new ByteArrayInputStream(bytes), bytes.length);
+        }
         stmt.setString(3, record.getId());
     }
     
@@ -175,6 +178,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             }
             stmt.executeBatch();
         } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
             if (!this.tableExists(conn, tenantId, tableName)) {
                 throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {
@@ -204,17 +208,20 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         String insertQuery = this.getRecordInsertSQL(tenantId, tableName);
         String updateQuery = this.getRecordUpdateSQL(tenantId, tableName);
         PreparedStatement stmt = null;
-        stmt = conn.prepareStatement(insertQuery);
-        for (Record record : records) {            
+        for (Record record : records) {
+            stmt = conn.prepareStatement(insertQuery);
             this.populateStatementForAdd(stmt, record);
             try {
                 stmt.executeUpdate();
+                conn.commit();
             } catch (SQLException e) {
                 /* maybe the record is already there, lets try to update */
+                RDBMSUtils.rollbackConnection(conn);
                 stmt.close();
                 stmt = conn.prepareStatement(updateQuery);
                 this.populateStatementForAdd(stmt, record);
                 stmt.executeUpdate();
+                conn.commit();
             }
         }        
     }
@@ -231,7 +238,9 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
                 stmt.addBatch();
             }
             stmt.executeBatch();
+            conn.commit();
         } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
             if (!this.tableExists(conn, tenantId, tableName)) {
                 throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {
@@ -427,6 +436,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             stmt.setLong(2, timeTo);
             stmt.executeUpdate();
         } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
             if (conn != null && !this.tableExists(conn, tenantId, tableName)) {
                 throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {
@@ -583,6 +593,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             rs = stmt.executeQuery();
             return true;
         } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
             return false;
         } finally {
             RDBMSUtils.cleanupConnection(rs, stmt, null);
@@ -687,10 +698,10 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             }
             try {
                 if (this.rs.next()) {
-                    Blob blob = this.rs.getBlob(3);
+                    byte[] bytes = this.rs.getBytes(3);
                     Map<String, Object> values;
-                    if (blob != null) {
-                        values = GenericUtils.decodeRecordValues(blob.getBytes(1, (int) blob.length()), colSet);
+                    if (bytes != null) {
+                        values = GenericUtils.decodeRecordValues(bytes, colSet);
                     } else {
                         values = new HashMap<>(0);
                     }

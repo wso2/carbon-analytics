@@ -89,6 +89,20 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.4-1200-jdbc41</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>cn.guoyukun.jdbc</groupId>
+			<artifactId>db2jcc</artifactId>
+			<version>1.4.2</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>

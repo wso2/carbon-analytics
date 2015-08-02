@@ -7,6 +7,7 @@
         <paginationSecondInclusive>false</paginationSecondInclusive>
         <paginationSecondLength>true</paginationSecondLength>
         <paginationSecondZeroIndexed>false</paginationSecondZeroIndexed>
+        <blobLengthRequired>true</blobLengthRequired>
         <recordTableCheckQuery>SELECT TOP 1 1 from {{TABLE_NAME}}</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>

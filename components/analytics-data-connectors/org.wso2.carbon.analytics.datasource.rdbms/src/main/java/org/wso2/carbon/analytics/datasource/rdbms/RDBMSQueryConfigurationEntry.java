@@ -87,6 +87,8 @@ public class RDBMSQueryConfigurationEntry {
     
     private int fsDataChunkSize;
 
+    private boolean blobLengthRequired;
+
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
     }
@@ -325,6 +327,15 @@ public class RDBMSQueryConfigurationEntry {
     
     public void setPaginationMode(PaginationMode paginationMode) {
         this.paginationMode = paginationMode;
+    }
+
+    @XmlElement(name = "blobLengthRequired", nillable = true)
+    public boolean isBlobLengthRequired() {
+        return blobLengthRequired;
+    }
+
+    public void setBlobLengthRequired(boolean blobLengthRequired) {
+        this.blobLengthRequired = blobLengthRequired;
     }
 
     /**

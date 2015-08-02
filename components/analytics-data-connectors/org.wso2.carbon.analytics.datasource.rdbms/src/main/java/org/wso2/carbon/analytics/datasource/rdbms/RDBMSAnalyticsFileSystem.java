@@ -107,6 +107,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             stmt.execute(this.getSystemTableCheckQuery());
             return true;
         } catch (SQLException ignore) {
+            RDBMSUtils.rollbackConnection(conn);
             RDBMSUtils.cleanupConnection(null, stmt, null);
             return false;
         }
@@ -163,6 +164,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             this.deleteDataImpl(conn, path);
             this.deletePathImpl(conn, path);
         } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
             throw new IOException("Error in deleting path: " + path + ": " + e.getMessage(), e);
         }
     }
@@ -266,6 +268,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             }
             return result;
         } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
             throw new IOException("Error in file exists: " + path + ": " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(rs, stmt, null);
@@ -333,6 +336,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
         try {
             stmt.executeUpdate();
         } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
             /* if this exception is because someone else already added the directory, we can ignore it */
             if (!this.existsImpl(conn, path)) {
                 throw e;
@@ -371,6 +375,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             conn = this.getConnection();
             return this.lengthImpl(conn, path);
         } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
             throw new IOException("Error in file length: " + path + ": " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
@@ -416,6 +421,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             stmt.setString(2, path);
             stmt.executeUpdate();
         } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
             throw new IOException("Error in file set length impl: " + path + ": " + e.getMessage());
         } finally {
             RDBMSUtils.cleanupConnection(null, stmt, null);
@@ -539,6 +545,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
                 conn.commit();
             } catch (SQLException e) {
                 /* maybe the chunk is already there, lets try the update */
+                RDBMSUtils.rollbackConnection(conn);
                 try {
                     query = this.getQueryConfiguration().getFsUpdateDataChunkQuery();
                     if (query == null) {
@@ -550,6 +557,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
                     stmt.execute();
                     conn.commit();
                 } catch (SQLException e1) {
+                    RDBMSUtils.rollbackConnection(conn);
                     throw new IOException("Error in updating data chunk: " + path + ": " + e1.getMessage(), e1);
                 }
             } finally {
@@ -568,22 +576,22 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             DataChunk chunk) throws SQLException {
         stmt.setString(1, path);
         stmt.setLong(2, chunk.getChunkNumber());
-        stmt.setBinaryStream(3, new ByteArrayInputStream(chunk.getData()));
-//        if (chunk.getData() != null) {
-//            stmt.setBinaryStream(3, new ByteArrayInputStream(chunk.getData()), chunk.getData().length);
-//        } else {
-//            stmt.setBinaryStream(3, new ByteArrayInputStream(chunk.getData()));
-//        }
+        byte [] bytes = chunk.getData();
+        if (!this.rdbmsQueryConfigurationEntry.isBlobLengthRequired()) {
+            stmt.setBinaryStream(3, new ByteArrayInputStream(bytes));
+        } else {
+            stmt.setBinaryStream(3, new ByteArrayInputStream(bytes), bytes.length);
+        }
     }
     
     private void populateStatementWithDataChunkUpdate(PreparedStatement stmt, String path, 
             DataChunk chunk) throws SQLException {
-//        if (chunk.getData() != null) {
-//            stmt.setBinaryStream(1, new ByteArrayInputStream(chunk.getData()), chunk.getData().length);
-//        } else {
-//            stmt.setBinaryStream(1, new ByteArrayInputStream(chunk.getData()));
-//        }
-        stmt.setBinaryStream(1, new ByteArrayInputStream(chunk.getData()));
+        byte [] bytes = chunk.getData();
+        if (!this.rdbmsQueryConfigurationEntry.isBlobLengthRequired()) {
+            stmt.setBinaryStream(1, new ByteArrayInputStream(bytes));
+        } else {
+            stmt.setBinaryStream(1, new ByteArrayInputStream(bytes), bytes.length);
+        }
         stmt.setString(2, path);
         stmt.setLong(3, chunk.getChunkNumber());
     }
