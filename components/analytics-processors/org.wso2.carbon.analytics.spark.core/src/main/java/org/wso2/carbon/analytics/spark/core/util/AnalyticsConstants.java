@@ -85,6 +85,7 @@ public class AnalyticsConstants {
     public static final String STREAM_NAME = "streamName";
     public static final String PRIMARY_KEYS = "primaryKeys";
     public static final String RECORD_STORE = "recordStore";
+    public static final String TIMESTAMP_FIELD = "_timestamp";
     public static final String DEFAULT_EVENT_STORE_NAME = "EVENT_STORE";
     public static final String DEFAULT_PROCESSED_DATA_STORE_NAME = "PROCESSED_DATA_STORE";
     public static final String SPARK_SHORTHAND_STRING = "CarbonAnalytics";

@@ -70,18 +70,20 @@ public class AnalyticsWritingFunction extends AbstractFunction1<Iterator<Row>, B
             ((AnalyticsDataServiceImpl) ads).invalidateAnalyticsTableInfo(this.tId, this.tName);
         }
         while (iterator.hasNext()) {
-            if (records.size() == AnalyticsConstants.MAX_RECORDS) {
-                try {
-                    ads.put(records);
-                } catch (AnalyticsException e) {
-                    log.error("Error while inserting data into table " + this.tName, e);
-                    throw new RuntimeException("Error while inserting data into table " + this.tName, e);
-                }
-                records.clear();
-            } else {
+            if (records.size() < AnalyticsConstants.MAX_RECORDS) {
                 Row row = iterator.next();
-                records.add(new Record(this.tId, this.tName,
-                                       convertRowAndSchemaToValuesMap(row, this.sch)));
+                records.add(convertRowAndSchemaToRecord(row, this.sch));
+
+                if (records.size() == AnalyticsConstants.MAX_RECORDS) {
+                    try {
+                        ads.put(records);
+                    } catch (AnalyticsException e) {
+                        String msg = "Error while inserting data into table " + this.tName;
+                        log.error(msg, e);
+                        throw new RuntimeException(msg, e);
+                    }
+                    records.clear();
+                }
             }
         }
 
@@ -103,6 +105,33 @@ public class AnalyticsWritingFunction extends AbstractFunction1<Iterator<Row>, B
             result.put(colNames[i], row.get(i));
         }
         return result;
+    }
+
+    private Record convertRowAndSchemaToRecord(Row row, StructType schema) {
+        String[] colNames = schema.fieldNames();
+        Map<String, Object> result = new HashMap<>();
+        long timestamp = -1;
+        for (int i = 0; i < row.length(); i++) {
+            if (colNames[i].equals(AnalyticsConstants.TIMESTAMP_FIELD)) {
+                timestamp = row.getLong(i);
+            } else {
+                result.put(colNames[i], row.get(i));
+            }
+        }
+
+        if (timestamp < 0) { // timestamp has not being set
+            return new Record(this.tId, this.tName, result);
+        } else {
+            logDebug("_timestamp found in a row. hence, setting the timestamp in the corresponding" +
+                     " record");
+            return new Record(this.tId, this.tName, result, timestamp);
+        }
+    }
+
+    private void logDebug (String msg){
+        if (log.isDebugEnabled()){
+            log.debug(msg);
+        }
     }
 
 }

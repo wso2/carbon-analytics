@@ -66,6 +66,8 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
 
     private String recordStore;
 
+    private String schemaString;
+
     public AnalyticsRelation() {
     }
 
@@ -96,10 +98,11 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         }
     }
 
-    public AnalyticsRelation(int tenantId, String tableName,
+    public AnalyticsRelation(int tenantId, String recordStore, String tableName,
                              SQLContext sqlContext, StructType schema) {
         this.tenantId = tenantId;
         this.tableName = tableName;
+        this.recordStore = recordStore;
         this.sqlContext = sqlContext;
         this.schema = schema;
     }
