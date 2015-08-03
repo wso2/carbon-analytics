@@ -53,6 +53,7 @@ public class UIEventAdapter implements OutputEventAdapter {
     private LinkedBlockingDeque<Object> streamSpecificEvents;
     private static ThreadPoolExecutor executorService;
     private int tenantId;
+    private boolean isLoggedDroppedMessage;
 
     public UIEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
             String> globalProperties) {
@@ -298,8 +299,9 @@ public class UIEventAdapter implements OutputEventAdapter {
                         }
                     }
                 }
-            } else {
+            } else if(!isLoggedDroppedMessage) {
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "No clients registered", log, tenantId);
+                isLoggedDroppedMessage = true;
             }
         }
     }
