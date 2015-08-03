@@ -53,8 +53,8 @@ public class AnalyticsDataBackupTool {
 
     private static final String TABLE_SCHEMA_FILE_NAME = "__TABLE_SCHEMA__";
     private static final int INDEX_PROCESS_WAIT_TIME = -1;
-    private static final int RECORD_BATCH_SIZE = 1000;
-    private static int batchSize = RECORD_BATCH_SIZE;
+    private static final String RECORD_BATCH_SIZE = "1000";
+    private static int batchSize = 0;
     private static boolean forceIndexing = false;
     
     @SuppressWarnings("static-access")
@@ -89,22 +89,12 @@ public class AnalyticsDataBackupTool {
             }
         }
         if (line.hasOption("backup")) {
-            if (line.hasOption("batch")) {
-                String batchValue = line.getOptionValue("batch");
-                batchSize = Integer.parseInt(batchValue);
-            } else {
-                batchSize = RECORD_BATCH_SIZE;
-            }
+            batchSize = Integer.parseInt(line.getOptionValue("batch", RECORD_BATCH_SIZE));
         }
         AnalyticsDataService service = null;
         try {
             service = AnalyticsServiceHolder.getAnalyticsDataService();
-            int tenantId;
-            if (line.hasOption("tenant_id")) {
-                tenantId = Integer.parseInt(args[2]);
-            } else {
-                tenantId = MultitenantConstants.SUPER_TENANT_ID;
-            }
+            int tenantId = Integer.parseInt(line.getOptionValue("tenant_id", "" + MultitenantConstants.SUPER_TENANT_ID));
             SimpleDateFormat dateFormat = new SimpleDateFormat(timePattern);
             long timeFrom = Long.MIN_VALUE;
             String tfStr = "-~";
@@ -247,7 +237,7 @@ public class AnalyticsDataBackupTool {
                         System.out.print(".");
                     }
                     records = new ArrayList<>();
-                    for (int i = 0; i < RECORD_BATCH_SIZE && recordItr.hasNext(); i++) {
+                    for (int i = 0; i < batchSize && recordItr.hasNext(); i++) {
                         records.add(recordItr.next());
                     }
                     try {

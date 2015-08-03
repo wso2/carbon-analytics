@@ -69,6 +69,9 @@ public class AnalyticsDataMigrationTool {
     private static final String CASSANDRA_USERNAME_ARG = "username";
     private static final String CASSANDRA_PASSWORD = "password";
     private static final String CASSANDRA_PASSWORD_ARG = "password";
+    private static final String RECORD_BATCH_SIZE = "1000";
+    private static final String BATCH_SIZE = "batch";
+    private static final String BATCH_SIZE_ARG = "number of rows in a batch";
 
     public static void main(String[] args) throws Exception {
         Options options = new Options();
@@ -85,6 +88,9 @@ public class AnalyticsDataMigrationTool {
         options.addOption(OptionBuilder.withArgName(TENANT_ID_ARG).hasArg()
                                   .withDescription("specify tenant id of the tenant considered '<default value: super tenant>'")
                                   .create(TENANT_ID));
+        options.addOption(OptionBuilder.withArgName(BATCH_SIZE_ARG).hasArg()
+                                  .withDescription("specify the batch size of rows of column family '<default value: 1000>'")
+                                  .create(BATCH_SIZE));
         options.addOption(OptionBuilder.withArgName(CASSANDRA_USERNAME_ARG).hasArg()
                                   .withDescription("specify the cassandra username")
                                   .create(CASSANDRA_USERNAME));
@@ -103,15 +109,14 @@ public class AnalyticsDataMigrationTool {
         Session session = null;
         try {
             service = AnalyticsServiceHolder.getAnalyticsDataService();
-            int tenantId = 0;
             String serverUrl;
-            int port = 0;
             String columnFamily;
             String analyticTable;
             String cassandraUser = null, cassandraPassword = null;
-            tenantId = Integer.parseInt(line.getOptionValue(TENANT_ID, "" + MultitenantConstants.SUPER_TENANT_ID));
+            int tenantId = Integer.parseInt(line.getOptionValue(TENANT_ID, "" + MultitenantConstants.SUPER_TENANT_ID));
             serverUrl = line.getOptionValue(SERVER_URL, DEFAULT_CASSANDRA_SERVER_URL);
-            port = Integer.parseInt(line.getOptionValue(PORT, DEFAULT_CASSANDRA_CQL_PORT));
+            int port = Integer.parseInt(line.getOptionValue(PORT, DEFAULT_CASSANDRA_CQL_PORT));
+            int batchSize = Integer.parseInt(line.getOptionValue(BATCH_SIZE, RECORD_BATCH_SIZE));
             if (line.hasOption(COLUMN_FAMILY)) {
                 columnFamily = line.getOptionValue(COLUMN_FAMILY);
             } else {
@@ -154,12 +159,18 @@ public class AnalyticsDataMigrationTool {
             }
             Iterator<Row> iterator = results.iterator();
             System.out.println("Inserting records to Analytic Table: " + analyticTable + " from column family: " + columnFamily);
+            List<Record> records;
             while (iterator.hasNext()) {
-                Map<String, Object> values = getAnalyticsValues(iterator.next());
-                List<Record> records = new ArrayList<Record>();
-                Record record = new Record(tenantId, analyticTable, values);
-                records.add(record);
+                int i = 0;
+                records = new ArrayList<Record>();
+                while (i < batchSize) {
+                    Map<String, Object> values = getAnalyticsValues(iterator.next());
+                    Record record = new Record(tenantId, analyticTable, values);
+                    records.add(record);
+                    i++;
+                }
                 service.put(records);
+                records.clear();
             }
             System.out.println("Successfully migrated!.");
             System.exit(0);
