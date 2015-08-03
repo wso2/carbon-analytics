@@ -329,12 +329,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     private void processIndexOperations(int shardId) throws AnalyticsException {
         int count = SHARD_INDEX_RECORD_BATCH_SIZE;
+        int tmpCount;
         /* continue processing operations in this until there aren't any to be processed */
         while (count >= SHARD_INDEX_RECORD_BATCH_SIZE) {
-            System.out.println("*** PROCESS INDEX OPS ZZZ: " + shardId + ":" + count);
+            count = 0;
             for (IndexedTableId indexTableId : this.indexedTableStore.getAllIndexedTables()) {
-                count = this.processIndexOperations(indexTableId.getTenantId(), 
+                tmpCount = this.processIndexOperations(indexTableId.getTenantId(), 
                         indexTableId.getTableName(), shardId, SHARD_INDEX_RECORD_BATCH_SIZE);
+                count = Math.max(count, tmpCount);
             }
         }
     }
@@ -342,12 +344,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     @SuppressWarnings("unchecked")
     private int processIndexOperations(int tenantId, String tableName, int shardId, 
             int count) throws AnalyticsException {
-        System.out.println("*** PROCESS INDEX OPS: " + tenantId + ":" + tableName + ":" + shardId);
         List<Record> indexRecords = this.loadIndexOperationRecords(tenantId, tableName, shardId, count);
         if (indexRecords.size() == 0) {
             return 0;
         }
-        System.out.println("*** PROCESS INDEX OPS X: " + tenantId + ":" + tableName + ":" + shardId + ":" + indexRecords.size());
         List<Object> indexObjs = this.checkAndExtractInsertDeleteIndexOperationBatches(indexRecords);
         List<Record> records;
         Record firstRecord;
@@ -369,7 +369,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     /* The logic in this method that is used to again group the records by table identity is important,
      * where the earlier query using process ids does not guarantee unique table/tenant-id combination,
-     * because there can be collitions when generating the process ids */
+     * because there can be collisions when generating the process ids */
     @SuppressWarnings("unchecked")
     private List<Object> checkAndExtractInsertDeleteIndexOperationBatches(
             List<Record> indexRecords) throws AnalyticsException {
@@ -407,6 +407,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 }
             } else {
                 log.error("Corrupted index operation from index record, deleting index record with table name: " + 
+                        indexRecord.getTableName() + " id: " + indexRecord.getId());
+                System.out.println("************* Corrupted index operation from index record, deleting index record with table name: " + 
                         indexRecord.getTableName() + " id: " + indexRecord.getId());
                 this.deleteIndexRecords(Arrays.asList(indexRecord));
             }
@@ -1356,14 +1358,12 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (maxWait < 0) {
             maxWait = Long.MAX_VALUE;
         }
-        System.out.println("**** START WAIT: " + tenantId + ":" + tableName);
         long start = System.currentTimeMillis(), end;
         boolean resume = true;
         while (resume) {
             resume = false;
             for (int i = 0; i < this.getShardCount(); i++) {
                 if (this.loadIndexOperationRecords(tenantId, tableName, i, 1).size() > 0) {
-                    System.out.println("*** WAIT RESUME: " + tenantId + ":" + tableName + ":" + i);
                     resume = true;
                     break;
                 }
@@ -1378,7 +1378,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 throw new AnalyticsException("Wait For Indexing Interrupted: " + e.getMessage(), e);
             }
         }
-        System.out.println("**** END WAIT: " + tenantId + ":" + tableName);
     }
     
     private void planIndexingWorkersInCluster() throws AnalyticsException {
@@ -1553,7 +1552,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         
         public IndexWorker(int shardIndex) {
             this.shardIndex = shardIndex;
-            System.out.println("** WORKER INIT: " + shardIndex);
         }
         
         public int getShardIndex() {
@@ -1569,14 +1567,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             while (!this.stop) {
                 try {
                     processIndexOperations(this.getShardIndex());
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
+                    System.out.println("**** Error in processing index batch operations: " + e.getMessage());
                     log.error("Error in processing index batch operations: " + e.getMessage(), e);
                 }
                 try {
                     Thread.sleep(INDEX_WORKER_SLEEP_TIME);
                 } catch (InterruptedException e) {
-                    System.out.println("**** KILLED INTERRUPTED: " + this.stop);
                     break;
                 }
             }
