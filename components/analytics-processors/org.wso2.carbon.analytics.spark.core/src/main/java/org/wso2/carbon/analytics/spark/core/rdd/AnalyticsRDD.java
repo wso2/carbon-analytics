@@ -33,9 +33,8 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
-
-import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsPartition;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
@@ -52,30 +51,30 @@ import static scala.collection.JavaConversions.asScalaIterator;
  * This class represents Spark analytics RDD implementation.
  */
 public class AnalyticsRDD extends RDD<Row> implements Serializable {
-    
+
     private static final Log log = LogFactory.getLog(AnalyticsRDD.class);
-    
+
     private static final long serialVersionUID = 5948588299500227997L;
 
     private List<String> columns;
-    
+
     private int tenantId;
-    
+
     private String tableName;
-    
-    public AnalyticsRDD() { 
+
+    public AnalyticsRDD() {
         super(null, null, null);
     }
-    
-    public AnalyticsRDD(int tenantId, String tableName, List<String> columns, 
-            SparkContext sc, Seq<Dependency<?>> deps, ClassTag<Row> evidence) {
+
+    public AnalyticsRDD(int tenantId, String tableName, List<String> columns,
+                        SparkContext sc, Seq<Dependency<?>> deps, ClassTag<Row> evidence) {
         super(sc, deps, evidence);
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.columns = columns;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public scala.collection.Iterator<Row> compute(Partition split, TaskContext context) {
         AnalyticsPartition partition = (AnalyticsPartition) split;
@@ -86,9 +85,9 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        
+
     }
-    
+
     @Override
     public Seq<String> getPreferredLocations(Partition split) {
         if (split instanceof AnalyticsPartition) {
@@ -96,8 +95,8 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
             try {
                 return JavaConversions.asScalaBuffer(Arrays.asList(ap.getRecordGroup().getLocations())).toList();
             } catch (AnalyticsException e) {
-                log.error("Error in getting preffered location: " + e.getMessage() + 
-                        " falling back to default impl.", e);
+                log.error("Error in getting preffered location: " + e.getMessage() +
+                          " falling back to default impl.", e);
                 return super.getPreferredLocations(split);
             }
         } else {
@@ -110,7 +109,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         AnalyticsDataResponse resp;
         try {
             resp = ServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName,
-                    computePartitions(), this.columns, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
+                                                               computePartitions(), this.columns, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -122,9 +121,9 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         return result;
     }
 
-    private int computePartitions(){
-        if (ServiceHolder.getAnalyticskExecutor() != null){
-           return ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint();
+    private int computePartitions() {
+        if (ServiceHolder.getAnalyticskExecutor() != null) {
+            return ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint();
         }
         return AnalyticsConstants.SPARK_DEFAULT_PARTITION_COUNT;
     }
@@ -135,13 +134,13 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     private class RowRecordIteratorAdaptor implements Iterator<Row>, Serializable {
 
         private static final long serialVersionUID = -8866801517386445810L;
-        
+
         private Iterator<Record> recordItr;
-        
+
         public RowRecordIteratorAdaptor(Iterator<Record> recordItr) {
             this.recordItr = recordItr;
         }
-        
+
         @Override
         public boolean hasNext() {
             return this.recordItr.hasNext();
@@ -149,23 +148,23 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
 
         @Override
         public Row next() {
-            return this.recordToRow(this.recordItr.next());           
+            return this.recordToRow(this.recordItr.next());
         }
-        
+
         private Row recordToRow(Record record) {
             if (record == null) {
                 return null;
             }
             Map<String, Object> recordVals = record.getValues();
-            Object[] rowVals = new Object[columns.size()+1];
+            Object[] rowVals = new Object[columns.size()];
 
-            //adding the timestamp for the record
-            rowVals[0] = record.getTimestamp();
-
-            for (int i = 1; i < columns.size(); i++) {
-                rowVals[i] = recordVals.get(columns.get(i));
+            for (int i = 0; i < columns.size(); i++) {
+                if (columns.get(i).equals(AnalyticsConstants.TIMESTAMP_FIELD)) {
+                    rowVals[i] = record.getTimestamp();
+                } else {
+                    rowVals[i] = recordVals.get(columns.get(i));
+                }
             }
-//            return new GenericRow(rowVals);
             return RowFactory.create(rowVals);
         }
 
@@ -173,7 +172,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         public void remove() {
             this.recordItr.remove();
         }
-        
+
     }
 
 }
