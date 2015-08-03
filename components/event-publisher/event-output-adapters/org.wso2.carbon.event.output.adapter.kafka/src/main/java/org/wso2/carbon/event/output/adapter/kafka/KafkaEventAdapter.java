@@ -15,8 +15,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.event.output.adapter.kafka;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
@@ -28,7 +30,6 @@ import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
-import org.wso2.carbon.event.output.adapter.core.util.EventOutputAdapterThreadFactory;
 import org.wso2.carbon.event.output.adapter.kafka.internal.util.KafkaEventAdapterConstants;
 
 import java.util.Map;
@@ -94,7 +95,8 @@ public class KafkaEventAdapter implements OutputEventAdapter {
             }
 
             threadPoolExecutor = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime,
-                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(jobQueSize), new EventOutputAdapterThreadFactory("Kafka_" + eventAdapterConfiguration.getName()));
+                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(jobQueSize), new ThreadFactoryBuilder()
+                    .setNameFormat("KafkaOutput-" + eventAdapterConfiguration.getName() + "-executor-thread-%d").build());
         }
 
     }
