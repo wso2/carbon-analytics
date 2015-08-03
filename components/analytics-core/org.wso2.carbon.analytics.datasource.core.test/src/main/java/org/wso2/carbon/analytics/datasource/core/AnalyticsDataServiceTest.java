@@ -238,7 +238,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     
     private void indexDataAddRetrieve(int tenantId, String tableName, int n) throws AnalyticsException {
         this.cleanupTable(tenantId, tableName);
-        System.out.println("*** INDEX ADD RETRIEVE CLEANUP: " + tenantId + ":" + tableName);
         List<ColumnDefinition> columns = new ArrayList<>();
         columns.add(new ColumnDefinition("INT1", ColumnType.INTEGER, true, false));
         columns.add(new ColumnDefinition("STR1", ColumnType.STRING, true, false));
