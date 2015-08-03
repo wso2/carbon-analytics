@@ -42,12 +42,15 @@ public class TCPEventServer {
     private TCPEventServerConfig TCPEventServerConfig = new TCPEventServerConfig(7211);
     private ExecutorService pool;
     private StreamCallback streamCallback;
+    private ConnectionCallback connectionCallback;
     private ServerWorker serverWorker;
     private Map<String, StreamRuntimeInfo> streamRuntimeInfoMap = new ConcurrentHashMap<String, StreamRuntimeInfo>();
 
-    public TCPEventServer(TCPEventServerConfig TCPEventServerConfig, StreamCallback streamCallback) {
+    public TCPEventServer(TCPEventServerConfig TCPEventServerConfig, StreamCallback streamCallback, ConnectionCallback connectionCallback) {
+//        EventManagementService.
         this.TCPEventServerConfig = TCPEventServerConfig;
         this.streamCallback = streamCallback;
+        this.connectionCallback = connectionCallback;
         this.serverWorker = new ServerWorker();
         this.pool = Executors.newFixedThreadPool(TCPEventServerConfig.getNumberOfThreads());
     }
@@ -96,6 +99,9 @@ public class TCPEventServer {
                 receiverSocket = new ServerSocket(TCPEventServerConfig.getPort());
                 while (isRunning) {
                     final Socket connectionSocket = receiverSocket.accept();
+                    if(connectionCallback != null){
+                        connectionCallback.onConnect();
+                    }
                     pool.execute(new ListenerProcessor(connectionSocket));
                 }
             } catch (Throwable e) {
@@ -184,6 +190,10 @@ public class TCPEventServer {
                     log.error("Error reading data from receiver socket:" + e.getMessage(), e);
                 } catch (Throwable t) {
                     log.error("Error :" + t.getMessage(), t);
+                } finally {
+                    if(connectionCallback != null){
+                        connectionCallback.onClose();
+                    }
                 }
             }
 
