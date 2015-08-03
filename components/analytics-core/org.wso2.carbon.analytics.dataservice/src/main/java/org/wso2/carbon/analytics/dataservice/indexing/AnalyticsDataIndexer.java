@@ -259,7 +259,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     private long createIndexProcessId(int tenantId, String tableName, int shardId) {
         String tableId = GenericUtils.calculateTableIdentity(tenantId, tableName);
-        return tableId.hashCode() + shardId;
+        return Math.abs(tableId.hashCode()) + shardId;
     }
     
     private Record createIndexProcessDataUpdateRecord(long processId, List<Record> records) {
@@ -331,6 +331,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         int count = SHARD_INDEX_RECORD_BATCH_SIZE;
         /* continue processing operations in this until there aren't any to be processed */
         while (count >= SHARD_INDEX_RECORD_BATCH_SIZE) {
+            System.out.println("*** PROCESS INDEX OPS ZZZ: " + shardId + ":" + count);
             for (IndexedTableId indexTableId : this.indexedTableStore.getAllIndexedTables()) {
                 count = this.processIndexOperations(indexTableId.getTenantId(), 
                         indexTableId.getTableName(), shardId, SHARD_INDEX_RECORD_BATCH_SIZE);
@@ -341,10 +342,12 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     @SuppressWarnings("unchecked")
     private int processIndexOperations(int tenantId, String tableName, int shardId, 
             int count) throws AnalyticsException {
+        System.out.println("*** PROCESS INDEX OPS: " + tenantId + ":" + tableName + ":" + shardId);
         List<Record> indexRecords = this.loadIndexOperationRecords(tenantId, tableName, shardId, count);
         if (indexRecords.size() == 0) {
             return 0;
         }
+        System.out.println("*** PROCESS INDEX OPS X: " + tenantId + ":" + tableName + ":" + shardId + ":" + indexRecords.size());
         List<Object> indexObjs = this.checkAndExtractInsertDeleteIndexOperationBatches(indexRecords);
         List<Record> records;
         Record firstRecord;
@@ -1353,12 +1356,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (maxWait < 0) {
             maxWait = Long.MAX_VALUE;
         }
+        System.out.println("**** START WAIT: " + tenantId + ":" + tableName);
         long start = System.currentTimeMillis(), end;
         boolean resume = true;
         while (resume) {
             resume = false;
             for (int i = 0; i < this.getShardCount(); i++) {
                 if (this.loadIndexOperationRecords(tenantId, tableName, i, 1).size() > 0) {
+                    System.out.println("*** WAIT RESUME: " + tenantId + ":" + tableName + ":" + i);
                     resume = true;
                     break;
                 }
@@ -1373,6 +1378,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 throw new AnalyticsException("Wait For Indexing Interrupted: " + e.getMessage(), e);
             }
         }
+        System.out.println("**** END WAIT: " + tenantId + ":" + tableName);
     }
     
     private void planIndexingWorkersInCluster() throws AnalyticsException {
@@ -1547,6 +1553,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         
         public IndexWorker(int shardIndex) {
             this.shardIndex = shardIndex;
+            System.out.println("** WORKER INIT: " + shardIndex);
         }
         
         public int getShardIndex() {
