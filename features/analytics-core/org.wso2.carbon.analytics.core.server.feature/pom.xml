@@ -83,6 +83,10 @@
             <artifactId>cassandra-driver-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.codahale.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.noggit</groupId>
             <artifactId>noggit</artifactId>
         </dependency>
@@ -119,6 +123,7 @@
                                 <bundleDef>org.wso2.orbit.org.ow2.asm:asm-all</bundleDef>
                                 <bundleDef>org.antlr.wso2:antlr-runtime</bundleDef>
                                 <bundleDef>com.datastax.cassandra:cassandra-driver-core</bundleDef>
+                                <bundleDef>com.codahale.metrics:metrics-core</bundleDef>
                                 <bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>
                                 <bundleDef>io.dropwizard.metrics:metrics-core</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef>

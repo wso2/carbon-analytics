@@ -33,8 +33,6 @@
 # OS specific support.  $var _must_ be set to either true or false.
 #ulimit -n 100000
 
-unzip -o ../repository/components/plugins/lucene_4.10.3.wso2v2.jar -d ../bin/ > /dev/null
-
 cygwin=false;
 darwin=false;
 os400=false;
@@ -288,7 +286,7 @@ for t in "$CARBON_HOME"/repository/components/plugins/*pool*.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done
-for t in "$CARBON_HOME"/repository/components/plugins/*lucene*.jar
+for t in "$CARBON_HOME"/repository/components/plugins/lucene_5.2.1.wso2v1.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done
@@ -300,7 +298,27 @@ for t in "$CARBON_HOME"/repository/components/plugins/*axiom*.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done
-for t in "$CARBON_HOME"/repository/components/plugins/cassandra-driver-core*.jar
+for t in "$CARBON_HOME"/repository/components/plugins/com.datastax.driver.core*.jar
+do
+    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
+done
+for t in "$CARBON_HOME"/repository/components/plugins/slf4j_1.5.10.wso2v1.jar
+do
+    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
+done
+for t in "$CARBON_HOME"/repository/components/plugins/com.google.guava_15.*.jar
+do
+    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
+done
+for t in "$CARBON_HOME"/repository/components/plugins/com.codahale.metrics.core_3.0.2.jar
+do
+    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
+done
+for t in "$CARBON_HOME"/repository/components/plugins/org.jboss.netty_3.9.0.Final.jar
+do
+    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
+done
+for t in "$CARBON_HOME"/repository/components/lib/*.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done
