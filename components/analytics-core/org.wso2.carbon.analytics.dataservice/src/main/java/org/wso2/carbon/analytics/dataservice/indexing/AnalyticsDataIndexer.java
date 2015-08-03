@@ -355,7 +355,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 records = (List<Record>) indexObj;
                 firstRecord = records.get(0);
                 /* we must use the tenantId/table name of this group, since there is a chance we are
-                 * processing another tenant/table's record because process ids can have collitions */
+                 * processing another tenant/table's record because process ids can have collisions */
                 this.updateIndex(shardId, records, this.lookupIndices(firstRecord.getTenantId(), 
                         firstRecord.getTableName()));
             }
@@ -1354,17 +1354,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             maxWait = Long.MAX_VALUE;
         }
         long start = System.currentTimeMillis(), end;
-        boolean complete;
-        while (true) {
-            complete = true;
+        boolean resume = true;
+        while (resume) {
+            resume = false;
             for (int i = 0; i < this.getShardCount(); i++) {
                 if (this.loadIndexOperationRecords(tenantId, tableName, i, 1).size() > 0) {
-                    complete = false;
+                    resume = true;
                     break;
                 }
-            }
-            if (complete) {
-                break;
             }
             end = System.currentTimeMillis();
             if (end - start > maxWait) {
@@ -1372,8 +1369,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
             try {
                 Thread.sleep(WAIT_INDEX_TIME_INTERVAL);
-            } catch (InterruptedException ignore) {
-                /* ignore */
+            } catch (InterruptedException e) {
+                throw new AnalyticsException("Wait For Indexing Interrupted: " + e.getMessage(), e);
             }
         }
     }
@@ -1572,6 +1569,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 try {
                     Thread.sleep(INDEX_WORKER_SLEEP_TIME);
                 } catch (InterruptedException e) {
+                    System.out.println("**** KILLED INTERRUPTED: " + this.stop);
                     break;
                 }
             }
