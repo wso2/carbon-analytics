@@ -545,7 +545,7 @@
             <dependency>
                 <groupId>org.wso2.orbit.org.apache.spark</groupId>
                 <artifactId>spark-core_2.10</artifactId>
-                <version>${spark.core.version}</version>
+                <version>${spark.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.org.apache.spark</groupId>
@@ -1169,9 +1169,8 @@
         <project.scm.id>my-scm-server</project.scm.id>
 
         <!-- Spark dependency versions start-->
-        <spark.version>1.4.0.wso2v1</spark.version>
-        <spark.imp.pkg.version>[1.4.0,1.5.0)</spark.imp.pkg.version>
-        <spark.core.version>1.4.0.wso2v2</spark.core.version>
+        <spark.version>1.4.1.wso2v1</spark.version>
+        <spark.imp.pkg.version>[1.4.1,1.5.0)</spark.imp.pkg.version>
         <hadoop.client.version>2.6.0.wso2v1</hadoop.client.version>
         <json4s.jackson.version>3.2.10.wso2v1</json4s.jackson.version>
         <twitter.chill.version>0.5.0.wso2v1</twitter.chill.version>
