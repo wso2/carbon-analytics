@@ -15,11 +15,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.event.publisher.core.internal.type.json;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
@@ -105,13 +104,7 @@ public class JSONOutputMapper implements OutputMapper {
             }
         }
 
-        String jsonEvent = eventText.toString();
-        try {
-            JsonParser jsonParser = new JsonParser();
-            return jsonParser.parse(jsonEvent).toString();
-        } catch (JsonSyntaxException e) {
-            throw new EventPublisherConfigurationException("Not valid JSON object : " + e.getMessage(), e);
-        }
+        return eventText.toString();
     }
 
     @Override
