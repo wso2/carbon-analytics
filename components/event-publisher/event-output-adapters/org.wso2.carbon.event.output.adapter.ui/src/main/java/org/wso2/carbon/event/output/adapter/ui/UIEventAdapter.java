@@ -291,6 +291,7 @@ public class UIEventAdapter implements OutputEventAdapter {
             UIOutputCallbackControllerServiceImpl uiOutputCallbackControllerServiceImpl = UIEventAdaptorServiceInternalValueHolder.getUIOutputCallbackRegisterServiceImpl();
             CopyOnWriteArrayList<Session> sessions = uiOutputCallbackControllerServiceImpl.getSessions(tenantId, streamId);
             if (sessions != null) {
+                doLogDroppedMessage = true;
                 for (Session session : sessions) {
                     synchronized (session) {
                         try {
