@@ -19,10 +19,8 @@
 package org.wso2.carbon.event.publisher.core.internal.type.xml;
 
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.Attribute;
@@ -38,9 +36,7 @@ import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceVal
 import org.wso2.siddhi.core.event.Event;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +46,7 @@ public class XMLOutputMapper implements OutputMapper {
     private EventPublisherConfiguration eventPublisherConfiguration = null;
     private Map<String, Integer> propertyPositionMap = null;
     private String outputXMLText = "";
+    private List<String> mappingTextList;
 
     public XMLOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                            Map<String, Integer> propertyPositionMap,
@@ -59,10 +56,11 @@ public class XMLOutputMapper implements OutputMapper {
         this.propertyPositionMap = propertyPositionMap;
 
         if (eventPublisherConfiguration.getOutputMapping().isCustomMappingEnabled()) {
-            validateStreamDefinitionWithOutputProperties(tenantId);
+            validateStreamDefinitionWithOutputProperties();
         } else {
             generateTemplateXMLEvent(streamDefinition);
         }
+        setMappingTextList(outputXMLText);
     }
 
     private List<String> getOutputMappingPropertyList(String mappingText) {
@@ -78,7 +76,22 @@ public class XMLOutputMapper implements OutputMapper {
         return mappingTextList;
     }
 
-    private void validateStreamDefinitionWithOutputProperties(int tenantId)
+    private void setMappingTextList(String mappingText) {
+
+        List<String> mappingTextList = new ArrayList<String>();
+        String text = mappingText;
+
+        mappingTextList.clear();
+        while (text.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0) {
+            mappingTextList.add(text.substring(0, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX)));
+            mappingTextList.add(text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) + 2, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX)));
+            text = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) + 2);
+        }
+        mappingTextList.add(text);
+        this.mappingTextList = mappingTextList;
+    }
+
+    private void validateStreamDefinitionWithOutputProperties()
             throws EventPublisherConfigurationException {
 
         XMLOutputMapping textOutputMapping = ((XMLOutputMapping) eventPublisherConfiguration.getOutputMapping());
@@ -89,9 +102,7 @@ public class XMLOutputMapper implements OutputMapper {
         this.outputXMLText = actualMappingText;
         List<String> mappingProperties = getOutputMappingPropertyList(actualMappingText);
 
-        Iterator<String> mappingTextListIterator = mappingProperties.iterator();
-        for (; mappingTextListIterator.hasNext(); ) {
-            String property = mappingTextListIterator.next();
+        for (String property : mappingProperties) {
             if (!propertyPositionMap.containsKey(property)) {
                 throw new EventPublisherStreamValidationException("Property " + property + " is not in the input stream definition.", eventPublisherConfiguration.getFromStreamName() + ":" + eventPublisherConfiguration.getFromStreamVersion());
             }
@@ -109,69 +120,23 @@ public class XMLOutputMapper implements OutputMapper {
         return "";
     }
 
-    private OMElement buildOuputOMElement(Object[] eventData, OMElement omElement)
+    private String buildOutputMessage(Object[] eventData)
             throws EventPublisherConfigurationException {
-        Iterator<OMElement> iterator = omElement.getChildElements();
-        int prefixIndex, postfixIndex;
-        if (iterator.hasNext()) {
-            while (iterator.hasNext()) {
-                OMElement childElement = iterator.next();
-                Iterator<OMAttribute> iteratorAttr = childElement.getAllAttributes();
-                while (iteratorAttr.hasNext()) {
-                    OMAttribute omAttribute = iteratorAttr.next();
-                    String attributeText = omAttribute.getAttributeValue();
-                    if (attributeText != null && !attributeText.isEmpty()) {
-                        prefixIndex = attributeText.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
-                        if (prefixIndex >= 0) {
-                            postfixIndex = attributeText.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX);
-                            if (postfixIndex > 0) {
-                                String propertyToReplace = attributeText.substring(prefixIndex + 2, postfixIndex);
-                                String value = getPropertyValue(eventData, propertyToReplace);
-                                omAttribute.setAttributeValue(value);
-                            }
-                        }
-                    }
-                }
 
-                // Since the same OM element is being modified, the modifications will be preserved even if
-                // the returned OM element is explicitly assigned.
-                buildOuputOMElement(eventData, childElement);
-            }
-        } else {
-            String text = omElement.getText();
-            if (text != null && !text.isEmpty()) {
-                prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
-                if (prefixIndex >= 0) {
-                    postfixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX);
-                    if (postfixIndex > 0) {
-                        String propertyToReplace = text.substring(prefixIndex + 2, postfixIndex);
-                        String value = getPropertyValue(eventData, propertyToReplace);
-                        omElement.setText(value);
-                    }
-                }
-            }
-        }
-        return omElement;
-    }
-
-    private String buildOuputStringMessage(Object[] eventData)
-            throws EventPublisherConfigurationException {
-        StringBuilder eventText = new StringBuilder(outputXMLText);
-        int postfixIndex, fromIndex = 0;
-        int prefixIndex = eventText.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
-        while (prefixIndex >= 0) {
-            postfixIndex = eventText.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX, fromIndex);
-            if (postfixIndex > 0) {
-                String propertyToReplace = eventText.substring(prefixIndex + 2, postfixIndex);
-                String value = getPropertyValue(eventData, propertyToReplace);
-                eventText.replace(prefixIndex, postfixIndex + 2, value);
-                fromIndex = postfixIndex + 2;
+        StringBuilder eventText = new StringBuilder(mappingTextList.get(0));
+        for (int i = 1, size = mappingTextList.size(); i < size; i++) {
+            if (i % 2 == 0) {
+                eventText.append(mappingTextList.get(i));
             } else {
-                throw new EventPublisherProcessingException("Could not find closing tag " + EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX
-                        + " after the opening tag for the attribute variable!");
+                Object propertyValue = getPropertyValue(eventData, mappingTextList.get(i));
+                if (propertyValue != null) {
+                    eventText.append(propertyValue);
+                } else {
+                    eventText.append("");
+                }
             }
-            prefixIndex = eventText.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX, fromIndex);
         }
+
         return eventText.toString();
     }
 
@@ -179,11 +144,7 @@ public class XMLOutputMapper implements OutputMapper {
     public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
         if (event.getData().length > 0) {
-            try {
-                return buildOuputOMElement(event.getData(), AXIOMUtil.stringToOM(outputXMLText));
-            } catch (XMLStreamException e) {
-                throw new EventPublisherConfigurationException("XML mapping is not in XML format :" + outputXMLText, e);
-            }
+            return buildOutputMessage(event.getData());
         } else {
             throw new EventPublisherProcessingException("Input Object array is empty!");
         }
@@ -192,11 +153,7 @@ public class XMLOutputMapper implements OutputMapper {
     @Override
     public Object convertToTypedInputEvent(Event event)
             throws EventPublisherConfigurationException {
-        if (event.getData().length > 0) {
-            return buildOuputStringMessage(event.getData());
-        } else {
-            throw new EventPublisherProcessingException("Input Object array is empty!");
-        }
+        return convertToMappedInputEvent(event);
     }
 
 
@@ -225,7 +182,6 @@ public class XMLOutputMapper implements OutputMapper {
         }
 
         outputXMLText = compositeEventElement.toString();
-
     }
 
     private static OMElement createPropertyElement(OMFactory factory, String dataPrefix,
