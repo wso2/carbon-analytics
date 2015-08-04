@@ -206,33 +206,61 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             acm.joinGroup(ANALYTICS_INDEXING_GROUP, this);
         } else {
             log.info("Analytics Indexing Mode: STANDALONE");
-            List<List<Integer>> indexingSchedule = this.generateIndexWorkerSchedulePlan(1);
+            List<Integer[]> indexingSchedule = this.generateIndexWorkerSchedulePlan(1);
             this.scheduleWorkers(indexingSchedule.get(0));
         }
     }
     
-    private List<List<Integer>> generateIndexWorkerSchedulePlan(int numWorkers) {
-        List<List<Integer>> result = new ArrayList<List<Integer>>(numWorkers);
+    private List<Integer[]> generateIndexWorkerSchedulePlan(int numWorkers) {
+        List<Integer[]> result = new ArrayList<Integer[]>(numWorkers);
+        int range = Math.max(1, this.getShardCount() / numWorkers);
+        int current = 0;
         for (int i = 0; i < numWorkers; i++) {
-            result.add(new ArrayList<Integer>());
-        }
-        for (int i = 0; i < this.getShardCount(); i++) {
-            result.get(i % numWorkers).add(i);
+            if (current >= this.getShardCount()) {
+                break;
+            }
+            if (i + 1 >= numWorkers) {
+                result.add(new Integer[] { current, this.getShardCount() - current });
+            } else {
+                result.add(new Integer[] { current, 
+                        current + range > this.getShardCount() ? this.getShardCount() - current : range });
+                current += range;
+            }
         }
         return result;
     }
     
-    private void scheduleWorkers(List<Integer> shardIndices) throws AnalyticsException {
+    private void scheduleWorkers(Integer[] shardInfo) throws AnalyticsException {
+        int shardIndexFrom = shardInfo[0];
+        int shardRange = shardInfo[1];
         this.stopAndCleanupIndexProcessing();
-        this.shardWorkerExecutor = Executors.newFixedThreadPool(shardIndices.size());
-        this.workers = new ArrayList<IndexWorker>(shardIndices.size());
+        int threadCount = this.getIndexingThreadCount();
+        threadCount = Math.min(threadCount, shardRange);
+        this.shardWorkerExecutor = Executors.newFixedThreadPool(threadCount);
+        this.workers = new ArrayList<IndexWorker>(threadCount);
         IndexWorker worker;
-        for (int shardIndex : shardIndices) {
-            worker = new IndexWorker(shardIndex, 1);
+        int range = Math.max(1, shardRange / threadCount);
+        int current = shardIndexFrom;
+        Map<Integer, Integer> shardDetails = new HashMap<Integer, Integer>();
+        int tmpRange;
+        for (int i = 0; i < threadCount; i++) {
+            if (i + 1 >= threadCount) {
+                tmpRange = shardIndexFrom + shardRange - current;
+                worker = new IndexWorker(current, tmpRange);                
+            } else {
+                tmpRange = current + range > shardIndexFrom + shardRange ? shardIndexFrom + shardRange - current : range;
+                worker = new IndexWorker(current, tmpRange);
+            }
+            shardDetails.put(current, tmpRange);
             this.workers.add(worker);
             this.shardWorkerExecutor.execute(worker);
+            current += range;
         }
-        log.info("Processing Analytics Indexing Shards " + shardIndices);
+        log.info("Processing Analytics Indexing Shards " + shardDetails);
+    }
+    
+    private int getIndexingThreadCount() {
+        return Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
     }
     
     public AnalyticsFileSystem getFileSystem() {
@@ -483,8 +511,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                     }
                 }
             } else {
-                System.out.println("Corrupted index operation from index record, deleting index record with table name: " + 
-                        indexRecord.getTableName() + " id: " + indexRecord.getId());
                 log.error("Corrupted index operation from index record, deleting index record with table name: " + 
                         indexRecord.getTableName() + " id: " + indexRecord.getId());
                 this.deleteIndexRecords(Arrays.asList(indexRecord.getId()));
@@ -1483,7 +1509,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             try {
                 acm.executeAll(ANALYTICS_INDEXING_GROUP, new IndexingStopMessage());
                 List<Object> members = acm.getMembers(ANALYTICS_INDEXING_GROUP);
-                List<List<Integer>> schedulePlan = this.generateIndexWorkerSchedulePlan(members.size());
+                List<Integer[]> schedulePlan = this.generateIndexWorkerSchedulePlan(members.size());
                 for (int i = 0; i < members.size(); i++) {
                     acm.executeOne(ANALYTICS_INDEXING_GROUP, members.get(i), 
                             new IndexingScheduleMessage(schedulePlan.get(i)));
@@ -1554,10 +1580,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         
         private static final long serialVersionUID = 7912933193977147465L;
         
-        private List<Integer> shardIndices;
+        private Integer[] shardInfo;
         
-        public IndexingScheduleMessage(List<Integer> shardIndices) {
-            this.shardIndices = shardIndices;
+        public IndexingScheduleMessage(Integer[] shardInfo) {
+            this.shardInfo = shardInfo;
         }
 
         @Override
@@ -1568,7 +1594,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
-                adsImpl.getIndexer().scheduleWorkers(this.shardIndices);
+                adsImpl.getIndexer().scheduleWorkers(this.shardInfo);
             }
             return "OK";
         }

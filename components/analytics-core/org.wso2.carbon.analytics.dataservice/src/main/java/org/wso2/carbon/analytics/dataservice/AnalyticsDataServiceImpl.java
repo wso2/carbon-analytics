@@ -110,6 +110,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     private String primaryARSName;
     
+    private String indexStagingARSName;
+    
     private AnalyticsIndexedTableStore indexedTableStore;
     
     public AnalyticsDataServiceImpl() throws AnalyticsException {
@@ -127,7 +129,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
                     e.getMessage(), e);
         }
         this.initIndexedTableStore();
-        this.indexer = new AnalyticsDataIndexer(this.getPrimaryAnalyticsRecordStore(), this.analyticsFileSystem, this,
+        this.indexer = new AnalyticsDataIndexer(this.getIndexStagingRecordStore(), this.analyticsFileSystem, this,
                                                 this.indexedTableStore, config.getShardCount(), luceneAnalyzer);
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
@@ -214,6 +216,10 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (this.primaryARSName.length() == 0) {
             throw new AnalyticsException("Primary record store name cannot be empty.");
         }
+        this.indexStagingARSName = config.getIndexStagingRecordStore();
+        if (this.indexStagingARSName != null) {
+            this.indexStagingARSName = this.indexStagingARSName.trim();
+        }
         this.analyticsRecordStores = new HashMap<String, AnalyticsRecordStore>();
         for (AnalyticsRecordStoreConfiguration arsConfig : config.getAnalyticsRecordStoreConfigurations()) {
             String name = arsConfig.getName().trim();
@@ -232,6 +238,19 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             throw new AnalyticsException("The primary record store with name '" + this.primaryARSName + "' cannot be found.");
         }
         this.recordsBatchSize = config.getRecordsBatchSize();
+    }
+    
+    private AnalyticsRecordStore getIndexStagingRecordStore() throws AnalyticsException {
+        if (this.indexStagingARSName != null) {
+            AnalyticsRecordStore ars = this.analyticsRecordStores.get(this.indexStagingARSName);
+            if (ars == null) {
+                throw new AnalyticsException("The analytics indexing staging record store '" + 
+                        this.indexStagingARSName + "' does not exist.");
+            }
+            return ars;
+        } else {
+            return this.getPrimaryAnalyticsRecordStore();
+        }
     }
     
     private AnalyticsRecordStore getPrimaryAnalyticsRecordStore() {

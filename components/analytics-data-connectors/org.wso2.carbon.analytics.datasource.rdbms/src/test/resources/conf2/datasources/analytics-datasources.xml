@@ -7,7 +7,7 @@
     <datasources>
         
         <datasource>
-            <name>WSO2_ANALYTICS_FS_DB_MEM</name>
+            <name>WSO2_ANALYTICS_FS_DB</name>
             <description>The datasource used for analytics file system</description>
             <definition type="RDBMS">
                 <configuration>
@@ -26,7 +26,7 @@
         </datasource>
         
         <datasource>
-            <name>WSO2_ANALYTICS_RS_DB_MEM</name>
+            <name>WSO2_ANALYTICS_RS_DB</name>
             <description>The datasource used for analytics record store</description>
             <definition type="RDBMS">
                 <configuration>

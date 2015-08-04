@@ -43,7 +43,7 @@ public class H2MemDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf2");        
         AnalyticsFileSystem afs = new RDBMSAnalyticsFileSystem();
         Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "WSO2_ANALYTICS_FS_DB_MEM");
+        props.put("datasource", "WSO2_ANALYTICS_FS_DB");
         afs.init(props);
         this.init("H2InMemoryDBAnalyticsDataSource", afs);
     }
