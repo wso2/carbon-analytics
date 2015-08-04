@@ -72,6 +72,9 @@ public class AnalyticsDataMigrationTool {
     private static final String RECORD_BATCH_SIZE = "1000";
     private static final String BATCH_SIZE = "batch";
     private static final String BATCH_SIZE_ARG = "number of rows in a batch";
+    private static final String PAYLOAD_PREFIX = "payload_";
+    private static final String OLD_VERSION_FIELD = "Version";
+    private static final String NEW_VERSION_FIELD = "_version";
 
     public static void main(String[] args) throws Exception {
         Options options = new Options();
@@ -159,19 +162,21 @@ public class AnalyticsDataMigrationTool {
             }
             Iterator<Row> iterator = results.iterator();
             System.out.println("Inserting records to Analytic Table: " + analyticTable + " from column family: " + columnFamily);
-            List<Record> records;
+            List<Record> records = new ArrayList<Record>();
+            int i = 0;
             while (iterator.hasNext()) {
-                int i = 0;
-                records = new ArrayList<Record>();
-                while (i < batchSize && iterator.hasNext()) {
-                    Map<String, Object> values = getAnalyticsValues(iterator.next());
-                    Record record = new Record(tenantId, analyticTable, values);
-                    records.add(record);
-                    i++;
+                i++;
+                Map<String, Object> values = getAnalyticsValues(iterator.next());
+                Record record = new Record(tenantId, analyticTable, values);
+                records.add(record);
+                if (i == batchSize) {
+                    service.put(records);
+                    records.clear();
+                    i = 0;
                 }
-                service.put(records);
-                records.clear();
             }
+            service.put(records);
+            records.clear();
             System.out.println("Successfully migrated!.");
             System.exit(0);
         }catch(Exception e) {
@@ -194,21 +199,38 @@ public class AnalyticsDataMigrationTool {
         Map<String, Object> values = new LinkedHashMap<String, Object>();
         for (ColumnDefinitions.Definition definition : definitions) {
             String dataType = definition.getType().asJavaClass().getSimpleName().toUpperCase();
-            String columnName = definition.getName();
-            if (dataType.equals(DOUBLE)) {
-                values.put(columnName, row.getDouble(columnName));
-            } else if (dataType.equals(INTEGER)) {
-                values.put(columnName, row.getInt(columnName));
-            } else if (dataType.equals(LONG)) {
-                values.put(columnName, row.getLong(columnName));
-            } else if (dataType.equals(FLOAT)) {
-                values.put(columnName, row.getFloat(columnName));
-            } else if (dataType.equals(BIGINTEGER)) {
-                values.put(columnName, row.getVarint(columnName).longValue());
-            } else if (dataType.equals(BIGDECIMAL)) {
-                values.put(columnName, row.getDecimal(columnName).doubleValue());
-            }else {
-                values.put(columnName, row.getString(columnName));
+            String originalColumnName = definition.getName();
+            String columnName;
+
+            columnName = originalColumnName.startsWith(PAYLOAD_PREFIX) ?
+                    originalColumnName.substring(originalColumnName.indexOf("_") + 1) : originalColumnName;
+
+            if(originalColumnName.equals(OLD_VERSION_FIELD)) {
+                columnName = NEW_VERSION_FIELD;
+            }
+
+            switch (dataType) {
+                case DOUBLE:
+                    values.put(columnName, row.getDouble(originalColumnName));
+                    break;
+                case INTEGER:
+                    values.put(columnName, row.getInt(originalColumnName));
+                    break;
+                case LONG:
+                    values.put(columnName, row.getLong(originalColumnName));
+                    break;
+                case FLOAT:
+                    values.put(columnName, row.getFloat(originalColumnName));
+                    break;
+                case BIGINTEGER:
+                    values.put(columnName, row.getVarint(originalColumnName).longValue());
+                    break;
+                case BIGDECIMAL:
+                    values.put(columnName, row.getDecimal(originalColumnName).doubleValue());
+                    break;
+                default:
+                    values.put(columnName, row.getString(originalColumnName));
+                    break;
             }
         }
         return values;
