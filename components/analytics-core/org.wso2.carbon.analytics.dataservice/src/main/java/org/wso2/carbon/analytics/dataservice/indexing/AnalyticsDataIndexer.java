@@ -408,8 +408,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             } else {
                 log.error("Corrupted index operation from index record, deleting index record with table name: " + 
                         indexRecord.getTableName() + " id: " + indexRecord.getId());
-                System.out.println("************* Corrupted index operation from index record, deleting index record with table name: " + 
-                        indexRecord.getTableName() + " id: " + indexRecord.getId());
                 this.deleteIndexRecords(Arrays.asList(indexRecord));
             }
         }
@@ -1544,7 +1542,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
      */
     private class IndexWorker implements Runnable {
 
-        private static final int INDEX_WORKER_SLEEP_TIME = 1000;
+        private static final int INDEX_WORKER_SLEEP_TIME = 1500;
 
         private int shardIndex;
         
@@ -1569,7 +1567,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                     processIndexOperations(this.getShardIndex());
                 } catch (Throwable e) {
                     e.printStackTrace();
-                    System.out.println("**** Error in processing index batch operations: " + e.getMessage());
                     log.error("Error in processing index batch operations: " + e.getMessage(), e);
                 }
                 try {
