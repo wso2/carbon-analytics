@@ -26,6 +26,8 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
@@ -35,6 +37,9 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import javax.naming.NamingException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -68,6 +73,7 @@ public class AnalyticsSparkExecutorTest {
      *
      * @throws AnalyticsException
      */
+/*
 
     @Test
     public void testCreateTableQuery() throws AnalyticsException {
@@ -344,6 +350,7 @@ public class AnalyticsSparkExecutorTest {
 
         System.out.println(testString("end : create temp table with multiple record stores test"));
     }
+*/
 
     @Test
     public void testTimestampRetrivability() throws AnalyticsException, InterruptedException {
@@ -356,16 +363,36 @@ public class AnalyticsSparkExecutorTest {
         this.service.deleteTable(1, "Log3");
         this.service.createTable(1, "Log");
         this.service.put(records);
+        List<ColumnDefinition> colDefs = new ArrayList<>();
+        colDefs.add(new ColumnDefinition("server_name", AnalyticsSchema.ColumnType.STRING));
+        colDefs.add(new ColumnDefinition("ip", AnalyticsSchema.ColumnType.STRING));
+        colDefs.add(new ColumnDefinition("tenant", AnalyticsSchema.ColumnType.INTEGER));
+        colDefs.add(new ColumnDefinition("sequence", AnalyticsSchema.ColumnType.LONG));
+        colDefs.add(new ColumnDefinition("summary", AnalyticsSchema.ColumnType.STRING));
+        AnalyticsSchema schema = new AnalyticsSchema(colDefs, Collections.<String>emptyList());
+        this.service.setTableSchema(1,"Log", schema);
+
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                           "OPTIONS" +
+                           "(tableName \"Log\"" +
+                           ")");
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM Log");
+        Assert.assertEquals(result.getRows().size(), 10);
+        Assert.assertEquals(result.getColumns().length, 5);
+        Assert.assertEquals(Arrays.asList(result.getColumns()).contains("_timestamp"), false);
+        System.out.println(result);
+
         ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
                            "OPTIONS" +
                            "(tableName \"Log\"," +
                            "schema \"_timestamp LONG, server_name STRING, ip STRING, tenant INTEGER, sequence LONG, summary STRING\"" +
                            ")");
-        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT _timestamp FROM Log");
+        result = ex.executeQuery(1, "SELECT _timestamp FROM Log");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
         result = ex.executeQuery(1, "SELECT * FROM Log");
         Assert.assertEquals(result.getRows().size(), 10);
+        Assert.assertEquals(result.getColumns().length, 6);
         System.out.println(result);
 
         ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
@@ -378,7 +405,9 @@ public class AnalyticsSparkExecutorTest {
         System.out.println(result);
         result = ex.executeQuery(1, "SELECT * FROM Log");
         Assert.assertEquals(result.getRows().size(), 10);
+        Assert.assertEquals(Arrays.asList(result.getColumns()).contains("_timestamp"), true);
         System.out.println(result);
+
 
         ex.executeQuery(1, "CREATE TEMPORARY TABLE Log1 USING CarbonAnalytics " +
                            "OPTIONS" +

@@ -37,7 +37,6 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.rdd.AnalyticsRDD;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
-import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import scala.reflect.ClassTag$;
 
 import java.io.Serializable;
@@ -157,12 +156,9 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     }
 
     private StructField[] extractFieldsFromColumns(Map<String, ColumnDefinition> columns) {
-        StructField[] resFields = new StructField[(columns.size()) + 1];
+        StructField[] resFields = new StructField[columns.size()];
 
-        //adding the timestamp column
-        resFields[0] = new StructField("_timestamp", AnalyticsCommonUtils.stringToDataType(AnalyticsConstants.LONG_TYPE),
-                                       false, Metadata.empty());
-        int i = 1;
+        int i = 0;
         for (Map.Entry<String, ColumnDefinition> entry : columns.entrySet()) {
             String type = entry.getValue().getType().name();
             resFields[i] = new StructField(entry.getKey(), AnalyticsCommonUtils.stringToDataType(type),
