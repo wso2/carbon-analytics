@@ -39,6 +39,8 @@ public class AnalyticsDataServiceConfiguration {
     
     private String primaryRecordStore;
     
+    private String indexStagingRecordStore;
+    
     private int shardCount;
     
     private int recordsBatchSize = Constants.RECORDS_BATCH_SIZE;
@@ -85,6 +87,15 @@ public class AnalyticsDataServiceConfiguration {
 
     public void setPrimaryRecordStore(String primaryRecordStore) {
         this.primaryRecordStore = primaryRecordStore;
+    }
+    
+    @XmlElement
+    public String getIndexStagingRecordStore() {
+        return indexStagingRecordStore;
+    }
+
+    public void setIndexStagingRecordStore(String indexStagingRecordStore) {
+        this.indexStagingRecordStore = indexStagingRecordStore;
     }
     
     @XmlElement (name = "shardCount", defaultValue = "6")

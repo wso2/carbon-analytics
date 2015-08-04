@@ -22,5 +22,5 @@
    </analytics-lucene-analyzer>
    <!-- The number of index shards, should be equal or higher to the number of indexing nodes that is going to be working,
         ideal count being 'number of indexing nodes * CPU cores' -->
-   <shardCount>1</shardCount>
+   <shardCount>20</shardCount>
 </analytics-dataservice-configuration>

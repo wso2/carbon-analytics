@@ -42,7 +42,7 @@ public class H2MemDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf2");        
         AnalyticsRecordStore ars = new RDBMSAnalyticsRecordStore();
         Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "WSO2_ANALYTICS_RS_DB_MEM");
+        props.put("datasource", "WSO2_ANALYTICS_RS_DB");
         ars.init(props);
         this.init("H2InMemoryDBAnalyticsDataSource", ars);
     }
