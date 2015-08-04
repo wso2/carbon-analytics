@@ -97,7 +97,6 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -348,89 +347,145 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (indexRecords.size() == 0) {
             return 0;
         }
-        List<Object> indexObjs = this.checkAndExtractInsertDeleteIndexOperationBatches(indexRecords);
+        Object[] result = this.checkAndExtractInsertDeleteIndexOperationBatches(tenantId, tableName, 
+                shardId, indexRecords);
+        List<Object> indexObjs = this.entriesListToIndexObjects((List<Object>) result[0]);
+        List<String> processedIds = (List<String>) result[1];
         List<Record> records;
-        Record firstRecord;
         for (Object indexObj : indexObjs) {
-            if (indexObj instanceof DeleteIndexEntry[]) {
-                this.deleteInIndex(shardId, (DeleteIndexEntry[]) indexObj);
+            if (indexObj instanceof String[]) {
+                this.deleteInIndex(tenantId, tableName, shardId, (String[]) indexObj);
             } else if (indexObj instanceof List<?>) {
                 records = (List<Record>) indexObj;
-                firstRecord = records.get(0);
-                /* we must use the tenantId/table name of this group, since there is a chance we are
-                 * processing another tenant/table's record because process ids can have collisions */
-                this.updateIndex(shardId, records, this.lookupIndices(firstRecord.getTenantId(), 
-                        firstRecord.getTableName()));
+                this.updateIndex(shardId, records, this.lookupIndices(tenantId, tableName));
             }
         }
-        this.deleteIndexRecords(indexRecords);
+        this.deleteIndexRecords(processedIds);
         return indexRecords.size();
+    }
+    
+    private List<Object> entriesListToIndexObjects(List<Object> entriesList) {
+        List<Record> updateRecords = new ArrayList<Record>();
+        List<String> deleteRecords = new ArrayList<String>();
+        List<Object> result = new ArrayList<Object>();
+        for (Object obj : entriesList) {
+            if (obj instanceof Record) {
+                if (!deleteRecords.isEmpty()) {
+                    result.add(deleteRecords.toArray(new String[deleteRecords.size()]));
+                    deleteRecords = new ArrayList<String>();
+                }
+                updateRecords.add((Record) obj);
+            } else if (obj instanceof String) {
+                if (!updateRecords.isEmpty()) {
+                    result.add(updateRecords);
+                    updateRecords = new ArrayList<Record>();
+                }
+                deleteRecords.add((String) obj);
+            }
+        }
+        if (!deleteRecords.isEmpty()) {
+            result.add(deleteRecords.toArray(new String[deleteRecords.size()]));
+        }
+        if (!updateRecords.isEmpty()) {
+            result.add(updateRecords);
+        }
+        return result;
     }
     
     /* The logic in this method that is used to again group the records by table identity is important,
      * where the earlier query using process ids does not guarantee unique table/tenant-id combination,
-     * because there can be collisions when generating the process ids */
+     * because there can be collisions when generating the process ids, if collisions are found, the 
+     * records that does not belong to this tenant/table/shard is re-inserted to the data store after
+     * extracting my records, and only the records that contains my records are returned as processed 
+     * records to be deleted later */
     @SuppressWarnings("unchecked")
-    private List<Object> checkAndExtractInsertDeleteIndexOperationBatches(
-            List<Record> indexRecords) throws AnalyticsException {
-        List<Object> result = new ArrayList<Object>();
-        Map<String, List<Record>> recordsUpdateMap = new HashMap<String, List<Record>>();
-        Map<String, List<DeleteIndexEntry>> deleteEntryMap = new HashMap<String, List<DeleteIndexEntry>>();
-        String tableId;
-        List<Record> recordsList;
-        List<DeleteIndexEntry> deleteList;
+    private Object[] checkAndExtractInsertDeleteIndexOperationBatches(int tenantId, String tableName,
+            int shardId, List<Record> indexRecords) throws AnalyticsException {
+        List<Object> entriesList = new ArrayList<Object>();
+        List<String> processedIds = new ArrayList<String>();
+        List<Object> foreignEntries = new ArrayList<Object>();
+        List<Record> foreignRecords = new ArrayList<Record>(0);
+        List<DeleteIndexEntry> foreignDeleteEntries = new ArrayList<DeleteIndexEntry>(0);
+        boolean processed;
         for (Record indexRecord : indexRecords) {
             Object value = indexRecord.getValue(INDEX_OP_DATA_ATTRIBUTE);
             if (value instanceof List<?>) {
-                result.addAll(this.deleteCollectionToArray(deleteEntryMap.values()));
-                deleteEntryMap.clear();
+                processed = false;
                 for (Record record : (List<Record>) value) {
-                    tableId = GenericUtils.calculateTableIdentity(record.getTenantId(), record.getTableName());
-                    recordsList = recordsUpdateMap.get(tableId);
-                    if (recordsList == null) {
-                        recordsList = new ArrayList<Record>();
-                        recordsUpdateMap.put(tableId, recordsList);
+                    if (this.checkRecordUpdateProcessEntitlement(record, tenantId, tableName, shardId)) {
+                        processed = true;
+                        entriesList.add(record);
+                    } else {
+                        foreignRecords.add(record);
                     }
-                    recordsList.add(record);
                 }
-            } else if (value instanceof DeleteIndexEntry[]) {                    
-                result.addAll(recordsUpdateMap.values());
-                recordsUpdateMap.clear();
-                for (DeleteIndexEntry entry : (DeleteIndexEntry[]) value) {
-                    tableId = GenericUtils.calculateTableIdentity(entry.getTenantId(), entry.getTableName());
-                    deleteList = deleteEntryMap.get(tableId);
-                    if (deleteList == null) {
-                        deleteList = new ArrayList<DeleteIndexEntry>();
-                        deleteEntryMap.put(tableId, deleteList);
+                if (processed) {
+                    processedIds.add(indexRecord.getId());
+                    if (!foreignRecords.isEmpty()) {
+                        foreignEntries.add(foreignRecords);
+                        foreignRecords = new ArrayList<Record>();
                     }
-                    deleteList.add(entry);                    
+                }
+            } else if (value instanceof DeleteIndexEntry[]) {
+                processed = false;
+                foreignDeleteEntries.clear();
+                for (DeleteIndexEntry deleteEntry : (DeleteIndexEntry[]) value) {
+                    if (this.checkRecordDeleteProcessEntitlement(deleteEntry, tenantId, tableName, shardId)) {
+                        processed = true;
+                        entriesList.add(deleteEntry.getId());                    
+                    } else {
+                        foreignDeleteEntries.add(deleteEntry);
+                    }
+                }
+                if (processed) {
+                    processedIds.add(indexRecord.getId());
+                    if (!foreignDeleteEntries.isEmpty()) {
+                        foreignEntries.add(foreignDeleteEntries.toArray(new DeleteIndexEntry[foreignDeleteEntries.size()]));
+                        foreignDeleteEntries = new ArrayList<AnalyticsDataIndexer.DeleteIndexEntry>();
+                    }
                 }
             } else {
+                System.out.println("Corrupted index operation from index record, deleting index record with table name: " + 
+                        indexRecord.getTableName() + " id: " + indexRecord.getId());
                 log.error("Corrupted index operation from index record, deleting index record with table name: " + 
                         indexRecord.getTableName() + " id: " + indexRecord.getId());
-                this.deleteIndexRecords(Arrays.asList(indexRecord));
+                this.deleteIndexRecords(Arrays.asList(indexRecord.getId()));
             }
         }
-        result.addAll(recordsUpdateMap.values());
-        result.addAll(this.deleteCollectionToArray(deleteEntryMap.values()));
-        return result;
+        this.handleForeignIndexEntries(foreignEntries);
+        return new Object[] { entriesList, processedIds };
     }
     
-    private List<DeleteIndexEntry[]> deleteCollectionToArray(Collection<List<DeleteIndexEntry>> entries) {
-        List<DeleteIndexEntry[]> result = new ArrayList<AnalyticsDataIndexer.DeleteIndexEntry[]>(entries.size());
-        for (List<DeleteIndexEntry> entry : entries) {
-            result.add(entry.toArray(new DeleteIndexEntry[0]));
+    @SuppressWarnings("unchecked")
+    private void handleForeignIndexEntries(List<Object> foreignEntries) throws AnalyticsException {
+        for (Object obj : foreignEntries) {
+            if (obj instanceof List<?>) {
+                this.scheduleIndexUpdate((List<Record>) obj);
+            } else if (obj instanceof DeleteIndexEntry[]) {
+                DeleteIndexEntry[] entries = (DeleteIndexEntry[]) obj;
+                int tenantId = entries[0].getTenantId();
+                String tableName = entries[0].getTableName();
+                List<String> ids = new ArrayList<String>(entries.length);
+                for (DeleteIndexEntry entry : entries) {
+                    ids.add(entry.getId());
+                }
+                this.scheduleIndexDelete(tenantId, tableName, ids);
+            }
         }
-        return result;
     }
     
-    private void deleteIndexRecords(List<Record> indexRecords) throws AnalyticsException {
-        List<String> ids = new ArrayList<String>(indexRecords.size());
-        for (Record indexRecord : indexRecords) {
-            ids.add(indexRecord.getId());
-        }
-        Record firstRecord = indexRecords.get(0);
-        this.getAnalyticsRecordStore().delete(firstRecord.getTenantId(), firstRecord.getTableName(), ids);
+    private boolean checkRecordUpdateProcessEntitlement(Record record, int tenantId, String tableName, int shardId) {
+        return tenantId == record.getTenantId() && tableName.equals(record.getTableName()) && 
+                this.calculateShardId(record.getId()) == shardId;
+    }
+    
+    private boolean checkRecordDeleteProcessEntitlement(DeleteIndexEntry deleteEntry, int tenantId, String tableName, int shardId) {
+        return tenantId == deleteEntry.getTenantId() && tableName.equals(deleteEntry.getTableName()) && 
+                this.calculateShardId(deleteEntry.getId()) == shardId;
+    }
+    
+    private void deleteIndexRecords(List<String> processedIds) throws AnalyticsException {
+        this.getAnalyticsRecordStore().delete(INDEX_DATA_RECORD_TENANT_ID, INDEX_DATA_RECORD_TABLE_NAME, processedIds);
     }
     
     private List<Record> loadIndexOperationRecords(int tenantId, String tableName, int shardId,
@@ -1026,15 +1081,12 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         this.scheduleIndexDelete(tenantId, tableName, ids);
     }
     
-    private void deleteInIndex(int shardIndex, DeleteIndexEntry[] entries) throws AnalyticsException {
-        DeleteIndexEntry firstEntry = entries[0];
-        int tenantId = firstEntry.getTenantId();
-        String tableName = firstEntry.getTableName();
+    private void deleteInIndex(int tenantId, String tableName, int shardIndex, String[] ids) throws AnalyticsException {
         String tableId = this.generateShardedTableId(tenantId, tableName, Integer.toString(shardIndex));
         IndexWriter indexWriter = this.createIndexWriter(tableId);
-        List<Term> terms = new ArrayList<Term>(entries.length);
-        for (DeleteIndexEntry entry : entries) {
-            terms.add(new Term(INDEX_ID_INTERNAL_FIELD, entry.getId()));
+        List<Term> terms = new ArrayList<Term>(ids.length);
+        for (String id : ids) {
+            terms.add(new Term(INDEX_ID_INTERNAL_FIELD, id));
         }
         try {
             indexWriter.deleteDocuments(terms.toArray(new Term[terms.size()]));
