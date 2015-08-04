@@ -39,20 +39,19 @@ import java.util.concurrent.Executors;
 
 public class TCPEventServer {
     private static Logger log = Logger.getLogger(TCPEventServer.class);
-    private TCPEventServerConfig TCPEventServerConfig = new TCPEventServerConfig(7211);
-    private ExecutorService pool;
+    private TCPEventServerConfig tcpEventServerConfig = new TCPEventServerConfig(7211);
+    private ExecutorService executorService;
     private StreamCallback streamCallback;
     private ConnectionCallback connectionCallback;
     private ServerWorker serverWorker;
     private Map<String, StreamRuntimeInfo> streamRuntimeInfoMap = new ConcurrentHashMap<String, StreamRuntimeInfo>();
 
     public TCPEventServer(TCPEventServerConfig TCPEventServerConfig, StreamCallback streamCallback, ConnectionCallback connectionCallback) {
-//        EventManagementService.
-        this.TCPEventServerConfig = TCPEventServerConfig;
+        this.tcpEventServerConfig = TCPEventServerConfig;
         this.streamCallback = streamCallback;
         this.connectionCallback = connectionCallback;
         this.serverWorker = new ServerWorker();
-        this.pool = Executors.newFixedThreadPool(TCPEventServerConfig.getNumberOfThreads());
+        this.executorService = Executors.newCachedThreadPool();
     }
 
     public void addStreamDefinition(StreamDefinition streamDefinition) {
@@ -94,15 +93,16 @@ public class TCPEventServer {
         @Override
         public void run() {
             try {
-                log.info("EventServer starting event listener on port " + TCPEventServerConfig.getPort());
+                log.info("EventServer starting event listener on port " + tcpEventServerConfig.getPort());
                 isRunning = true;
-                receiverSocket = new ServerSocket(TCPEventServerConfig.getPort());
+                receiverSocket = new ServerSocket(tcpEventServerConfig.getPort());
                 while (isRunning) {
                     final Socket connectionSocket = receiverSocket.accept();
                     if(connectionCallback != null){
                         connectionCallback.onConnect();
                     }
-                    pool.execute(new ListenerProcessor(connectionSocket));
+                    connectionSocket.setKeepAlive(true);
+                    executorService.execute(new ListenerProcessor(connectionSocket));
                 }
             } catch (Throwable e) {
                 if (isRunning) {

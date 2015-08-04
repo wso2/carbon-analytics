@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.event.processor.manager.commons.transport.client;
 
-import com.lmax.disruptor.dsl.ProducerType;
-
 public class TCPEventPublisherConfig {
 
     private int bufferSize = 1024;
-    private ProducerType producerType =ProducerType.MULTI;
+    private String defaultCharset = "UTF-8";
+    private int tcpSendBufferSize = 5242880;
+
 
     public int getBufferSize() {
         return bufferSize;
@@ -33,11 +33,19 @@ public class TCPEventPublisherConfig {
         this.bufferSize = bufferSize;
     }
 
-    public ProducerType getProducerType() {
-        return producerType;
+    public String getDefaultCharset() {
+        return defaultCharset;
     }
 
-    public void setProducerType(ProducerType producerType) {
-        this.producerType = producerType;
+    public void setDefaultCharset(String defaultCharset) {
+        this.defaultCharset = defaultCharset;
+    }
+
+    public int getTcpSendBufferSize() {
+        return tcpSendBufferSize;
+    }
+
+    public void setTcpSendBufferSize(int tcpSendBufferSize) {
+        this.tcpSendBufferSize = tcpSendBufferSize;
     }
 }

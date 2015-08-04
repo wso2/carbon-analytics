@@ -135,8 +135,13 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                     this.ringBuffer.publish(sequence);
                     break;
                 } catch (InsufficientCapacityException ex) {
-                    if (stopTime > System.currentTimeMillis()) {
+                    if (stopTime <= System.currentTimeMillis()) {
                         throw new EventQueueFullException("Cannot send events because the event queue is full", ex);
+                    }
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+
                     }
                 }
             }

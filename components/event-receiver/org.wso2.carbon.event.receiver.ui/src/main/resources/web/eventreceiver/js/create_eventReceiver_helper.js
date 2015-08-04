@@ -1,16 +1,19 @@
 /*
- * Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 var advancedMappingCounter = 0;
@@ -62,8 +65,6 @@ function loadEventAdapterProperty(inputAdapterProperty, eventReceiverInputTable,
         defaultValue = inputAdapterProperty.localDefaultValue;
     }
 
-    requiredElementId
-
     var inputField = tableRow.insertCell(1);
     var classType = 'outputFields';
 
@@ -71,20 +72,16 @@ function loadEventAdapterProperty(inputAdapterProperty, eventReceiverInputTable,
 
         if (hint != null && hint.trim() != "") {
             inputField.innerHTML = '<div class="' + classType + '"> <input style="width:75%" type="' + textPasswordType + '" id="' + requiredElementId + propertyLoop + '" name="' + inputAdapterProperty.localKey + '" value="' + defaultValue + '" class="initE"  /> <br/> <div class="sectionHelp">' + hint + '</div></div>';
-        }
-        else {
+        } else {
             inputField.innerHTML = '<div class="' + classType + '"> <input style="width:75%" type="' + textPasswordType + '" id="' + requiredElementId + propertyLoop + '" name="' + inputAdapterProperty.localKey + '" value="' + defaultValue + '" class="initE"  /> </div>';
         }
-    }
-
-    else {
+    } else {
 
         var option = '';
         jQuery.each(inputAdapterProperty.localOptions, function (index, localOption) {
             if (localOption == inputAdapterProperty.localDefaultValue) {
                 option = option + '<option selected=selected>' + localOption + '</option>';
-            }
-            else {
+            } else {
                 option = option + '<option>' + localOption + '</option>';
             }
 
@@ -93,8 +90,7 @@ function loadEventAdapterProperty(inputAdapterProperty, eventReceiverInputTable,
 
         if (hint != null && hint.trim() != "") {
             inputField.innerHTML = '<div class="' + classType + '"> <select   id="' + requiredElementId + propertyLoop + '" name="' + inputAdapterProperty.localKey + '">' + option + '</select><br/> <div class="sectionHelp">' + hint + '</div></div>';
-        }
-        else {
+        } else {
             inputField.innerHTML = '<div class="' + classType + '"> <select  id="' + requiredElementId + propertyLoop + '" name="' + inputAdapterProperty.localKey + '"  />' + option + ' </div>';
         }
 
@@ -158,15 +154,6 @@ function loadEventAdapterRelatedProperties(toPropertyHeader, propertiesHeading) 
             if (propertiesString != null) {
                 var jsonObject = JSON.parse(propertiesString);
                 loadEventAdapterProperties(jsonObject, propertiesHeading);
-
-                //if (jsonObject != undefined) {
-                //    var propertyLoop = 0;
-                //    jQuery.each(jsonObject, function (index, messageProperty) {
-                //        loadEventAdapterMessageProperties(messageProperty, eventReceiverInputTable, propertyLoop, inputProperty, inputRequiredProperty);
-                //        propertyLoop = propertyLoop + 1;
-                //    });
-                //}
-
             }
         }
     });
@@ -184,7 +171,6 @@ function handleAdvancedMapping() {
         outerDiv.style.display = "none";
     }
     advancedMappingCounter = advancedMappingCounter + 1;
-
 }
 
 function loadMappingUiElements() {
@@ -350,6 +336,7 @@ function addInputTextProperty() {
     var newTableRow = tableTBody.insertRow(tableTBody.rows.length);
     var newCell0 = newTableRow.insertCell(0);
     newCell0.innerHTML = regexExpr.value;
+    YAHOO.util.Dom.addClass(newCell0, "property-names");
 
     var newCell1 = newTableRow.insertCell(1);
     newCell1.innerHTML = propName.value;
@@ -357,19 +344,20 @@ function addInputTextProperty() {
 
     var newCell2 = newTableRow.insertCell(2);
     newCell2.innerHTML = propertyType.value;
+    YAHOO.util.Dom.addClass(newCell2, "property-names");
 
     var newCell3 = newTableRow.insertCell(3);
     newCell3.innerHTML = propDefault.value;
+    YAHOO.util.Dom.addClass(newCell3, "property-names");
 
     var newCell4 = newTableRow.insertCell(4);
-    newCell4.innerHTML = ' <a class="icon-link" style="background-image:url(../admin/images/delete.gif)" onclick="removeInputProperty(this,\'' + 'map' + '\')">Delete</a>';
+    newCell4.innerHTML = '<a class="icon-link" style="background-image:url(../admin/images/delete.gif)" onclick="removeInputProperty(this)">Delete</a>';
+    YAHOO.util.Dom.addClass(newCell4, "property-names");
 
     propDefault.value = "";
     noPropertyDiv.style.display = "none";
 }
 
-
-var advancedMappingCounter = 0;
 
 //Method that used in jsp files
 
@@ -609,9 +597,7 @@ function addEventReceiverViaPopup(form, toStreamId, redirectPage) {
                 }
             })
         }
-    }
-
-    else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'text') {
+    } else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'text') {
 
         mappingType = "text";
         var textData = "";
@@ -654,9 +640,7 @@ function addEventReceiverViaPopup(form, toStreamId, redirectPage) {
                 }
             })
         }
-    }
-
-    else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'xml') {
+    } else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'xml') {
         var parentSelectorXpath = document.getElementById("parentSelectorXpath").value;
 
         mappingType = "xml";
@@ -709,8 +693,7 @@ function addEventReceiverViaPopup(form, toStreamId, redirectPage) {
                 }
             });
         }
-    }
-    else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'map') {
+    } else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'map') {
 
         mappingType = "map";
         var mapData = "";
@@ -752,8 +735,7 @@ function addEventReceiverViaPopup(form, toStreamId, redirectPage) {
                 }
             });
         }
-    }
-    else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'json') {
+    } else if (document.getElementById("mappingTypeFilter")[document.getElementById("mappingTypeFilter").selectedIndex].text == 'json') {
 
         mappingType = "json";
         var jsonData = "";
@@ -877,7 +859,8 @@ function addInputRegexDef() {
     YAHOO.util.Dom.addClass(newCell0, "property-names");
 
     var newCell1 = newTableRow.insertCell(1);
-    newCell1.innerHTML = ' <a class="icon-link" style="background-image:url(../admin/images/delete.gif)" onclick="removeRegexInputProperty(this,\'' + 'xml' + '\')">Delete</a>';
+    YAHOO.util.Dom.addClass(newCell1, "property-names");
+    newCell1.innerHTML = '<a class="icon-link" style="background-image:url(../admin/images/delete.gif)" onclick="removeRegexInputProperty(this)">Delete</a>';
 
 
     if (regexSelect.value == "") {
@@ -893,7 +876,7 @@ function addInputRegexDef() {
 }
 
 function updateAttributeType() {
-    var typeMap = JSON.parse( document.getElementById("streamMapping").getAttribute("mapping"));
+    var typeMap = JSON.parse(document.getElementById("streamMapping").getAttribute("mapping"));
     var selectedIndex = document.getElementById("inputPropertyName").selectedIndex;
     document.getElementById("inputPropertyType").value = typeMap[selectedIndex];
 }

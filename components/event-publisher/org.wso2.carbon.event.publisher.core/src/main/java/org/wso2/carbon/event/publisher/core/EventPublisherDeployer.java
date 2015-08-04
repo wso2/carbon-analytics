@@ -15,6 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.event.publisher.core;
 
 import org.apache.axiom.om.OMElement;
@@ -28,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.application.deployer.EventProcessingDeployer;
+import org.wso2.carbon.event.output.adapter.core.TenantConfigHolder;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfigurationFile;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
@@ -60,6 +62,7 @@ public class EventPublisherDeployer extends AbstractDeployer implements EventPro
 
     public void init(ConfigurationContext configurationContext) {
         this.configurationContext = configurationContext;
+        TenantConfigHolder.addTenantConfig(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(), configurationContext);
     }
 
     /**

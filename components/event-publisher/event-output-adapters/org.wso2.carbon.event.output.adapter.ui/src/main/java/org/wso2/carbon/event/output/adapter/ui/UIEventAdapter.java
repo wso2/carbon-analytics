@@ -53,11 +53,13 @@ public class UIEventAdapter implements OutputEventAdapter {
     private LinkedBlockingDeque<Object> streamSpecificEvents;
     private static ThreadPoolExecutor executorService;
     private int tenantId;
+    private boolean doLogDroppedMessage;
 
     public UIEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
             String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
+        this.doLogDroppedMessage = true;
     }
 
     @Override
@@ -177,16 +179,16 @@ public class UIEventAdapter implements OutputEventAdapter {
 
         Event event = (Event) message;
         StringBuilder eventBuilder = new StringBuilder("[");
-        Boolean dataExist = false;
 
         if (streamSpecificEvents.size() == queueSize) {
             streamSpecificEvents.removeFirst();
         }
 
-        if (event.getMetaData() != null) {
+        eventBuilder.append(event.getTimeStamp());
 
+        if (event.getMetaData() != null) {
+            eventBuilder.append(",");
             Object[] metaData = event.getMetaData();
-            dataExist = true;
             for (int i = 0; i < metaData.length; i++) {
                 eventBuilder.append("\"");
                 eventBuilder.append(metaData[i]);
@@ -200,11 +202,8 @@ public class UIEventAdapter implements OutputEventAdapter {
         if (event.getCorrelationData() != null) {
             Object[] correlationData = event.getCorrelationData();
 
-            if (dataExist) {
-                eventBuilder.append(",");
-            } else {
-                dataExist = true;
-            }
+            eventBuilder.append(",");
+
             for (int i = 0; i < correlationData.length; i++) {
                 eventBuilder.append("\"");
                 eventBuilder.append(correlationData[i]);
@@ -216,11 +215,8 @@ public class UIEventAdapter implements OutputEventAdapter {
         }
 
         if (event.getPayloadData() != null) {
-
             Object[] payloadData = event.getPayloadData();
-            if (dataExist) {
-                eventBuilder.append(",");
-            }
+            eventBuilder.append(",");
             for (int i = 0; i < payloadData.length; i++) {
                 eventBuilder.append("\"");
                 eventBuilder.append(payloadData[i]);
@@ -295,6 +291,7 @@ public class UIEventAdapter implements OutputEventAdapter {
             UIOutputCallbackControllerServiceImpl uiOutputCallbackControllerServiceImpl = UIEventAdaptorServiceInternalValueHolder.getUIOutputCallbackRegisterServiceImpl();
             CopyOnWriteArrayList<Session> sessions = uiOutputCallbackControllerServiceImpl.getSessions(tenantId, streamId);
             if (sessions != null) {
+                doLogDroppedMessage = true;
                 for (Session session : sessions) {
                     synchronized (session) {
                         try {
@@ -304,8 +301,9 @@ public class UIEventAdapter implements OutputEventAdapter {
                         }
                     }
                 }
-            } else {
+            } else if(doLogDroppedMessage) {
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "No clients registered", log, tenantId);
+                doLogDroppedMessage = false;
             }
         }
     }

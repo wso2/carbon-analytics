@@ -161,7 +161,7 @@ public class ServerOfflineBinaryTest extends TestCase {
             dataPublisher.tryPublish(event);
         }
         try {
-            Thread.sleep(35000);
+            Thread.sleep(50000);
         } catch (InterruptedException e) {
         }
 

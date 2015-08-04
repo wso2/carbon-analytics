@@ -1,8 +1,8 @@
 
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ax2106="http://internal.admin.stream.event.carbon.wso2.org/xsd" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://internal.admin.stream.event.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://internal.admin.stream.event.carbon.wso2.org">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ax2106="http://admin.stream.event.carbon.wso2.org/xsd" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://admin.stream.event.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://admin.stream.event.carbon.wso2.org">
     <wsdl:documentation>EventStreamAdminService</wsdl:documentation>
     <wsdl:types>
-        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://internal.admin.stream.event.carbon.wso2.org/xsd">
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.stream.event.carbon.wso2.org/xsd">
             <xs:complexType name="EventStreamDefinitionDto">
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationData" nillable="true" type="ax2106:EventStreamAttributeDto"/>
@@ -32,8 +32,8 @@
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>
-        <xs:schema xmlns:ax2107="http://internal.admin.stream.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://internal.admin.stream.event.carbon.wso2.org">
-            <xs:import namespace="http://internal.admin.stream.event.carbon.wso2.org/xsd"/>
+        <xs:schema xmlns:ax2107="http://admin.stream.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.stream.event.carbon.wso2.org">
+            <xs:import namespace="http://admin.stream.event.carbon.wso2.org/xsd"/>
             <xs:element name="removeEventStreamDefinition">
                 <xs:complexType>
                     <xs:sequence>
@@ -712,13 +712,13 @@
     </wsdl:binding>
     <wsdl:service name="EventStreamAdminService">
         <wsdl:port name="EventStreamAdminServiceHttpsSoap11Endpoint" binding="ns:EventStreamAdminServiceSoap11Binding">
-            <soap:address location="https://192.168.1.6:9443/services/EventStreamAdminService.EventStreamAdminServiceHttpsSoap11Endpoint/"/>
+            <soap:address location="https://10.100.1.144:9443/services/EventStreamAdminService.EventStreamAdminServiceHttpsSoap11Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="EventStreamAdminServiceHttpsSoap12Endpoint" binding="ns:EventStreamAdminServiceSoap12Binding">
-            <soap12:address location="https://192.168.1.6:9443/services/EventStreamAdminService.EventStreamAdminServiceHttpsSoap12Endpoint/"/>
+            <soap12:address location="https://10.100.1.144:9443/services/EventStreamAdminService.EventStreamAdminServiceHttpsSoap12Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="EventStreamAdminServiceHttpsEndpoint" binding="ns:EventStreamAdminServiceHttpBinding">
-            <http:address location="https://192.168.1.6:9443/services/EventStreamAdminService.EventStreamAdminServiceHttpsEndpoint/"/>
+            <http:address location="https://10.100.1.144:9443/services/EventStreamAdminService.EventStreamAdminServiceHttpsEndpoint/"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

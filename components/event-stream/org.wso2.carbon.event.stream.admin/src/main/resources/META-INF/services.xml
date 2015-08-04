@@ -26,7 +26,7 @@
                              class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
         </messageReceivers>
         <parameter name="ServiceClass" locked="false">
-            org.wso2.carbon.event.stream.admin.internal.EventStreamAdminService
+            org.wso2.carbon.event.stream.admin.EventStreamAdminService
         </parameter>
 
         <parameter name="AuthorizationAction" locked="false">
