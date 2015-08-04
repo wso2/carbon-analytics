@@ -163,7 +163,7 @@ public class AnalyticsDataMigrationTool {
             while (iterator.hasNext()) {
                 int i = 0;
                 records = new ArrayList<Record>();
-                while (i < batchSize) {
+                while (i < batchSize && iterator.hasNext()) {
                     Map<String, Object> values = getAnalyticsValues(iterator.next());
                     Record record = new Record(tenantId, analyticTable, values);
                     records.add(record);

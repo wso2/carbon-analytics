@@ -310,7 +310,7 @@ for t in "$CARBON_HOME"/repository/components/plugins/com.google.guava_15.*.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done
-for t in "$CARBON_HOME"/repository/components/plugins/com.codahale.metrics.core_3.0.2.jar
+for t in "$CARBON_HOME"/repository/components/plugins/io.dropwizard.metrics.core_3.1.2.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done

@@ -83,8 +83,12 @@
             <artifactId>cassandra-driver-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.codahale.metrics</groupId>
+            <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.noggit</groupId>
@@ -122,12 +126,11 @@
                                 <bundleDef>org.wso2.orbit.org.apache.lucene:lucene</bundleDef>
                                 <bundleDef>org.wso2.orbit.org.ow2.asm:asm-all</bundleDef>
                                 <bundleDef>org.antlr.wso2:antlr-runtime</bundleDef>
-                                <bundleDef>com.datastax.cassandra:cassandra-driver-core</bundleDef>
-                                <bundleDef>com.codahale.metrics:metrics-core</bundleDef>
                                 <bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>
+                                <bundleDef>com.datastax.cassandra:cassandra-driver-core</bundleDef>
                                 <bundleDef>io.dropwizard.metrics:metrics-core</bundleDef>
+                                <bundleDef>com.google.guava:guava</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef>
-                                <!--<bundleDef>com.esotericsoftware.kryo:kryo</bundleDef>-->
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.core
                                 </bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice</bundleDef>
