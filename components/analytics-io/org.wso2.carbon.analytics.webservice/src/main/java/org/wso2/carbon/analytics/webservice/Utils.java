@@ -101,7 +101,7 @@ public class Utils {
                     pathAsString.add(String.valueOf(iterator.next()));
                 }
                 AnalyticsCategoryPathBean categoryPathBean = new AnalyticsCategoryPathBean();
-                categoryPathBean.setPath(pathAsString.toArray(new String[analyticsCategoryPath.size()]));
+                categoryPathBean.setPath(pathAsString.toArray(new String[pathAsString.size()]));
                 bean.setFieldName(entry.getKey());
                 bean.setAnalyticsCategoryPathBeanValue(categoryPathBean);
                 bean.setType(RecordValueEntryBean.FACET);
