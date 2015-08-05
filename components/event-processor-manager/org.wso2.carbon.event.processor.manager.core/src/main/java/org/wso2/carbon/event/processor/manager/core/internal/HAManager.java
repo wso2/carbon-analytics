@@ -226,6 +226,7 @@ public class HAManager {
             public void run() {
                 while (true) {
                     try {
+                        log.info("CEP HA State syncing started..");
                         syncState(activeMember, eventManagementService);
                         log.info("CEP HA State successfully synced.");
                         return;
