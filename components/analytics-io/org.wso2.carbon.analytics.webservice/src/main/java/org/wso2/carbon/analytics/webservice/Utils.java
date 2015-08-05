@@ -40,6 +40,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -93,9 +94,14 @@ public class Utils {
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             RecordValueEntryBean bean = new RecordValueEntryBean();
             if (entry.getValue() instanceof List) {
-                List<String> analyticsCategoryPath = (List<String>) entry.getValue();
+                List<Object> analyticsCategoryPath = (List<Object>) entry.getValue();
+                Iterator<Object> iterator = analyticsCategoryPath.iterator();
+                List<String> pathAsString = new ArrayList<>();
+                while (iterator.hasNext()) {
+                    pathAsString.add(String.valueOf(iterator.next()));
+                }
                 AnalyticsCategoryPathBean categoryPathBean = new AnalyticsCategoryPathBean();
-                categoryPathBean.setPath(analyticsCategoryPath.toArray(new String[analyticsCategoryPath.size()]));
+                categoryPathBean.setPath(pathAsString.toArray(new String[analyticsCategoryPath.size()]));
                 bean.setFieldName(entry.getKey());
                 bean.setAnalyticsCategoryPathBeanValue(categoryPathBean);
                 bean.setType(RecordValueEntryBean.FACET);
