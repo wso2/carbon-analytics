@@ -373,12 +373,16 @@ public class AnalyticsDataBackupTool {
             } else {                                          // the node is a file
                 AnalyticsFileSystem.DataInput input = analyticsFileSystem.createInput(nodePath);
                 byte[] dataInBuffer = new byte[READ_BUFFER_SIZE];
-                int i;
                 FileOutputStream out = new FileOutputStream(baseDir+nodePath);
-                while ((i = input.read(dataInBuffer, 0, dataInBuffer.length)) > 0) {
-                    out.write(dataInBuffer);
+                while (input.read(dataInBuffer, 0, dataInBuffer.length) > 0) {
+                    try {
+                        out.write(dataInBuffer);
+                    } catch (IOException e) {
+                        throw new IOException("Could not write to the output file: ", e);
+                    }finally{
+                        out.close();
+                    }
                 }
-                out.close();
             }
         }
     }
@@ -418,9 +422,14 @@ public class AnalyticsDataBackupTool {
         } else if (node.isFile()) {
             OutputStream out = analyticsFileSystem.createOutput(relativePath);
             byte[] data = readFile(node);
-            out.write(data, 0, data.length);
-            out.flush();
-            out.close();
+            try {
+                out.write(data, 0, data.length);
+                out.flush();
+            } catch (IOException e) {
+                throw new IOException("Error in restoring the file to the filesystem: ", e);
+            }finally{
+                out.close();
+            }
         }
 
     }
