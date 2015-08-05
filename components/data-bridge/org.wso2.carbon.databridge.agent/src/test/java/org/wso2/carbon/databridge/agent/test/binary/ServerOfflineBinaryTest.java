@@ -18,7 +18,8 @@
 package org.wso2.carbon.databridge.agent.test.binary;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -36,7 +37,7 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import java.io.IOException;
 import java.net.SocketException;
 
-public class ServerOfflineBinaryTest extends TestCase {
+public class ServerOfflineBinaryTest {
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
 
@@ -60,15 +61,20 @@ public class ServerOfflineBinaryTest extends TestCase {
 
     private BinaryTestServer binaryTestServer;
 
-    private synchronized void startServer(int port, int securePort) throws DataBridgeException,
-            StreamDefinitionStoreException, MalformedStreamDefinitionException, IOException {
+    @BeforeClass
+    public static void init() {
         DataPublisherTestUtil.setKeyStoreParams();
         DataPublisherTestUtil.setTrustStoreParams();
+    }
+
+    private synchronized void startServer(int port, int securePort) throws DataBridgeException,
+            StreamDefinitionStoreException, MalformedStreamDefinitionException, IOException {
         binaryTestServer = new BinaryTestServer();
         binaryTestServer.start(port, securePort);
         binaryTestServer.addStreamDefinition(STREAM_DEFN, -1234);
     }
 
+    @Test
     public void testSendingEventsWhileServerOffline()
             throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException,
             DataEndpointException, DataEndpointConfigurationException, SocketException {
@@ -95,6 +101,7 @@ public class ServerOfflineBinaryTest extends TestCase {
         }
     }
 
+    @Test
     public void testBlockingEventSendingAndServerStartup()
             throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
         DataPublisherTestUtil.setKeyStoreParams();
@@ -133,6 +140,7 @@ public class ServerOfflineBinaryTest extends TestCase {
     }
 
 
+    @Test
     public void testNonBlockingEventSendingAndServerStartup()
             throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException,
             TransportException, DataEndpointException, DataEndpointConfigurationException,
