@@ -338,7 +338,7 @@ public class AnalyticsDataBackupTool {
     }
 
     /**
-     * Backs up the file system to Local
+     * Backs up the file system to Local.
      *
      * @param analyticsFileSystem
      * @param tenantId
@@ -352,7 +352,7 @@ public class AnalyticsDataBackupTool {
     }
 
     /**
-     * Backing up the filesystem to the local recursively
+     * Backing up the filesystem to the local recursively.
      * @param analyticsFileSystem
      * @param path
      * @param baseDir
@@ -361,20 +361,20 @@ public class AnalyticsDataBackupTool {
     private static void backupFileSystemToLocal(AnalyticsFileSystem analyticsFileSystem,
                                                 String path, String baseDir) throws IOException {
         List<String> nodeList = analyticsFileSystem.list(path);
-        String parent_path = (path.equals("/")) ? path : path + File.separator;
-        String node_path = "";
+        String parentPath = (path.equals("/")) ? path : path + File.separator;
+        String nodePath = "";
 
         for (String node : nodeList) {
-            node_path = parent_path + node;
-            if (analyticsFileSystem.length(node_path) == 0) { // the node is a directory
-                createDirectoryInLocalSystem(baseDir + File.separator + node_path);
-                backupFileSystemToLocal(analyticsFileSystem, node_path, baseDir);
+            nodePath = parentPath + node;
+            if (analyticsFileSystem.length(nodePath) == 0) { // the node is a directory
+                createDirectoryInLocalSystem(baseDir + File.separator + nodePath);
+                backupFileSystemToLocal(analyticsFileSystem, nodePath, baseDir);
 
             } else {                                          // the node is a file
-                AnalyticsFileSystem.DataInput input = analyticsFileSystem.createInput(node_path);
+                AnalyticsFileSystem.DataInput input = analyticsFileSystem.createInput(nodePath);
                 byte[] dataInBuffer = new byte[READ_BUFFER_SIZE];
                 int i;
-                FileOutputStream out = new FileOutputStream(baseDir+node_path);
+                FileOutputStream out = new FileOutputStream(baseDir+nodePath);
                 while ((i = input.read(dataInBuffer, 0, dataInBuffer.length)) > 0) {
                     out.write(dataInBuffer);
                 }
@@ -384,7 +384,7 @@ public class AnalyticsDataBackupTool {
     }
 
     /**
-     * Restores the a local filesystem to the DAS filesystem
+     * Restores the a local filesystem to the DAS filesystem.
      *
      * @param analyticsFileSystem
      * @param baseDir
@@ -397,7 +397,7 @@ public class AnalyticsDataBackupTool {
     }
 
     /**
-     * Recursively travels through the filestructure and restores them
+     * Recursively travels through the filestructure and restores them.
      *
      * @param analyticsFileSystem
      * @param node
@@ -426,7 +426,7 @@ public class AnalyticsDataBackupTool {
     }
 
     /**
-     * Read the file into a byte array
+     * Read the file into a byte array.
      *
      * @param file
      * @return
@@ -442,18 +442,15 @@ public class AnalyticsDataBackupTool {
                 throw new IOException("EOF reached while trying to read the whole file");
             }
         } finally {
-            try {
-                if (inputStream != null)
-                    inputStream.close();
-            } catch (IOException e) {
-            }
+            if (inputStream != null)
+                inputStream.close();
         }
 
         return buffer;
     }
 
     /**
-     * returning a map of properties read from the config
+     * returning a map of properties read from the config.
      *
      * @param props
      * @return
@@ -491,13 +488,13 @@ public class AnalyticsDataBackupTool {
     }
 
     /**
-     * Creates a directory in the local file system for the given path
+     * Creates a directory in the local file system for the given path.
      *
      * @param path
      */
     private static void createDirectoryInLocalSystem(String path) {
         File dir = new File(path);
-        // if the directory does not exist, create it
+        // if the directory does not exist, create it.
         if (!dir.exists()) {
             dir.mkdir();
         }
