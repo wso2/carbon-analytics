@@ -19,23 +19,19 @@
 package org.wso2.carbon.analytics.spark.core.udf;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.naming.NamingException;
 
-import org.testng.annotations.Test;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.internal.SparkAnalyticsExecutor;
@@ -44,8 +40,7 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 /**
  * This class tests the default UDFs added to the spark SQL
  */
-public class DefaultUDFTest {
-	private AnalyticsDataService service;
+public class DefaultUDFTest extends UDFTestBase {
 
 	@Test
 	public void testStringConcatUDF() throws AnalyticsException {
@@ -73,84 +68,4 @@ public class DefaultUDFTest {
 
 		System.out.println(testString("END: String concat UDF tester"));
 	}
-
-	@BeforeClass
-	public void setup() throws NamingException, AnalyticsException, IOException {
-		GenericUtils.clearGlobalCustomDataSourceRepo();
-		System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP,
-				"src/test/resources/conf1");
-		AnalyticsServiceHolder.setHazelcastInstance(null);
-		AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
-		System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
-		this.service = ServiceHolder.getAnalyticsDataService();
-		ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor("localhost", 0));
-		ServiceHolder.getAnalyticskExecutor().initializeSparkServer();
-	}
-
-	@AfterClass
-	public void done() throws NamingException, AnalyticsException, IOException {
-		ServiceHolder.getAnalyticskExecutor().stop();
-		this.service.destroy();
-		System.clearProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP);
-	}
-
-	private String testString(String str) {
-		return "\n************** " + str.toUpperCase() + " **************\n";
-	}
-
-	/**
-	 * Generates a given number of dummy log records
-	 * @param tenantId
-	 * @param tableName
-	 * @param time
-	 * @param timeOffset
-	 * @param errorMessages => number of error messages required
-	 * @param infoMessages  => number of info messages required
-	 * @return
-	 */
-	private List<Record> generateRecords(int tenantId, String tableName, long time, int timeOffset,int errorMessages,int infoMessages) {
-		List<Record> result = new ArrayList<Record>();
-
-        for (int i = 0; i < errorMessages; i++) {
-            result.add(generateRecord(tenantId, tableName, "ERROR", "[ERROR] /get failed for tenant:" + tenantId,
-                    time, timeOffset, true));
-        }
-        for (int i = 0; i < infoMessages; i++) {
-            result.add(generateRecord(tenantId, tableName, "INFO", "[INFO] the request success for tenant:" + tenantId,
-                    time, timeOffset, true));
-        }
-        return result;
-	}
-	/**
-	 * generates an random record
-	 *
-	 * @param tenantId
-	 * @param tableName
-	 * @param logLevel
-	 * @param message
-	 * @param time
-	 * @param timeOffset
-	 * @param generateRecordIds
-	 * @return
-	 */
-	private Record generateRecord(int tenantId, String tableName, String logLevel, String message,
-	                              long time, int timeOffset, boolean generateRecordIds) {
-
-		Map<String, Object> values = new HashMap<String, Object>();
-		values.put("log_level", logLevel);
-		values.put("tenant", tenantId);
-		values.put("message", "Important syslog with tenant ID: " + tenantId + "and message:" +
-		                      message);
-		long timeTmp;
-		if (time != -1) {
-			timeTmp = time;
-			time += timeOffset;
-		} else {
-			timeTmp = System.currentTimeMillis();
-		}
-		return new Record(generateRecordIds ? GenericUtils.generateRecordID() : null, tenantId,
-		                  tableName, values, timeTmp);
-	}
-
-
 }

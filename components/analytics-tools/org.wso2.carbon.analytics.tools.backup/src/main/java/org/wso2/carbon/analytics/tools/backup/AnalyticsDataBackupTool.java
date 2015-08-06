@@ -83,13 +83,13 @@ public class AnalyticsDataBackupTool {
             new HelpFormatter().printHelp("analytics-backup.sh|cmd", options);
             System.exit(1);
         }
-        if (line.hasOption("restore")) {
+        if (line.hasOption("restoreAnalytics")) {
             if (line.hasOption("enableIndexing")) {
                 System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
                 forceIndexing = true;
             }
         }
-        if (line.hasOption("backup")) {
+        if (line.hasOption("backupAnalytics")) {
             batchSize = Integer.parseInt(line.getOptionValue("batch", RECORD_BATCH_SIZE));
         }
         AnalyticsDataService service = null;
@@ -373,15 +373,10 @@ public class AnalyticsDataBackupTool {
             } else {                                          // the node is a file
                 AnalyticsFileSystem.DataInput input = analyticsFileSystem.createInput(nodePath);
                 byte[] dataInBuffer = new byte[READ_BUFFER_SIZE];
-                FileOutputStream out = new FileOutputStream(baseDir+nodePath);
-                while (input.read(dataInBuffer, 0, dataInBuffer.length) > 0) {
-                    try {
-                        out.write(dataInBuffer);
-                    } catch (IOException e) {
-                        throw new IOException("Could not write to the output file: ", e);
-                    }finally{
-                        out.close();
-                    }
+                try (FileOutputStream out = new FileOutputStream(baseDir + nodePath)) {
+                    while (input.read(dataInBuffer, 0, dataInBuffer.length) > 0) out.write(dataInBuffer);
+                } catch (IOException e) {
+                    throw new IOException("Could not write to the output file: ", e);
                 }
             }
         }
@@ -420,15 +415,12 @@ public class AnalyticsDataBackupTool {
                 restoreFileStructure(analyticsFileSystem, new File(node, filename), baseDir);
             }
         } else if (node.isFile()) {
-            OutputStream out = analyticsFileSystem.createOutput(relativePath);
             byte[] data = readFile(node);
-            try {
+            try (OutputStream out = analyticsFileSystem.createOutput(relativePath)) {
                 out.write(data, 0, data.length);
                 out.flush();
             } catch (IOException e) {
                 throw new IOException("Error in restoring the file to the filesystem: ", e);
-            }finally{
-                out.close();
             }
         }
 
