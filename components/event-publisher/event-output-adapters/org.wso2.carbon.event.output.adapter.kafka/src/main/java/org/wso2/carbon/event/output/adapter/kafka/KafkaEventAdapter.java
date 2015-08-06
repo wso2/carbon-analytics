@@ -182,7 +182,7 @@ public class KafkaEventAdapter implements OutputEventAdapter {
             try {
                 KeyedMessage<String, Object> data = new KeyedMessage<String, Object>(topic, message.toString());
                 producer.send(data);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 log.error("Unexpected error when sending event via Kafka Output Adatper:" + e.getMessage(), e);
             }
         }
