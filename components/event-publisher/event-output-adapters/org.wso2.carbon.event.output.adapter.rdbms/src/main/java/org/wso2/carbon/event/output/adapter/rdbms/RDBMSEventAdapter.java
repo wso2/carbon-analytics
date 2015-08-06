@@ -1,21 +1,19 @@
 /*
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- *   Copyright (c) 2014-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- *   WSO2 Inc. licenses this file to you under the Apache License,
- *   Version 2.0 (the "License"); you may not use this file except
- *   in compliance with the License.
- *   You may obtain a copy of the License at
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an
- *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *  KIND, either express or implied.  See the License for the
- *  specific language governing permissions and limitations
- *  under the License.
- * /
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.event.output.adapter.rdbms;
@@ -37,17 +35,8 @@ import org.wso2.carbon.ndatasource.common.DataSourceException;
 import org.wso2.carbon.ndatasource.core.CarbonDataSource;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.sql.*;
+import java.util.*;
 
 /**
  * Class will Insert or Update/Insert values to selected RDBMS
@@ -113,7 +102,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
             dataSource = (DataSource) carbonDataSource.getDSObject();
             con = ((DataSource) carbonDataSource.getDSObject()).getConnection();
         } catch (DataSourceException e) {
-            log.error("There is no any data-source found called : " + eventAdapterConfiguration.getStaticProperties()
+            log.error("No data-source found by the name: " + eventAdapterConfiguration.getStaticProperties()
                     .get(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_DATASOURCE_NAME), e);
             throw new ConnectionUnavailableException(e.getMessage(), e);
         } catch (SQLException e) {
