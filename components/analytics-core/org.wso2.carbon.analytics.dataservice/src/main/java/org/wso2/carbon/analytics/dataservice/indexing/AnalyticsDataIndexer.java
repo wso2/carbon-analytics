@@ -1098,7 +1098,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             throws AnalyticsIndexException {
         String tableName = drillDownRequest.getTableName();
         List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds(TAXONOMY_INDEX_DATA_FS_BASE_PATH,
-                                                                            tenantId,tableName);
+                                                                            tenantId, tableName);
         double totalCount = 0;
         for (String shardId : taxonomyShardIds) {
             totalCount += this.getDrillDownRecordCountPerShard(tenantId, shardId, drillDownRequest, rangeField, range);
