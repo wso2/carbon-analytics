@@ -21,21 +21,24 @@ import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
-import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
-import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkUtil;
-import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
+import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkUtil;
+import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Analytics data service connector which actually makes the interacts with DS.
@@ -115,7 +118,7 @@ public class AnalyticsDSConnector {
     }
 
     private void populateTypedAttributes(AnalyticsSchema schema, String type, List<Attribute> attributes, Object[] values,
-                                         Map<String, Object> eventAttribute) {
+                                         Map<String, Object> eventAttribute) throws AnalyticsException{
         if (attributes == null) {
             return;
         }
@@ -139,19 +142,25 @@ public class AnalyticsDSConnector {
     }
 
     private void populateCommonAttributes(StreamDefinition streamDefinition, AnalyticsSchema schema,
-                                          Map<String, Object> eventAttributes) {
+                                          Map<String, Object> eventAttributes) throws AnalyticsException {
         eventAttributes.put(AnalyticsEventSinkConstants.STREAM_VERSION_KEY, getRecordValue(schema,
                 AnalyticsEventSinkConstants.STREAM_VERSION_KEY, streamDefinition.getVersion(), true));
     }
 
-    private Object getRecordValue(AnalyticsSchema schema, String fieldName, Object fieldValue, boolean mandatoryValue) {
+    private Object getRecordValue(AnalyticsSchema schema, String fieldName, Object fieldValue, boolean mandatoryValue)
+            throws AnalyticsException {
         ColumnDefinition columnDefinition = schema.getColumns().get(fieldName);
         if (columnDefinition != null) {
             if (fieldValue instanceof String) {
                 String fieldStrValue = (String) fieldValue;
                 switch (columnDefinition.getType()) {
                     case FACET:
-                        return gson.fromJson(fieldStrValue, List.class);
+                        try {
+                            return gson.fromJson(fieldStrValue, List.class);
+                        } catch (Exception e) {
+                            throw new AnalyticsException("Error while parsing FACET field: " + fieldName +
+                                                         ", Expected a JSON array without double quotations", e );
+                        }
                     case STRING:
                         return fieldStrValue;
                     case BINARY:
