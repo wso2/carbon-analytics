@@ -98,9 +98,6 @@ public class TCPEventServer {
                 receiverSocket = new ServerSocket(tcpEventServerConfig.getPort());
                 while (isRunning) {
                     final Socket connectionSocket = receiverSocket.accept();
-                    if(connectionCallback != null){
-                        connectionCallback.onConnect();
-                    }
                     connectionSocket.setKeepAlive(true);
                     executorService.execute(new ListenerProcessor(connectionSocket));
                 }
@@ -131,6 +128,9 @@ public class TCPEventServer {
             @Override
             public void run() {
                 try {
+                    if(connectionCallback != null){
+                        connectionCallback.onConnect();
+                    }
                     BufferedInputStream in = new BufferedInputStream(connectionSocket.getInputStream());
                     while (true) {
 
