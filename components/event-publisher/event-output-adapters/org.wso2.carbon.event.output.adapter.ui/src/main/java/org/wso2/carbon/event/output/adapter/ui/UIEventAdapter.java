@@ -53,11 +53,13 @@ public class UIEventAdapter implements OutputEventAdapter {
     private LinkedBlockingDeque<Object> streamSpecificEvents;
     private static ThreadPoolExecutor executorService;
     private int tenantId;
+    private boolean doLogDroppedMessage;
 
     public UIEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
             String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
+        this.doLogDroppedMessage = true;
     }
 
     @Override
@@ -289,6 +291,7 @@ public class UIEventAdapter implements OutputEventAdapter {
             UIOutputCallbackControllerServiceImpl uiOutputCallbackControllerServiceImpl = UIEventAdaptorServiceInternalValueHolder.getUIOutputCallbackRegisterServiceImpl();
             CopyOnWriteArrayList<Session> sessions = uiOutputCallbackControllerServiceImpl.getSessions(tenantId, streamId);
             if (sessions != null) {
+                doLogDroppedMessage = true;
                 for (Session session : sessions) {
                     synchronized (session) {
                         try {
@@ -298,8 +301,9 @@ public class UIEventAdapter implements OutputEventAdapter {
                         }
                     }
                 }
-            } else {
+            } else if(doLogDroppedMessage) {
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "No clients registered", log, tenantId);
+                doLogDroppedMessage = false;
             }
         }
     }

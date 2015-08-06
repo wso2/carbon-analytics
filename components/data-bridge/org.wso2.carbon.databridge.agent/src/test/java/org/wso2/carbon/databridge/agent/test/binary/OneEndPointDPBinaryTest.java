@@ -18,8 +18,9 @@
 package org.wso2.carbon.databridge.agent.test.binary;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 import org.apache.log4j.Logger;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -40,7 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class OneEndPointDPBinaryTest extends TestCase {
+public class OneEndPointDPBinaryTest {
     Logger log = Logger.getLogger(OneEndPointDPBinaryTest.class);
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
@@ -66,15 +67,20 @@ public class OneEndPointDPBinaryTest extends TestCase {
             "}";
 
 
-    private synchronized void startServer(int port, int securePort) throws DataBridgeException,
-            StreamDefinitionStoreException, MalformedStreamDefinitionException, IOException {
+    @BeforeClass
+    public static void init() {
         DataPublisherTestUtil.setKeyStoreParams();
         DataPublisherTestUtil.setTrustStoreParams();
+    }
+
+    private synchronized void startServer(int port, int securePort) throws DataBridgeException,
+            StreamDefinitionStoreException, MalformedStreamDefinitionException, IOException {
         testServer = new BinaryTestServer();
         testServer.start(port, securePort);
         testServer.addStreamDefinition(STREAM_DEFN, -1234);
     }
 
+    @Test
     public void testOneDataEndpoint() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
         startServer(9681, 9781);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
@@ -102,6 +108,7 @@ public class OneEndPointDPBinaryTest extends TestCase {
         testServer.stop();
     }
 
+    @Test
     public void testOneDataEndpointWithArbitraryEventFields() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
         startServer(9601, 9701);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
@@ -133,6 +140,7 @@ public class OneEndPointDPBinaryTest extends TestCase {
         testServer.stop();
     }
 
+    @Test
     public void testTwoDataEndpoint() throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException, TransportException,
             DataEndpointException, DataEndpointConfigurationException,
@@ -163,6 +171,7 @@ public class OneEndPointDPBinaryTest extends TestCase {
         testServer.stop();
     }
 
+    @Test
     public void testInvalidAuthenticationURLs() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
         boolean expected = false;
         DataPublisherTestUtil.setKeyStoreParams();
@@ -179,6 +188,7 @@ public class OneEndPointDPBinaryTest extends TestCase {
         Assert.assertTrue("Invalid urls passed for receiver and auth, and hence expected to fail", expected);
     }
 
+    @Test
     public void testInvalidReceiverURLs() throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException, TransportException,
             DataEndpointException, DataEndpointConfigurationException,
@@ -199,6 +209,7 @@ public class OneEndPointDPBinaryTest extends TestCase {
         Assert.assertTrue("Invalid urls passed for receiver and auth, and hence expected to fail", expected);
     }
 
+    @Test
     public void testShutdownDataPublisher() throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException, TransportException,
             DataEndpointException, DataEndpointConfigurationException,
