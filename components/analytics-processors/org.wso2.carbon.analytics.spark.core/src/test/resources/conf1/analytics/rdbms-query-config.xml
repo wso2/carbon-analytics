@@ -27,6 +27,7 @@
         </recordTableInitQueries>
         <fsDataChunkSize>10240</fsDataChunkSize>
         <fsDeletePathQuery>DELETE FROM AN_FS_PATH WHERE path = ?</fsDeletePathQuery>
+        <fsDeleteDataQuery>DELETE FROM AN_FS_DATA WHERE path = ?</fsDeleteDataQuery>
         <fsFileLengthRetrievalQuery>SELECT length FROM AN_FS_PATH WHERE path = ?</fsFileLengthRetrievalQuery>
         <fsInsertPathQuery>INSERT INTO AN_FS_PATH (path,is_directory,length,parent_path) VALUES (?,?,?,?)</fsInsertPathQuery>
         <fsListFilesQuery>SELECT path FROM AN_FS_PATH WHERE parent_path = ?</fsListFilesQuery>
