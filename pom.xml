@@ -81,7 +81,7 @@
             <dependency>
                 <groupId>com.hazelcast</groupId>
                 <artifactId>hazelcast</artifactId>
-                <version>3.2.6</version>
+                <version>${hazelcast.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.tomcat</groupId>
@@ -1216,8 +1216,8 @@
 
     <properties>
         <!-- Carbon platform version comes here-->
-        <carbon.kernel.version>4.4.0</carbon.kernel.version>
-        <carbon.kernel.version.import.version.range>[4.3.0, 4.4.0)
+        <carbon.kernel.version>4.4.1</carbon.kernel.version>
+        <carbon.kernel.version.import.version.range>[4.4.0, 4.5.0)
         </carbon.kernel.version.import.version.range>
 
         <!-- Axis2 Version -->
@@ -1252,6 +1252,9 @@
         <log4j.version>1.2.14</log4j.version>
         <version.equinox.osgi>3.8.1.v20120830-144521</version.equinox.osgi>
         <gson.version>2.1</gson.version>
+
+        <!-- Hazelcast -->
+        <hazelcast.version>3.5</hazelcast.version>
 
         <!-- Orbits -->
         <orbit.version.xmlschema>1.4.7.wso2v2</orbit.version.xmlschema>
@@ -1290,8 +1293,8 @@
         <lucene.orbit.version>5.2.1.wso2v1</lucene.orbit.version>
         <lucene.imp.pkg.version>[5.2.1, 5.3.0)</lucene.imp.pkg.version>
         <asm4.orbit.version>4.1.0.wso2v1</asm4.orbit.version>
-        <carbon.commons.version>4.4.3</carbon.commons.version>
-        <carbon.commons.imp.pkg.version>[4.4.3, 4.5.0)</carbon.commons.imp.pkg.version>
+        <carbon.commons.version>4.4.4</carbon.commons.version>
+        <carbon.commons.imp.pkg.version>[4.4.4, 4.5.0)</carbon.commons.imp.pkg.version>
         <carbon.event-processing.version>2.0.4-SNAPSHOT</carbon.event-processing.version>
         <carbon.analytics.common.version>2.0.0-SNAPSHOT</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[2.0.0-SNAPSHOT, 2.1.0)</carbon.analytics.common.imp.pkg.version>
