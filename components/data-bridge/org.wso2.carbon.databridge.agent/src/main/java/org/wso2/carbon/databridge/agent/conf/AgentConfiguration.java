@@ -80,7 +80,11 @@ public class AgentConfiguration {
     }
 
     public void setTrustStore(String trustStore) {
-        this.trustStore = trustStore.trim();
+        if (trustStore != null) {
+            this.trustStore = trustStore.trim();
+        } else {
+            this.trustStore = null;
+        }
     }
 
     @XmlElement(name = "TrustSorePassword")
@@ -89,7 +93,11 @@ public class AgentConfiguration {
     }
 
     public void setTrustStorePassword(String trustStorePassword) {
-        this.trustStorePassword = trustStorePassword.trim();
+        if (trustStorePassword != null) {
+            this.trustStorePassword = trustStorePassword.trim();
+        } else {
+            this.trustStorePassword = null;
+        }
     }
 
     @XmlElement(name = "QueueSize")
@@ -219,11 +227,19 @@ public class AgentConfiguration {
     }
 
     public void setDataEndpointName(String dataEndpointName) {
-        this.dataEndpointName = dataEndpointName.trim();
+        if (dataEndpointName != null) {
+            this.dataEndpointName = dataEndpointName.trim();
+        } else {
+            this.dataEndpointName = null;
+        }
     }
 
     public void setClassName(String className) {
-        this.className = className.trim();
+        if (className != null) {
+            this.className = className.trim();
+        } else {
+            this.className = null;
+        }
     }
 
     /**
