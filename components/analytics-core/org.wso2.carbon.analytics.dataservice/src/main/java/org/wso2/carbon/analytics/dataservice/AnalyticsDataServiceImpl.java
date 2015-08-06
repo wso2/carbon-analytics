@@ -915,6 +915,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         
         private AnalyticsSchema schema;
         
+        public AnalyticsTableInfo() { }
+        
         public AnalyticsTableInfo(int tenantId, String tableName, String recordStoreName, AnalyticsSchema schema) {
             this.tenantId = tenantId;
             this.tableName = tableName;

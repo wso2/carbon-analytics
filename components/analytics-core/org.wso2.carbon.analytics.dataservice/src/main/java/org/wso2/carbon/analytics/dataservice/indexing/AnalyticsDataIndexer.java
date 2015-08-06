@@ -577,9 +577,13 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return Math.abs(id.hashCode()) % this.getShardCount();
     }
     
+    private String generateGlobalPath(String basepath, int tenantId, String tableName) {
+        return this.generateDirPath(basepath, this.generateTableId(tenantId, tableName));
+    }
+    
     private List<String> lookupGloballyExistingShardIds(String basepath, int tenantId, String tableName)
             throws AnalyticsIndexException {
-        String globalPath = this.generateDirPath(basepath, this.generateTableId(tenantId, tableName));
+        String globalPath = this.generateGlobalPath(basepath, tenantId, tableName);
         try {
             List<String> names = this.getFileSystem().list(globalPath);
             List<String> result = new ArrayList<>();
@@ -1063,7 +1067,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (endIndex <= startIndex) throw new AnalyticsIndexException("Record Count should be greater than 0");
         String tableName = drillDownRequest.getTableName();
         List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds(TAXONOMY_INDEX_DATA_FS_BASE_PATH,
-                                                                            tenantId,tableName);
+                                                                            tenantId, tableName);
         List<SearchResultEntry> resultFacetList = new ArrayList<>();
         for (String shardId : taxonomyShardIds) {
             resultFacetList.addAll(this.drillDownRecordsPerShard(tenantId, shardId, drillDownRequest, rangeField, range));
@@ -1081,7 +1085,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private List<CategorySearchResultEntry> getDrillDownCategories(int tenantId,
                    CategoryDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
         List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds(TAXONOMY_INDEX_DATA_FS_BASE_PATH,
-                                                                            tenantId,drillDownRequest.getTableName());
+                                                                            tenantId, drillDownRequest.getTableName());
         List<CategorySearchResultEntry> categoriesPerShard = new ArrayList<>();
         for (String shardId : taxonomyShardIds) {
             categoriesPerShard.addAll(this.drillDownCategoriesPerShard(tenantId, shardId, drillDownRequest));
@@ -1396,32 +1400,17 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
     
-    private void deleteIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
-        List<String> shardIds = this.lookupGloballyExistingShardIds(INDEX_DATA_FS_BASE_PATH, tenantId, tableName);
-        for (String shardId : shardIds) {
-            this.deleteIndexData(tenantId, tableName, shardId);
-        }
-    }
-    
-    private void deleteIndexData(int tenantId, String tableName, String shardId) throws AnalyticsIndexException {
-        String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
-        IndexWriter writer = this.createIndexWriter(shardedTableId);
-        try {
-            writer.deleteAll();
-        } catch (IOException e) {
-            throw new AnalyticsIndexException("Error in deleting index data: " + e.getMessage(), e);
-        } finally {
-            try {
-                writer.close();
-            } catch (IOException e) {
-                log.error("Error in closing index writer: " + e.getMessage(), e);
-            }
-        }
-    }
-    
     public void clearIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
         /* delete all global index data, not only local ones */
-        this.deleteIndexData(tenantId, tableName);
+        String globalFacetPath = this.generateGlobalPath(TAXONOMY_INDEX_DATA_FS_BASE_PATH, tenantId, tableName);
+        String globalIndexPath = this.generateGlobalPath(INDEX_DATA_FS_BASE_PATH, tenantId, tableName);
+        try {
+            this.getFileSystem().delete(globalFacetPath);
+            this.getFileSystem().delete(globalIndexPath);
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error in clearing index data for tenant: " + 
+                    tenantId + " table: " + tableName + " : " + e.getMessage(), e);
+        }
     }
     
     private String generateShardedTableId(int tenantId, String tableName, String shardId) {
@@ -1612,6 +1601,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         private String tableName;
         
         private String id;
+        
+        public DeleteIndexEntry() { }
         
         public DeleteIndexEntry(int tenantId, String tableName, String id) {
             this.tenantId = tenantId;
