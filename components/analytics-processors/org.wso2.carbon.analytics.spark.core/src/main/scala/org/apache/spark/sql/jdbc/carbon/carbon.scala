@@ -27,7 +27,7 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row}
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils
 
-package object carbon {
+package object carbon extends java.io.Serializable{
 
   @SerialVersionUID(101L)
   object JDBCWriteDetails extends Logging with java.io.Serializable {
