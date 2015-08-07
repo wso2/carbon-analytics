@@ -36,427 +36,143 @@ public class FacetUDF {
      * @param facet_1
      * @return List<String>
      */
-    public List<String> facet1(Object facet_1) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        return facetList;
+    public String[] facet1(Object facet_1) {
+        return FacetUtils.getFacetArray(facet_1);
     }
 
-    public List<String> facet2(Object facet_1, Object facet_2) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        return facetList;
+    public String[] facet2(Object facet_1, Object facet_2) {
+        return FacetUtils.getFacetArray(facet_1,facet_2);
     }
 
-    public List<String> facet3(Object facet_1, Object facet_2, Object facet_3) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        return facetList;
+    public String[] facet3(Object facet_1, Object facet_2, Object facet_3) {
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3);
     }
 
-    public List<String> facet4(Object facet_1, Object facet_2, Object facet_3, Object facet_4) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        return facetList;
+    public String[] facet4(Object facet_1, Object facet_2, Object facet_3, Object facet_4) {
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4);
     }
 
-    public List<String> facet5(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        return facetList;
+    public String[] facet5(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5) {
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5);
     }
 
-    public List<String> facet6(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet6(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                Object facet_6) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6);
     }
 
-    public List<String> facet7(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet7(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                Object facet_6, Object facet_7) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7);
     }
 
-    public List<String> facet8(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet8(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                Object facet_6, Object facet_7, Object facet_8) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7,facet_8);
     }
 
-    public List<String> facet9(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet9(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                Object facet_6, Object facet_7, Object facet_8, Object facet_9) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        facetList.add(String.valueOf(facet_9));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7,facet_8,facet_9);
     }
 
-    public List<String> facet10(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet10(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                 Object facet_6, Object facet_7, Object facet_8, Object facet_9, Object facet_10) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        facetList.add(String.valueOf(facet_9));
-        facetList.add(String.valueOf(facet_10));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7,facet_8,facet_9,
+                facet_10);
     }
 
-    public List<String> facet11(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet11(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                 Object facet_6, Object facet_7, Object facet_8, Object facet_9, Object facet_10,
                                 Object facet_11) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        facetList.add(String.valueOf(facet_9));
-        facetList.add(String.valueOf(facet_10));
-        facetList.add(String.valueOf(facet_11));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7,facet_8,facet_9,
+                facet_10,facet_11);
     }
 
-    public List<String> facet12(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet12(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                 Object facet_6, Object facet_7, Object facet_8, Object facet_9, Object facet_10,
                                 Object facet_11, Object facet_12) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        facetList.add(String.valueOf(facet_9));
-        facetList.add(String.valueOf(facet_10));
-        facetList.add(String.valueOf(facet_11));
-        facetList.add(String.valueOf(facet_12));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7,facet_8,facet_9,
+                facet_10,facet_11,facet_12);
     }
 
-    public List<String> facet13(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet13(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                 Object facet_6, Object facet_7, Object facet_8, Object facet_9, Object facet_10,
                                 Object facet_11, Object facet_12, Object facet_13) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        facetList.add(String.valueOf(facet_9));
-        facetList.add(String.valueOf(facet_10));
-        facetList.add(String.valueOf(facet_11));
-        facetList.add(String.valueOf(facet_12));
-        facetList.add(String.valueOf(facet_13));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7,facet_8,facet_9,
+                facet_10,facet_11,facet_12,facet_13);
     }
 
-    public List<String> facet14(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet14(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                 Object facet_6, Object facet_7, Object facet_8, Object facet_9, Object facet_10,
                                 Object facet_11, Object facet_12, Object facet_13, Object facet_14) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        facetList.add(String.valueOf(facet_9));
-        facetList.add(String.valueOf(facet_10));
-        facetList.add(String.valueOf(facet_11));
-        facetList.add(String.valueOf(facet_12));
-        facetList.add(String.valueOf(facet_13));
-        facetList.add(String.valueOf(facet_14));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7,facet_8,facet_9,
+                facet_10,facet_11,facet_12,facet_13,facet_14);
     }
 
-    public List<String> facet15(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet15(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                 Object facet_6, Object facet_7, Object facet_8, Object facet_9, Object facet_10,
                                 Object facet_11, Object facet_12, Object facet_13, Object facet_14, Object facet_15) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        facetList.add(String.valueOf(facet_9));
-        facetList.add(String.valueOf(facet_10));
-        facetList.add(String.valueOf(facet_11));
-        facetList.add(String.valueOf(facet_12));
-        facetList.add(String.valueOf(facet_13));
-        facetList.add(String.valueOf(facet_14));
-        facetList.add(String.valueOf(facet_15));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7,facet_8,facet_9,
+                facet_10,facet_11,facet_12,facet_13,facet_14,facet_15);
     }
 
-    public List<String> facet16(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet16(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                 Object facet_6, Object facet_7, Object facet_8, Object facet_9, Object facet_10,
                                 Object facet_11, Object facet_12, Object facet_13, Object facet_14, Object facet_15,
                                 Object facet_16) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        facetList.add(String.valueOf(facet_9));
-        facetList.add(String.valueOf(facet_10));
-        facetList.add(String.valueOf(facet_11));
-        facetList.add(String.valueOf(facet_12));
-        facetList.add(String.valueOf(facet_13));
-        facetList.add(String.valueOf(facet_14));
-        facetList.add(String.valueOf(facet_15));
-        facetList.add(String.valueOf(facet_16));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7,facet_8,facet_9,
+                facet_10,facet_11,facet_12,facet_13,facet_14,facet_15,facet_16);
     }
 
-    public List<String> facet17(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet17(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                 Object facet_6, Object facet_7, Object facet_8, Object facet_9, Object facet_10,
                                 Object facet_11, Object facet_12, Object facet_13, Object facet_14, Object facet_15,
                                 Object facet_16, Object facet_17) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        facetList.add(String.valueOf(facet_9));
-        facetList.add(String.valueOf(facet_10));
-        facetList.add(String.valueOf(facet_11));
-        facetList.add(String.valueOf(facet_12));
-        facetList.add(String.valueOf(facet_13));
-        facetList.add(String.valueOf(facet_14));
-        facetList.add(String.valueOf(facet_15));
-        facetList.add(String.valueOf(facet_16));
-        facetList.add(String.valueOf(facet_17));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7,facet_8,facet_9,
+                facet_10,facet_11,facet_12,facet_13,facet_14,facet_15,facet_16,facet_17);
     }
 
-    public List<String> facet18(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet18(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                 Object facet_6, Object facet_7, Object facet_8, Object facet_9, Object facet_10,
                                 Object facet_11, Object facet_12, Object facet_13, Object facet_14, Object facet_15,
                                 Object facet_16, Object facet_17, Object facet_18) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        facetList.add(String.valueOf(facet_9));
-        facetList.add(String.valueOf(facet_10));
-        facetList.add(String.valueOf(facet_11));
-        facetList.add(String.valueOf(facet_12));
-        facetList.add(String.valueOf(facet_13));
-        facetList.add(String.valueOf(facet_14));
-        facetList.add(String.valueOf(facet_15));
-        facetList.add(String.valueOf(facet_16));
-        facetList.add(String.valueOf(facet_17));
-        facetList.add(String.valueOf(facet_18));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7,facet_8,facet_9,
+                facet_10,facet_11,facet_12,facet_13,facet_14,facet_15,facet_16,facet_17,facet_18);
     }
 
-    public List<String> facet19(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet19(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                 Object facet_6, Object facet_7, Object facet_8, Object facet_9, Object facet_10,
                                 Object facet_11, Object facet_12, Object facet_13, Object facet_14, Object facet_15,
                                 Object facet_16, Object facet_17, Object facet_18, Object facet_19) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        facetList.add(String.valueOf(facet_9));
-        facetList.add(String.valueOf(facet_10));
-        facetList.add(String.valueOf(facet_11));
-        facetList.add(String.valueOf(facet_12));
-        facetList.add(String.valueOf(facet_13));
-        facetList.add(String.valueOf(facet_14));
-        facetList.add(String.valueOf(facet_15));
-        facetList.add(String.valueOf(facet_16));
-        facetList.add(String.valueOf(facet_17));
-        facetList.add(String.valueOf(facet_18));
-        facetList.add(String.valueOf(facet_19));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7,facet_8,facet_9,
+                facet_10,facet_11,facet_12,facet_13,facet_14,facet_15,facet_16,facet_17,facet_18,facet_19);
     }
 
-    public List<String> facet20(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet20(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                 Object facet_6, Object facet_7, Object facet_8, Object facet_9, Object facet_10,
                                 Object facet_11, Object facet_12, Object facet_13, Object facet_14, Object facet_15,
                                 Object facet_16, Object facet_17, Object facet_18, Object facet_19, Object facet_20) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        facetList.add(String.valueOf(facet_9));
-        facetList.add(String.valueOf(facet_10));
-        facetList.add(String.valueOf(facet_11));
-        facetList.add(String.valueOf(facet_12));
-        facetList.add(String.valueOf(facet_13));
-        facetList.add(String.valueOf(facet_14));
-        facetList.add(String.valueOf(facet_15));
-        facetList.add(String.valueOf(facet_16));
-        facetList.add(String.valueOf(facet_17));
-        facetList.add(String.valueOf(facet_18));
-        facetList.add(String.valueOf(facet_19));
-        facetList.add(String.valueOf(facet_20));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1, facet_2, facet_3, facet_4, facet_5, facet_6, facet_7, facet_8, facet_9,
+                facet_10, facet_11, facet_12, facet_13, facet_14, facet_15, facet_16, facet_17, facet_18, facet_19, facet_20);
     }
-
-    public List<String> facet21(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet21(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                 Object facet_6, Object facet_7, Object facet_8, Object facet_9, Object facet_10,
                                 Object facet_11, Object facet_12, Object facet_13, Object facet_14, Object facet_15,
                                 Object facet_16, Object facet_17, Object facet_18, Object facet_19, Object facet_20,
                                 Object facet_21) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        facetList.add(String.valueOf(facet_9));
-        facetList.add(String.valueOf(facet_10));
-        facetList.add(String.valueOf(facet_11));
-        facetList.add(String.valueOf(facet_12));
-        facetList.add(String.valueOf(facet_13));
-        facetList.add(String.valueOf(facet_14));
-        facetList.add(String.valueOf(facet_15));
-        facetList.add(String.valueOf(facet_16));
-        facetList.add(String.valueOf(facet_17));
-        facetList.add(String.valueOf(facet_18));
-        facetList.add(String.valueOf(facet_19));
-        facetList.add(String.valueOf(facet_20));
-        facetList.add(String.valueOf(facet_21));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7,facet_8,facet_9,
+                facet_10,facet_11,facet_12,facet_13,facet_14,facet_15,facet_16,facet_17,facet_18,facet_19,facet_20,
+                facet_21);
     }
 
-    public List<String> facet22(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
+    public String[] facet22(Object facet_1, Object facet_2, Object facet_3, Object facet_4, Object facet_5,
                                 Object facet_6, Object facet_7, Object facet_8, Object facet_9, Object facet_10,
                                 Object facet_11, Object facet_12, Object facet_13, Object facet_14, Object facet_15,
                                 Object facet_16, Object facet_17, Object facet_18, Object facet_19, Object facet_20,
                                 Object facet_21, Object facet_22) {
-        List<String> facetList = new ArrayList<>();
-
-        facetList.add(String.valueOf(facet_1));
-        facetList.add(String.valueOf(facet_2));
-        facetList.add(String.valueOf(facet_3));
-        facetList.add(String.valueOf(facet_4));
-        facetList.add(String.valueOf(facet_5));
-        facetList.add(String.valueOf(facet_6));
-        facetList.add(String.valueOf(facet_7));
-        facetList.add(String.valueOf(facet_8));
-        facetList.add(String.valueOf(facet_9));
-        facetList.add(String.valueOf(facet_10));
-        facetList.add(String.valueOf(facet_11));
-        facetList.add(String.valueOf(facet_12));
-        facetList.add(String.valueOf(facet_13));
-        facetList.add(String.valueOf(facet_14));
-        facetList.add(String.valueOf(facet_15));
-        facetList.add(String.valueOf(facet_16));
-        facetList.add(String.valueOf(facet_17));
-        facetList.add(String.valueOf(facet_18));
-        facetList.add(String.valueOf(facet_19));
-        facetList.add(String.valueOf(facet_20));
-        facetList.add(String.valueOf(facet_21));
-        facetList.add(String.valueOf(facet_22));
-        return facetList;
+        return FacetUtils.getFacetArray(facet_1,facet_2,facet_3,facet_4,facet_5,facet_6,facet_7,facet_8,facet_9,
+                facet_10,facet_11,facet_12,facet_13,facet_14,facet_15,facet_16,facet_17,facet_18,facet_19,facet_20,
+                facet_21,facet_22);
     }
-
 }
