@@ -33,6 +33,7 @@ import org.apache.spark.deploy.worker.Worker;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.jdbc.carbon.AnalyticsJDBCRelationProvider;
 import org.apache.spark.util.Utils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
@@ -66,6 +67,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -118,6 +120,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private boolean clientActive = false;
 
     private boolean electedLeader = false;
+
+    private Map<String, String> shorthandStringsMap = new HashMap<>();
 
 
     public SparkAnalyticsExecutor(String myHost, int portOffset) throws AnalyticsException {
@@ -537,7 +541,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private String encodeQueryWithTenantId(int tenantId, String query)
             throws AnalyticsExecutionException {
-        String result = query;
+        String result;
         // parse the query to see if it is a create temporary table
         // add the table names to the hz cluster map with tenantId -> table Name (put if absent)
         // iterate through the dist map and replace the relevant table names
@@ -566,29 +570,35 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     this.inMemSparkTableNames.put(tenantId, tempTableName);
                 }
                 //replace the CA shorthand string in the query
-                boolean carbonQuery = false;
-                query = query.replaceFirst("\\b" + AnalyticsConstants.SPARK_SHORTHAND_STRING + "\\b",
-                                           AnalyticsRelationProvider.class.getName());
-                if (query.length() > result.length()) {
-                    carbonQuery = true;
-                }
+//                boolean carbonQuery = false;
+//                result = query.replaceFirst("\\b" + AnalyticsConstants.SPARK_SHORTHAND_STRING + "\\b",
+//                                           AnalyticsRelationProvider.class.getName());
+//                if (result.length() > query.length()) {
+//                    carbonQuery = true;
+//                }
 
-                int optStrStart = query.toLowerCase().indexOf(AnalyticsConstants.TERM_OPTIONS, m.end());
-                int bracketsOpen = query.indexOf("(", optStrStart);
-                int bracketsClose = query.indexOf(")", bracketsOpen);
+                this.registerShorthandString(AnalyticsConstants.SPARK_SHORTHAND_STRING,
+                                             AnalyticsRelationProvider.class.getName());
+                this.registerShorthandString(AnalyticsConstants.SPARK_JDBC_SHORTHAND_STRING,
+                                             AnalyticsJDBCRelationProvider.class.getName());
+                result = replaceShorthandStrings(query);
+
+                int optStrStart = result.toLowerCase().indexOf(AnalyticsConstants.TERM_OPTIONS, m.end());
+                int bracketsOpen = result.indexOf("(", optStrStart);
+                int bracketsClose = result.indexOf(")", bracketsOpen);
 
                 //if its a carbon query, append the tenantId to the end of options
                 String options;
-                if (carbonQuery) {
-                    options = query.substring(optStrStart, bracketsOpen + 1)
-                              + addTenantIdToOptions(tenantId, query.substring(bracketsOpen + 1, bracketsClose))
+                if (isCarbonQuery(query)) {
+                    options = result.substring(optStrStart, bracketsOpen + 1)
+                              + addTenantIdToOptions(tenantId, result.substring(bracketsOpen + 1, bracketsClose))
                               + ")";
                 } else {
-                    options = query.substring(optStrStart, bracketsClose + 1);
+                    options = result.substring(optStrStart, bracketsClose + 1);
                 }
 
-                String beforeOptions = replaceTableNamesInQuery(tenantId, query.substring(0, optStrStart));
-                String afterOptions = replaceTableNamesInQuery(tenantId, query.substring(bracketsClose + 1, query.length()));
+                String beforeOptions = replaceTableNamesInQuery(tenantId, result.substring(0, optStrStart));
+                String afterOptions = replaceTableNamesInQuery(tenantId, result.substring(bracketsClose + 1, result.length()));
                 result = beforeOptions + options + afterOptions;
 
             }
@@ -596,6 +606,27 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             result = replaceTableNamesInQuery(tenantId, query);
         }
         return result.trim();
+    }
+
+    private boolean isCarbonQuery(String query) {
+        return query.contains(AnalyticsConstants.SPARK_SHORTHAND_STRING);
+    }
+
+    private String replaceShorthandStrings(String query) {
+        Set<String> keys = this.shorthandStringsMap.keySet();
+        for (String key : keys) {
+            query = query.replaceFirst("\\b" + key + "\\b", this.shorthandStringsMap.get(key));
+        }
+        return query;
+    }
+
+    private void registerShorthandString(String shorthand, String className) {
+        try {
+            Class.forName(className);
+            this.shorthandStringsMap.put(shorthand, className);
+        } catch (ClassNotFoundException e) {
+            log.error(className + " class is not available", e);
+        }
     }
 
     private String addTenantIdToOptions(int tenantId, String optStr)

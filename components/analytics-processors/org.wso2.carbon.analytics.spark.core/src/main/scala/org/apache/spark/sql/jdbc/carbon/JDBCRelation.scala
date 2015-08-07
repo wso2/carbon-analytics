@@ -85,7 +85,7 @@ object JDBCRelation {
   }
 }
 
-class DefaultSource extends RelationProvider {
+class AnalyticsJDBCRelationProvider extends RelationProvider {
   /** Returns a new base relation with the given parameters. */
   override def createRelation(
                                sqlContext: SQLContext,
