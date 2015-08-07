@@ -517,6 +517,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     public AnalyticsQueryResult executeQueryLocal(int tenantId, String query)
             throws AnalyticsExecutionException {
+        String origQuery = query;
         query = query.trim();
         if (query.endsWith(";")) {
             query = query.substring(0, query.length() - 1);
@@ -525,7 +526,13 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         if (log.isDebugEnabled()) {
             log.debug("Executing : " + query);
         }
-        return toResult(this.sqlCtx.sql(query));
+
+        long start = System.nanoTime();
+        DataFrame result = this.sqlCtx.sql(query);
+        long end = System.nanoTime();
+        log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end-start) + " nanoseconds");
+
+        return toResult(result);
     }
 
     private String encodeQueryWithTenantId(int tenantId, String query)
