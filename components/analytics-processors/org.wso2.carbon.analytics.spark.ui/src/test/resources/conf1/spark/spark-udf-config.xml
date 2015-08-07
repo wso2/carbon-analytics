@@ -22,5 +22,6 @@
       <class-name>org.wso2.carbon.analytics.spark.core.udf.defaults.TimestampUDF</class-name>
       <class-name>org.wso2.carbon.analytics.spark.core.udf.defaults.StringConcatenator</class-name>
       <class-name>org.wso2.carbon.analytics.spark.core.udf.facets.FacetUDF</class-name>
+      <class-name>org.wso2.carbon.analytics.spark.core.udf.defaults.TimeNowUDF</class-name>
     </custom-udf-classes>
 </udf-configuration>

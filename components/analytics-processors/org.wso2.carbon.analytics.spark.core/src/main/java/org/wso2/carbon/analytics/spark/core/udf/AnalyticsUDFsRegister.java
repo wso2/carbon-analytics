@@ -42,28 +42,7 @@ import org.apache.spark.sql.api.java.UDF7;
 import org.apache.spark.sql.api.java.UDF8;
 import org.apache.spark.sql.api.java.UDF9;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF10Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF11Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF12Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF13Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF14Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF15Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF16Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF17Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF18Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF19Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF1Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF20Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF21Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF22Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF2Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF3Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF4Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF5Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF6Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF7Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF8Adaptor;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF9Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.*;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 
 import java.lang.reflect.Method;
@@ -90,6 +69,11 @@ public class AnalyticsUDFsRegister {
         String methodName = udfMethod.getName();
         int parameterCount = parameterTypes == null ? 0 : parameterTypes.length;
         switch (parameterCount) {
+            case 0: {
+                UDF1 udfAdapter = new UDF0Adaptor(udfClass, methodName, parameterTypes);
+                sqlContext.udf().register(methodName, udfAdapter, AnalyticsCommonUtils.getDataType(returnType));
+                break;
+            }
             case 1: {
                 UDF1 udfAdapter = new UDF1Adaptor(udfClass, methodName, parameterTypes);
                 sqlContext.udf().register(methodName, udfAdapter, AnalyticsCommonUtils.getDataType(returnType));
