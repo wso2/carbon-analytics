@@ -30,11 +30,11 @@ public class FacetUtils {
      * @param objects
      * @return An array of String values
      */
-    public static String[] getFacetArray(Object... objects) {
+    public static List<String> getFacetArray(Object... objects) {
         List<String> valueList = new ArrayList<>();
         for (Object object : objects) {
             valueList.add(String.valueOf(object));
         }
-        return (String[]) valueList.toArray();
+        return valueList;
     }
 }
