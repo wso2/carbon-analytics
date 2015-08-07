@@ -18,29 +18,21 @@
 
 package org.wso2.carbon.analytics.spark.core.udf;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.naming.NamingException;
-
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.spark.core.SparkTestBase;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.internal.SparkAnalyticsExecutor;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 
+import java.util.List;
+
 /**
  * This class tests the default UDFs added to the spark SQL
  */
-public class DefaultUDFTest extends UDFTestBase {
+public class DefaultSparkTest extends SparkTestBase {
 
 	@Test
 	public void testStringConcatUDF() throws AnalyticsException {

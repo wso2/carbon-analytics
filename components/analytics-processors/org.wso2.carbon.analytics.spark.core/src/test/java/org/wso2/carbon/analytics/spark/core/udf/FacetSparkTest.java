@@ -18,17 +18,18 @@
 
 package org.wso2.carbon.analytics.spark.core.udf;
 
-import java.util.List;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.spark.core.SparkTestBase;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.internal.SparkAnalyticsExecutor;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 
-public class FacetUDFTest extends UDFTestBase {
+import java.util.List;
+
+public class FacetSparkTest extends SparkTestBase {
 
     /**
      * Tests the Facet UDFs

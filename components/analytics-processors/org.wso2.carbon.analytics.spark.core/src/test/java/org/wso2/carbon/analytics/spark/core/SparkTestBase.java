@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.analytics.spark.core.udf;
+package org.wso2.carbon.analytics.spark.core;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -41,7 +41,7 @@ import java.util.Map;
  * Custom UDFs supported by DAS
  */
 
-public abstract class UDFTestBase {
+public abstract class SparkTestBase {
 
     protected AnalyticsDataService service;
 
