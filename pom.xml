@@ -33,6 +33,7 @@
         <module>service-stubs</module>
         <module>components/analytics-dashboard</module>
         <module>components/data-bridge</module>
+        <module>components/analytics-data-agents</module>
         <module>components/event-stream</module>
         <module>components/application-deployer</module>
         <module>components/event-monitor</module>
@@ -42,6 +43,7 @@
         <module>features/event-stream</module>
         <module>features/data-bridge</module>
         <module>features/analytics-dashboard</module>
+        <module>features/analytics-data-agents</module>
         <module>features/application-deployer</module>
         <module>features/event-monitor</module>
         <module>features/event-receiver</module>
@@ -155,6 +157,11 @@
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.ndatasource.core</artifactId>
                 <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>wsdl4j.wso2</groupId>
+                <artifactId>wsdl4j</artifactId>
+                <version>${wsdl4j.wso2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
@@ -541,6 +548,11 @@
                 <artifactId>org.wso2.carbon.event.publisher.admin</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.commons</groupId>
+                <artifactId>org.wso2.carbon.ntask.core</artifactId>
+                <version>${carbon.commons.version}</version>
+            </dependency>
             <!--carbon analytics common dependencies stop-->
 
             <!-- spark commons dependencies start -->
@@ -905,6 +917,33 @@
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.common.jmx.agent.server.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.common.jmx.agent.ui.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.common.jmx.agent</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.common.jmx.agent.ui</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.common.jmx.agent.stub</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
 
             <!--carbon-deployment features start-->
             <!--<dependency>-->
@@ -1208,6 +1247,8 @@
         <javax.jsr.version>1.1.1</javax.jsr.version>
         <jersey.version>1.9</jersey.version>
         <!-- Spark dependency versions end-->
+
+        <wsdl4j.wso2.version>1.6.2.wso2v2</wsdl4j.wso2.version>
     </properties>
 
 </project>
