@@ -146,6 +146,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 //        this.redundantMasterCount = this.sparkConf.getInt(AnalyticsConstants.CARBON_SPARK_MASTER_COUNT, 1);
         this.sparkMaster = getStringFromSparkConf(AnalyticsConstants.CARBON_SPARK_MASTER, "local");
         this.redundantMasterCount = this.sparkConf.getInt(AnalyticsConstants.CARBON_SPARK_MASTER_COUNT, 2);
+
+        this.registerShorthandStrings();
     }
 
     /**
@@ -474,21 +476,21 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         conf.setIfMissing(AnalyticsConstants.SPARK_KRYOSERIALIZER_BUFFER_MAX, "256m");
 
         conf.setIfMissing("spark.blockManager.port", "12000");
-        conf.setIfMissing("spark.broadcast.port",  "12500");
-        conf.setIfMissing("spark.driver.port",  "13000");
-        conf.setIfMissing("spark.executor.port",  "13500");
-        conf.setIfMissing("spark.fileserver.port",  "14000");
-        conf.setIfMissing("spark.replClassServer.port",  "14500");
+        conf.setIfMissing("spark.broadcast.port", "12500");
+        conf.setIfMissing("spark.driver.port", "13000");
+        conf.setIfMissing("spark.executor.port", "13500");
+        conf.setIfMissing("spark.fileserver.port", "14000");
+        conf.setIfMissing("spark.replClassServer.port", "14500");
 
-        conf.setIfMissing(AnalyticsConstants.SPARK_MASTER_PORT,  "7077");
-        conf.setIfMissing("spark.master.rest.port",  "6066");
-        conf.setIfMissing(AnalyticsConstants.SPARK_MASTER_WEBUI_PORT,  "8081");
+        conf.setIfMissing(AnalyticsConstants.SPARK_MASTER_PORT, "7077");
+        conf.setIfMissing("spark.master.rest.port", "6066");
+        conf.setIfMissing(AnalyticsConstants.SPARK_MASTER_WEBUI_PORT, "8081");
 
-        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_CORES,  "1");
-        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_MEMORY,  "1g");
-        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_DIR,  "work");
-        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_PORT,  "11000");
-        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_WEBUI_PORT,  "11500");
+        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_CORES, "1");
+        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_MEMORY, "1g");
+        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_DIR, "work");
+        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_PORT, "11000");
+        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_WEBUI_PORT, "11500");
 
         conf.setIfMissing(AnalyticsConstants.SPARK_SCHEDULER_MODE, "FAIR");
         conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE, "CUSTOM");
@@ -612,10 +614,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 //                    carbonQuery = true;
 //                }
 
-                this.registerShorthandString(AnalyticsConstants.SPARK_SHORTHAND_STRING,
-                                             AnalyticsRelationProvider.class.getName());
-                this.registerShorthandString(AnalyticsConstants.SPARK_JDBC_SHORTHAND_STRING,
-                                             AnalyticsJDBCRelationProvider.class.getName());
                 result = replaceShorthandStrings(query);
 
                 int optStrStart = result.toLowerCase().indexOf(AnalyticsConstants.TERM_OPTIONS, m.end());
@@ -655,7 +653,14 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         return query;
     }
 
-    private void registerShorthandString(String shorthand, String className) {
+    private void registerShorthandStrings() {
+        this.addShorthandString(AnalyticsConstants.SPARK_SHORTHAND_STRING,
+                                AnalyticsRelationProvider.class.getName());
+        this.addShorthandString(AnalyticsConstants.SPARK_JDBC_SHORTHAND_STRING,
+                                AnalyticsJDBCRelationProvider.class.getName());
+    }
+
+    private void addShorthandString(String shorthand, String className) {
         try {
             Class.forName(className);
             this.shorthandStringsMap.put(shorthand, className);

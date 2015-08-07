@@ -26,7 +26,8 @@ import scala.util.Try
 /**
  * Util functions for JDBC tables.
  */
-private[sql] object JdbcUtils {
+@SerialVersionUID(105L)
+object JdbcUtils extends java.io.Serializable {
 
   /**
    * Establishes a JDBC connection.

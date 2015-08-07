@@ -32,7 +32,8 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils
 
 import scala.collection.mutable.ArrayBuffer
 
-object JDBCRelation {
+@SerialVersionUID(102L)
+object JDBCRelation extends java.io.Serializable {
   /**
    * Given a partitioning schematic (a column of integral type, a number of
    * partitions, and upper and lower bounds on the column's value), generate
@@ -85,7 +86,8 @@ object JDBCRelation {
   }
 }
 
-class AnalyticsJDBCRelationProvider extends RelationProvider {
+@SerialVersionUID(103L)
+class AnalyticsJDBCRelationProvider extends RelationProvider with java.io.Serializable {
   /** Returns a new base relation with the given parameters. */
   override def createRelation(
                                sqlContext: SQLContext,
@@ -125,6 +127,7 @@ class AnalyticsJDBCRelationProvider extends RelationProvider {
   }
 }
 
+@SerialVersionUID(104L)
 case class JDBCRelation(
                          dataSource: String,
                          tableName: String,
@@ -132,7 +135,8 @@ case class JDBCRelation(
                        (@transient val sqlContext: SQLContext)
   extends BaseRelation
           with PrunedFilteredScan
-          with InsertableRelation {
+          with InsertableRelation
+          with java.io.Serializable {
 
   override val needConversion: Boolean = false
 

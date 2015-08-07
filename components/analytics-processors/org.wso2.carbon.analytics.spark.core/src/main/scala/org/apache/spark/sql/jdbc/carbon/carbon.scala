@@ -29,7 +29,8 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils
 
 package object carbon {
 
-  object JDBCWriteDetails extends Logging {
+  @SerialVersionUID(101L)
+  object JDBCWriteDetails extends Logging with java.io.Serializable {
     /**
      * Returns a PreparedStatement that inserts a row into table via conn.
      */
@@ -60,7 +61,7 @@ package object carbon {
      *
      * This is not a closure inside saveTable() because apparently cosmetic
      * implementation changes elsewhere might easily render such a closure
-     * non-Serializable.  Instead, we explicitly close over all variables that
+     * non-java.io.Serializable.  Instead, we explicitly close over all variables that
      * are used.
      */
     def savePartition(
@@ -210,26 +211,6 @@ package object carbon {
       }
     }
 
-  }
-
-  class DriverWrapper(val wrapped: Driver) extends Driver {
-    override def acceptsURL(url: String): Boolean = wrapped.acceptsURL(url)
-
-    override def jdbcCompliant(): Boolean = wrapped.jdbcCompliant()
-
-    override def getPropertyInfo(url: String, info: Properties): Array[DriverPropertyInfo] = {
-      wrapped.getPropertyInfo(url, info)
-    }
-
-    override def getMinorVersion: Int = wrapped.getMinorVersion
-
-    def getParentLogger: java.util.logging.Logger =
-      throw new SQLFeatureNotSupportedException(
-        s"${this.getClass().getName}.getParentLogger is not yet implemented.")
-
-    override def connect(url: String, info: Properties): Connection = wrapped.connect(url, info)
-
-    override def getMajorVersion: Int = wrapped.getMajorVersion
   }
 
 }

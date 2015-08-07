@@ -30,8 +30,8 @@ import org.apache.spark.sql.types._
 import org.apache.spark.{Logging, Partition, SparkContext}
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils
 
-
-object JDBCRDDCarbonUtils extends Logging {
+@SerialVersionUID(100L)
+object JDBCRDDCarbonUtils extends Logging with java.io.Serializable{
 
   /**
    * Maps a JDBC type to a Catalyst type.  This function is called only when
