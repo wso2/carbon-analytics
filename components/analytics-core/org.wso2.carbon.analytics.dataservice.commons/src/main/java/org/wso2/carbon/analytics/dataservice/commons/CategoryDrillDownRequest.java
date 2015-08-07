@@ -22,7 +22,7 @@ import java.io.Serializable;
  * This class contains the details about category drilldown. This class is used  as an input to get
  * the subcategories of a facet field when using drillDownCategories API
  */
-public class CategoryDrillDownRequest implements Serializable{
+public class CategoryDrillDownRequest implements Serializable {
 
     private static final long serialVersionUID = 1303627415169817875L;
     private String tableName;
@@ -31,6 +31,8 @@ public class CategoryDrillDownRequest implements Serializable{
     private String query;
     private String scoreFunction;
 
+    public CategoryDrillDownRequest() { }
+    
     public String getTableName() {
         return tableName;
     }

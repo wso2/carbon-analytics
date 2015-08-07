@@ -31,6 +31,8 @@ public class CategorySearchResultEntry implements Comparable<CategorySearchResul
 
     private double score;
 
+    public CategorySearchResultEntry() { }
+    
     public CategorySearchResultEntry(String category, double score) {
         this.categoryValue = category;
         this.score = score;

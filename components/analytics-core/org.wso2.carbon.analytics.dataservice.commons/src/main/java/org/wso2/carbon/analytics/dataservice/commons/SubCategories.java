@@ -26,11 +26,12 @@ import java.util.List;
 
 public class SubCategories implements Serializable {
 
-
     private static final long serialVersionUID = -4760813079030890572L;
     private String[] path;
     private List<CategorySearchResultEntry> categories;
 
+    public SubCategories() { }
+    
     public SubCategories(String[] path,
                          List<CategorySearchResultEntry> categories) {
         this.path = path;

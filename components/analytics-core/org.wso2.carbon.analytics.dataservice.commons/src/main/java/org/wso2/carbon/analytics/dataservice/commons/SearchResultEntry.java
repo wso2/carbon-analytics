@@ -31,6 +31,8 @@ public class SearchResultEntry implements Comparable<SearchResultEntry>, Seriali
     
     private float score;
     
+    public SearchResultEntry() { }
+    
     public SearchResultEntry(String id, float score) {
         this.id = id;
         this.score = score;
