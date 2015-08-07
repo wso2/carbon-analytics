@@ -19,26 +19,20 @@
 package org.apache.spark.sql.jdbc.carbon
 
 import java.util.Properties
+import javax.sql.DataSource
 
 import org.apache.spark.Partition
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.expressions.Row
+import org.apache.spark.sql.jdbc.{JDBCPartition, JDBCPartitioningInfo}
 import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
+import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils
 
 import scala.collection.mutable.ArrayBuffer
 
-/**
- * Instructions on how to partition the table among workers.
- */
-private[sql] case class JDBCPartitioningInfo(
-                                              column: String,
-                                              lowerBound: Long,
-                                              upperBound: Long,
-                                              numPartitions: Int)
-
-private[sql] object JDBCRelation {
+object JDBCRelation {
   /**
    * Given a partitioning schematic (a column of integral type, a number of
    * partitions, and upper and lower bounds on the column's value), generate
@@ -91,7 +85,7 @@ private[sql] object JDBCRelation {
   }
 }
 
-private[sql] class DefaultSource extends RelationProvider {
+class DefaultSource extends RelationProvider {
   /** Returns a new base relation with the given parameters. */
   override def createRelation(
                                sqlContext: SQLContext,
@@ -131,40 +125,59 @@ private[sql] class DefaultSource extends RelationProvider {
   }
 }
 
-private[sql] case class JDBCRelation(
-                                      dataSource: String,
-                                      tableName: String,
-                                      parts: Array[Partition])
-                                    (@transient val sqlContext: SQLContext)
+case class JDBCRelation(
+                         dataSource: String,
+                         tableName: String,
+                         parts: Array[Partition])
+                       (@transient val sqlContext: SQLContext)
   extends BaseRelation
           with PrunedFilteredScan
           with InsertableRelation {
 
   override val needConversion: Boolean = false
 
-  override val schema: StructType = JDBCRDD.resolveTable(dataSource, tableName)
+  override val schema: StructType = JDBCRDDCarbonUtils.resolveTable(dataSource, tableName)
 
   override def buildScan(requiredColumns: Array[String], filters: Array[Filter]): RDD[Row] = {
-    val driver: String = DriverRegistry.getDriverClassName(url)
-    JDBCRDD.scanTable(
+    JDBCRDDCarbonUtils.scanTable(
       sqlContext.sparkContext,
       schema,
-      driver,
-      url,
-      properties,
-      table,
+      dataSource,
+      tableName,
       requiredColumns,
       filters,
       parts)
   }
 
   override def insert(data: DataFrame, overwrite: Boolean): Unit = {
-    data.write
-      .mode(if (overwrite) {
-      SaveMode.Overwrite
-    } else {
-      SaveMode.Append
-    })
-      .jdbc(url, table, properties)
+
+    val conn = GenericUtils.loadGlobalDataSource(dataSource).asInstanceOf[DataSource].getConnection
+
+    try {
+      var tableExists = JdbcUtils.tableExists(conn, tableName)
+
+      if (overwrite && tableExists) {
+        JdbcUtils.dropTable(conn, tableName)
+        tableExists = false
+      }
+
+      // Create the table if the table didn't exist.
+      if (!tableExists) {
+        val schema = JDBCWriteDetails.schemaString(data, conn.getMetaData.getURL)
+        val sql = s"CREATE TABLE $tableName ($schema)"
+        conn.prepareStatement(sql).executeUpdate()
+      }
+    } finally {
+      conn.close()
+    }
+
+    JDBCWriteDetails.saveTable(data, dataSource, tableName)
+    //    data.write
+    //      .mode(if (overwrite) {
+    //      SaveMode.Overwrite
+    //    } else {
+    //      SaveMode.Append
+    //    })
+    //      .jdbc(url, table, properties)
   }
 }

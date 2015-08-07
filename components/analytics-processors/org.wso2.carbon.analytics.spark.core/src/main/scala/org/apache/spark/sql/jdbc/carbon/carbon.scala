@@ -18,28 +18,32 @@
 
 package org.apache.spark.sql.jdbc
 
-import java.sql.{Connection, Driver, DriverManager, DriverPropertyInfo, PreparedStatement, SQLFeatureNotSupportedException}
+import java.sql.{Connection, Driver, DriverPropertyInfo, PreparedStatement, SQLFeatureNotSupportedException}
 import java.util.Properties
+import javax.sql.DataSource
 
 import org.apache.spark.Logging
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row}
-import org.apache.spark.util.Utils
-
-import scala.collection.mutable
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils
 
 package object carbon {
-  private[sql] object JDBCWriteDetails extends Logging {
+
+  object JDBCWriteDetails extends Logging {
     /**
      * Returns a PreparedStatement that inserts a row into table via conn.
      */
     def insertStatement(conn: Connection, table: String, rddSchema: StructType):
-        PreparedStatement = {
+    PreparedStatement = {
       val sql = new StringBuilder(s"INSERT INTO $table VALUES (")
       var fieldsLeft = rddSchema.fields.length
       while (fieldsLeft > 0) {
         sql.append("?")
-        if (fieldsLeft > 1) sql.append(", ") else sql.append(")")
+        if (fieldsLeft > 1) {
+          sql.append(", ")
+        } else {
+          sql.append(")")
+        }
         fieldsLeft = fieldsLeft - 1
       }
       conn.prepareStatement(sql.toString)
@@ -60,11 +64,11 @@ package object carbon {
      * are used.
      */
     def savePartition(
-        getConnection: () => Connection,
-        table: String,
-        iterator: Iterator[Row],
-        rddSchema: StructType,
-        nullTypes: Array[Int]): Iterator[Byte] = {
+                       getConnection: () => Connection,
+                       table: String,
+                       iterator: Iterator[Row],
+                       rddSchema: StructType,
+                       nullTypes: Array[Int]): Iterator[Byte] = {
       val conn = getConnection()
       var committed = false
       try {
@@ -92,9 +96,9 @@ package object carbon {
                   case TimestampType => stmt.setTimestamp(i + 1, row.getAs[java.sql.Timestamp](i))
                   case DateType => stmt.setDate(i + 1, row.getAs[java.sql.Date](i))
                   case DecimalType.Unlimited => stmt.setBigDecimal(i + 1,
-                      row.getAs[java.math.BigDecimal](i))
+                                                                   row.getAs[java.math.BigDecimal](i))
                   case _ => throw new IllegalArgumentException(
-                      s"Can't translate non-null value for field $i")
+                    s"Can't translate non-null value for field $i")
                 }
               }
               i = i + 1
@@ -135,67 +139,80 @@ package object carbon {
         val name = field.name
         val typ: String =
           dialect.getJDBCType(field.dataType).map(_.databaseTypeDefinition).getOrElse(
-          field.dataType match {
-            case IntegerType => "INTEGER"
-            case LongType => "BIGINT"
-            case DoubleType => "DOUBLE PRECISION"
-            case FloatType => "REAL"
-            case ShortType => "INTEGER"
-            case ByteType => "BYTE"
-            case BooleanType => "BIT(1)"
-            case StringType => "TEXT"
-            case BinaryType => "BLOB"
-            case TimestampType => "TIMESTAMP"
-            case DateType => "DATE"
-            case DecimalType.Unlimited => "DECIMAL(40,20)"
-            case _ => throw new IllegalArgumentException(s"Don't know how to save $field to JDBC")
-          })
-        val nullable = if (field.nullable) "" else "NOT NULL"
+            field.dataType match {
+              case IntegerType => "INTEGER"
+              case LongType => "BIGINT"
+              case DoubleType => "DOUBLE PRECISION"
+              case FloatType => "REAL"
+              case ShortType => "INTEGER"
+              case ByteType => "BYTE"
+              case BooleanType => "BIT(1)"
+              case StringType => "TEXT"
+              case BinaryType => "BLOB"
+              case TimestampType => "TIMESTAMP"
+              case DateType => "DATE"
+              case DecimalType.Unlimited => "DECIMAL(40,20)"
+              case _ => throw new IllegalArgumentException(s"Don't know how to save $field to JDBC")
+            })
+        val nullable = if (field.nullable) {
+          ""
+        } else {
+          "NOT NULL"
+        }
         sb.append(s", $name $typ $nullable")
-      }}
-      if (sb.length < 2) "" else sb.substring(2)
+      }
+      }
+      if (sb.length < 2) {
+        ""
+      } else {
+        sb.substring(2)
+      }
     }
 
     /**
      * Saves the RDD to the database in a single transaction.
      */
     def saveTable(
-        df: DataFrame,
-        url: String,
-        table: String,
-        properties: Properties = new Properties()) {
-      val dialect = JdbcDialects.get(url)
-      val nullTypes: Array[Int] = df.schema.fields.map { field =>
-        dialect.getJDBCType(field.dataType).map(_.jdbcNullType).getOrElse(
-          field.dataType match {
-            case IntegerType => java.sql.Types.INTEGER
-            case LongType => java.sql.Types.BIGINT
-            case DoubleType => java.sql.Types.DOUBLE
-            case FloatType => java.sql.Types.REAL
-            case ShortType => java.sql.Types.INTEGER
-            case ByteType => java.sql.Types.INTEGER
-            case BooleanType => java.sql.Types.BIT
-            case StringType => java.sql.Types.CLOB
-            case BinaryType => java.sql.Types.BLOB
-            case TimestampType => java.sql.Types.TIMESTAMP
-            case DateType => java.sql.Types.DATE
-            case DecimalType.Unlimited => java.sql.Types.DECIMAL
-            case _ => throw new IllegalArgumentException(
-              s"Can't translate null value for field $field")
-          })
-      }
-
+                   df: DataFrame,
+                   dataSource: String,
+                   tableName: String) {
       val rddSchema = df.schema
-      val driver: String = DriverRegistry.getDriverClassName(url)
-      val getConnection: () => Connection = JDBCRDD.getConnector(driver, url, properties)
-      df.foreachPartition { iterator =>
-        JDBCWriteDetails.savePartition(getConnection, table, iterator, rddSchema, nullTypes)
+      val getConnection: () => Connection = GenericUtils.loadGlobalDataSource(dataSource).
+        asInstanceOf[DataSource].getConnection
+
+      val conn = getConnection()
+      try {
+        val dialect = JdbcDialects.get(conn.getMetaData.getURL)
+        val nullTypes: Array[Int] = df.schema.fields.map { field =>
+          dialect.getJDBCType(field.dataType).map(_.jdbcNullType).getOrElse(
+            field.dataType match {
+              case IntegerType => java.sql.Types.INTEGER
+              case LongType => java.sql.Types.BIGINT
+              case DoubleType => java.sql.Types.DOUBLE
+              case FloatType => java.sql.Types.REAL
+              case ShortType => java.sql.Types.INTEGER
+              case ByteType => java.sql.Types.INTEGER
+              case BooleanType => java.sql.Types.BIT
+              case StringType => java.sql.Types.CLOB
+              case BinaryType => java.sql.Types.BLOB
+              case TimestampType => java.sql.Types.TIMESTAMP
+              case DateType => java.sql.Types.DATE
+              case DecimalType.Unlimited => java.sql.Types.DECIMAL
+              case _ => throw new IllegalArgumentException(
+                s"Can't translate null value for field $field")
+            })
+                                                         }
+        df.foreachPartition { iterator =>
+          JDBCWriteDetails.savePartition(getConnection, tableName, iterator, rddSchema, nullTypes)
+                            }
+      } finally {
+        conn.close()
       }
     }
 
   }
 
-  private [sql] class DriverWrapper(val wrapped: Driver) extends Driver {
+  class DriverWrapper(val wrapped: Driver) extends Driver {
     override def acceptsURL(url: String): Boolean = wrapped.acceptsURL(url)
 
     override def jdbcCompliant(): Boolean = wrapped.jdbcCompliant()
@@ -215,41 +232,4 @@ package object carbon {
     override def getMajorVersion: Int = wrapped.getMajorVersion
   }
 
-  /**
-   * java.sql.DriverManager is always loaded by bootstrap classloader,
-   * so it can't load JDBC drivers accessible by Spark ClassLoader.
-   *
-   * To solve the problem, drivers from user-supplied jars are wrapped
-   * into thin wrapper.
-   */
-  private [sql] object DriverRegistry extends Logging {
-
-    private val wrapperMap: mutable.Map[String, DriverWrapper] = mutable.Map.empty
-
-    def register(className: String): Unit = {
-      val cls = Utils.getContextOrSparkClassLoader.loadClass(className)
-      if (cls.getClassLoader == null) {
-        logTrace(s"$className has been loaded with bootstrap ClassLoader, wrapper is not required")
-      } else if (wrapperMap.get(className).isDefined) {
-        logTrace(s"Wrapper for $className already exists")
-      } else {
-        synchronized {
-          if (wrapperMap.get(className).isEmpty) {
-            val wrapper = new DriverWrapper(cls.newInstance().asInstanceOf[Driver])
-            DriverManager.registerDriver(wrapper)
-            wrapperMap(className) = wrapper
-            logTrace(s"Wrapper for $className registered")
-          }
-        }
-      }
-    }
-
-    def getDriverClassName(url: String): String = DriverManager.getDriver(url) match {
-      case wrapper: DriverWrapper => wrapper.wrapped.getClass.getCanonicalName
-      case driver => driver.getClass.getCanonicalName
-    }
-  }
-
 }
-
-// package object jdbc
