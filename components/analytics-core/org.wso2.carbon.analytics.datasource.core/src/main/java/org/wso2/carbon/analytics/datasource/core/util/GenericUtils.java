@@ -41,18 +41,20 @@ import org.wso2.carbon.ndatasource.core.utils.DataSourceUtils;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+
 import javax.xml.bind.JAXBContext;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -61,6 +63,7 @@ import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -112,11 +115,11 @@ public class GenericUtils {
 
     private static DataSourceRepository globalCustomRepo;
 
-//    private static ThreadLocal<Kryo> kryoTL = new ThreadLocal<Kryo>() {
-//        protected Kryo initialValue() {
-//            return new Kryo();
-//        };
-//    };
+    private static ThreadLocal<Kryo> kryoTL = new ThreadLocal<Kryo>() {
+        protected Kryo initialValue() {
+            return new Kryo();
+        }
+    };
 
     public static String getParentPath(String path) {
         if (path.equals("/")) {
@@ -401,28 +404,16 @@ public class GenericUtils {
     /* do not touch if you do not know what you're doing, critical for serialize/deserialize
      * implementation to be stable to retain backward compatibility */
     public static byte[] serializeObject(Object obj) {
-//        Kryo kryo = kryoTL.get();
-//        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-//        Output out = new Output(byteOut);
-//        try {
-//            kryo.writeClassAndObject(out, obj);
-//            out.flush();
-//            byte[] data = byteOut.toByteArray();
-//            ByteBuffer result = ByteBuffer.allocate(data.length + Integer.SIZE / 8);
-//            result.putInt(data.length);
-//            result.put(data);
-//            return result.array();
-//        } finally {
-//            out.close();
-//        }
-        try {
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-            objOut.writeObject(obj);
-            objOut.close();
-            return byteOut.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        Kryo kryo = kryoTL.get();
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        try (Output out = new Output(byteOut)) {
+            kryo.writeClassAndObject(out, obj);
+            out.flush();
+            byte[] data = byteOut.toByteArray();
+            ByteBuffer result = ByteBuffer.allocate(data.length + Integer.SIZE / 8);
+            result.putInt(data.length);
+            result.put(data);
+            return result.array();
         }
     }
 
@@ -437,20 +428,10 @@ public class GenericUtils {
         if (source == null) {
             return null;
         }
-//        /* skip the object size integer */
-//        Input input = new Input(Arrays.copyOfRange(source, Integer.SIZE / 8, source.length));
-//        try {
-//            Kryo kryo = kryoTL.get();
-//            return kryo.readClassAndObject(input);
-//        } finally {
-//            input.close();
-//        }
-        try {
-            ByteArrayInputStream byteIn = new ByteArrayInputStream(source);
-            ObjectInputStream objIn = new ObjectInputStream(byteIn);
-            return objIn.readObject();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        /* skip the object size integer */
+        try (Input input = new Input(Arrays.copyOfRange(source, Integer.SIZE / 8, source.length))) {
+            Kryo kryo = kryoTL.get();
+            return kryo.readClassAndObject(input);
         }
     }
 
@@ -459,27 +440,16 @@ public class GenericUtils {
         if (in == null) {
             return null;
         }
-//        if (in.available() == 0) {
-//            throw new EOFException();
-//        }
-//        DataInputStream dataIn = new DataInputStream(in);
-//        int size = dataIn.readInt();
-//        byte[] buff = new byte[size];
-//        dataIn.readFully(buff);
-//        Input input = new Input(buff);
-//        Kryo kryo = kryoTL.get();
-//        try {
-//            return kryo.readClassAndObject(input);
-//        } finally {
-//            input.close();
-//        }
-        try {
-            ObjectInputStream objIn = new ObjectInputStream(in);
-            return objIn.readObject();
-        } catch (EOFException ex){
-           throw ex;
-        }catch (Exception e) {
-            throw new RuntimeException(e);
+        if (in.available() == 0) {
+            throw new EOFException();
+        }
+        DataInputStream dataIn = new DataInputStream(in);
+        int size = dataIn.readInt();
+        byte[] buff = new byte[size];
+        dataIn.readFully(buff);
+        Kryo kryo = kryoTL.get();
+        try (Input input = new Input(buff)) {
+            return kryo.readClassAndObject(input);
         }
     }
 

@@ -18,9 +18,9 @@
  */
 package org.wso2.carbon.analytics.dataservice.commons;
 
-import java.io.Serializable;
-
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+
+import java.io.Serializable;
 
 /**
  * This class represents an analytics data service response.
@@ -30,20 +30,23 @@ public class AnalyticsDataResponse implements Serializable {
     private static final long serialVersionUID = 7912542783175151940L;
 
     private String recordStoreName;
-    
+
     private RecordGroup[] recordGroups;
+
+    public AnalyticsDataResponse() {
+    }
 
     public AnalyticsDataResponse(String recordStoreName, RecordGroup[] recordGroups) {
         this.recordStoreName = recordStoreName;
         this.recordGroups = recordGroups;
     }
-    
+
     public String getRecordStoreName() {
         return recordStoreName;
     }
-    
+
     public RecordGroup[] getRecordGroups() {
         return recordGroups;
     }
-    
+
 }
