@@ -30,6 +30,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.deploy.master.LeaderElectable;
 import org.apache.spark.deploy.master.Master;
 import org.apache.spark.deploy.worker.Worker;
+import org.apache.spark.serializer.KryoSerializer;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
@@ -42,6 +43,7 @@ import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.AnalyticsRecoveryModeFactory;
 import org.wso2.carbon.analytics.spark.core.deploy.CheckElectedLeaderExecutionCall;
 import org.wso2.carbon.analytics.spark.core.deploy.ElectLeaderExecutionCall;
 import org.wso2.carbon.analytics.spark.core.deploy.InitClientExecutionCall;
@@ -460,6 +462,39 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private void setAdditionalConfigs(SparkConf conf) {
         //executor constants for spark env
         conf.setIfMissing(AnalyticsConstants.SPARK_APP_NAME, DEFAULT_SPARK_APP_NAME);
+        conf.setIfMissing(AnalyticsConstants.SPARK_DRIVER_CORES, "1");
+        conf.setIfMissing(AnalyticsConstants.SPARK_DRIVER_MEMORY, "512m");
+        conf.setIfMissing(AnalyticsConstants.SPARK_EXECUTOR_MEMORY, "512m");
+
+        conf.setIfMissing(AnalyticsConstants.SPARK_UI_PORT, "4040");
+        conf.setIfMissing(AnalyticsConstants.SPARK_HISTORY_OPTS, "18080");
+
+        conf.setIfMissing(AnalyticsConstants.SPARK_SERIALIZER, KryoSerializer.class.getName());
+        conf.setIfMissing(AnalyticsConstants.SPARK_KRYOSERIALIZER_BUFFER, "256k");
+        conf.setIfMissing(AnalyticsConstants.SPARK_KRYOSERIALIZER_BUFFER_MAX, "256m");
+
+        conf.setIfMissing("spark.blockManager.port", "12000");
+        conf.setIfMissing("spark.broadcast.port",  "12500");
+        conf.setIfMissing("spark.driver.port",  "13000");
+        conf.setIfMissing("spark.executor.port",  "13500");
+        conf.setIfMissing("spark.fileserver.port",  "14000");
+        conf.setIfMissing("spark.replClassServer.port",  "14500");
+
+        conf.setIfMissing(AnalyticsConstants.SPARK_MASTER_PORT,  "7077");
+        conf.setIfMissing("spark.master.rest.port",  "6066");
+        conf.setIfMissing(AnalyticsConstants.SPARK_MASTER_WEBUI_PORT,  "8081");
+
+        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_CORES,  "1");
+        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_MEMORY,  "1g");
+        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_DIR,  "work");
+        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_PORT,  "11000");
+        conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_WEBUI_PORT,  "11500");
+
+        conf.setIfMissing(AnalyticsConstants.SPARK_SCHEDULER_MODE, "FAIR");
+        conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE, "CUSTOM");
+        conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE_FACTORY,
+                          AnalyticsRecoveryModeFactory.class.getName());
+
         if (GenericUtils.isCarbonServer()) {
             conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
             conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());

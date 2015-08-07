@@ -57,24 +57,24 @@ public class AnalyticsConstants {
     public static final String FACET_TYPE = "facet";
 
     public static final String TERM_TABLE = "table";
-    public static final String TERM_DEFINE = "define";
-    public static final String TERM_INSERT = "insert";
-    public static final String TERM_INTO = "into";
-    public static final String TERM_PRIMARY = "primary";
-    public static final String TERM_KEY = "key";
-    public static final String TERM_AS = "as";
-    public static final String TERM_FROM = "from";
-    public static final String TERM_JOIN = "join";
+//    public static final String TERM_DEFINE = "define";
+//    public static final String TERM_INSERT = "insert";
+//    public static final String TERM_INTO = "into";
+//    public static final String TERM_PRIMARY = "primary";
+//    public static final String TERM_KEY = "key";
+//    public static final String TERM_AS = "as";
+//    public static final String TERM_FROM = "from";
+//    public static final String TERM_JOIN = "join";
     public static final String TERM_CREATE = "create";
     public static final String TERM_TEMPORARY = "temporary";
-    public static final String TERM_USING = "using";
+//    public static final String TERM_USING = "using";
     public static final String TERM_OPTIONS = "options";
 
-    public static final String TABLE_INFO_TABLE_NAME = "__TABLE_INFO__";
-    public static final int TABLE_INFO_TENANT_ID = -1000;
-    public static final String OBJECT = "OBJECT";
-    public static final String DEFAULT_CHARSET = "UTF8";
-    public static final String SCRIPT_DEPLOYMENT_DIR = "spark-scripts";
+//    public static final String TABLE_INFO_TABLE_NAME = "__TABLE_INFO__";
+//    public static final int TABLE_INFO_TENANT_ID = -1000;
+//    public static final String OBJECT = "OBJECT";
+//    public static final String DEFAULT_CHARSET = "UTF8";
+//    public static final String SCRIPT_DEPLOYMENT_DIR = "spark-scripts";
     public static final String SPARK_DEFAULTS_FILE = "spark-defaults.conf";
     public static final int SPARK_DEFAULT_PARTITION_COUNT = 6;
 
@@ -86,52 +86,46 @@ public class AnalyticsConstants {
     public static final String PRIMARY_KEYS = "primaryKeys";
     public static final String RECORD_STORE = "recordStore";
     public static final String TIMESTAMP_FIELD = "_timestamp";
-    public static final String DEFAULT_EVENT_STORE_NAME = "EVENT_STORE";
+//    public static final String DEFAULT_EVENT_STORE_NAME = "EVENT_STORE";
     public static final String DEFAULT_PROCESSED_DATA_STORE_NAME = "PROCESSED_DATA_STORE";
     public static final String SPARK_SHORTHAND_STRING = "CarbonAnalytics";
     public static final String SPARK_JDBC_SHORTHAND_STRING = "CarbonJDBC";
-    public static final String CARBON_STRING = "carbon";
+//    public static final String CARBON_STRING = "carbon";
     public static final String TENANT_ID_AND_TABLES_MAP = "tenantIdTablesMap";
     public static final int MAX_RECORDS = 1000;
-
-    //EventStream relation constants
-    public static final String VERSION = "version";
-    public static final String DESCRIPTION = "description";
-    public static final String NICKNAME = "nickname";
-    public static final String PAYLOAD = "payload";
 
     //Carbon Spark properties strings
     public static final String CARBON_SPARK_MASTER_COUNT = "carbon.spark.master.count";
     public static final String CARBON_SPARK_MASTER = "carbon.spark.master";
 
-    public static final String CARBON_TENANT_ID = "carbon.tenant.id";
+//    public static final String CARBON_TENANT_ID = "carbon.tenant.id";
     public static final int SPARK_PERSISTENCE_TENANT_ID = -5000;
     public static final String SPARK_MASTER_MAP = "__SPARK_MASTER_MAP__";
 
     //Spark default properties strings
-    public static final String SPARK_MASTER_IP = "spark.master.ip";
+//    public static final String SPARK_MASTER_IP = "spark.master.ip";
     public static final String SPARK_MASTER_PORT = "spark.master.port";
     public static final String SPARK_MASTER_WEBUI_PORT = "spark.master.webui.port";
-    public static final String SPARK_MASTER_OPTS = "spark.master.opts";
+//    public static final String SPARK_MASTER_OPTS = "spark.master.opts";
     public static final String SPARK_WORKER_CORES = "spark.worker.cores";
     public static final String SPARK_WORKER_MEMORY = "spark.worker.memory";
     public static final String SPARK_WORKER_PORT = "spark.worker.port";
     public static final String SPARK_WORKER_WEBUI_PORT = "spark.worker.webui.port";
-    public static final String SPARK_WORKER_INSTANCES = "spark.worker.instances";
+//    public static final String SPARK_WORKER_INSTANCES = "spark.worker.instances";
     public static final String SPARK_WORKER_DIR = "spark.worker.dir";
-    public static final String SPARK_WORKER_OPTS = "spark.worker.opts";
+//    public static final String SPARK_WORKER_OPTS = "spark.worker.opts";
     public static final String SPARK_HISTORY_OPTS = "spark.history.opts";
-    public static final String SPARK_DAEMON_JAVA_OPTS = "spark.daemon.java.opts";
-    public static final String SPARK_PUBLIC_DNS = "spark.public.dns";
+//    public static final String SPARK_DAEMON_JAVA_OPTS = "spark.daemon.java.opts";
+//    public static final String SPARK_PUBLIC_DNS = "spark.public.dns";
 
     public static final String SPARK_APP_NAME = "spark.app.name";
     public static final String SPARK_DRIVER_CORES = "spark.driver.cores";
-    public static final String SPARK_DRIVER_MAXRESULTSIZE = "spark.driver.maxResultSize";
+//    public static final String SPARK_DRIVER_MAXRESULTSIZE = "spark.driver.maxResultSize";
     public static final String SPARK_DRIVER_MEMORY = "spark.driver.memory";
     public static final String SPARK_EXECUTOR_MEMORY = "spark.executor.memory";
-    public static final String SPARK_EXTRALISTENERS = "spark.extraListeners";
-    public static final String SPARK_LOCAL_DIR = "spark.local.dir";
-    public static final String SPARK_LOGCONF = "spark.logConf";
+//    public static final String SPARK_EXTRALISTENERS = "spark.extraListeners";
+//    public static final String SPARK_LOCAL_DIR = "spark.local.dir";
+//    public static final String SPARK_LOGCONF = "spark.logConf";
     public static final String SPARK_MASTER = "spark.master";
 
     public static final String SPARK_SCHEDULER_MODE = "spark.scheduler.mode";
@@ -146,11 +140,11 @@ public class AnalyticsConstants {
 
     public static final String SPARK_RECOVERY_MODE_FACTORY = "spark.deploy.recoveryMode.factory";
 
-    public static final String SPARK_DRIVER_EXTRACLASSPATH = "spark.driver.extraClassPath";
-    public static final String SPARK_DRIVER_EXTRAJAVAOPTIONS = "spark.driver.extraJavaOptions";
-    public static final String SPARK_EXECUTOR_EXTRACLASSPATH = "spark.executor.extraClassPath";
-    public static final String SPARK_EXECUTOR_EXTRAJAVAOPTIONS = "spark.executor.extraJavaOptions";
-    public static final String SPARK_EXECUTOR_EXTRALIBRARYPATH = "spark.executor.extraLibraryPath";
+//    public static final String SPARK_DRIVER_EXTRACLASSPATH = "spark.driver.extraClassPath";
+//    public static final String SPARK_DRIVER_EXTRAJAVAOPTIONS = "spark.driver.extraJavaOptions";
+//    public static final String SPARK_EXECUTOR_EXTRACLASSPATH = "spark.executor.extraClassPath";
+//    public static final String SPARK_EXECUTOR_EXTRAJAVAOPTIONS = "spark.executor.extraJavaOptions";
+//    public static final String SPARK_EXECUTOR_EXTRALIBRARYPATH = "spark.executor.extraLibraryPath";
 
     //Extra constants available for Spark
 /*  public static final String SPARK_DRIVER_EXTRALIBRARYPATH = "spark.driver.extraLibraryPath";
