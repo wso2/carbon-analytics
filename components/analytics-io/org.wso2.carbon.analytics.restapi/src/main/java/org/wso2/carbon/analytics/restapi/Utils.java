@@ -325,7 +325,7 @@ public class Utils {
                 path = new String[]{};
             }
             categoryPaths.put(drillDownPathBean.getFieldName(),
-                              Arrays.asList(path));
+                              new ArrayList<String>(Arrays.asList(path)));
         }
         return categoryPaths;
     }
