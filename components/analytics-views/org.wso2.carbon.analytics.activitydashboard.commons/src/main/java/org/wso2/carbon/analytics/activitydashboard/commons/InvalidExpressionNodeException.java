@@ -22,6 +22,8 @@ package org.wso2.carbon.analytics.activitydashboard.commons;
  */
 public class InvalidExpressionNodeException extends Exception {
 
+    private static final long serialVersionUID = -54297375848975183L;
+
     public InvalidExpressionNodeException(String message) {
         super(message);
     }

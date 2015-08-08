@@ -34,11 +34,10 @@ import org.wso2.carbon.analytics.activitydashboard.stub.bean.ActivitySearchReque
 import org.wso2.carbon.analytics.activitydashboard.stub.bean.RecordBean;
 import org.wso2.carbon.analytics.activitydashboard.stub.bean.RecordId;
 import org.wso2.carbon.analytics.activitydashboard.commons.SearchExpressionTree;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import javax.activation.DataHandler;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+
 import java.rmi.RemoteException;
 
 /**
@@ -95,31 +94,7 @@ public class ActivityDashboardClient {
     }
 
     private byte[] serializeObject(Object obj) throws ActivityDashboardAdminServiceActivityDashboardExceptionException {
-        ByteArrayOutputStream byteOut = null;
-        ObjectOutputStream objOut = null;
-        try {
-            byteOut = new ByteArrayOutputStream();
-            objOut = new ObjectOutputStream(byteOut);
-            objOut.writeObject(obj);
-            return byteOut.toByteArray();
-        } catch (IOException e) {
-            String msg = "Error while serializing the search request! ";
-            logger.error(msg, e);
-            throw getActivityException(msg, e);
-        } finally {
-            if (objOut != null) {
-                try {
-                    objOut.close();
-                } catch (IOException ignored) {
-                }
-            }
-            if (byteOut != null) {
-                try {
-                    byteOut.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
+        return GenericUtils.serializeObject(obj);
     }
 
     public String[] getAllTables()

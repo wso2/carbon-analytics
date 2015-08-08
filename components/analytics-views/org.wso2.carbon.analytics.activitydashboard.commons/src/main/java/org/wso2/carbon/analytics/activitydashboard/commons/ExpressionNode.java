@@ -23,6 +23,9 @@ import java.io.Serializable;
  * This class represents the node in the search tree expressions.
  */
 public abstract class ExpressionNode implements Serializable {
+
+    private static final long serialVersionUID = -8570752546981747287L;
+    
     private String id;
     private ExpressionNode leftExpression;
     private ExpressionNode rightExpression;
@@ -31,6 +34,8 @@ public abstract class ExpressionNode implements Serializable {
     static final String LEFT_EXPRESSION_NODE_ID = "1";
     static final String RIGHT_EXPRESSION_NODE_ID = "2";
 
+    public ExpressionNode() { }
+    
     public ExpressionNode(String id) throws InvalidExpressionNodeException {
         if (validateID(id)) {
             this.id = id.trim();

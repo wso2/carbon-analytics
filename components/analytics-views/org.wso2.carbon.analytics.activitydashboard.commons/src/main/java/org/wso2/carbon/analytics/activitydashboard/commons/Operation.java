@@ -23,8 +23,13 @@ import java.io.Serializable;
  * This class represents the Operation of an search expression.
  */
 public class Operation extends ExpressionNode implements Serializable {
+
+    private static final long serialVersionUID = -1120171493752423626L;
+    
     private Operator operator;
 
+    public Operation() { }
+    
     public Operation(String id, Operator operator, ExpressionNode leftExpression,
                      ExpressionNode rightExpression) throws InvalidExpressionNodeException {
         super(id);

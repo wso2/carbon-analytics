@@ -26,7 +26,11 @@ import java.util.TreeSet;
  */
 public class SearchExpressionTree implements Serializable {
 
+    private static final long serialVersionUID = -5717170446779888253L;
+    
     private ExpressionNode root;
+    
+    public SearchExpressionTree() { }
 
     public void setRoot(ExpressionNode root) {
         this.root = root;

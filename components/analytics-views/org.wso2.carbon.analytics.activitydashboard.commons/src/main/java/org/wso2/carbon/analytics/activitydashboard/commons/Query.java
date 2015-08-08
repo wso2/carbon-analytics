@@ -23,9 +23,14 @@ import java.io.Serializable;
  * This is the implementation of Query final expression given at the search tree.
  */
 public class Query extends ExpressionNode implements Serializable {
+    
+    private static final long serialVersionUID = -8838167296783655458L;
+    
     private String queryString;
     private String tableName;
 
+    public Query() { }
+    
     public Query(String id, String tableName, String queryString) throws InvalidExpressionNodeException {
         super(id);
         this.queryString = queryString;
