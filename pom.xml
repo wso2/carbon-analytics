@@ -86,7 +86,7 @@
                 <version>${orbit.version.axiom}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.lmax</groupId>
+                <groupId>org.wso2.orbit.com.lmax</groupId>
                 <artifactId>disruptor</artifactId>
                 <version>${disruptor.orbit.version}</version>
             </dependency>
@@ -1180,8 +1180,8 @@
         <geronimo-jms.version>1.1.1</geronimo-jms.version>
         <hector.wso2.version>1.1.4.wso2v1</hector.wso2.version>
         <junit.version>4.10</junit.version>
-        <disruptor.version>3.3.0</disruptor.version>
-        <disruptor.orbit.version>${disruptor.version}.wso2v1</disruptor.orbit.version>
+        <disruptor.version.range>[2.10.0,3.4)</disruptor.version.range>
+        <disruptor.orbit.version>3.3.2.wso2v2</disruptor.orbit.version>
         <kafka.version>0.8.1</kafka.version>
         <org.eclipse.paho.version>0.4.0</org.eclipse.paho.version>
         <org.glassfish.tyrus.wso2.version>1.7-wso2v1</org.glassfish.tyrus.wso2.version>
