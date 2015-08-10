@@ -43,6 +43,12 @@ public class DistributedConfiguration implements Serializable {
 
     private String distributedUIUrl;
 
+    /**
+     * Status monitor configs
+     */
+    private int lockTimeout = 60;   //Lock timeout in seconds.
+    private int updateRate = 60000; //Rate in milliseconds at which the hazelcast map will be updated by each worker.
+
 
     public int getHeartbeatInterval() {
         return heartbeatInterval;
@@ -138,5 +144,21 @@ public class DistributedConfiguration implements Serializable {
 
     public void setDistributedUIUrl(String distributedUIUrl) {
         this.distributedUIUrl = distributedUIUrl;
+    }
+
+    public int getLockTimeout() {
+        return lockTimeout;
+    }
+
+    public void setLockTimeout(int lockTimeout) {
+        this.lockTimeout = lockTimeout;
+    }
+
+    public int getUpdateRate() {
+        return updateRate;
+    }
+
+    public void setUpdateRate(int updateRate) {
+        this.updateRate = updateRate;
     }
 }

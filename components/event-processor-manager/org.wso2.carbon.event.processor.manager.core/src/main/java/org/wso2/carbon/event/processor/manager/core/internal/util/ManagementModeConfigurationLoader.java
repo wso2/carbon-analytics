@@ -264,6 +264,28 @@ public class ManagementModeConfigurationLoader {
         OMElement jar = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_JAR_ELEMENT));
         stormDeploymentConfig.setJar(jar.getText());
 
+        //Reading Status Monitor Info
+        OMElement statusMonitor = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STATUS_MONITOR_ELEMENT));
+        if(statusMonitor != null){
+            OMElement lockTimeoutElement = statusMonitor.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STATUS_MONITOR_LOCK_TIMEOUT));
+            if(lockTimeoutElement != null){
+                int lockTimeout = Integer.parseInt(lockTimeoutElement.getText());
+                stormDeploymentConfig.setLockTimeout(lockTimeout);
+            } else {
+                log.info("No lockTimeout value specified in Status Monitor configurations. Hence using default lockTimeout value");
+            }
+            OMElement updateRateElement = statusMonitor.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STATUS_MONITOR_UPDATE_RATE));
+            if(updateRateElement != null){
+                int updateRate =  Integer.parseInt(updateRateElement.getText());
+                stormDeploymentConfig.setUpdateRate(updateRate);
+            } else {
+                log.info("No updateRate value specified in Status Monitor configurations. Hence using default updateRate value");
+            }
+        } else {
+            log.info("No Status Monitor configurations provided. Hence using default Status Monitor configurations");
+        }
+
+
         return stormDeploymentConfig;
     }
 
