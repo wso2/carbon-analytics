@@ -18,6 +18,7 @@
 package org.wso2.carbon.databridge.agent.client;
 
 import org.apache.commons.pool.BaseKeyedPoolableObjectFactory;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointSecurityException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.util.DataPublisherUtil;
@@ -31,7 +32,7 @@ public abstract class AbstractClientPoolFactory extends BaseKeyedPoolableObjectF
 
     @Override
     public Object makeObject(Object key)
-            throws DataEndpointException, DataEndpointSecurityException {
+            throws DataEndpointException, DataEndpointSecurityException, DataEndpointAgentConfigurationException {
        Object[] urlParams = DataPublisherUtil.getProtocolHostPort(key.toString());
         return createClient(urlParams[0].toString(),urlParams[1].toString(), Integer.parseInt(urlParams[2].toString()));
     }
@@ -48,7 +49,7 @@ public abstract class AbstractClientPoolFactory extends BaseKeyedPoolableObjectF
      * @throws DataEndpointSecurityException
      */
     public abstract Object createClient(String protocol, String hostName, int port)
-            throws DataEndpointException, DataEndpointSecurityException;
+            throws DataEndpointException, DataEndpointSecurityException, DataEndpointAgentConfigurationException;
 
     @Override
     public boolean validateObject(Object key, Object obj) {
