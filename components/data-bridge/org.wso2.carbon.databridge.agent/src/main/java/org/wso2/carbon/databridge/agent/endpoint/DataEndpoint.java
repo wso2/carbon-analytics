@@ -80,7 +80,7 @@ public abstract class DataEndpoint {
                 if (currentNoOfThreads >= this.maxPoolSize - 1) {
                     this.setState(State.BUSY);
                 } else {
-                    this.setState(State.ACTIVE);
+                    this.setState(State.BUSY);
                 }
                 threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
                 events = new ArrayList<>();
