@@ -33,7 +33,7 @@
             <artifactId>org.wso2.carbon.utils</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.lmax</groupId>
+            <groupId>org.wso2.orbit.com.lmax</groupId>
             <artifactId>disruptor</artifactId>
         </dependency>
         <dependency>
@@ -70,14 +70,14 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-                            org.wso2.carbon.event.processor.manager.commons.*,
+                            org.wso2.carbon.event.processor.manager.commons.*
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
                             org.apache.axis2,
-                            org.wso2.lmax.disruptor.*; version=${disruptor.version},
-                            *;resolution:=optional,
+                            com.lmax.disruptor.*;version="${disruptor.version.range}",
+                            *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

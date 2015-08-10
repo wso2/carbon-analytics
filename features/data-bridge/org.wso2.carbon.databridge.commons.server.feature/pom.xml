@@ -39,10 +39,6 @@
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.commons</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-        </dependency>
     </dependencies>
 
 	<build>
@@ -70,7 +66,6 @@
                             <bundles>
                                 <bundleDef>org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons:${carbon.analytics.common.version}</bundleDef>
                                 <bundleDef>org.json.wso2:json</bundleDef>
-                                <bundleDef>com.google.code.gson:gson</bundleDef>
                             </bundles>
 							<importFeatures>
 							    <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
