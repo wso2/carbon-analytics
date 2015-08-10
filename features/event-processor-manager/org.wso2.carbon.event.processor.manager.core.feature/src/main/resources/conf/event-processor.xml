@@ -67,6 +67,10 @@
             <reconnectionInterval>20000</reconnectionInterval>
             <heartbeatInterval>5000</heartbeatInterval>
             <topologyResubmitInterval>10000</topologyResubmitInterval>
+	    <!--Must be a power of two-->
+	    <cepReceiverOutputQueueSize>8192</cepReceiverOutputQueueSize>
+	    <!--Must be a power of two-->
+            <stormPublisherOutputQueueSize>8192</stormPublisherOutputQueueSize>
         </management>
 
         <transport>
