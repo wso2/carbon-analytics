@@ -102,19 +102,24 @@
 	</script>
 
 	<script type="text/javascript">
-
-		var ENABLE = "enable";
-		var DISABLE = "disable";
-		var STAT = "statistics";
-		var TRACE = "Tracing";
-
 		function doDelete(eventStreamName, eventStreamVersion) {
-			CARBON.showConfirmationDialog(
-					"If event stream is deleted then other artifacts using this stream will go into inactive state! Are you sure want to delete?", function () {
-						var theform = document.getElementById('deleteForm');
-						theform.eventStream.value = eventStreamName;
-						theform.eventStreamVersion.value = eventStreamVersion;
-						theform.submit();
+
+			CARBON.showConfirmationDialog("If event stream is deleted then other artifacts using this stream will go into inactive state! Are you sure want to delete?",
+					function () {
+						new Ajax.Request('../eventstream/delete_event_stream_ajaxprocessor.jsp', {
+							method: 'POST',
+							asynchronous: false,
+							parameters: {
+								eventStreamName: eventStreamName,
+								eventStreamVersion: eventStreamVersion,
+							}, onSuccess: function (msg) {
+								if ("success" == msg.responseText.trim()) {
+									window.location.href = "../eventstream/index.jsp?region=region1&item=eventstream_menu.jsp";
+								} else {
+									CARBON.showErrorDialog("Failed to delete event stream, Exception: " + msg.responseText.trim());
+								}
+							}
+						})
 					}, null, null);
 		}
 
@@ -572,6 +577,13 @@
 
 				</table>
 
+			</form>
+		</div>
+		<div>
+			<br/>
+			<form id="deleteForm" name="input" action="" method="post">
+				<input type="HIDDEN" name="eventStream" value=""/>
+				<input type="HIDDEN" name="eventStreamVersion" value=""/>
 			</form>
 		</div>
 	</div>
