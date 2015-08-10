@@ -18,8 +18,9 @@
 package org.wso2.carbon.databridge.agent.test.thrift;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 import org.apache.log4j.Logger;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -37,7 +38,7 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import java.net.SocketException;
 
 
-public class OneEndPointDPThriftTest extends TestCase {
+public class OneEndPointDPThriftTest {
     Logger log = Logger.getLogger(OneEndPointDPThriftTest.class);
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
@@ -63,16 +64,21 @@ public class OneEndPointDPThriftTest extends TestCase {
             "}";
 
 
+    @BeforeClass
+    public static void init() {
+        DataPublisherTestUtil.setKeyStoreParams();
+        DataPublisherTestUtil.setTrustStoreParams();
+    }
+
     private synchronized void startServer(int port) throws DataBridgeException,
             StreamDefinitionStoreException, MalformedStreamDefinitionException {
         thriftTestServer = new ThriftTestServer();
         thriftTestServer.start(port);
         thriftTestServer.addStreamDefinition(STREAM_DEFN, -1234);
 
-        DataPublisherTestUtil.setKeyStoreParams();
-        DataPublisherTestUtil.setTrustStoreParams();
     }
 
+    @Test
     public void testOneDataEndpoint() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
         startServer(7611);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
@@ -101,6 +107,7 @@ public class OneEndPointDPThriftTest extends TestCase {
     }
 
 
+    @Test
     public void testTwoDataEndpoint() throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException, TransportException,
             DataEndpointException, DataEndpointConfigurationException,
@@ -130,6 +137,7 @@ public class OneEndPointDPThriftTest extends TestCase {
         thriftTestServer.stop();
     }
 
+    @Test
     public void testInvalidAuthenticationURLs() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
         boolean expected = false;
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
@@ -144,6 +152,7 @@ public class OneEndPointDPThriftTest extends TestCase {
         Assert.assertTrue("Invalid urls passed for receiver and auth, and hence expected to fail", expected);
     }
 
+    @Test
     public void testInvalidReceiverURLs() throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException, TransportException,
             DataEndpointException, DataEndpointConfigurationException,
@@ -162,6 +171,7 @@ public class OneEndPointDPThriftTest extends TestCase {
         Assert.assertTrue("Invalid urls passed for receiver and auth, and hence expected to fail", expected);
     }
 
+    @Test
     public void testShutdownDataPublisher() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
         startServer(10161);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());

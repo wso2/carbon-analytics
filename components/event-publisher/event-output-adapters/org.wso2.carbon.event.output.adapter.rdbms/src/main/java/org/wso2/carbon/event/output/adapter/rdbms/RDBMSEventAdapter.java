@@ -1,21 +1,19 @@
 /*
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- *   Copyright (c) 2014-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- *   WSO2 Inc. licenses this file to you under the Apache License,
- *   Version 2.0 (the "License"); you may not use this file except
- *   in compliance with the License.
- *   You may obtain a copy of the License at
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an
- *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *  KIND, either express or implied.  See the License for the
- *  specific language governing permissions and limitations
- *  under the License.
- * /
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.event.output.adapter.rdbms;
@@ -37,17 +35,8 @@ import org.wso2.carbon.ndatasource.common.DataSourceException;
 import org.wso2.carbon.ndatasource.core.CarbonDataSource;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.sql.*;
+import java.util.*;
 
 /**
  * Class will Insert or Update/Insert values to selected RDBMS
@@ -64,7 +53,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
     private float count;
 
     public RDBMSEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
-            Map<String, String> globalProperties) {
+                             Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
         this.count = 0;
@@ -91,7 +80,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
                 dataSource = (DataSource) carbonDataSource.getDSObject();
                 con = dataSource.getConnection();
             } else {
-                throw new OutputEventAdapterRuntimeException("There is no any datasource found named "
+                throw new OutputEventAdapterRuntimeException("There is no datasource found by the name "
                         + RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_DATASOURCE_NAME + " to connect.");
             }
         } catch (Exception e) {
@@ -113,7 +102,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
             dataSource = (DataSource) carbonDataSource.getDSObject();
             con = ((DataSource) carbonDataSource.getDSObject()).getConnection();
         } catch (DataSourceException e) {
-            log.error("There is no any data-source found called : " + eventAdapterConfiguration.getStaticProperties()
+            log.error("No data-source found by the name: " + eventAdapterConfiguration.getStaticProperties()
                     .get(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_DATASOURCE_NAME), e);
             throw new ConnectionUnavailableException(e.getMessage(), e);
         } catch (SQLException e) {
@@ -156,7 +145,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
      * Construct all the queries and assign to executionInfo instance
      */
     private void initializeDatabaseExecutionInfo(String tableName, String executionMode, String updateColumnKeys,
-            Object message) {
+                                                 Object message) {
 
         if (resourceBundle.getString(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_EXECUTION_MODE_UPDATE)
                 .equalsIgnoreCase(executionMode)) {
@@ -360,24 +349,24 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
                 Object value = map.get(attribute.getName());
                 if (value != null) {
                     switch (attribute.getType()) {
-                    case INT:
-                        stmt.setInt(i + 1, (Integer) value);
-                        break;
-                    case LONG:
-                        stmt.setLong(i + 1, (Long) value);
-                        break;
-                    case FLOAT:
-                        stmt.setFloat(i + 1, (Float) value);
-                        break;
-                    case DOUBLE:
-                        stmt.setDouble(i + 1, (Double) value);
-                        break;
-                    case STRING:
-                        stmt.setString(i + 1, (String) value);
-                        break;
-                    case BOOL:
-                        stmt.setBoolean(i + 1, (Boolean) value);
-                        break;
+                        case INT:
+                            stmt.setInt(i + 1, (Integer) value);
+                            break;
+                        case LONG:
+                            stmt.setLong(i + 1, (Long) value);
+                            break;
+                        case FLOAT:
+                            stmt.setFloat(i + 1, (Float) value);
+                            break;
+                        case DOUBLE:
+                            stmt.setDouble(i + 1, (Double) value);
+                            break;
+                        case STRING:
+                            stmt.setString(i + 1, (String) value);
+                            break;
+                        case BOOL:
+                            stmt.setBoolean(i + 1, (Boolean) value);
+                            break;
                     }
                 } else {
                     throw new OutputEventAdapterException("Cannot Execute Insert/Update. Null value detected for " +
@@ -455,7 +444,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
      * Replace attribute values with target build queries
      */
     public String constructQuery(String tableName, String query, StringBuilder columnTypes, StringBuilder columns,
-            StringBuilder values, StringBuilder columnValues, StringBuilder condition) {
+                                 StringBuilder values, StringBuilder columnValues, StringBuilder condition) {
 
         if (query.contains(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_ATTRIBUTE_TABLE_NAME)) {
             query = query.replace(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_ATTRIBUTE_TABLE_NAME, tableName);
@@ -508,7 +497,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
 
         } catch (DataSourceException e) {
             log.error(
-                    "There is no any data-source found called : " + eventAdapterConfiguration.getStaticProperties().get(
+                    "There is no data-source found by the name: " + eventAdapterConfiguration.getStaticProperties().get(
                             RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_DATASOURCE_NAME), e);
             throw new ConnectionUnavailableException(e.getMessage(), e);
         } catch (SQLException e) {
@@ -518,7 +507,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
         }
 
         // Map<String, String> defaultMappings = new HashMap<String, String>();
-        String[] staticAttributes = { RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_STRING,
+        String[] staticAttributes = {RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_STRING,
                 RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_DOUBLE,
                 RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_INTEGER,
                 RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_LONG,
@@ -533,7 +522,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
                 RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_COMMA,
                 RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_QUESTION_MARK,
                 RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_EQUAL,
-                RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_AND };
+                RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_AND};
 
         Boolean staticAttributeExist;
         String attribute = null;

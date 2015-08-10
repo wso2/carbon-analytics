@@ -43,12 +43,32 @@ public class DistributedConfiguration implements Serializable {
 
     private String distributedUIUrl;
 
+    private int cepReceiverOutputQueueSize = 8192;
+    private int stormPublisherOutputQueueSize = 8192;
+
     /**
      * Status monitor configs
      */
     private int lockTimeout = 60;   //Lock timeout in seconds.
     private int updateRate = 60000; //Rate in milliseconds at which the hazelcast map will be updated by each worker.
 
+
+    public int getCepReceiverOutputQueueSize() {
+        return cepReceiverOutputQueueSize;
+    }
+
+    public void setCepReceiverOutputQueueSize(int cepReceiverOutputQueueSize) {
+
+        this.cepReceiverOutputQueueSize = cepReceiverOutputQueueSize;
+    }
+
+    public int getStormPublisherOutputQueueSize() {
+        return stormPublisherOutputQueueSize;
+    }
+
+    public void setStormPublisherOutputQueueSize(int stormPublisherOutputQueueSize) {
+        this.stormPublisherOutputQueueSize = stormPublisherOutputQueueSize;
+    }
 
     public int getHeartbeatInterval() {
         return heartbeatInterval;
@@ -161,4 +181,5 @@ public class DistributedConfiguration implements Serializable {
     public void setUpdateRate(int updateRate) {
         this.updateRate = updateRate;
     }
+
 }

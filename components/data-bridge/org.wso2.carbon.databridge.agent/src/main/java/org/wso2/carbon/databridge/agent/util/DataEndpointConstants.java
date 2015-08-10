@@ -35,4 +35,7 @@ public class DataEndpointConstants {
     public static final String FAILOVER_URL_GROUP_SEPARATOR = "|";
     public static final int DEFAULT_AUTH_PORT_OFFSET = 100;
     public static final String SEPARATOR = "##";
+
+    public static final String THRIFT_DATA_AGENT_TYPE = "THRIFT";
+    public static final String BINARY_DATA_AGENT_TYPE = "BINARY";
 }

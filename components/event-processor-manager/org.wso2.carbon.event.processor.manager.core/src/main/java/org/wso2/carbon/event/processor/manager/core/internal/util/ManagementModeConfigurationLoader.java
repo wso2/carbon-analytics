@@ -231,7 +231,35 @@ public class ManagementModeConfigurationLoader {
             stormDeploymentConfig.setTransportReconnectInterval(Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)).getText()));
         } else {
-            log.info("No transport reconnection interval provided. Hence using default topology resubmit interval");
+            log.info("No transport reconnection interval provided. Hence using default reconnection interval");
+        }
+        if (transport.getChildrenWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE)) != null){
+            int queueSize = Integer.parseInt(transport.getFirstChildWithName(
+                    new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE)).getText());
+
+            if (isPowerOfTwo(queueSize)){
+                stormDeploymentConfig.setCepReceiverOutputQueueSize(queueSize);
+            }else{
+                // Disruptor queue size only allows powers of two
+                throw new IllegalArgumentException(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE + " must be a power of two.");
+            }
+
+        } else {
+            log.info("No CEP receiver output queue size specified. Hence using default queue size");
+        }
+        if (transport.getChildrenWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE)) != null){
+            int queueSize = Integer.parseInt(transport.getFirstChildWithName(
+                    new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE)).getText());
+
+            if (isPowerOfTwo(queueSize)){
+                stormDeploymentConfig.setStormPublisherOutputQueueSize(queueSize);
+            }else{
+                // Disruptor queue size only allows powers of two
+                throw new IllegalArgumentException(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE + " must be a power of two.");
+            }
+
+        } else {
+            log.info("No storm publisher output queue size specified. Hence using default queue size");
         }
 
 
@@ -365,6 +393,13 @@ public class ManagementModeConfigurationLoader {
     public static int haReadPortOffset() {
         return org.wso2.carbon.utils.CarbonUtils.
                 getPortFromServerConfig(ConfigurationConstants.CARBON_CONFIG_PORT_OFFSET_NODE) + 1;
+    }
+
+    public static boolean isPowerOfTwo ( int value)
+    {
+        while (((value % 2) == 0) && value > 1) /* While x is even and > 1 */
+            value /= 2;
+        return (value == 1);
     }
 
 }

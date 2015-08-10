@@ -1,22 +1,24 @@
 /*
- * Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
 package org.wso2.carbon.event.publisher.core.internal.type.json;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
@@ -47,40 +49,59 @@ public class JSONOutputMapper implements OutputMapper {
         this.eventPublisherConfiguration = eventPublisherConfiguration;
         this.propertyPositionMap = propertyPositionMap;
         this.streamDefinition = streamDefinition;
+        String mappingText;
         if (eventPublisherConfiguration.getOutputMapping().isCustomMappingEnabled()) {
-            validateStreamDefinitionWithOutputProperties(tenantId);
+            mappingText = getCustomMappingText();
+            validateStreamDefinitionWithOutputProperties(mappingText);
         } else {
-            generateJsonEventTemplate(streamDefinition);
+            mappingText = generateJsonEventTemplate(streamDefinition);
         }
+        this.mappingTextList = generateMappingTextList(mappingText);
     }
 
 
-    private List<String> getOutputMappingPropertyList(String mappingText) {
+    private List<String> getOutputMappingPropertyList(String mappingText) throws EventPublisherConfigurationException {
 
         List<String> mappingTextList = new ArrayList<String>();
         String text = mappingText;
 
-        mappingTextList.clear();
-        while (text.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0) {
-            mappingTextList.add(text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) + 2, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX)));
-            text = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) + 2);
+        int prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
+        int postFixIndex;
+        while (prefixIndex > 0) {
+            postFixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX);
+            if (postFixIndex > prefixIndex) {
+                mappingTextList.add(text.substring(prefixIndex + 2, postFixIndex));
+                text = text.substring(postFixIndex + 2);
+            } else {
+                throw new EventPublisherConfigurationException("Found template attribute prefix " + EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX
+                        + " without corresponding postfix " + EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX + ". Please verify your JSON template.");
+            }
+            prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
         }
         return mappingTextList;
     }
 
-    public void setMappingTextList(String mappingText) {
+    private List<String> generateMappingTextList(String mappingText) throws EventPublisherConfigurationException {
 
         List<String> mappingTextList = new ArrayList<String>();
         String text = mappingText;
 
-        mappingTextList.clear();
-        while (text.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0) {
-            mappingTextList.add(text.substring(0, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX)));
-            mappingTextList.add(text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) + 2, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX)));
-            text = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) + 2);
+        int prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
+        int postFixIndex;
+        while (prefixIndex > 0) {
+            postFixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX);
+            if (postFixIndex > prefixIndex) {
+                mappingTextList.add(text.substring(0, prefixIndex));
+                mappingTextList.add(text.substring(prefixIndex + 2, postFixIndex));
+                text = text.substring(postFixIndex + 2);
+            } else {
+                throw new EventPublisherConfigurationException("Found template attribute prefix " + EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX
+                        + " without corresponding postfix " + EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX + ". Please verify your JSON template.");
+            }
+            prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
         }
         mappingTextList.add(text);
-        this.mappingTextList = mappingTextList;
+        return mappingTextList;
     }
 
     @Override
@@ -92,7 +113,7 @@ public class JSONOutputMapper implements OutputMapper {
                 eventText.append(mappingTextList.get(i));
             } else {
                 Object propertyValue = getPropertyValue(event.getData(), mappingTextList.get(i));
-                if (propertyValue!=null && propertyValue instanceof String) {
+                if (propertyValue != null && propertyValue instanceof String) {
                     eventText.append(EventPublisherConstants.DOUBLE_QUOTE)
                             .append(propertyValue)
                             .append(EventPublisherConstants.DOUBLE_QUOTE);
@@ -102,13 +123,7 @@ public class JSONOutputMapper implements OutputMapper {
             }
         }
 
-        String jsonEvent = eventText.toString();
-        try {
-            JsonParser jsonParser = new JsonParser();
-            return jsonParser.parse(jsonEvent).toString();
-        } catch (JsonSyntaxException e) {
-            throw new EventPublisherConfigurationException("Not valid JSON object : " + e.getMessage(), e);
-        }
+        return eventText.toString();
     }
 
     @Override
@@ -117,18 +132,9 @@ public class JSONOutputMapper implements OutputMapper {
         return convertToMappedInputEvent(event);
     }
 
-    private void validateStreamDefinitionWithOutputProperties(int tenantId)
+    private void validateStreamDefinitionWithOutputProperties(String actualMappingText)
             throws EventPublisherConfigurationException {
-
-        JSONOutputMapping jsonOutputMapping = ((JSONOutputMapping) eventPublisherConfiguration.getOutputMapping());
-        String actualMappingText = jsonOutputMapping.getMappingText();
-        if (jsonOutputMapping.isRegistryResource()) {
-            actualMappingText = EventPublisherServiceValueHolder.getCarbonEventPublisherService().getRegistryResourceContent(jsonOutputMapping.getMappingText());
-        }
-
-        setMappingTextList(actualMappingText);
         List<String> mappingProperties = getOutputMappingPropertyList(actualMappingText);
-
         Iterator<String> mappingTextListIterator = mappingProperties.iterator();
         for (; mappingTextListIterator.hasNext(); ) {
             String property = mappingTextListIterator.next();
@@ -136,7 +142,18 @@ public class JSONOutputMapper implements OutputMapper {
                 throw new EventPublisherStreamValidationException("Property " + property + " is not in the input stream definition.", streamDefinition.getStreamId());
             }
         }
+    }
 
+    private String getCustomMappingText() throws EventPublisherConfigurationException {
+        JSONOutputMapping jsonOutputMapping = ((JSONOutputMapping) eventPublisherConfiguration.getOutputMapping());
+        String actualMappingText = jsonOutputMapping.getMappingText();
+        if (actualMappingText == null) {
+            throw new EventPublisherConfigurationException("Json mapping text is empty!");
+        }
+        if (jsonOutputMapping.isRegistryResource()) {
+            actualMappingText = EventPublisherServiceValueHolder.getCarbonEventPublisherService().getRegistryResourceContent(jsonOutputMapping.getMappingText());
+        }
+        return actualMappingText;
     }
 
     private Object getPropertyValue(Object[] eventData, String mappingProperty) {
@@ -147,7 +164,7 @@ public class JSONOutputMapper implements OutputMapper {
         return null;
     }
 
-    private void generateJsonEventTemplate(StreamDefinition streamDefinition) {
+    private String generateJsonEventTemplate(StreamDefinition streamDefinition) {
 
         JsonObject jsonEventObject = new JsonObject();
         JsonObject innerParentObject = new JsonObject();
@@ -173,8 +190,7 @@ public class JSONOutputMapper implements OutputMapper {
         defaultMapping = defaultMapping.replaceAll("\"\\{\\{", "{{");
         defaultMapping = defaultMapping.replaceAll("\\}\\}\"", "}}");
 
-        setMappingTextList(defaultMapping);
-
+        return defaultMapping;
     }
 
     private static JsonObject createPropertyElement(String dataPrefix,

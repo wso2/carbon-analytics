@@ -1,20 +1,18 @@
 <!--
- ~ Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- ~
- ~ WSO2 Inc. licenses this file to you under the Apache License,
- ~ Version 2.0 (the "License"); you may not use this file except
- ~ in compliance with the License.
- ~ You may obtain a copy of the License at
- ~
- ~    http://www.apache.org/licenses/LICENSE-2.0
- ~
- ~ Unless required by applicable law or agreed to in writing,
- ~ software distributed under the License is distributed on an
- ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- ~ KIND, either express or implied.  See the License for the
- ~ specific language governing permissions and limitations
- ~ under the License.
--->
+  ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
@@ -35,6 +33,7 @@
         <module>service-stubs</module>
         <module>components/analytics-dashboard</module>
         <module>components/data-bridge</module>
+        <module>components/analytics-data-agents</module>
         <module>components/event-stream</module>
         <module>components/application-deployer</module>
         <module>components/event-monitor</module>
@@ -44,6 +43,7 @@
         <module>features/event-stream</module>
         <module>features/data-bridge</module>
         <module>features/analytics-dashboard</module>
+        <module>features/analytics-data-agents</module>
         <module>features/application-deployer</module>
         <module>features/event-monitor</module>
         <module>features/event-receiver</module>
@@ -86,7 +86,7 @@
                 <version>${orbit.version.axiom}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.lmax</groupId>
+                <groupId>org.wso2.orbit.com.lmax</groupId>
                 <artifactId>disruptor</artifactId>
                 <version>${disruptor.orbit.version}</version>
             </dependency>
@@ -156,6 +156,16 @@
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.ndatasource.core</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>wsdl4j.wso2</groupId>
+                <artifactId>wsdl4j</artifactId>
+                <version>${wsdl4j.wso2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.tomcat.ext</artifactId>
                 <version>${carbon.kernel.version}</version>
             </dependency>
             <!--carbon-kernel dependencies stop-->
@@ -538,6 +548,11 @@
                 <artifactId>org.wso2.carbon.event.publisher.admin</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.commons</groupId>
+                <artifactId>org.wso2.carbon.ntask.core</artifactId>
+                <version>${carbon.commons.version}</version>
+            </dependency>
             <!--carbon analytics common dependencies stop-->
 
             <!-- spark commons dependencies start -->
@@ -902,6 +917,33 @@
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.common.jmx.agent.server.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.common.jmx.agent.ui.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.common.jmx.agent</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.common.jmx.agent.ui</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.common.jmx.agent.stub</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
 
             <!--carbon-deployment features start-->
             <!--<dependency>-->
@@ -1109,10 +1151,10 @@
         <carbon.analytics.common.version>2.0.0-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
-        <carbon.kernel.version>4.4.0</carbon.kernel.version>
+        <carbon.kernel.version>4.4.1</carbon.kernel.version>
         <!--<carbon.kernel.imp.pkg.version>[4.3.0, 4.4.0)</carbon.kernel.imp.pkg.version>-->
 
-        <carbon.commons.version>4.4.0</carbon.commons.version>
+        <carbon.commons.version>4.4.4</carbon.commons.version>
         <!--<carbon.deployment.version>4.3.1</carbon.deployment.version>-->
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
@@ -1133,13 +1175,13 @@
         <libthrift.wso2.version>0.8.0.wso2v1</libthrift.wso2.version>
         <libthrift.wso2.version.hector>0.7.0.wso2v2</libthrift.wso2.version.hector>
         <orbit.version.commons.lang>2.6.0.wso2v1</orbit.version.commons.lang>
-        <gson.version>2.1</gson.version>
+        <gson.version>2.3.1</gson.version>
         <slf4j.version>1.7.5</slf4j.version>
         <geronimo-jms.version>1.1.1</geronimo-jms.version>
         <hector.wso2.version>1.1.4.wso2v1</hector.wso2.version>
         <junit.version>4.10</junit.version>
-        <disruptor.version>3.3.0</disruptor.version>
-        <disruptor.orbit.version>${disruptor.version}.wso2v1</disruptor.orbit.version>
+        <disruptor.version.range>[2.10.0,3.4)</disruptor.version.range>
+        <disruptor.orbit.version>3.3.2.wso2v2</disruptor.orbit.version>
         <kafka.version>0.8.1</kafka.version>
         <org.eclipse.paho.version>0.4.0</org.eclipse.paho.version>
         <org.glassfish.tyrus.wso2.version>1.7-wso2v1</org.glassfish.tyrus.wso2.version>
@@ -1205,6 +1247,8 @@
         <javax.jsr.version>1.1.1</javax.jsr.version>
         <jersey.version>1.9</jersey.version>
         <!-- Spark dependency versions end-->
+
+        <wsdl4j.wso2.version>1.6.2.wso2v2</wsdl4j.wso2.version>
     </properties>
 
 </project>

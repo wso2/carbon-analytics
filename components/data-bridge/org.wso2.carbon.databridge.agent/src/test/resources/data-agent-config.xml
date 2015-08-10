@@ -27,6 +27,7 @@
         <BatchSize>200</BatchSize>
         <CorePoolSize>5</CorePoolSize>
         <MaxPoolSize>10</MaxPoolSize>
+        <SocketTimeoutMS>30000</SocketTimeoutMS>
         <KeepAliveTimeInPool>20</KeepAliveTimeInPool>
         <ReconnectionInterval>30</ReconnectionInterval>
         <MaxTransportPoolSize>250</MaxTransportPoolSize>
@@ -48,6 +49,7 @@
         <BatchSize>200</BatchSize>
         <CorePoolSize>5</CorePoolSize>
         <MaxPoolSize>10</MaxPoolSize>
+        <SocketTimeoutMS>30000</SocketTimeoutMS>
         <KeepAliveTimeInPool>20</KeepAliveTimeInPool>
         <ReconnectionInterval>30</ReconnectionInterval>
         <MaxTransportPoolSize>250</MaxTransportPoolSize>
