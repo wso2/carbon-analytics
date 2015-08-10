@@ -94,6 +94,7 @@ public class TCPEventServer {
                 log.info("EventServer starting event listener on port " + tcpEventServerConfig.getPort());
                 isRunning = true;
                 receiverSocket = new ServerSocket(tcpEventServerConfig.getPort());
+                receiverSocket.setReuseAddress(true);
                 while (isRunning) {
                     final Socket connectionSocket = receiverSocket.accept();
                     connectionSocket.setKeepAlive(true);
@@ -135,7 +136,11 @@ public class TCPEventServer {
                         byte[] streamNameData = loadData(in, new byte[streamNameSize]);
                         String streamId = new String(streamNameData, 0, streamNameData.length);
                         StreamRuntimeInfo streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
-
+                        while (streamRuntimeInfo == null) {
+                            Thread.sleep(100);
+                            log.warn("TCP server on port :'" + tcpEventServerConfig.getPort() + "' waiting for streamId:'" + streamId + "' to process incoming events");
+                            streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
+                        }
                         Object[] eventData = new Object[streamRuntimeInfo.getNoOfAttributes()];
                         byte[] fixedMessageData = loadData(in, new byte[8 + streamRuntimeInfo.getFixedMessageSize()]);
 

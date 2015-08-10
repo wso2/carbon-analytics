@@ -37,7 +37,7 @@
             <artifactId>org.wso2.carbon.event.processor.manager.commons</artifactId>
         </dependency>
         <dependency>
-        <groupId>org.wso2.lmax</groupId>
+        <groupId>org.wso2.orbit.com.lmax</groupId>
         <artifactId>disruptor</artifactId>
     </dependency>
     </dependencies>
@@ -60,9 +60,8 @@
                             <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <bundles>
                                 <bundleDef>org.wso2.carbon.analytics-common:org.wso2.carbon.event.processor.manager.commons</bundleDef>
-                                <bundleDef>org.wso2.lmax:disruptor:${disruptor.orbit.version}</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.lmax:disruptor:${disruptor.orbit.version}</bundleDef>
                             </bundles>
-
                         </configuration>
                     </execution>
                 </executions>
