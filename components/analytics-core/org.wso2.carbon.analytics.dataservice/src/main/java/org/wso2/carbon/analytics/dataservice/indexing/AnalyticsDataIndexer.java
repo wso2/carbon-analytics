@@ -115,6 +115,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class AnalyticsDataIndexer implements GroupEventListener {
 
+    private static final String ENABLE_INDEXING_STATS_SYS_PROP = "enableIndexingStats";
+
     private static final Log log = LogFactory.getLog(AnalyticsDataIndexer.class);
 
     private static final int INDEX_WORKER_STOP_WAIT_TIME = 60;
@@ -171,6 +173,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     private AnalyticsIndexedTableStore indexedTableStore;
     
+    private boolean indexingStatsEnabled;
+    
+    private AnalyticsDataIndexingStatsCollector statsCollector;
+    
     public AnalyticsDataIndexer(AnalyticsRecordStore analyticsRecordStore, 
             AnalyticsFileSystem analyticsFileSystem, AnalyticsDataService analyticsDataService,
             AnalyticsIndexedTableStore indexedTableStore, int shardCount, Analyzer analyzer) throws AnalyticsException {
@@ -179,7 +185,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     	this.analyticsFileSystem = analyticsFileSystem;
         this.analyticsDataService = analyticsDataService;
         this.indexedTableStore = indexedTableStore;
-    	this.shardCount = shardCount;
+    	this.shardCount = shardCount;        
     }
     
     /**
@@ -187,6 +193,12 @@ public class AnalyticsDataIndexer implements GroupEventListener {
      * @throws AnalyticsException
      */
     public void init() throws AnalyticsException {
+        if (System.getProperty(ENABLE_INDEXING_STATS_SYS_PROP) != null) {
+            this.indexingStatsEnabled = true;
+        }
+        if (this.indexingStatsEnabled) {
+            this.statsCollector = new AnalyticsDataIndexingStatsCollector();
+        }
         this.initializeIndexingSchedules();
     }
     
@@ -257,6 +269,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             current += range;
         }
         log.info("Processing Analytics Indexing Shards " + shardDetails);
+    }
+    
+    public boolean isIndexingStatsEnabled() {
+        return indexingStatsEnabled;
     }
     
     private int getIndexingThreadCount() {
@@ -1172,6 +1188,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         try {
             indexWriter.deleteDocuments(terms.toArray(new Term[terms.size()]));
             indexWriter.commit();
+            if (this.isIndexingStatsEnabled()) {
+                this.statsCollector.processedRecords(terms.size());
+            }
         } catch (IOException e) {
             throw new AnalyticsException("Error in deleting indices: " + e.getMessage(), e);
         } finally {
@@ -1195,6 +1214,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             for (Record record : recordBatch) {
                 indexWriter.updateDocument(new Term(INDEX_ID_INTERNAL_FIELD, record.getId()),
                                            this.generateIndexDoc(record, columns, taxonomyWriter).getFields());
+            }
+            if (this.isIndexingStatsEnabled()) {
+                this.statsCollector.processedRecords(recordBatch.size());
             }
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in updating index: " + e.getMessage(), e);
