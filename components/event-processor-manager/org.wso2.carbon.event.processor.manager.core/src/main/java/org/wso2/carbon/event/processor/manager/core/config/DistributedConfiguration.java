@@ -43,6 +43,26 @@ public class DistributedConfiguration implements Serializable {
 
     private String distributedUIUrl;
 
+    private int cepReceiverOutputQueueSize = 8192;
+    private int stormPublisherOutputQueueSize = 8192;
+
+
+    public int getCepReceiverOutputQueueSize() {
+        return cepReceiverOutputQueueSize;
+    }
+
+    public void setCepReceiverOutputQueueSize(int cepReceiverOutputQueueSize) {
+
+        this.cepReceiverOutputQueueSize = cepReceiverOutputQueueSize;
+    }
+
+    public int getStormPublisherOutputQueueSize() {
+        return stormPublisherOutputQueueSize;
+    }
+
+    public void setStormPublisherOutputQueueSize(int stormPublisherOutputQueueSize) {
+        this.stormPublisherOutputQueueSize = stormPublisherOutputQueueSize;
+    }
 
     public int getHeartbeatInterval() {
         return heartbeatInterval;
@@ -139,4 +159,5 @@ public class DistributedConfiguration implements Serializable {
     public void setDistributedUIUrl(String distributedUIUrl) {
         this.distributedUIUrl = distributedUIUrl;
     }
+
 }
