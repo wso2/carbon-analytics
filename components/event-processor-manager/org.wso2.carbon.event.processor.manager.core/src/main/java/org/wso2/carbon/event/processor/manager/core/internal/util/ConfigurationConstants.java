@@ -68,6 +68,8 @@ public final class ConfigurationConstants {
     public static final String DISTRIBUTED_NODE_CONFIG_PORT_RANGE_ELEMENT = "portRange";
     public static final String DISTRIBUTED_NODE_CONFIG_DISTRIBUTED_UI_URL_ELEMENT = "distributedUIUrl";
     public static final String DISTRIBUTED_NODE_CONFIG_STORM_JAR_ELEMENT = "stormJar";
+    public static final String DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE = "cepReceiverOutputQueueSize";
+    public static final String DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE = "stormPublisherOutputQueueSize";
     public static final String ENABLE_ATTRIBUTE = "enable";
 
     public static final String PREFIX = "org.wso2.cep.org.wso2.carbon.event.processor.management";
