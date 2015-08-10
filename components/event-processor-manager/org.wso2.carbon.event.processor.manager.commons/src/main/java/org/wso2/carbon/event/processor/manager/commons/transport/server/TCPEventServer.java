@@ -129,7 +129,7 @@ public class TCPEventServer {
             public void run() {
                 try {
                     if(connectionCallback != null){
-                        connectionCallback.onConnect();
+                        connectionCallback.onPublisherBoltConnect();
                     }
                     BufferedInputStream in = new BufferedInputStream(connectionSocket.getInputStream());
                     while (true) {
@@ -192,7 +192,7 @@ public class TCPEventServer {
                     log.error("Error :" + t.getMessage(), t);
                 } finally {
                     if(connectionCallback != null){
-                        connectionCallback.onClose();
+                        connectionCallback.onPublisherBoltDisconnect();
                     }
                 }
             }

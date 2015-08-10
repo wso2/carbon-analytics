@@ -99,7 +99,7 @@ public class TCPEventPublisher {
         this.outputStream = new BufferedOutputStream(this.clientSocket.getOutputStream());
         log.info("Connecting to " + hostUrl);
         if(connectionCallback != null){
-            connectionCallback.onConnect();
+            connectionCallback.onCepReceiverConnect();
         }
     }
 
@@ -294,7 +294,8 @@ public class TCPEventPublisher {
             log.debug("Error while closing socket to " + hostUrl + " : " + e.getMessage(), e);
         }  finally {
             if(connectionCallback != null){
-                connectionCallback.onClose();
+                connectionCallback.onCepReceiverDisconnect();
+                log.info("--------------------------TCPEventPublisher onclose invoked.");//todo: delete later
             }
         }
     }

@@ -5,7 +5,11 @@ package org.wso2.carbon.event.processor.manager.commons.transport.server;
  */
 public interface ConnectionCallback {
 
-    public void onConnect();
+    public void onCepReceiverConnect();
 
-    public void onClose();
+    public void onCepReceiverDisconnect();
+
+    public void onPublisherBoltConnect();
+
+    public void onPublisherBoltDisconnect();
 }
