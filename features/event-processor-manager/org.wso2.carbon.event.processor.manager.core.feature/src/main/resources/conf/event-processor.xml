@@ -67,10 +67,6 @@
             <reconnectionInterval>20000</reconnectionInterval>
             <heartbeatInterval>5000</heartbeatInterval>
             <topologyResubmitInterval>10000</topologyResubmitInterval>
-	    <!--Must be a power of two-->
-	    <cepReceiverOutputQueueSize>8192</cepReceiverOutputQueueSize>
-	    <!--Must be a power of two-->
-            <stormPublisherOutputQueueSize>8192</stormPublisherOutputQueueSize>
         </management>
 
         <transport>
@@ -79,6 +75,10 @@
                 <max>15100</max>
             </portRange>
             <reconnectionInterval>20000</reconnectionInterval>
+	    <!--Must be a power of two-->
+	    <cepReceiverOutputQueueSize>8192</cepReceiverOutputQueueSize>
+	    <!--Must be a power of two-->
+            <stormPublisherOutputQueueSize>8192</stormPublisherOutputQueueSize>
         </transport>
 
         <stormJar>org.wso2.carbon.event.processor.storm.jar</stormJar>
