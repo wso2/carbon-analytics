@@ -35,6 +35,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.text.TabExpander;
+
 /**
  * This class contains tests related to {@link AnalyticsRecordStore}.
  */
@@ -190,6 +192,21 @@ public class AnalyticsRecordStoreTest {
             ok = true;
         }
         Assert.assertTrue(ok);
+    }
+    
+    @Test
+    public void testLongTableNameCreate() throws AnalyticsException {
+        int tenantId = 25;
+        String tableName = "OIJFOEIJFW4535363463643ooijowigjweg09XXXX52352_2532oijgwgowij_2352502965u2526515243623632632oijgwergwergw_15251233";
+        this.analyticsRS.deleteTable(tenantId, tableName);
+        this.analyticsRS.createTable(tenantId, tableName);
+        Record record = this.createRecord(tenantId, tableName, "S1", "192.168.1.1", 55, "LOG1");
+        List<Record> records = new ArrayList<Record>();
+        records.add(record);
+        this.analyticsRS.put(records);
+        long count = this.analyticsRS.getRecordCount(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
+        Assert.assertEquals(count, 1);
+        this.analyticsRS.deleteTable(tenantId, tableName);
     }
     
     @Test
