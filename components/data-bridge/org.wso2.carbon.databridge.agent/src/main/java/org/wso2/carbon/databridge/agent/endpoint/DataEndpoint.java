@@ -207,12 +207,18 @@ public abstract class DataEndpoint {
             transportPool.returnObject(getDataEndpointConfiguration().getPublisherKey(), client);
         } catch (Exception e) {
             log.warn("Error occurred while returning object to connection pool", e);
-            discardClient();
+            discardClient(client);
         }
     }
 
-    private void discardClient() {
-        transportPool.clear(getDataEndpointConfiguration().getPublisherKey());
+    private void discardClient(Object client) {
+        if (client != null) {
+            try {
+                transportPool.invalidateObject(getDataEndpointConfiguration().getPublisherKey(), client);
+            } catch (Exception e) {
+                log.error("Error while invalidating the client ", e);
+            }
+        }
     }
 
     void registerDataEndpointFailureCallback(DataEndpointFailureCallback callback) {

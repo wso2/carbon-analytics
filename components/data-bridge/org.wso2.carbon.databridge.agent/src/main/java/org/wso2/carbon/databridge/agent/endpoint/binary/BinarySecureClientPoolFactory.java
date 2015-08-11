@@ -19,10 +19,13 @@ package org.wso2.carbon.databridge.agent.endpoint.binary;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.databridge.agent.AgentHolder;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointSecurityException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.client.AbstractSecureClientPoolFactory;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
+import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -41,11 +44,14 @@ public class BinarySecureClientPoolFactory extends AbstractSecureClientPoolFacto
 
     @Override
     public Object createClient(String protocol, String hostName, int port) throws DataEndpointException,
-            DataEndpointSecurityException {
+            DataEndpointSecurityException, DataEndpointAgentConfigurationException {
         if (protocol.equalsIgnoreCase(DataEndpointConfiguration.Protocol.SSL.toString())) {
+            int timeout = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.BINARY_DATA_AGENT_TYPE)
+                    .getAgentConfiguration().getSocketTimeoutMS();
             try {
                 SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
                 SSLSocket sslSocket = (SSLSocket) sslsocketfactory.createSocket(hostName, port);
+                sslSocket.setSoTimeout(timeout);
                 sslSocket.setEnabledCipherSuites(sslSocket.getSupportedCipherSuites());
                 return sslSocket;
             } catch (IOException e) {

@@ -64,6 +64,8 @@ public class AgentConfiguration {
 
     private int secureEvictionTimePeriod;
 
+    private int socketTimeoutMS;
+
     @XmlElement(name = "Name")
     public String getDataEndpointName() {
         return dataEndpointName;
@@ -234,8 +236,18 @@ public class AgentConfiguration {
         }
     }
 
+    @XmlElement( name = "SocketTimeoutMS")
+    public int getSocketTimeoutMS() {
+        return socketTimeoutMS;
+    }
+
+    public void setSocketTimeoutMS(int socketTimeoutMS) {
+        this.socketTimeoutMS = socketTimeoutMS;
+    }
+
     public void setClassName(String className) {
         if (className != null) {
+
             this.className = className.trim();
         } else {
             this.className = null;
