@@ -3,8 +3,6 @@
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
-<%@ page
-        import="org.wso2.carbon.analytics.spark.admin.stub.AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException" %>
 <%
     String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
     ConfigurationContext configContext =
@@ -17,11 +15,8 @@
     try {
         jsonResult = client.execute(query.trim());
         response.setStatus(HttpServletResponse.SC_OK);
-    } catch (AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException e) {
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getFaultMessage().
-                getAnalyticsProcessorAdminException().getMessage());
-    }catch (Exception ex){
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+    }catch (Exception e){
+        throw new RuntimeException("Exception occured while executing query: "+e.getMessage(),e);
     }
 %>
 <%=jsonResult%>
