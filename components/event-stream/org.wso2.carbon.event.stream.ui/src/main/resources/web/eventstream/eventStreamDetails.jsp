@@ -114,7 +114,9 @@
 								eventStreamVersion: eventStreamVersion,
 							}, onSuccess: function (msg) {
 								if ("success" == msg.responseText.trim()) {
-									window.location.href = "../eventstream/index.jsp?region=region1&item=eventstream_menu.jsp";
+									CARBON.showInfoDialog("Event Stream successfully deleted.", function () {
+										window.location.href = "../eventstream/index.jsp?region=region1&item=eventstream_menu.jsp";
+									});
 								} else {
 									CARBON.showErrorDialog("Failed to delete event stream, Exception: " + msg.responseText.trim());
 								}

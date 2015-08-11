@@ -88,7 +88,9 @@
                             eventPublisherName: eventPublisherName
                         }, onSuccess: function (msg) {
                             if ("success" == msg.responseText.trim()) {
-                                window.location.href = "../eventpublisher/index.jsp?region=region1&item=eventpublisher_menu.jsp";
+                                CARBON.showInfoDialog("Event publisher successfully deleted.", function () {
+                                    window.location.href = "../eventpublisher/index.jsp?region=region1&item=eventpublisher_menu.jsp";
+                                });
                             } else {
                                 CARBON.showErrorDialog("Failed to delete event publisher, Exception: " + msg.responseText.trim());
                             }
@@ -105,7 +107,7 @@
     <fmt:message key="event.publisher.details"/>
     <span style="float: right; font-size:75%">
         <%
-            boolean editable = stub.isReceiverEditable(eventPublisherName);
+            boolean editable = stub.isPublisherEditable(eventPublisherName);
             boolean statEnabled = stub.isPublisherStatisticsEnabled(eventPublisherName);
             boolean traceEnabled = stub.isPublisherTraceEnabled(eventPublisherName);
         %>

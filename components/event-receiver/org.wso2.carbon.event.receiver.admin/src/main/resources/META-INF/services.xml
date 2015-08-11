@@ -31,128 +31,128 @@
         </parameter>
 
         <parameter name="AuthorizationAction" locked="false">
-            /permission/admin/manage/event-publish
+            /permission/admin/manage/event-receive
         </parameter>
 
         <operation name="getAllActiveEventReceiverConfigurations">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="getAllStreamSpecificActiveEventReceiverConfigurations">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
 
         <operation name="undeployActiveEventReceiverConfiguration">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="getAllInactiveEventReceiverConfigurations">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="undeployInactiveEventReceiverConfiguration">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="getInactiveEventReceiverConfigurationContent">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="editInactiveEventReceiverConfiguration">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="getActiveEventReceiverConfigurationContent">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="editActiveEventReceiverConfiguration">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="deployEventReceiverConfiguration">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="deployWso2EventReceiverConfiguration">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="deployTextEventReceiverConfiguration">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="deployXmlEventReceiverConfiguration">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="deployMapEventReceiverConfiguration">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="deployJsonEventReceiverConfiguration">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="getActiveEventReceiverConfiguration">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="setStatisticsEnabled">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="setTracingEnabled">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="getActiveEventReceiverConfiguration">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="getInputAdapterConfigurationSchema">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="getAllInputAdapterTypes">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="isReceiverEditable">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="isReceiverStatisticsEnabled">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
         <operation name="isReceiverTraceEnabled">
             <parameter name="AuthorizationAction" locked="true">
-                /permission/admin/manage/event-publish
+                /permission/admin/manage/event-receive
             </parameter>
         </operation>
 

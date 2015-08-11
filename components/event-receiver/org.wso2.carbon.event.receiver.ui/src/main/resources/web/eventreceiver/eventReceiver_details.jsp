@@ -88,7 +88,9 @@
                             eventReceiverName: eventReceiverName
                         }, onSuccess: function (msg) {
                             if ("success" == msg.responseText.trim()) {
-                                window.location.href = "../eventreceiver/index.jsp?region=region1&item=eventreceiver_menu.jsp";
+                                CARBON.showInfoDialog("Event receiver successfully deleted.", function () {
+                                    window.location.href = "../eventreceiver/index.jsp?region=region1&item=eventreceiver_menu.jsp";
+                                });
                             } else {
                                 CARBON.showErrorDialog("Failed to delete event receiver, Exception: " + msg.responseText.trim());
                             }

@@ -969,7 +969,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
         }
     }
 
-    public boolean isReceiverEditable(String eventPublisherName) {
+    public boolean isPublisherEditable(String eventPublisherName) {
         EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
         List<EventPublisherConfiguration> eventPublisherConfigurationList = null;
         boolean isEditable = false;
