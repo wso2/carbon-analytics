@@ -35,8 +35,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.text.TabExpander;
-
 /**
  * This class contains tests related to {@link AnalyticsRecordStore}.
  */
