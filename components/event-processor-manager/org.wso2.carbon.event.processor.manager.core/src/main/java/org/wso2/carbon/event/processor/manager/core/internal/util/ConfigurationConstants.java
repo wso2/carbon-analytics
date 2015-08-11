@@ -70,6 +70,12 @@ public final class ConfigurationConstants {
     public static final String DISTRIBUTED_NODE_CONFIG_STORM_JAR_ELEMENT = "stormJar";
     public static final String DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE = "cepReceiverOutputQueueSize";
     public static final String DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE = "stormPublisherOutputQueueSize";
+    public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_MODE = "tcpEventPublisherMode";
+    public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_QUEUE_SIZE = "tcpEventPublisherOutputQueueSize";
+    public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE = "tcpEventPublisherSendBufferSize";
+    public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET = "tcpEventPublisherCharSet";
+    public static final String DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT = "tcpEventReceiverThreadCount";
+
     public static final String ENABLE_ATTRIBUTE = "enable";
 
     public static final String PREFIX = "org.wso2.cep.org.wso2.carbon.event.processor.management";
