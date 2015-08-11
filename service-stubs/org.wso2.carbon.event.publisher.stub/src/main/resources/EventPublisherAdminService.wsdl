@@ -3,21 +3,6 @@
     <wsdl:types>
         <xs:schema xmlns:ax299="http://admin.publisher.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.publisher.event.carbon.wso2.org">
             <xs:import namespace="http://admin.publisher.event.carbon.wso2.org/xsd"/>
-            <xs:element name="setTracingEnabled">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="flag" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="setTracingEnabledResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="deployEventPublisherConfiguration">
                 <xs:complexType>
                     <xs:sequence>
@@ -165,6 +150,21 @@
                 </xs:complexType>
             </xs:element>
             <xs:element name="setStatisticsEnabledResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setTracingEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="flag" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setTracingEnabledResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
@@ -322,6 +322,48 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="isPublisherEditable">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isPublisherEditableResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isPublisherStatisticsEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isPublisherStatisticsEnabledResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isPublisherTraceEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isPublisherTraceEnabledResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
         </xs:schema>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.publisher.event.carbon.wso2.org/xsd">
             <xs:complexType name="EventPublisherConfigurationDto">
@@ -472,11 +514,23 @@
     <wsdl:message name="getActiveEventPublisherConfigurationContentResponse">
         <wsdl:part name="parameters" element="ns:getActiveEventPublisherConfigurationContentResponse"/>
     </wsdl:message>
+    <wsdl:message name="isPublisherStatisticsEnabledRequest">
+        <wsdl:part name="parameters" element="ns:isPublisherStatisticsEnabled"/>
+    </wsdl:message>
+    <wsdl:message name="isPublisherStatisticsEnabledResponse">
+        <wsdl:part name="parameters" element="ns:isPublisherStatisticsEnabledResponse"/>
+    </wsdl:message>
     <wsdl:message name="deployJsonEventPublisherConfigurationRequest">
         <wsdl:part name="parameters" element="ns:deployJsonEventPublisherConfiguration"/>
     </wsdl:message>
     <wsdl:message name="deployJsonEventPublisherConfigurationResponse">
         <wsdl:part name="parameters" element="ns:deployJsonEventPublisherConfigurationResponse"/>
+    </wsdl:message>
+    <wsdl:message name="isPublisherTraceEnabledRequest">
+        <wsdl:part name="parameters" element="ns:isPublisherTraceEnabled"/>
+    </wsdl:message>
+    <wsdl:message name="isPublisherTraceEnabledResponse">
+        <wsdl:part name="parameters" element="ns:isPublisherTraceEnabledResponse"/>
     </wsdl:message>
     <wsdl:message name="undeployInactiveEventPublisherConfigurationRequest">
         <wsdl:part name="parameters" element="ns:undeployInactiveEventPublisherConfiguration"/>
@@ -532,6 +586,12 @@
     <wsdl:message name="setTracingEnabledResponse">
         <wsdl:part name="parameters" element="ns:setTracingEnabledResponse"/>
     </wsdl:message>
+    <wsdl:message name="isPublisherEditableRequest">
+        <wsdl:part name="parameters" element="ns:isPublisherEditable"/>
+    </wsdl:message>
+    <wsdl:message name="isPublisherEditableResponse">
+        <wsdl:part name="parameters" element="ns:isPublisherEditableResponse"/>
+    </wsdl:message>
     <wsdl:message name="deployTextEventPublisherConfigurationRequest">
         <wsdl:part name="parameters" element="ns:deployTextEventPublisherConfiguration"/>
     </wsdl:message>
@@ -583,9 +643,17 @@
             <wsdl:input message="ns:getActiveEventPublisherConfigurationContentRequest" wsaw:Action="urn:getActiveEventPublisherConfigurationContent"/>
             <wsdl:output message="ns:getActiveEventPublisherConfigurationContentResponse" wsaw:Action="urn:getActiveEventPublisherConfigurationContentResponse"/>
         </wsdl:operation>
+        <wsdl:operation name="isPublisherStatisticsEnabled">
+            <wsdl:input message="ns:isPublisherStatisticsEnabledRequest" wsaw:Action="urn:isPublisherStatisticsEnabled"/>
+            <wsdl:output message="ns:isPublisherStatisticsEnabledResponse" wsaw:Action="urn:isPublisherStatisticsEnabledResponse"/>
+        </wsdl:operation>
         <wsdl:operation name="deployJsonEventPublisherConfiguration">
             <wsdl:input message="ns:deployJsonEventPublisherConfigurationRequest" wsaw:Action="urn:deployJsonEventPublisherConfiguration"/>
             <wsdl:output message="ns:deployJsonEventPublisherConfigurationResponse" wsaw:Action="urn:deployJsonEventPublisherConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="isPublisherTraceEnabled">
+            <wsdl:input message="ns:isPublisherTraceEnabledRequest" wsaw:Action="urn:isPublisherTraceEnabled"/>
+            <wsdl:output message="ns:isPublisherTraceEnabledResponse" wsaw:Action="urn:isPublisherTraceEnabledResponse"/>
         </wsdl:operation>
         <wsdl:operation name="undeployInactiveEventPublisherConfiguration">
             <wsdl:input message="ns:undeployInactiveEventPublisherConfigurationRequest" wsaw:Action="urn:undeployInactiveEventPublisherConfiguration"/>
@@ -622,6 +690,10 @@
         <wsdl:operation name="setTracingEnabled">
             <wsdl:input message="ns:setTracingEnabledRequest" wsaw:Action="urn:setTracingEnabled"/>
             <wsdl:output message="ns:setTracingEnabledResponse" wsaw:Action="urn:setTracingEnabledResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="isPublisherEditable">
+            <wsdl:input message="ns:isPublisherEditableRequest" wsaw:Action="urn:isPublisherEditable"/>
+            <wsdl:output message="ns:isPublisherEditableResponse" wsaw:Action="urn:isPublisherEditableResponse"/>
         </wsdl:operation>
         <wsdl:operation name="deployTextEventPublisherConfiguration">
             <wsdl:input message="ns:deployTextEventPublisherConfigurationRequest" wsaw:Action="urn:deployTextEventPublisherConfiguration"/>
@@ -710,8 +782,26 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="isPublisherStatisticsEnabled">
+            <soap:operation soapAction="urn:isPublisherStatisticsEnabled" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="deployJsonEventPublisherConfiguration">
             <soap:operation soapAction="urn:deployJsonEventPublisherConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isPublisherTraceEnabled">
+            <soap:operation soapAction="urn:isPublisherTraceEnabled" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -793,6 +883,15 @@
         </wsdl:operation>
         <wsdl:operation name="setTracingEnabled">
             <soap:operation soapAction="urn:setTracingEnabled" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isPublisherEditable">
+            <soap:operation soapAction="urn:isPublisherEditable" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -902,8 +1001,26 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="isPublisherStatisticsEnabled">
+            <soap12:operation soapAction="urn:isPublisherStatisticsEnabled" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="deployJsonEventPublisherConfiguration">
             <soap12:operation soapAction="urn:deployJsonEventPublisherConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isPublisherTraceEnabled">
+            <soap12:operation soapAction="urn:isPublisherTraceEnabled" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -985,6 +1102,15 @@
         </wsdl:operation>
         <wsdl:operation name="setTracingEnabled">
             <soap12:operation soapAction="urn:setTracingEnabled" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isPublisherEditable">
+            <soap12:operation soapAction="urn:isPublisherEditable" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1094,8 +1220,26 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="isPublisherStatisticsEnabled">
+            <http:operation location="isPublisherStatisticsEnabled"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="deployJsonEventPublisherConfiguration">
             <http:operation location="deployJsonEventPublisherConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isPublisherTraceEnabled">
+            <http:operation location="isPublisherTraceEnabled"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1184,6 +1328,15 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="isPublisherEditable">
+            <http:operation location="isPublisherEditable"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="deployTextEventPublisherConfiguration">
             <http:operation location="deployTextEventPublisherConfiguration"/>
             <wsdl:input>
@@ -1214,13 +1367,13 @@
     </wsdl:binding>
     <wsdl:service name="EventPublisherAdminService">
         <wsdl:port name="EventPublisherAdminServiceHttpsSoap11Endpoint" binding="ns:EventPublisherAdminServiceSoap11Binding">
-            <soap:address location="https://10.100.5.159:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsSoap11Endpoint/"/>
+            <soap:address location="https://10.100.7.56:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsSoap11Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="EventPublisherAdminServiceHttpsSoap12Endpoint" binding="ns:EventPublisherAdminServiceSoap12Binding">
-            <soap12:address location="https://10.100.5.159:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsSoap12Endpoint/"/>
+            <soap12:address location="https://10.100.7.56:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsSoap12Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="EventPublisherAdminServiceHttpsEndpoint" binding="ns:EventPublisherAdminServiceHttpBinding">
-            <http:address location="https://10.100.5.159:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsEndpoint/"/>
+            <http:address location="https://10.100.7.56:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsEndpoint/"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

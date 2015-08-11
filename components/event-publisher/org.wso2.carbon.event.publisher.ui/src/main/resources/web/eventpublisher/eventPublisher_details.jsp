@@ -1,16 +1,17 @@
 <%--
-  ~ Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
-  ~ use this file except in compliance with the License. You may obtain a copy
-  ~ of the License at
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
   ~
-  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~     http://www.apache.org/licenses/LICENSE-2.0
   ~
-  ~ Unless required by applicable law or agreed to in writing, software distributed
-  ~ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-  ~ CONDITIONS OF ANY KIND, either express or implied.  See the License for the
-  ~ specific language governing permissions and limitations under the License.
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
   --%>
 <%@ page
         import="org.wso2.carbon.event.publisher.stub.EventPublisherAdminServiceStub" %>
@@ -49,6 +50,10 @@
 
 <%
     EventPublisherAdminServiceStub stub = EventPublisherUIUtils.getEventPublisherAdminService(config, session, request);
+    String eventPublisherName = request.getParameter("eventPublisherName");
+    if (eventPublisherName != null) {
+        EventPublisherConfigurationDto eventPublisherConfigurationDto = stub.getActiveEventPublisherConfiguration(eventPublisherName);
+
 %>
 <script language="javascript">
 
@@ -71,9 +76,140 @@
     }
 </script>
 
+<script type="text/javascript">
+    function doDelete(eventPublisherName) {
+
+        CARBON.showConfirmationDialog("Are you sure want to delete event publisher:" + eventPublisherName,
+                function () {
+                    new Ajax.Request('../eventpublisher/delete_event_publisher_ajaxprocessor.jsp', {
+                        method: 'POST',
+                        asynchronous: false,
+                        parameters: {
+                            eventPublisherName: eventPublisherName
+                        }, onSuccess: function (msg) {
+                            if ("success" == msg.responseText.trim()) {
+                                CARBON.showInfoDialog("Event publisher successfully deleted.", function () {
+                                    window.location.href = "../eventpublisher/index.jsp?region=region1&item=eventpublisher_menu.jsp";
+                                });
+                            } else {
+                                CARBON.showErrorDialog("Failed to delete event publisher, Exception: " + msg.responseText.trim());
+                            }
+                        }
+                    })
+                }, null, null);
+    }
+
+</script>
+
 
 <div id="middle">
-<h2><fmt:message key="event.publisher.details"/></h2>
+<h2 style="padding-bottom: 7px">
+    <fmt:message key="event.publisher.details"/>
+    <span style="float: right; font-size:75%">
+        <%
+            boolean editable = stub.isPublisherEditable(eventPublisherName);
+            boolean statEnabled = stub.isPublisherStatisticsEnabled(eventPublisherName);
+            boolean traceEnabled = stub.isPublisherTraceEnabled(eventPublisherName);
+        %>
+        <% if (editable) { %>
+            <% if (statEnabled) {%>
+        <div style="display: inline-block">
+            <div id="disableStat<%= eventPublisherName%>">
+                <a href="#"
+                   onclick="disablePublisherStat('<%= eventPublisherName %>')"
+                   class="icon-link"
+                   style="background-image:url(../admin/images/static-icon.gif);"><fmt:message
+                        key="stat.disable.link"/></a>
+            </div>
+            <div id="enableStat<%= eventPublisherName%>"
+                 style="display:none;">
+                <a href="#"
+                   onclick="enablePublisherStat('<%= eventPublisherName %>')"
+                   class="icon-link"
+                   style="background-image:url(../admin/images/static-icon-disabled.gif);"><fmt:message
+                        key="stat.enable.link"/></a>
+            </div>
+        </div>
+        <% } else { %>
+        <div style="display: inline-block">
+            <div id="enableStat<%= eventPublisherName%>">
+                <a href="#"
+                   onclick="enablePublisherStat('<%= eventPublisherName %>')"
+                   class="icon-link"
+                   style="background-image:url(../admin/images/static-icon-disabled.gif);"><fmt:message
+                        key="stat.enable.link"/></a>
+            </div>
+            <div id="disableStat<%= eventPublisherName%>"
+                 style="display:none">
+                <a href="#"
+                   onclick="disablePublisherStat('<%= eventPublisherName %>')"
+                   class="icon-link"
+                   style="background-image:url(../admin/images/static-icon.gif);"><fmt:message
+                        key="stat.disable.link"/></a>
+            </div>
+        </div>
+        <% }
+            if (traceEnabled) {%>
+        <div style="display: inline-block">
+            <div id="disableTracing<%= eventPublisherName%>">
+                <a href="#"
+                   onclick="disablePublisherTracing('<%= eventPublisherName %>')"
+                   class="icon-link"
+                   style="background-image:url(../admin/images/trace-icon.gif);"><fmt:message
+                        key="trace.disable.link"/></a>
+            </div>
+            <div id="enableTracing<%= eventPublisherName%>"
+                 style="display:none;">
+                <a href="#"
+                   onclick="enablePublisherTracing('<%= eventPublisherName %>')"
+                   class="icon-link"
+                   style="background-image:url(../admin/images/trace-icon-disabled.gif);"><fmt:message
+                        key="trace.enable.link"/></a>
+            </div>
+        </div>
+        <% } else { %>
+        <div style="display: inline-block">
+            <div id="enableTracing<%= eventPublisherName%>">
+                <a href="#"
+                   onclick="enablePublisherTracing('<%= eventPublisherName %>')"
+                   class="icon-link"
+                   style="background-image:url(../admin/images/trace-icon-disabled.gif);"><fmt:message
+                        key="trace.enable.link"/></a>
+            </div>
+            <div id="disableTracing<%= eventPublisherName%>"
+                 style="display:none">
+                <a href="#"
+                   onclick="disablePublisherTracing('<%= eventPublisherName %>')"
+                   class="icon-link"
+                   style="background-image:url(../admin/images/trace-icon.gif);"><fmt:message
+                        key="trace.disable.link"/></a>
+            </div>
+        </div>
+
+        <% } %>
+
+        <div style="display: inline-block">
+            <a style="background-image: url(../admin/images/delete.gif);"
+               class="icon-link"
+               onclick="doDelete('<%=eventPublisherName%>')"><font
+                    color="#4682b4">Delete</font></a>
+        </div>
+        <div style="display: inline-block">
+            <a style="background-image: url(../admin/images/edit.gif);"
+               class="icon-link"
+               href="../eventpublisher/edit_event_publisher_details.jsp?ordinal=1&eventPublisherName=<%=eventPublisherName%>"><font
+                    color="#4682b4">Edit</font></a>
+        </div>
+        <% } else { %>
+            <div class="inlineDiv">
+                <div id="cappArtifact<%=eventPublisherName%>">
+                    <div style="background-image: url(images/capp.gif);" class="icon-nolink-nofloat">
+                        <fmt:message key="capp.artifact.message"/></div>
+                </div>
+            </div>
+        <%}%>
+    </span>
+</h2>
 
 <div id="workArea">
 
@@ -84,10 +220,6 @@
     <th><fmt:message key="title.event.publisher.details"/></th>
 </tr>
 </thead>
-<% String eventPublisherName = request.getParameter("eventPublisherName");
-    if (eventPublisherName != null) {
-        EventPublisherConfigurationDto eventPublisherConfigurationDto = stub.getActiveEventPublisherConfiguration(eventPublisherName);
-%>
 <tbody>
 <tr>
 <td class="formRaw">
