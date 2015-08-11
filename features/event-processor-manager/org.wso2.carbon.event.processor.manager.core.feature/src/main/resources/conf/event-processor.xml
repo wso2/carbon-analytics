@@ -75,10 +75,17 @@
                 <max>15100</max>
             </portRange>
             <reconnectionInterval>20000</reconnectionInterval>
-	    <!--Must be a power of two-->
-	    <cepReceiverOutputQueueSize>8192</cepReceiverOutputQueueSize>
-	    <!--Must be a power of two-->
+	        <!--Must be a power of two-->
+	        <cepReceiverOutputQueueSize>8192</cepReceiverOutputQueueSize>
+	        <!--Must be a power of two-->
             <stormPublisherOutputQueueSize>8192</stormPublisherOutputQueueSize>
+            <!--blocking/non-blocking-->
+            <tcpEventPublisherMode>blocking</tcpEventPublisherMode>
+            <!--Must be a power of two. Only used when tcpEventPublisherMode is non-blocking-->
+            <tcpEventPublisherOutputQueueSize>8192</tcpEventPublisherOutputQueueSize>
+            <tcpEventPublisherSendBufferSize>5242880</tcpEventPublisherSendBufferSize>
+            <tcpEventPublisherCharSet>UTF-8</tcpEventPublisherCharSet>
+            <tcpEventReceiverThreadCount>10</tcpEventReceiverThreadCount>
         </transport>
 
         <stormJar>org.wso2.carbon.event.processor.storm.jar</stormJar>

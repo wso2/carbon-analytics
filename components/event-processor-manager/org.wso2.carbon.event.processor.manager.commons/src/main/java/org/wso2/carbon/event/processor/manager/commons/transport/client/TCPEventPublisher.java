@@ -59,7 +59,7 @@ public class TCPEventPublisher {
     public TCPEventPublisher(String hostUrl, TCPEventPublisherConfig publisherConfig, boolean isSynchronous) throws IOException {
         this.hostUrl = hostUrl;
         this.publisherConfig = publisherConfig;
-        this.defaultCharset=publisherConfig.getDefaultCharset();
+        this.defaultCharset= publisherConfig.getDefaultCharset();
         this.streamRuntimeInfoMap = new ConcurrentHashMap<String, StreamRuntimeInfo>();
         this.isSynchronous = isSynchronous;
 

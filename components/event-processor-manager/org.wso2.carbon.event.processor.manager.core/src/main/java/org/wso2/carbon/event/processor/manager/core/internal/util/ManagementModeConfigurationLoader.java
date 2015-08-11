@@ -233,7 +233,7 @@ public class ManagementModeConfigurationLoader {
         } else {
             log.info("No transport reconnection interval provided. Hence using default reconnection interval");
         }
-        if (transport.getChildrenWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE)) != null){
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE)) != null){
             int queueSize = Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE)).getText());
 
@@ -245,9 +245,9 @@ public class ManagementModeConfigurationLoader {
             }
 
         } else {
-            log.info("No CEP receiver output queue size specified. Hence using default queue size");
+            log.info("No CEP receiver output queue size specified. Hence using default queue size " + stormDeploymentConfig.getCepReceiverOutputQueueSize());
         }
-        if (transport.getChildrenWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE)) != null){
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE)) != null){
             int queueSize = Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE)).getText());
 
@@ -259,7 +259,49 @@ public class ManagementModeConfigurationLoader {
             }
 
         } else {
-            log.info("No storm publisher output queue size specified. Hence using default queue size");
+            log.info("No storm publisher output queue size specified. Hence using default queue size " + stormDeploymentConfig.getStormPublisherOutputQueueSize());
+        }
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_MODE)) != null){
+            String tcpEventPublisherMode = transport.getFirstChildWithName(
+                    new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_MODE)).getText();
+            stormDeploymentConfig.setTcpEventPublisherMode(tcpEventPublisherMode);
+        }else{
+            log.info("TCP event publisher mode not set. Hence using default value " + stormDeploymentConfig.getTcpEventPublisherMode());
+        }
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_QUEUE_SIZE)) != null){
+            int queueSize = Integer.parseInt(transport.getFirstChildWithName(
+                    new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_QUEUE_SIZE)).getText());
+
+            if (isPowerOfTwo(queueSize)){
+                stormDeploymentConfig.setTcpEventPublisherOutputQueueSize(queueSize);
+            }else{
+                // Disruptor queue size only allows powers of two
+                throw new IllegalArgumentException(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_QUEUE_SIZE + " must be a power of two.");
+            }
+
+        } else {
+            log.info("No TCP publisher output queue size specified. Hence using default queue size " + stormDeploymentConfig.getTcpEventPublisherOutputQueueSize());
+        }
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE)) != null){
+            int bufferSize = Integer.parseInt(transport.getFirstChildWithName(
+                    new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE)).getText());
+            stormDeploymentConfig.setTcpEventPublisherSendBufferSize(bufferSize);
+        } else {
+            log.info("No TCP publisher buffer size not specified. Hence using default buffer size " + stormDeploymentConfig.getTcpEventPublisherSendBufferSize());
+        }
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET)) != null){
+            String tcpEventPublisherCharSet = transport.getFirstChildWithName(
+                    new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET)).getText();
+            stormDeploymentConfig.setTcpEventPublisherCharSet(tcpEventPublisherCharSet);
+        }else{
+            log.info("TCP event publisher Char-Set not set. Hence using default value " + stormDeploymentConfig.getTcpEventPublisherCharSet());
+        }
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)) != null){
+            int threadCount = Integer.parseInt(transport.getFirstChildWithName(
+                    new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)).getText());
+            stormDeploymentConfig.setTcpEventReceiverThreadCount(threadCount);
+        } else {
+            log.info("No TCP receiver thread count not specified. Hence using default thread count " + stormDeploymentConfig.getTcpEventReceiverThreadCount());
         }
 
 

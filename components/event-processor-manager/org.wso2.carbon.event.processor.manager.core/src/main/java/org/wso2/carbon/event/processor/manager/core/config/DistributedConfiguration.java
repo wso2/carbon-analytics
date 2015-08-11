@@ -31,7 +31,6 @@ public class DistributedConfiguration implements Serializable {
 
     private List<HostAndPort> managers = new ArrayList<HostAndPort>();
 
-
     private int transportMaxPort = 15100;
     private int transportMinPort = 15000;
     private int transportReconnectInterval = 15000;
@@ -46,6 +45,41 @@ public class DistributedConfiguration implements Serializable {
     private int cepReceiverOutputQueueSize = 8192;
     private int stormPublisherOutputQueueSize = 8192;
 
+    private String tcpEventPublisherMode = "blocking";
+    private int tcpEventPublisherOutputQueueSize = 8192;
+    private int tcpEventPublisherSendBufferSize = 5242880;
+    private String tcpEventPublisherCharSet = "UTF-8";
+    private int tcpEventReceiverThreadCount = 10;
+
+    public int getTcpEventReceiverThreadCount() { return tcpEventReceiverThreadCount;}
+
+    public void setTcpEventReceiverThreadCount(int tcpEventReceiverThreadCount) {
+        this.tcpEventReceiverThreadCount = tcpEventReceiverThreadCount;
+    }
+
+    public String getTcpEventPublisherCharSet() { return tcpEventPublisherCharSet;}
+
+    public void setTcpEventPublisherCharSet(String tcpEventPublisherCharSet) {
+        this.tcpEventPublisherCharSet = tcpEventPublisherCharSet;
+    }
+
+    public int getTcpEventPublisherSendBufferSize() { return tcpEventPublisherSendBufferSize;}
+
+    public void setTcpEventPublisherSendBufferSize(int tcpEventPublisherSendBufferSize) {
+        this.tcpEventPublisherSendBufferSize = tcpEventPublisherSendBufferSize;
+    }
+
+    public int getTcpEventPublisherOutputQueueSize() { return tcpEventPublisherOutputQueueSize;}
+
+    public void setTcpEventPublisherOutputQueueSize(int tcpEventPublisherOutputQueueSize) {
+        this.tcpEventPublisherOutputQueueSize = tcpEventPublisherOutputQueueSize;
+    }
+
+    public String getTcpEventPublisherMode() { return tcpEventPublisherMode; }
+
+    public void setTcpEventPublisherMode(String tcpEventPublisherMode) {
+        this.tcpEventPublisherMode = tcpEventPublisherMode;
+    }
 
     public int getCepReceiverOutputQueueSize() {
         return cepReceiverOutputQueueSize;
