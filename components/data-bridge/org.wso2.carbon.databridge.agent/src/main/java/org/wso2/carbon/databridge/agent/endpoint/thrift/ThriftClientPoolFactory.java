@@ -20,9 +20,12 @@ package org.wso2.carbon.databridge.agent.endpoint.thrift;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.*;
+import org.wso2.carbon.databridge.agent.AgentHolder;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.client.AbstractClientPoolFactory;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
+import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.databridge.commons.thrift.service.general.ThriftEventTransmissionService;
 
 /**
@@ -31,9 +34,12 @@ import org.wso2.carbon.databridge.commons.thrift.service.general.ThriftEventTran
 public class ThriftClientPoolFactory extends AbstractClientPoolFactory {
 
     @Override
-    public Object createClient(String protocol, String hostName, int port) throws DataEndpointException {
+    public Object createClient(String protocol, String hostName, int port) throws DataEndpointException,
+            DataEndpointAgentConfigurationException {
         if (protocol.equalsIgnoreCase(DataEndpointConfiguration.Protocol.TCP.toString())) {
-            TTransport receiverTransport = new TSocket(hostName, port);
+            int socketTimeout = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.THRIFT_DATA_AGENT_TYPE).
+                    getAgentConfiguration().getSocketTimeoutMS();
+            TTransport receiverTransport = new TSocket(hostName, port, socketTimeout);
             TProtocol tProtocol = new TBinaryProtocol(receiverTransport);
             ThriftEventTransmissionService.Client client = new ThriftEventTransmissionService.Client(tProtocol);
             try {

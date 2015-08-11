@@ -19,9 +19,12 @@ package org.wso2.carbon.databridge.agent.endpoint.binary;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.databridge.agent.AgentHolder;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.client.AbstractClientPoolFactory;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
+import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -34,15 +37,19 @@ public class BinaryClientPoolFactory extends AbstractClientPoolFactory {
     private static Log log = LogFactory.getLog(BinaryClientPoolFactory.class);
 
     @Override
-    public Object createClient(String protocol, String hostName, int port) throws DataEndpointException {
+    public Object createClient(String protocol, String hostName, int port) throws DataEndpointException,
+            DataEndpointAgentConfigurationException {
         if (protocol.equalsIgnoreCase(DataEndpointConfiguration.Protocol.TCP.toString())) {
+            int timeout = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.BINARY_DATA_AGENT_TYPE)
+                    .getAgentConfiguration().getSocketTimeoutMS();
             try {
-                return new Socket(hostName, port);
+                Socket socket =  new Socket(hostName, port);
+                socket.setSoTimeout(timeout);
+                return socket;
             } catch (IOException e) {
                 throw new DataEndpointException("Error while opening socket to " + hostName + ":" + port + ". " +
                         e.getMessage(), e);
             }
-
         } else {
             throw new DataEndpointException("Unsupported protocol: " + protocol + ". Currently only " +
                     DataEndpointConfiguration.Protocol.TCP.toString() + " supported.");

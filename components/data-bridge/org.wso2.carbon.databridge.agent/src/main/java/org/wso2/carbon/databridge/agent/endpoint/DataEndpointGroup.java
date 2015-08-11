@@ -346,7 +346,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
         private boolean isServerExists(String ip, int port) {
             try {
-                new Socket(ip, port);
+                Socket socket = new Socket(ip, port);
+                socket.close();
                 return true;
             } catch (UnknownHostException e) {
                 return false;
