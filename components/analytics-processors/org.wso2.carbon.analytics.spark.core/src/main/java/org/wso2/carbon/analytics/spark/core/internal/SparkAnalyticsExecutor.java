@@ -568,10 +568,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             log.debug("Executing : " + query);
         }
 
-        long start = System.nanoTime();
+        long start = System.currentTimeMillis();
         DataFrame result = this.sqlCtx.sql(query);
-        long end = System.nanoTime();
-        log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end-start) + " nanoseconds");
+        long end = System.currentTimeMillis();
+        log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds");
 
         return toResult(result);
     }

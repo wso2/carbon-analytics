@@ -32,8 +32,7 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils
 
 import scala.collection.mutable.ArrayBuffer
 
-@SerialVersionUID(102L)
-object JDBCRelation extends java.io.Serializable {
+object JDBCRelation {
   /**
    * Given a partitioning schematic (a column of integral type, a number of
    * partitions, and upper and lower bounds on the column's value), generate
@@ -86,25 +85,17 @@ object JDBCRelation extends java.io.Serializable {
   }
 }
 
-@SerialVersionUID(103L)
-class AnalyticsJDBCRelationProvider extends RelationProvider with java.io.Serializable {
+class AnalyticsJDBCRelationProvider extends RelationProvider {
   /** Returns a new base relation with the given parameters. */
   override def createRelation(
                                sqlContext: SQLContext,
                                parameters: Map[String, String]): BaseRelation = {
     val dataSource = parameters.getOrElse("dataSource", sys.error("Option 'dataSource' not specified"))
     val tableName = parameters.getOrElse("tableName", sys.error("Option 'tableName' not specified"))
-    //    val url = parameters.getOrElse("url", sys.error("Option 'url' not specified"))
-    //    val driver = parameters.getOrElse("driver", null)
-    //    val table = parameters.getOrElse("dbtable", sys.error("Option 'dbtable' not specified"))
     val partitionColumn = parameters.getOrElse("partitionColumn", null)
     val lowerBound = parameters.getOrElse("lowerBound", null)
     val upperBound = parameters.getOrElse("upperBound", null)
     val numPartitions = parameters.getOrElse("numPartitions", null)
-
-    //    if (driver != null) {
-    //      DriverRegistry.register(driver)
-    //    }
 
     if (partitionColumn != null
         && (lowerBound == null || upperBound == null || numPartitions == null)) {
@@ -127,7 +118,6 @@ class AnalyticsJDBCRelationProvider extends RelationProvider with java.io.Serial
   }
 }
 
-@SerialVersionUID(104L)
 case class JDBCRelation(
                          dataSource: String,
                          tableName: String,
@@ -135,8 +125,7 @@ case class JDBCRelation(
                        (@transient val sqlContext: SQLContext)
   extends BaseRelation
           with PrunedFilteredScan
-          with InsertableRelation
-          with java.io.Serializable {
+          with InsertableRelation {
 
   override val needConversion: Boolean = false
 
@@ -176,12 +165,5 @@ case class JDBCRelation(
     }
 
     JDBCWriteDetails.saveTable(data, dataSource, tableName)
-    //    data.write
-    //      .mode(if (overwrite) {
-    //      SaveMode.Overwrite
-    //    } else {
-    //      SaveMode.Append
-    //    })
-    //      .jdbc(url, table, properties)
   }
 }

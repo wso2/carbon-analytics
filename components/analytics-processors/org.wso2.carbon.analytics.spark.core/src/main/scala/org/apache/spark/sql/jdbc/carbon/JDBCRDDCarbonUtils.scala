@@ -29,9 +29,57 @@ import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types._
 import org.apache.spark.{Logging, Partition, SparkContext}
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils
+import org.wso2.carbon.analytics.spark.core.sources.AnalyticsDatasourceWrapper
 
-@SerialVersionUID(100L)
-object JDBCRDDCarbonUtils extends Logging with java.io.Serializable{
+object JDBCRDDCarbonUtils extends Logging {
+
+  /**
+   * Takes a (schema, table) specification and returns the table's Catalyst
+   * schema.
+   *
+   * @param dataSource - The JDBC url to fetch information from.
+   * @param table - The table name of the desired table.  This may also be a
+   *              SQL query wrapped in parentheses.
+   *
+   * @return A StructType giving the table's Catalyst schema.
+   * @throws SQLException if the table specification is garbage.
+   * @throws SQLException if the table contains an unsupported type.
+   */
+  def resolveTable(dataSource: String, table: String): StructType = {
+    val conn: Connection = GenericUtils.loadGlobalDataSource(dataSource).asInstanceOf[DataSource].getConnection
+    val dialect = JdbcDialects.get(conn.getMetaData.getURL)
+    try {
+      val rs = conn.prepareStatement(s"SELECT * FROM $table WHERE 1=0").executeQuery()
+      try {
+        val rsmd = rs.getMetaData
+        val ncols = rsmd.getColumnCount
+        val fields = new Array[StructField](ncols)
+        var i = 0
+        while (i < ncols) {
+          val columnName = rsmd.getColumnLabel(i + 1)
+          val dataType = rsmd.getColumnType(i + 1)
+          val typeName = rsmd.getColumnTypeName(i + 1)
+          val fieldSize = rsmd.getPrecision(i + 1)
+          val fieldScale = rsmd.getScale(i + 1)
+          val isSigned = rsmd.isSigned(i + 1)
+          val nullable = rsmd.isNullable(i + 1) != ResultSetMetaData.columnNoNulls
+          val metadata = new MetadataBuilder().putString("name", columnName)
+          val columnType =
+            dialect.getCatalystType(dataType, typeName, fieldSize, metadata).getOrElse(
+              getCatalystType(dataType, fieldSize, fieldScale, isSigned))
+          fields(i) = StructField(columnName, columnType, nullable, metadata.build())
+          i = i + 1
+        }
+        return new StructType(fields)
+      } finally {
+        rs.close()
+      }
+    } finally {
+      conn.close()
+    }
+
+    throw new RuntimeException("This line is unreachable.")
+  }
 
   /**
    * Maps a JDBC type to a Catalyst type.  This function is called only when
@@ -106,67 +154,6 @@ object JDBCRDDCarbonUtils extends Logging with java.io.Serializable{
   }
 
   /**
-   * Takes a (schema, table) specification and returns the table's Catalyst
-   * schema.
-   *
-   * @param dataSource - The JDBC url to fetch information from.
-   * @param table - The table name of the desired table.  This may also be a
-   *              SQL query wrapped in parentheses.
-   *
-   * @return A StructType giving the table's Catalyst schema.
-   * @throws SQLException if the table specification is garbage.
-   * @throws SQLException if the table contains an unsupported type.
-   */
-  def resolveTable(dataSource: String, table: String): StructType = {
-    val conn: Connection = GenericUtils.loadGlobalDataSource(dataSource).asInstanceOf[DataSource].getConnection
-    val dialect = org.apache.spark.sql.jdbc.JdbcDialects.get(conn.getMetaData.getURL)
-    try {
-      val rs = conn.prepareStatement(s"SELECT * FROM $table WHERE 1=0").executeQuery()
-      try {
-        val rsmd = rs.getMetaData
-        val ncols = rsmd.getColumnCount
-        val fields = new Array[StructField](ncols)
-        var i = 0
-        while (i < ncols) {
-          val columnName = rsmd.getColumnLabel(i + 1)
-          val dataType = rsmd.getColumnType(i + 1)
-          val typeName = rsmd.getColumnTypeName(i + 1)
-          val fieldSize = rsmd.getPrecision(i + 1)
-          val fieldScale = rsmd.getScale(i + 1)
-          val isSigned = rsmd.isSigned(i + 1)
-          val nullable = rsmd.isNullable(i + 1) != ResultSetMetaData.columnNoNulls
-          val metadata = new MetadataBuilder().putString("name", columnName)
-          val columnType =
-            dialect.getCatalystType(dataType, typeName, fieldSize, metadata).getOrElse(
-              getCatalystType(dataType, fieldSize, fieldScale, isSigned))
-          fields(i) = StructField(columnName, columnType, nullable, metadata.build())
-          i = i + 1
-        }
-        return new StructType(fields)
-      } finally {
-        rs.close()
-      }
-    } finally {
-      conn.close()
-    }
-
-    throw new RuntimeException("This line is unreachable.")
-  }
-
-  /**
-   * Prune all but the specified columns from the specified Catalyst schema.
-   *
-   * @param schema - The Catalyst schema of the master table
-   * @param columns - The list of desired columns
-   *
-   * @return A Catalyst schema corresponding to columns in the given order.
-   */
-  private def pruneSchema(schema: StructType, columns: Array[String]): StructType = {
-    val fieldMap = Map(schema.fields map { x => x.metadata.getString("name") -> x}: _*)
-    new StructType(columns map { name => fieldMap(name)})
-  }
-
-  /**
    * Build and return JDBCRDD from the given information.
    *
    * @param sc - Your SparkContext.
@@ -188,15 +175,16 @@ object JDBCRDDCarbonUtils extends Logging with java.io.Serializable{
                  requiredColumns: Array[String],
                  filters: Array[Filter],
                  parts: Array[Partition]): RDD[Row] = {
-    val ds = GenericUtils.loadGlobalDataSource(dataSource).asInstanceOf[DataSource]
 
-    val conn = ds.getConnection
+    //    val conn = GenericUtils.loadGlobalDataSource(dataSource).asInstanceOf[DataSource].getConnection
+    val dsWrapper = new AnalyticsDatasourceWrapper(dataSource)
+    val conn = dsWrapper.getConnection
     try {
       val dialect = JdbcDialects.get(conn.getMetaData.getURL)
       val quotedColumns = requiredColumns.map(colName => dialect.quoteIdentifier(colName))
       new JDBCRDD(
         sc,
-        ds.getConnection,
+        dsWrapper.getConnection,
         pruneSchema(schema, requiredColumns),
         fqTable,
         quotedColumns,
@@ -206,6 +194,19 @@ object JDBCRDDCarbonUtils extends Logging with java.io.Serializable{
     } finally {
       conn.close()
     }
+  }
+
+  /**
+   * Prune all but the specified columns from the specified Catalyst schema.
+   *
+   * @param schema - The Catalyst schema of the master table
+   * @param columns - The list of desired columns
+   *
+   * @return A Catalyst schema corresponding to columns in the given order.
+   */
+  private def pruneSchema(schema: StructType, columns: Array[String]): StructType = {
+    val fieldMap = Map(schema.fields map { x => x.metadata.getString("name") -> x}: _*)
+    new StructType(columns map { name => fieldMap(name)})
   }
 }
 

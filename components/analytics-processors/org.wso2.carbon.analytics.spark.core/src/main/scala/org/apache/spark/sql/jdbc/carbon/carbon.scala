@@ -18,36 +18,94 @@
 
 package org.apache.spark.sql.jdbc
 
-import java.sql.{Connection, Driver, DriverPropertyInfo, PreparedStatement, SQLFeatureNotSupportedException}
-import java.util.Properties
-import javax.sql.DataSource
+import java.sql.{Connection, PreparedStatement}
 
 import org.apache.spark.Logging
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row}
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils
+import org.wso2.carbon.analytics.spark.core.sources.AnalyticsDatasourceWrapper
 
-package object carbon extends java.io.Serializable{
+package object carbon {
 
-  @SerialVersionUID(101L)
-  object JDBCWriteDetails extends Logging with java.io.Serializable {
+  object JDBCWriteDetails extends Logging {
     /**
-     * Returns a PreparedStatement that inserts a row into table via conn.
+     * Compute the schema string for this RDD.
      */
-    def insertStatement(conn: Connection, table: String, rddSchema: StructType):
-    PreparedStatement = {
-      val sql = new StringBuilder(s"INSERT INTO $table VALUES (")
-      var fieldsLeft = rddSchema.fields.length
-      while (fieldsLeft > 0) {
-        sql.append("?")
-        if (fieldsLeft > 1) {
-          sql.append(", ")
+    def schemaString(df: DataFrame, url: String): String = {
+      val sb = new StringBuilder()
+      val dialect = JdbcDialects.get(url)
+      df.schema.fields foreach { field => {
+        val name = field.name
+        val typ: String =
+          dialect.getJDBCType(field.dataType).map(_.databaseTypeDefinition).getOrElse(
+            field.dataType match {
+              case IntegerType => "INTEGER"
+              case LongType => "BIGINT"
+              case DoubleType => "DOUBLE PRECISION"
+              case FloatType => "REAL"
+              case ShortType => "INTEGER"
+              case ByteType => "BYTE"
+              case BooleanType => "BIT(1)"
+              case StringType => "TEXT"
+              case BinaryType => "BLOB"
+              case TimestampType => "TIMESTAMP"
+              case DateType => "DATE"
+              case DecimalType.Unlimited => "DECIMAL(40,20)"
+              case _ => throw new IllegalArgumentException(s"Don't know how to save $field to JDBC")
+            })
+        val nullable = if (field.nullable) {
+          ""
         } else {
-          sql.append(")")
+          "NOT NULL"
         }
-        fieldsLeft = fieldsLeft - 1
+        sb.append(s", $name $typ $nullable")
       }
-      conn.prepareStatement(sql.toString)
+      }
+      if (sb.length < 2) {
+        ""
+      } else {
+        sb.substring(2)
+      }
+    }
+
+    /**
+     * Saves the RDD to the database in a single transaction.
+     */
+    def saveTable(
+                   df: DataFrame,
+                   dataSource: String,
+                   tableName: String) {
+      val rddSchema = df.schema
+      val dsWrapper = new AnalyticsDatasourceWrapper(dataSource)
+
+      val conn = dsWrapper.getConnection
+      try {
+        val dialect = JdbcDialects.get(conn.getMetaData.getURL)
+        val nullTypes: Array[Int] = df.schema.fields.map { field =>
+          dialect.getJDBCType(field.dataType).map(_.jdbcNullType).getOrElse(
+            field.dataType match {
+              case IntegerType => java.sql.Types.INTEGER
+              case LongType => java.sql.Types.BIGINT
+              case DoubleType => java.sql.Types.DOUBLE
+              case FloatType => java.sql.Types.REAL
+              case ShortType => java.sql.Types.INTEGER
+              case ByteType => java.sql.Types.INTEGER
+              case BooleanType => java.sql.Types.BIT
+              case StringType => java.sql.Types.CLOB
+              case BinaryType => java.sql.Types.BLOB
+              case TimestampType => java.sql.Types.TIMESTAMP
+              case DateType => java.sql.Types.DATE
+              case DecimalType.Unlimited => java.sql.Types.DECIMAL
+              case _ => throw new IllegalArgumentException(
+                s"Can't translate null value for field $field")
+            })
+                                                         }
+        df.foreachPartition { iterator =>
+          JDBCWriteDetails.savePartition(dsWrapper.getConnection, tableName, iterator, rddSchema, nullTypes)
+                            }
+      } finally {
+        conn.close()
+      }
     }
 
     /**
@@ -131,84 +189,22 @@ package object carbon extends java.io.Serializable{
     }
 
     /**
-     * Compute the schema string for this RDD.
+     * Returns a PreparedStatement that inserts a row into table via conn.
      */
-    def schemaString(df: DataFrame, url: String): String = {
-      val sb = new StringBuilder()
-      val dialect = JdbcDialects.get(url)
-      df.schema.fields foreach { field => {
-        val name = field.name
-        val typ: String =
-          dialect.getJDBCType(field.dataType).map(_.databaseTypeDefinition).getOrElse(
-            field.dataType match {
-              case IntegerType => "INTEGER"
-              case LongType => "BIGINT"
-              case DoubleType => "DOUBLE PRECISION"
-              case FloatType => "REAL"
-              case ShortType => "INTEGER"
-              case ByteType => "BYTE"
-              case BooleanType => "BIT(1)"
-              case StringType => "TEXT"
-              case BinaryType => "BLOB"
-              case TimestampType => "TIMESTAMP"
-              case DateType => "DATE"
-              case DecimalType.Unlimited => "DECIMAL(40,20)"
-              case _ => throw new IllegalArgumentException(s"Don't know how to save $field to JDBC")
-            })
-        val nullable = if (field.nullable) {
-          ""
+    def insertStatement(conn: Connection, table: String, rddSchema: StructType):
+    PreparedStatement = {
+      val sql = new StringBuilder(s"INSERT INTO $table VALUES (")
+      var fieldsLeft = rddSchema.fields.length
+      while (fieldsLeft > 0) {
+        sql.append("?")
+        if (fieldsLeft > 1) {
+          sql.append(", ")
         } else {
-          "NOT NULL"
+          sql.append(")")
         }
-        sb.append(s", $name $typ $nullable")
+        fieldsLeft = fieldsLeft - 1
       }
-      }
-      if (sb.length < 2) {
-        ""
-      } else {
-        sb.substring(2)
-      }
-    }
-
-    /**
-     * Saves the RDD to the database in a single transaction.
-     */
-    def saveTable(
-                   df: DataFrame,
-                   dataSource: String,
-                   tableName: String) {
-      val rddSchema = df.schema
-      val getConnection: () => Connection = GenericUtils.loadGlobalDataSource(dataSource).
-        asInstanceOf[DataSource].getConnection
-
-      val conn = getConnection()
-      try {
-        val dialect = JdbcDialects.get(conn.getMetaData.getURL)
-        val nullTypes: Array[Int] = df.schema.fields.map { field =>
-          dialect.getJDBCType(field.dataType).map(_.jdbcNullType).getOrElse(
-            field.dataType match {
-              case IntegerType => java.sql.Types.INTEGER
-              case LongType => java.sql.Types.BIGINT
-              case DoubleType => java.sql.Types.DOUBLE
-              case FloatType => java.sql.Types.REAL
-              case ShortType => java.sql.Types.INTEGER
-              case ByteType => java.sql.Types.INTEGER
-              case BooleanType => java.sql.Types.BIT
-              case StringType => java.sql.Types.CLOB
-              case BinaryType => java.sql.Types.BLOB
-              case TimestampType => java.sql.Types.TIMESTAMP
-              case DateType => java.sql.Types.DATE
-              case DecimalType.Unlimited => java.sql.Types.DECIMAL
-              case _ => throw new IllegalArgumentException(
-                s"Can't translate null value for field $field")
-            })
-                                                         }
-        df.foreachPartition { iterator =>
-          JDBCWriteDetails.savePartition(getConnection, tableName, iterator, rddSchema, nullTypes)
-                            }
-      } finally {
-        conn.close()
-      }
+      conn.prepareStatement(sql.toString())
     }
 
   }
