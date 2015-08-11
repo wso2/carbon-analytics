@@ -3,7 +3,7 @@
         <transports>
             <transport>https</transport>
         </transports>
-        <parameter name="ServiceClass">org.wso2.carbon.analytics.jmx.agent.JmxAgentWebInterface
+        <parameter name="ServiceClass">org.wso2.carbon.analytics.common.jmx.agent.JmxAgentWebInterface
         </parameter>
     </service>
 

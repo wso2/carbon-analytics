@@ -15,27 +15,27 @@
  */
 
 /**
- * Date: 8/6/13
- * Time: 11:44 AM
+ * Date: 7/16/13
+ * Time: 11:59 AM
  */
 
-package org.wso2.carbon.analytics.jmx.agent.exceptions;
+package org.wso2.carbon.analytics.common.jmx.agent.exceptions;
 
-public class JmxProfileException extends Exception {
+public class JmxMBeanException extends Exception {
 
-    private static final long serialVersionUID = 1964250880783971787L;
-
+    private static final long serialVersionUID = -2641261566547038727L;
     private String message;
 
     public String getMessage() {
         return message;
     }
 
-    public JmxProfileException(String message) {
+    public JmxMBeanException(String message) {
+        super(message);
         this.message = message;
     }
 
-    public JmxProfileException(String message, Throwable cause) {
+    public JmxMBeanException(String message, Throwable cause) {
         super(message, cause);
         this.message = message;
     }

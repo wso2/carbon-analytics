@@ -14,24 +14,37 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.analytics.jmx.agent.exceptions;
+/**
+ * Date: 7/25/13
+ * Time: 4:39 PM
+ */
 
-public class JmxConnectionException extends Exception {
+package org.wso2.carbon.analytics.common.jmx.agent.profiles;
 
-    private static final long serialVersionUID = -8557438267297699388L;
-    private String message;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
-    public String getMessage() {
-        return message;
+@XmlRootElement
+public class MBean {
+
+    private String mBeanName;
+    private MBeanAttribute[] attributes;
+
+    public String getMBeanName() {
+        return mBeanName;
     }
 
-    public JmxConnectionException(String message) {
-        super(message);
-        this.message = message;
+    @XmlElement
+    public void setMBeanName(String mBeanName) {
+        this.mBeanName = mBeanName;
     }
 
-    public JmxConnectionException(String message, Throwable cause) {
-        super(message, cause);
-        this.message = message;
+    public MBeanAttribute[] getAttributes() {
+        return attributes;
+    }
+
+    @XmlElement
+    public void setAttributes(MBeanAttribute[] attributes) {
+        this.attributes = attributes;
     }
 }
