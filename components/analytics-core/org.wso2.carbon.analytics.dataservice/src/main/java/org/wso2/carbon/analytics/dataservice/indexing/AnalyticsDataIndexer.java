@@ -1309,31 +1309,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (obj == null) {
             doc.add(new StringField(name, NULL_INDEX_VALUE, Store.NO));
         }
-        if (type == AnalyticsSchema.ColumnType.FACET) {
+        if (obj instanceof String && type == AnalyticsSchema.ColumnType.FACET) {
             facetsConfig.setMultiValued(name, true);
             facetsConfig.setHierarchical(name, true);
-            // for the REST Api facets
-            if(obj instanceof List){
-                List<Object> path = new ArrayList<>();
-                path.addAll((List<Object>) obj);
-                if (path.isEmpty()) {
-                    path.add(EMPTY_FACET_VALUE);
-                }
-                List<String> pathAsStrings = new ArrayList<>();
-                Iterator<Object> iterator = path.iterator();
-                while (iterator.hasNext()) {
-                    pathAsStrings.add(String.valueOf(iterator.next()));
-                }
-                doc.add(new FacetField(name, pathAsStrings.toArray(new String[pathAsStrings.size()])));
+            String values = (String) obj;
+            if (values.isEmpty()) {
+                values = EMPTY_FACET_VALUE;
             }
-            //for the spark SQL UDF facets
-            else if (obj instanceof String) {
-                String values = (String) obj;
-                if (values.isEmpty()) {
-                    values = EMPTY_FACET_VALUE;
-                }
-                doc.add(new FacetField(name, values.split(",")));
-            }
+            doc.add(new FacetField(name, values.split(",")));
         }
     }
 
