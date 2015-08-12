@@ -18,6 +18,7 @@
 package org.wso2.carbon.analytics.eventtable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +100,7 @@ public class AnalyticsEventTable implements EventTable {
         try {
             this.tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         } catch (Throwable e) {
+            /* this would never happens in real server runtime, caught for unit tests */
             this.tenantId = -1;
         }        
     }
@@ -249,7 +251,7 @@ public class AnalyticsEventTable implements EventTable {
      */
     public class AnalyticsTableOperator implements Operator {
     
-        private static final String LUCENE_QUERY_PARAM = "KKJIOJEEFEFXA";
+        private static final String LUCENE_QUERY_PARAM = "e267ba83-0c77-4e0d-9c5f-cd3a31dbe2d3";
 
         private static final int MAX_SEARCH_QUERY_RESULT_SIZE = 1000;
 
@@ -337,23 +339,23 @@ public class AnalyticsEventTable implements EventTable {
         }
         
         private void initMetaStateEvent() {
-            if (metaComplexEvent instanceof MetaStreamEvent) {
-                metaStateEvent = new MetaStateEvent(1);
-                metaStateEvent.addEvent(((MetaStreamEvent) metaComplexEvent));
+            if (this.metaComplexEvent instanceof MetaStreamEvent) {
+                this.metaStateEvent = new MetaStateEvent(1);
+                this.metaStateEvent.addEvent(((MetaStreamEvent) this.metaComplexEvent));
             } else {
-                MetaStreamEvent[] metaStreamEvents = ((MetaStateEvent) metaComplexEvent).getMetaStreamEvents();
+                MetaStreamEvent[] metaStreamEvents = ((MetaStateEvent) this.metaComplexEvent).getMetaStreamEvents();
                 for (int candidateEventPosition = 0; candidateEventPosition < metaStreamEvents.length; candidateEventPosition++) {
                     MetaStreamEvent metaStreamEvent = metaStreamEvents[candidateEventPosition];
-                    if (candidateEventPosition != matchingStreamIndex
+                    if (candidateEventPosition != this.matchingStreamIndex
                             && metaStreamEvent.getLastInputDefinition().equalsIgnoreAnnotations(tableDefinition)) {
-                        metaStateEvent = ((MetaStateEvent) metaComplexEvent);
+                        this.metaStateEvent = ((MetaStateEvent) this.metaComplexEvent);
                         break;
                     }
                 }
-                if (metaStateEvent == null) {
-                    metaStateEvent = new MetaStateEvent(metaStreamEvents.length + 1);
+                if (this.metaStateEvent == null) {
+                    this.metaStateEvent = new MetaStateEvent(metaStreamEvents.length + 1);
                     for (MetaStreamEvent metaStreamEvent : metaStreamEvents) {
-                        metaStateEvent.addEvent(metaStreamEvent);
+                        this.metaStateEvent.addEvent(metaStreamEvent);
                     }
                 }
             }
@@ -390,10 +392,8 @@ public class AnalyticsEventTable implements EventTable {
                 case EQUAL:
                     this.checkPrimaryKeyUsage(field);
                     this.mentionedFields.add(field);
-//                    return "(" + Constants.NON_TOKENIZED_FIELD_PREFIX + field + ": " + 
-//                            luceneQueryFromExpression(compare.getRightExpression()) + ")";
-                    return "(" + field + ": " + 
-                    luceneQueryFromExpression(compare.getRightExpression()) + ")";                    
+                    return "(" + Constants.NON_TOKENIZED_FIELD_PREFIX + field + ": " + 
+                            luceneQueryFromExpression(compare.getRightExpression()) + ")";                
                 case GREATER_THAN:
                     this.pkMatchCompatible = false;
                     rhv = luceneQueryFromExpression(compare.getRightExpression());
@@ -427,15 +427,17 @@ public class AnalyticsEventTable implements EventTable {
                     return "(-" + Constants.NON_TOKENIZED_FIELD_PREFIX + field + ": " + 
                     luceneQueryFromExpression(compare.getRightExpression()) + ")";
                 default:
-                    return true;                
+                    return true;
                 }
             } else if (expr instanceof Constant) {
                 return this.returnConstantValue((Constant) expr);
             } else if (expr instanceof Variable) {
                 Variable var = (Variable) expr;
                 if (var.getStreamId().equals(tableDefinition.getId())) {
+                    System.out.println("AAAAAA: " + var + ":" + var.getStreamId());
                     return var.getAttributeName();
                 } else {
+                    System.out.println("BBBBBB: " + var + ":" + var.getStreamId());
                     ExpressionExecutor expressionExecutor = ExpressionParser.parseExpression(expr,
                             metaStateEvent, matchingStreamIndex, eventTableMap, variableExpressionExecutors, executionPlanContext, false, 0);
                     this.expressionExecs.add(expressionExecutor);
@@ -519,18 +521,25 @@ public class AnalyticsEventTable implements EventTable {
         }
     
         @Override
-        public StreamEvent find(ComplexEvent matchingEvent, Object candidateEvents, StreamEventCloner streamEventCloner) {
+        public StreamEvent find(ComplexEvent matchingEvent, Object candidateEvents, 
+                StreamEventCloner streamEventCloner) {
+            List<Record> records = this.findRecords(matchingEvent, candidateEvents, streamEventCloner);
+            return AnalyticsEventTableUtils.recordsToStreamEvent(this.attrs, records);
+        }
+        
+        private List<Record> findRecords(ComplexEvent matchingEvent, Object candidateEvents, 
+                StreamEventCloner streamEventCloner) {
+            List<Record> records;
             if (this.returnAllRecords) {
-                List<Record> records = AnalyticsEventTableUtils.getAllRecords(this.tenantId, this.tableName);
-                return AnalyticsEventTableUtils.recordsToStreamEvent(this.attrs, records);
+                records = AnalyticsEventTableUtils.getAllRecords(this.tenantId, this.tableName);
             } else if (this.pkMatchCompatible) {
                 Record record = AnalyticsEventTableUtils.getRecordWithEventValues(this.tenantId, this.tableName, 
                         this.attrs, matchingEvent);
-                return AnalyticsEventTableUtils.recordToStreamEvent(this.attrs, record);
+                records = Arrays.asList(record);
             } else {
-                List<Record> records = this.executeLuceneQuery(matchingEvent);
-                return AnalyticsEventTableUtils.recordsToStreamEvent(this.attrs, records);
+                records = this.executeLuceneQuery(matchingEvent);
             }
+            return records;
         }
         
         private String getTranslatedLuceneQuery(ComplexEvent matchingEvent) {
@@ -562,12 +571,22 @@ public class AnalyticsEventTable implements EventTable {
 
         @SuppressWarnings("rawtypes")
         @Override
-        public void delete(ComplexEventChunk deletingEventChunk, Object candidateEvents) {            
+        public void delete(ComplexEventChunk deletingEventChunk, Object candidateEvents) {
+            deletingEventChunk.reset();
+            while (deletingEventChunk.hasNext()) {
+                List<Record> records = this.findRecords(deletingEventChunk.next(), candidateEvents, null);
+                AnalyticsEventTableUtils.deleteRecords(this.tenantId, this.tableName, records);
+            }
         }
 
         @SuppressWarnings("rawtypes")
         @Override
-        public void update(ComplexEventChunk updatingEventChunk, Object candidateEvents, int[] mappingPosition) {            
+        public void update(ComplexEventChunk updatingEventChunk, Object candidateEvents, int[] mappingPosition) {
+            updatingEventChunk.reset();
+            while (updatingEventChunk.hasNext()) {
+                this.findRecords(updatingEventChunk.next(), candidateEvents, null);
+                // finish impl.
+            }
         }
     
     }

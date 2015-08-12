@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wso2.carbon.analytics.dataservice.commons;
 
 /**
- * This class contains the constants required by the AnalyticsDataService
+ * This class contains the constants required by the AnalyticsDataService.
  */
 public class Constants {
+    
     public static final String NON_TOKENIZED_FIELD_PREFIX = "_";
+    
 }
 
