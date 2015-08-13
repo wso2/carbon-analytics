@@ -101,9 +101,58 @@
 		}
 	</script>
 
+	<script type="text/javascript">
+		function doDelete(eventStreamName, eventStreamVersion) {
+
+			CARBON.showConfirmationDialog("If event stream is deleted then other artifacts using this stream will go into inactive state! Are you sure want to delete?",
+					function () {
+						new Ajax.Request('../eventstream/delete_event_stream_ajaxprocessor.jsp', {
+							method: 'POST',
+							asynchronous: false,
+							parameters: {
+								eventStreamName: eventStreamName,
+								eventStreamVersion: eventStreamVersion,
+							}, onSuccess: function (msg) {
+								if ("success" == msg.responseText.trim()) {
+									CARBON.showInfoDialog("Event Stream successfully deleted.", function () {
+										window.location.href = "../eventstream/index.jsp?region=region1&item=eventstream_menu.jsp";
+									});
+								} else {
+									CARBON.showErrorDialog("Failed to delete event stream, Exception: " + msg.responseText.trim());
+								}
+							}
+						})
+					}, null, null);
+		}
+
+	</script>
+
 	<div id="middle">
-		<h2>
+		<h2  style="padding-bottom: 7px">
 			<fmt:message key="event.stream.details" /><%=eventStreamWithVersion%>
+			<span style="float: right; font-size:75%">
+				<a style="background-image: url(images/event-simulator.png);"
+				   class="icon-link"
+				   href = "../eventsimulator/index.jsp?streamId=<%=streamDefinitionDto.getName()%>:<%=streamDefinitionDto.getVersion()%>"
+						<font color="#4682b4">Simulate</font>
+				</a>
+				<%
+					if (streamDefinitionDto.getEditable()) {
+				%>
+
+				<a style="background-image: url(../admin/images/delete.gif);"
+				   class="icon-link"
+				   onclick="doDelete('<%=streamDefinitionDto.getName()%>', '<%=streamDefinitionDto.getVersion()%>')"><font
+						color="#4682b4">Delete</font></a>
+
+				<a style="background-image: url(../admin/images/edit.gif);"
+				   class="icon-link"
+				   href="edit_event_stream.jsp?ordinal=1&eventStreamWithVersion=<%=eventStreamWithVersion%>"><font
+						color="#4682b4">Edit</font></a>
+				<%
+					}
+				%>
+			</span>
 		</h2>
 
 		<div id="workArea">
@@ -530,6 +579,13 @@
 
 				</table>
 
+			</form>
+		</div>
+		<div>
+			<br/>
+			<form id="deleteForm" name="input" action="" method="post">
+				<input type="HIDDEN" name="eventStream" value=""/>
+				<input type="HIDDEN" name="eventStreamVersion" value=""/>
 			</form>
 		</div>
 	</div>

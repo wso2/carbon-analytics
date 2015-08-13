@@ -17,12 +17,12 @@
 *
 */
 
-package org.wso2.carbon.analytics.jmx.agent.tasks.internal;
+package org.wso2.carbon.analytics.common.jmx.agent.tasks.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.analytics.jmx.agent.JmxConstant;
+import org.wso2.carbon.analytics.common.jmx.agent.JmxConstant;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.service.TaskService;

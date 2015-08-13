@@ -17,16 +17,16 @@
 *
 */
 
-package org.wso2.carbon.analytics.jmx.agent.profiles;
+package org.wso2.carbon.analytics.common.jmx.agent.profiles;
 
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.jmx.agent.exceptions.JmxProfileException;
-import org.wso2.carbon.analytics.jmx.agent.exceptions.ProfileAlreadyExistsException;
-import org.wso2.carbon.analytics.jmx.agent.exceptions.ProfileDoesNotExistException;
-import org.wso2.carbon.analytics.jmx.agent.tasks.internal.JmxTaskServiceComponent;
+import org.wso2.carbon.analytics.common.jmx.agent.exceptions.JmxProfileException;
+import org.wso2.carbon.analytics.common.jmx.agent.exceptions.ProfileAlreadyExistsException;
+import org.wso2.carbon.analytics.common.jmx.agent.exceptions.ProfileDoesNotExistException;
+import org.wso2.carbon.analytics.common.jmx.agent.tasks.internal.JmxTaskServiceComponent;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.util.CryptoException;
 import org.wso2.carbon.core.util.CryptoUtil;

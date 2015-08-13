@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.wso2.carbon.analytics.jmx.agent;
+package org.wso2.carbon.analytics.common.jmx.agent;
 
 
 import org.apache.axis2.context.MessageContext;

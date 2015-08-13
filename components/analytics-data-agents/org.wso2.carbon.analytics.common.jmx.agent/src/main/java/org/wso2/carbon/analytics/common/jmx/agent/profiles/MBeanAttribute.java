@@ -16,27 +16,39 @@
 
 /**
  * Date: 7/25/13
- * Time: 4:56 PM
+ * Time: 12:16 PM
  */
 
-package org.wso2.carbon.analytics.jmx.agent.profiles;
+package org.wso2.carbon.analytics.common.jmx.agent.profiles;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class MBeanAttributeProperty {
+public class MBeanAttribute {
 
-    private String propertyName;
+
+    private String attributeName;
+    /* Alias name is optional if MBean type is composite. Mandatory if MBean is a simple type */
     private String aliasName;
+    private MBeanAttributeProperty[] properties;
 
-    public String getPropertyName() {
-        return propertyName;
+    public String getAttributeName() {
+        return attributeName;
     }
 
     @XmlElement
-    public void setPropertyName(String propertyName) {
-        this.propertyName = propertyName;
+    public void setAttributeName(String attributeName) {
+        this.attributeName = attributeName;
+    }
+
+    public MBeanAttributeProperty[] getProperties() {
+        return properties;
+    }
+
+    @XmlElement
+    public void setProperties(MBeanAttributeProperty[] properties) {
+        this.properties = properties;
     }
 
     public String getAliasName() {

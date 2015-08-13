@@ -70,7 +70,7 @@ public class TCPEventPublisher {
             throws IOException {
         this.hostUrl = hostUrl;
         this.publisherConfig = publisherConfig;
-        this.defaultCharset=publisherConfig.getDefaultCharset();
+        this.defaultCharset= publisherConfig.getDefaultCharset();
         this.streamRuntimeInfoMap = new ConcurrentHashMap<String, StreamRuntimeInfo>();
         this.isSynchronous = isSynchronous;
         this.connectionCallback = connectionCallback;

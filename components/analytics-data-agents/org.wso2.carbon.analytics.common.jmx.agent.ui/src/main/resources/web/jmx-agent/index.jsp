@@ -2,18 +2,18 @@
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
-<%@ page import="org.wso2.carbon.analytics.jmx.agent.stub.profiles.xsd.Profile" %>
-<%@ page import="org.wso2.carbon.analytics.jmx.agent.ui.JmxConnector" %>
+<%@ page import="org.wso2.carbon.analytics.common.jmx.agent.stub.profiles.xsd.Profile" %>
+<%@ page import="org.wso2.carbon.analytics.common.jmx.agent.ui.JmxConnector" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
-<%@ page import="org.wso2.carbon.analytics.jmx.agent.stub.JmxAgentProfileDoesNotExistExceptionException" %>
-<%@ page import="org.wso2.carbon.analytics.jmx.agent.stub.JmxAgentJmxProfileExceptionException" %>
+<%@ page import="org.wso2.carbon.analytics.common.jmx.agent.stub.JmxAgentProfileDoesNotExistExceptionException" %>
+<%@ page import="org.wso2.carbon.analytics.common.jmx.agent.stub.JmxAgentJmxProfileExceptionException" %>
 
-<fmt:bundle basename="org.wso2.carbon.analytics.jmx.agent.ui.i18n.Resources">
+<fmt:bundle basename="org.wso2.carbon.analytics.common.jmx.agent.ui.i18n.Resources">
 
     <carbon:breadcrumb
             label="bam.jmx-agent"
-            resourceBundle="org.wso2.carbon.analytics.jmx.agent.ui.i18n.Resources"
+            resourceBundle="org.wso2.carbon.analytics.common.jmx.agent.ui.i18n.Resources"
             topPage="true"
             request="<%=request%>"/>
     <% String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);

@@ -17,17 +17,17 @@
 *
 */
 
-package org.wso2.carbon.analytics.jmx.agent;
+package org.wso2.carbon.analytics.common.jmx.agent;
 
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.jmx.agent.exceptions.JmxProfileException;
-import org.wso2.carbon.analytics.jmx.agent.exceptions.ProfileAlreadyExistsException;
-import org.wso2.carbon.analytics.jmx.agent.exceptions.ProfileDoesNotExistException;
-import org.wso2.carbon.analytics.jmx.agent.profiles.Profile;
-import org.wso2.carbon.analytics.jmx.agent.profiles.ProfileManager;
-import org.wso2.carbon.analytics.jmx.agent.tasks.JmxTaskAdmin;
+import org.wso2.carbon.analytics.common.jmx.agent.exceptions.JmxProfileException;
+import org.wso2.carbon.analytics.common.jmx.agent.exceptions.ProfileAlreadyExistsException;
+import org.wso2.carbon.analytics.common.jmx.agent.exceptions.ProfileDoesNotExistException;
+import org.wso2.carbon.analytics.common.jmx.agent.profiles.Profile;
+import org.wso2.carbon.analytics.common.jmx.agent.profiles.ProfileManager;
+import org.wso2.carbon.analytics.common.jmx.agent.tasks.JmxTaskAdmin;
 import org.wso2.carbon.core.AbstractAdmin;
 
 import javax.management.AttributeNotFoundException;

@@ -17,14 +17,14 @@
 *
 */
 
-package org.wso2.carbon.analytics.jmx.agent.tasks;
+package org.wso2.carbon.analytics.common.jmx.agent.tasks;
 
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.jmx.agent.JmxConstant;
-import org.wso2.carbon.analytics.jmx.agent.profiles.Profile;
-import org.wso2.carbon.analytics.jmx.agent.tasks.internal.JmxTaskServiceComponent;
+import org.wso2.carbon.analytics.common.jmx.agent.JmxConstant;
+import org.wso2.carbon.analytics.common.jmx.agent.profiles.Profile;
+import org.wso2.carbon.analytics.common.jmx.agent.tasks.internal.JmxTaskServiceComponent;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.ntask.core.TaskManager;

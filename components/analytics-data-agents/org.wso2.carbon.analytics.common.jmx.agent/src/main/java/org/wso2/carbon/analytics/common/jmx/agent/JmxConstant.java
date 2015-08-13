@@ -17,23 +17,12 @@
 *
 */
 
-package org.wso2.carbon.analytics.jmx.agent.exceptions;
+package org.wso2.carbon.analytics.common.jmx.agent;
 
-public class ProfileDoesNotExistException extends Exception {
 
-    private String message;
+public class JmxConstant {
 
-    public String getMessage() {
-        return message;
-    }
-
-    public ProfileDoesNotExistException(String message) {
-        super(message);
-        this.message = message;
-    }
-
-    public ProfileDoesNotExistException(String message, Throwable cause) {
-        super(message, cause);
-        this.message = message;
-    }
+    public static final String JMX_REMOTE_CREDENTIALS_STR = "jmx.remote.credentials";
+    public static final String JMX_SERVICE_TASK_TYPE = "JMX_SERVICE_TASK";
+    public static String JMX_PROFILE_NAME = "JMX_PROFILE_NAME";
 }

@@ -17,10 +17,10 @@
 *
 */
 
-package org.wso2.carbon.analytics.jmx.agent.tasks;
+package org.wso2.carbon.analytics.common.jmx.agent.tasks;
 
-import org.wso2.carbon.analytics.jmx.agent.JmxConstant;
-import org.wso2.carbon.analytics.jmx.agent.profiles.Profile;
+import org.wso2.carbon.analytics.common.jmx.agent.JmxConstant;
+import org.wso2.carbon.analytics.common.jmx.agent.profiles.Profile;
 import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.ntask.core.TaskInfo.TriggerInfo;
 

@@ -15,28 +15,36 @@
  */
 
 /**
- * Date: 7/16/13
- * Time: 11:59 AM
+ * Date: 7/25/13
+ * Time: 4:56 PM
  */
 
-package org.wso2.carbon.analytics.jmx.agent.exceptions;
+package org.wso2.carbon.analytics.common.jmx.agent.profiles;
 
-public class JmxMBeanException extends Exception {
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
-    private static final long serialVersionUID = -2641261566547038727L;
-    private String message;
+@XmlRootElement
+public class MBeanAttributeProperty {
 
-    public String getMessage() {
-        return message;
+    private String propertyName;
+    private String aliasName;
+
+    public String getPropertyName() {
+        return propertyName;
     }
 
-    public JmxMBeanException(String message) {
-        super(message);
-        this.message = message;
+    @XmlElement
+    public void setPropertyName(String propertyName) {
+        this.propertyName = propertyName;
     }
 
-    public JmxMBeanException(String message, Throwable cause) {
-        super(message, cause);
-        this.message = message;
+    public String getAliasName() {
+        return aliasName;
+    }
+
+    @XmlElement
+    public void setAliasName(String aliasName) {
+        this.aliasName = aliasName;
     }
 }

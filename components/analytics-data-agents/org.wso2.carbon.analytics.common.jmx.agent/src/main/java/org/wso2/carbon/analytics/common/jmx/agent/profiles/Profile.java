@@ -17,7 +17,7 @@
 *
 */
 
-package org.wso2.carbon.analytics.jmx.agent.profiles;
+package org.wso2.carbon.analytics.common.jmx.agent.profiles;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
