@@ -166,7 +166,7 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
                     }
                 }
             } else if(doLogDroppedMessage) {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send as session not available", log, tenantId);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "No clients registered", log, tenantId);
                 doLogDroppedMessage = false;
             }
 
