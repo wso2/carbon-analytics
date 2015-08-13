@@ -46,8 +46,8 @@ public class TCPEventServer {
     private ServerWorker serverWorker;
     private Map<String, StreamRuntimeInfo> streamRuntimeInfoMap = new ConcurrentHashMap<String, StreamRuntimeInfo>();
 
-    public TCPEventServer(TCPEventServerConfig TCPEventServerConfig, StreamCallback streamCallback, ConnectionCallback connectionCallback) {
-        this.tcpEventServerConfig = TCPEventServerConfig;
+    public TCPEventServer(TCPEventServerConfig tcpeventserverconfig, StreamCallback streamCallback, ConnectionCallback connectionCallback) {
+        this.tcpEventServerConfig = tcpeventserverconfig;
         this.streamCallback = streamCallback;
         this.connectionCallback = connectionCallback;
         this.serverWorker = new ServerWorker();
