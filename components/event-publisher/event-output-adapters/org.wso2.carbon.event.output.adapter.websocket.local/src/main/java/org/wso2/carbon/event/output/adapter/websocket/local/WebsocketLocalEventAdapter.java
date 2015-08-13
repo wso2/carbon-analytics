@@ -98,7 +98,7 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
 
     @Override
     public void testConnect() throws TestConnectionNotSupportedException {
-        //Not applicable.
+        throw new TestConnectionNotSupportedException("Test connection is not available");
     }
 
     @Override
@@ -166,7 +166,7 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
                     }
                 }
             } else if(doLogDroppedMessage) {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send as session not available", log, tenantId);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "No clients registered", log, tenantId);
                 doLogDroppedMessage = false;
             }
 
