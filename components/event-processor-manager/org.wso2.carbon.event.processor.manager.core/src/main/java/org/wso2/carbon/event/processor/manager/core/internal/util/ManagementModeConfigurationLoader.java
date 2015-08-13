@@ -233,7 +233,7 @@ public class ManagementModeConfigurationLoader {
         } else {
             log.info("No transport reconnection interval provided. Hence using default reconnection interval");
         }
-        if (transport.getChildrenWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE)) != null){
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE)) != null){
             int queueSize = Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE)).getText());
 
@@ -247,7 +247,7 @@ public class ManagementModeConfigurationLoader {
         } else {
             log.info("No CEP receiver output queue size specified. Hence using default queue size");
         }
-        if (transport.getChildrenWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE)) != null){
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE)) != null){
             int queueSize = Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE)).getText());
 
