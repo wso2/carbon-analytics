@@ -328,7 +328,7 @@ public class CarbonEventManagementService implements EventManagementService {
                         }
                     }
                 }
-            });
+            }, null);
             for (EventSync eventSync : eventSyncMap.values()) {
                 tcpEventServer.addStreamDefinition(eventSync.getStreamDefinition());
             }
@@ -375,7 +375,7 @@ public class CarbonEventManagementService implements EventManagementService {
     public synchronized void addMember(HostAndPort member) {
         try {
             if (!tcpEventPublisherPool.containsKey(member)) {
-                TCPEventPublisher tcpEventPublisher = new TCPEventPublisher(member.getHostName() + ":" + member.getPort(), false);
+                TCPEventPublisher tcpEventPublisher = new TCPEventPublisher(member.getHostName() + ":" + member.getPort(), false, null);
                 for (EventSync eventSync : eventSyncMap.values()) {
                     tcpEventPublisher.addStreamDefinition(eventSync.getStreamDefinition());
                 }

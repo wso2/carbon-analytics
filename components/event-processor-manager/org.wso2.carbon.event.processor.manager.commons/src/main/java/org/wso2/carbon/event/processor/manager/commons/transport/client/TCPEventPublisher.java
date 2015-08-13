@@ -25,6 +25,7 @@ import com.lmax.disruptor.dsl.Disruptor;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.event.processor.manager.commons.transport.common.EventServerUtils;
 import org.wso2.carbon.event.processor.manager.commons.transport.common.StreamRuntimeInfo;
+import org.wso2.carbon.event.processor.manager.commons.transport.server.ConnectionCallback;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
@@ -55,13 +56,24 @@ public class TCPEventPublisher {
      * returns only after writing the event to the socket.
      */
     private boolean isSynchronous;
+    private ConnectionCallback connectionCallback;
 
-    public TCPEventPublisher(String hostUrl, TCPEventPublisherConfig publisherConfig, boolean isSynchronous) throws IOException {
+    /**
+     *
+     * @param hostUrl
+     * @param publisherConfig
+     * @param isSynchronous
+     * @param connectionCallback is a callback, invoked on connect() and disconnect() methods of TCPEventPublisher. Set this to null if a callback is not needed.
+     * @throws IOException
+     */
+    public TCPEventPublisher(String hostUrl, TCPEventPublisherConfig publisherConfig, boolean isSynchronous, ConnectionCallback connectionCallback)
+            throws IOException {
         this.hostUrl = hostUrl;
         this.publisherConfig = publisherConfig;
         this.defaultCharset= publisherConfig.getDefaultCharset();
         this.streamRuntimeInfoMap = new ConcurrentHashMap<String, StreamRuntimeInfo>();
         this.isSynchronous = isSynchronous;
+        this.connectionCallback = connectionCallback;
 
         if (!isSynchronous) {
             try {
@@ -86,10 +98,13 @@ public class TCPEventPublisher {
         this.clientSocket.setSendBufferSize(publisherConfig.getTcpSendBufferSize());
         this.outputStream = new BufferedOutputStream(this.clientSocket.getOutputStream());
         log.info("Connecting to " + hostUrl);
+        if(connectionCallback != null){
+            connectionCallback.onCepReceiverConnect();
+        }
     }
 
-    public TCPEventPublisher(String hostUrl, boolean isSynchronous) throws IOException {
-        this(hostUrl, new TCPEventPublisherConfig(), isSynchronous);
+    public TCPEventPublisher(String hostUrl, boolean isSynchronous, ConnectionCallback connectionCallback) throws IOException {
+        this(hostUrl, new TCPEventPublisherConfig(), isSynchronous, connectionCallback);
     }
 
     public void addStreamDefinition(StreamDefinition streamDefinition) {
@@ -277,6 +292,10 @@ public class TCPEventPublisher {
             }
         } catch (IOException e) {
             log.debug("Error while closing socket to " + hostUrl + " : " + e.getMessage(), e);
+        }  finally {
+            if(connectionCallback != null){
+                connectionCallback.onCepReceiverDisconnect();
+            }
         }
     }
 

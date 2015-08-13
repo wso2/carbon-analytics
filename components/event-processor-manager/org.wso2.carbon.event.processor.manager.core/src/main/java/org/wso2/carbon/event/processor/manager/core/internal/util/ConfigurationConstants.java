@@ -68,6 +68,9 @@ public final class ConfigurationConstants {
     public static final String DISTRIBUTED_NODE_CONFIG_PORT_RANGE_ELEMENT = "portRange";
     public static final String DISTRIBUTED_NODE_CONFIG_DISTRIBUTED_UI_URL_ELEMENT = "distributedUIUrl";
     public static final String DISTRIBUTED_NODE_CONFIG_STORM_JAR_ELEMENT = "stormJar";
+    public static final String DISTRIBUTED_NODE_CONFIG_STATUS_MONITOR_ELEMENT = "statusMonitor";
+    public static final String DISTRIBUTED_NODE_CONFIG_STATUS_MONITOR_LOCK_TIMEOUT = "lockTimeout";
+    public static final String DISTRIBUTED_NODE_CONFIG_STATUS_MONITOR_UPDATE_RATE = "updateRate";
     public static final String DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE = "cepReceiverOutputQueueSize";
     public static final String DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE = "stormPublisherOutputQueueSize";
     public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_MODE = "tcpEventPublisherMode";

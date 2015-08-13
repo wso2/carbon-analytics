@@ -60,7 +60,7 @@ public class TCPEventSendingTestCase {
                 .attribute("att4", Attribute.Type.INT);
 
         TestStreamCallback streamCallback = new TestStreamCallback();
-        TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig(7612), streamCallback);
+        TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig(7612), streamCallback, null);
         try {
             TCPEventServer.addStreamDefinition(streamDefinition);
             TCPEventServer.start();
@@ -87,7 +87,7 @@ public class TCPEventSendingTestCase {
                 .attribute("searchTerms", Attribute.Type.STRING);
 
         TestStreamCallback streamCallback = new TestStreamCallback();
-        TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig(7612), streamCallback);
+        TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig(7612), streamCallback, null);
         try {
             TCPEventServer.addStreamDefinition(streamDefinition);
             TCPEventServer.start();
@@ -117,7 +117,7 @@ public class TCPEventSendingTestCase {
                 .attribute("att4", Attribute.Type.INT);
 
         TestStreamCallback streamCallback = new TestStreamCallback();
-        TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig(7612), streamCallback);
+        TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig(7612), streamCallback, null);
         try {
             threadPool.submit(new ClientThread(streamDefinition, new SimpleDataProvider(), 100, false, 1000));
             Thread.sleep(10000);
@@ -164,7 +164,7 @@ public class TCPEventSendingTestCase {
         public void run() {
             TCPEventPublisher TCPEventPublisher = null;
             try {
-                TCPEventPublisher = new TCPEventPublisher("localhost:7612", isSynchronous);
+                TCPEventPublisher = new TCPEventPublisher("localhost:7612", isSynchronous, null);
                 TCPEventPublisher.addStreamDefinition(streamDefinition);
                 Thread.sleep(1000);
                 log.info("Starting event client to send events to localhost:7612");

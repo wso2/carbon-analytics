@@ -72,7 +72,7 @@ public class TCPEventTestServer {
 //                    e.printStackTrace();
 //                }
             }
-        });
+        }, null);
 
         eventServer.addStreamDefinition(streamDefinition);
         eventServer.addStreamDefinition(streamDefinition1);
