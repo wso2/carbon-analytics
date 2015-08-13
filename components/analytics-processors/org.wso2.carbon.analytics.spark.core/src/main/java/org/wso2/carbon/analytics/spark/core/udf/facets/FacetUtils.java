@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.analytics.spark.core.udf.facets;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,11 +32,11 @@ public class FacetUtils {
      * @param objects
      * @return An array of String values
      */
-    public static List<String> getFacetArray(Object... objects) {
+    public static String getFacetString(Object... objects) {
         List<String> valueList = new ArrayList<>();
         for (Object object : objects) {
             valueList.add(String.valueOf(object));
         }
-        return valueList;
+        return StringUtils.join(valueList, ',');
     }
 }
