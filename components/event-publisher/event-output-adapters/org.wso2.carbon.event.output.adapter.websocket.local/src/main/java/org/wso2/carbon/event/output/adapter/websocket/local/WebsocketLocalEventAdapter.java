@@ -98,7 +98,7 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
 
     @Override
     public void testConnect() throws TestConnectionNotSupportedException {
-        //Not applicable.
+        throw new TestConnectionNotSupportedException("Test connection is not available");
     }
 
     @Override

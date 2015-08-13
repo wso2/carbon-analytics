@@ -166,7 +166,7 @@ public class UIEventAdapter implements OutputEventAdapter {
 
     @Override
     public void testConnect() throws TestConnectionNotSupportedException {
-        //Not needed
+        throw new TestConnectionNotSupportedException("Test connection is not available");
     }
 
     @Override
@@ -252,13 +252,17 @@ public class UIEventAdapter implements OutputEventAdapter {
 
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
-        //Removing outputadapter and streamId
-        UIEventAdaptorServiceInternalValueHolder
-                .getTenantSpecificOutputEventStreamAdapterMap().get(tenantId).remove(streamId);
+        ConcurrentHashMap<String, String> tenantSpecificAdapterMap = UIEventAdaptorServiceInternalValueHolder
+                .getTenantSpecificOutputEventStreamAdapterMap().get(tenantId);
+        if(tenantSpecificAdapterMap != null){
+            tenantSpecificAdapterMap.remove(streamId);      //Removing outputadapter and streamId
+        }
 
-        //Removing the streamId and events registered for the output adapter
-        UIEventAdaptorServiceInternalValueHolder.getTenantSpecificStreamEventMap().get(tenantId).remove(streamId);
-
+        ConcurrentHashMap<String, LinkedBlockingDeque<Object>> tenantSpecificStreamEventMap =
+                UIEventAdaptorServiceInternalValueHolder.getTenantSpecificStreamEventMap().get(tenantId);
+        if(tenantSpecificStreamEventMap != null){
+            tenantSpecificStreamEventMap.remove(streamId);  //Removing the streamId and events registered for the output adapter
+        }
     }
 
     @Override
