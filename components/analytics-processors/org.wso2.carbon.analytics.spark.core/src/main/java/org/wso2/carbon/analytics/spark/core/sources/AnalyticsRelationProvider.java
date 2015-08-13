@@ -237,7 +237,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
     }
 
     private List<String> createPrimaryKeyList(String primaryKeyStr) {
-        return Arrays.asList(primaryKeyStr.trim().split("\\s*,\\s*"));
+        return new ArrayList<>(Arrays.asList(primaryKeyStr.trim().split("\\s*,\\s*")));
     }
 
     /**
