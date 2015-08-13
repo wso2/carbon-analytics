@@ -73,7 +73,7 @@ public class AnalyticsSparkExecutorTest {
      *
      * @throws AnalyticsException
      */
-/*
+
 
     @Test
     public void testCreateTableQuery() throws AnalyticsException {
@@ -350,7 +350,7 @@ public class AnalyticsSparkExecutorTest {
 
         System.out.println(testString("end : create temp table with multiple record stores test"));
     }
-*/
+
 
     @Test
     public void testTimestampRetrivability() throws AnalyticsException, InterruptedException {
