@@ -202,8 +202,9 @@ public class AnalyticsRecordStoreTest {
         List<Record> records = new ArrayList<Record>();
         records.add(record);
         this.analyticsRS.put(records);
-        long count = this.analyticsRS.getRecordCount(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
-        Assert.assertEquals(count, 1);
+        List<Record> recordsIn = GenericUtils.listRecords(this.analyticsRS,
+                this.analyticsRS.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(recordsIn.size(), 1);
         this.analyticsRS.deleteTable(tenantId, tableName);
     }
     
