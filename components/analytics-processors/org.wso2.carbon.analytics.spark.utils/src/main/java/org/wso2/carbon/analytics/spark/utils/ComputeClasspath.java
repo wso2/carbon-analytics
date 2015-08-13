@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.spark.utils;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 /**
  * this class creates the spark classpath by looking at the plugins folder
@@ -225,9 +226,27 @@ public class ComputeClasspath {
     }
 
     private static String createSparkClasspath(String carbonHome, String[] requiredJars) {
+
+        String sparkClasspath = "$SPARK_CLASSPATH";
         File pluginsDir = new File(carbonHome + File.separator + "repository" + File.separator
                                    + "pluginsDir");
 
+        File[] pluginJars = pluginsDir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".jar");
+            }
+        });
+
+        for (File pluginJar : pluginJars) {
+            String plugin = pluginJar.getName();
+            for (String requiredJar : requiredJars) {
+                if (plugin.startsWith(requiredJar)) {
+                    sparkClasspath = sparkClasspath + ":" + pluginJar.getAbsolutePath();
+                    break;
+                }
+            }
+        }
         return null;
     }
 }
