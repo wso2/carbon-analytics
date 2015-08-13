@@ -46,6 +46,7 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
     private static final Log log = LogFactory.getLog(WebsocketEventAdapter.class);
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
+    private boolean doLogDroppedMessage;
 
     private Session session;
     private String socketServerUrl;
@@ -55,6 +56,7 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
     public WebsocketEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
+        this.doLogDroppedMessage = true;
     }
 
 
@@ -193,6 +195,7 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
         @Override
         public void run() {
             if (session != null) {
+                doLogDroppedMessage = true;
                 synchronized (session) {
                     try {
                         session.getBasicRemote().sendText(message);
@@ -200,8 +203,9 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
                         EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to endpoint", e, log, tenantId);
                     }
                 }
-            } else {
+            } else if(doLogDroppedMessage) {
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send as session not available", log, tenantId);
+                doLogDroppedMessage = false;
             }
         }
     }
