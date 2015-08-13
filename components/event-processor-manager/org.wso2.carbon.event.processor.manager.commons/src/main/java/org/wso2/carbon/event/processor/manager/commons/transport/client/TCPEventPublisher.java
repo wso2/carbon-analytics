@@ -295,7 +295,6 @@ public class TCPEventPublisher {
         }  finally {
             if(connectionCallback != null){
                 connectionCallback.onCepReceiverDisconnect();
-                log.info("--------------------------TCPEventPublisher onclose invoked.");//todo: delete later
             }
         }
     }
