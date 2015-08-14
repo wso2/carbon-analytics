@@ -15,27 +15,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.event.output.adapter.core.internal.ds;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.w3c.dom.Document;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
-import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.internal.CarbonOutputEventAdapterService;
-import org.wso2.carbon.event.output.adapter.core.internal.EventAdapterConstants;
-import org.wso2.carbon.event.output.adapter.core.internal.config.AdapterConfigs;
-import org.wso2.carbon.event.output.adapter.core.internal.util.SecureVaultHelper;
+import org.wso2.carbon.event.output.adapter.core.internal.util.EventAdapterConfigHelper;
 import org.wso2.carbon.securevault.SecretCallbackHandlerService;
-import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +56,7 @@ public class OutputEventAdapterServiceDS {
     protected void activate(ComponentContext context) {
 
 
-        OutputEventAdapterServiceValueHolder.setGlobalAdapterConfigs(loadGlobalConfigs());
+        OutputEventAdapterServiceValueHolder.setGlobalAdapterConfigs(EventAdapterConfigHelper.loadGlobalConfigs());
 
         CarbonOutputEventAdapterService outputEventAdapterService = new CarbonOutputEventAdapterService();
         OutputEventAdapterServiceValueHolder.setCarbonOutputEventAdapterService(outputEventAdapterService);
@@ -111,31 +103,6 @@ public class OutputEventAdapterServiceDS {
 
     protected void unSetEventAdapterType(OutputEventAdapterFactory outputEventAdapterFactory) {
         OutputEventAdapterServiceValueHolder.getCarbonOutputEventAdapterService().unRegisterEventAdapterFactory(outputEventAdapterFactory);
-    }
-
-    private AdapterConfigs loadGlobalConfigs() {
-
-        String path = CarbonUtils.getCarbonConfigDirPath() + File.separator + EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME;
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(AdapterConfigs.class);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
-            File configFile = new File(path);
-            if (!configFile.exists()) {
-                log.warn(EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME + " can not found in " + path + "," +
-                        " hence Output Event Adapters will be running with default global configs.");
-            }
-            Document globalConfigDoc = SecureVaultHelper.convertToDocument(configFile);
-            SecureVaultHelper.secureResolveDocument(globalConfigDoc);
-            return (AdapterConfigs) unmarshaller.unmarshal(globalConfigDoc);
-        } catch (JAXBException e) {
-            log.error("Error in loading " + EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME + " from " + path + "," +
-                    " hence Output Event Adapters will be running with default global configs.");
-        } catch (OutputEventAdapterException e) {
-            log.error("Error in converting " + EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME + " to parsed document," +
-                    " hence Output Event Adapters will be running with default global configs.");
-        }
-        return new AdapterConfigs();
     }
 
     protected void setConfigurationContextService(

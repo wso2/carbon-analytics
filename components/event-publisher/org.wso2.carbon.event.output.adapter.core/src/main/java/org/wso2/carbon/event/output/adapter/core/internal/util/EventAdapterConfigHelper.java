@@ -19,19 +19,27 @@
 package org.wso2.carbon.event.output.adapter.core.internal.util;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.*;
 import org.wso2.carbon.core.util.CryptoException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.internal.EventAdapterConstants;
+import org.wso2.carbon.event.output.adapter.core.internal.config.AdapterConfigs;
 import org.wso2.carbon.event.output.adapter.core.internal.ds.OutputEventAdapterServiceValueHolder;
+import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.securevault.SecretResolver;
 import org.wso2.securevault.SecretResolverFactory;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 
-public class SecureVaultHelper {
+public class EventAdapterConfigHelper {
 
+    private static final Log log = LogFactory.getLog(EventAdapterConfigHelper.class);
     private static SecretResolver secretResolver;
 
     public static void secureResolveDocument(Document doc)
@@ -87,4 +95,28 @@ public class SecureVaultHelper {
         return secretResolver.resolve(alias);
     }
 
+    public static AdapterConfigs loadGlobalConfigs() {
+
+        String path = CarbonUtils.getCarbonConfigDirPath() + File.separator + EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME;
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(AdapterConfigs.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+
+            File configFile = new File(path);
+            if (!configFile.exists()) {
+                log.warn(EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME + " can not found in " + path + "," +
+                        " hence Output Event Adapters will be running with default global configs.");
+            }
+            Document globalConfigDoc = convertToDocument(configFile);
+            secureResolveDocument(globalConfigDoc);
+            return (AdapterConfigs) unmarshaller.unmarshal(globalConfigDoc);
+        } catch (JAXBException e) {
+            log.error("Error in loading " + EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME + " from " + path + "," +
+                    " hence Output Event Adapters will be running with default global configs.");
+        } catch (OutputEventAdapterException e) {
+            log.error("Error in converting " + EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME + " to parsed document," +
+                    " hence Output Event Adapters will be running with default global configs.");
+        }
+        return new AdapterConfigs();
+    }
 }
