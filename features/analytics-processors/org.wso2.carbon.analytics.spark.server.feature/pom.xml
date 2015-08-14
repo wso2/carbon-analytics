@@ -265,6 +265,7 @@
                     <include>spark-udf-config.xml</include>
                     <include>wso2server.sh</include>
                     <include>load-spark-env-vars.sh</include>
+                    <include>add-to-spark-classpath.conf</include>
                 </includes>
             </resource>
         </resources>
@@ -296,6 +297,9 @@
                                 </bundleDef>
                                 <bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.admin
+                                </bundleDef>
+                                <bundleDef>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.utils
                                 </bundleDef>
                                 <bundleDef>org.roaringbitmap:RoaringBitmap</bundleDef>
                             </bundles>

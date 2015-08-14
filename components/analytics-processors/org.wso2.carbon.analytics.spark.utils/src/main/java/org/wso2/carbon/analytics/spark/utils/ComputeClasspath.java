@@ -18,18 +18,21 @@
 
 package org.wso2.carbon.analytics.spark.utils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FilenameFilter;
+import java.io.IOException;
 
 /**
  * this class creates the spark classpath by looking at the plugins folder
  */
 public class ComputeClasspath {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         String[] requiredJars = {
                 "apache-zookeeper",
                 "cassandra-thrift",
-                "chill_2.10",
+                "chill",
                 "com.datastax.driver.core",
                 "com.fasterxml.jackson.core.jackson-annotations",
                 "com.fasterxml.jackson.core.jackson-core",
@@ -43,7 +46,6 @@ public class ComputeClasspath {
                 "commons-configuration",
                 "commons-httpclient",
                 "commons-io",
-                "commons-io",
                 "commons-lang",
                 "com.ning.compress-lzf",
                 "com.sun.jersey.jersey-core",
@@ -55,7 +57,6 @@ public class ComputeClasspath {
                 "hector-core",
                 "htrace-core",
                 "htrace-core-apache",
-                "httpclient",
                 "httpclient",
                 "httpcore",
                 "io.dropwizard.metrics.core",
@@ -69,11 +70,9 @@ public class ComputeClasspath {
                 "jdom",
                 "jettison",
                 "json",
-                "json",
-                "json4s-jackson_2.10",
+                "json4s-jackson",
                 "json-simple",
                 "kryo",
-                "libthrift",
                 "libthrift",
                 "mesos",
                 "minlog",
@@ -81,7 +80,6 @@ public class ComputeClasspath {
                 "netty-all",
                 "objenesis",
                 "org.apache.commons.lang3",
-                "org.apache.commons.math3",
                 "org.apache.commons.math3",
                 "org.jboss.netty",
                 "org.roaringbitmap.RoaringBitmap",
@@ -120,9 +118,9 @@ public class ComputeClasspath {
                 "quartz",
                 "slf4j",
                 "solr",
-                "spark-core_2.10",
-                "spark-sql_2.10",
-                "spark-streaming_2.10",
+                "spark-core",
+                "spark-sql",
+                "spark-streaming",
                 "stream",
                 "tomcat",
                 "tomcat-catalina-ha",
@@ -130,7 +128,6 @@ public class ComputeClasspath {
                 "tomcat-jsp-api",
                 "tomcat-servlet-api",
                 "uncommons-maths",
-                "wss4j",
                 "wss4j",
                 "xmlbeans",
                 "XmlSchema",
@@ -155,7 +152,6 @@ public class ComputeClasspath {
                 "org.wso2.carbon.base",
                 "org.wso2.carbon.cluster.mgt.core",
                 "org.wso2.carbon.core.common",
-                "org.wso2.carbon.core.commons.stub",
                 "org.wso2.carbon.core.services",
                 "org.wso2.carbon.core",
                 "org.wso2.carbon.databridge.agent",
@@ -172,7 +168,6 @@ public class ComputeClasspath {
                 "org.wso2.carbon.email.verification",
                 "org.wso2.carbon.event.admin",
                 "org.wso2.carbon.event.application.deployer",
-                "org.wso2.carbon.event.client.stub",
                 "org.wso2.carbon.event.client",
                 "org.wso2.carbon.event.common",
                 "org.wso2.carbon.event.core",
@@ -211,7 +206,6 @@ public class ComputeClasspath {
                 "org.wso2.carbon.event.simulator.core",
                 "org.wso2.carbon.event.statistics",
                 "org.wso2.carbon.event.stream.core",
-                "org.wso2.carbon.event.stream.persistence.stub",
                 "org.wso2.carbon.event.tracer",
                 "org.wso2.carbon.utils",
                 "org.spark.project.akka.actor",
@@ -220,16 +214,55 @@ public class ComputeClasspath {
                 "config"
         };
 
-        String carbonHome = args[0];
+        if (args.length == 0) {
+            throw new Exception("Arguments to the main method should not be empty");
+        }
 
-        System.out.print(createSparkClasspath(carbonHome, requiredJars));
+        String carbonHome = args[0];
+        String sparkClasspath = "";
+        sparkClasspath = createSparkClasspath(sparkClasspath, carbonHome, requiredJars);
+        sparkClasspath = readFromConfig(sparkClasspath, carbonHome);
+        System.out.println(sparkClasspath);
     }
 
-    private static String createSparkClasspath(String carbonHome, String[] requiredJars) {
+    private static String readFromConfig(String sparkClasspath, String carbonHome)
+            throws IOException {
+        File cpFile = new File(carbonHome + File.separator + "repository" + File.separator + "conf"
+                               + File.separator + "spark" + File.separator + "add-to-spark-classpath.conf");
 
-        String sparkClasspath = "$SPARK_CLASSPATH";
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(cpFile));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#")) {
+                    // skip if a comment or an empty line or does not start with "carbon."
+                    continue;
+                }
+
+                if (line.endsWith(";")) {
+                    line = line.substring(0, line.length());
+                }
+                sparkClasspath = sparkClasspath + ":" + line;
+            }
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+//                        throw e;
+                }
+            }
+        }
+
+        return sparkClasspath;
+    }
+
+    private static String createSparkClasspath(String sparkClasspath, String carbonHome,
+                                               String[] requiredJars) {
         File pluginsDir = new File(carbonHome + File.separator + "repository" + File.separator
-                                   + "pluginsDir");
+                                   + "components" + File.separator + "plugins");
 
         File[] pluginJars = pluginsDir.listFiles(new FilenameFilter() {
             @Override
@@ -238,15 +271,18 @@ public class ComputeClasspath {
             }
         });
 
-        for (File pluginJar : pluginJars) {
-            String plugin = pluginJar.getName();
-            for (String requiredJar : requiredJars) {
-                if (plugin.startsWith(requiredJar)) {
-                    sparkClasspath = sparkClasspath + ":" + pluginJar.getAbsolutePath();
-                    break;
+        for (String requiredJar : requiredJars) {
+            for (File pluginJar : pluginJars) {
+                String plugin = pluginJar.getName();
+                if (plugin.split("_")[0].equals(requiredJar)) {
+                    if (sparkClasspath.isEmpty()) {
+                        sparkClasspath = pluginJar.getAbsolutePath();
+                    } else {
+                        sparkClasspath = sparkClasspath + ":" + pluginJar.getAbsolutePath();
+                    }
                 }
             }
         }
-        return null;
+        return sparkClasspath;
     }
 }
