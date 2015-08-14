@@ -845,6 +845,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
     
     @Override
+    public void waitForIndexing(int tenantId, String tableName, long maxWait) throws AnalyticsException,
+            AnalyticsTimeoutException {
+        this.getIndexer().waitForIndexing(tenantId, tableName, maxWait);
+    }
+    
+    @Override
     public void destroy() throws AnalyticsException {
         if (this.indexer != null) {
             this.indexer.close();

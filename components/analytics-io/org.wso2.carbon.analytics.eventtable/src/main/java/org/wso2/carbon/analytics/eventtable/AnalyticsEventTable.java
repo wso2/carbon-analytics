@@ -51,6 +51,7 @@ import org.wso2.siddhi.core.util.collection.operator.Finder;
 import org.wso2.siddhi.core.util.collection.operator.Operator;
 import org.wso2.siddhi.core.util.parser.ExpressionParser;
 import org.wso2.siddhi.query.api.annotation.Annotation;
+import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.TableDefinition;
 import org.wso2.siddhi.query.api.expression.Expression;
@@ -84,7 +85,7 @@ public class AnalyticsEventTable implements EventTable {
     private String primaryKeys;
     
     private String indices;
-    
+        
     @Override
     public void init(TableDefinition tableDefinition, ExecutionPlanContext executionPlanContext) {
         Annotation fromAnnotation = AnnotationHelper.getAnnotation(SiddhiConstants.ANNOTATION_FROM,
@@ -204,6 +205,15 @@ public class AnalyticsEventTable implements EventTable {
     public StreamEvent find(ComplexEvent matchingEvent, Finder finder) {
         return finder.find(matchingEvent, null, null);
     }
+    
+    private void waitForIndexing(int tenantId, String tableName) {
+        try {
+            ServiceHolder.getAnalyticsDataService().waitForIndexing(this.tenantId, this.tableName, -1);
+        } catch (Exception e) {
+            throw new IllegalStateException("Error in waiting for indexing in analytics event table: " + 
+                    e.getMessage(), e);
+        }        
+    }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
@@ -212,6 +222,7 @@ public class AnalyticsEventTable implements EventTable {
         addingEventChunk.reset();
         AnalyticsEventTableUtils.putEvents(this.tenantId, this.tableName, 
                 this.tableDefinition.getAttributeList(), addingEventChunk);
+        this.waitForIndexing(this.tenantId, this.tableName);
     }
 
     @Override
@@ -293,6 +304,8 @@ public class AnalyticsEventTable implements EventTable {
         
         private int paramIndex = 0;
         
+        private Set<String> eventTableRefs = new HashSet<String>();
+        
         public AnalyticsTableOperator(int tenantId, String tableName, List<Attribute> attrs, Expression expression, 
                 MetaComplexEvent metaComplexEvent, ExecutionPlanContext executionPlanContext, 
                 List<VariableExpressionExecutor> variableExpressionExecutors, 
@@ -359,6 +372,19 @@ public class AnalyticsEventTable implements EventTable {
                     }
                 }
             }
+            MetaStreamEvent[] metaStreamEvents = metaStateEvent.getMetaStreamEvents();
+            for (MetaStreamEvent metaStreamEvent : metaStreamEvents) {
+                String referenceId = metaStreamEvent.getInputReferenceId();
+                AbstractDefinition abstractDefinition = metaStreamEvent.getInputDefinitions().get(0);
+                if (!abstractDefinition.getId().trim().equals("")) {
+                    if (abstractDefinition instanceof TableDefinition) {
+                        this.eventTableRefs.add(abstractDefinition.getId());
+                        if (referenceId != null) {
+                            this.eventTableRefs.add(referenceId);
+                        }
+                    }
+                }
+            }
         }
         
         private void checkPrimaryKeyUsage(String field) {
@@ -382,45 +408,49 @@ public class AnalyticsEventTable implements EventTable {
             } else if (expr instanceof Compare) {
                 this.returnAllRecords = false;
                 Compare compare = (Compare) expr;
-                Object rhv;
-                String field = luceneQueryFromExpression(compare.getLeftExpression()).toString();
+                Object origLHS = luceneQueryFromExpression(compare.getLeftExpression());
+                Object origRHS = luceneQueryFromExpression(compare.getRightExpression());
+                String field;
+                Object rhs;
+                if (origRHS.toString().startsWith(LUCENE_QUERY_PARAM)) {
+                    field = origLHS.toString();
+                    rhs = origRHS;
+                } else {
+                    field = origRHS.toString();
+                    rhs = origLHS;
+                }
                 switch (compare.getOperator()) {
                 case CONTAINS:
                     this.pkMatchCompatible = false;
                     this.mentionedFields.add(field);
-                    return "(" + field + ": " + luceneQueryFromExpression(compare.getRightExpression()) + ")";
+                    return "(" + field + ": " + rhs + ")";
                 case EQUAL:
                     this.checkPrimaryKeyUsage(field);
                     this.mentionedFields.add(field);
-                    return "(" + Constants.NON_TOKENIZED_FIELD_PREFIX + field + ": " + 
-                            luceneQueryFromExpression(compare.getRightExpression()) + ")";                
+                    return "(" + Constants.NON_TOKENIZED_FIELD_PREFIX + field + ": " + rhs + ")";                
                 case GREATER_THAN:
                     this.pkMatchCompatible = false;
-                    rhv = luceneQueryFromExpression(compare.getRightExpression());
                     this.mentionedFields.add(field);
-                    return "(" + field + ": {" + this.toLuceneQueryRHSValue(rhv) + " TO " + 
-                            this.rangeExtentValueForValueType(rhv, true) + "]" + ")";
+                    return "(" + field + ": {" + this.toLuceneQueryRHSValue(rhs) + " TO " + 
+                            this.rangeExtentValueForValueType(rhs, true) + "]" + ")";
                 case GREATER_THAN_EQUAL:
                     this.pkMatchCompatible = false;
-                    rhv = luceneQueryFromExpression(compare.getRightExpression());
                     this.mentionedFields.add(field);
-                    return "(" + field + ": [" + this.toLuceneQueryRHSValue(rhv) + " TO " + 
-                            this.rangeExtentValueForValueType(rhv, true) + "]" + ")";
+                    return "(" + field + ": [" + this.toLuceneQueryRHSValue(rhs) + " TO " + 
+                            this.rangeExtentValueForValueType(rhs, true) + "]" + ")";
                 case INSTANCE_OF:
                     this.pkMatchCompatible = false;
                     throw new IllegalStateException("INSTANCE_OF is not supported in analytics event tables.");
                 case LESS_THAN:
                     this.pkMatchCompatible = false;
-                    rhv = luceneQueryFromExpression(compare.getRightExpression());
                     this.mentionedFields.add(field);
-                    return "(" + field + ": [" + this.rangeExtentValueForValueType(rhv, false) + " TO " + 
-                            this.toLuceneQueryRHSValue(rhv) + "}" + ")";
+                    return "(" + field + ": [" + this.rangeExtentValueForValueType(rhs, false) + " TO " + 
+                            this.toLuceneQueryRHSValue(rhs) + "}" + ")";
                 case LESS_THAN_EQUAL:
                     this.pkMatchCompatible = false;
-                    rhv = luceneQueryFromExpression(compare.getRightExpression());
                     this.mentionedFields.add(field);
-                    return "(" + field + ": [" + this.rangeExtentValueForValueType(rhv, false) + " TO " + 
-                            this.toLuceneQueryRHSValue(rhv) + "]" + ")";
+                    return "(" + field + ": [" + this.rangeExtentValueForValueType(rhs, false) + " TO " + 
+                            this.toLuceneQueryRHSValue(rhs) + "]" + ")";
                 case NOT_EQUAL:
                     this.pkMatchCompatible = false;
                     this.mentionedFields.add(field);
@@ -433,11 +463,9 @@ public class AnalyticsEventTable implements EventTable {
                 return this.returnConstantValue((Constant) expr);
             } else if (expr instanceof Variable) {
                 Variable var = (Variable) expr;
-                if (var.getStreamId().equals(tableDefinition.getId())) {
-                    System.out.println("AAAAAA: " + var + ":" + var.getStreamId());
+                if (eventTableRefs.contains(var.getStreamId())) {
                     return var.getAttributeName();
                 } else {
-                    System.out.println("BBBBBB: " + var + ":" + var.getStreamId());
                     ExpressionExecutor expressionExecutor = ExpressionParser.parseExpression(expr,
                             metaStateEvent, matchingStreamIndex, eventTableMap, variableExpressionExecutors, executionPlanContext, false, 0);
                     this.expressionExecs.add(expressionExecutor);
@@ -577,6 +605,7 @@ public class AnalyticsEventTable implements EventTable {
                 List<Record> records = this.findRecords(deletingEventChunk.next(), candidateEvents, null);
                 AnalyticsEventTableUtils.deleteRecords(this.tenantId, this.tableName, records);
             }
+            waitForIndexing(this.tenantId, this.tableName);
         }
 
         @SuppressWarnings("rawtypes")
@@ -587,6 +616,7 @@ public class AnalyticsEventTable implements EventTable {
                 this.findRecords(updatingEventChunk.next(), candidateEvents, null);
                 // finish impl.
             }
+            waitForIndexing(this.tenantId, this.tableName);
         }
     
     }

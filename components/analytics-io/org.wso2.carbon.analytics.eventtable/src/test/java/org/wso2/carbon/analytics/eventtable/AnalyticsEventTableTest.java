@@ -89,7 +89,7 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
-        Thread.sleep(2000);
+        Thread.sleep(4000);
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 2);
@@ -114,7 +114,7 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
-        Thread.sleep(2000);
+        Thread.sleep(4000);
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 2);
@@ -140,7 +140,7 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
-        Thread.sleep(2000);
+        Thread.sleep(4000);
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 2);
@@ -208,7 +208,7 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
         checkStockStream.send(new Object[] { "WSO2" });
 
-        Thread.sleep(2000);
+        Thread.sleep(4000);
 
         Assert.assertEquals(2, this.inEventCount);
         Assert.assertEquals(0, this.removeEventCount);
@@ -280,7 +280,7 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
         checkStockStream.send(new Object[] { "WSO2" });
 
-        Thread.sleep(2000);
+        Thread.sleep(4000);
         
         Assert.assertEquals(this.inEventCount, 1);
         Assert.assertEquals(this.removeEventCount, 0);
@@ -291,7 +291,7 @@ public class AnalyticsEventTableTest {
         this.cleanupCommonProps();
     }
     
-    @Test (enabled = false)
+    @Test
     public void testJoin3() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
         this.service.deleteTable(-1, "stocks");
@@ -308,9 +308,9 @@ public class AnalyticsEventTableTest {
                 "insert into StockTable ;" +
                 "" +
                 "@info(name = 'query2') " +
-                "from CheckStockStream#window.length(1) join StockTable " +
-                " on CheckStockStream.symbol==StockTable.symbol " +
-                "select CheckStockStream.symbol as checkSymbol, StockTable.symbol as symbol, StockTable.volume as volume  " +
+                "from CheckStockStream#window.length(1) join StockTable as T1 " +
+                " on CheckStockStream.symbol==T1.symbol " +
+                "select CheckStockStream.symbol as checkSymbol, T1.symbol as symbol, T1.volume as volume  " +
                 "insert into OutputStream ;";
 
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(streams + query);
@@ -352,7 +352,7 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
         checkStockStream.send(new Object[] { "WSO2" });
 
-        Thread.sleep(2000);
+        Thread.sleep(4000);
         
         Assert.assertEquals(this.inEventCount, 1);
         Assert.assertEquals(this.removeEventCount, 0);
