@@ -30,6 +30,8 @@ case object DialectRegister {
     JdbcDialects.registerDialect(PostgresDialect)
     JdbcDialects.registerDialect(OracleDialect)
     JdbcDialects.registerDialect(MySQLDialect)
+    JdbcDialects.registerDialect(MSSQLDialect)
+    JdbcDialects.registerDialect(DB2Dialect)
   }
 }
 
@@ -37,12 +39,10 @@ case object DialectRegister {
  * Custom postgres dialect
  */
 case object PostgresDialect extends JdbcDialect {
-  override def canHandle(url: String): Boolean = url.startsWith("jdbc:postgresql")
+  override def canHandle(url: String): Boolean = url.startsWith("jdbc:postgresql") || url.contains("postgre")
 
   override def getCatalystType(sqlType: Int, typeName: String, size: Int, md: MetadataBuilder): Option[DataType] = {
-    if (sqlType == Types.REAL) {
-      Some(FloatType)
-    } else if (sqlType == Types.BIT && typeName.equals("bit") && size != 1) {
+    if (sqlType == Types.BIT && typeName.equals("bit") && size != 1) {
       Some(BinaryType)
     } else if (sqlType == Types.OTHER && typeName.equals("cidr")) {
       Some(StringType)
@@ -72,7 +72,7 @@ case object PostgresDialect extends JdbcDialect {
  * Custom mysql dialect.
  */
 case object MySQLDialect extends JdbcDialect {
-  override def canHandle(url: String): Boolean = url.startsWith("jdbc:mysql")
+  override def canHandle(url: String): Boolean = url.startsWith("jdbc:mysql") || url.contains("mysql")
 
   override def getCatalystType(
                                 sqlType: Int, typeName: String, size: Int, md: MetadataBuilder): Option[DataType] = {
@@ -110,7 +110,7 @@ case object MySQLDialect extends JdbcDialect {
  * Custom oracle dialect.
  */
 case object OracleDialect extends JdbcDialect {
-  override def canHandle(url: String): Boolean = url.startsWith("jdbc:oracle")
+  override def canHandle(url: String): Boolean = url.startsWith("jdbc:oracle") || url.contains("oracle")
 
   override def getJDBCType(dt: DataType): Option[JdbcType] = dt match {
     case StringType => Some(JdbcType("VARCHAR2(255)", java.sql.Types.VARCHAR))
@@ -129,5 +129,54 @@ case object OracleDialect extends JdbcDialect {
     case _ => None
   }
 }
+
+  /**
+   * Custom DB2 dialect.
+   */
+  case object DB2Dialect extends JdbcDialect {
+    override def canHandle(url: String): Boolean = url.startsWith("jdbc:db2") || url.contains("db2") || url.contains("ibm")
+
+    override def getJDBCType(dt: DataType): Option[JdbcType] = dt match {
+      case StringType => Some(JdbcType("VARCHAR(255)", java.sql.Types.VARCHAR))
+      case BooleanType => Some(JdbcType("SMALLINT", java.sql.Types.SMALLINT))
+      case IntegerType => Some(JdbcType("INTEGER", java.sql.Types.INTEGER))
+      case LongType => Some(JdbcType("BIGINT", java.sql.Types.BIGINT))
+      case DoubleType => Some(JdbcType("DOUBLE", java.sql.Types.DOUBLE))
+      case FloatType => Some(JdbcType("REAL", java.sql.Types.REAL))
+      case ShortType => Some(JdbcType("SMALLINT", java.sql.Types.SMALLINT))
+      case ByteType => Some(JdbcType("SMALLINT", java.sql.Types.SMALLINT))
+      case BinaryType => Some(JdbcType("BLOB(64000)", java.sql.Types.BLOB))
+      case TimestampType => Some(JdbcType("TIMESTAMP", java.sql.Types.TIMESTAMP))
+      case DateType => Some(JdbcType("DATE", java.sql.Types.DATE))
+      case DecimalType.Fixed(precision, scale) => Some(JdbcType("DECIMAL(" + precision + "," + scale + ")", java.sql.Types.NUMERIC))
+      case DecimalType.Unlimited => Some(JdbcType("DECIMAL(15)", java.sql.Types.NUMERIC))
+      case _ => None
+    }
+  }
+
+    /**
+     * Custom mssql dialect.
+     */
+    case object MSSQLDialect extends JdbcDialect {
+      override def canHandle(url: String): Boolean = url.startsWith("jdbc:jtds:sqlserver") ||
+        url.startsWith("jdbc:sqlserver") || url.contains("sqlserver")
+
+      override def getJDBCType(dt: DataType): Option[JdbcType] = dt match {
+        case StringType => Some(JdbcType("TEXT", java.sql.Types.LONGVARCHAR))
+        case BooleanType => Some(JdbcType("BIT", java.sql.Types.BIT))
+        case IntegerType => Some(JdbcType("INTEGER", java.sql.Types.INTEGER))
+        case LongType => Some(JdbcType("BIGINT", java.sql.Types.BIGINT))
+        case DoubleType => Some(JdbcType("FLOAT(32)", java.sql.Types.DOUBLE))
+        case FloatType => Some(JdbcType("REAL", java.sql.Types.REAL))
+        case ShortType => Some(JdbcType("SMALLINT", java.sql.Types.SMALLINT))
+        case ByteType => Some(JdbcType("SMALLINT", java.sql.Types.SMALLINT))
+        case BinaryType => Some(JdbcType("VARBINARY(max)", java.sql.Types.VARBINARY))
+        case TimestampType => Some(JdbcType("DATETIME", java.sql.Types.TIMESTAMP))
+        case DateType => Some(JdbcType("DATETIME", java.sql.Types.TIMESTAMP))
+        case DecimalType.Fixed(precision, scale) => Some(JdbcType("NUMERIC(" + precision + "," + scale + ")", java.sql.Types.NUMERIC))
+        case DecimalType.Unlimited => Some(JdbcType("NUMERIC(28)", java.sql.Types.NUMERIC))
+        case _ => None
+      }
+    }
 
 

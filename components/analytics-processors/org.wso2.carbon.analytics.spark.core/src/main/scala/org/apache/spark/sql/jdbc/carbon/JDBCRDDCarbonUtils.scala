@@ -69,7 +69,6 @@ object JDBCRDDCarbonUtils extends Logging {
               getCatalystType(dataType, fieldSize, fieldScale, isSigned))
           fields(i) = StructField(columnName, columnType, nullable, metadata.build())
           i = i + 1
-//          println("*************types -> " + columnName + "," + dataType + "," + columnType)
         }
         return new StructType(fields)
       } finally {
@@ -133,15 +132,15 @@ object JDBCRDDCarbonUtils extends Logging {
       case java.sql.Types.NUMERIC => DecimalType.Unlimited
       case java.sql.Types.NVARCHAR => StringType
       case java.sql.Types.OTHER => null
-      case java.sql.Types.REAL => DoubleType
+      case java.sql.Types.REAL => FloatType
       case java.sql.Types.REF => StringType
       case java.sql.Types.ROWID => LongType
-      case java.sql.Types.SMALLINT => IntegerType
+      case java.sql.Types.SMALLINT => ShortType
       case java.sql.Types.SQLXML => StringType
       case java.sql.Types.STRUCT => StringType
       case java.sql.Types.TIME => TimestampType
       case java.sql.Types.TIMESTAMP => TimestampType
-      case java.sql.Types.TINYINT => IntegerType
+      case java.sql.Types.TINYINT => ByteType
       case java.sql.Types.VARBINARY => BinaryType
       case java.sql.Types.VARCHAR => StringType
       case _ => null

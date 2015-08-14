@@ -42,6 +42,8 @@ object JdbcUtils {
     // Somewhat hacky, but there isn't a good way to identify whether a table exists for all
     // SQL database systems, considering "table" could also include the database name.
     Try(conn.prepareStatement(s"SELECT 1 FROM $table LIMIT 1").executeQuery().next()).isSuccess
+//    Try(conn.prepareStatement(s"SELECT TOP 1 1 from $table").executeQuery().next()).isSuccess
+//    Try(conn.prepareStatement(s"SELECT 1 FROM $table FETCH FIRST 1 ROWS ONLY").executeQuery().next()).isSuccess
 //    Try(conn.prepareStatement(s"SELECT 1 FROM $table WHERE rownum=1").executeQuery().next()).isSuccess
   }
 
