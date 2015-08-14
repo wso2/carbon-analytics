@@ -69,6 +69,7 @@ object JDBCRDDCarbonUtils extends Logging {
               getCatalystType(dataType, fieldSize, fieldScale, isSigned))
           fields(i) = StructField(columnName, columnType, nullable, metadata.build())
           i = i + 1
+//          println("*************types -> " + columnName + "," + dataType + "," + columnType)
         }
         return new StructType(fields)
       } finally {

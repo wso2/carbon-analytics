@@ -95,11 +95,12 @@ package object carbon {
               case BinaryType => java.sql.Types.BLOB
               case TimestampType => java.sql.Types.TIMESTAMP
               case DateType => java.sql.Types.DATE
-              case DecimalType.Unlimited => java.sql.Types.DECIMAL
+              case DecimalType.Fixed(precision, scale) =>  java.sql.Types.NUMERIC
+              case DecimalType.Unlimited => java.sql.Types.NUMERIC
               case _ => throw new IllegalArgumentException(
                 s"Can't translate null value for field $field")
             })
-                                                         }
+        }
         df.foreachPartition { iterator =>
           JDBCWriteDetails.savePartition(dsWrapper.getConnection, tableName, iterator, rddSchema, nullTypes)
                             }
@@ -154,8 +155,10 @@ package object carbon {
                   case BinaryType => stmt.setBytes(i + 1, row.getAs[Array[Byte]](i))
                   case TimestampType => stmt.setTimestamp(i + 1, row.getAs[java.sql.Timestamp](i))
                   case DateType => stmt.setDate(i + 1, row.getAs[java.sql.Date](i))
+                  case DecimalType.Fixed(precision, scale) => stmt.setBigDecimal(i + 1,
+                    row.getAs[java.math.BigDecimal](i))
                   case DecimalType.Unlimited => stmt.setBigDecimal(i + 1,
-                                                                   row.getAs[java.math.BigDecimal](i))
+                    row.getAs[java.math.BigDecimal](i))
                   case _ => throw new IllegalArgumentException(
                     s"Can't translate non-null value for field $i")
                 }

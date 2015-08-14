@@ -158,7 +158,9 @@ case class JDBCRelation(
       if (!tableExists) {
         val schema = JDBCWriteDetails.schemaString(data, conn.getMetaData.getURL)
         val sql = s"CREATE TABLE $tableName ($schema)"
+//        println("*************sql -> " + sql)
         conn.prepareStatement(sql).executeUpdate()
+        conn.commit()
       }
     } finally {
       conn.close()

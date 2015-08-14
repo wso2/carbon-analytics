@@ -34,7 +34,11 @@ import org.apache.spark.serializer.KryoSerializer;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.jdbc.JdbcDialects;
+import org.apache.spark.sql.jdbc.PostgresDialect;
 import org.apache.spark.sql.jdbc.carbon.AnalyticsJDBCRelationProvider;
+import org.apache.spark.sql.jdbc.carbon.DialectRegister;
+import org.apache.spark.sql.jdbc.carbon.MySQLDialect;
 import org.apache.spark.util.Utils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
@@ -148,6 +152,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.redundantMasterCount = this.sparkConf.getInt(AnalyticsConstants.CARBON_SPARK_MASTER_COUNT, 2);
 
         this.registerShorthandStrings();
+        this.registerSqlDialects();
+    }
+
+    private void registerSqlDialects() {
+        DialectRegister.register();
     }
 
     /**

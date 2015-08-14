@@ -42,6 +42,7 @@ object JdbcUtils {
     // Somewhat hacky, but there isn't a good way to identify whether a table exists for all
     // SQL database systems, considering "table" could also include the database name.
     Try(conn.prepareStatement(s"SELECT 1 FROM $table LIMIT 1").executeQuery().next()).isSuccess
+//    Try(conn.prepareStatement(s"SELECT 1 FROM $table WHERE rownum=1").executeQuery().next()).isSuccess
   }
 
   /**
@@ -49,5 +50,6 @@ object JdbcUtils {
    */
   def dropTable(conn: Connection, table: String): Unit = {
     conn.prepareStatement(s"DROP TABLE $table").executeUpdate()
+    conn.commit()
   }
 }
