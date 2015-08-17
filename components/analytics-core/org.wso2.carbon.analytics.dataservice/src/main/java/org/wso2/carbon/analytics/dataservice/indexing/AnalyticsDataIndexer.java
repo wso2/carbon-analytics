@@ -1610,15 +1610,16 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private Record aggregatePerGrouping(int tenantId, CategorySearchResultEntry facetValue, AggregateRequest aggregateRequest)
             throws AnalyticsException {
-        Iterator<Record> iterator = IteratorUtils.chainedIterator(getRecordIterators(tenantId, facetValue, aggregateRequest));
         Map<String,  Object> optionalParams = new HashMap<>();
         optionalParams.put(Constants.AggregateOptionalParams.COUNT, facetValue.getScore());
         Map<String, Object> aggregatedValues = new HashMap<>();
         for (AggregateField field : aggregateRequest.getFields()) {
+            Iterator<Record> iterator = IteratorUtils.chainedIterator(getRecordIterators(tenantId, facetValue, aggregateRequest));
             Aggregate function = this.getAggregates().get(field.getAggregate());
             Object aggregatedValue = function.aggregate(iterator, field.getFieldName(), optionalParams);
             aggregatedValues.put(field.getAlias(), aggregatedValue);
         }
+        aggregatedValues.put(aggregateRequest.getGroupByField(), facetValue.getCategoryValue());
         return new Record(tenantId, aggregateRequest.getTableName(), aggregatedValues);
     }
 
