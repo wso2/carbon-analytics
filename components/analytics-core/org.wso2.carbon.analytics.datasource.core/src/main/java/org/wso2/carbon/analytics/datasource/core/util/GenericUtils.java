@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.datasource.core.util;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.collections.IteratorUtils;
 import org.w3c.dom.Document;
@@ -39,6 +40,7 @@ import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.xml.bind.JAXBContext;
+
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -665,6 +667,24 @@ public class GenericUtils {
             /* this will never happen */
             throw new RuntimeException(e);
         }
+    }
+    
+    public static List<Integer[]> splitNumberRange(int count, int nsplit) {
+        List<Integer[]> result = new ArrayList<Integer[]>(nsplit);
+        int range = Math.max(1, count / nsplit);
+        int current = 0;
+        for (int i = 0; i < nsplit; i++) {
+            if (current >= count) {
+                break;
+            }
+            if (i + 1 >= nsplit) {
+                result.add(new Integer[] { current, count - current });
+            } else {
+                result.add(new Integer[] { current, current + range > count ? count - current : range });
+                current += range;
+            }
+        }
+        return result;
     }
 
 }

@@ -44,10 +44,14 @@ public class RDBMSRangeRecordGroup implements RecordGroup {
     
     private int recordsCount;
     
+    private int partitionStart;
+    
+    private int partitionEnd;
+    
     public RDBMSRangeRecordGroup() { }
     
     public RDBMSRangeRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, 
-            int recordsFrom, int recordsCount) {
+            int recordsFrom, int recordsCount, int partitionStart, int partitionEnd) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.columns = columns;
@@ -55,6 +59,8 @@ public class RDBMSRangeRecordGroup implements RecordGroup {
         this.timeTo = timeTo;
         this.recordsFrom = recordsFrom;
         this.recordsCount = recordsCount;
+        this.partitionStart = partitionStart;
+        this.partitionEnd = partitionEnd;
     }
     
     public int getTenantId() {
@@ -83,6 +89,14 @@ public class RDBMSRangeRecordGroup implements RecordGroup {
     
     public int getRecordsCount() {
         return recordsCount;
+    }
+    
+    public int getPartitionStart() {
+        return partitionStart;
+    }
+    
+    public int getPartitionEnd() {
+        return partitionEnd;
     }
 
     @Override

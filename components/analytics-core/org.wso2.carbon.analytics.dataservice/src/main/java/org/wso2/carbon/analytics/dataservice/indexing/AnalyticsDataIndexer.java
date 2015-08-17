@@ -100,7 +100,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -224,22 +223,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     private List<Integer[]> generateIndexWorkerSchedulePlan(int numWorkers) {
-        List<Integer[]> result = new ArrayList<Integer[]>(numWorkers);
-        int range = Math.max(1, this.getShardCount() / numWorkers);
-        int current = 0;
-        for (int i = 0; i < numWorkers; i++) {
-            if (current >= this.getShardCount()) {
-                break;
-            }
-            if (i + 1 >= numWorkers) {
-                result.add(new Integer[] { current, this.getShardCount() - current });
-            } else {
-                result.add(new Integer[] { current, 
-                        current + range > this.getShardCount() ? this.getShardCount() - current : range });
-                current += range;
-            }
-        }
-        return result;
+        return GenericUtils.splitNumberRange(this.getShardCount(), numWorkers);
     }
     
     private void scheduleWorkers(Integer[] shardInfo) throws AnalyticsException {
@@ -1301,7 +1285,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void checkAndAddTaxonomyDocEntries(Document doc, AnalyticsSchema.ColumnType type,
                                                    String name, Object obj,
                                                    FacetsConfig facetsConfig)
