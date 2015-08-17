@@ -504,6 +504,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             return this.getRecordStoreNameByTable(tenantId, tableName) != null;
         } catch (AnalyticsTableNotAvailableException e) {
             return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

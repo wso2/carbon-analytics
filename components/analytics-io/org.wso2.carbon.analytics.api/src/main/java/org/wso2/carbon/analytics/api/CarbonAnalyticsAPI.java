@@ -668,6 +668,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void waitForIndexing(int tenantId, String tableName, long maxWait) throws AnalyticsException {
+        this.waitForIndexing(maxWait);
         //TODO impl.
     }
 

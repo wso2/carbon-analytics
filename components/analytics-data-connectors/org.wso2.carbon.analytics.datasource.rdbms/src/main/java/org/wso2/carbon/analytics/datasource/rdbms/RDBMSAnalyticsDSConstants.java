@@ -25,8 +25,12 @@ public class RDBMSAnalyticsDSConstants {
 
     public static final String DATASOURCE = "datasource";
     
+    public static final String PARTITION_COUNT = "partitionCount";
+    
     public static final String DEFAULT_CHARSET = "UTF8";
         
     public static final int RECORD_BATCH_SIZE = 1000;
+    
+    public static final int DEFAULT_PARTITION_COUNT = 100;
 
 }
