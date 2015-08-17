@@ -87,7 +87,11 @@ import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsIndexedTableStore.IndexedTableId;
+import org.wso2.carbon.analytics.dataservice.indexing.aggregates.AVGAggregate;
 import org.wso2.carbon.analytics.dataservice.indexing.aggregates.Aggregate;
+import org.wso2.carbon.analytics.dataservice.indexing.aggregates.COUNTAggregate;
+import org.wso2.carbon.analytics.dataservice.indexing.aggregates.MAXAggregate;
+import org.wso2.carbon.analytics.dataservice.indexing.aggregates.MINAggregate;
 import org.wso2.carbon.analytics.dataservice.indexing.aggregates.SUMAggregate;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
@@ -1052,10 +1056,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     public Map<String, Aggregate> getAggregates() {
         if (this.aggregates.isEmpty()) {
             aggregates.put(Constants.SUM_AGGREGATE, new SUMAggregate());
-            aggregates.put(Constants.MAX_AGGREGATE, new SUMAggregate());
-            aggregates.put(Constants.COUNT_AGGREGATE, new SUMAggregate());
-            aggregates.put(Constants.MIN_AGGREGATE, new SUMAggregate());
-            aggregates.put(Constants.MAX_AGGREGATE, new SUMAggregate());
+            aggregates.put(Constants.AVG_AGGREGATE, new AVGAggregate());
+            aggregates.put(Constants.COUNT_AGGREGATE, new COUNTAggregate());
+            aggregates.put(Constants.MIN_AGGREGATE, new MINAggregate());
+            aggregates.put(Constants.MAX_AGGREGATE, new MAXAggregate());
         }
         return this.aggregates;
     }
