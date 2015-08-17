@@ -21,6 +21,8 @@ package org.apache.spark.sql.jdbc.carbon
 import java.sql.{Connection, DriverManager}
 import java.util.Properties
 
+import org.wso2.carbon.analytics.datasource.rdbms.{RDBMSQueryConfigurationEntry, RDBMSUtils}
+
 import scala.util.Try
 
 /**
@@ -39,15 +41,30 @@ object JdbcUtils {
    * Returns true if the table already exists in the JDBC database.
    */
   def tableExists(conn: Connection, table: String): Boolean = {
-    // Somewhat hacky, but there isn't a good way to identify whether a table exists for all
-    // SQL database systems, considering "table" could also include the database name.
-    Try(conn.prepareStatement(s"SELECT 1 FROM $table LIMIT 1").executeQuery().next()).isSuccess
+    //using the rdbms-query-config.xml to get the table exists query
+    val qConfEntry = getQueryConfigEntry(conn)
+    val query = qConfEntry.getRecordTableCheckQuery.replace("{{TABLE_NAME}}", table)
+
+    Try(conn.prepareStatement(query).executeQuery().next()).isSuccess
   }
 
   /**
    * Drops a table from the JDBC database.
    */
   def dropTable(conn: Connection, table: String): Unit = {
-    conn.prepareStatement(s"DROP TABLE $table").executeUpdate()
+    //using the rdbms-query-config.xml to get the table exists query
+    val qConfEntry = getQueryConfigEntry(conn)
+    val query = {
+      qConfEntry.getRecordTableDeleteQueries.head.replace("{{TABLE_NAME}}", table)
+    }
+    conn.prepareStatement(query).executeUpdate()
+    conn.commit()
+  }
+
+  private def getQueryConfigEntry(conn: Connection): RDBMSQueryConfigurationEntry ={
+    val qConf = RDBMSUtils.loadQueryConfiguration()
+    val dbType = conn.getMetaData.getDatabaseProductName
+
+    qConf.getDatabases.find(entry => entry.getDatabaseName.equalsIgnoreCase(dbType)).get
   }
 }

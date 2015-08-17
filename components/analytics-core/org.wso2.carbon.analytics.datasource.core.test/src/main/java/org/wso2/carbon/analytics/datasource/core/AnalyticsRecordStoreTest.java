@@ -108,12 +108,11 @@ public class AnalyticsRecordStoreTest {
                                                boolean generateRecordIds) {
         List<Record> result = new ArrayList<Record>();
         Map<String, Object> values;
-        List<String> afacet;
+        String afacet;
         long timeTmp;
         for (int j = 0; j < c; j++) {
             values = new HashMap<String, Object>();
-            afacet = new ArrayList<>();
-            afacet.addAll(Arrays.asList(new String[] {"SomeLocation", "SomeInnerLocation", "AVillage"}));
+            afacet = "SomeLocation,SomeInnerLocation,AVillage";
             values.put("server_name", "ESB-" + i);
             values.put("ip", "192.168.0." + (i % 256));
             values.put("tenant", i);
@@ -202,8 +201,9 @@ public class AnalyticsRecordStoreTest {
         List<Record> records = new ArrayList<Record>();
         records.add(record);
         this.analyticsRS.put(records);
-        long count = this.analyticsRS.getRecordCount(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
-        Assert.assertEquals(count, 1);
+        List<Record> recordsIn = GenericUtils.listRecords(this.analyticsRS,
+                this.analyticsRS.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(recordsIn.size(), 1);
         this.analyticsRS.deleteTable(tenantId, tableName);
     }
     

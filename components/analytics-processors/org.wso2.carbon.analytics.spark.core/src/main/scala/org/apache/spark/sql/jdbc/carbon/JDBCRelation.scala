@@ -159,6 +159,7 @@ case class JDBCRelation(
         val schema = JDBCWriteDetails.schemaString(data, conn.getMetaData.getURL)
         val sql = s"CREATE TABLE $tableName ($schema)"
         conn.prepareStatement(sql).executeUpdate()
+        conn.commit()
       }
     } finally {
       conn.close()

@@ -316,7 +316,7 @@ public interface AnalyticsDataService {
      */
     public List<AnalyticsDrillDownRange> drillDownRangeCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
         throws AnalyticsIndexException;
-
+    
     /**
      * Returns a list of records containing the aggregate values computed over the given fields map
      * , grouped by a predefined FACET field.
@@ -336,6 +336,17 @@ public interface AnalyticsDataService {
      * @throws AnalyticsException 
      */
     public void waitForIndexing(long maxWait) throws AnalyticsTimeoutException, AnalyticsException;
+    
+    /**
+     * This method waits until the current indexing operations for a specific table is done.
+     * @param tenantId The tenant id
+     * @param tableName The table name
+     * @param maxWait Maximum amount of time in milliseconds, if the time is reached, 
+     * an {@link AnalyticsTimeoutException} will be thrown, -1 for infinity
+     * @throws AnalyticsTimeoutException
+     * @throws AnalyticsException 
+     */
+    public void waitForIndexing(int tenantId, String tableName, long maxWait) throws AnalyticsTimeoutException, AnalyticsException;
 
     /**
      * Destroys and frees any resources taken up by the analytics data service implementation.

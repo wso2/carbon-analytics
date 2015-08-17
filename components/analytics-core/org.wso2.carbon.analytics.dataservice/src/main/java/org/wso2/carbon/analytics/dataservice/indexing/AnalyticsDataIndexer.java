@@ -810,7 +810,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private MultiReader getCombinedIndexReader(int tenantId, String tableName)
             throws IOException, AnalyticsIndexException {
         List<String> shardIds = this.lookupGloballyExistingShardIds(INDEX_DATA_FS_BASE_PATH,
-                                                                    tenantId, tableName);
+                tenantId, tableName);
         List<IndexReader> indexReaders = new ArrayList<>();
 
         for (String shardId : shardIds) {
@@ -1148,7 +1148,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             throws AnalyticsIndexException {
         String tableName = drillDownRequest.getTableName();
         List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds(TAXONOMY_INDEX_DATA_FS_BASE_PATH,
-                                                                            tenantId, tableName);
+                tenantId, tableName);
         double totalCount = 0;
         for (String shardId : taxonomyShardIds) {
             totalCount += this.getDrillDownRecordCountPerShard(tenantId, shardId, drillDownRequest, rangeField, range);
@@ -1343,20 +1343,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (obj == null) {
             doc.add(new StringField(name, NULL_INDEX_VALUE, Store.NO));
         }
-        if (obj instanceof List && type == AnalyticsSchema.ColumnType.FACET) {
+        if (obj instanceof String && type == AnalyticsSchema.ColumnType.FACET) {
             facetsConfig.setMultiValued(name, true);
             facetsConfig.setHierarchical(name, true);
-            List<Object> path = new ArrayList<>();
-                    path.addAll((List<Object>) obj);
-            if (path.isEmpty()) {
-                path.add(EMPTY_FACET_VALUE);
+            String values = (String) obj;
+            if (values.isEmpty()) {
+                values = EMPTY_FACET_VALUE;
             }
-            List<String> pathAsStrings = new ArrayList<>();
-            Iterator<Object> iterator = path.iterator();
-            while (iterator.hasNext()) {
-                pathAsStrings.add(String.valueOf(iterator.next()));
-            }
-            doc.add(new FacetField(name, pathAsStrings.toArray(new String[pathAsStrings.size()])));
+            doc.add(new FacetField(name, values.split(",")));
         }
     }
 

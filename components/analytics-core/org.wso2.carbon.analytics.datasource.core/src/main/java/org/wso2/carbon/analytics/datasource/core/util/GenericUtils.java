@@ -18,6 +18,9 @@
  */
 package org.wso2.carbon.analytics.datasource.core.util;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.collections.IteratorUtils;
 import org.w3c.dom.Document;
@@ -30,47 +33,20 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.ndatasource.common.DataSourceConstants;
 import org.wso2.carbon.ndatasource.common.DataSourceConstants.DataSourceStatusModes;
 import org.wso2.carbon.ndatasource.common.DataSourceException;
-import org.wso2.carbon.ndatasource.core.CarbonDataSource;
-import org.wso2.carbon.ndatasource.core.DataSourceManager;
-import org.wso2.carbon.ndatasource.core.DataSourceMetaInfo;
-import org.wso2.carbon.ndatasource.core.DataSourceRepository;
-import org.wso2.carbon.ndatasource.core.DataSourceService;
-import org.wso2.carbon.ndatasource.core.DataSourceStatus;
-import org.wso2.carbon.ndatasource.core.SystemDataSourcesConfiguration;
+import org.wso2.carbon.ndatasource.core.*;
 import org.wso2.carbon.ndatasource.core.utils.DataSourceUtils;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-
 import javax.xml.bind.JAXBContext;
-
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Generic utility methods for analytics data source implementations.
@@ -106,8 +82,6 @@ public class GenericUtils {
     private static final byte DATA_TYPE_BINARY = 0x07;
 
     private static final byte DATA_TYPE_OBJECT = 0x10;
-
-    private static final String DEFAULT_CHARSET = "UTF8";
 
     public static final String WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP = "wso2_custom_conf_dir";
     
@@ -177,50 +151,48 @@ public class GenericUtils {
         String strVal;
         boolean boolVal;
         byte[] binData;
-        try {
-            buffer.putInt(name.getBytes(DEFAULT_CHARSET).length);
-            buffer.put(name.getBytes(DEFAULT_CHARSET));
-            if (value instanceof String) {
-                buffer.put(DATA_TYPE_STRING);
-                strVal = (String) value;
-                buffer.putInt(strVal.getBytes(DEFAULT_CHARSET).length);
-                buffer.put(strVal.getBytes(DEFAULT_CHARSET));
-            } else if (value instanceof Long) {
-                buffer.put(DATA_TYPE_LONG);
-                buffer.putLong((Long) value);
-            } else if (value instanceof Double) {
-                buffer.put(DATA_TYPE_DOUBLE);
-                buffer.putDouble((Double) value);
-            } else if (value instanceof Boolean) {
-                buffer.put(DATA_TYPE_BOOLEAN);
-                boolVal = (Boolean) value;
-                if (boolVal) {
-                    buffer.put(BOOLEAN_TRUE);
-                } else {
-                    buffer.put(BOOLEAN_FALSE);
-                }
-            } else if (value instanceof Integer) {
-                buffer.put(DATA_TYPE_INTEGER);
-                buffer.putInt((Integer) value);
-            } else if (value instanceof Float) {
-                buffer.put(DATA_TYPE_FLOAT);
-                buffer.putFloat((Float) value);
-            } else if (value instanceof byte[]) {
-                buffer.put(DATA_TYPE_BINARY);
-                binData = (byte[]) value;
-                buffer.putInt(binData.length);
-                buffer.put(binData);
-            } else if (value == null) {
-                buffer.put(DATA_TYPE_NULL);
+
+        buffer.putInt(name.getBytes(StandardCharsets.UTF_8).length);
+        buffer.put(name.getBytes(StandardCharsets.UTF_8));
+        if (value instanceof String) {
+            buffer.put(DATA_TYPE_STRING);
+            strVal = (String) value;
+            buffer.putInt(strVal.getBytes(StandardCharsets.UTF_8).length);
+            buffer.put(strVal.getBytes(StandardCharsets.UTF_8));
+        } else if (value instanceof Long) {
+            buffer.put(DATA_TYPE_LONG);
+            buffer.putLong((Long) value);
+        } else if (value instanceof Double) {
+            buffer.put(DATA_TYPE_DOUBLE);
+            buffer.putDouble((Double) value);
+        } else if (value instanceof Boolean) {
+            buffer.put(DATA_TYPE_BOOLEAN);
+            boolVal = (Boolean) value;
+            if (boolVal) {
+                buffer.put(BOOLEAN_TRUE);
             } else {
-                buffer.put(DATA_TYPE_OBJECT);
-                binData = GenericUtils.serializeObject(value);
-                buffer.putInt(binData.length);
-                buffer.put(binData);
+                buffer.put(BOOLEAN_FALSE);
             }
-        } catch (UnsupportedEncodingException e) {
-            throw new AnalyticsException("Error in encoding record values: " + e.getMessage());
+        } else if (value instanceof Integer) {
+            buffer.put(DATA_TYPE_INTEGER);
+            buffer.putInt((Integer) value);
+        } else if (value instanceof Float) {
+            buffer.put(DATA_TYPE_FLOAT);
+            buffer.putFloat((Float) value);
+        } else if (value instanceof byte[]) {
+            buffer.put(DATA_TYPE_BINARY);
+            binData = (byte[]) value;
+            buffer.putInt(binData.length);
+            buffer.put(binData);
+        } else if (value == null) {
+            buffer.put(DATA_TYPE_NULL);
+        } else {
+            buffer.put(DATA_TYPE_OBJECT);
+            binData = GenericUtils.serializeObject(value);
+            buffer.putInt(binData.length);
+            buffer.put(binData);
         }
+
         return buffer.array();
     }
 
@@ -228,13 +200,12 @@ public class GenericUtils {
         int count = 0;
          /* column name length value + data type (including null) */
         count += Integer.SIZE / 8 + 1;
-        try {
             /* column name */
-            count += name.getBytes(DEFAULT_CHARSET).length;
-            if (value instanceof String) {
+        count += name.getBytes(StandardCharsets.UTF_8).length;
+        if (value instanceof String) {
                 /* string length + value */
                 count += Integer.SIZE / 8;
-                count += ((String) value).getBytes(DEFAULT_CHARSET).length;
+                count += ((String) value).getBytes(StandardCharsets.UTF_8).length;
             } else if (value instanceof Long) {
                 count += Long.SIZE / 8;
             } else if (value instanceof Double) {
@@ -248,22 +219,16 @@ public class GenericUtils {
             } else if (value instanceof byte[]) {
                 count += Integer.SIZE / 8;
                 count += ((byte[]) value).length;
-            } else if (value instanceof Object) {
+            } else if (value != null) {
                 count += Integer.SIZE / 8;
                 count += GenericUtils.serializeObject(value).length;
-            } else if (value != null) {
-                throw new AnalyticsException("Invalid column value type in calculating column "
-                                             + "values length: " + value.getClass());
             }
-        } catch (UnsupportedEncodingException e) {
-            throw new AnalyticsException("Default CharSet : " + DEFAULT_CHARSET + " is not supported");
-        }
         return count;
     }
 
     public static Map<String, Object> decodeRecordValues(byte[] data, Set<String> columns) throws AnalyticsException {
         /* using LinkedHashMap to retain the column order */
-        Map<String, Object> result = new LinkedHashMap<String, Object>();
+        Map<String, Object> result = new LinkedHashMap<>();
         int type, size;
         String colName;
         Object value;
@@ -279,14 +244,14 @@ public class GenericUtils {
                 }
                 buff = new byte[size];
                 buffer.get(buff, 0, size);
-                colName = new String(buff, DEFAULT_CHARSET);
+                colName = new String(buff, StandardCharsets.UTF_8);
                 type = buffer.get();
                 switch (type) {
                     case DATA_TYPE_STRING:
                         size = buffer.getInt();
                         buff = new byte[size];
                         buffer.get(buff, 0, size);
-                        value = new String(buff, DEFAULT_CHARSET);
+                        value = new String(buff, StandardCharsets.UTF_8);
                         break;
                     case DATA_TYPE_LONG:
                         value = buffer.getLong();
@@ -341,7 +306,7 @@ public class GenericUtils {
     @SuppressWarnings("unchecked")
     public static List<Record> listRecords(AnalyticsRecordStore rs,
                                            RecordGroup[] rgs) throws AnalyticsException {
-        List<Record> result = new ArrayList<Record>();
+        List<Record> result = new ArrayList<>();
         for (RecordGroup rg : rgs) {
             result.addAll(IteratorUtils.toList(rs.readRecords(rg)));
         }
@@ -378,7 +343,7 @@ public class GenericUtils {
         /* if the records have identities (unique table category and name) as the following
          * "ABABABCCAACBDABCABCDBAC", the job of this method is to make it like the following,
          * {"AAAAAAAA", "BBBBBBB", "CCCCCC", "DD" } */
-        Map<String, List<Record>> recordBatches = new HashMap<String, List<Record>>();
+        Map<String, List<Record>> recordBatches = new HashMap<>();
         List<Record> recordBatch;
         for (Record record : records) {
             if (normalizeTableName) {
@@ -386,7 +351,7 @@ public class GenericUtils {
             }
             recordBatch = recordBatches.get(calculateRecordIdentity(record));
             if (recordBatch == null) {
-                recordBatch = new ArrayList<Record>();
+                recordBatch = new ArrayList<>();
                 recordBatches.put(calculateRecordIdentity(record), recordBatch);
             }
             recordBatch.add(record);
@@ -395,10 +360,7 @@ public class GenericUtils {
     }
 
     public static String generateRecordID() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(System.currentTimeMillis());
-        builder.append(Math.random() * Math.random());
-        return builder.toString();
+        return String.valueOf(System.currentTimeMillis()) + Math.random() * Math.random();
     }
 
     /* do not touch if you do not know what you're doing, critical for serialize/deserialize
@@ -436,7 +398,7 @@ public class GenericUtils {
     }
 
     /* do not touch, @see serializeObject(Object) */
-    public static Object deserializeObject(InputStream in) throws IOException, EOFException {
+    public static Object deserializeObject(InputStream in) throws IOException {
         if (in == null) {
             return null;
         }

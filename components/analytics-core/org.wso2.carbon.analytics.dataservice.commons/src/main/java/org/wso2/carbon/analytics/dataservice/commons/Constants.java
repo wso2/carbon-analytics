@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wso2.carbon.analytics.dataservice.commons;
 
-
 /**
- * This class contains the constants required by the AnalyticsDataService
+ * This class contains the constants required by the AnalyticsDataService.
  */
 public class Constants {
+    
     public static final String NON_TOKENIZED_FIELD_PREFIX = "_";
     public static final String SUM_AGGREGATE = "SUM";
     public static final String AVG_AGGREGATE = "AVG";
@@ -31,6 +30,6 @@ public class Constants {
     public final class AggregateOptionalParams {
         public static final String COUNT = "aggregateCount";
     }
-
+    
 }
 

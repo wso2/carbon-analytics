@@ -155,12 +155,8 @@ public class AnalyticsDSConnector {
                 String fieldStrValue = (String) fieldValue;
                 switch (columnDefinition.getType()) {
                     case FACET:
-                        try {
-                            return gson.fromJson(fieldStrValue, List.class);
-                        } catch (Exception e) {
-                            throw new AnalyticsException("Error while parsing FACET field: " + fieldName +
-                                                         ", Expected a JSON array without double quotations", e );
-                        }
+                        //converting the json array to comma separated String
+                        return fieldStrValue.substring(1, fieldStrValue.length()-1);
                     case STRING:
                         return fieldStrValue;
                     case BINARY:

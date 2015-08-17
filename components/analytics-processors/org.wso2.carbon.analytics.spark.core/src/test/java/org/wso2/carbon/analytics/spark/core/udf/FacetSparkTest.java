@@ -32,12 +32,12 @@ import java.util.List;
 public class FacetSparkTest extends SparkTestBase {
 
     /**
-     * Tests the Facet UDFs
+     * Tests the persistence of facets in the record store.
      * @throws AnalyticsException
      */
 	@Test
-	public void testFacetUDF() throws AnalyticsException {
-		System.out.println(testString("START : Facet UDF tester"));
+	public void testFacetPersistence() throws AnalyticsException {
+		System.out.println(testString("START : Facet Persistence tester"));
 		final int INFO_MESSAGES = 10;
 		final int ERROR_MESSAGES = 0;
 
@@ -49,28 +49,33 @@ public class FacetSparkTest extends SparkTestBase {
 		this.service.createTable(1, "Log");
 		this.service.put(records);
 		ex.executeQuery(1,
-		                "CREATE TEMPORARY TABLE Log USING CarbonAnalytics "
-		                        + "OPTIONS"
-		                        + "(tableName \"Log\","
-		                        + "schema \"log_level STRING, message STRING, tenant INTEGER, composite FACET -i\""
-		                        + ")");
+                "CREATE TEMPORARY TABLE Log USING CarbonAnalytics "
+                        + "OPTIONS"
+                        + "(tableName \"Log\","
+                        + " schema \"log_level STRING, message STRING, tenant INTEGER\""
+                        + ")");
 
-		// for a single facet
-		AnalyticsQueryResult result = ex.executeQuery(1, "SELECT facet1(tenant) from Log");
-		Assert.assertEquals(result.getRows().size(), INFO_MESSAGES + ERROR_MESSAGES);
+        ex.executeQuery(1,
+                "CREATE TEMPORARY TABLE facetTest USING CarbonAnalytics "
+                        + "OPTIONS"
+                        + "(tableName \"facetTest\","
+                        + " schema \"log_level STRING, message STRING, tenant INTEGER, composite FACET -i\""
+                        + ")");
 
-		// for two facets
-		result = ex.executeQuery(1, "SELECT facet2(tenant,log_level) from Log");
-		Assert.assertEquals(result.getRows().size(), INFO_MESSAGES + ERROR_MESSAGES);
+        ex.executeQuery(1,"INSERT INTO TABLE facetTest SELECT log_level,message,tenant, facet2(tenant,log_level) from Log");
+
+		// testing the facet persistence
+		AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * from facetTest where composite = '1,INFO'");
+		Assert.assertEquals(result.getRows().size(), INFO_MESSAGES);
 
 		this.service.deleteTable(1, "Log");
 
-		System.out.println(testString("END: Facet UDF tester"));
+		System.out.println(testString("END: Facet Persistence tester"));
 
 	}
 
     /**
-     * tests if the Facet UDFs fails if given the wrong number of parameters
+     * tests if the Facet UDFs fails if given the wrong number of parameters.
      * @throws AnalyticsException
      */
     @Test (expectedExceptions = ClassCastException.class)
@@ -102,6 +107,4 @@ public class FacetSparkTest extends SparkTestBase {
         System.out.println(testString("END: Facet UDF fail tester"));
 
     }
-
-
 }

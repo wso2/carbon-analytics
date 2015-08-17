@@ -105,6 +105,18 @@ public class AnalyticsEventTableUtils {
         }
     }
     
+    public static void deleteRecords(int tenantId, String tableName, List<Record> records) {
+        try {
+            List<String> ids = new ArrayList<String>(records.size());
+            for (Record record : records) {
+                ids.add(record.getId());
+            }
+            ServiceHolder.getAnalyticsDataService().delete(tenantId, tableName, ids);
+        } catch (AnalyticsException e) {
+            throw new IllegalStateException("Error in getting deleting records: " + e.getMessage(), e);
+        }
+    }
+    
     public static StreamEvent recordsToStreamEvent(List<Attribute> attrs, List<Record> records) {
         ComplexEventChunk<StreamEvent> eventChunk = new ComplexEventChunk<StreamEvent>();
         for (Record record : records) {

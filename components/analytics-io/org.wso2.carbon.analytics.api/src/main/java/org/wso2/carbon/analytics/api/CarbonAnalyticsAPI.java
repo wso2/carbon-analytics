@@ -667,6 +667,11 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
+    public void waitForIndexing(int tenantId, String tableName, long maxWait) throws AnalyticsException {
+        //TODO impl.
+    }
+
+    @Override
     public void destroy() throws AnalyticsException {
         if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getAnalyticsDataService().destroy();

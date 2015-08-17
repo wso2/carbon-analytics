@@ -13,9 +13,6 @@
             <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
             <query>DROP INDEX IF EXISTS {{TABLE_NAME}}_TIMESTAMP</query>
         </recordTableDeleteQueries>
-        <recordMetaTableInitQueries>
-            <query>CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), tableSchema BINARY, PRIMARY KEY(tenantId, tableName))</query>
-        </recordMetaTableInitQueries>
         <recordTableInitQueries>
             <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BINARY, PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
@@ -39,5 +36,4 @@
         <fsMergeDataChunkQuery>MERGE INTO AN_FS_DATA (path,sequence,data) KEY (path,sequence) VALUES (?,?,?)</fsMergeDataChunkQuery>
     </database>
 </query-configuration>
-
 

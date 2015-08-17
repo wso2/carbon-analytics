@@ -30,7 +30,6 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics Data Agent Stubs Aggregator Module</name>
     <modules>
-        <module>org.wso2.carbon.analytics.jmx.agent.stub</module>
         <module>org.wso2.carbon.analytics.message.tracer.handler.stub</module>
     </modules>
 

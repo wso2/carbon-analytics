@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.dataservice;
  * This class hold constants that required for data service
  */
 public class Constants {
+    
     public static final String PERMISSION_LIST_TABLE = "/permission/admin/manage/analytics/table/list";
     public static final String PERMISSION_CREATE_TABLE = "/permission/admin/manage/analytics/table/create";
     public static final String PERMISSION_DROP_TABLE = "/permission/admin/manage/analytics/table/drop";
@@ -36,8 +37,5 @@ public class Constants {
     public static final String INCLUDE_CLASS_SPLITTER = "###";
     public static final String DISABLE_ANALYTICS_DATA_PURGING_JVM_OPTION = "disableDataPurging";
     public static final int RECORDS_BATCH_SIZE = 1000;
-
-    public enum AGGREGATES {
-        SUM, AVG, MIN, MAX, COUNT
-    }
+    
 }
