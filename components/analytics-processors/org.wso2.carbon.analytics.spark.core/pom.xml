@@ -52,6 +52,11 @@
             <artifactId>org.wso2.carbon.databridge.commons</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
         </dependency>
@@ -66,11 +71,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.wso2.carbon</groupId>
