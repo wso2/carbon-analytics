@@ -27,6 +27,7 @@ import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
@@ -51,6 +52,8 @@ import org.apache.lucene.facet.taxonomy.TaxonomyWriter;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyReader;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.DocValuesType;
+import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -1270,6 +1273,12 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     private void checkAndAddDocEntry(Document doc, AnalyticsSchema.ColumnType type, String name, Object obj)
             throws AnalyticsIndexException {
+        FieldType fieldType = new FieldType();
+        fieldType.setStored(false);
+        fieldType.setDocValuesType(DocValuesType.NUMERIC);
+        fieldType.setTokenized(true);
+        fieldType.setOmitNorms(true);
+        fieldType.setIndexOptions(IndexOptions.DOCS);
         if (obj == null) {
             doc.add(new StringField(name, NULL_INDEX_VALUE, Store.NO));
             return;
@@ -1280,53 +1289,35 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             doc.add(new StringField(Constants.NON_TOKENIZED_FIELD_PREFIX + name, obj.toString(), Store.NO));
             break;
         case INTEGER:
-            if (obj instanceof Integer) {
-                doc.add(new IntField(name, (Integer) obj, Store.NO));
-            } else if (obj instanceof Long) {
-                doc.add(new IntField(name, ((Long) obj).intValue(), Store.NO));
-            } else if (obj instanceof Double) {
-                doc.add(new IntField(name, ((Double) obj).intValue(), Store.NO));
-            } else if (obj instanceof Float) {
-                doc.add(new IntField(name, ((Float) obj).intValue(), Store.NO));
+            fieldType.setNumericType(FieldType.NumericType.INT);
+            fieldType.setNumericPrecisionStep(8);
+            if (obj instanceof Number) {
+                doc.add(new IntField(name, ((Number) obj).intValue(), fieldType));
             } else {
                 doc.add(new StringField(name, obj.toString(), Store.NO));
             }
             break;
         case DOUBLE:
-            if (obj instanceof Double) {
-                doc.add(new DoubleField(name, (Double) obj, Store.NO));
-            } else if (obj instanceof Integer) {
-                doc.add(new DoubleField(name, ((Integer) obj).doubleValue(), Store.NO));
-            } else if (obj instanceof Long) {
-                doc.add(new DoubleField(name, ((Long) obj).doubleValue(), Store.NO));
-            } else if (obj instanceof Float) {
-                doc.add(new DoubleField(name, ((Float) obj).doubleValue(), Store.NO));
+            fieldType.setNumericType(FieldType.NumericType.DOUBLE);
+            if (obj instanceof Number) {
+                doc.add(new DoubleField(name, ((Number) obj).doubleValue(), fieldType));
             } else {
                 doc.add(new StringField(name, obj.toString(), Store.NO));
             }
             break;
         case LONG:
-            if (obj instanceof Long) {
-                doc.add(new LongField(name, ((Long) obj).longValue(), Store.NO));
-            } else if (obj instanceof Integer) {
-                doc.add(new LongField(name, ((Integer) obj).longValue(), Store.NO));
-            } else if (obj instanceof Double) {
-                doc.add(new LongField(name, ((Double) obj).longValue(), Store.NO));
-            } else if (obj instanceof Float) {
-                doc.add(new LongField(name, ((Float) obj).longValue(), Store.NO));
+            fieldType.setNumericType(FieldType.NumericType.LONG);
+            if (obj instanceof Number) {
+                doc.add(new LongField(name, ((Number) obj).longValue(), fieldType));
             } else {
                 doc.add(new StringField(name, obj.toString(), Store.NO));
             }
             break;
         case FLOAT:
-            if (obj instanceof Float) {
-                doc.add(new FloatField(name, ((Float) obj).floatValue(), Store.NO));
-            } else if (obj instanceof Integer) {
-                doc.add(new FloatField(name, ((Integer) obj).floatValue(), Store.NO));
-            } else if (obj instanceof Long) {
-                doc.add(new FloatField(name, ((Long) obj).floatValue(), Store.NO));
-            } else if (obj instanceof Double) {
-                doc.add(new FloatField(name, ((Double) obj).floatValue(), Store.NO));
+            fieldType.setNumericType(FieldType.NumericType.FLOAT);
+            fieldType.setNumericPrecisionStep(8);
+            if (obj instanceof Number) {
+                doc.add(new FloatField(name, ((Number) obj).floatValue(), fieldType));
             } else {
                 doc.add(new StringField(name, obj.toString(), Store.NO));
             }
@@ -1337,6 +1328,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         default:
             break;
         }
+        fieldType.freeze();
     }
 
     @SuppressWarnings("unchecked")
