@@ -739,7 +739,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public void waitForIndexing(long maxWait) throws AnalyticsServiceException {
+    public void waitForIndexing(int tenantId, String tableName, long maxWait, boolean tenantAware) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI);
         try {
@@ -748,6 +748,11 @@ public class AnalyticsAPIHttpClient {
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.WAIT_FOR_INDEXING_OPERATION));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.MAX_WAIT_PARAM, String.valueOf(maxWait)));
+            params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_AWARE_PARAM, String.valueOf(tenantAware)));
+            if (tenantAware){
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
+            }
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             String response = getResponseString(httpResponse);

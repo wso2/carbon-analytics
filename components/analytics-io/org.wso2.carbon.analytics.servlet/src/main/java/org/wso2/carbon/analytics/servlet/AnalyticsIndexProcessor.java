@@ -36,7 +36,7 @@ public class AnalyticsIndexProcessor extends HttpServlet {
     /**
      * This focuses on changing the wait time for indexing for the given table.
      *
-     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param req  HttpRequest which has the required parameters to do the operation.
      * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
@@ -54,11 +54,23 @@ public class AnalyticsIndexProcessor extends HttpServlet {
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.WAIT_FOR_INDEXING_OPERATION)) {
                 long maxWait = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.MAX_WAIT_PARAM));
-                try {
-                    ServiceHolder.getAnalyticsDataService().waitForIndexing(maxWait);
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                } catch (AnalyticsException e) {
-                    resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                boolean tenantAware = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.TENANT_AWARE_PARAM));
+                if (tenantAware) {
+                    String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
+                    int tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+                    try {
+                        ServiceHolder.getAnalyticsDataService().waitForIndexing(tenantId, tableName, maxWait);
+                        resp.setStatus(HttpServletResponse.SC_OK);
+                    } catch (AnalyticsException e) {
+                        resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                    }
+                } else {
+                    try {
+                        ServiceHolder.getAnalyticsDataService().waitForIndexing(maxWait);
+                        resp.setStatus(HttpServletResponse.SC_OK);
+                    } catch (AnalyticsException e) {
+                        resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                    }
                 }
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.WAIT_FOR_INDEXING_FOR_TABLE_OPERATION)) {
                 boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
@@ -86,7 +98,7 @@ public class AnalyticsIndexProcessor extends HttpServlet {
     /**
      * This focuses on deleting the index data for the given table.
      *
-     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param req  HttpRequest which has the required parameters to do the operation.
      * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
