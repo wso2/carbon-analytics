@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.dataservice.indexing;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
@@ -74,6 +75,9 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsQueryParser;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
+import org.wso2.carbon.analytics.dataservice.commons.AggregateField;
+import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
@@ -83,9 +87,12 @@ import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsIndexedTableStore.IndexedTableId;
+import org.wso2.carbon.analytics.dataservice.indexing.aggregates.Aggregate;
+import org.wso2.carbon.analytics.dataservice.indexing.aggregates.SUMAggregate;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
@@ -156,6 +163,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private Map<String, Directory> indexDirs = new HashMap<>();
 
     private Map<String, Directory> indexTaxonomyDirs = new HashMap<>();
+
+    private Map<String, Aggregate> aggregates = new HashMap<>();
     
     private Analyzer luceneAnalyzer;
     
@@ -201,7 +210,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         this.initializeIndexingSchedules();
     }
-    
+
     private boolean checkIfIndexingNode() {
         String indexDisableProp =  System.getProperty(DISABLE_INDEXING_ENV_PROP);
         return !(indexDisableProp != null && Boolean.parseBoolean(indexDisableProp));
@@ -640,7 +649,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             IndexSearcher searcher = new IndexSearcher(reader, searchExecutor);
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, tableName);
             Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
-            Query indexQuery = new AnalyticsQueryParser(analyzer, indices).parse(query);
+            String validatedQuery;
+            if (query == null || query.isEmpty()) {
+                validatedQuery = "*:*";
+                log.warn("Lucene filtering query is not given, So matching all values.");
+            } else {
+                validatedQuery = query;
+            }
+            Query indexQuery = new AnalyticsQueryParser(analyzer, indices).parse(validatedQuery);
             if (count <= 0) {
                 log.warn("Record Count/Page size is ZERO!. Please set Record count/Page size.");
             }
@@ -691,7 +707,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             IndexSearcher searcher = new IndexSearcher(reader);
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, tableName);
             Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
-            Query indexQuery = new AnalyticsQueryParser(analyzer, indices).parse(query);
+            String validatedQuery;
+            if (query == null || query.isEmpty()) {
+                log.warn("Lucene filter query is not given. So matching all values.");
+                validatedQuery = "*:*";
+            } else {
+                validatedQuery = query;
+            }
+            Query indexQuery = new AnalyticsQueryParser(analyzer, indices).parse(validatedQuery);
             TotalHitCountCollector collector = new TotalHitCountCollector();
             searcher.search(indexQuery, collector);
             return collector.getTotalHits();
@@ -1024,6 +1047,17 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
         }
         return config;
+    }
+
+    public Map<String, Aggregate> getAggregates() {
+        if (this.aggregates.isEmpty()) {
+            aggregates.put(Constants.SUM_AGGREGATE, new SUMAggregate());
+            aggregates.put(Constants.MAX_AGGREGATE, new SUMAggregate());
+            aggregates.put(Constants.COUNT_AGGREGATE, new SUMAggregate());
+            aggregates.put(Constants.MIN_AGGREGATE, new SUMAggregate());
+            aggregates.put(Constants.MAX_AGGREGATE, new SUMAggregate());
+        }
+        return this.aggregates;
     }
 
     private ValueSource getCompiledScoreFunction(String scoreFunction, Map<String, ColumnDefinition> scoreParams)
@@ -1560,6 +1594,84 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         } catch (AnalyticsException e) {
             log.error("Error in planning indexing workers on members change: " + e.getMessage(), e);
         }
+    }
+
+    public List<Record> searchWithAggregates(int tenantId, AggregateRequest aggregateRequest)
+            throws AnalyticsException {
+        List<CategorySearchResultEntry> facetValues = getUniqueGroupings(tenantId, aggregateRequest);
+        List<Record> aggregatedRecords = new ArrayList<>();
+        for (CategorySearchResultEntry facetValue : facetValues) {
+            Record aggregatedRecord = aggregatePerGrouping(tenantId, facetValue, aggregateRequest);
+            aggregatedRecords.add(aggregatedRecord);
+        }
+        return aggregatedRecords;
+    }
+
+    private List<CategorySearchResultEntry> getUniqueGroupings(int tenantId,
+                                                               AggregateRequest aggregateRequest)
+            throws AnalyticsIndexException {
+        CategoryDrillDownRequest categoryDrillDownRequest = new CategoryDrillDownRequest();
+        categoryDrillDownRequest.setFieldName(aggregateRequest.getGroupByField());
+        categoryDrillDownRequest.setPath(new String[]{});
+        categoryDrillDownRequest.setQuery(aggregateRequest.getQuery());
+        categoryDrillDownRequest.setTableName(aggregateRequest.getTableName());
+        return this.drilldownCategories(tenantId, categoryDrillDownRequest).getCategories();
+    }
+
+    private Record aggregatePerGrouping(int tenantId, CategorySearchResultEntry facetValue, AggregateRequest aggregateRequest)
+            throws AnalyticsException {
+        Iterator<Record> iterator = IteratorUtils.chainedIterator(getRecordIterators(tenantId, facetValue, aggregateRequest));
+        Map<String,  Object> optionalParams = new HashMap<>();
+        optionalParams.put(Constants.AggregateOptionalParams.COUNT, facetValue.getScore());
+        Map<String, Object> aggregatedValues = new HashMap<>();
+        for (AggregateField field : aggregateRequest.getFields()) {
+            Aggregate function = this.getAggregates().get(field.getAggregate());
+            Object aggregatedValue = function.aggregate(iterator, field.getFieldName(), optionalParams);
+            aggregatedValues.put(field.getAlias(), aggregatedValue);
+        }
+        return new Record(tenantId, aggregateRequest.getTableName(), aggregatedValues);
+    }
+
+
+    private List<Iterator<Record>> getRecordIterators(int tenantId,
+                                                      CategorySearchResultEntry facetValue,
+                                                      AggregateRequest aggregateRequest)
+            throws AnalyticsException {
+        List<SearchResultEntry> searchResultEntries = getRecordSearchEntries(tenantId, facetValue, aggregateRequest);
+        List<String> recordIds = getRecordIds(searchResultEntries);
+        AnalyticsDataResponse analyticsDataResponse = this.analyticsDataService.get(tenantId, aggregateRequest.getTableName(),
+                                                                                    1, null, recordIds);
+        RecordGroup[] recordGroups = analyticsDataResponse.getRecordGroups();
+        List<Iterator<Record>> iterators = new ArrayList<>();
+        for (RecordGroup recordGroup : recordGroups) {
+            iterators.add(this.analyticsDataService.readRecords(analyticsDataResponse.getRecordStoreName(), recordGroup));
+        }
+        return iterators;
+    }
+
+    private List<SearchResultEntry> getRecordSearchEntries(int tenantId,
+                                                           CategorySearchResultEntry facetValue,
+                                                           AggregateRequest aggregateRequest)
+            throws AnalyticsIndexException {
+        AnalyticsDrillDownRequest analyticsDrillDownRequest = new AnalyticsDrillDownRequest();
+        analyticsDrillDownRequest.setTableName(aggregateRequest.getTableName());
+        analyticsDrillDownRequest.setQuery(aggregateRequest.getQuery());
+        analyticsDrillDownRequest.setRecordStartIndex(0);
+        analyticsDrillDownRequest.setRecordCount(Integer.MAX_VALUE);
+        Map<String, List<String>> groupByCategory = new HashMap<>();
+        List<String> groupByValue = new ArrayList<>();
+        groupByValue.add(facetValue.getCategoryValue());
+        groupByCategory.put(aggregateRequest.getGroupByField(), groupByValue);
+        analyticsDrillDownRequest.setCategoryPaths(groupByCategory);
+        return this.getDrillDownRecords(tenantId, analyticsDrillDownRequest, null, null);
+    }
+
+    private static List<String> getRecordIds(List<SearchResultEntry> searchResults) {
+        List<String> ids = new ArrayList<>();
+        for (SearchResultEntry searchResult : searchResults) {
+            ids.add(searchResult.getId());
+        }
+        return ids;
     }
 
     /**

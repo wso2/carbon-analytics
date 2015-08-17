@@ -19,7 +19,6 @@ package org.wso2.carbon.analytics.api.internal.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,6 +46,7 @@ import org.wso2.carbon.analytics.api.exception.AnalyticsServiceAuthenticationExc
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceRemoteException;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
+import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
@@ -63,7 +63,6 @@ import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
 import org.wso2.carbon.base.ServerConfiguration;
 
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -1209,6 +1208,46 @@ public class AnalyticsAPIHttpClient {
                 } else {
                     throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("preforming drill down range count",
                             drillDownRequest.getTableName(), "list of analytics drill down ranges", listOfReangeObj));
+                }
+            }
+        } catch (URISyntaxException e) {
+            throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AnalyticsServiceException("Error while connecting to the remote service. " + e.getMessage(), e);
+        }
+    }
+
+    public List<Record> searchWithAggregates(int tenantId, String username,
+                                                             AggregateRequest aggregateRequest,
+                                                             boolean securityEnabled) {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
+                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SEARCH_WITH_AGGREGATES_OPERATION)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled))
+                .addParameter(AnalyticsAPIConstants.GROUP_BY_FIELD_PARAM, aggregateRequest.getGroupByField())
+                .addParameter(AnalyticsAPIConstants.QUERY, aggregateRequest.getQuery())
+                .addParameter(AnalyticsAPIConstants.AGGREGATING_FIELDS, gson.toJson(aggregateRequest.getFields()))
+                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, aggregateRequest.getTableName());
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
+        try {
+            HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
+            HttpResponse httpResponse = httpClient.execute(getMethod);
+            String response = getResponseString(httpResponse);
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                throw new AnalyticsServiceException("Error while searching with aggregates. " + response);
+            } else {
+                Object searchResultListObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
+                if (searchResultListObj != null && searchResultListObj instanceof List) {
+                    return (List<Record>) searchResultListObj;
+                } else {
+                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("preforming search with aggregates",
+                        aggregateRequest.getTableName(), "list of search result entry", searchResultListObj));
                 }
             }
         } catch (URISyntaxException e) {

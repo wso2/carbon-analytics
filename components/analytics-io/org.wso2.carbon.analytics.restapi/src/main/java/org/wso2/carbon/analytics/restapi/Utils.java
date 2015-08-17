@@ -17,6 +17,8 @@
 package org.wso2.carbon.analytics.restapi;
 
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.analytics.dataservice.commons.AggregateField;
+import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
@@ -32,6 +34,8 @@ import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.restapi.beans.AggregateFieldBean;
+import org.wso2.carbon.analytics.restapi.beans.AggregateRequestBean;
 import org.wso2.carbon.analytics.restapi.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.restapi.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.restapi.beans.ColumnDefinitionBean;
@@ -421,5 +425,25 @@ public class Utils {
         } catch (UserStoreException e) {
             throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
         }
+    }
+
+    public static AggregateRequest createAggregateRequest(
+            AggregateRequestBean aggregateRequestBean) {
+        AggregateRequest request = new AggregateRequest();
+        request.setTableName(aggregateRequestBean.getTableName());
+        request.setQuery(aggregateRequestBean.getQuery());
+        request.setGroupByField(aggregateRequestBean.getGroupByField());
+        request.setFields(createAggregatingFields(aggregateRequestBean.getFields()));
+        return request;
+    }
+
+    private static List<AggregateField> createAggregatingFields(List<AggregateFieldBean> fields) {
+        List<AggregateField> aggregateFields = new ArrayList<>();
+        for (AggregateFieldBean fieldBean : fields) {
+            AggregateField aggregateField = new AggregateField(fieldBean.getFieldName(),
+                fieldBean.getAggregate(), fieldBean.getAlias());
+            aggregateFields.add(aggregateField);
+        }
+        return aggregateFields;
     }
 }

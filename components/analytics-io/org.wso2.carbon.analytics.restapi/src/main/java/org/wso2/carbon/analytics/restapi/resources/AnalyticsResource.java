@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceUtils;
+import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
@@ -34,6 +35,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.restapi.Constants;
 import org.wso2.carbon.analytics.restapi.UnauthenticatedUserException;
 import org.wso2.carbon.analytics.restapi.Utils;
+import org.wso2.carbon.analytics.restapi.beans.AggregateRequestBean;
 import org.wso2.carbon.analytics.restapi.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.restapi.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.restapi.beans.ColumnKeyValueBean;
@@ -930,6 +932,34 @@ public class AnalyticsResource extends AbstractResource {
         AnalyticsSchema analyticsSchema = analyticsDataService.getTableSchema(username, tableName);
         AnalyticsSchemaBean analyticsSchemaBean = Utils.createTableSchemaBean(analyticsSchema);
         return Response.ok(analyticsSchemaBean).build();
+    }
+
+    /**
+     * Returns the aggregated values of the given fields grouped by the given facet field.
+     * @param aggregateRequestBean the aggregate request bean
+     * @return the {@link Response}response
+     * @throws AnalyticsException
+     */
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path(Constants.ResourcePath.SEARCH_COUNT)
+    public Response searchWithAggregates(AggregateRequestBean aggregateRequestBean,
+                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+            throws AnalyticsException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking search with aggregates for tableName : " + aggregateRequestBean.getTableName());
+        }
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
+        String username = authenticate(authHeader);
+        if (aggregateRequestBean != null) {
+            AggregateRequest aggregateRequest = Utils.createAggregateRequest(aggregateRequestBean);
+            List<Record> aggregatesRecords = analyticsDataService.searchWithAggregates(username, aggregateRequest);
+
+            return Response.ok(aggregatesRecords).build();
+        } else {
+            throw new AnalyticsException("Search parameters not found");
+        }
     }
 
     private String authenticate(String authHeader) throws AnalyticsException {

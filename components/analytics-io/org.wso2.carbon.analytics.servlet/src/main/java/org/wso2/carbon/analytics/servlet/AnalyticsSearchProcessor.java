@@ -17,11 +17,16 @@
 */
 package org.wso2.carbon.analytics.servlet;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.wso2.carbon.analytics.dataservice.commons.AggregateField;
+import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
+import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
@@ -36,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,6 +103,30 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                         count = ServiceHolder.getSecureAnalyticsDataService().searchCount(userName, tableName, query);
                     PrintWriter output = resp.getWriter();
                     output.append(AnalyticsAPIConstants.SEARCH_COUNT).append(AnalyticsAPIConstants.SEPARATOR).append(String.valueOf(count));
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                } catch (AnalyticsException e) {
+                    resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                }
+            } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.SEARCH_WITH_AGGREGATES_OPERATION)) {
+                try {
+                    List<Record> aggregatedResults;
+                    String groupByField = req.getParameter(AnalyticsAPIConstants.GROUP_BY_FIELD_PARAM);
+                    Type aggregateFieldsMapType = new TypeToken<List<AggregateField>>() {}.getType();
+                    Gson gson = new Gson();
+                    List<AggregateField> fields = gson.fromJson(req.getParameter(AnalyticsAPIConstants.AGGREGATING_FIELDS),
+                                                                             aggregateFieldsMapType);
+                    AggregateRequest aggregateRequest = new AggregateRequest();
+                    aggregateRequest.setTableName(tableName);
+                    aggregateRequest.setQuery(query);
+                    aggregateRequest.setFields(fields);
+                    aggregateRequest.setGroupByField(groupByField);
+                    if (!securityEnabled) aggregatedResults = ServiceHolder.getAnalyticsDataService()
+                            .searchWithAggregates(tenantIdParam, aggregateRequest);
+                    else
+                        aggregatedResults = ServiceHolder.getSecureAnalyticsDataService().searchWithAggregates(userName,
+                                                                                                               aggregateRequest);
+                    aggregatedResults = new ArrayList<>(aggregatedResults);
+                    resp.getOutputStream().write(GenericUtils.serializeObject(aggregatedResults));
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());

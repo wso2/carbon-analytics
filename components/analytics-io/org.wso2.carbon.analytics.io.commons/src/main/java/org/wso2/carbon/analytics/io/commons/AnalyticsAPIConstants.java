@@ -45,6 +45,10 @@ public class AnalyticsAPIConstants {
     public static final String COLUMNS_PARAM = "columns";
     public static final String RECORD_FROM_PARAM = "recordFrom";
     public static final String KEY_VALUE_PARAM = "keyValues";
+    public static final String GROUP_BY_FIELD_PARAM = "groupByField";
+    public static final String AGGREGATING_FIELDS = "aggregatingFields";
+    public static final String ALIASES = "aliases";
+
 
     public static final String OPERATION = "__operation";
     public static final String SESSION_ID = "__sessionId";
@@ -73,6 +77,7 @@ public class AnalyticsAPIConstants {
     public static final String DRILL_DOWN_SEARCH_COUNT_OPERATION = "drillDownSearchCount_opr";
     public static final String DRILL_DOWN_SEARCH_CATEGORY_OPERATION = "drillDownSearchCategory_opr";
     public static final String DRILL_DOWN_SEARCH_RANGE_COUNT_OPERATION = "drillDownRangeCount_opr";
+    public static final String SEARCH_WITH_AGGREGATES_OPERATION = "searchWithAggregates_opr";
     public static final String SEARCH_COUNT_OPERATION = "__search_count_opr";
     public static final String WAIT_FOR_INDEXING_OPERATION = "__wait_for_index_opr";
     public static final String DESTROY_OPERATION = "__destroy_opr";

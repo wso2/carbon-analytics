@@ -301,6 +301,21 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     }
 
     @Override
+    public List<Record> searchWithAggregates(String username, AggregateRequest aggregateRequest)
+            throws AnalyticsException {
+        try {
+            int tenantId = getTenantId(username);
+            if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
+                throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                               "permission to search with aggregates");
+            }
+            return analyticsDataService.searchWithAggregates(tenantId, aggregateRequest);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsIndexException(e.getMessage(), e);
+        }
+    }
+
+    @Override
     public void destroy() throws AnalyticsException {
         analyticsDataService.destroy();
     }

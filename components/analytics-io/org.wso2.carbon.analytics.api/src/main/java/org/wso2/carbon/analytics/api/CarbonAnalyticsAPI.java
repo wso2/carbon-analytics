@@ -23,6 +23,7 @@ import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
 import org.wso2.carbon.analytics.api.internal.ServiceHolder;
 import org.wso2.carbon.analytics.api.internal.client.AnalyticsAPIHttpClient;
+import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -203,7 +204,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().getRecordCount(tenantId, null, tableName, timeFrom, timeTo,
-                    false);
+                                                                       false);
         }
     }
 
@@ -253,7 +254,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             AnalyticsAPIHttpClient.getInstance().createTable(MultitenantConstants.INVALID_TENANT_ID,
-                    username, null, tableName, true);
+                                                             username, null, tableName, true);
         }
     }
 
@@ -265,7 +266,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             AnalyticsAPIHttpClient.getInstance().createTable(MultitenantConstants.INVALID_TENANT_ID,
-                    username, recordStoreName, tableName, true);
+                                                             username, recordStoreName, tableName, true);
         }
     }
 
@@ -314,7 +315,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().isTableExists(MultitenantConstants.INVALID_TENANT_ID, username,
-                    tableName, true);
+                                                                      tableName, true);
         }
     }
 
@@ -350,7 +351,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().getRecordCount(MultitenantConstants.INVALID_TENANT_ID, username,
-                    tableName, timeFrom, timeTo, true);
+                                                                       tableName, timeFrom, timeTo, true);
         }
     }
 
@@ -370,12 +371,12 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
                                      long timeFrom, long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException {
         if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().get(username, tableName, numPartitionsHint, columns,
-                    timeFrom, timeTo, recordsFrom, recordsCount);
+                                                                     timeFrom, timeTo, recordsFrom, recordsCount);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().getRecordGroup(MultitenantConstants.INVALID_TENANT_ID, username,
-                    tableName, numPartitionsHint, columns, timeFrom, timeTo, recordsFrom, recordsCount, true);
+                                                                       tableName, numPartitionsHint, columns, timeFrom, timeTo, recordsFrom, recordsCount, true);
         }
     }
 
@@ -388,7 +389,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().getRecordGroup(MultitenantConstants.INVALID_TENANT_ID, username,
-                    tableName, numPartitionsHint, columns, ids, true);
+                                                                       tableName, numPartitionsHint, columns, ids, true);
         }
     }
 
@@ -452,7 +453,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().search(MultitenantConstants.INVALID_TENANT_ID,
-                    username, tableName, query, start, count, true);
+                                                               username, tableName, query, start, count, true);
         }
     }
 
@@ -464,7 +465,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().searchCount(MultitenantConstants.INVALID_TENANT_ID,
-                    username, tableName, query, true);
+                                                                    username, tableName, query, true);
         }
     }
 
@@ -477,7 +478,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().drillDownSearch(MultitenantConstants.INVALID_TENANT_ID,
-                    username, drillDownRequest, true);
+                                                                        username, drillDownRequest, true);
         }
     }
 
@@ -490,7 +491,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().drillDownSearchCount(MultitenantConstants.INVALID_TENANT_ID,
-                    username, drillDownRequest, true);
+                                                                             username, drillDownRequest, true);
         }
     }
 
@@ -518,7 +519,20 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().drillDownRangeCount(MultitenantConstants.INVALID_TENANT_ID,
-                    username, drillDownRequest, true);
+                                                                            username, drillDownRequest, true);
+        }
+    }
+
+    @Override
+    public List<Record> searchWithAggregates(String username, AggregateRequest aggregateRequest)
+            throws AnalyticsException {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
+            return ServiceHolder.getSecureAnalyticsDataService().searchWithAggregates(username, aggregateRequest);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            return AnalyticsAPIHttpClient.getInstance().searchWithAggregates(MultitenantConstants.INVALID_TENANT_ID,
+                                                                             username, aggregateRequest, true);
         }
     }
 
@@ -625,6 +639,19 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().drillDownRangeCount(tenantId, null, drillDownRequest, false);
+        }
+    }
+
+    @Override
+    public List<Record> searchWithAggregates(int tenantId, AggregateRequest aggregateRequest)
+            throws AnalyticsException {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
+            return ServiceHolder.getAnalyticsDataService().searchWithAggregates(tenantId, aggregateRequest);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            return AnalyticsAPIHttpClient.getInstance().searchWithAggregates(tenantId,
+                                                                             null, aggregateRequest, false);
         }
     }
 

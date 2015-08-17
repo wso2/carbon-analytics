@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
+import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
@@ -57,12 +58,19 @@ import org.wso2.carbon.ntask.core.service.TaskService;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 
 /**
@@ -831,6 +839,13 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             throws AnalyticsIndexException {
         drillDownRequest.setTableName(GenericUtils.normalizeTableName(drillDownRequest.getTableName()));
         return this.getIndexer().drillDownRangeCount(tenantId, drillDownRequest);
+    }
+
+    @Override
+    public List<Record> searchWithAggregates(int tenantId, AggregateRequest aggregateRequest)
+            throws AnalyticsException {
+        aggregateRequest.setTableName(GenericUtils.normalizeTableName(aggregateRequest.getTableName()));
+        return this.getIndexer().searchWithAggregates(tenantId, aggregateRequest);
     }
 
     private void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException {

@@ -316,6 +316,18 @@ public interface SecureAnalyticsDataService {
      */
     List<AnalyticsDrillDownRange> drillDownRangeCount(String username, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException;
+
+    /**
+     * Returns a list of records containing the aggregate values computed over the given fields map
+     * , grouped by a predefined FACET field.
+     * @param username The username
+     * @param aggregateRequest Inputs required for performing aggregation.
+     * groupByField is used to group the records. It should be a facet field created by the grouping fields.
+     * fields attribute represents the record fields and the respective aggregate function.
+     * aliases represents the output field names for aggregated values over the fields.
+     * @return List of records of which the record values will be the aggregate values of the given fields
+     */
+    List<Record> searchWithAggregates(String username, AggregateRequest aggregateRequest) throws AnalyticsException;
     /**
      * Destroys and frees any resources taken up by the analytics data service implementation.
      */

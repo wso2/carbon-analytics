@@ -16,10 +16,21 @@
 
 package org.wso2.carbon.analytics.dataservice.commons;
 
+
 /**
  * This class contains the constants required by the AnalyticsDataService
  */
 public class Constants {
     public static final String NON_TOKENIZED_FIELD_PREFIX = "_";
+    public static final String SUM_AGGREGATE = "SUM";
+    public static final String AVG_AGGREGATE = "AVG";
+    public static final String COUNT_AGGREGATE = "COUNT";
+    public static final String MIN_AGGREGATE = "MIN";
+    public static final String MAX_AGGREGATE = "MAX";
+
+    public final class AggregateOptionalParams {
+        public static final String COUNT = "aggregateCount";
+    }
+
 }
 
