@@ -94,5 +94,7 @@ public class Constants {
         public static final String DRILLDOWNCATEGORIES = "facets";
 
         public static final String RECORDSTORES = "recordstores";
+
+        public static final String AGGREGATES = "aggregates";
     }
 }

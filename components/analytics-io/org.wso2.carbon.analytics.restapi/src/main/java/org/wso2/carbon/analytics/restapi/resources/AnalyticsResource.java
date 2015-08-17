@@ -943,7 +943,7 @@ public class AnalyticsResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON})
     @Produces({ MediaType.APPLICATION_JSON })
-    @Path(Constants.ResourcePath.SEARCH_COUNT)
+    @Path(Constants.ResourcePath.AGGREGATES)
     public Response searchWithAggregates(AggregateRequestBean aggregateRequestBean,
                                 @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
@@ -955,8 +955,8 @@ public class AnalyticsResource extends AbstractResource {
         if (aggregateRequestBean != null) {
             AggregateRequest aggregateRequest = Utils.createAggregateRequest(aggregateRequestBean);
             List<Record> aggregatesRecords = analyticsDataService.searchWithAggregates(username, aggregateRequest);
-
-            return Response.ok(aggregatesRecords).build();
+            List<RecordBean> recordBeans = Utils.createRecordBeans(aggregatesRecords);
+            return Response.ok(recordBeans).build();
         } else {
             throw new AnalyticsException("Search parameters not found");
         }

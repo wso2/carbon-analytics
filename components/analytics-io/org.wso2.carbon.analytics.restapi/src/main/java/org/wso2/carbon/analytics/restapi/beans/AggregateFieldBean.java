@@ -27,12 +27,16 @@ import javax.xml.bind.annotation.XmlRootElement;
  * Aggregate function will be calculated over the given field name.
  */
 
-@XmlRootElement(name = "aggregateFields")
+@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class AggregateFieldBean {
     private String fieldName;
     private String aggregate;
     private String alias;
+
+    public AggregateFieldBean() {
+
+    }
 
     public AggregateFieldBean(String fieldName, String aggregate, String alias) {
         this.fieldName = fieldName;

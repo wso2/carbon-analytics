@@ -39,6 +39,10 @@ public class AggregateRequestBean {
     @XmlElement(name = "aggregateFields", required = true)
     private List<AggregateFieldBean> fields;
 
+    public AggregateRequestBean() {
+
+    }
+
     public AggregateRequestBean(String tableName, String groupByField, String query,
                                 List<AggregateFieldBean> fields) {
         this.tableName = tableName;
