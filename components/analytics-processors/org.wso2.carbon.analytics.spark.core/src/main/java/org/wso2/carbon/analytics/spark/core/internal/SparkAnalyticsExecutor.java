@@ -304,7 +304,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                          " and UI port : " + this.sparkConf.get(AnalyticsConstants.SPARK_UI_PORT));
             }
         } else {
-            log.warn("Analytics Spark Context is disabled in this node, therefore ignoring the client initiation.");
+            this.logDebug("Analytics Spark Context is disabled in this node, therefore ignoring the client initiation.");
         }
 
     }
