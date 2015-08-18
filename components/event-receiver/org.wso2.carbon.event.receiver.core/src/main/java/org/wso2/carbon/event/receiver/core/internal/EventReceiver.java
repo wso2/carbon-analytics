@@ -26,6 +26,7 @@ import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRunti
 import org.wso2.carbon.event.processor.manager.core.EventManagementUtil;
 import org.wso2.carbon.event.processor.manager.core.EventSync;
 import org.wso2.carbon.event.processor.manager.core.Manager;
+import org.wso2.carbon.event.processor.manager.core.config.DistributedConfiguration;
 import org.wso2.carbon.event.processor.manager.core.config.Mode;
 import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
@@ -53,6 +54,7 @@ public class EventReceiver implements EventProducer {
     private boolean traceEnabled = false;
     private boolean statisticsEnabled = false;
     private boolean customMappingEnabled = false;
+    private boolean isManagerNode = false;
     private Logger trace = Logger.getLogger(EventReceiverConstants.EVENT_TRACE_LOGGER);
     private EventReceiverConfiguration eventReceiverConfiguration = null;
     private StreamDefinition exportedStreamDefinition;
@@ -113,6 +115,13 @@ public class EventReceiver implements EventProducer {
                         eventReceiverConfiguration.getFromAdapterConfiguration(), inputEventAdapterSubscription);
 
                 isEventDuplicatedInCluster = EventReceiverServiceValueHolder.getInputEventAdapterService().isEventDuplicatedInCluster(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
+
+
+                DistributedConfiguration distributedConfiguration = EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getDistributedConfiguration();
+                if(distributedConfiguration != null){
+                    isManagerNode = distributedConfiguration.isManagerNode();
+                }
+
             } catch (InputEventAdapterException e) {
                 throw new EventReceiverConfigurationException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error in configuration. " + e.getMessage(), e);
             } catch (InputEventAdapterRuntimeException e) {
@@ -239,7 +248,8 @@ public class EventReceiver implements EventProducer {
             statisticsMonitor.incrementRequest();
         }
         //in distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator
-        if (!(mode == Mode.Distributed) || !isEventDuplicatedInCluster || EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator()) {
+        if ((!(mode == Mode.Distributed) || !isEventDuplicatedInCluster || EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator())
+                        && !isManagerNode) {
             this.inputEventDispatcher.onEvent(event);
         }
 
