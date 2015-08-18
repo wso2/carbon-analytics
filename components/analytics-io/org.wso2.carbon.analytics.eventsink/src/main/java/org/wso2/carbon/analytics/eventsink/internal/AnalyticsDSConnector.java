@@ -157,7 +157,12 @@ public class AnalyticsDSConnector {
                 switch (columnDefinition.getType()) {
                     case FACET:
                         //converting the json array to comma separated String
-                        return StringUtils.join(gson.fromJson(fieldStrValue, List.class), ',');
+                        try {
+                            return StringUtils.join(gson.fromJson(fieldStrValue, List.class), ',');
+                        } catch (Exception e) {
+                            throw new AnalyticsException("Error while parsing FACET field: " + fieldName +
+                                    ", Expected a JSON array without double quotations", e );
+                        }
                     case STRING:
                         return fieldStrValue;
                     case BINARY:
