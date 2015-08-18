@@ -85,18 +85,20 @@
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
-        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?)</recordInsertQuery>
-        <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
-        <recordMergeQuery>MERGE INTO {{TABLE_NAME}} dest USING( SELECT ? timestamp, ? data, ? record_id FROM dual) src ON(dest.record_id = src.record_id) WHEN NOT MATCHED THEN INSERT(timestamp, data, record_id) VALUES(src.timestamp, src.data, src.record_id) WHEN MATCHED THEN UPDATE SET dest.timestamp = src.timestamp, dest.data = src.data</recordMergeQuery>
-        <recordRetrievalQuery>SELECT record_id, timestamp, data from (SELECT rownum RNUM, record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ? and rownum &lt;= ?) where RNUM &gt; ?</recordRetrievalQuery>
+        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (partition_key, timestamp, data, record_id) VALUES (?, ?, ?, ?)</recordInsertQuery>
+        <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET partition_key = ?, timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
+        <recordMergeQuery>MERGE INTO {{TABLE_NAME}} dest USING( SELECT  ? partition_key, ? timestamp, ? data, ? record_id FROM dual) src ON(dest.record_id = src.record_id) WHEN NOT MATCHED THEN INSERT(partition_key, timestamp, data, record_id) VALUES(src.partition_key, src.timestamp, src.data, src.record_id) WHEN MATCHED THEN UPDATE SET dest.partition_key = src.partition_key, dest.timestamp = src.timestamp, dest.data = src.data</recordMergeQuery>
+        <recordRetrievalQuery>SELECT record_id, timestamp, data from (SELECT rownum RNUM, record_id, timestamp, data FROM {{TABLE_NAME}} WHERE partition_key &gt;= ? and partition_key &lt; ? AND timestamp &gt;= ? AND timestamp &lt; ? and rownum &lt;= ?) where RNUM &gt; ?</recordRetrievalQuery>
         <recordRetrievalWithIdsQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordRetrievalWithIdsQuery>
         <recordTableDeleteQueries>
-            <query>DROP TABLE {{TABLE_NAME}}</query>
+            <query>DROP INDEX {{TABLE_NAME}}_PARTITION_KEY</query>
             <query>DROP INDEX {{TABLE_NAME}}_TIMESTAMP</query>
+            <query>DROP TABLE {{TABLE_NAME}}</query>
         </recordTableDeleteQueries>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR2(50), timestamp NUMBER(19), data BLOB, PRIMARY KEY(record_id))</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR2(50), timestamp NUMBER(19), data BLOB, partition_key NUMBER(10), PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
+            <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{PARTITION_KEY}} (partition_key)</query>
         </recordTableInitQueries>
         <fsDataChunkSize>10240</fsDataChunkSize>
         <fsDeletePathQuery>DELETE FROM AN_FS_PATH WHERE path = ?</fsDeletePathQuery>
@@ -130,19 +132,21 @@
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
-        <recordMergeQuery>MERGE {{TABLE_NAME}} AS dest USING (SELECT ?, ?, ?) AS src (timestamp, data, record_id) ON (dest.record_id = src.record_id) WHEN MATCHED THEN UPDATE SET timestamp = src.timestamp, data = src.data WHEN NOT MATCHED THEN INSERT(timestamp, data, record_id) VALUES (src.timestamp, src.data, src.record_id);</recordMergeQuery>
-        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?)</recordInsertQuery>
-        <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
-        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM (SELECT ROW_NUMBER() OVER(ORDER BY record_id) AS rownumber, record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?) AS A WHERE A.rownumber &lt;= ? AND A.rownumber &gt; ?</recordRetrievalQuery>
+        <recordMergeQuery>MERGE {{TABLE_NAME}} AS dest USING (SELECT ?, ?, ?, ?) AS src (partition_key, timestamp, data, record_id) ON (dest.record_id = src.record_id) WHEN MATCHED THEN UPDATE SET partition_key = src.partition_key, timestamp = src.timestamp, data = src.data WHEN NOT MATCHED THEN INSERT(partition_key, timestamp, data, record_id) VALUES (src.partition_key, src.timestamp, src.data, src.record_id);</recordMergeQuery>
+        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (partition_key, timestamp, data, record_id) VALUES (?, ?, ?, ?)</recordInsertQuery>
+        <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET partition_key = ?, timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
+        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM (SELECT ROW_NUMBER() OVER(ORDER BY record_id) AS rownumber, record_id, timestamp, data FROM {{TABLE_NAME}} WHERE partition_key &gt;= ? and partition_key &lt; ? AND timestamp &gt;= ? AND timestamp &lt; ?) AS A WHERE A.rownumber &lt;= ? AND A.rownumber &gt; ?</recordRetrievalQuery>
         <!--recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ? OFFSET ? ROWS FETCH NEXT ? ROWS ONLY</recordRetrievalQuery-->
         <recordRetrievalWithIdsQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordRetrievalWithIdsQuery>
         <recordTableDeleteQueries>
-            <query>DROP TABLE {{TABLE_NAME}}</query>
+            <query>DROP INDEX {{TABLE_NAME}}_PARTITION_KEY</query>
             <query>DROP INDEX {{TABLE_NAME}}_TIMESTAMP</query>
+            <query>DROP TABLE {{TABLE_NAME}}</query>
         </recordTableDeleteQueries>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data VARBINARY(max), PRIMARY KEY(record_id))</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data VARBINARY(max), partition_key INTEGER, PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
+            <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{PARTITION_KEY}} (partition_key)</query>
         </recordTableInitQueries>
         <fsDataChunkSize>10240</fsDataChunkSize>
         <fsDeletePathQuery>DELETE FROM AN_FS_PATH WHERE path = ?</fsDeletePathQuery>
@@ -175,18 +179,20 @@
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
-        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?)</recordInsertQuery>
-        <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
-        <!--recordMergeQuery>INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?) ON CONFLICT DO UPDATE timestamp=VALUES(timestamp), data=VALUES(data)</recordMergeQuery-->
-        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ? OFFSET ? LIMIT ?</recordRetrievalQuery>
+        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (partition_key, timestamp, data, record_id) VALUES (?, ?, ?, ?)</recordInsertQuery>
+        <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET partition_key = ?, timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
+        <!--recordMergeQuery>INSERT INTO {{TABLE_NAME}} (partition_key, timestamp, data, record_id) VALUES (?, ?, ?, ?) ON CONFLICT DO UPDATE partition_key=VALUES(partition_key), timestamp=VALUES(timestamp), data=VALUES(data)</recordMergeQuery-->
+        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE partition_key &gt;= ? and partition_key &lt; ? AND timestamp &gt;= ? AND timestamp &lt; ? OFFSET ? LIMIT ?</recordRetrievalQuery>
         <recordRetrievalWithIdsQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordRetrievalWithIdsQuery>
         <recordTableDeleteQueries>
-            <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
+            <query>DROP INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}}</query>
             <query>DROP INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}}</query>
+            <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
         </recordTableDeleteQueries>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BYTEA, PRIMARY KEY(record_id))</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BYTEA, partition_key INTEGER, PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
+            <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
         </recordTableInitQueries>
         <fsDataChunkSize>10240</fsDataChunkSize>
         <fsDeletePathQuery>DELETE FROM AN_FS_PATH WHERE path = ?</fsDeletePathQuery>
@@ -220,18 +226,20 @@
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
-        <recordMergeQuery>MERGE INTO {{TABLE_NAME}} AS dest USING (VALUES(?, ?, ?)) AS src (timestamp, data, record_id) ON dest.record_id = src.record_id WHEN MATCHED THEN UPDATE SET dest.timestamp = src.timestamp, dest.data = src.data WHEN NOT MATCHED THEN INSERT (timestamp, data, record_id) VALUES (src.timestamp, src.data, src.record_id)</recordMergeQuery>
-        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?)</recordInsertQuery>
-        <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
-        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ? LIMIT ?,?</recordRetrievalQuery>
+        <recordMergeQuery>MERGE INTO {{TABLE_NAME}} AS dest USING (VALUES(?, ?, ?, ?)) AS src (partition_key, timestamp, data, record_id) ON dest.record_id = src.record_id WHEN MATCHED THEN UPDATE SET dest.partition_key = src.partition_key, dest.timestamp = src.timestamp, dest.data = src.data WHEN NOT MATCHED THEN INSERT (partition_key, timestamp, data, record_id) VALUES (src.partition_key, src.timestamp, src.data, src.record_id)</recordMergeQuery>
+        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (partition_key, timestamp, data, record_id) VALUES (?, ?, ?, ?)</recordInsertQuery>
+        <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET partition_key = ?, timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
+        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE partition_key &gt;= ? and partition_key &lt; ? AND timestamp &gt;= ? AND timestamp &lt; ? LIMIT ?,?</recordRetrievalQuery>
         <recordRetrievalWithIdsQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordRetrievalWithIdsQuery>
         <recordTableDeleteQueries>
-            <query>DROP TABLE {{TABLE_NAME}}</query>
+            <query>DROP INDEX {{TABLE_NAME}}_PARTITION_KEY</query>
             <query>DROP INDEX {{TABLE_NAME}}_TIMESTAMP</query>
+            <query>DROP TABLE {{TABLE_NAME}}</query>
         </recordTableDeleteQueries>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50) NOT NULL, timestamp BIGINT, data BLOB(2G) NOT LOGGED, PRIMARY KEY(record_id))</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50) NOT NULL, timestamp BIGINT, data BLOB(2G) NOT LOGGED, partition_key INTEGER, PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
+            <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
         </recordTableInitQueries>
         <fsDataChunkSize>10240</fsDataChunkSize>
         <fsDeletePathQuery>DELETE FROM AN_FS_PATH WHERE path = ?</fsDeletePathQuery>
