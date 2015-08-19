@@ -227,7 +227,7 @@ public class CarbonInputEventAdapterService implements InputEventAdapterService 
                 return inputAdapterRuntime.isEventDuplicatedInCluster();
             }
         }
-        throw new InputEventAdapterException("Adapter with name'" + inputEventAdapterName + "' not found");
+        throw new InputEventAdapterException("Adapter with name '" + inputEventAdapterName + "' not found");
     }
 
     @Override
