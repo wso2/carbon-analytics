@@ -956,7 +956,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 }
                 FacetsCollector.search(indexSearcher, drillDownQuery, Integer.MAX_VALUE, facetsCollector);
                 Facets facets = new TaxonomyFacetSumValueSource(taxonomyReader, config, facetsCollector, scoreFunction);
-                FacetResult facetResult = facets.getTopChildren(Integer.MAX_VALUE, categoryName, pathAsArray);
+                FacetResult facetResult = facets.getTopChildren(Integer.MAX_VALUE, categoryName, new String[0]);
                 if (facetResult != null) {
                     LabelAndValue[] subCategories = facetResult.labelValues;
                     for (LabelAndValue category : subCategories) {
@@ -999,7 +999,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             throws AnalyticsIndexException {
         Query languageQuery = new MatchAllDocsQuery();
         try {
-            if (drillDownRequest.getQuery() != null) {
+            if (drillDownRequest.getQuery() != null && !drillDownRequest.getQuery().isEmpty()) {
                 Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
                 languageQuery = new AnalyticsQueryParser(analyzer,
                          indices).parse(drillDownRequest.getQuery());
