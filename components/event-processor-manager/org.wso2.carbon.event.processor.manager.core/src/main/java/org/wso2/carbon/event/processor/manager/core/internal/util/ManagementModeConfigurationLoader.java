@@ -203,19 +203,22 @@ public class ManagementModeConfigurationLoader {
             stormDeploymentConfig.setHeartbeatInterval(Integer.parseInt(management.getFirstChildWithName(new QName
                     (ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_HEARTBEAT_INTERVAL_ELEMENT)).getText()));
         } else {
-            log.info("No heartbeat interval provided. Hence using default heartbeat interval");
+            log.info("No heartbeat interval provided. Hence using default heartbeat interval "
+                    + stormDeploymentConfig.getHeartbeatInterval());
         }
         if (management.getFirstChildWithName(new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)) != null) {
             stormDeploymentConfig.setManagementReconnectInterval(Integer.parseInt(management.getFirstChildWithName
                     (new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)).getText()));
         } else {
-            log.info("No reconnection interval provided. Hence using default reconnection interval");
+            log.info("No reconnection interval provided. Hence using default reconnection interval "
+                    + stormDeploymentConfig.getManagementReconnectInterval());
         }
         if (management.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TOPOLOGY_RESUBMIT_INTERVAL_ELEMENT)) != null) {
             stormDeploymentConfig.setTopologySubmitRetryInterval(Integer.parseInt(management.getFirstChildWithName(new QName
                     (ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TOPOLOGY_RESUBMIT_INTERVAL_ELEMENT)).getText()));
         } else {
-            log.info("No topology resubmit interval provided. Hence using default topology resubmit interval");
+            log.info("No topology resubmit interval provided. Hence using default topology resubmit interval "
+                    + stormDeploymentConfig.getTopologySubmitRetryInterval());
         }
 
         //Reading transport
@@ -225,13 +228,15 @@ public class ManagementModeConfigurationLoader {
             stormDeploymentConfig.setTransportMaxPort(Integer.parseInt(portRange.getFirstChildWithName(new QName("max")).getText()));
             stormDeploymentConfig.setTransportMinPort(Integer.parseInt(portRange.getFirstChildWithName(new QName("min")).getText()));
         } else {
-            log.info("No port information provided. Hence using default port settings");
+            log.info("No port information provided. Hence using default port range " +
+            stormDeploymentConfig.getTransportMinPort() + " - " + stormDeploymentConfig.getTransportMaxPort());
         }
         if (transport.getFirstChildWithName(new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)) != null) {
             stormDeploymentConfig.setTransportReconnectInterval(Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)).getText()));
         } else {
-            log.info("No transport reconnection interval provided. Hence using default reconnection interval");
+            log.info("No transport reconnection interval provided. Hence using default reconnection interval "
+                    + stormDeploymentConfig.getTransportReconnectInterval());
         }
         if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE)) != null){
             int queueSize = Integer.parseInt(transport.getFirstChildWithName(
@@ -342,17 +347,20 @@ public class ManagementModeConfigurationLoader {
                 int lockTimeout = Integer.parseInt(lockTimeoutElement.getText());
                 stormDeploymentConfig.setLockTimeout(lockTimeout);
             } else {
-                log.info("No lockTimeout value specified in Status Monitor configurations. Hence using default lockTimeout value");
+                log.info("No lockTimeout value specified in Status Monitor configurations. Hence using default lock timeout value: "
+                        + stormDeploymentConfig.getLockTimeout() + " seconds.");
             }
             OMElement updateRateElement = statusMonitor.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STATUS_MONITOR_UPDATE_RATE));
             if(updateRateElement != null){
                 int updateRate =  Integer.parseInt(updateRateElement.getText());
                 stormDeploymentConfig.setUpdateRate(updateRate);
             } else {
-                log.info("No updateRate value specified in Status Monitor configurations. Hence using default updateRate value");
+                log.info("No updateRate value specified in Status Monitor configurations. Hence using default update rate: "
+                        + stormDeploymentConfig.getUpdateRate() + " milliseconds.");
             }
         } else {
-            log.info("No Status Monitor configurations provided. Hence using default Status Monitor configurations");
+            log.info("No Status Monitor configurations provided. Hence using default Status Monitor configurations. Lock timeout: " +
+            stormDeploymentConfig.getLockTimeout() + " seconds, Update rate: " + stormDeploymentConfig.getUpdateRate() + " milliseconds.");
         }
 
 
