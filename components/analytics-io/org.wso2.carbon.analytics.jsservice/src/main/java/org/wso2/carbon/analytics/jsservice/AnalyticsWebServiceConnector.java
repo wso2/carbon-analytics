@@ -27,6 +27,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.jsservice.beans.AggregateRequest;
 import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.jsservice.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.ColumnKeyValueBean;
@@ -42,6 +43,7 @@ import org.wso2.carbon.analytics.jsservice.exception.JSServiceException;
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceAnalyticsWebServiceExceptionException;
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceMalformedStreamDefinitionExceptionException;
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceStub;
+import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsAggregateRequest;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.ValuesBatchBean;
 
@@ -61,31 +63,6 @@ public class AnalyticsWebServiceConnector {
     private static final String ANALYTICS_WEB_SERVICE = "AnalyticsWebService";
     private AnalyticsWebServiceStub analyticsWebServiceStub;
     private Gson gson;
-
-    public static final int TYPE_CLEAR_INDEX_DATA = 1;
-//    public static final int TYPE_CREATE_TABLE = 2;
-//    public static final int TYPE_DELETE_BY_ID = 3;
-//    public static final int TYPE_DELETE_BY_RANGE = 4;
-//    public static final int TYPE_DELETE_TABLE = 5;
-    public static final int TYPE_GET_RECORD_COUNT = 6;
-    public static final int TYPE_GET_BY_ID = 7;
-    public static final int TYPE_GET_BY_RANGE = 8;
-    public static final int TYPE_LIST_TABLES = 9;
-    public static final int TYPE_GET_SCHEMA = 10;
-//    public static final int TYPE_PUT_RECORDS_TO_TABLE = 11;
-    public static final int TYPE_PUT_RECORDS = 12;
-    public static final int TYPE_SEARCH = 13;
-    public static final int TYPE_SEARCH_COUNT = 14;
-//    public static final int TYPE_SET_SCHEMA = 15;
-    public static final int TYPE_TABLE_EXISTS = 16;
-    public static final int TYPE_WAIT_FOR_INDEXING = 17;
-    public static final int TYPE_PAGINATION_SUPPORTED = 18;
-    public static final int TYPE_DRILLDOWN_CATEGORIES = 19;
-    public static final int TYPE_DRILLDOWN_SEARCH = 20;
-    public static final int TYPE_DRILLDOWN_SEARCH_COUNT = 21;
-    public static final int TYPE_ADD_STREAM_DEFINITION = 22;
-    public static final int TYPE_GET_STREAM_DEFINITION = 23;
-    public static final int TYPE_PUBLISH_EVENT = 24;
 
     public AnalyticsWebServiceConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
         try {
@@ -657,6 +634,41 @@ public class AnalyticsWebServiceConnector {
         }
     }
 
+    public ResponseBean searchWithAggregates(String tableName, String requestAsString) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking search with aggregate for tableName : " + tableName);
+        }
+        if (requestAsString != null && !requestAsString.isEmpty()) {
+            try {
+                AggregateRequest aggregateRequest = gson.fromJson(requestAsString, AggregateRequest.class);
+                AnalyticsAggregateRequest request = Utils.getAggregateRequest(aggregateRequest);
+                RecordBean[] searchResults = analyticsWebServiceStub.searchWithAggregates(request);
+                List<Record> records = Utils.getRecordBeans(searchResults);
+                if (logger.isDebugEnabled()) {
+                    for (Record record : records) {
+                        logger.debug("Search Result -- Record Id: " + record.getId() + " values :" +
+                                     record.toString());
+                    }
+                }
+                return handleResponse(ResponseStatus.SUCCESS, gson.toJson(records));
+            } catch (RemoteException e) {
+                logger.error("Failed to perform search with aggregate on table: " + tableName + " : " +
+                             e.getMessage(), e);
+                return handleResponse(ResponseStatus.FAILED,
+                                      "Failed to perform search with aggregate on table: " + tableName + ": " +
+                                      e.getMessage());
+            } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
+                logger.error("Failed to perform search with aggregate on table: " + tableName + " : " +
+                             e.getFaultMessage(), e);
+                return handleResponse(ResponseStatus.FAILED,
+                                      "Failed to perform search with aggregate on table: " + tableName + ": "
+                                      + e.getFaultMessage());
+            }
+        } else {
+            return handleResponse(ResponseStatus.FAILED, "Search parameters are not provided");
+        }
+    }
+
     public ResponseBean searchCount(String tableName, String queryAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking search count for tableName : " + tableName);
@@ -691,6 +703,24 @@ public class AnalyticsWebServiceConnector {
         }
         try {
             analyticsWebServiceStub.waitForIndexing(seconds * Constants.MILLISECONDSPERSECOND);
+            return handleResponse(ResponseStatus.SUCCESS, "Indexing Completed successfully");
+        } catch (RemoteException e) {
+            logger.error("Failed to wait till indexing finishes: " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED,
+                                  "Failed to wait till indexing finishes: " + e.getMessage());
+        } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
+            logger.error("Failed to wait till indexing finishes: " + e.getFaultMessage(), e);
+            return handleResponse(ResponseStatus.FAILED,
+                                  "Failed to wait till indexing finishes: " + e.getFaultMessage());
+        }
+    }
+
+    public ResponseBean waitForIndexingForTable(String tableName, long seconds) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking waiting for indexing - timeout : " + seconds + " seconds for table: " + tableName);
+        }
+        try {
+            analyticsWebServiceStub.waitForIndexingForTable(tableName, seconds * Constants.MILLISECONDSPERSECOND);
             return handleResponse(ResponseStatus.SUCCESS, "Indexing Completed successfully");
         } catch (RemoteException e) {
             logger.error("Failed to wait till indexing finishes: " + e.getMessage(), e);

@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceUtils;
+import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
@@ -30,6 +31,7 @@ import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.webservice.beans.AnalyticsAggregateRequest;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRangeBean;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRequestBean;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsSchemaBean;
@@ -175,6 +177,32 @@ public class AnalyticsWebService extends AbstractAdmin {
     }
 
     /**
+     * Returns a list of records containing the aggregate values computed over the given fields map
+     * , grouped by a predefined FACET field.
+     * @param aggregateRequest The inputs required for performing aggregation.
+     * groupByField is used to group the records. It should be a facet field created by the grouping fields.
+     * fields attribute represents the record fields and the respective aggregate function.
+     * aliases represents the output field names for aggregated values over the fields.
+     * @return List of records of which the record values will be the aggregate values of the given fields
+     */
+    public RecordBean[] searchWithAggregates(AnalyticsAggregateRequest request)
+            throws AnalyticsWebServiceException {
+        try {
+
+            AggregateRequest aggregateRequest = Utils.getAggregateRequest(request);
+            List<Record> records = analyticsDataAPI.searchWithAggregates(getUsername(), aggregateRequest);
+            List<RecordBean> recordBeans = Utils.createRecordBeans(records);
+            RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
+            return recordBeans.toArray(resultRecordBeans);
+        } catch (Exception e) {
+            logger.error("unable to search with aggregates for table: " + request.getTableName() + ", " +
+                         e.getMessage(), e);
+            throw new AnalyticsWebServiceException("unable to search with aggregates: " + request.getTableName() +
+                                                   ", " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * Retrieves the table schema for the given table.
      *
      * @param tableName The table name
@@ -282,7 +310,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             List<String> columnList = null;
             if (columns != null && columns.length != 0) {
-                columnList = Arrays.asList(columns);
+                columnList = new ArrayList<>(Arrays.asList(columns));
             }
             if (!isPaginationSupported(analyticsDataAPI.getRecordStoreNameByTable(getUsername(), tableName))) {
                 recordsFrom = 0;
@@ -461,6 +489,21 @@ public class AnalyticsWebService extends AbstractAdmin {
         }
     }
 
+    /**
+     * This method waits until the current indexing operations for a given table is done.
+     *
+     * @param tableName table being checked
+     * @param maxWait Maximum amount of time in milliseconds, -getUsername() for infinity
+     * @throws AnalyticsWebServiceException
+     */
+    public void waitForIndexingForTable(String tableName, long maxWait) throws AnalyticsWebServiceException {
+        try {
+            analyticsDataAPI.waitForIndexing(getUsername(), tableName, maxWait);
+        } catch (Exception e) {
+            logger.error("An exception occurred: " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("An exception occurred: " + e.getMessage(), e);
+        }
+    }
 
     /**
      * Destroys and frees any resources taken up by the analytics data service implementation.

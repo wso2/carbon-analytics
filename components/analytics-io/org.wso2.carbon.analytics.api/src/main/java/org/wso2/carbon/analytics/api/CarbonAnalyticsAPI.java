@@ -37,6 +37,7 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.securevault.SecretResolver;
@@ -667,9 +668,28 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
+    public void waitForIndexing(String username, String tableName, long maxWait)
+            throws AnalyticsTimeoutException, AnalyticsException {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
+            ServiceHolder.getSecureAnalyticsDataService().waitForIndexing(username, tableName, maxWait);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            AnalyticsAPIHttpClient.getInstance().waitForIndexing(MultitenantConstants.INVALID_TENANT_ID,
+                                                                 username, tableName,maxWait, true);
+        }
+    }
+
+    @Override
     public void waitForIndexing(int tenantId, String tableName, long maxWait) throws AnalyticsException {
         this.waitForIndexing(maxWait);
-        //TODO impl.
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
+            ServiceHolder.getAnalyticsDataService().waitForIndexing(tenantId, tableName, maxWait);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            AnalyticsAPIHttpClient.getInstance().waitForIndexing(tenantId, null, tableName, maxWait, false);
+        }
     }
 
     @Override

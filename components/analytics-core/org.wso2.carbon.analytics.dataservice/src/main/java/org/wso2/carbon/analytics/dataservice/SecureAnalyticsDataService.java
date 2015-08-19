@@ -274,6 +274,18 @@ public interface SecureAnalyticsDataService {
     void waitForIndexing(long maxWait) throws AnalyticsTimeoutException, AnalyticsException;
 
     /**
+    * This method waits until the current indexing operations for a specific table is done.
+    * @param username The username
+    * @param tableName The table name
+    * @param maxWait Maximum amount of time in milliseconds, if the time is reached,
+    * an {@link AnalyticsTimeoutException} will be thrown, -1 for infinity
+    * @throws AnalyticsTimeoutException
+    * @throws AnalyticsException
+    */
+    public void waitForIndexing(String username, String tableName, long maxWait) throws AnalyticsTimeoutException, AnalyticsException;
+
+
+    /**
      * Returns the drill down results of a search query, given
      * {@link org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest}
      * @param username The username

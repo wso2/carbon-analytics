@@ -16,17 +16,13 @@
  *  under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.commons;
-
-import java.io.Serializable;
+package org.wso2.carbon.analytics.jsservice.beans;
 
 /**
  * This class represents the bean class to hold the field name, alias and the aggregate function.
  * Aggregate function will be calculated over the given field name.
  */
-public class AggregateField implements Serializable {
-
-    private static final long serialVersionUID = 3077504068553108030L;
+public class AggregateField {
     private String fieldName;
     private String aggregate;
     private String alias;
@@ -34,7 +30,6 @@ public class AggregateField implements Serializable {
     public AggregateField(){
 
     }
-
     public AggregateField(String fieldName, String aggregate, String alias) {
         this.fieldName = fieldName;
         this.alias = alias;
@@ -65,4 +60,3 @@ public class AggregateField implements Serializable {
         this.alias = alias;
     }
 }
-

@@ -80,6 +80,7 @@ public class AnalyticsAPIConstants {
     public static final String SEARCH_WITH_AGGREGATES_OPERATION = "searchWithAggregates_opr";
     public static final String SEARCH_COUNT_OPERATION = "__search_count_opr";
     public static final String WAIT_FOR_INDEXING_OPERATION = "__wait_for_index_opr";
+    public static final String WAIT_FOR_INDEXING_FOR_TABLE_OPERATION = "__wait_for_index_for_table_opr";
     public static final String DESTROY_OPERATION = "__destroy_opr";
     public static final String READ_RECORD_OPERATION = "__readRecord_opr";
     public static final String GET_RANGE_RECORD_GROUP_OPERATION = "__get_range_record_group_opr";

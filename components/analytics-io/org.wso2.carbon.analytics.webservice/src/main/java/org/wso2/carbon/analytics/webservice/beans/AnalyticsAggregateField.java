@@ -16,7 +16,7 @@
  *  under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.commons;
+package org.wso2.carbon.analytics.webservice.beans;
 
 import java.io.Serializable;
 
@@ -24,37 +24,14 @@ import java.io.Serializable;
  * This class represents the bean class to hold the field name, alias and the aggregate function.
  * Aggregate function will be calculated over the given field name.
  */
-public class AggregateField implements Serializable {
+public class AnalyticsAggregateField implements Serializable {
 
-    private static final long serialVersionUID = 3077504068553108030L;
+    private static final long serialVersionUID = 2783679819001791855L;
     private String fieldName;
     private String aggregate;
     private String alias;
 
-    public AggregateField(){
-
-    }
-
-    public AggregateField(String fieldName, String aggregate, String alias) {
-        this.fieldName = fieldName;
-        this.alias = alias;
-        this.aggregate = aggregate.toUpperCase();
-    }
-
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
-
-    public String getAggregate() {
-        return aggregate;
-    }
-
-    public void setAggregate(String aggregate) {
-        this.aggregate = aggregate.toUpperCase();
+    public AnalyticsAggregateField() {
     }
 
     public String getAlias() {
@@ -64,5 +41,20 @@ public class AggregateField implements Serializable {
     public void setAlias(String alias) {
         this.alias = alias;
     }
-}
 
+    public String getAggregate() {
+        return aggregate;
+    }
+
+    public void setAggregate(String aggregate) {
+        this.aggregate = aggregate;
+    }
+
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
+    }
+}

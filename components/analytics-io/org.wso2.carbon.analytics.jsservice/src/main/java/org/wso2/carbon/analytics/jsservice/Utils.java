@@ -17,6 +17,8 @@
 package org.wso2.carbon.analytics.jsservice;
 
 import org.apache.axiom.om.util.Base64;
+import org.wso2.carbon.analytics.jsservice.beans.AggregateField;
+import org.wso2.carbon.analytics.jsservice.beans.AggregateRequest;
 import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.jsservice.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.ColumnDefinitionBean;
@@ -27,6 +29,8 @@ import org.wso2.carbon.analytics.jsservice.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.EventBean;
 import org.wso2.carbon.analytics.jsservice.beans.Record;
 import org.wso2.carbon.analytics.jsservice.beans.StreamDefinitionBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsAggregateField;
+import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsAggregateRequest;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsCategoryPathBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsDrillDownRangeBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsDrillDownRequestBean;
@@ -485,5 +489,26 @@ public class Utils {
             }
         }
         return valuesBatchBeans.toArray(new ValuesBatchBean[valuesBatchBeans.size()]);
+    }
+
+    public static AnalyticsAggregateRequest getAggregateRequest(AggregateRequest aggregateRequest) {
+        AnalyticsAggregateRequest request = new AnalyticsAggregateRequest();
+        request.setGroupByField(aggregateRequest.getGroupByField());
+        request.setQuery(aggregateRequest.getQuery());
+        request.setTableName(aggregateRequest.getTableName());
+        request.setFields(createAggregateFieds(aggregateRequest.getFields()));
+        return request;
+    }
+
+    private static AnalyticsAggregateField[] createAggregateFieds(List<AggregateField> fields) {
+        List<AnalyticsAggregateField> analyticsAggregateFields = new ArrayList<>();
+        for (AggregateField field : fields) {
+            AnalyticsAggregateField aggregateField = new AnalyticsAggregateField();
+            aggregateField.setFieldName(field.getFieldName());
+            aggregateField.setAggregate(field.getAggregate());
+            aggregateField.setAlias(field.getAlias());
+            analyticsAggregateFields.add(aggregateField);
+        }
+        return analyticsAggregateFields.toArray(new AnalyticsAggregateField[analyticsAggregateFields.size()]);
     }
 }

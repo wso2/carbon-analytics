@@ -238,6 +238,13 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     }
 
     @Override
+    public void waitForIndexing(String username, String tableName, long maxWait)
+            throws AnalyticsTimeoutException, AnalyticsException {
+            int tenantId = getTenantId(username);
+            analyticsDataService.waitForIndexing(tenantId, tableName, maxWait);
+    }
+
+    @Override
     public List<SearchResultEntry> drillDownSearch(String username,
                                                    AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {

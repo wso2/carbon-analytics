@@ -60,6 +60,22 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
+            } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.WAIT_FOR_INDEXING_FOR_TABLE_OPERATION)) {
+                boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
+                long maxWait = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.MAX_WAIT_PARAM));
+                int tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+                String username = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
+                String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
+                try {
+                    if (securityEnabled) {
+                        ServiceHolder.getSecureAnalyticsDataService().waitForIndexing(username, tableName, maxWait);
+                    } else {
+                        ServiceHolder.getAnalyticsDataService().waitForIndexing(tenantId, tableName, maxWait);
+                    }
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                } catch (AnalyticsException e) {
+                    resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                }
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : "
                         + operation + " with post request!");

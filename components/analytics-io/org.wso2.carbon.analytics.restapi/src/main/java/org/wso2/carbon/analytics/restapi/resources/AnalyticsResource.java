@@ -872,13 +872,18 @@ public class AnalyticsResource extends AbstractResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path(Constants.ResourcePath.INDEXING_DONE)
 	public Response waitForIndexing(@QueryParam("timeout") @DefaultValue(value="-1") long seconds,
-                                    @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+                                    @QueryParam("table") String tableName, @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 			throws AnalyticsException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Invoking waiting for indexing - timeout : " + seconds + " seconds");
+            logger.debug("Invoking waiting for indexing - timeout : " + seconds + " seconds for table: " + tableName);
         }
         AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
-        analyticsDataService.waitForIndexing(seconds * Constants.MILLISECONDSPERSECOND);
+        String username = authenticate(authHeader);
+        if (tableName == null) {
+            analyticsDataService.waitForIndexing(seconds * Constants.MILLISECONDSPERSECOND);
+        } else {
+            analyticsDataService.waitForIndexing(username, tableName, seconds * Constants.MILLISECONDSPERSECOND);
+        }
         return handleResponse(ResponseStatus.SUCCESS, "Indexing Completed successfully");
 	}
 

@@ -16,10 +16,14 @@
 
 package org.wso2.carbon.analytics.webservice;
 
+import org.wso2.carbon.analytics.dataservice.commons.AggregateField;
+import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.webservice.beans.AnalyticsAggregateField;
+import org.wso2.carbon.analytics.webservice.beans.AnalyticsAggregateRequest;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsCategoryPathBean;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.webservice.beans.EventBean;
@@ -537,5 +541,25 @@ public class Utils {
             default:
                 return AnalyticsSchema.ColumnType.STRING;
         }
+    }
+
+    public static AggregateRequest getAggregateRequest(AnalyticsAggregateRequest request) {
+        AggregateRequest aggregateRequest = new AggregateRequest();
+        aggregateRequest.setTableName(request.getTableName());
+        aggregateRequest.setGroupByField(request.getGroupByField());
+        aggregateRequest.setQuery(request.getQuery());
+        aggregateRequest.setFields(createAggregateFields(request.getFields()));
+        return aggregateRequest;
+    }
+
+    private static List<AggregateField> createAggregateFields(AnalyticsAggregateField[] fields) {
+        List<AggregateField> aggregateFields = new ArrayList<>();
+        if (fields != null) {
+            for (AnalyticsAggregateField field : fields) {
+                AggregateField aggregateField = new AggregateField(field.getFieldName(),field.getAggregate(), field.getAlias());
+                aggregateFields.add(aggregateField);
+            }
+        }
+        return  aggregateFields;
     }
 }
