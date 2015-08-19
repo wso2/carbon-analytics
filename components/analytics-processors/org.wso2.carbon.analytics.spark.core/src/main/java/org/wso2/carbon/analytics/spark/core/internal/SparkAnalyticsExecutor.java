@@ -287,7 +287,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 logDebug("Client is already active in this node, therefore ignoring client init");
             }
         } else {
-            log.warn("Analytics Spark Context is disabled in this node, therefore ignoring the client initiation.");
+            log.info("Analytics Spark Context is disabled in this node, therefore ignoring the client initiation.");
         }
     }
 
