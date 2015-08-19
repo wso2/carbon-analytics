@@ -284,10 +284,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                          " with the application name : " + this.sparkConf.get(AnalyticsConstants.SPARK_APP_NAME) +
                          " and UI port : " + this.sparkConf.get(AnalyticsConstants.SPARK_UI_PORT));
             } else {
-                logDebug("Client is already active in this node, therefore ignoring client init");
+                this.logDebug("Client is already active in this node, therefore ignoring client init");
             }
         } else {
-            log.warn("Analytics Spark Context is disabled in this node, therefore ignoring the client initiation.");
+            this.logDebug("Analytics Spark Context is disabled in this node, therefore ignoring the client initiation.");
         }
     }
 
