@@ -16,7 +16,6 @@ package org.wso2.carbon.event.input.adapter.core.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.input.adapter.core.*;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
@@ -228,7 +227,7 @@ public class CarbonInputEventAdapterService implements InputEventAdapterService 
                 return inputAdapterRuntime.isEventDuplicatedInCluster();
             }
         }
-        throw new InputEventAdapterException("Adopter with name'" + inputEventAdapterName + "' not found");
+        throw new InputEventAdapterException("Adapter with name'" + inputEventAdapterName + "' not found");
     }
 
     @Override
