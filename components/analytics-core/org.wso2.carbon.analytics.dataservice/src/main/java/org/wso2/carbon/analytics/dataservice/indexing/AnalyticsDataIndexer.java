@@ -947,13 +947,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             if (!categoryPaths.isEmpty()) {
                 Map.Entry<String, List<String>> aCategory = categoryPaths.entrySet().iterator().next();
                 String categoryName = aCategory.getKey();
-                List<String> path = aCategory.getValue();
-                String[] pathAsArray;
-                if (path != null) {
-                    pathAsArray = path.toArray(new String[aCategory.getValue().size()]);
-                } else {
-                    pathAsArray = new String[]{};
-                }
                 FacetsCollector.search(indexSearcher, drillDownQuery, Integer.MAX_VALUE, facetsCollector);
                 Facets facets = new TaxonomyFacetSumValueSource(taxonomyReader, config, facetsCollector, scoreFunction);
                 FacetResult facetResult = facets.getTopChildren(Integer.MAX_VALUE, categoryName, new String[0]);
