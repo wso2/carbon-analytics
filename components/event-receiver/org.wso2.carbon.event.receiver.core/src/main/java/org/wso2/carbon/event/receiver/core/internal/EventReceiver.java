@@ -55,6 +55,7 @@ public class EventReceiver implements EventProducer {
     private boolean statisticsEnabled = false;
     private boolean customMappingEnabled = false;
     private boolean isManagerNode = false;
+    private boolean sufficientToSend = false;
     private Logger trace = Logger.getLogger(EventReceiverConstants.EVENT_TRACE_LOGGER);
     private EventReceiverConfiguration eventReceiverConfiguration = null;
     private StreamDefinition exportedStreamDefinition;
@@ -121,6 +122,7 @@ public class EventReceiver implements EventProducer {
                 if(distributedConfiguration != null){
                     isManagerNode = distributedConfiguration.isManagerNode();
                 }
+                sufficientToSend = mode != Mode.Distributed || (!isManagerNode && !isEventDuplicatedInCluster);
 
             } catch (InputEventAdapterException e) {
                 throw new EventReceiverConfigurationException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error in configuration. " + e.getMessage(), e);
@@ -247,9 +249,8 @@ public class EventReceiver implements EventProducer {
         if (statisticsEnabled) {
             statisticsMonitor.incrementRequest();
         }
-        //in distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator
-        if ((!(mode == Mode.Distributed) || !isEventDuplicatedInCluster || EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator())
-                        && !isManagerNode) {
+        //in distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator. Also do not send if this is a manager node.
+        if (sufficientToSend || (!isManagerNode && EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator())) {
             this.inputEventDispatcher.onEvent(event);
         }
 
