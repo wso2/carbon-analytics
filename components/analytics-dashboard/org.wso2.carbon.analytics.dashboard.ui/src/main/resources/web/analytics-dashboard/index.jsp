@@ -19,7 +19,9 @@
 <script type="text/javascript">
     jQuery(document).ready(function () {
         var url = window.location.origin + "/portal";
+        var consoleUrl = window.location.origin + "/carbon/admin/index.jsp";
         var win = window.open(url, '_blank');
         win.focus();
+        window.location.href = consoleUrl;
     });
 </script>
