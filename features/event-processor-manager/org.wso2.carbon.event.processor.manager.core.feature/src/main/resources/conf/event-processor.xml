@@ -98,6 +98,7 @@
             <tcpEventPublisherSendBufferSize>5242880</tcpEventPublisherSendBufferSize>
             <!--Character encoding of event publishing client-->
             <tcpEventPublisherCharSet>UTF-8</tcpEventPublisherCharSet>
+            <!--Number of threads to be used by event receiving servers in "Storm Receivers" and "CEP Publishers"-->
             <tcpEventReceiverThreadCount>10</tcpEventReceiverThreadCount>
         </transport>
 
