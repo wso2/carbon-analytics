@@ -47,7 +47,6 @@
     <!-- Distributed Mode Config -->
 
     <mode name="Distributed" enable="false">
-
         <nodeType>
             <worker enable="true"/>
             <manager enable="true">
@@ -67,27 +66,39 @@
                     <port>8905</port>
                 </manager>
             </managers>
+            <!--Connection re-try interval to connect to Storm Manager service in case of a connection failure-->
             <reconnectionInterval>20000</reconnectionInterval>
+            <!--Heart beat interval (in ms) for event listeners in "Storm Receivers" and "CEP Publishers" to acknowledge their
+            availability for receiving events"-->
             <heartbeatInterval>5000</heartbeatInterval>
+            <!--Storm topology re-submit interval in case of a topology submission failure-->
             <topologyResubmitInterval>10000</topologyResubmitInterval>
         </management>
 
         <transport>
+            <!--Port range to be used for events listener servers in "Storm Receiver Spouts" and "CEP Publishers"-->
             <portRange>
                 <min>15000</min>
                 <max>15100</max>
             </portRange>
+            <!--Connection re-try interval (in ms) for connection failures between "CEP Receiver" to "Storm Receiver" connection
+            and "Storm Publisher" to "CEP Publisher" connection-->
             <reconnectionInterval>20000</reconnectionInterval>
-            <!--Must be a power of two-->
+            <!--Size of the output queue of each "CEP Receiver" which stores events to be published into "Storm Receivers" .
+            This must be a power of two-->
             <cepReceiverOutputQueueSize>8192</cepReceiverOutputQueueSize>
-            <!--Must be a power of two-->
+            <!--Size of the output queue of each "Storm Publisher" which stores events to be published into "CEP Publisher" .
+           This must be a power of two-->
             <stormPublisherOutputQueueSize>8192</stormPublisherOutputQueueSize>
             <!--blocking/non-blocking-->
             <tcpEventPublisherMode>blocking</tcpEventPublisherMode>
             <!--Must be a power of two. Only used when tcpEventPublisherMode is non-blocking-->
             <tcpEventPublisherOutputQueueSize>8192</tcpEventPublisherOutputQueueSize>
+            <!--Size of event publishing client's send buffer in bytes-->
             <tcpEventPublisherSendBufferSize>5242880</tcpEventPublisherSendBufferSize>
+            <!--Character encoding of event publishing client-->
             <tcpEventPublisherCharSet>UTF-8</tcpEventPublisherCharSet>
+            <!--Number of threads to be used by event receiving servers in "Storm Receivers" and "CEP Publishers"-->
             <tcpEventReceiverThreadCount>10</tcpEventReceiverThreadCount>
         </transport>
 
