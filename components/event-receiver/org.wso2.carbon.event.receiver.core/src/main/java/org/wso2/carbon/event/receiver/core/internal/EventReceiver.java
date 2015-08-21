@@ -120,7 +120,7 @@ public class EventReceiver implements EventProducer {
 
                 DistributedConfiguration distributedConfiguration = EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getDistributedConfiguration();
                 if(distributedConfiguration != null){
-                    isManagerNode = distributedConfiguration.isManagerNode();
+                    this.isManagerNode = distributedConfiguration.isManagerNode();
                 }
                 sufficientToSend = mode != Mode.Distributed || (!isManagerNode && !isEventDuplicatedInCluster);
 
@@ -250,7 +250,7 @@ public class EventReceiver implements EventProducer {
             statisticsMonitor.incrementRequest();
         }
         //in distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator. Also do not send if this is a manager node.
-        if (sufficientToSend || (!isManagerNode && EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator())) {
+        if (sufficientToSend || EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator()) {
             this.inputEventDispatcher.onEvent(event);
         }
 
