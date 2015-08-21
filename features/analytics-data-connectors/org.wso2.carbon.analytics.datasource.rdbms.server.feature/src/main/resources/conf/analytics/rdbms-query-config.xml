@@ -44,6 +44,9 @@
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
         <recordMergeQuery>INSERT INTO {{TABLE_NAME}} (partition_key, timestamp, data, record_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE partition_key=VALUES(partition_key), timestamp=VALUES(timestamp), data=VALUES(data)</recordMergeQuery>
+        <forwardOnlyReadEnabled>true</forwardOnlyReadEnabled>
+        <!--For MySQL fetch Size should be specified as minimum integer value-->
+        <fetchSize>-2147483648</fetchSize>
         <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE partition_key &gt;= ? and partition_key &lt; ? AND timestamp &gt;= ? AND timestamp &lt; ? LIMIT ?,?</recordRetrievalQuery>
         <recordRetrievalWithIdsQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordRetrievalWithIdsQuery>
         <recordTableDeleteQueries>

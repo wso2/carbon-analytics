@@ -89,6 +89,10 @@ public class RDBMSQueryConfigurationEntry {
 
     private boolean blobLengthRequired;
 
+    private boolean forwardOnlyReadEnabled;
+
+    private int fetchSize = Integer.MIN_VALUE;;
+
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
     }
@@ -336,6 +340,24 @@ public class RDBMSQueryConfigurationEntry {
 
     public void setBlobLengthRequired(boolean blobLengthRequired) {
         this.blobLengthRequired = blobLengthRequired;
+    }
+
+    @XmlElement(name = "forwardOnlyReadEnabled", nillable = true)
+    public boolean isForwardOnlyReadEnabled() {
+        return forwardOnlyReadEnabled;
+    }
+
+    public void setForwardOnlyReadEnabled(boolean forwardOnlyReadEnabled) {
+        this.forwardOnlyReadEnabled = forwardOnlyReadEnabled;
+    }
+
+    @XmlElement(name = "fetchSize", nillable = true)
+    public int getFetchSize() {
+        return fetchSize;
+    }
+
+    public void setFetchSize(int fetchSize) {
+        this.fetchSize = fetchSize;
     }
 
     /**

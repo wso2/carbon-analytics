@@ -359,7 +359,13 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         ResultSet rs = null;
         try {
             conn = this.getConnection();
-            stmt = conn.prepareStatement(this.getRecordRetrievalQuery(tenantId, tableName));
+            if (!this.rdbmsQueryConfigurationEntry.isForwardOnlyReadEnabled()) {
+                stmt = conn.prepareStatement(this.getRecordRetrievalQuery(tenantId, tableName));
+            } else {
+                stmt = conn.prepareStatement(this.getRecordRetrievalQuery(tenantId, tableName),
+                        ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+                stmt.setFetchSize(this.rdbmsQueryConfigurationEntry.getFetchSize());
+            }
             if (recordsCount == -1) {
                 recordsCount = Integer.MAX_VALUE;
             }
@@ -369,7 +375,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             stmt.setLong(4, timeTo);
             int[] paginationIndices = this.calculateIndicesForPaginationMode(recordsFrom, recordsCount);
             stmt.setInt(5, paginationIndices[0]);
-            stmt.setInt(6, paginationIndices[1]);            
+            stmt.setInt(6, paginationIndices[1]);
             rs = stmt.executeQuery();
             return new RDBMSResultSetIterator(tenantId, tableName, columns, conn, stmt, rs);
         } catch (SQLException e) {
@@ -748,7 +754,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         public void remove() {
             /* this is a read-only iterator, nothing will be removed */
         }
-        
+
         @Override
         public void finalize() {
             /* in the unlikely case, this iterator does not go to the end,
