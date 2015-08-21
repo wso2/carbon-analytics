@@ -273,23 +273,28 @@ public class TCPEventPublisher {
 
 
     /**
-     * Gracefully shutdown the TCPEventPublisher.
+     * Gracefully shutdown the TCPEventPublisher and flush the data in output buffer.
      * When this method is used already consumer threads of disruptor will try to publishToDisruptor the queued messages in the RingBuffer.
      */
-    public void shutdown(boolean flushDataInBuffer) {
-        connectionStatusCheckTimer.cancel();
+    public void shutdown() {
         try {
-            if (!isSynchronous) {
-                disruptor.shutdown();
-            }
-            if (flushDataInBuffer){
-                outputStream.flush();
-            }
+            outputStream.flush();
         } catch (IOException e) {
-            log.warn("Error while closing stream to " + hostUrl + " : " + e.getMessage(), e);
+            log.warn("Error while flushing output stream to " + hostUrl + " : " + e.getMessage(), e);
         } finally {
-            disconnect();
+            terminate();
         }
+    }
+
+    /**
+     * Immediately shutdown the TCPEventPublisher and discard the data in output buffer.
+     */
+    public void terminate(){
+        connectionStatusCheckTimer.cancel();
+        if (!isSynchronous) {
+            disruptor.shutdown();
+        }
+        disconnect();
     }
 
     private void disconnect() {
