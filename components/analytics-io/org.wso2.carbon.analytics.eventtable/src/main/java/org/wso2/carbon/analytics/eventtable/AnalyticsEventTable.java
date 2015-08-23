@@ -22,8 +22,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceUtils;
@@ -74,6 +77,8 @@ import org.wso2.siddhi.core.util.SiddhiConstants;
  */
 public class AnalyticsEventTable implements EventTable {
     
+    private static final Log log = LogFactory.getLog(AnalyticsEventTable.class);
+    
     private String tableName;
         
     private TableDefinition tableDefinition;
@@ -85,7 +90,15 @@ public class AnalyticsEventTable implements EventTable {
     private String primaryKeys;
     
     private String indices;
-        
+    
+    private boolean mergeSchema;
+    
+    private boolean waitForIndexing;
+    
+    private int maxSearchResultCount;
+    
+    private boolean indicesAvailable;
+
     @Override
     public void init(TableDefinition tableDefinition, ExecutionPlanContext executionPlanContext) {
         Annotation fromAnnotation = AnnotationHelper.getAnnotation(SiddhiConstants.ANNOTATION_FROM,
@@ -98,6 +111,27 @@ public class AnalyticsEventTable implements EventTable {
         }
         this.primaryKeys = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_PRIMARY_KEYS);
         this.indices = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_INDICES);
+        String mergeSchemaProp = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_MERGE_SCHEMA);
+        if (mergeSchemaProp != null) {
+            mergeSchemaProp = mergeSchemaProp.trim();
+            this.mergeSchema = Boolean.parseBoolean(mergeSchemaProp);
+        } else {
+            this.mergeSchema = true;
+        }
+        String waitForIndexingProp = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_WAIT_FOR_INDEXING);
+        if (waitForIndexingProp != null) {
+            waitForIndexingProp = waitForIndexingProp.trim();
+            this.waitForIndexing = Boolean.parseBoolean(waitForIndexingProp);
+        } else {
+            this.waitForIndexing = false;
+        }
+        String maxSearchResultCountProp = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_MAX_SEARCH_RESULT_COUNT);
+        if (maxSearchResultCountProp != null) {
+            maxSearchResultCountProp = maxSearchResultCountProp.trim();
+            this.maxSearchResultCount = Integer.parseInt(maxSearchResultCountProp);
+        } else {
+            this.maxSearchResultCount = -1;
+        }
         try {
             this.tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         } catch (Throwable e) {
@@ -116,23 +150,6 @@ public class AnalyticsEventTable implements EventTable {
                         e.getMessage(), e);
             }
         }
-    }
-    
-    private List<String> tokenizeAndTrimToList(String value, String delimeter) {
-        if (value == null) {
-            return new ArrayList<String>(0);
-        }
-        value = value.trim();
-        String[] tokens = value.split(delimeter);
-        String token;
-        List<String> result = new ArrayList<String>(tokens.length);
-        for (int i = 0; i < tokens.length; i++) {
-            token = tokens[i].trim();
-            if (token.length() > 0) {
-                result.add(token);
-            }
-        }
-        return result;
     }
     
     private void processTableSchema() throws AnalyticsException {
@@ -167,28 +184,20 @@ public class AnalyticsEventTable implements EventTable {
             }
             cols.add(new ColumnDefinition(attr.getName(), colType));
         }
-        AnalyticsSchema schema = new AnalyticsSchema(cols, this.tokenizeAndTrimToList(this.primaryKeys, ","));
-        for (String index : this.tokenizeAndTrimToList(this.indices, ",")) {
-            this.processIndex(schema.getColumns(), index.trim());
-        }
+        List<String> primaryKeys = AnalyticsDataServiceUtils.tokenizeAndTrimToList(this.primaryKeys, ",");
         ServiceHolder.getAnalyticsDataService().createTable(this.tenantId, this.tableName);
-        ServiceHolder.getAnalyticsDataService().setTableSchema(this.tenantId, this.tableName, schema);
-    }
-    
-    private void processIndex(Map<String, ColumnDefinition> indexedColumns, String index) {
-        String[] tokens = index.split(" ");
-        String name = tokens[0].trim();
-        ColumnDefinition column = indexedColumns.get(name);
-        if (column != null) {
-            column.setIndexed(true);
-            Set<String> options = new HashSet<String>();
-            for (int i = 1; i < tokens.length; i++) {
-                options.add(tokens[i]);
-            }
-            if (options.contains(AnalyticsEventTableConstants.OPTION_SCORE_PARAM)) {
-                column.setScoreParam(true);
-            }
+        AnalyticsSchema schema;
+        if (this.mergeSchema) {
+            schema = ServiceHolder.getAnalyticsDataService().getTableSchema(this.tenantId, this.tableName);
+        } else {
+            schema = new AnalyticsSchema();
         }
+        schema = AnalyticsDataServiceUtils.createMergedSchema(schema, primaryKeys, cols, 
+                AnalyticsDataServiceUtils.tokenizeAndTrimToList(indices, ","));
+        if (schema.getIndexedColumns().size() > 0) {
+            this.indicesAvailable = true;
+        }
+        ServiceHolder.getAnalyticsDataService().setTableSchema(this.tenantId, this.tableName, schema);
     }
     
     @Override
@@ -203,7 +212,7 @@ public class AnalyticsEventTable implements EventTable {
 
     @Override
     public StreamEvent find(ComplexEvent matchingEvent, Finder finder) {
-        return finder.find(matchingEvent, null, null);
+        return finder.find(matchingEvent, null, null);     
     }
     
     private void waitForIndexing(int tenantId, String tableName) {
@@ -222,7 +231,13 @@ public class AnalyticsEventTable implements EventTable {
         addingEventChunk.reset();
         AnalyticsEventTableUtils.putEvents(this.tenantId, this.tableName, 
                 this.tableDefinition.getAttributeList(), addingEventChunk);
-        this.waitForIndexing(this.tenantId, this.tableName);
+        this.checkAndWaitForIndexing();
+    }
+    
+    private void checkAndWaitForIndexing() {
+        if (this.waitForIndexing && this.indicesAvailable) {
+            this.waitForIndexing(this.tenantId, this.tableName);
+        }
     }
 
     @Override
@@ -264,8 +279,6 @@ public class AnalyticsEventTable implements EventTable {
     
         private static final String LUCENE_QUERY_PARAM = "e267ba83-0c77-4e0d-9c5f-cd3a31dbe2d3";
 
-        private static final int MAX_SEARCH_QUERY_RESULT_SIZE = 1000;
-
         private int tenantId;
         
         private String tableName;
@@ -306,6 +319,8 @@ public class AnalyticsEventTable implements EventTable {
         
         private Set<String> eventTableRefs = new HashSet<String>();
         
+        private List<Attribute> outputAttrs;
+        
         public AnalyticsTableOperator(int tenantId, String tableName, List<Attribute> attrs, Expression expression, 
                 MetaComplexEvent metaComplexEvent, ExecutionPlanContext executionPlanContext, 
                 List<VariableExpressionExecutor> variableExpressionExecutors, 
@@ -344,7 +359,7 @@ public class AnalyticsEventTable implements EventTable {
             this.luceneQuery = this.luceneQueryFromExpression(this.expression).toString();
             Set<String> nonIndixedFields = new HashSet<String>(this.mentionedFields);
             nonIndixedFields.removeAll(this.indexedKeySet);
-            if (nonIndixedFields.size() > 0) {
+            if (!this.pkMatchCompatible && nonIndixedFields.size() > 0) {
                 throw new IllegalStateException("The table [" + this.tenantId + ", " + this.tableName + 
                         "] requires the field(s): " + nonIndixedFields + 
                         " to be indexed for the given analytics event table based query to execute.");
@@ -376,6 +391,9 @@ public class AnalyticsEventTable implements EventTable {
             for (MetaStreamEvent metaStreamEvent : metaStreamEvents) {
                 String referenceId = metaStreamEvent.getInputReferenceId();
                 AbstractDefinition abstractDefinition = metaStreamEvent.getInputDefinitions().get(0);
+                if (this.outputAttrs == null) {
+                    this.outputAttrs = metaStreamEvent.getOutputData();
+                }
                 if (!abstractDefinition.getId().trim().equals("")) {
                     if (abstractDefinition instanceof TableDefinition) {
                         this.eventTableRefs.add(abstractDefinition.getId());
@@ -384,12 +402,28 @@ public class AnalyticsEventTable implements EventTable {
                         }
                     }
                 }
-            }
+            }            
+            if (tableDefinition instanceof TableDefinition) {
+                this.eventTableRefs.add(tableDefinition.getId());
+            }            
         }
         
         private void checkPrimaryKeyUsage(String field) {
             if (!this.primaryKeySet.contains(field)) {
                 this.pkMatchCompatible = false;
+            }
+        }
+        
+        private ColumnType getFieldType(String field) {
+            try {
+                AnalyticsSchema schema = ServiceHolder.getAnalyticsDataService().getTableSchema(this.tenantId, this.tableName);
+                ColumnDefinition column = schema.getColumns().get(field);
+                if (column != null) {
+                    return column.getType();
+                }
+                return ColumnType.STRING;
+            } catch (AnalyticsException e) {
+                throw new IllegalStateException("Error in checking if a field is string: " + e.getMessage(), e);
             }
         }
         
@@ -412,44 +446,63 @@ public class AnalyticsEventTable implements EventTable {
                 Object origRHS = luceneQueryFromExpression(compare.getRightExpression());
                 String field;
                 Object rhs;
+                org.wso2.siddhi.query.api.expression.condition.Compare.Operator operator = compare.getOperator();
                 if (origRHS.toString().startsWith(LUCENE_QUERY_PARAM)) {
                     field = origLHS.toString();
                     rhs = origRHS;
                 } else {
                     field = origRHS.toString();
                     rhs = origLHS;
+                    switch (operator) {
+                    case GREATER_THAN:
+                        operator = org.wso2.siddhi.query.api.expression.condition.Compare.Operator.LESS_THAN;
+                        break;
+                    case GREATER_THAN_EQUAL:
+                        operator = org.wso2.siddhi.query.api.expression.condition.Compare.Operator.LESS_THAN_EQUAL;
+                        break;
+                    case LESS_THAN:
+                        operator = org.wso2.siddhi.query.api.expression.condition.Compare.Operator.GREATER_THAN;
+                        break;
+                    case LESS_THAN_EQUAL:
+                        operator = org.wso2.siddhi.query.api.expression.condition.Compare.Operator.GREATER_THAN_EQUAL;
+                        break;
+                    default:
+                        break;
+                    }
                 }
-                switch (compare.getOperator()) {
+                switch (operator) {
                 case CONTAINS:
                     this.pkMatchCompatible = false;
                     this.mentionedFields.add(field);
-                    return "(" + field + ": " + rhs + ")";
+                    return "(" + field + ": " + this.toLuceneQueryRHSValue(rhs) + ")";
                 case EQUAL:
                     this.checkPrimaryKeyUsage(field);
                     this.mentionedFields.add(field);
-                    return "(" + Constants.NON_TOKENIZED_FIELD_PREFIX + field + ": " + rhs + ")";                
+                    return "(" + (this.getFieldType(field).equals(ColumnType.STRING) ? 
+                            Constants.NON_TOKENIZED_FIELD_PREFIX : "") + 
+                            field + ": " + this.toLuceneQueryRHSValue(rhs) + ")";                
                 case GREATER_THAN:
                     this.pkMatchCompatible = false;
                     this.mentionedFields.add(field);
                     return "(" + field + ": {" + this.toLuceneQueryRHSValue(rhs) + " TO " + 
-                            this.rangeExtentValueForValueType(rhs, true) + "]" + ")";
+                            this.rangeExtentValueForValueType(this.getFieldType(field), true) + "]" + ")";
                 case GREATER_THAN_EQUAL:
                     this.pkMatchCompatible = false;
                     this.mentionedFields.add(field);
                     return "(" + field + ": [" + this.toLuceneQueryRHSValue(rhs) + " TO " + 
-                            this.rangeExtentValueForValueType(rhs, true) + "]" + ")";
+                            this.rangeExtentValueForValueType(this.getFieldType(field), true) + "]" + ")";
                 case INSTANCE_OF:
                     this.pkMatchCompatible = false;
                     throw new IllegalStateException("INSTANCE_OF is not supported in analytics event tables.");
                 case LESS_THAN:
                     this.pkMatchCompatible = false;
                     this.mentionedFields.add(field);
-                    return "(" + field + ": [" + this.rangeExtentValueForValueType(rhs, false) + " TO " + 
+                    return "(" + field + ": [" + this.rangeExtentValueForValueType(this.getFieldType(field), false) + " TO " + 
                             this.toLuceneQueryRHSValue(rhs) + "}" + ")";
                 case LESS_THAN_EQUAL:
                     this.pkMatchCompatible = false;
                     this.mentionedFields.add(field);
-                    return "(" + field + ": [" + this.rangeExtentValueForValueType(rhs, false) + " TO " + 
+                    return "(" + field + ": [" + this.rangeExtentValueForValueType(this.getFieldType(field), false) + " TO " + 
                             this.toLuceneQueryRHSValue(rhs) + "]" + ")";
                 case NOT_EQUAL:
                     this.pkMatchCompatible = false;
@@ -477,44 +530,48 @@ public class AnalyticsEventTable implements EventTable {
         }
         
         private String toLuceneQueryRHSValue(Object value) {
-            if (value instanceof String || value instanceof Boolean) {
+            if (value instanceof String && !value.toString().startsWith(LUCENE_QUERY_PARAM)) {
+                return "\"" + value + "\"";
+            }
+            if (value instanceof Boolean) {
                 return "\"" + value + "\"";
             } else {
                 return value.toString();
             }
         }
         
-        private String rangeExtentValueForValueType(Object value, boolean max) {
-            if (value instanceof Integer) {
-                if (max) {
-                    return Integer.toString(Integer.MAX_VALUE);
-                } else {
-                    return Integer.toString(Integer.MIN_VALUE);
-                }
-            } else if (value instanceof Long) {
-                if (max) {
-                    return Long.toString(Long.MAX_VALUE);
-                } else {
-                    return Long.toString(Long.MIN_VALUE);
-                }
-            } else if (value instanceof Float) {
-                if (max) {
-                    return Float.toString(Float.MAX_VALUE);
-                } else {
-                    return Float.toString(Float.MIN_VALUE);
-                }
-            } else if (value instanceof Double) {
+        private String rangeExtentValueForValueType(ColumnType type, boolean max) {
+            switch (type) {
+            case BOOLEAN:
+                return "*";
+            case DOUBLE:
                 if (max) {
                     return Double.toString(Double.MAX_VALUE);
                 } else {
                     return Double.toString(Double.MIN_VALUE);
                 }
-            } else if (value instanceof Boolean) {
+            case FLOAT:
+                if (max) {
+                    return Float.toString(Float.MAX_VALUE);
+                } else {
+                    return Float.toString(Float.MIN_VALUE);
+                }
+            case INTEGER:
+                if (max) {
+                    return Integer.toString(Integer.MAX_VALUE);
+                } else {
+                    return Integer.toString(Integer.MIN_VALUE);
+                }
+            case LONG:
+                if (max) {
+                    return Long.toString(Long.MAX_VALUE);
+                } else {
+                    return Long.toString(Long.MIN_VALUE);
+                }
+            case STRING:
                 return "*";
-            } else if (value instanceof String) {
-                return "*";
-            } else {
-                return "*";
+            default:
+                return "*";            
             }
         }
         
@@ -584,8 +641,17 @@ public class AnalyticsEventTable implements EventTable {
             try {
                 AnalyticsDataService service = ServiceHolder.getAnalyticsDataService();
                 String query = this.getTranslatedLuceneQuery(matchingEvent);
-                List<SearchResultEntry> searchResults = service.search(this.tenantId, this.tableName, 
-                        query, 0, MAX_SEARCH_QUERY_RESULT_SIZE);
+                if (log.isDebugEnabled()) {
+                    log.debug("Analytics Table Search Query: '" + query + "'");
+                }
+                int count = maxSearchResultCount;
+                if (count == -1) {
+                    count = service.searchCount(this.tenantId, this.tableName, query);
+                }
+                if (count == 0) {
+                    return new ArrayList<Record>(0);
+                }
+                List<SearchResultEntry> searchResults = service.search(this.tenantId, this.tableName, query, 0, count);
                 List<String> ids = new ArrayList<String>();
                 for (SearchResultEntry entry : searchResults) {
                     ids.add(entry.getId());
@@ -605,20 +671,41 @@ public class AnalyticsEventTable implements EventTable {
                 List<Record> records = this.findRecords(deletingEventChunk.next(), candidateEvents, null);
                 AnalyticsEventTableUtils.deleteRecords(this.tenantId, this.tableName, records);
             }
-            waitForIndexing(this.tenantId, this.tableName);
+            checkAndWaitForIndexing();
         }
 
         @SuppressWarnings("rawtypes")
         @Override
         public void update(ComplexEventChunk updatingEventChunk, Object candidateEvents, int[] mappingPosition) {
             updatingEventChunk.reset();
-            while (updatingEventChunk.hasNext()) {
-                this.findRecords(updatingEventChunk.next(), candidateEvents, null);
-                // finish impl.
+            ComplexEvent event;
+            List<Record> records;
+            try {
+                while (updatingEventChunk.hasNext()) {
+                    event = updatingEventChunk.next();
+                    records = this.findRecords(event, candidateEvents, null);
+                    this.updateRecordsWithEvent(records, event);
+                    ServiceHolder.getAnalyticsDataService().put(records);
+                }
+                checkAndWaitForIndexing();
+            } catch (AnalyticsException e) {
+                throw new IllegalStateException("Error in executing update query: " + e.getMessage(), e);
             }
-            waitForIndexing(this.tenantId, this.tableName);
+        }
+        
+        private void updateRecordsWithEvent(List<Record> records, ComplexEvent event) {
+            Map<String, Object> values = AnalyticsEventTableUtils.streamEventToRecordValues(this.tenantId, 
+                    this.tableName, this.outputAttrs, event);
+            for (Record record : records) {
+                for (Entry<String, Object> entry : values.entrySet()) {
+                    if (record.getValues().containsKey(entry.getKey())) {
+                        record.getValues().put(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
         }
     
     }
 
 }
+	

@@ -37,8 +37,6 @@ import org.wso2.siddhi.query.api.definition.Attribute;
  */
 public class AnalyticsEventTableUtils {
 
-    private static final int DEFAULT_INDEX_WAIT_TIME = 10000;
-
     public static void putEvents(int tenantId, String tableName, List<Attribute> attrs, 
             ComplexEventChunk<StreamEvent> addingEventChunk) {
         List<Record> records = new ArrayList<Record>();
@@ -49,7 +47,6 @@ public class AnalyticsEventTableUtils {
         }
         try {
             ServiceHolder.getAnalyticsDataService().put(records);
-            ServiceHolder.getAnalyticsDataService().waitForIndexing(DEFAULT_INDEX_WAIT_TIME);
         } catch (AnalyticsException e) {
             throw new IllegalStateException("Error in adding records to analytics event table: " + 
                     e.getMessage(), e);
@@ -62,7 +59,7 @@ public class AnalyticsEventTableUtils {
         return new Record(tenantId, tableName, values, event.getTimestamp());
     }
     
-    private static Map<String, Object> streamEventToRecordValues(int tenantId, String tableName, List<Attribute> attrs,
+    public static Map<String, Object> streamEventToRecordValues(int tenantId, String tableName, List<Attribute> attrs,
             ComplexEvent event) {
         Object[] data = event.getOutputData();
         Map<String, Object> values = new HashMap<String, Object>();

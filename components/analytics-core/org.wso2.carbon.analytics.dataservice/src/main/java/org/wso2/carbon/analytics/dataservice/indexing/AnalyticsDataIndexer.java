@@ -1585,13 +1585,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return this.drilldownCategories(tenantId, categoryDrillDownRequest).getCategories();
     }
 
+    @SuppressWarnings("unchecked")
     private Record aggregatePerGrouping(int tenantId, CategorySearchResultEntry facetValue, AggregateRequest aggregateRequest)
             throws AnalyticsException {
         Map<String,  Object> optionalParams = new HashMap<>();
         optionalParams.put(Constants.AggregateOptionalParams.COUNT, facetValue.getScore());
         Map<String, Object> aggregatedValues = new HashMap<>();
         for (AggregateField field : aggregateRequest.getFields()) {
-            Iterator<Record> iterator = IteratorUtils.chainedIterator(getRecordIterators(tenantId, facetValue, aggregateRequest));
+            Iterator<Record> iterator = IteratorUtils.chainedIterator(this.getRecordIterators(tenantId, facetValue, aggregateRequest));
             Aggregate function = this.getAggregates().get(field.getAggregate());
             Object aggregatedValue = function.aggregate(iterator, field.getFieldName(), optionalParams);
             aggregatedValues.put(field.getAlias(), aggregatedValue);
@@ -1599,7 +1600,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         aggregatedValues.put(aggregateRequest.getGroupByField(), facetValue.getCategoryValue());
         return new Record(tenantId, aggregateRequest.getTableName(), aggregatedValues);
     }
-
 
     private List<Iterator<Record>> getRecordIterators(int tenantId,
                                                       CategorySearchResultEntry facetValue,

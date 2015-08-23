@@ -30,6 +30,10 @@ public class AnalyticsEventTableConstants {
     
     public static final String ANNOTATION_INDICES = "indices";
     
-    public static final String OPTION_SCORE_PARAM = "-sp";
-        
+    public static final String ANNOTATION_MERGE_SCHEMA = "merge.schema";
+    
+    public static final String ANNOTATION_WAIT_FOR_INDEXING = "wait.for.indexing";
+    
+    public static final String ANNOTATION_MAX_SEARCH_RESULT_COUNT = "max.search.result.count";
+            
 }

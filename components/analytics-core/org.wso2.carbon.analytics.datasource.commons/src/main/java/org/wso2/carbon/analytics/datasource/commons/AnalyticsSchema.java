@@ -38,6 +38,7 @@ public class AnalyticsSchema implements Serializable {
     /** primary keys are set separately rather than having in {@link ColumnDefinition} 
      * to optimize the lookup of just the primary keys when required */
     private List<String> primaryKeys;
+    
     public AnalyticsSchema() { }
     
     public AnalyticsSchema(List<ColumnDefinition> columns, List<String> primaryKeys) {

@@ -2,20 +2,22 @@
 <query-configuration>
     <database name = "h2">
         <paginationMode>MODE1</paginationMode>
-        <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}}  LIMIT 1</recordTableCheckQuery>
+        <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
-        <recordMergeQuery>MERGE INTO {{TABLE_NAME}} (timestamp, data, record_id) KEY (record_id) VALUES (?, ?, ?)</recordMergeQuery>
-        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ? LIMIT ?,?</recordRetrievalQuery>
+        <recordMergeQuery>MERGE INTO {{TABLE_NAME}} (partition_key, timestamp, data, record_id) KEY (record_id) VALUES (?, ?, ?, ?)</recordMergeQuery>
+        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE partition_key &gt;= ? and partition_key &lt; ? AND timestamp &gt;= ? AND timestamp &lt; ? LIMIT ?,?</recordRetrievalQuery>
         <recordRetrievalWithIdsQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordRetrievalWithIdsQuery>
         <recordTableDeleteQueries>
-            <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
+            <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>                    
             <query>DROP INDEX IF EXISTS {{TABLE_NAME}}_TIMESTAMP</query>
+            <query>DROP INDEX IF EXISTS {{TABLE_NAME}}_PARTITION_KEY</query>
         </recordTableDeleteQueries>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BINARY, PRIMARY KEY(record_id))</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BINARY, partition_key INT, PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
+            <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{PARTITION_KEY}} (partition_key)</query>
         </recordTableInitQueries>
         <fsDataChunkSize>10240</fsDataChunkSize>
         <fsDeletePathQuery>DELETE FROM AN_FS_PATH WHERE path = ?</fsDeletePathQuery>
@@ -36,4 +38,5 @@
         <fsMergeDataChunkQuery>MERGE INTO AN_FS_DATA (path,sequence,data) KEY (path,sequence) VALUES (?,?,?)</fsMergeDataChunkQuery>
     </database>
 </query-configuration>
+
 
