@@ -48,6 +48,7 @@ import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.security.SecureRandom;
 import java.util.*;
 
 /**
@@ -94,6 +95,12 @@ public class GenericUtils {
     private static ThreadLocal<Kryo> kryoTL = new ThreadLocal<Kryo>() {
         protected Kryo initialValue() {
             return new Kryo();
+        }
+    };
+    
+    private static ThreadLocal<SecureRandom> secureRandom = new ThreadLocal<SecureRandom>() {
+        protected SecureRandom initialValue() {
+            return new SecureRandom();
         }
     };
 
@@ -362,9 +369,12 @@ public class GenericUtils {
     }
 
     public static String generateRecordID() {
-        return String.valueOf(System.currentTimeMillis()) + Math.random() * Math.random();
+        byte[] data = new byte[16];
+        secureRandom.get().nextBytes(data);
+        ByteBuffer buff = ByteBuffer.wrap(data);
+        return new UUID(buff.getLong(), buff.getLong()).toString();
     }
-
+    
     /* do not touch if you do not know what you're doing, critical for serialize/deserialize
      * implementation to be stable to retain backward compatibility */
     public static byte[] serializeObject(Object obj) {
