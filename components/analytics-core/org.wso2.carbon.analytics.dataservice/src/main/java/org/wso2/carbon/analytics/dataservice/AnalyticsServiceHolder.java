@@ -18,14 +18,13 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
+import com.hazelcast.core.HazelcastInstance;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-
-import com.hazelcast.core.HazelcastInstance;
-
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.user.core.service.RealmService;
 
@@ -34,12 +33,13 @@ import org.wso2.carbon.user.core.service.RealmService;
  */
 public class AnalyticsServiceHolder {
 
+    private static final Log log = LogFactory.getLog(AnalyticsServiceHolder.class);
     public static final String FORCE_INDEXING_ENV_PROP = "force.indexing";
-    
+
     private static HazelcastInstance hazelcastInstance;
-    
+
     private static AnalyticsClusterManager analyticsClusterManager;
-    
+
     private static AnalyticsDataService analyticsDataService;
 
     private static RealmService realmService;
@@ -49,7 +49,7 @@ public class AnalyticsServiceHolder {
     public static void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         AnalyticsServiceHolder.hazelcastInstance = hazelcastInstance;
     }
-    
+
     public static HazelcastInstance getHazelcastInstance() {
         return hazelcastInstance;
     }
@@ -61,28 +61,28 @@ public class AnalyticsServiceHolder {
     public static void setAnalyticsClusterManager(AnalyticsClusterManager analyticsClusterManager) {
         AnalyticsServiceHolder.analyticsClusterManager = analyticsClusterManager;
     }
-    
+
     public static AnalyticsDataService getAnalyticsDataService() {
         if (analyticsDataService == null) {
             checkAndPopulateCustomAnalyticsDS();
         }
         return analyticsDataService;
     }
-    
+
     private static void checkAndPopulateCustomAnalyticsDS() {
-        if (!GenericUtils.isCarbonServer()) {
-            try {
-                if (System.getProperty(FORCE_INDEXING_ENV_PROP) == null) {
-                    System.setProperty(AnalyticsDataIndexer.DISABLE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
-                }
-                analyticsClusterManager = new AnalyticsClusterManagerImpl();
-                analyticsDataService = new AnalyticsDataServiceImpl();
-            } catch (AnalyticsException e) {
-                throw new RuntimeException("Error in creating analytics data service impl.: " + e.getMessage(), e);
+//        if (!GenericUtils.isCarbonServer()) {
+        try {
+            if (System.getProperty(FORCE_INDEXING_ENV_PROP) == null) {
+                System.setProperty(AnalyticsDataIndexer.DISABLE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
             }
+            analyticsClusterManager = new AnalyticsClusterManagerImpl();
+            analyticsDataService = new AnalyticsDataServiceImpl();
+        } catch (AnalyticsException e) {
+            throw new RuntimeException("Error in creating analytics data service impl.: " + e.getMessage(), e);
         }
+//        }
     }
-    
+
     public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
         AnalyticsServiceHolder.analyticsDataService = analyticsDataService;
     }

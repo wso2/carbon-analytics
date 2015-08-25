@@ -576,13 +576,13 @@ public class GenericUtils {
         globalCustomRepo = null;
     }
 
-    public static boolean isCarbonServer() {
-        try {
-            return CarbonUtils.getCarbonHome() != null;
-        } catch (Throwable e) {
-            return false;
-        }
-    }
+//    public static boolean isCarbonServer() {
+//        try {
+//            return CarbonUtils.getCarbonHome() != null;
+//        } catch (Throwable e) {
+//            return false;
+//        }
+//    }
 
     public static String streamToTableName(String streamName) {
         return streamName.replace('.', '_');
