@@ -27,6 +27,7 @@ import org.wso2.carbon.application.deployer.config.ApplicationConfiguration;
 import org.wso2.carbon.application.deployer.config.Artifact;
 import org.wso2.carbon.application.deployer.config.CappFile;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.utils.CarbonUtils;
 
@@ -49,6 +50,7 @@ public class DashboardDeployer implements AppDeploymentHandler {
     public void deployArtifacts(CarbonApplication carbonApp, AxisConfiguration axisConfig)
             throws DeploymentException {
 
+        checkForTenantDirectory();
         ApplicationConfiguration appConfig = carbonApp.getAppConfig();
         List<Artifact.Dependency> deps = appConfig.getApplicationArtifact().getDependencies();
         List<Artifact> artifacts = new ArrayList<Artifact>();
@@ -58,6 +60,44 @@ public class DashboardDeployer implements AppDeploymentHandler {
             }
         }
         deploy(artifacts);
+    }
+
+    /**
+     *  If tenant domain is foo.com, this method checks for a directory named foo.com inside /portal/store directory.
+     *  If not found, this will create foo.com, foo.com/gadget, foo.com/layout and foo.com/widget directories too
+     */
+    private void checkForTenantDirectory() throws DeploymentException{
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        String carbonRepository = CarbonUtils.getCarbonRepository();
+        String path = new StringBuilder(carbonRepository)
+                .append("jaggeryapps").append(File.separator)
+                .append(DashboardConstants.APP_NAME).append(File.separator)
+                .append("store").append(File.separator)
+                .append(tenantDomain).toString();
+
+        File tenantDir = new File(path.toString());
+        if(!tenantDir.exists()) {
+            log.info("Creating directory " + tenantDomain + " for tenant related dashboard artifacts");
+            try {
+                tenantDir.mkdir();
+                //create gadgte, layout and widget directories for this tenant
+                File gadgetDir = new File(path + File.separator + "gadget");
+                if(!gadgetDir.exists()) {
+                    gadgetDir.mkdir();
+                }
+                File layoutDir = new File(path + File.separator + "layout");
+                if(!layoutDir.exists()) {
+                    layoutDir.mkdir();
+                }
+                File widgetDir = new File(path + File.separator + "widget");
+                if(!widgetDir.exists()) {
+                    widgetDir.mkdir();
+                }
+                log.info("Created gadget,layout and widget directories for tenant [" + tenantDomain + "]");
+            } catch (Exception e) {
+                throw new DeploymentException(e);
+            }
+        }
     }
 
     private void deploy(List<Artifact> artifacts) throws DashboardDeploymentException {
@@ -183,7 +223,7 @@ public class DashboardDeployer implements AppDeploymentHandler {
         sb.append("jaggeryapps").append(File.separator)
                 .append(DashboardConstants.APP_NAME).append(File.separator)
                 .append("store").append(File.separator)
-                .append("carbon.super").append(File.separator)
+                .append(CarbonContext.getThreadLocalCarbonContext().getTenantDomain()).append(File.separator)
                 .append(artifactName).append(File.separator);
         return sb.toString();
     }
