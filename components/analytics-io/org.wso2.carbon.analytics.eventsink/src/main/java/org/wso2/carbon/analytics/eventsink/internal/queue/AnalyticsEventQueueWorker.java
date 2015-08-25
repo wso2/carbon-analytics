@@ -30,10 +30,10 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * This is the queue worker which listens to analytics queue, and once the batch size si reached it will
- * be doing an insertion operation on the analytics data sevrice,
+ * This is the queue worker which listens to analytics queue; and once the batch size is reached, it will
+ * do an insertion operation on the analytics data service.
  */
-public class AnalyticsEventQueueWorker implements EventHandler<Event> {
+public class AnalyticsEventQueueWorker implements EventHandler<WrappedEventFactory.WrappedEvent> {
     private static final Log log = LogFactory.getLog(AnalyticsEventQueueWorker.class);
 
     private List<Event> events;
@@ -49,16 +49,17 @@ public class AnalyticsEventQueueWorker implements EventHandler<Event> {
 
 
     @Override
-    public void onEvent(Event event, long sequence, boolean endOfBatch) throws Exception {
-        events.add(event);
-        if (endOfBatch || events.size() == ServiceHolder.getAnalyticsEventSinkConfiguration().getBundleSize()) {
-            submitJob();
+    public void onEvent(WrappedEventFactory.WrappedEvent wrappedEvent, long sequence, boolean endOfBatch) throws Exception {
+        this.events.add(wrappedEvent.getEvent());
+        if (endOfBatch || this.events.size() == ServiceHolder.getAnalyticsEventSinkConfiguration().getBundleSize()) {
+            List<Event> tmpEvents = this.events;
+            this.events = new ArrayList<>();
+            submitJob(tmpEvents);
         }
     }
 
-    private void submitJob() {
-        this.threadPoolExecutor.submit(new AnalyticsEventProcessor(events));
-        events = new ArrayList<>();
+    private void submitJob(List<Event> tmpEvents) {
+        this.threadPoolExecutor.submit(new AnalyticsEventProcessor(tmpEvents));
     }
 
     public class AnalyticsEventProcessor extends Thread {

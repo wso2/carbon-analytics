@@ -17,7 +17,6 @@
 */
 package org.wso2.carbon.analytics.eventsink.internal.queue;
 
-import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import org.apache.commons.logging.Log;
@@ -34,17 +33,11 @@ import java.util.concurrent.Executors;
 
 public class AnalyticsEventQueue {
     private static final Log log = LogFactory.getLog(AnalyticsEventQueue.class);
-    private RingBuffer<Event> ringBuffer;
-
-    public final EventFactory<Event> EVENT_FACTORY = new EventFactory<Event>() {
-        public Event newInstance() {
-            return new Event();
-        }
-    };
+    private RingBuffer<WrappedEventFactory.WrappedEvent> ringBuffer;
 
     @SuppressWarnings("unchecked")
     public AnalyticsEventQueue(int tenantId) {
-        Disruptor<Event> eventQueue = new Disruptor<Event>(EVENT_FACTORY, ServiceHolder.
+        Disruptor<WrappedEventFactory.WrappedEvent> eventQueue = new Disruptor<>(new WrappedEventFactory(), ServiceHolder.
                 getAnalyticsEventSinkConfiguration().getQueueSize(), Executors.newCachedThreadPool());
         eventQueue.handleEventsWith(new AnalyticsEventQueueWorker(tenantId));
         this.ringBuffer = eventQueue.start();
@@ -58,17 +51,8 @@ public class AnalyticsEventQueue {
             log.debug("Adding an event to the event queue");
         }
         long sequence = this.ringBuffer.next();
-        Event bufferedEvent = this.ringBuffer.get(sequence);
-        updateEvent(bufferedEvent, event);
+        WrappedEventFactory.WrappedEvent bufferedEvent = this.ringBuffer.get(sequence);
+        bufferedEvent.setEvent(event);
         this.ringBuffer.publish(sequence);
-    }
-
-    private void updateEvent(Event oldEvent, Event newEvent) {
-        oldEvent.setArbitraryDataMap(newEvent.getArbitraryDataMap());
-        oldEvent.setCorrelationData(newEvent.getCorrelationData());
-        oldEvent.setMetaData(newEvent.getMetaData());
-        oldEvent.setPayloadData(newEvent.getPayloadData());
-        oldEvent.setStreamId(newEvent.getStreamId());
-        oldEvent.setTimeStamp(newEvent.getTimeStamp());
     }
 }
