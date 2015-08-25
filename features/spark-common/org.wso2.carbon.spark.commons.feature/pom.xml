@@ -285,6 +285,7 @@
                                 <bundleDef>com.sun.jersey:jersey-server</bundleDef>
                                 <!--slf4j 5.10 is needed for akka in spark cluster mode-->
                                 <bundleDef>slf4j.wso2:slf4j</bundleDef>
+                                <bundleDef>org.slf4j:slf4j-log4j12</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>
