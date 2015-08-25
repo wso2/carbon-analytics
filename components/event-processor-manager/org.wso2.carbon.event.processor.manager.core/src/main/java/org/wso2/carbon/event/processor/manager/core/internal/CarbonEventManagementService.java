@@ -65,6 +65,7 @@ public class CarbonEventManagementService implements EventManagementService {
     private CopyOnWriteArrayList<HostAndPort> publisherMembers = new CopyOnWriteArrayList<HostAndPort>();
 
     private IMap<String, Long> stormEventPublisherSyncMap = null;
+    private boolean isManagerNode = false;
 
     public CarbonEventManagementService() {
         try {
@@ -88,6 +89,7 @@ public class CarbonEventManagementService implements EventManagementService {
             }
         } else if (mode == Mode.Distributed) {
             DistributedConfiguration distributedConfiguration = managementModeInfo.getDistributedConfiguration();
+            isManagerNode = distributedConfiguration.isManagerNode();
             if (distributedConfiguration.isWorkerNode()) {
                 stormReceiverCoordinator = new StormReceiverCoordinator();
             }
@@ -158,25 +160,27 @@ public class CarbonEventManagementService implements EventManagementService {
     }
 
     public void init(ConfigurationContextService configurationContextService) {
-        if (mode != Mode.HA) {
+        if (mode != Mode.HA && !isManagerNode) {
             receiverManager.start();
         }
-        executorService.schedule(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    log.info("Starting polling event adapters");
-                    EventReceiverManagementService eventReceiverManagementService = getEventReceiverManagementService();
-                    if (eventReceiverManagementService != null) {
-                        eventReceiverManagementService.startPolling();
-                    } else {
-                        log.error("Adapter polling failed as EventReceiverManagementService not available");
+        if (!isManagerNode) {
+            executorService.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        log.info("Starting polling event adapters");
+                        EventReceiverManagementService eventReceiverManagementService = getEventReceiverManagementService();
+                        if (eventReceiverManagementService != null) {
+                            eventReceiverManagementService.startPolling();
+                        } else {
+                            log.error("Adapter polling failed as EventReceiverManagementService not available");
+                        }
+                    } catch (Exception e) {
+                        log.error("Unexpected error occurred when start polling event adapters", e);
                     }
-                } catch (Exception e) {
-                    log.error("Unexpected error occurred when start polling event adapters", e);
                 }
-            }
-        }, ConfigurationConstants.AXIS_TIME_INTERVAL_IN_MILLISECONDS * 4, TimeUnit.MILLISECONDS);
+            }, ConfigurationConstants.AXIS_TIME_INTERVAL_IN_MILLISECONDS * 4, TimeUnit.MILLISECONDS);
+        }
 
         executorService.scheduleAtFixedRate(new Runnable() {
             @Override

@@ -90,7 +90,7 @@ public class CarbonInputEventAdapterService implements InputEventAdapterService 
                     "with type " + inputEventAdapterConfiguration.getType());
         }
         if (inputEventAdapterConfiguration.getName() == null) {
-            throw new InputEventAdapterException("Input Event Adapter name cannot by null, for the adapter type " +
+            throw new InputEventAdapterException("Input Event Adapter name cannot be null, for the adapter type " +
                     inputEventAdapterConfiguration.getType());
         }
         if (eventAdapters.get(inputEventAdapterConfiguration.getName()) != null) {
