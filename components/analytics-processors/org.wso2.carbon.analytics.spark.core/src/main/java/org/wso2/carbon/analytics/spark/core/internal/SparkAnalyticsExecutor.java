@@ -503,9 +503,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE_FACTORY,
                           AnalyticsRecoveryModeFactory.class.getName());
 
-        if (CarbonUtils.getCarbonHome() != null) {
+        try {
             conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
             conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
+        } catch (Throwable e) {
+            logDebug("Spark conf in non-carbon environment");
         }
     }
 
