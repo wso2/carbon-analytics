@@ -358,7 +358,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            conn = this.getConnection();
+            conn = this.getConnection(false);
             if (!this.rdbmsQueryConfigurationEntry.isForwardOnlyReadEnabled()) {
                 stmt = conn.prepareStatement(this.getRecordRetrievalQuery(tenantId, tableName));
             } else {
