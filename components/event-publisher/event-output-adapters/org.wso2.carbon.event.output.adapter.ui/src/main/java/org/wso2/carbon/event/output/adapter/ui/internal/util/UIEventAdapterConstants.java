@@ -29,9 +29,6 @@ public class UIEventAdapterConstants {
 
     public static final String ADAPTER_TYPE_UI = "ui";
     public static final String ADAPTER_USAGE_TIPS_PREFIX = "ui.usage.tips_prefix";
-    public static final String ADAPTER_USAGE_TIPS_MID1 = "ui.usage.tips_mid1";
-    public static final String ADAPTER_USAGE_TIPS_MID2 = "ui.usage.tips_mid2";
-    public static final String ADAPTER_USAGE_TIPS_MID3 = "ui.usage.tips_mid3";
     public static final String ADAPTER_USAGE_TIPS_POSTFIX = "ui.usage.tips_postfix";
     public static final String ADAPTER_UI_DEFAULT_OUTPUT_STREAM_VERSION = "1.0.0";
     public static final String ADAPTER_UI_COLON = ":";
