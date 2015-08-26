@@ -19,6 +19,7 @@
 package org.wso2.carbon.event.processor.manager.commons.transport.server;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisher;
 import org.wso2.carbon.event.processor.manager.commons.transport.common.EventServerUtils;
 import org.wso2.carbon.event.processor.manager.commons.transport.common.StreamRuntimeInfo;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -138,6 +139,9 @@ public class TCPEventServer {
                         byte[] streamNameByteSize = loadData(in, new byte[4]);
                         ByteBuffer sizeBuf = ByteBuffer.wrap(streamNameByteSize);
                         int streamNameSize = sizeBuf.getInt();
+                        if  (streamNameSize == TCPEventPublisher.PING_HEADER_VALUE){
+                            continue;
+                        }
                         byte[] streamNameData = loadData(in, new byte[streamNameSize]);
                         String streamId = new String(streamNameData, 0, streamNameData.length);
                         StreamRuntimeInfo streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
