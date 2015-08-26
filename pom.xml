@@ -476,7 +476,7 @@
                 <type>zip</type>
             </dependency>
             <dependency>
-                <groupId>com.lmax.wso2</groupId>
+                <groupId>org.wso2.orbit.com.lmax</groupId>
                 <artifactId>disruptor</artifactId>
                 <version>${orbit.version.disruptor}</version>
             </dependency>
