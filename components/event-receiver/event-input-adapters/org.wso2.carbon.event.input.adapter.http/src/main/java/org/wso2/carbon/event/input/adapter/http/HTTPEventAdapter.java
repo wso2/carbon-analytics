@@ -46,13 +46,12 @@ public final class HTTPEventAdapter implements InputEventAdapter {
     private static final Log log = LogFactory.getLog(HTTPEventAdapter.class);
 
     public HTTPEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
-                            Map<String, String> globalProperties) {
+            Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
     }
 
-    @Override
-    public void init(InputEventAdapterListener eventAdaptorListener) throws InputEventAdapterException {
+    @Override public void init(InputEventAdapterListener eventAdaptorListener) throws InputEventAdapterException {
         this.eventAdaptorListener = eventAdaptorListener;
 
         //ThreadPoolExecutor will be assigned  if it is null
@@ -64,36 +63,35 @@ public final class HTTPEventAdapter implements InputEventAdapter {
 
             //If global properties are available those will be assigned else constant values will be assigned
             if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME) != null) {
-                minThread = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME));
+                minThread = Integer
+                        .parseInt(globalProperties.get(HTTPEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME));
             } else {
                 minThread = HTTPEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE;
             }
 
             if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME) != null) {
-                maxThread = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME));
+                maxThread = Integer
+                        .parseInt(globalProperties.get(HTTPEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME));
             } else {
                 maxThread = HTTPEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE;
             }
 
             if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME) != null) {
-                defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
+                defaultKeepAliveTime = Integer
+                        .parseInt(globalProperties.get(HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
             } else {
                 defaultKeepAliveTime = HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLS;
             }
 
             if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME) != null) {
-                jobQueueSize = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME));
+                jobQueueSize = Integer
+                        .parseInt(globalProperties.get(HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME));
             } else {
                 jobQueueSize = HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE;
             }
 
             RejectedExecutionHandler rejectedExecutionHandler = new RejectedExecutionHandler() {
-                @Override
-                public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                @Override public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
                     try {
                         executor.getQueue().put(r);
                     } catch (InterruptedException e) {
@@ -103,35 +101,32 @@ public final class HTTPEventAdapter implements InputEventAdapter {
 
             };
 
-            executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime,
-                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(jobQueueSize), rejectedExecutionHandler);
+            executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<Runnable>(jobQueueSize), rejectedExecutionHandler);
 
         }
     }
 
-    @Override
-    public void testConnect() throws TestConnectionNotSupportedException {
+    @Override public void testConnect() throws TestConnectionNotSupportedException {
         throw new TestConnectionNotSupportedException("not-supported");
     }
 
-    @Override
-    public void connect() {
+    @Override public void connect() {
         registerDynamicEndpoint(eventAdapterConfiguration.getName());
     }
 
-    @Override
-    public void disconnect() {
+    @Override public void disconnect() {
         unregisterDynamicEndpoint(eventAdapterConfiguration.getName());
     }
 
-    @Override
-    public void destroy() {
+    @Override public void destroy() {
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof HTTPEventAdapter)) return false;
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof HTTPEventAdapter))
+            return false;
 
         HTTPEventAdapter that = (HTTPEventAdapter) o;
 
@@ -139,18 +134,15 @@ public final class HTTPEventAdapter implements InputEventAdapter {
 
     }
 
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
         return id.hashCode();
     }
 
-    @Override
-    public boolean isEventDuplicatedInCluster() {
+    @Override public boolean isEventDuplicatedInCluster() {
         return false;
     }
 
-    @Override
-    public boolean isPolling() {
+    @Override public boolean isPolling() {
         return false;
     }
 
@@ -171,12 +163,12 @@ public final class HTTPEventAdapter implements InputEventAdapter {
         try {
             HttpService httpService = HTTPEventAdapterServiceValueHolder.getHTTPService();
             if (httpService == null) {
-                throw new InputEventAdapterRuntimeException("HttpService not available, Error in registering endpoint " + endpoint);
+                throw new InputEventAdapterRuntimeException(
+                        "HttpService not available, Error in registering endpoint " + endpoint);
             }
-            httpService.registerServlet(endpoint,
-                    new HTTPMessageServlet(eventAdaptorListener, tenantId, eventAdapterConfiguration.getProperties().get(HTTPEventAdapterConstants.EXPOSED_TRANSPORTS)),
-                    new Hashtable(),
-                    httpService.createDefaultHttpContext());
+            httpService.registerServlet(endpoint, new HTTPMessageServlet(eventAdaptorListener, tenantId,
+                    eventAdapterConfiguration.getProperties().get(HTTPEventAdapterConstants.EXPOSED_TRANSPORTS)),
+                    new Hashtable(), httpService.createDefaultHttpContext());
         } catch (ServletException | NamespaceException e) {
             throw new InputEventAdapterRuntimeException("Error in registering endpoint " + endpoint, e);
         }
@@ -191,8 +183,8 @@ public final class HTTPEventAdapter implements InputEventAdapter {
             endpoint = HTTPEventAdapterConstants.ENDPOINT_PREFIX + adapterName;
         } else {
             endpoint = HTTPEventAdapterConstants.ENDPOINT_PREFIX + HTTPEventAdapterConstants.ENDPOINT_TENANT_KEY
-                    + HTTPEventAdapterConstants.ENDPOINT_URL_SEPARATOR
-                    + tenantDomain + HTTPEventAdapterConstants.ENDPOINT_URL_SEPARATOR + adapterName;
+                    + HTTPEventAdapterConstants.ENDPOINT_URL_SEPARATOR + tenantDomain
+                    + HTTPEventAdapterConstants.ENDPOINT_URL_SEPARATOR + adapterName;
         }
         if (httpService != null) {
             httpService.unregister(endpoint);

@@ -52,23 +52,20 @@ public final class SOAPEventAdapter implements InputEventAdapter {
     private final String id = UUID.randomUUID().toString();
 
     public SOAPEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
-                            Map<String, String> globalProperties) {
+            Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
     }
 
-    @Override
-    public void init(InputEventAdapterListener eventAdaptorListener) throws InputEventAdapterException {
+    @Override public void init(InputEventAdapterListener eventAdaptorListener) throws InputEventAdapterException {
         this.eventAdaptorListener = eventAdaptorListener;
     }
 
-    @Override
-    public void testConnect() throws TestConnectionNotSupportedException {
+    @Override public void testConnect() throws TestConnectionNotSupportedException {
         throw new TestConnectionNotSupportedException("not-supported");
     }
 
-    @Override
-    public void connect() {
+    @Override public void connect() {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         try {
@@ -80,27 +77,25 @@ public final class SOAPEventAdapter implements InputEventAdapter {
         }
     }
 
-    @Override
-    public void disconnect() {
+    @Override public void disconnect() {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         try {
-            unregisterService(eventAdapterConfiguration.getName(),
-                    EventAdapterUtil.getAxisConfiguration());
+            unregisterService(eventAdapterConfiguration.getName(), EventAdapterUtil.getAxisConfiguration());
         } catch (AxisFault axisFault) {
             throw new InputEventAdapterRuntimeException("Cannot un-register Input Adapter " +
                     eventAdapterConfiguration.getName() + " on tenant " + tenantId, axisFault);
         }
     }
 
-    @Override
-    public void destroy() {
+    @Override public void destroy() {
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SOAPEventAdapter)) return false;
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof SOAPEventAdapter))
+            return false;
 
         SOAPEventAdapter that = (SOAPEventAdapter) o;
 
@@ -108,24 +103,20 @@ public final class SOAPEventAdapter implements InputEventAdapter {
 
     }
 
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
         return id.hashCode();
     }
 
-    @Override
-    public boolean isEventDuplicatedInCluster() {
+    @Override public boolean isEventDuplicatedInCluster() {
         return false;
     }
 
-    @Override
-    public boolean isPolling() {
+    @Override public boolean isPolling() {
         return false;
     }
 
     private void registerService(InputEventAdapterListener eventAdaptorListener, String serviceName,
-                                 AxisConfiguration axisConfiguration) throws AxisFault {
-
+            AxisConfiguration axisConfiguration) throws AxisFault {
 
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
@@ -143,7 +134,8 @@ public final class SOAPEventAdapter implements InputEventAdapter {
 
         List<String> transports = axisService.getExposedTransports();
         transports.clear();
-        String exposedTransports = eventAdapterConfiguration.getProperties().get(SOAPEventAdapterConstants.EXPOSED_TRANSPORTS);
+        String exposedTransports = eventAdapterConfiguration.getProperties()
+                .get(SOAPEventAdapterConstants.EXPOSED_TRANSPORTS);
         if (exposedTransports.equalsIgnoreCase(SOAPEventAdapterConstants.ALL)) {
             transports.add("http");
             transports.add("https");
@@ -160,10 +152,9 @@ public final class SOAPEventAdapter implements InputEventAdapter {
 
     }
 
-    private void unregisterService(String serviceName,
-                                   AxisConfiguration axisConfiguration) throws AxisFault {
+    private void unregisterService(String serviceName, AxisConfiguration axisConfiguration) throws AxisFault {
         AxisService axisService = axisConfiguration.getService(serviceName);
-        try{
+        try {
             if (axisService == null) {
                 throw new AxisFault("There is no service with the name " + serviceName);
             }
@@ -171,14 +162,14 @@ public final class SOAPEventAdapter implements InputEventAdapter {
             if (axisOperation == null) {
                 throw new AxisFault("There is no operation with the name " + SOAPEventAdapterConstants.OPERATION_NAME);
             }
-            SubscriptionMessageReceiver messageReceiver =
-                    (SubscriptionMessageReceiver) axisOperation.getMessageReceiver();
+            SubscriptionMessageReceiver messageReceiver = (SubscriptionMessageReceiver) axisOperation
+                    .getMessageReceiver();
             if (messageReceiver == null) {
                 throw new AxisFault("There is no message receiver for operation with name "
                         + SOAPEventAdapterConstants.OPERATION_NAME);
             }
-        }finally{
-            if(axisService != null){
+        } finally {
+            if (axisService != null) {
                 axisConfiguration.removeService(serviceName);
             }
         }

@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-
 public class CarbonEventManagementService implements EventManagementService {
 
     private static Logger log = Logger.getLogger(CarbonEventManagementService.class);
@@ -79,7 +78,8 @@ public class CarbonEventManagementService implements EventManagementService {
         } else if (mode == Mode.SingleNode) {
             PersistenceConfiguration persistConfig = managementModeInfo.getPersistenceConfiguration();
             if (persistConfig != null) {
-                ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(persistConfig.getThreadPoolSize());
+                ScheduledExecutorService scheduledExecutorService = Executors
+                        .newScheduledThreadPool(persistConfig.getThreadPoolSize());
                 long persistenceTimeInterval = persistConfig.getPersistenceTimeInterval();
                 if (persistenceTimeInterval > 0) {
                     persistenceManager = new PersistenceManager(scheduledExecutorService, persistenceTimeInterval);
@@ -91,7 +91,7 @@ public class CarbonEventManagementService implements EventManagementService {
             if (distributedConfiguration.isWorkerNode()) {
                 stormReceiverCoordinator = new StormReceiverCoordinator();
             }
-//            startServer(distributedConfiguration.getEventSyncHostAndPort()); //Todo
+            //            startServer(distributedConfiguration.getEventSyncHostAndPort()); //Todo
         }
     }
 
@@ -100,16 +100,14 @@ public class CarbonEventManagementService implements EventManagementService {
             stormReceiverCoordinator.tryBecomeCoordinator();
         }
         hazelcastInstance.getCluster().addMembershipListener(new MembershipListener() {
-            @Override
-            public void memberAdded(MembershipEvent membershipEvent) {
+            @Override public void memberAdded(MembershipEvent membershipEvent) {
                 checkMemberUpdate();
-                if(haManager!=null){
+                if (haManager != null) {
                     haManager.verifyState();
                 }
             }
 
-            @Override
-            public void memberRemoved(MembershipEvent membershipEvent) {
+            @Override public void memberRemoved(MembershipEvent membershipEvent) {
                 members.remove(membershipEvent.getMember().getUuid());
                 checkMemberUpdate();
                 if (mode == Mode.HA) {
@@ -123,8 +121,7 @@ public class CarbonEventManagementService implements EventManagementService {
                 }
             }
 
-            @Override
-            public void memberAttributeChanged(MemberAttributeEvent memberAttributeEvent) {
+            @Override public void memberAttributeChanged(MemberAttributeEvent memberAttributeEvent) {
 
             }
 
@@ -143,9 +140,9 @@ public class CarbonEventManagementService implements EventManagementService {
             publisherMembers.addAll(memberList);
         } else if (mode == Mode.Distributed) {
             //Todo
-//            IMap<Object, Object> members = hazelcastInstance.getMap(ConfigurationConstants.MEMBERS);
-//            members.set(hazelcastInstance.getCluster().getLocalMember().getUuid(), haConfiguration.getEventSyncHostAndPort());
-//            EventManagementServiceValueHolder.getCarbonEventManagementService().setPublisherMembers(new ArrayList<HostAndPort>(members.values()));
+            //            IMap<Object, Object> members = hazelcastInstance.getMap(ConfigurationConstants.MEMBERS);
+            //            members.set(hazelcastInstance.getCluster().getLocalMember().getUuid(), haConfiguration.getEventSyncHostAndPort());
+            //            EventManagementServiceValueHolder.getCarbonEventManagementService().setPublisherMembers(new ArrayList<HostAndPort>(members.values()));
         } else if (mode == Mode.SingleNode) {
             log.warn("CEP started with clustering enabled, but SingleNode configuration given.");
         }
@@ -162,8 +159,7 @@ public class CarbonEventManagementService implements EventManagementService {
             receiverManager.start();
         }
         executorService.schedule(new Runnable() {
-            @Override
-            public void run() {
+            @Override public void run() {
                 try {
                     log.info("Starting polling event adapters");
                     EventReceiverManagementService eventReceiverManagementService = getEventReceiverManagementService();
@@ -179,8 +175,7 @@ public class CarbonEventManagementService implements EventManagementService {
         }, ConfigurationConstants.AXIS_TIME_INTERVAL_IN_MILLISECONDS * 4, TimeUnit.MILLISECONDS);
 
         executorService.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
+            @Override public void run() {
                 checkMemberUpdate();
             }
         }, 10, 10, TimeUnit.SECONDS);
@@ -197,7 +192,8 @@ public class CarbonEventManagementService implements EventManagementService {
             persistenceManager.shutdown();
         }
         if (members != null) {
-            members.remove(EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().getUuid());
+            members.remove(
+                    EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().getUuid());
         }
         receiverMembers.clear();
         publisherMembers.clear();
@@ -227,8 +223,7 @@ public class CarbonEventManagementService implements EventManagementService {
         }
     }
 
-    @Override
-    public void unsubscribe(Manager manager) {
+    @Override public void unsubscribe(Manager manager) {
         if (manager.getType() == Manager.ManagerType.Processor) {
             this.processorManager = null;
         } else if (manager.getType() == Manager.ManagerType.Receiver) {
@@ -238,8 +233,7 @@ public class CarbonEventManagementService implements EventManagementService {
         }
     }
 
-    @Override
-    public void syncEvent(String syncId, Manager.ManagerType type, Event event) {
+    @Override public void syncEvent(String syncId, Manager.ManagerType type, Event event) {
         List<HostAndPort> members = null;
         if (type == Manager.ManagerType.Receiver) {
             members = receiverMembers;
@@ -261,8 +255,7 @@ public class CarbonEventManagementService implements EventManagementService {
 
     }
 
-    @Override
-    public void registerEventSync(EventSync eventSync) {
+    @Override public void registerEventSync(EventSync eventSync) {
         eventSyncMap.putIfAbsent(eventSync.getStreamDefinition().getId(), eventSync);
         for (TCPEventPublisher tcpEventPublisher : tcpEventPublisherPool.values()) {
             tcpEventPublisher.addStreamDefinition(eventSync.getStreamDefinition());
@@ -272,8 +265,7 @@ public class CarbonEventManagementService implements EventManagementService {
         }
     }
 
-    @Override
-    public void unregisterEventSync(String syncId) {
+    @Override public void unregisterEventSync(String syncId) {
         EventSync eventSync = eventSyncMap.remove(syncId);
         if (eventSync != null) {
             for (TCPEventPublisher tcpEventPublisher : tcpEventPublisherPool.values()) {
@@ -298,14 +290,12 @@ public class CarbonEventManagementService implements EventManagementService {
         return publisherManager;
     }
 
-
     private void startServer(HostAndPort member) {
         if (tcpEventServer == null) {
             TCPEventServerConfig tcpEventServerConfig = new TCPEventServerConfig(member.getPort());
             tcpEventServerConfig.setNumberOfThreads(10); //todo fix
             tcpEventServer = new TCPEventServer(tcpEventServerConfig, new StreamCallback() {
-                @Override
-                public void receive(String streamId, long timestamp, Object[] data) {
+                @Override public void receive(String streamId, long timestamp, Object[] data) {
                     int index = streamId.indexOf("/");
                     if (index != -1) {
                         int tenantId = Integer.parseInt(streamId.substring(0, index));
@@ -350,12 +340,12 @@ public class CarbonEventManagementService implements EventManagementService {
         }
     }
 
-
     public synchronized void removeMember(HostAndPort member) {
         TCPEventPublisher tcpEventPublisher = tcpEventPublisherPool.remove(member);
         if (tcpEventPublisher != null) {
             tcpEventPublisher.shutdown();
-            log.info("CEP sync publisher disconnected from Member '" + member.getHostName() + ":" + member.getPort() + "'");
+            log.info("CEP sync publisher disconnected from Member '" + member.getHostName() + ":" + member.getPort()
+                    + "'");
         }
     }
 
@@ -371,16 +361,17 @@ public class CarbonEventManagementService implements EventManagementService {
         }
     }
 
-
     public synchronized void addMember(HostAndPort member) {
         try {
             if (!tcpEventPublisherPool.containsKey(member)) {
-                TCPEventPublisher tcpEventPublisher = new TCPEventPublisher(member.getHostName() + ":" + member.getPort(), false, null);
+                TCPEventPublisher tcpEventPublisher = new TCPEventPublisher(
+                        member.getHostName() + ":" + member.getPort(), false, null);
                 for (EventSync eventSync : eventSyncMap.values()) {
                     tcpEventPublisher.addStreamDefinition(eventSync.getStreamDefinition());
                 }
                 tcpEventPublisherPool.putIfAbsent(member, tcpEventPublisher);
-                log.info("CEP sync publisher initiated to Member '" + member.getHostName() + ":" + member.getPort() + "'");
+                log.info("CEP sync publisher initiated to Member '" + member.getHostName() + ":" + member.getPort()
+                        + "'");
             }
         } catch (IOException e) {
             log.error("Error occurred while trying to start the publisher: " + e.getMessage(), e);
@@ -392,13 +383,12 @@ public class CarbonEventManagementService implements EventManagementService {
         receiverMembers.addAll(members);
     }
 
-
     private void checkMemberUpdate() {
         if (members != null) {
             if (mode == Mode.Distributed) {
                 List<HostAndPort> memberList = new ArrayList<HostAndPort>(members.values());
                 updateMembers(memberList);
-//                memberList.remove(managementModeInfo.getHaConfiguration().getTransport());   todo fix
+                //                memberList.remove(managementModeInfo.getHaConfiguration().getTransport());   todo fix
                 publisherMembers.clear();
                 publisherMembers.addAll(memberList);
             } else if (mode == Mode.HA) {
@@ -410,15 +400,13 @@ public class CarbonEventManagementService implements EventManagementService {
         }
     }
 
-    @Override
-    public void updateLatestEventSentTime(String publisherName, int tenantId, long timestamp) {
+    @Override public void updateLatestEventSentTime(String publisherName, int tenantId, long timestamp) {
 
         stormEventPublisherSyncMap.putAsync(tenantId + "-" + publisherName,
                 EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime());
     }
 
-    @Override
-    public long getLatestEventSentTime(String publisherName, int tenantId) {
+    @Override public long getLatestEventSentTime(String publisherName, int tenantId) {
         if (stormEventPublisherSyncMap == null) {
             stormEventPublisherSyncMap = EventManagementServiceValueHolder.getHazelcastInstance()
                     .getMap(ConfigurationConstants.STORM_EVENT_PUBLISHER_SYNC_MAP);
@@ -430,8 +418,7 @@ public class CarbonEventManagementService implements EventManagementService {
         return 0;
     }
 
-    @Override
-    public long getClusterTimeInMillis() {
+    @Override public long getClusterTimeInMillis() {
         return EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime();
     }
 }

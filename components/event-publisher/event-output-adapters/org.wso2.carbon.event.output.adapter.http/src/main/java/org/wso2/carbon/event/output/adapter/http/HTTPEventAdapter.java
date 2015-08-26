@@ -53,18 +53,18 @@ public class HTTPEventAdapter implements OutputEventAdapter {
     private HttpClient httpClient = null;
     private HostConfiguration hostConfiguration = null;
 
-    public HTTPEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
-            String> globalProperties) {
+    public HTTPEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
+            Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
-        this.clientMethod = eventAdapterConfiguration.getStaticProperties().get(HTTPEventAdapterConstants.ADAPTER_HTTP_CLIENT_METHOD);
+        this.clientMethod = eventAdapterConfiguration.getStaticProperties()
+                .get(HTTPEventAdapterConstants.ADAPTER_HTTP_CLIENT_METHOD);
 
     }
 
-    @Override
-    public void init() throws OutputEventAdapterException {
+    @Override public void init() throws OutputEventAdapterException {
 
-        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         //ExecutorService will be assigned  if it is null
         if (executorService == null) {
@@ -75,29 +75,29 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
             //If global properties are available those will be assigned else constant values will be assigned
             if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME) != null) {
-                minThread = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME));
+                minThread = Integer
+                        .parseInt(globalProperties.get(HTTPEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME));
             } else {
                 minThread = HTTPEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE;
             }
 
             if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME) != null) {
-                maxThread = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME));
+                maxThread = Integer
+                        .parseInt(globalProperties.get(HTTPEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME));
             } else {
                 maxThread = HTTPEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE;
             }
 
             if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME) != null) {
-                defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
+                defaultKeepAliveTime = Integer
+                        .parseInt(globalProperties.get(HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
             } else {
                 defaultKeepAliveTime = HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS;
             }
 
             if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME) != null) {
-                jobQueSize = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME));
+                jobQueSize = Integer
+                        .parseInt(globalProperties.get(HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME));
             } else {
                 jobQueSize = HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE;
             }
@@ -108,17 +108,17 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             int defaultMaxConnectionsPerHost;
             int maxTotalConnections;
 
-            if(globalProperties.get(HTTPEventAdapterConstants.DEFAULT_MAX_CONNECTIONS_PER_HOST) != null){
-                defaultMaxConnectionsPerHost = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.DEFAULT_MAX_CONNECTIONS_PER_HOST));
-            }else{
+            if (globalProperties.get(HTTPEventAdapterConstants.DEFAULT_MAX_CONNECTIONS_PER_HOST) != null) {
+                defaultMaxConnectionsPerHost = Integer
+                        .parseInt(globalProperties.get(HTTPEventAdapterConstants.DEFAULT_MAX_CONNECTIONS_PER_HOST));
+            } else {
                 defaultMaxConnectionsPerHost = HTTPEventAdapterConstants.DEFAULT_DEFAULT_MAX_CONNECTIONS_PER_HOST;
             }
 
-            if(globalProperties.get(HTTPEventAdapterConstants.MAX_TOTAL_CONNECTIONS) != null){
-                maxTotalConnections = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.MAX_TOTAL_CONNECTIONS));
-            }else{
+            if (globalProperties.get(HTTPEventAdapterConstants.MAX_TOTAL_CONNECTIONS) != null) {
+                maxTotalConnections = Integer
+                        .parseInt(globalProperties.get(HTTPEventAdapterConstants.MAX_TOTAL_CONNECTIONS));
+            } else {
                 maxTotalConnections = HTTPEventAdapterConstants.DEFAULT_MAX_TOTAL_CONNECTIONS;
             }
 
@@ -129,52 +129,46 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         }
     }
 
-    @Override
-    public void testConnect() throws TestConnectionNotSupportedException {
+    @Override public void testConnect() throws TestConnectionNotSupportedException {
         throw new TestConnectionNotSupportedException("Test connection is not available");
     }
 
-    @Override
-    public void connect() {
+    @Override public void connect() {
         this.checkHTTPClientInit(eventAdapterConfiguration.getStaticProperties());
     }
 
-    @Override
-    public void publish(Object message, Map<String, String> dynamicProperties) {
+    @Override public void publish(Object message, Map<String, String> dynamicProperties) {
         //Load dynamic properties
         String url = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_MESSAGE_URL);
         String username = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_USERNAME);
         String password = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_PASSWORD);
-        Map<String, String> headers = this.extractHeaders(dynamicProperties.get(
-                HTTPEventAdapterConstants.ADAPTER_HEADERS));
+        Map<String, String> headers = this
+                .extractHeaders(dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_HEADERS));
         String payload = message.toString();
 
         try {
             executorService.submit(new HTTPSender(url, payload, username, password, headers, httpClient));
         } catch (RejectedExecutionException e) {
-            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
+            EventAdapterUtil
+                    .logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
     }
 
-    @Override
-    public void disconnect() {
+    @Override public void disconnect() {
         //not required
     }
 
-    @Override
-    public void destroy() {
+    @Override public void destroy() {
         //not required
     }
 
-    @Override
-    public boolean isPolled() {
+    @Override public boolean isPolled() {
         return false;
     }
 
-    private void checkHTTPClientInit(
-            Map<String, String> staticProperties) {
+    private void checkHTTPClientInit(Map<String, String> staticProperties) {
 
-        if(this.httpClient != null){
+        if (this.httpClient != null) {
             return;
         }
 
@@ -198,11 +192,11 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             }
 
             String messageFormat = eventAdapterConfiguration.getMessageFormat();
-            if(messageFormat.equalsIgnoreCase("json")){
+            if (messageFormat.equalsIgnoreCase("json")) {
                 contentType = "application/json";
-            }else if(messageFormat.equalsIgnoreCase("text")){
+            } else if (messageFormat.equalsIgnoreCase("text")) {
                 contentType = "text/plain";
-            }else{
+            } else {
                 contentType = "text/xml";
             }
 
@@ -247,8 +241,8 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
         private HttpClient httpClient;
 
-        public HTTPSender(String url, String payload, String username, String password,
-                          Map<String, String> headers, HttpClient httpClient) {
+        public HTTPSender(String url, String payload, String username, String password, Map<String, String> headers,
+                HttpClient httpClient) {
             this.url = url;
             this.payload = payload;
             this.username = username;
@@ -277,7 +271,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             return headers;
         }
 
-        public HttpClient getHttpClient(){
+        public HttpClient getHttpClient() {
             return httpClient;
         }
 
@@ -293,7 +287,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                     method = new PostMethod(this.getUrl());
                 }
 
-                if(hostConfiguration == null) {
+                if (hostConfiguration == null) {
                     URL hostUrl = new URL(this.getUrl());
                     hostConfiguration = new HostConfiguration();
                     hostConfiguration.setHost(hostUrl.getHost(), hostUrl.getPort(), hostUrl.getProtocol());
@@ -302,9 +296,9 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 method.setRequestEntity(new StringRequestEntity(this.getPayload(), contentType, "UTF-8"));
 
                 if (this.getUsername() != null && this.getUsername().trim().length() > 0) {
-                    method.setRequestHeader("Authorization", "Basic " + Base64.encode(
-                            (this.getUsername() + HTTPEventAdapterConstants.ENTRY_SEPARATOR
-                                    + this.getPassword()).getBytes()));
+                    method.setRequestHeader("Authorization", "Basic " + Base64
+                            .encode((this.getUsername() + HTTPEventAdapterConstants.ENTRY_SEPARATOR + this
+                                            .getPassword()).getBytes()));
                 }
 
                 if (this.getHeaders() != null) {
@@ -315,13 +309,13 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
                 this.getHttpClient().executeMethod(hostConfiguration, method);
 
-            }catch (UnknownHostException e) {
+            } catch (UnknownHostException e) {
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(),
                         "Cannot connect to " + this.getUrl(), e, log, tenantId);
-            }catch (Throwable e) {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(),
-                        null, e, log, tenantId);
-            }finally {
+            } catch (Throwable e) {
+                EventAdapterUtil
+                        .logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(), null, e, log, tenantId);
+            } finally {
                 if (method != null) {
                     method.releaseConnection();
                 }
