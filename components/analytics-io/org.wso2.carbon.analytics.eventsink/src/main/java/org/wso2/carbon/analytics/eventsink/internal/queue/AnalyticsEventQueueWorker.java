@@ -75,10 +75,11 @@ public class AnalyticsEventQueueWorker implements EventHandler<WrappedEventFacto
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId, true);
                 ServiceHolder.getAnalyticsDSConnector().insertEvents(tenantId, this.events);
-                PrivilegedCarbonContext.endTenantFlow();
             } catch (Exception e) {
                 String errorMsg = "Error processing event. ";
                 log.error(errorMsg, e);
+            } finally {
+                PrivilegedCarbonContext.endTenantFlow();
             }
         }
     }
