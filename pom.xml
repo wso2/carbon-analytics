@@ -1,17 +1,19 @@
 <!--
   ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
+  ~ WSO2 Inc. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
   ~ You may obtain a copy of the License at
   ~
   ~     http://www.apache.org/licenses/LICENSE-2.0
   ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -25,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics-common</groupId>
     <artifactId>carbon-analytics-common</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>5.0.0-SNAPSHOT</version>
     <name>WSO2 Carbon - Carbon Analytics Common Aggregator Module</name>
     <url>http://wso2.org</url>
 
@@ -1148,7 +1150,7 @@
     </repositories>
 
     <properties>
-        <carbon.analytics.common.version>2.0.0-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.0.0-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.4.1</carbon.kernel.version>
@@ -1176,7 +1178,7 @@
         <libthrift.wso2.version.hector>0.7.0.wso2v2</libthrift.wso2.version.hector>
         <orbit.version.commons.lang>2.6.0.wso2v1</orbit.version.commons.lang>
         <gson.version>2.3.1</gson.version>
-        <slf4j.version>1.7.5</slf4j.version>
+        <slf4j.version>1.7.10</slf4j.version>
         <geronimo-jms.version>1.1.1</geronimo-jms.version>
         <hector.wso2.version>1.1.4.wso2v1</hector.wso2.version>
         <junit.version>4.10</junit.version>

@@ -80,7 +80,7 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
         } catch (InputEventAdapterRuntimeException e) {
             connected = false;
             inputEventAdapter.disconnect();
-            log.error("Error initializing Input Adopter '" + this.name + ", hence this will be suspended indefinitely, " + e.getMessage(), e);
+            log.error("Error initializing Input Adapter '" + this.name + ", hence this will be suspended indefinitely, " + e.getMessage(), e);
         }
     }
 
