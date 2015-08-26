@@ -95,7 +95,6 @@ public class WebsocketEventAdapter implements InputEventAdapter {
 
     }
 
-    //TODO : Check the usage of the duplicated events property
     @Override
     public boolean isEventDuplicatedInCluster() {
         return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER));
