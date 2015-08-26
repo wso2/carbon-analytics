@@ -95,19 +95,13 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     }
 
     class EventQueue {
-        private RingBuffer<Event> ringBuffer;
-        private Disruptor<Event> eventQueueDisruptor;
+        private RingBuffer<WrappedEventFactory.WrappedEvent> ringBuffer;
+        private Disruptor<WrappedEventFactory.WrappedEvent> eventQueueDisruptor;
         private ExecutorService eventQueuePool;
-
-        public final EventFactory<Event> EVENT_FACTORY = new EventFactory<Event>() {
-            public Event newInstance() {
-                return new Event();
-            }
-        };
 
         EventQueue(int queueSize) {
             eventQueuePool = Executors.newCachedThreadPool(new DataBridgeThreadFactory("EventQueue"));
-            eventQueueDisruptor = new Disruptor<>(EVENT_FACTORY, queueSize, eventQueuePool);
+            eventQueueDisruptor = new Disruptor<>(new WrappedEventFactory(), queueSize, eventQueuePool);
             eventQueueDisruptor.handleEventsWith(new EventQueueWorker());
             this.ringBuffer = eventQueueDisruptor.start();
         }
@@ -116,8 +110,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             long sequence;
             try {
                 sequence = this.ringBuffer.tryNext(1);
-                Event bufferedEvent = this.ringBuffer.get(sequence);
-                updateEvent(bufferedEvent, event);
+                WrappedEventFactory.WrappedEvent bufferedEvent = this.ringBuffer.get(sequence);
+                bufferedEvent.setEvent(event);
                 this.ringBuffer.publish(sequence);
             } catch (InsufficientCapacityException e) {
                 throw new EventQueueFullException("Cannot send events because the event queue is full", e);
@@ -130,8 +124,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             while (true) {
                 try {
                     sequence = this.ringBuffer.tryNext(1);
-                    Event bufferedEvent = this.ringBuffer.get(sequence);
-                    updateEvent(bufferedEvent, event);
+                    WrappedEventFactory.WrappedEvent bufferedEvent = this.ringBuffer.get(sequence);
+                    bufferedEvent.setEvent(event);
                     this.ringBuffer.publish(sequence);
                     break;
                 } catch (InsufficientCapacityException ex) {
@@ -152,22 +146,13 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             do {
                 try {
                     long sequence = this.ringBuffer.tryNext(1);
-                    Event bufferedEvent = this.ringBuffer.get(sequence);
-                    updateEvent(bufferedEvent, event);
+                    WrappedEventFactory.WrappedEvent bufferedEvent = this.ringBuffer.get(sequence);
+                    bufferedEvent.setEvent(event);
                     this.ringBuffer.publish(sequence);
                     return;
                 } catch (InsufficientCapacityException ignored) {
                 }
             } while (isActiveDataEndpointExists());
-        }
-
-        private void updateEvent(Event oldEvent, Event newEvent) {
-            oldEvent.setArbitraryDataMap(newEvent.getArbitraryDataMap());
-            oldEvent.setCorrelationData(newEvent.getCorrelationData());
-            oldEvent.setMetaData(newEvent.getMetaData());
-            oldEvent.setPayloadData(newEvent.getPayloadData());
-            oldEvent.setStreamId(newEvent.getStreamId());
-            oldEvent.setTimeStamp(newEvent.getTimeStamp());
         }
 
         private void shutdown() {
@@ -176,11 +161,12 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         }
     }
 
-    class EventQueueWorker implements EventHandler<Event> {
+    class EventQueueWorker implements EventHandler<WrappedEventFactory.WrappedEvent> {
 
         @Override
-        public void onEvent(Event event, long sequence, boolean endOfBatch) throws Exception {
+        public void onEvent(WrappedEventFactory.WrappedEvent wrappedEvent, long sequence, boolean endOfBatch) throws Exception {
             DataEndpoint endpoint = getDataEndpoint(true);
+            Event event = wrappedEvent.getEvent();
             if (endpoint != null) {
                 endpoint.collectAndSend(event);
                 if (endOfBatch) {
@@ -250,7 +236,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                         } else {
                             if (!isActiveDataEndpointExists()) {
                                 return null;
-                            }else {
+                            } else {
                                 busyWait(1);
                             }
                         }
