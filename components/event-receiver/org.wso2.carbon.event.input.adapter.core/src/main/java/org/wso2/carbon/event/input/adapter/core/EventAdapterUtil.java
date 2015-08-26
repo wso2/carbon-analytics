@@ -32,10 +32,11 @@ public class EventAdapterUtil {
             axisConfiguration = InputEventAdapterServiceValueHolder.getConfigurationContextService().
                     getServerConfigContext().getAxisConfiguration();
         } else {
-            ConfigurationContext configurationContext = TenantConfigHolder.getTenantConfig(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
-            if(configurationContext != null){
+            ConfigurationContext configurationContext = TenantConfigHolder
+                    .getTenantConfig(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            if (configurationContext != null) {
                 axisConfiguration = configurationContext.getAxisConfiguration();
-            }else{
+            } else {
                 throw new InputEventAdapterRuntimeException("Tenant configuration not found");
             }
         }
