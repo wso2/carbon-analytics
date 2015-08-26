@@ -65,7 +65,7 @@
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.eventsink:${carbon.analytics.version}
                                 </bundleDef>
                                 <bundleDef>
-                                    com.lmax.wso2:disruptor:${orbit.version.disruptor}
+                                    org.wso2.orbit.com.lmax:disruptor:${orbit.version.disruptor}
                                 </bundleDef>
                             </bundles>
                             <importFeatures>
