@@ -277,4 +277,5 @@ function reset() {
     document.getElementById('primaryKeySearch').style.display = 'none';
     document.getElementById('facetSearchCombo').style.display = 'none';
     document.getElementById('facetSearchTableRow').style.display = 'none';
+    document.getElementById('resultsTable').style.display = 'none';
 }
