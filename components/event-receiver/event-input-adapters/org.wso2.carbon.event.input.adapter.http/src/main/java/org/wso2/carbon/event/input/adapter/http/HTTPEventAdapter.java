@@ -51,7 +51,8 @@ public final class HTTPEventAdapter implements InputEventAdapter {
         this.globalProperties = globalProperties;
     }
 
-    @Override public void init(InputEventAdapterListener eventAdaptorListener) throws InputEventAdapterException {
+    @Override
+    public void init(InputEventAdapterListener eventAdaptorListener) throws InputEventAdapterException {
         this.eventAdaptorListener = eventAdaptorListener;
 
         //ThreadPoolExecutor will be assigned  if it is null
@@ -91,7 +92,8 @@ public final class HTTPEventAdapter implements InputEventAdapter {
             }
 
             RejectedExecutionHandler rejectedExecutionHandler = new RejectedExecutionHandler() {
-                @Override public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                @Override
+                public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
                     try {
                         executor.getQueue().put(r);
                     } catch (InterruptedException e) {
@@ -107,22 +109,27 @@ public final class HTTPEventAdapter implements InputEventAdapter {
         }
     }
 
-    @Override public void testConnect() throws TestConnectionNotSupportedException {
+    @Override
+    public void testConnect() throws TestConnectionNotSupportedException {
         throw new TestConnectionNotSupportedException("not-supported");
     }
 
-    @Override public void connect() {
+    @Override
+    public void connect() {
         registerDynamicEndpoint(eventAdapterConfiguration.getName());
     }
 
-    @Override public void disconnect() {
+    @Override
+    public void disconnect() {
         unregisterDynamicEndpoint(eventAdapterConfiguration.getName());
     }
 
-    @Override public void destroy() {
+    @Override
+    public void destroy() {
     }
 
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (!(o instanceof HTTPEventAdapter))
@@ -134,15 +141,18 @@ public final class HTTPEventAdapter implements InputEventAdapter {
 
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return id.hashCode();
     }
 
-    @Override public boolean isEventDuplicatedInCluster() {
+    @Override
+    public boolean isEventDuplicatedInCluster() {
         return false;
     }
 
-    @Override public boolean isPolling() {
+    @Override
+    public boolean isPolling() {
         return false;
     }
 

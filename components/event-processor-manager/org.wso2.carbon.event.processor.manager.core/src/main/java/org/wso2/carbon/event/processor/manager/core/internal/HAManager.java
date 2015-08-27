@@ -78,7 +78,8 @@ public class HAManager {
         roleToMembershipMap = hazelcastInstance.getMap(ConfigurationConstants.ROLE_MEMBERSHIP_MAP);
         roleToMembershipMap.addEntryListener(new EntryAdapter<String, HAConfiguration>() {
 
-            @Override public void entryRemoved(EntryEvent<String, HAConfiguration> stringCEPMembershipEntryEvent) {
+            @Override
+            public void entryRemoved(EntryEvent<String, HAConfiguration> stringCEPMembershipEntryEvent) {
                 tryChangeState();
             }
 
@@ -227,7 +228,8 @@ public class HAManager {
         eventManagementService.addMember(otherMember.getTransport());
 
         executorService.execute(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 while (true) {
                     try {
                         log.info("CEP HA State syncing started..");
@@ -306,7 +308,8 @@ public class HAManager {
          *
          * @see Thread#run()
          */
-        @Override public void run() {
+        @Override
+        public void run() {
             tryChangeState();
             if (!activeLockAcquired) {
                 stateChanger = executorService.schedule(this, 15, TimeUnit.SECONDS);

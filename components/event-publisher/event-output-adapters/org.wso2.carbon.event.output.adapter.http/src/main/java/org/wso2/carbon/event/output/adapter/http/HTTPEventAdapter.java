@@ -62,7 +62,8 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
     }
 
-    @Override public void init() throws OutputEventAdapterException {
+    @Override
+    public void init() throws OutputEventAdapterException {
 
         tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
@@ -129,15 +130,18 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         }
     }
 
-    @Override public void testConnect() throws TestConnectionNotSupportedException {
+    @Override
+    public void testConnect() throws TestConnectionNotSupportedException {
         throw new TestConnectionNotSupportedException("Test connection is not available");
     }
 
-    @Override public void connect() {
+    @Override
+    public void connect() {
         this.checkHTTPClientInit(eventAdapterConfiguration.getStaticProperties());
     }
 
-    @Override public void publish(Object message, Map<String, String> dynamicProperties) {
+    @Override
+    public void publish(Object message, Map<String, String> dynamicProperties) {
         //Load dynamic properties
         String url = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_MESSAGE_URL);
         String username = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_USERNAME);
@@ -154,15 +158,18 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         }
     }
 
-    @Override public void disconnect() {
+    @Override
+    public void disconnect() {
         //not required
     }
 
-    @Override public void destroy() {
+    @Override
+    public void destroy() {
         //not required
     }
 
-    @Override public boolean isPolled() {
+    @Override
+    public boolean isPolled() {
         return false;
     }
 
