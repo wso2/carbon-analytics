@@ -217,7 +217,7 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
                     .getRequiredFeatures());
         }
         Boolean acceptance = acceptanceList.get(serviceType);
-        return (acceptance == null || acceptance);
+        return (acceptance != null && acceptance);
     }
 
     private boolean validateArtifact(Artifact artifact) {
