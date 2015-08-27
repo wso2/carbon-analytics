@@ -641,8 +641,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public boolean isPaginationSupported() {
-        /* pagination is supported */
-        return true;
+        return this.rdbmsQueryConfigurationEntry.isPaginationSupported();
     }
     
     @Override

@@ -58,6 +58,8 @@ public class RDBMSQueryConfigurationEntry {
     private String recordDeletionWithIdsQuery;
         
     private int recordBatchSize = RDBMSAnalyticsDSConstants.RECORD_BATCH_SIZE;
+
+    private boolean paginationSupported = true;
         
     private PaginationMode paginationMode;
     
@@ -349,6 +351,15 @@ public class RDBMSQueryConfigurationEntry {
 
     public void setForwardOnlyReadEnabled(boolean forwardOnlyReadEnabled) {
         this.forwardOnlyReadEnabled = forwardOnlyReadEnabled;
+    }
+
+    @XmlElement(name = "paginationSupported")
+    public boolean isPaginationSupported() {
+        return paginationSupported;
+    }
+
+    public void setPaginationSupported(boolean paginationSupported) {
+        this.paginationSupported = paginationSupported;
     }
 
     @XmlElement(name = "fetchSize", nillable = true)

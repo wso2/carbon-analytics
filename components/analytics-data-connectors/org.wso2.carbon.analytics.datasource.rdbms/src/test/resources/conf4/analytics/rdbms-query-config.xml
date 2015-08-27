@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <query-configuration>
     <database name = "oracle">
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE2</paginationMode>
         <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} WHERE rownum=1</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>

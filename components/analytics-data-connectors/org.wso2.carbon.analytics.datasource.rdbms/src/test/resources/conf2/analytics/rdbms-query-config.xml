@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <query-configuration>
     <database name = "h2">
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE1</paginationMode>
         <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>

@@ -61,8 +61,7 @@ public interface AnalyticsRecordStore {
     
     /**
      * Checks whether or not pagination (i.e. jumping to record n and then retrieving k further records)
-     * is supported by the underlying record store implementation.
-     * Also returns false if the total record count in a table cannot be determined.
+     * is supported by the underlying record store implementation. Configurable.
      *
      * @return Pagination/row-count support
      */

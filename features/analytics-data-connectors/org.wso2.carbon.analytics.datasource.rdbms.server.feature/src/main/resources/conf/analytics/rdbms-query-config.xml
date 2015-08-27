@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <query-configuration>
     <database name = "h2">
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE1</paginationMode>
         <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
@@ -38,6 +39,7 @@
         <fsMergeDataChunkQuery>MERGE INTO AN_FS_DATA (path,sequence,data) KEY (path,sequence) VALUES (?,?,?)</fsMergeDataChunkQuery>
     </database>
     <database name = "mysql">
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE1</paginationMode>
         <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
@@ -78,6 +80,7 @@
         <fsMergeDataChunkQuery>INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE data=VALUES(data)</fsMergeDataChunkQuery>        
     </database>
     <database name = "oracle">
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE2</paginationMode>
         <paginationFirstInclusive>true</paginationFirstInclusive>
         <paginationFirstZeroIndexed>true</paginationFirstZeroIndexed>
@@ -124,6 +127,7 @@
         <fsMergeDataChunkQuery>MERGE INTO AN_FS_DATA dest USING( SELECT ? path, ? sequence, ? data FROM dual) src ON(dest.path = src.path AND dest.sequence = src.sequence) WHEN NOT MATCHED THEN INSERT(path, sequence, data) VALUES(src.path, src.sequence, src.data) WHEN MATCHED THEN UPDATE SET dest.data = src.data</fsMergeDataChunkQuery>
     </database>
     <database name = "Microsoft SQL Server">
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE2</paginationMode>
         <paginationFirstInclusive>true</paginationFirstInclusive>
         <paginationFirstZeroIndexed>true</paginationFirstZeroIndexed>
@@ -172,6 +176,7 @@
         <fsMergeDataChunkQuery>MERGE AN_FS_DATA AS dest USING (SELECT ?, ?, ?) AS src (path, sequence, data) ON (dest.path = src.path AND dest.sequence = src.sequence) WHEN MATCHED THEN UPDATE SET data = src.data WHEN NOT MATCHED THEN INSERT(path, sequence, data) VALUES (src.path, src.sequence, src.data);</fsMergeDataChunkQuery>
     </database>
     <database name = "PostgreSQL">
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE1</paginationMode>
         <paginationFirstInclusive>true</paginationFirstInclusive>
         <paginationFirstZeroIndexed>true</paginationFirstZeroIndexed>
@@ -220,6 +225,7 @@
         <!--fsMergeDataChunkQuery>INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?, ?, ?) ON CONFLICT DO UPDATE data=VALUES(data)</fsMergeDataChunkQuery-->
     </database>
     <database name = "DB2/NT64">
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE1</paginationMode>
         <paginationFirstInclusive>true</paginationFirstInclusive>
         <paginationFirstZeroIndexed>true</paginationFirstZeroIndexed>
