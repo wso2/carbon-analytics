@@ -148,13 +148,13 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
 
         try {
             undeployTypeSpecifiedArtifacts(eventStreams, axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_STREAM_DIR,
-                    EventProcessingAppDeployerConstants.FILE_TYPE_JSON);
+                                           EventProcessingAppDeployerConstants.FILE_TYPE_JSON);
             undeployTypeSpecifiedArtifacts(eventReceivers, axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_RECEIVER_DIR,
-                    EventProcessingAppDeployerConstants.FILE_TYPE_XML);
+                                           EventProcessingAppDeployerConstants.FILE_TYPE_XML);
             undeployTypeSpecifiedArtifacts(eventPublishers, axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_PUBLISHER_DIR,
-                    EventProcessingAppDeployerConstants.FILE_TYPE_XML);
+                                           EventProcessingAppDeployerConstants.FILE_TYPE_XML);
             undeployTypeSpecifiedArtifacts(executionPlans, axisConfig, EventProcessingAppDeployerConstants.CEP_EXECUTION_PLAN_DIR,
-                    EventProcessingAppDeployerConstants.FILE_TYPE_SIDDHIQL);
+                                           EventProcessingAppDeployerConstants.FILE_TYPE_SIDDHIQL);
         } finally {
             executionPlans.clear();
             eventStreams.clear();
@@ -214,10 +214,10 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
     private boolean isAccepted(String serviceType) {
         if (acceptanceList == null) {
             acceptanceList = AppDeployerUtils.buildAcceptanceList(EventProcessingAppDeployerDS
-                    .getRequiredFeatures());
+                                                                          .getRequiredFeatures());
         }
         Boolean acceptance = acceptanceList.get(serviceType);
-        return (acceptance != null && acceptance);
+        return (Boolean.TRUE.equals(acceptance));
     }
 
     private boolean validateArtifact(Artifact artifact) {
