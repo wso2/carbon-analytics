@@ -765,7 +765,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
         Query indexQuery = new MatchAllDocsQuery();
         FacetsCollector fc = new FacetsCollector();
-        if (drillDownRequest.getQuery() != null) {
+        if (drillDownRequest.getQuery() != null && !drillDownRequest.getQuery().isEmpty()) {
             Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
             indexQuery = new AnalyticsQueryParser(analyzer,
                                                   indices).parse(drillDownRequest.getQuery());
