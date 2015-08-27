@@ -23,22 +23,14 @@ import org.wso2.siddhi.core.event.Event;
 
 public interface EventManagementService {
 
-    public void subscribe(Manager manager);
-
     public ManagementModeInfo getManagementModeInfo();
-
+    public void subscribe(Manager manager);
     public void unsubscribe(Manager manager);
-
     public void syncEvent(String syncId, Manager.ManagerType type, Event event);
-
     public void registerEventSync(EventSync eventSync);
-
     public void unregisterEventSync(String syncId);
-
     public void updateLatestEventSentTime(String publisherName, int tenantId, long timestamp);
-
     public long getLatestEventSentTime(String publisherName, int tenantId);
-
     public long getClusterTimeInMillis();
 
 }
