@@ -363,6 +363,8 @@ public class JMSUtils extends BaseUtils {
      * @param pass      optional password
      * @param jmsSpec11 should we use JMS 1.1 API ?
      * @param isQueue   is this to deal with a Queue?
+     * @param isDurable whether the messaging provider is durable
+     * @param clientID  durable subscriber client id
      * @return a JMS Connection as requested
      * @throws javax.jms.JMSException on errors, to be handled and logged by the caller
      */
