@@ -170,6 +170,7 @@ public class CarbonAnalyticsProcessorService implements AnalyticsProcessorServic
      */
     public String[] getQueries(String scriptContent) {
         if (scriptContent != null && !scriptContent.trim().isEmpty()) {
+            scriptContent = scriptContent.replaceAll("\\n|\\r", "");
             String[] queries = scriptContent.split(";(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
             List<String> processedQueries = new ArrayList<>();
             for (String query : queries) {
