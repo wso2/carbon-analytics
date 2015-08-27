@@ -13,16 +13,16 @@
   ~ specific language governing permissions and limitations under the License.
   -->
 <featureSets>
-    <featureSet artifactType="event-processing/eventreceiver">
-        <feature id="org.wso2.carbon.event.receiver.feature.group" version="[2.0.0.SNAPSHOT, 4.4.0)"/>
+    <featureSet artifactType="event/receiver">
+        <feature id="org.wso2.carbon.event.receiver.feature.group" version="[5.0.0.SNAPSHOT, 5.1.0)"/>
     </featureSet>
-    <featureSet artifactType="event-processing/eventpublisher">
-        <feature id="org.wso2.carbon.event.publisher.feature.group" version="[2.0.0.SNAPSHOT, 4.4.0)"/>
+    <featureSet artifactType="event/publisher">
+        <feature id="org.wso2.carbon.event.publisher.feature.group" version="[5.0.0.SNAPSHOT, 5.1.0)"/>
     </featureSet>
-    <featureSet artifactType="event-processing/executionplan">
-        <feature id="org.wso2.carbon.event.processor.feature.group" version="[2.0.0.SNAPSHOT, 4.4.0)"/>
+    <featureSet artifactType="event/execution-plan">
+        <feature id="org.wso2.carbon.event.processor.feature.group" version="[2.0.4.SNAPSHOT, 2.1.0)"/>
     </featureSet>
-    <featureSet artifactType="event-processing/eventstream">
-        <!--<feature id="org.wso2.carbon.cep.server.feature.group" version="[4.3.0.SNAPSHOT, 4.4.0)"/>-->
+    <featureSet artifactType="event/stream">
+        <feature id="org.wso2.carbon.event.stream.feature.group" version="[5.0.0.SNAPSHOT, 5.1.0)"/>-->
     </featureSet>
 </featureSets>

@@ -44,7 +44,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
 public class HAManager {
     private static final Log log = LogFactory.getLog(HAManager.class);
 
@@ -63,8 +62,8 @@ public class HAManager {
 
     private HAConfiguration otherMember;
 
-
-    public HAManager(HazelcastInstance hazelcastInstance, HAConfiguration haConfiguration, ScheduledExecutorService executorService) {
+    public HAManager(HazelcastInstance hazelcastInstance, HAConfiguration haConfiguration,
+            ScheduledExecutorService executorService) {
         this.haConfiguration = haConfiguration;
         this.executorService = executorService;
         activeId = ConfigurationConstants.ACTIVEID;
@@ -118,10 +117,10 @@ public class HAManager {
         }
     }
 
-    public void verifyState(){
-        if(activeLockAcquired &&
-                !roleToMembershipMap.get(activeId).getMemberUuid().equalsIgnoreCase(haConfiguration.getMemberUuid())){
-            if(passiveLock.tryLock()){
+    public void verifyState() {
+        if (activeLockAcquired && !roleToMembershipMap.get(activeId).getMemberUuid()
+                .equalsIgnoreCase(haConfiguration.getMemberUuid())) {
+            if (passiveLock.tryLock()) {
                 passiveLockAcquired = true;
                 activeLockAcquired = false;
                 becomePassive();
@@ -131,9 +130,12 @@ public class HAManager {
     }
 
     public byte[] getState() {
-        CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder.getCarbonEventManagementService();
-        EventReceiverManagementService eventReceiverManagementService = eventManagementService.getEventReceiverManagementService();
-        EventProcessorManagementService eventProcessorManagementService = eventManagementService.getEventProcessorManagementService();
+        CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder
+                .getCarbonEventManagementService();
+        EventReceiverManagementService eventReceiverManagementService = eventManagementService
+                .getEventReceiverManagementService();
+        EventProcessorManagementService eventProcessorManagementService = eventManagementService
+                .getEventProcessorManagementService();
         HAConfiguration passiveMember = roleToMembershipMap.get(passiveId);
         otherMember = passiveMember;
         HashMap<Manager.ManagerType, byte[]> stateMap = new HashMap<Manager.ManagerType, byte[]>();
@@ -188,9 +190,12 @@ public class HAManager {
     }
 
     private void becomeActive() {
-        CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder.getCarbonEventManagementService();
-        EventReceiverManagementService eventReceiverManagementService = eventManagementService.getEventReceiverManagementService();
-        EventPublisherManagementService eventPublisherManagementService = eventManagementService.getEventPublisherManagementService();
+        CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder
+                .getCarbonEventManagementService();
+        EventReceiverManagementService eventReceiverManagementService = eventManagementService
+                .getEventReceiverManagementService();
+        EventPublisherManagementService eventPublisherManagementService = eventManagementService
+                .getEventPublisherManagementService();
 
         roleToMembershipMap.set(activeId, haConfiguration);
         eventManagementService.setReceiverMembers(new ArrayList<HostAndPort>());
@@ -215,7 +220,8 @@ public class HAManager {
         otherMember = activeMember;
 
         // Send non-duplicate events to active member
-        final CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder.getCarbonEventManagementService();
+        final CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder
+                .getCarbonEventManagementService();
         List<HostAndPort> receiverList = new ArrayList<HostAndPort>();
         receiverList.add(otherMember.getTransport());
         eventManagementService.setReceiverMembers(receiverList);
@@ -244,9 +250,12 @@ public class HAManager {
     }
 
     private void syncState(HAConfiguration activeMember, CarbonEventManagementService eventManagementService) {
-        EventReceiverManagementService eventReceiverManagementService = eventManagementService.getEventReceiverManagementService();
-        EventProcessorManagementService eventProcessorManagementService = eventManagementService.getEventProcessorManagementService();
-        EventPublisherManagementService eventPublisherManagementService = eventManagementService.getEventPublisherManagementService();
+        EventReceiverManagementService eventReceiverManagementService = eventManagementService
+                .getEventReceiverManagementService();
+        EventProcessorManagementService eventProcessorManagementService = eventManagementService
+                .getEventProcessorManagementService();
+        EventPublisherManagementService eventPublisherManagementService = eventManagementService
+                .getEventPublisherManagementService();
         if (eventReceiverManagementService != null) {
             eventReceiverManagementService.start();
             eventReceiverManagementService.pause();
@@ -264,7 +273,8 @@ public class HAManager {
         } catch (Throwable e) {
             log.error(e);
         }
-        HashMap<Manager.ManagerType, byte[]> stateMap = (HashMap<Manager.ManagerType, byte[]>) ByteSerializer.BToO(state);
+        HashMap<Manager.ManagerType, byte[]> stateMap = (HashMap<Manager.ManagerType, byte[]>) ByteSerializer
+                .BToO(state);
         // Synchronize the duplicate events with active member
         try {
             if (eventProcessorManagementService != null) {
@@ -316,15 +326,16 @@ public class HAManager {
             try {
                 TServerSocket serverTransport = new TServerSocket(
                         new InetSocketAddress(management.getHostName(), management.getPort()));
-                ManagementService.Processor<ManagementServiceImpl> processor =
-                        new ManagementService.Processor<ManagementServiceImpl>(new ManagementServiceImpl());
+                ManagementService.Processor<ManagementServiceImpl> processor = new ManagementService.Processor<ManagementServiceImpl>(
+                        new ManagementServiceImpl());
                 dataReceiverServer = new TThreadPoolServer(
                         new TThreadPoolServer.Args(serverTransport).processor(processor));
                 Thread thread = new Thread(new ServerThread(dataReceiverServer));
                 log.info("CEP HA Snapshot Server started on " + management.getHostName() + ":" + management.getPort());
                 thread.start();
             } catch (TTransportException e) {
-                log.error("Cannot start CEP HA Snapshot Server on port " + management.getHostName() + ":" + management.getPort(), e);
+                log.error("Cannot start CEP HA Snapshot Server on port " + management.getHostName() + ":" + management
+                        .getPort(), e);
             } catch (Throwable e) {
                 log.error("Error in starting CEP HA Snapshot Server ", e);
             }

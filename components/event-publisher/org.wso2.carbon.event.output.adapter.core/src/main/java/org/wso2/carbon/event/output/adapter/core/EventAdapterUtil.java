@@ -32,32 +32,37 @@ public class EventAdapterUtil {
             axisConfiguration = OutputEventAdapterServiceValueHolder.getConfigurationContextService().
                     getServerConfigContext().getAxisConfiguration();
         } else {
-            ConfigurationContext configurationContext = TenantConfigHolder.getTenantConfig(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
-            if(configurationContext != null){
+            ConfigurationContext configurationContext = TenantConfigHolder
+                    .getTenantConfig(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            if (configurationContext != null) {
                 axisConfiguration = configurationContext.getAxisConfiguration();
-            }else{
+            } else {
                 throw new OutputEventAdapterRuntimeException("Tenant configuration not found");
             }
         }
         return axisConfiguration;
     }
 
-    public static void logAndDrop(String adapterName, Object event, String message, Throwable e, Log log, int tenantId) {
+    public static void logAndDrop(String adapterName, Object event, String message, Throwable e, Log log,
+            int tenantId) {
         if (message != null) {
             message = message + ", ";
         } else {
             message = "";
         }
-        log.error("Event dropped at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', " + message + e.getMessage(), e);
+        log.error("Event dropped at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', " + message + e
+                        .getMessage(), e);
         if (log.isDebugEnabled()) {
-            log.debug("Error at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', dropping event: \n" + event, e);
+            log.debug("Error at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', dropping event: \n"
+                            + event, e);
         }
     }
 
     public static void logAndDrop(String adapterName, Object event, String message, Log log, int tenantId) {
         log.error("Event dropped at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', " + message);
         if (log.isDebugEnabled()) {
-            log.debug("Error at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', dropping event: \n" + event);
+            log.debug("Error at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', dropping event: \n"
+                            + event);
         }
     }
 }
