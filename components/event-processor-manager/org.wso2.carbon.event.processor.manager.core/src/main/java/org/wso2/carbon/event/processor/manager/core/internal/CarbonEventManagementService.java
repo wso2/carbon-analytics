@@ -165,7 +165,8 @@ public class CarbonEventManagementService implements EventManagementService {
         }
         if (!isManagerNode) {
             executorService.schedule(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     try {
                         log.info("Starting polling event adapters");
                         EventReceiverManagementService eventReceiverManagementService = getEventReceiverManagementService();
@@ -182,7 +183,8 @@ public class CarbonEventManagementService implements EventManagementService {
         }
 
         executorService.scheduleAtFixedRate(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 checkMemberUpdate();
             }
         }, 10, 10, TimeUnit.SECONDS);
@@ -306,7 +308,8 @@ public class CarbonEventManagementService implements EventManagementService {
             TCPEventServerConfig tcpEventServerConfig = new TCPEventServerConfig(member.getPort());
             tcpEventServerConfig.setNumberOfThreads(10); //todo fix
             tcpEventServer = new TCPEventServer(tcpEventServerConfig, new StreamCallback() {
-                @Override public void receive(String streamId, long timestamp, Object[] data) {
+                @Override
+                public void receive(String streamId, long timestamp, Object[] data) {
                     int index = streamId.indexOf("/");
                     if (index != -1) {
                         int tenantId = Integer.parseInt(streamId.substring(0, index));
