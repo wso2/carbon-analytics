@@ -65,13 +65,17 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
         }
 
         try {
-            deployTypeSpecifiedArtifacts(eventStreams, axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_STREAM_DIR,
+            deployTypeSpecifiedArtifacts(eventStreams, axisConfig,
+                    EventProcessingAppDeployerConstants.CEP_EVENT_STREAM_DIR,
                     EventProcessingAppDeployerConstants.FILE_TYPE_JSON);
-            deployTypeSpecifiedArtifacts(eventReceivers, axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_RECEIVER_DIR,
+            deployTypeSpecifiedArtifacts(eventReceivers, axisConfig,
+                    EventProcessingAppDeployerConstants.CEP_EVENT_RECEIVER_DIR,
                     EventProcessingAppDeployerConstants.FILE_TYPE_XML);
-            deployTypeSpecifiedArtifacts(eventPublishers, axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_PUBLISHER_DIR,
+            deployTypeSpecifiedArtifacts(eventPublishers, axisConfig,
+                    EventProcessingAppDeployerConstants.CEP_EVENT_PUBLISHER_DIR,
                     EventProcessingAppDeployerConstants.FILE_TYPE_XML);
-            deployTypeSpecifiedArtifacts(executionPlans, axisConfig, EventProcessingAppDeployerConstants.CEP_EXECUTION_PLAN_DIR,
+            deployTypeSpecifiedArtifacts(executionPlans, axisConfig,
+                    EventProcessingAppDeployerConstants.CEP_EXECUTION_PLAN_DIR,
                     EventProcessingAppDeployerConstants.FILE_TYPE_SIDDHIQL);
         } catch (Exception e) {
             try {
@@ -190,13 +194,17 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
     private EventProcessingDeployer getDeployer(Artifact artifact, AxisConfiguration axisConfig) {
         Deployer deployer;
         if (EventProcessingAppDeployerConstants.CEP_EVENT_RECEIVER_TYPE.equals(artifact.getType())) {
-            deployer = AppDeployerUtils.getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_RECEIVER_DIR, "xml");
+            deployer = AppDeployerUtils
+                    .getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_RECEIVER_DIR, "xml");
         } else if (EventProcessingAppDeployerConstants.CEP_EVENT_PUBLISHER_TYPE.equals(artifact.getType())) {
-            deployer = AppDeployerUtils.getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_PUBLISHER_DIR, "xml");
+            deployer = AppDeployerUtils
+                    .getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_PUBLISHER_DIR, "xml");
         } else if (EventProcessingAppDeployerConstants.CEP_EXECUTION_PLAN_TYPE.equals(artifact.getType())) {
-            deployer = AppDeployerUtils.getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EXECUTION_PLAN_DIR, "xml");
+            deployer = AppDeployerUtils
+                    .getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EXECUTION_PLAN_DIR, "xml");
         } else if (EventProcessingAppDeployerConstants.CEP_EVENT_STREAM_TYPE.equals(artifact.getType())) {
-            deployer = AppDeployerUtils.getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_STREAM_DIR, "json");
+            deployer = AppDeployerUtils
+                    .getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_STREAM_DIR, "json");
         } else {
             deployer = null;
         }
