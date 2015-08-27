@@ -23,9 +23,9 @@ import org.wso2.siddhi.core.event.Event;
 
 public interface EventManagementService {
 
-    public void subscribe(Manager manager);
-
     public ManagementModeInfo getManagementModeInfo();
+
+    public void subscribe(Manager manager);
 
     public void unsubscribe(Manager manager);
 
