@@ -52,10 +52,14 @@ public class SuperTenantSubscriptionEndpoint extends SubscriptionEndpoint {
         if (log.isDebugEnabled()) {
             log.debug("WebSocket opened, for Session id: "+session.getId()+", for the Stream:"+streamName);
         }
-        PrivilegedCarbonContext.startTenantFlow();
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(MultitenantConstants.SUPER_TENANT_ID);
-        uiOutputCallbackControllerService.subscribeWebsocket(streamName, version, session);
-        PrivilegedCarbonContext.endTenantFlow();
+
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(MultitenantConstants.SUPER_TENANT_ID);
+            uiOutputCallbackControllerService.subscribeWebsocket(streamName, version, session);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
     }
 
     /**
@@ -84,10 +88,13 @@ public class SuperTenantSubscriptionEndpoint extends SubscriptionEndpoint {
     @OnClose
     public void onClose (Session session, CloseReason reason, @PathParam("streamname") String streamName,
             @PathParam("version") String version) {
-        PrivilegedCarbonContext.startTenantFlow();
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(MultitenantConstants.SUPER_TENANT_ID);
-        super.onClose(session, reason, streamName, version);
-        PrivilegedCarbonContext.endTenantFlow();
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(MultitenantConstants.SUPER_TENANT_ID);
+            super.onClose(session, reason, streamName, version);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
     }
 
     /**
@@ -101,10 +108,14 @@ public class SuperTenantSubscriptionEndpoint extends SubscriptionEndpoint {
     @OnError
     public void onError (Session session, Throwable throwable, @PathParam("streamname") String streamName,
             @PathParam("version") String version) {
-        PrivilegedCarbonContext.startTenantFlow();
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(MultitenantConstants.SUPER_TENANT_ID);
-        super.onError(session, throwable, streamName, version);
-        PrivilegedCarbonContext.endTenantFlow();
+        try {
+
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(MultitenantConstants.SUPER_TENANT_ID);
+            super.onError(session, throwable, streamName, version);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
     }
 
 }
