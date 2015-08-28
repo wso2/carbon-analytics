@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfigProperty;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -53,16 +54,19 @@ public class AnalyticsDataBackupTool {
     private static int batchSize = 0;
     private static boolean forceIndexing = false;
     private static final int READ_BUFFER_SIZE = 10;
+    private static final int RECORD_INDEX_CHUNK_SIZE = 1000;
 
     @SuppressWarnings("static-access")
     public static void main(String[] args) throws Exception {
         String timePattern = "yy-mm-dd hh:mm:ss";
         Options options = new Options();
-        options.addOption(new Option("backupAnalytics", false, "backup analytics data"));
+        options.addOption(new Option("backupRecordStore", false, "backup analytics data"));
         options.addOption(new Option("backupFileSystem", false, "backup filesystem data"));
 
-        options.addOption(new Option("restoreAnalytics", false, "restores analytics data"));
+        options.addOption(new Option("restoreRecordStore", false, "restores analytics data"));
         options.addOption(new Option("restoreFileSystem", false, "restores filesystem data"));
+
+        options.addOption(new Option("reindexEvents", false, "re-indexes records in the given table data"));
 
         options.addOption(new Option("enableIndexing", false, "enables indexing while restoring"));
         options.addOption(OptionBuilder.withArgName("directory").hasArg().withDescription(
@@ -83,13 +87,13 @@ public class AnalyticsDataBackupTool {
             new HelpFormatter().printHelp("analytics-backup.sh|cmd", options);
             System.exit(1);
         }
-        if (line.hasOption("restoreAnalytics")) {
+        if (line.hasOption("restoreRecordStore")) {
             if (line.hasOption("enableIndexing")) {
                 System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
                 forceIndexing = true;
             }
         }
-        if (line.hasOption("backupAnalytics")) {
+        if (line.hasOption("backupRecordStore")) {
             batchSize = Integer.parseInt(line.getOptionValue("batch", RECORD_BATCH_SIZE));
         }
         AnalyticsDataService service = null;
@@ -101,6 +105,7 @@ public class AnalyticsDataBackupTool {
             analyticsFileSystem.init(convertToMap(config.getAnalyticsFileSystemConfiguration()
                     .getProperties()));
             service = AnalyticsServiceHolder.getAnalyticsDataService();
+
             int tenantId = Integer.parseInt(line.getOptionValue("tenant_id", "" + MultitenantConstants.SUPER_TENANT_ID));
             SimpleDateFormat dateFormat = new SimpleDateFormat(timePattern);
             long timeFrom = Long.MIN_VALUE;
@@ -119,20 +124,35 @@ public class AnalyticsDataBackupTool {
             if (line.hasOption("tables")) {
                 specificTables = line.getOptionValue("tables").split(",");
             }
-            File baseDir = new File(line.getOptionValue("dir"));
-            if (!baseDir.exists()) {
-                baseDir.mkdirs();
+
+            File baseDir;
+            String baseDirPath;
+            if(line.getOptionValue("dir") != null){
+                baseDir = new File(line.getOptionValue("dir"));
+                baseDirPath = baseDir.getAbsolutePath();
+                if (!baseDir.exists()) {
+                    baseDir.mkdirs();
+                }
+            } else {
+                baseDir = null;
+                baseDirPath = "Not specified";
             }
-            System.out.println("Intializing [tenant=" + tenantId + "] [timefrom='" + tfStr + "'] [timeto='" + ttStr + "'] [dir='" + baseDir.getAbsolutePath() + "']" +
+
+            System.out.println("Intializing [tenant=" + tenantId + "] [timefrom='" + tfStr + "'] [timeto='" + ttStr + "'] [dir='" + baseDirPath + "']" +
                     (specificTables != null ? (" [table=" + Arrays.toString(specificTables) + "]") : "") + "...");
-            if (line.hasOption("backupAnalytics")) {
-                backupAnalytics(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
+            if (line.hasOption("backupRecordStore")) {
+                backupRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
             } else if (line.hasOption("backupFileSystem")) {
                 backupFileSystem(analyticsFileSystem, tenantId, baseDir);
-            } else if (line.hasOption("restoreAnalytics")) {
-                restoreAnalytics(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
+            } else if (line.hasOption("restoreRecordStore")) {
+                restoreRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
             } else if (line.hasOption("restoreFileSystem")) {
                 restoreFileSystem(analyticsFileSystem, baseDir);
+            } else if (line.hasOption("reindexEvents")) {
+                for (int i = 0; i < specificTables.length; i++) {
+                    System.out.printf("Reindexing data for the table: " + specificTables[i]);
+                    reindexData(service, tenantId, specificTables[i]);
+                }
             }
             System.out.println("Done.");
         } finally {
@@ -145,8 +165,8 @@ public class AnalyticsDataBackupTool {
         }
     }
 
-    private static void backupAnalytics(AnalyticsDataService service, int tenantId, File baseDir,
-                                        long timeFrom, long timeTo, String[] specificTables)
+    private static void backupRecordStore(AnalyticsDataService service, int tenantId, File baseDir,
+                                          long timeFrom, long timeTo, String[] specificTables)
             throws AnalyticsException {
         if (specificTables != null) {
             for (String specificTable : specificTables) {
@@ -161,8 +181,8 @@ public class AnalyticsDataBackupTool {
         }
     }
 
-    private static void restoreAnalytics(AnalyticsDataService service, int tenantId, File baseDir,
-                                         long timeFrom, long timeTo, String[] specificTables)
+    private static void restoreRecordStore(AnalyticsDataService service, int tenantId, File baseDir,
+                                           long timeFrom, long timeTo, String[] specificTables)
             throws IOException {
         if (specificTables != null) {
             for (String specificTable : specificTables) {
@@ -178,7 +198,7 @@ public class AnalyticsDataBackupTool {
     }
 
     private static void restoreTable(AnalyticsDataService service, int tenantId, String table, File baseDir,
-            long timeFrom, long timeTo) {
+                                     long timeFrom, long timeTo) {
         try {
             System.out.print("Restoring table '" + table + "'..");
             service.createTable(tenantId, table);
@@ -207,7 +227,7 @@ public class AnalyticsDataBackupTool {
                     for (Record record : records) {
                         if (!table.equals(record.getTableName())) {
                             System.out.println("Invalid record, invalid table name in record compared to "
-                                               + "current directory: " + record.getTableName());
+                                    + "current directory: " + record.getTableName());
                         }
                     /* check timestamp range */
                         if (!(record.getTimestamp() >= timeFrom && record.getTimestamp() < timeTo)) {
@@ -233,7 +253,7 @@ public class AnalyticsDataBackupTool {
     }
 
     private static void backupTable(AnalyticsDataService service, int tenantId, String table, File basedir,
-            long timeFrom, long timeTo) {
+                                    long timeFrom, long timeTo) {
         try {
             System.out.print("Backing up table '" + table + "'..");
             File myDir = new File(basedir.getAbsolutePath() + File.separator + table);
@@ -346,9 +366,9 @@ public class AnalyticsDataBackupTool {
      * @throws IOException
      */
     private static void backupFileSystem(AnalyticsFileSystem analyticsFileSystem, int tenantId,
-                                         File baseDir) throws IOException {
-        System.out.println("Backing up the filesystem to: " + baseDir);
-        backupFileSystemToLocal(analyticsFileSystem, "/", baseDir.getAbsolutePath());
+                                         File targetBaseDir) throws IOException {
+        System.out.println("Backing up the filesystem to: " + targetBaseDir);
+        backupFileSystemToLocal(analyticsFileSystem, "/", targetBaseDir.getAbsolutePath());
     }
 
     /**
@@ -359,24 +379,32 @@ public class AnalyticsDataBackupTool {
      * @throws IOException
      */
     private static void backupFileSystemToLocal(AnalyticsFileSystem analyticsFileSystem,
-                                                String path, String baseDir) throws IOException {
+                                                String path, String targetBaseDir) throws IOException {
+        targetBaseDir = GenericUtils.normalizePath(targetBaseDir);
         List<String> nodeList = analyticsFileSystem.list(path);
-        String parentPath = (path.equals("/")) ? path : path + File.separator;
-        String nodePath = "";
+        String parentPath = (path.equals("/")) ? path : path + "/";
+        String nodePath;            // dependent on the DAS filesystem
+        String fileSystemNodePath; // dependent on the file system
 
         for (String node : nodeList) {
             nodePath = parentPath + node;
+            //convert the filesystem target path to match the filesystem path settings
+            fileSystemNodePath = targetBaseDir + nodePath;
+            fileSystemNodePath = fileSystemNodePath.replaceAll("/", File.separator);
+
             if (analyticsFileSystem.length(nodePath) == 0) { // the node is a directory
-                createDirectoryInLocalSystem(baseDir + File.separator + nodePath);
-                backupFileSystemToLocal(analyticsFileSystem, nodePath, baseDir);
+                createDirectoryInLocalSystem(fileSystemNodePath);
+                backupFileSystemToLocal(analyticsFileSystem, nodePath, targetBaseDir);
 
             } else {                                          // the node is a file
                 AnalyticsFileSystem.DataInput input = analyticsFileSystem.createInput(nodePath);
                 byte[] dataInBuffer = new byte[READ_BUFFER_SIZE];
-                try (FileOutputStream out = new FileOutputStream(baseDir + nodePath)) {
-                    while (input.read(dataInBuffer, 0, dataInBuffer.length) > 0) out.write(dataInBuffer);
+                try (FileOutputStream out = new FileOutputStream(fileSystemNodePath)) {
+                    while (input.read(dataInBuffer, 0, dataInBuffer.length) > 0) {
+                        out.write(dataInBuffer);
+                    }
                 } catch (IOException e) {
-                    throw new IOException("Could not write to the output file: ", e);
+                    throw new IOException("Could not write to the output file: " + e.getMessage(), e);
                 }
             }
         }
@@ -404,7 +432,6 @@ public class AnalyticsDataBackupTool {
      * @throws IOException
      */
     private static void restoreFileStructure(AnalyticsFileSystem analyticsFileSystem, File node, File baseDir) throws IOException {
-
         //get the relative path
         final String relativePath = node.getAbsolutePath().substring(baseDir.getParent().length());
 
@@ -420,10 +447,9 @@ public class AnalyticsDataBackupTool {
                 out.write(data, 0, data.length);
                 out.flush();
             } catch (IOException e) {
-                throw new IOException("Error in restoring the file to the filesystem: ", e);
+                throw new IOException("Error in restoring the file to the filesystem: " + e.getMessage(), e);
             }
         }
-
     }
 
     /**
@@ -433,21 +459,23 @@ public class AnalyticsDataBackupTool {
      * @return
      * @throws IOException
      */
-    public static byte[] readFile(File file) throws IOException {
+    private static byte[] readFile(File file) throws IOException {
 
-        byte[] buffer = new byte[(int) file.length()];
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(file);
-            if (inputStream.read(buffer) == -1) {
-                throw new IOException("EOF reached while trying to read the whole file");
+        byte[] buffer = new byte[READ_BUFFER_SIZE];
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (InputStream inputStream = new FileInputStream(file)) {
+            int nRead;
+            while ((nRead = inputStream.read(buffer, 0, (int) file.length())) != -1) {
+                byteArrayOutputStream.write(buffer, 0, nRead);
             }
+        } catch (FileNotFoundException e) {
+            throw new IOException("Error in reading the file: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new IOException("Error in reading the file: " + e.getMessage(), e);
         } finally {
-            if (inputStream != null)
-                inputStream.close();
+            byteArrayOutputStream.flush();
         }
-
-        return buffer;
+        return byteArrayOutputStream.toByteArray();
     }
 
     /**
@@ -457,7 +485,7 @@ public class AnalyticsDataBackupTool {
      * @return
      */
     private static Map<String, String> convertToMap(AnalyticsDataServiceConfigProperty[] props) {
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
         for (AnalyticsDataServiceConfigProperty prop : props) {
             result.put(prop.getName(), prop.getValue());
         }
@@ -499,5 +527,42 @@ public class AnalyticsDataBackupTool {
         if (!dir.exists()) {
             dir.mkdir();
         }
+    }
+
+    /**
+     * Re-indexes the published events.
+     * @param dataService
+     * @param indexer
+     * @param tenantId
+     * @param tableName
+     * @throws AnalyticsException
+     */
+    private static void reindexData(AnalyticsDataService dataService, int tenantId,String tableName) throws AnalyticsException {
+        AnalyticsDataResponse analyticsDataResponse = dataService.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
+        RecordGroup[] recordGroups = analyticsDataResponse.getRecordGroups();
+        String recordStoreName = analyticsDataResponse.getRecordStoreName();
+        List<Record> recordList = new ArrayList<>();
+        dataService.clearIndexData(tenantId,tableName);
+
+        int j = 1;
+        //iterating the record groups
+        for (int i = 0; i < recordGroups.length; i++) {
+            AnalyticsIterator<Record> recordAnalyticsIterator = dataService.readRecords(recordStoreName, recordGroups[i]);
+
+            //iterating each record in the record group
+            while (recordAnalyticsIterator.hasNext()) {
+                recordList.add(recordAnalyticsIterator.next());
+
+                // index the data as chuncks
+                if (j % RECORD_INDEX_CHUNK_SIZE == 0) {
+                    dataService.put(recordList);
+                    recordList.clear();
+                }
+                j++;
+            }
+        }
+        //write the remaining records in the records list
+        if (!recordList.isEmpty())
+            dataService.put(recordList);
     }
 }
