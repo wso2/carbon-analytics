@@ -60,4 +60,30 @@ public class DefaultSparkTest extends SparkTestBase {
 
 		System.out.println(testString("END: String concat UDF tester"));
 	}
+
+	@Test
+	public void testTimeNow() throws AnalyticsException, InterruptedException {
+		System.out.println(testString("START : now() UDF tester"));
+		final int INFO_MESSAGES = 5;
+		final int ERROR_MESSAGES = 5;
+
+		SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+		List<Record> records = generateRecords(1, "Log", System.currentTimeMillis(), -1, ERROR_MESSAGES, INFO_MESSAGES);
+		this.service.deleteTable(1, "Log");
+		this.service.createTable(1, "Log");
+		this.service.put(records);
+		ex.executeQuery(1,
+				"CREATE TEMPORARY TABLE Log USING CarbonAnalytics "
+						+ "OPTIONS"
+						+ "(tableName \"Log\","
+						+ "schema \"log_level STRING, message STRING, tenant INTEGER, _timestamp LONG\""
+						+ ")");
+
+		// setting a time difference between the insertion of records and search.
+		Thread.sleep(2000);
+		AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM Log where _timestamp < now('')");
+		Assert.assertEquals(result.getRows().size(), INFO_MESSAGES+ERROR_MESSAGES);
+
+		System.out.println(testString("END: now() UDF tester"));
+	}
 }
