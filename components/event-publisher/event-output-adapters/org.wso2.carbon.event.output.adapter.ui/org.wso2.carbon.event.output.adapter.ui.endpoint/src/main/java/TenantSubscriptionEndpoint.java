@@ -87,14 +87,13 @@ public class TenantSubscriptionEndpoint extends SubscriptionEndpoint {
     @OnClose
     public void onClose (Session session, CloseReason reason, @PathParam("streamname") String streamName,
             @PathParam("version") String version, @PathParam("tdomain") String tdomain) {
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
 
         try {
-            carbonContext.startTenantFlow();
-            carbonContext.setTenantDomain(tdomain,true);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tdomain,true);
             super.onClose(session, reason, streamName, version);
         } finally {
-            carbonContext.endTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().endTenantFlow();
         }
     }
 
@@ -109,14 +108,13 @@ public class TenantSubscriptionEndpoint extends SubscriptionEndpoint {
     @OnError
     public void onError (Session session, Throwable throwable, @PathParam("streamname") String streamName,
             @PathParam("version") String version, @PathParam("tdomain") String tdomain) {
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
 
         try {
-            carbonContext.startTenantFlow();
-            carbonContext.setTenantDomain(tdomain, true);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tdomain, true);
             super.onError(session, throwable, streamName, version);
         } finally {
-            carbonContext.endTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().endTenantFlow();
         }
     }
 }
