@@ -148,7 +148,7 @@ public class AnalyticsDataBackupTool {
                 restoreRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
             } else if (line.hasOption("restoreFileSystem")) {
                 restoreFileSystem(analyticsFileSystem, baseDir);
-            }else if (line.hasOption("reindexEvents")) {
+            } else if (line.hasOption("reindexEvents")) {
                 for (int i = 0; i < specificTables.length; i++) {
                     System.out.printf("Reindexing data for the table: " + specificTables[i]);
                     reindexData(service, tenantId, specificTables[i]);
