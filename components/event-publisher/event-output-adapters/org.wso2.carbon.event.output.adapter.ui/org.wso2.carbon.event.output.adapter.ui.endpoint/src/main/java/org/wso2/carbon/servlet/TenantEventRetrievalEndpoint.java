@@ -72,7 +72,6 @@ public class TenantEventRetrievalEndpoint{
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tdomain, true);
-            // PrivilegedCarbonContext.startTenantFlow();
             streamId = streamName + UIConstants.ADAPTER_UI_COLON + version;
             eventDetails = uiOutputCallbackControllerService.retrieveEvents(streamName, version, lastUpdatedTime);
         } finally {

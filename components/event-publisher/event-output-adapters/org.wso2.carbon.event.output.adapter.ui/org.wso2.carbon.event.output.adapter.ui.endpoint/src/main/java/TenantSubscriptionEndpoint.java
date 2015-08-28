@@ -56,7 +56,6 @@ public class TenantSubscriptionEndpoint extends SubscriptionEndpoint {
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tdomain, true);
-            // PrivilegedCarbonContext.startTenantFlow();
             uiOutputCallbackControllerService.subscribeWebsocket(streamName, version, session);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
