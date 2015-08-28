@@ -35,13 +35,15 @@ public class TenantSubscriptionEndpoint extends SubscriptionEndpoint {
         if (log.isDebugEnabled()) {
             log.debug("WebSocket opened, for Session id: "+session.getId()+", for tenant domain"+tdomain+", for the Adaptor:"+adaptorName);
         }
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        carbonContext.setTenantDomain(tdomain,true);
-        tenantId = carbonContext.getTenantId();
-        PrivilegedCarbonContext.startTenantFlow();
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
-        websocketLocalOutputCallbackRegisterService.subscribe(adaptorName, session);
-        PrivilegedCarbonContext.endTenantFlow();
+
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tdomain, true);
+            tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            websocketLocalOutputCallbackRegisterService.subscribe(adaptorName, session);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
     }
 
     @OnMessage

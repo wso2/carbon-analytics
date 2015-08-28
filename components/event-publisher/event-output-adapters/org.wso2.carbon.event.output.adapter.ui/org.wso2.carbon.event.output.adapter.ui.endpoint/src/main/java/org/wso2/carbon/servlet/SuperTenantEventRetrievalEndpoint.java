@@ -59,16 +59,21 @@ public class SuperTenantEventRetrievalEndpoint{
     @Path("/{streamname}/{version}")
     public Response retrieveEvents(@PathParam("streamname") String streamName, @PathParam("version") String version,
             @QueryParam("lastUpdatedTime") String lastUpdatedTime) {
-
-
-        PrivilegedCarbonContext.startTenantFlow();
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(MultitenantConstants.SUPER_TENANT_ID);
-        String streamId = streamName + UIConstants.ADAPTER_UI_COLON + version;
-
-        JsonObject eventDetails = uiOutputCallbackControllerService.retrieveEvents(streamName, version,
-                lastUpdatedTime);
+        String streamId;
+        JsonObject eventDetails;
         String jsonString;
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().endTenantFlow();
+
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(MultitenantConstants.SUPER_TENANT_ID);
+            streamId = streamName + UIConstants.ADAPTER_UI_COLON + version;
+
+            eventDetails = uiOutputCallbackControllerService.retrieveEvents(streamName, version,
+                    lastUpdatedTime);
+
+        } finally {
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().endTenantFlow();
+        }
 
         if(eventDetails == null){
             JsonObject errorData = new JsonObject();
