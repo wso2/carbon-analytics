@@ -65,6 +65,7 @@ public class CarbonEventManagementService implements EventManagementService {
 
     private IMap<String, Long> stormEventPublisherSyncMap = null;
     private boolean isManagerNode = false;
+    private boolean isWorkerNode = false;
 
     public CarbonEventManagementService() {
         try {
@@ -90,7 +91,8 @@ public class CarbonEventManagementService implements EventManagementService {
         } else if (mode == Mode.Distributed) {
             DistributedConfiguration distributedConfiguration = managementModeInfo.getDistributedConfiguration();
             isManagerNode = distributedConfiguration.isManagerNode();
-            if (distributedConfiguration.isWorkerNode()) {
+            isWorkerNode = distributedConfiguration.isWorkerNode();
+            if (isWorkerNode) {
                 stormReceiverCoordinator = new StormReceiverCoordinator();
             }
             //startServer(distributedConfiguration.getEventSyncHostAndPort()); //Todo
@@ -160,10 +162,10 @@ public class CarbonEventManagementService implements EventManagementService {
     }
 
     public void init(ConfigurationContextService configurationContextService) {
-        if (mode != Mode.HA && !isManagerNode) {
+        if (mode == Mode.SingleNode || isWorkerNode) {
             receiverManager.start();
         }
-        if (!isManagerNode) {
+        if (mode != Mode.Distributed || isWorkerNode) {
             executorService.schedule(new Runnable() {
                 @Override
                 public void run() {
