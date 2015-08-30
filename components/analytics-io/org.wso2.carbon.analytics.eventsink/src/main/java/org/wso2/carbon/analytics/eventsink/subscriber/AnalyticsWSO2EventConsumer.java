@@ -18,28 +18,21 @@
 
 package org.wso2.carbon.analytics.eventsink.subscriber;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.eventsink.internal.queue.AnalyticsEventQueueManager;
-import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.event.stream.core.WSO2EventListConsumer;
-
-import java.util.List;
+import org.wso2.carbon.event.stream.core.WSO2EventConsumer;
 
 /**
  * This is the actual consumer which is getting registered for the list of
  * wso2 events received in stream junction for a specific stream.
  *
  */
-public class AnalyticsWSO2EventListConsumer implements WSO2EventListConsumer {
-    private static final Log log = LogFactory.getLog(AnalyticsWSO2EventListConsumer.class);
+public class AnalyticsWSO2EventConsumer implements WSO2EventConsumer {
     private String streamId;
     private int tenantId;
 
-    public AnalyticsWSO2EventListConsumer(String streamId, int tenantId) {
+    public AnalyticsWSO2EventConsumer(String streamId, int tenantId) {
         this.streamId = streamId;
         this.tenantId = tenantId;
     }
@@ -55,19 +48,6 @@ public class AnalyticsWSO2EventListConsumer implements WSO2EventListConsumer {
     }
 
     @Override
-    public void onEventList(List<Event> eventList) {
-        try {
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId, true);
-            ServiceHolder.getAnalyticsDSConnector().insertEvents(tenantId, eventList);
-            PrivilegedCarbonContext.endTenantFlow();
-        } catch (Exception e) {
-            String errorMsg = "Error processing event. ";
-            log.error(errorMsg, e);
-        }
-    }
-
-    @Override
     public void onAddDefinition(StreamDefinition streamDefinition) {
        //Nothing to do, create table, and setting the schema has been handled above.
     }
@@ -78,8 +58,8 @@ public class AnalyticsWSO2EventListConsumer implements WSO2EventListConsumer {
     }
 
     public boolean equals(Object object){
-        if (object != null && object instanceof AnalyticsWSO2EventListConsumer){
-            AnalyticsWSO2EventListConsumer anotherObj = (AnalyticsWSO2EventListConsumer) object;
+        if (object != null && object instanceof AnalyticsWSO2EventConsumer){
+            AnalyticsWSO2EventConsumer anotherObj = (AnalyticsWSO2EventConsumer) object;
             if (anotherObj.getStreamId().equals(this.streamId) && anotherObj.tenantId == this.tenantId){
                 return true;
             }

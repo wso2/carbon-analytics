@@ -39,15 +39,15 @@ public class AnalyticsEventStreamListener implements EventStreamListener {
 
     private static final Log log = LogFactory.getLog(AnalyticsEventStreamListener.class);
 
-    private static final ConcurrentHashMap<Integer, List<AnalyticsWSO2EventListConsumer>> consumerCache
+    private static final ConcurrentHashMap<Integer, List<AnalyticsWSO2EventConsumer>> consumerCache
             = new ConcurrentHashMap<>();
 
     @Override
     public void removedEventStream(int tenantId, String streamName, String version) {
-        List<AnalyticsWSO2EventListConsumer> tenantConsumers = consumerCache.get(tenantId);
+        List<AnalyticsWSO2EventConsumer> tenantConsumers = consumerCache.get(tenantId);
         if (tenantConsumers != null) {
             String streamId = DataBridgeCommonsUtils.generateStreamId(streamName, version);
-            for (AnalyticsWSO2EventListConsumer consumer : tenantConsumers) {
+            for (AnalyticsWSO2EventConsumer consumer : tenantConsumers) {
                 if (consumer.getStreamId().equals(streamId)) {
                     try {
                         ServiceHolder.getAnalyticsEventSinkService().removeEventSink(tenantId, streamName, version);
@@ -73,7 +73,7 @@ public class AnalyticsEventStreamListener implements EventStreamListener {
     }
 
     public void subscribeForStream(int tenantId, String streamId) {
-        List<AnalyticsWSO2EventListConsumer> consumers = consumerCache.get(tenantId);
+        List<AnalyticsWSO2EventConsumer> consumers = consumerCache.get(tenantId);
         if (consumers == null) {
             synchronized (this) {
                 consumers = consumerCache.get(tenantId);
@@ -83,12 +83,12 @@ public class AnalyticsEventStreamListener implements EventStreamListener {
                 }
             }
         }
-        AnalyticsWSO2EventListConsumer analyticsWSO2EventListConsumer =
-                new AnalyticsWSO2EventListConsumer(streamId, tenantId);
-        if (!consumers.contains(analyticsWSO2EventListConsumer)) {
+        AnalyticsWSO2EventConsumer analyticsWSO2EventConsumer =
+                new AnalyticsWSO2EventConsumer(streamId, tenantId);
+        if (!consumers.contains(analyticsWSO2EventConsumer)) {
             try {
-                ServiceHolder.getEventStreamService().subscribe(analyticsWSO2EventListConsumer);
-                consumers.add(analyticsWSO2EventListConsumer);
+                ServiceHolder.getEventStreamService().subscribe(analyticsWSO2EventConsumer);
+                consumers.add(analyticsWSO2EventConsumer);
             } catch (EventStreamConfigurationException e) {
                 log.error("Error while registering subscriber for stream id " + streamId
                         + " for tenant id " + tenantId + ". " + e.getMessage(), e);
@@ -97,13 +97,13 @@ public class AnalyticsEventStreamListener implements EventStreamListener {
     }
 
     public void unsubscribeFromStream(int tenantId, String streamId) {
-        List<AnalyticsWSO2EventListConsumer> consumers = consumerCache.get(tenantId);
+        List<AnalyticsWSO2EventConsumer> consumers = consumerCache.get(tenantId);
         if (consumers != null) {
-            AnalyticsWSO2EventListConsumer analyticsWSO2EventListConsumer =
-                    new AnalyticsWSO2EventListConsumer(streamId, tenantId);
-            int index = consumers.indexOf(analyticsWSO2EventListConsumer);
+            AnalyticsWSO2EventConsumer analyticsWSO2EventConsumer =
+                    new AnalyticsWSO2EventConsumer(streamId, tenantId);
+            int index = consumers.indexOf(analyticsWSO2EventConsumer);
             if (index != -1) {
-                AnalyticsWSO2EventListConsumer consumer = consumers.remove(index);
+                AnalyticsWSO2EventConsumer consumer = consumers.remove(index);
                 ServiceHolder.getEventStreamService().unsubscribe(consumer);
             }
         }
