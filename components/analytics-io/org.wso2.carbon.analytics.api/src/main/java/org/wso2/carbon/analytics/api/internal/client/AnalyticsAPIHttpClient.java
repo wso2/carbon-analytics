@@ -739,34 +739,6 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public void waitForIndexing(int tenantId, String tableName, long maxWait, boolean tenantAware) throws AnalyticsServiceException {
-        URIBuilder builder = new URIBuilder();
-        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI);
-        try {
-            HttpPost postMethod = new HttpPost(builder.build().toString());
-            postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.WAIT_FOR_INDEXING_OPERATION));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.MAX_WAIT_PARAM, String.valueOf(maxWait)));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_AWARE_PARAM, String.valueOf(tenantAware)));
-            if (tenantAware){
-                params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
-                params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
-            }
-            postMethod.setEntity(new UrlEncodedFormEntity(params));
-            HttpResponse httpResponse = httpClient.execute(postMethod);
-            String response = getResponseString(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                throw new AnalyticsServiceException("Unable to configure max wait: " + maxWait + " for indexing. "
-                        + response);
-            }
-        } catch (URISyntaxException e) {
-            throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
-        } catch (IOException e) {
-            throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. " + e.getMessage(), e);
-        }
-    }
-
     public void waitForIndexing(int tenantId, String username, String tableName, long maxWait, boolean securityEnabled)
             throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();

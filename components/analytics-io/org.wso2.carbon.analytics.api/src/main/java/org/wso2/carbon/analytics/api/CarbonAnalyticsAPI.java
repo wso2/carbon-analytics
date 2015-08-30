@@ -663,7 +663,8 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
-            AnalyticsAPIHttpClient.getInstance().waitForIndexing(maxWait);
+            AnalyticsAPIHttpClient.getInstance().waitForIndexing(MultitenantConstants.INVALID_TENANT_ID, null, null,
+                    maxWait, false);
         }
     }
 
