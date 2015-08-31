@@ -244,7 +244,14 @@ public class ComputeClasspath {
                 if (line.endsWith(";")) {
                     line = line.substring(0, line.length());
                 }
-                sparkClasspath = sparkClasspath + ":" + line;
+
+                if (fileExists(line)) {
+                    sparkClasspath = sparkClasspath + ":" + line;
+                } else if (fileExists(carbonHome + File.separator + line)) {
+                    sparkClasspath = sparkClasspath + ":" + carbonHome + File.separator + line;
+                } else {
+                    throw new IOException("File not found : " + line);
+                }
             }
         } finally {
             if (reader != null) {
@@ -257,6 +264,11 @@ public class ComputeClasspath {
         }
 
         return sparkClasspath;
+    }
+
+    private static boolean fileExists( String path ){
+        File tempFile = new File(path);
+        return tempFile.exists() && !tempFile.isDirectory();
     }
 
     private static String createSparkClasspath(String sparkClasspath, String carbonHome,
