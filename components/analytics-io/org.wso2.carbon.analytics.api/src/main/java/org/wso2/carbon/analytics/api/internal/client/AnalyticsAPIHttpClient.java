@@ -747,7 +747,7 @@ public class AnalyticsAPIHttpClient {
             HttpPost postMethod = new HttpPost(builder.build().toString());
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.WAIT_FOR_INDEXING_FOR_TABLE_OPERATION));
+            params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.WAIT_FOR_INDEXING_OPERATION));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.MAX_WAIT_PARAM, String.valueOf(maxWait)));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));

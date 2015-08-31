@@ -683,7 +683,6 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void waitForIndexing(int tenantId, String tableName, long maxWait) throws AnalyticsException {
-        this.waitForIndexing(maxWait);
         if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             ServiceHolder.getAnalyticsDataService().waitForIndexing(tenantId, tableName, maxWait);
         } else {

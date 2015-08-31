@@ -55,12 +55,12 @@ public class AnalyticsIndexProcessor extends HttpServlet {
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.WAIT_FOR_INDEXING_OPERATION)) {
                 long maxWait = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.MAX_WAIT_PARAM));
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
-                if (tableName != null) {
+                if (tableName != null && !tableName.trim().isEmpty()) {
                     int tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
                     boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
                     String username = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
                     try {
-                        if (securityEnabled) {
+                        if (!securityEnabled) {
                             ServiceHolder.getAnalyticsDataService().waitForIndexing(tenantId, tableName, maxWait);
                         }else {
                             ServiceHolder.getSecureAnalyticsDataService().waitForIndexing(username, tableName, maxWait);
@@ -77,6 +77,9 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                         resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                     }
                 }
+            }else {
+                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : "
+                                                                      + operation + " with post request!");
             }
         }
     }
@@ -116,7 +119,7 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                 }
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : "
-                        + operation + " with post request!");
+                        + operation + " with delete request!");
             }
         }
     }
