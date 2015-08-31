@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <query-configuration>
     <database name = "Microsoft SQL Server">
-        <paginationSupported>true</paginationSupported>
+        <paginationSupported>false</paginationSupported>
         <paginationMode>MODE2</paginationMode>
         <paginationFirstInclusive>true</paginationFirstInclusive>
         <paginationFirstZeroIndexed>true</paginationFirstZeroIndexed>
