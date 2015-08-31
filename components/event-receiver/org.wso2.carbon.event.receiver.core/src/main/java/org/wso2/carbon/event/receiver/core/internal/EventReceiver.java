@@ -54,7 +54,7 @@ public class EventReceiver implements EventProducer {
     private boolean traceEnabled = false;
     private boolean statisticsEnabled = false;
     private boolean customMappingEnabled = false;
-    private boolean isManagerNode = false;
+    private boolean isWorkerNode = false;
     private boolean sufficientToSend = false;
     private Logger trace = Logger.getLogger(EventReceiverConstants.EVENT_TRACE_LOGGER);
     private EventReceiverConfiguration eventReceiverConfiguration = null;
@@ -120,9 +120,9 @@ public class EventReceiver implements EventProducer {
 
                 DistributedConfiguration distributedConfiguration = EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getDistributedConfiguration();
                 if(distributedConfiguration != null){
-                    this.isManagerNode = distributedConfiguration.isManagerNode();
+                    this.isWorkerNode = distributedConfiguration.isWorkerNode();
                 }
-                sufficientToSend = mode != Mode.Distributed || (!isManagerNode && !isEventDuplicatedInCluster);
+                sufficientToSend = mode != Mode.Distributed || (isWorkerNode && !isEventDuplicatedInCluster);
 
             } catch (InputEventAdapterException e) {
                 throw new EventReceiverConfigurationException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error in configuration. " + e.getMessage(), e);
