@@ -27,7 +27,6 @@ import org.wso2.carbon.databridge.commons.Event;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
 
 /**
  * This is the queue worker which listens to analytics queue; and once the batch size is reached, it will
@@ -38,15 +37,14 @@ public class AnalyticsEventQueueWorker implements EventHandler<WrappedEventFacto
 
     private List<Event> events;
     private int tenantId;
-    private ExecutorService threadPoolExecutor;
+    private AnalyticsBlockingExecutor threadPoolExecutor;
 
     public AnalyticsEventQueueWorker(int tenantId) {
         this.tenantId = tenantId;
         this.events = new ArrayList<>();
-        this.threadPoolExecutor = Executors.newFixedThreadPool(ServiceHolder.getAnalyticsEventSinkConfiguration().
-                getWorkerPoolSize());
+        this.threadPoolExecutor = new AnalyticsBlockingExecutor(
+                ServiceHolder.getAnalyticsEventSinkConfiguration().getWorkerPoolSize());
     }
-
 
     @Override
     public void onEvent(WrappedEventFactory.WrappedEvent wrappedEvent, long sequence, boolean endOfBatch) throws Exception {
