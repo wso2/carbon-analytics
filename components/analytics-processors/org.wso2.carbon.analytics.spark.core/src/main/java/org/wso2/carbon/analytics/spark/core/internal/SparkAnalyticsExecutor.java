@@ -18,11 +18,8 @@
  */
 package org.wso2.carbon.analytics.spark.core.internal;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-import com.hazelcast.core.MultiMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.SparkConf;
@@ -57,6 +54,7 @@ import org.wso2.carbon.analytics.spark.core.udf.config.UDFConfiguration;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
+import org.wso2.carbon.analytics.spark.core.util.SparkTableNamesHolder;
 import org.wso2.carbon.utils.CarbonUtils;
 import scala.None$;
 import scala.Option;
@@ -102,13 +100,14 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private int workerCount = 1;
 
-    private MultiMap<Integer, String> sparkTableNames;
-
-    private ListMultimap<Integer, String> inMemSparkTableNames;
+    //    private MultiMap<Integer, String> sparkTableNames;
+//
+//    private ListMultimap<Integer, String> inMemSparkTableNames;
+    private SparkTableNamesHolder sparkTableNamesHolder;
 
     private UDFConfiguration udfConfiguration;
 
-    private boolean isClustered = false;
+//    private boolean isClustered = false;
 
     private int redundantMasterCount = 1;
 
@@ -163,6 +162,12 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         if (isLocalMode()) {
             if (isClusterMode()) {
                 log.info("Using Carbon clustering for Spark");
+
+                //initialize the spark table names holder in the clustered mode
+                if (this.sparkTableNamesHolder == null) {
+                    this.sparkTableNamesHolder = new SparkTableNamesHolder(true);
+                }
+
                 if (acm.isClusteringEnabled()) {
                     runClusteredSetupLogic();
                 } else {
@@ -171,11 +176,23 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 }
             } else {
                 log.info("Starting SPARK in the LOCAL mode...");
+
+                //initialize the spark table names holder in the in-memory mode
+                if (this.sparkTableNamesHolder == null) {
+                    this.sparkTableNamesHolder = new SparkTableNamesHolder(false);
+                }
+
                 this.initializeClient(true);
             }
         } else if (isClientMode()) {
             log.info("Client mode enabled for Spark");
             log.info("Starting SPARK CLIENT pointing to an external Spark Cluster");
+
+            //initialize the spark table names holder in the in-memory mode
+            if (this.sparkTableNamesHolder == null) {
+                this.sparkTableNamesHolder = new SparkTableNamesHolder(false);
+            }
+
             this.initializeClient(false);
         } else {
             throw new AnalyticsClusterException("Unknown mode for Spark Server start up: "
@@ -184,7 +201,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private void runClusteredSetupLogic() throws AnalyticsClusterException {
-        this.isClustered = true;
 
         acm.joinGroup(CLUSTER_GROUP_NAME, this);
         log.info("Member joined the cluster");
@@ -590,12 +606,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         // parse the query to see if it is a create temporary table
         // add the table names to the hz cluster map with tenantId -> table Name (put if absent)
         // iterate through the dist map and replace the relevant table names
-        HazelcastInstance hz = AnalyticsServiceHolder.getHazelcastInstance();
-        if (hz != null && this.isClustered) {
-            this.sparkTableNames = hz.getMultiMap(AnalyticsConstants.TENANT_ID_AND_TABLES_MAP);
-        } else if (this.inMemSparkTableNames == null) {
-            this.inMemSparkTableNames = ArrayListMultimap.create();
-        }
 
         Pattern p = Pattern.compile("(?i)(?<=(" + AnalyticsConstants.TERM_CREATE +
                                     "\\s" + AnalyticsConstants.TERM_TEMPORARY +
@@ -609,20 +619,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 throw new AnalyticsExecutionException("Malformed query: CREATE TEMPORARY TABLE IF NOT " +
                                                       "EXISTS is not supported");
             } else {
-                if (this.isClustered) {
-                    this.sparkTableNames.put(tenantId, tempTableName);
-                } else {
-                    this.inMemSparkTableNames.put(tenantId, tempTableName);
+                synchronized (this.sparkTableNamesHolder) {
+                    this.sparkTableNamesHolder.addTableName(tenantId, tempTableName);
                 }
-                //replace the CA shorthand string in the query
-//                boolean carbonQuery = false;
-//                result = query.replaceFirst("\\b" + AnalyticsConstants.SPARK_SHORTHAND_STRING + "\\b",
-//                                           AnalyticsRelationProvider.class.getName());
-//                if (result.length() > query.length()) {
-//                    carbonQuery = true;
-//                }
-
-                result = replaceShorthandStrings(query);
+                result = this.replaceShorthandStrings(query);
 
                 int optStrStart = result.toLowerCase().indexOf(AnalyticsConstants.TERM_OPTIONS, m.end());
                 int bracketsOpen = result.indexOf("(", optStrStart);
@@ -630,7 +630,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
                 //if its a carbon query, append the tenantId to the end of options
                 String options;
-                if (isCarbonQuery(query)) {
+                if (this.isCarbonQuery(query)) {
                     options = result.substring(optStrStart, bracketsOpen + 1)
                               + addTenantIdToOptions(tenantId, result.substring(bracketsOpen + 1, bracketsClose))
                               + ")";
@@ -644,7 +644,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
             }
         } else {
-            result = replaceTableNamesInQuery(tenantId, query);
+            result = this.replaceTableNamesInQuery(tenantId, query);
         }
         return result.trim();
     }
@@ -699,18 +699,15 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private String replaceTableNamesInQuery(int tenantId, String query) {
         String result = query;
 
-        Collection<String> tableNames;
-        if (this.isClustered) {
-            tableNames = this.sparkTableNames.get(tenantId);
-        } else {
-            tableNames = this.inMemSparkTableNames.get(tenantId);
-        }
+        synchronized (this.sparkTableNamesHolder) {
+            Collection<String> tableNames = this.sparkTableNamesHolder.getTableNames(tenantId);
 
-        for (String name : tableNames) {
-            result = result.replaceAll("\\b" + name + "\\b",
-                                       AnalyticsCommonUtils.encodeTableNameWithTenantId(tenantId, name));
+            for (String name : tableNames) {
+                result = result.replaceAll("\\b" + name + "\\b",
+                                           AnalyticsCommonUtils.encodeTableNameWithTenantId(tenantId, name));
+            }
+            return result;
         }
-        return result;
     }
 
     private static AnalyticsQueryResult toResult(DataFrame dataFrame)
