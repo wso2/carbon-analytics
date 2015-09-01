@@ -37,7 +37,7 @@ public class AnalyticsDataPurgingTask extends AbstractTask {
     @Override
     public void execute() {
         if (log.isDebugEnabled()) {
-            log.debug("Staring execute analytics data puring task");
+            log.debug("Staring execution of analytics data purging task");
         }
         Map<String, String> taskProperties = this.getProperties();
         String retention = taskProperties.get(Constants.RETENTION_PERIOD);
@@ -52,8 +52,8 @@ public class AnalyticsDataPurgingTask extends AbstractTask {
             calendar.set(Calendar.MILLISECOND, 999);
             calendar.add(Calendar.DATE, -retentionPeriod);
             try {
-                log.info("All the data records before " + calendar.getTime() + "[" + calendar.getTimeInMillis() +
-                            "] going to purge from " + table);
+                log.info("All data records before " + calendar.getTime() + "[" + calendar.getTimeInMillis() +
+                            "] will be purged from " + table);
                 ServiceHolder.getAnalyticsDataService().delete(Integer.parseInt(tenantId), table, Long.MIN_VALUE,
                                                                calendar.getTimeInMillis());
             } catch (AnalyticsException e) {
