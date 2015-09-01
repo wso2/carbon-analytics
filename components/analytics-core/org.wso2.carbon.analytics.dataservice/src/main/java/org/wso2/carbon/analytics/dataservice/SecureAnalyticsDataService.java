@@ -65,7 +65,7 @@ public interface SecureAnalyticsDataService {
      * @throws AnalyticsException
      */
     void setTableSchema(String username, String tableName,
-                        AnalyticsSchema schema) throws AnalyticsTableNotAvailableException, AnalyticsException;
+                        AnalyticsSchema schema) throws AnalyticsException;
 
     /**
      * Retrieves the table schema for the given table.
@@ -77,7 +77,7 @@ public interface SecureAnalyticsDataService {
      * @throws AnalyticsException
      */
     AnalyticsSchema getTableSchema(String username, String tableName)
-            throws AnalyticsTableNotAvailableException, AnalyticsException;
+            throws AnalyticsException;
 
     /**
      * Checks if the specified table with the given category and name exists.
@@ -122,7 +122,7 @@ public interface SecureAnalyticsDataService {
      * @throws AnalyticsTableNotAvailableException
      */
     long getRecordCount(String username, String tableName, long timeFrom, long timeTo)
-            throws AnalyticsException, AnalyticsTableNotAvailableException;
+            throws AnalyticsException;
 
 
     /**
@@ -139,7 +139,7 @@ public interface SecureAnalyticsDataService {
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    void put(String username, List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException;
+    void put(String username, List<Record> records) throws AnalyticsException;
 
     /**
      * Retrieves data from a table, with a given range.
@@ -160,7 +160,7 @@ public interface SecureAnalyticsDataService {
      */
     AnalyticsDataResponse get(String username, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
                       long timeTo, int recordsFrom, int recordsCount)
-            throws AnalyticsException, AnalyticsTableNotAvailableException;
+            throws AnalyticsException;
 
     /**
      * Retrieves data from a table with given ids.
@@ -175,7 +175,7 @@ public interface SecureAnalyticsDataService {
      * @throws AnalyticsTableNotAvailableException
      */
     AnalyticsDataResponse get(String username, String tableName, int numPartitionsHint, List<String> columns,
-                      List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException;
+                      List<String> ids) throws AnalyticsException;
 
     /**
      * Retrieves data from a table with the values for all the given primary key value composites.
@@ -189,7 +189,7 @@ public interface SecureAnalyticsDataService {
      * @throws AnalyticsTableNotAvailableException
      */
     AnalyticsDataResponse getWithKeyValues(String username, String tableName, int numPartitionsHint, List<String> columns,
-                                   List<Map<String, Object>> valuesBatch) throws AnalyticsException, AnalyticsTableNotAvailableException;
+                                   List<Map<String, Object>> valuesBatch) throws AnalyticsException;
     
     /**
      * Reads in the records from a given record group at a given record store, the records will be streamed in.
@@ -223,7 +223,7 @@ public interface SecureAnalyticsDataService {
      * @throws AnalyticsTableNotAvailableException
      */
     void delete(String username, String tableName, long timeFrom, long timeTo)
-            throws AnalyticsException, AnalyticsTableNotAvailableException;
+            throws AnalyticsException;
 
     /**
      * Delete data in a table with given ids.
@@ -235,7 +235,7 @@ public interface SecureAnalyticsDataService {
      * @throws AnalyticsTableNotAvailableException
      */
     void delete(String username, String tableName, List<String> ids)
-            throws AnalyticsException, AnalyticsTableNotAvailableException;
+            throws AnalyticsException;
 
     /**
      * Searches the data with a given search query.
@@ -250,7 +250,7 @@ public interface SecureAnalyticsDataService {
      * @throws AnalyticsException
      */
     List<SearchResultEntry> search(String username, String tableName, String query, int start, int count)
-            throws AnalyticsIndexException, AnalyticsException;
+            throws AnalyticsException;
 
     /**
      * Returns the search count of results of a given search query.
@@ -271,7 +271,7 @@ public interface SecureAnalyticsDataService {
      * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException
      * @throws AnalyticsException
      */
-    void waitForIndexing(long maxWait) throws AnalyticsTimeoutException, AnalyticsException;
+    void waitForIndexing(long maxWait) throws AnalyticsException;
 
     /**
     * This method waits until the current indexing operations for a specific table is done.
@@ -282,7 +282,7 @@ public interface SecureAnalyticsDataService {
     * @throws AnalyticsTimeoutException
     * @throws AnalyticsException
     */
-    public void waitForIndexing(String username, String tableName, long maxWait) throws AnalyticsTimeoutException, AnalyticsException;
+    public void waitForIndexing(String username, String tableName, long maxWait) throws AnalyticsException;
 
 
     /**
@@ -369,5 +369,5 @@ public interface SecureAnalyticsDataService {
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    String getRecordStoreNameByTable(String username, String tableName) throws AnalyticsException, AnalyticsTableNotAvailableException;
+    String getRecordStoreNameByTable(String username, String tableName) throws AnalyticsException;
 }

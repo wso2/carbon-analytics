@@ -15,6 +15,8 @@
  */
 package org.wso2.carbon.analytics.jsservice.beans;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -25,9 +27,11 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "response")
-public class ResponseBean {
+public class ResponseBean implements Serializable {
 
-	/** The status. */
+    private static final long serialVersionUID = -6397487831007044053L;
+    
+    /** The status. */
 	@XmlElement(required = true)
 	private String status;
      /**The status code **/

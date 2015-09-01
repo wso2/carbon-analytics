@@ -19,8 +19,6 @@
 package org.wso2.carbon.analytics.dataservice;
 
 import com.hazelcast.core.HazelcastInstance;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
@@ -33,7 +31,6 @@ import org.wso2.carbon.user.core.service.RealmService;
  */
 public class AnalyticsServiceHolder {
 
-    private static final Log log = LogFactory.getLog(AnalyticsServiceHolder.class);
     public static final String FORCE_INDEXING_ENV_PROP = "force.indexing";
 
     private static HazelcastInstance hazelcastInstance;

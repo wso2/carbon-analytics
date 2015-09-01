@@ -69,7 +69,8 @@ public interface AnalyticsDataService {
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    String getRecordStoreNameByTable(int tenantId, String tableName) throws AnalyticsException, AnalyticsTableNotAvailableException;
+    String getRecordStoreNameByTable(int tenantId, String tableName) throws AnalyticsException;
+    
     /**
      * Clears the index data of the table. This will delete all the index information
      * up to the current moment.
@@ -89,7 +90,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsException
      */
     void setTableSchema(int tenantId, String tableName, 
-            AnalyticsSchema schema) throws AnalyticsTableNotAvailableException, AnalyticsException;
+            AnalyticsSchema schema) throws AnalyticsException;
     
     /**
      * Retrieves the table schema for the given table.
@@ -100,7 +101,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsException
      */
     AnalyticsSchema getTableSchema(int tenantId, String tableName) 
-            throws AnalyticsTableNotAvailableException, AnalyticsException;
+            throws AnalyticsException;
     
     /**
      * Checks if the specified table with the given category and name exists.
@@ -141,7 +142,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsTableNotAvailableException
      */
     long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) 
-            throws AnalyticsException, AnalyticsTableNotAvailableException;
+            throws AnalyticsException;
     
     /**
      * Adds a new record to the table. If the record id is mentioned, 
@@ -155,7 +156,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException;
+    void put(List<Record> records) throws AnalyticsException;
     
     /**
      * Retrieves data from a table, with a given range.
@@ -175,7 +176,7 @@ public interface AnalyticsDataService {
      */
     AnalyticsDataResponse get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
             long timeTo, int recordsFrom, int recordsCount) 
-            throws AnalyticsException, AnalyticsTableNotAvailableException;
+            throws AnalyticsException;
     
     /**
      * Retrieves data from a table with given ids.
@@ -189,7 +190,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsTableNotAvailableException
      */
     AnalyticsDataResponse get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, 
-            List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException;
+            List<String> ids) throws AnalyticsException;
     
     /**
      * Retrieves data from a table with the values for all the given primary key value composites.
@@ -203,7 +204,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsTableNotAvailableException
      */
     AnalyticsDataResponse getWithKeyValues(int tenantId, String tableName, int numPartitionsHint, List<String> columns, 
-            List<Map<String, Object>> valuesBatch) throws AnalyticsException, AnalyticsTableNotAvailableException;
+            List<Map<String, Object>> valuesBatch) throws AnalyticsException;
     
     /**
      * Reads in the records from a given record group at a given record store, the records will be streamed in.
@@ -236,7 +237,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsTableNotAvailableException
      */
     void delete(int tenantId, String tableName, long timeFrom, long timeTo) 
-            throws AnalyticsException, AnalyticsTableNotAvailableException;
+            throws AnalyticsException;
     
     /**
      * Delete data in a table with given ids.
@@ -247,7 +248,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsTableNotAvailableException
      */
     void delete(int tenantId, String tableName, List<String> ids) 
-            throws AnalyticsException, AnalyticsTableNotAvailableException;
+            throws AnalyticsException;
 
     /**
      * Searches the data with a given search query.
@@ -261,7 +262,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsException 
      */
     List<SearchResultEntry> search(int tenantId, String tableName,
-            String query, int start, int count) throws AnalyticsIndexException, AnalyticsException;
+            String query, int start, int count) throws AnalyticsException;
     
     /**
      * Returns the search count of results of a given search query.
@@ -328,6 +329,7 @@ public interface AnalyticsDataService {
      * @return List of records of which the record values will be the aggregate values of the given fields
      */
     public List<Record> searchWithAggregates(int tenantId, AggregateRequest aggregateRequest) throws AnalyticsException;
+    
     /**
      * This method waits until the current indexing operations for the system is done.
      * @param maxWait Maximum amount of time in milliseconds, if the time is reached, 
@@ -335,7 +337,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsTimeoutException
      * @throws AnalyticsException 
      */
-    public void waitForIndexing(long maxWait) throws AnalyticsTimeoutException, AnalyticsException;
+    public void waitForIndexing(long maxWait) throws AnalyticsException;
     
     /**
      * This method waits until the current indexing operations for a specific table is done.
@@ -346,7 +348,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsTimeoutException
      * @throws AnalyticsException 
      */
-    public void waitForIndexing(int tenantId, String tableName, long maxWait) throws AnalyticsTimeoutException, AnalyticsException;
+    public void waitForIndexing(int tenantId, String tableName, long maxWait) throws AnalyticsException;
 
     /**
      * Destroys and frees any resources taken up by the analytics data service implementation.
