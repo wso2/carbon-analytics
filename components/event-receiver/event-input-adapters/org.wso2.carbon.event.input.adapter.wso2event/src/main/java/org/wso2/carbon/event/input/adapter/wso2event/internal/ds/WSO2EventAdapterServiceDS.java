@@ -85,36 +85,19 @@ public class WSO2EventAdapterServiceDS {
                         PrivilegedCarbonContext.startTenantFlow();
                         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(credentials.getTenantId());
                         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(credentials.getDomainName());
-
-                        String currentStreamId = null;
-                        int lastProcessedIndex = 0;
-                        int currentIndex = 0;
                         for (Event event : events) {
-                            currentIndex++;
-                            if (currentStreamId == null) {
-                                currentStreamId = event.getStreamId();
-                            } else if (!currentStreamId.equalsIgnoreCase(event.getStreamId())) {
-                                pushToAdapter(currentStreamId, credentials.getDomainName(),
-                                        events.subList(lastProcessedIndex, currentIndex));
-                                lastProcessedIndex = currentIndex - 1;
-                                currentStreamId = event.getStreamId();
-                            } else if (currentIndex == events.size()) {
-                                pushToAdapter(currentStreamId, credentials.getDomainName(),
-                                        events.subList(lastProcessedIndex, currentIndex));
+                            ConcurrentHashMap<String, WSO2EventAdapter> adapters = WSO2EventAdapterServiceValueHolder.getAdapterService(credentials.getDomainName(), event.getStreamId());
+                            if (adapters != null) {
+                                for (WSO2EventAdapter adapter : adapters.values()) {
+                                    adapter.getEventAdaptorListener().onEvent(event);
+                                }
+                            }
+                            if (log.isDebugEnabled()) {
+                                log.debug("Event received in wso2Event Adapter - " + event);
                             }
                         }
                     } finally {
                         PrivilegedCarbonContext.endTenantFlow();
-                    }
-                }
-
-                private void pushToAdapter(String streamId, String tenantDomain, List<Event> events) {
-                    WSO2EventAdapter adapter = WSO2EventAdapterServiceValueHolder.getAdapterService(tenantDomain, streamId);
-                    if (adapter != null) {
-                        adapter.getEventAdaptorListener().onEvent(events);
-                    }
-                    if (log.isDebugEnabled()) {
-                        log.debug("Event received in wso2Event Adapter - " + events);
                     }
                 }
             });
