@@ -17,9 +17,12 @@
 package org.wso2.carbon.analytics.jsservice.exception;
 
 /**
- * This class represents the jsservice layer exceptions
+ * This class represents the jsservice layer exceptions.
  */
 public class JSServiceException extends Exception{
+
+    private static final long serialVersionUID = -8139593084753313385L;
+
     public JSServiceException(String message) {
         super(message);
     }

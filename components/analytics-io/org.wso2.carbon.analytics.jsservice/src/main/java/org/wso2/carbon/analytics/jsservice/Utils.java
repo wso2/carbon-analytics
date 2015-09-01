@@ -146,6 +146,7 @@ public class Utils {
         return records.toArray(new  RecordBean[records.size()]);
     }
 
+    @SuppressWarnings("unchecked")
     private static AnalyticsCategoryPathBean validateAndReturn(Object value) {
         List<String> pathList = (List<String>) value;
         AnalyticsCategoryPathBean categoryPathBean = new AnalyticsCategoryPathBean();
