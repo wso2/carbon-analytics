@@ -54,13 +54,13 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private int reconnectionInterval;
 
-    private AtomicInteger currentDataPublisherIndex = new AtomicInteger();
+    private final Integer START_INDEX = 0;
+
+    private AtomicInteger currentDataPublisherIndex = new AtomicInteger(START_INDEX);
 
     private AtomicInteger maximumDataPublisherIndex = new AtomicInteger();
 
     private ScheduledExecutorService reconnectionService;
-
-    private final Integer START_INDEX = 0;
 
     public enum HAType {
         FAILOVER, LOADBALANCE
@@ -74,6 +74,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         this.eventQueue = new EventQueue(agent.getAgentConfiguration().getQueueSize());
         this.reconnectionService.scheduleAtFixedRate(new ReconnectionTask(), reconnectionInterval,
                 reconnectionInterval, TimeUnit.SECONDS);
+        currentDataPublisherIndex.set(START_INDEX);
     }
 
     public void addDataEndpoint(DataEndpoint dataEndpoint) {
@@ -204,7 +205,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
      */
     private DataEndpoint getDataEndpoint(boolean isBusyWait) {
         int startIndex;
-        if (haType.equals(HAType.LOADBALANCE)) {
+        if (haType.equals(HAType.FAILOVER)) {
             startIndex = getDataPublisherIndex();
         } else {
             startIndex = START_INDEX;
