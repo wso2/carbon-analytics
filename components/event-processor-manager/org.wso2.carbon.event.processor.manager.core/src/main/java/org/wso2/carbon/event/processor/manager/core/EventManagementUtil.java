@@ -37,10 +37,14 @@ public class EventManagementUtil {
 
         List<Attribute> attributes = new ArrayList<Attribute>();
         if (inStreamDefinition.getMetaData() != null) {
-            attributes.addAll(inStreamDefinition.getMetaData());
+            for (Attribute attr : inStreamDefinition.getMetaData()) {
+                attributes.add(new Attribute("meta_" + attr.getName(), attr.getType()));
+            }
         }
         if (inStreamDefinition.getCorrelationData() != null) {
-            attributes.addAll(inStreamDefinition.getCorrelationData());
+            for (Attribute attr : inStreamDefinition.getCorrelationData()) {
+                attributes.add(new Attribute("correlation_" + attr.getName(), attr.getType()));
+            }
         }
         if (inStreamDefinition.getPayloadData() != null) {
             attributes.addAll(inStreamDefinition.getPayloadData());
