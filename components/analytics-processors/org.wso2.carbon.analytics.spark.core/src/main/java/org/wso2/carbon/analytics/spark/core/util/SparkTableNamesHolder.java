@@ -40,8 +40,6 @@ public class SparkTableNamesHolder implements Serializable {
 
     private boolean isClustered = false;
 
-//    final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
-
     public SparkTableNamesHolder() {
     }
 
@@ -56,17 +54,11 @@ public class SparkTableNamesHolder implements Serializable {
     }
 
     public void addTableName(int tenantId, String tableName) {
-//        ReentrantReadWriteLock.WriteLock rl = rwl.writeLock();
-//        rl.lock();
-//        try {
         if (isClustered) {
             this.sparkTableNames.put(tenantId, tableName);
         } else {
             this.inMemSparkTableNames.put(tenantId, tableName);
         }
-//        } finally {
-//            rl.unlock();
-//        }
     }
 
     public Collection<String> getTableNames(int tenantId) {

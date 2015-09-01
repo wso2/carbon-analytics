@@ -100,14 +100,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private int workerCount = 1;
 
-    //    private MultiMap<Integer, String> sparkTableNames;
-//
-//    private ListMultimap<Integer, String> inMemSparkTableNames;
     private SparkTableNamesHolder sparkTableNamesHolder;
 
     private UDFConfiguration udfConfiguration;
-
-//    private boolean isClustered = false;
 
     private int redundantMasterCount = 1;
 
