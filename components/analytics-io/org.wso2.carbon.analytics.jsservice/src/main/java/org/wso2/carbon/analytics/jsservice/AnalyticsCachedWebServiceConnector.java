@@ -1,0 +1,329 @@
+/*
+* Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+* WSO2 Inc. licenses this file to you under the Apache License,
+* Version 2.0 (the "License"); you may not use this file except
+* in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
+package org.wso2.carbon.analytics.jsservice;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.axis2.context.ConfigurationContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
+import org.wso2.carbon.analytics.jsservice.beans.ResponseBean;
+import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceStub;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.Weigher;
+import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MaxSizeConfig;
+import com.hazelcast.config.MaxSizeConfig.MaxSizePolicy;
+import com.hazelcast.core.HazelcastInstance;
+
+/**
+ * This is a thin wrapper on top of {@link AnalyticsWebServiceConnector} to provide caching functionality.
+ */
+public class AnalyticsCachedWebServiceConnector extends AnalyticsWebServiceConnector {
+    
+    private AnalyticsCache cache;
+
+    public AnalyticsCachedWebServiceConnector(ConfigurationContext configCtx, String backendServerURL, 
+            String cookie, AnalyticsCache cache) {
+        super(configCtx, backendServerURL, cookie);
+        this.cache = cache;
+    }
+    
+    public AnalyticsCachedWebServiceConnector(ConfigurationContext configCtx, String backendServerURL,
+            String username, String password, AnalyticsCache cache) {
+        super(configCtx, backendServerURL, username, password);
+        this.cache = cache;
+    }
+    
+    public AnalyticsCachedWebServiceConnector(AnalyticsWebServiceStub analyticsStub, AnalyticsCache cache) {
+        super(analyticsStub);
+        this.cache = cache;
+    }
+    
+    private String calculateCacheItemId(String... keys) {
+        StringBuilder builder = new StringBuilder();
+        for (String key : keys) {
+            builder.append(key + "_");
+        }
+        return builder.toString();
+    }
+    
+    private ResponseBean lookupCachedValue(String cacheItemId) {
+        return this.cache.lookupCachedValue(cacheItemId);
+    }
+    
+    private void setCachedValue(String cacheItemId, ResponseBean result) {
+        this.cache.setCachedValue(cacheItemId, result);
+    }
+    
+    @Override
+    public ResponseBean getRecordCount(String tableName) {
+        String cacheItemId = this.calculateCacheItemId("getRecordCount", tableName);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.getRecordCount(tableName);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+    
+    @Override
+    public ResponseBean getRecordsByRange(String tableName, String timeFrom, String timeTo, String recordsFrom,
+            String count, String columns) {
+        String cacheItemId = this.calculateCacheItemId("getRecordsByRange", tableName, timeFrom, timeTo, recordsFrom, count, columns);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.getRecordsByRange(tableName, timeFrom, timeTo, recordsFrom, count, columns);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+    
+    @Override
+    public ResponseBean getWithKeyValues(String tableName, String valuesBatch) {
+        String cacheItemId = this.calculateCacheItemId("getWithKeyValues", tableName, valuesBatch);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.getWithKeyValues(tableName, valuesBatch);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+    
+    @Override
+    public ResponseBean getRecordsByIds(String tableName, String idsAsString) {
+        String cacheItemId = this.calculateCacheItemId("getRecordsByIds", tableName, idsAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.getRecordsByIds(tableName, idsAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+    
+    @Override
+    public ResponseBean search(String tableName, String queryAsString) {
+        String cacheItemId = this.calculateCacheItemId("search", tableName, queryAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.search(tableName, queryAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+    
+    @Override
+    public ResponseBean searchWithAggregates(String tableName, String requestAsString) {
+        String cacheItemId = this.calculateCacheItemId("searchWithAggregates", tableName, requestAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.searchWithAggregates(tableName, requestAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+    
+    @Override
+    public ResponseBean searchCount(String tableName, String queryAsString) {
+        String cacheItemId = this.calculateCacheItemId("searchCount", tableName, queryAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.searchCount(tableName, queryAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+    
+    @Override
+    public ResponseBean getTableSchema(String tableName) {
+        String cacheItemId = this.calculateCacheItemId("getTableSchema", tableName);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.getTableSchema(tableName);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+    
+    @Override
+    public ResponseBean isPaginationSupported(String recordStoreName) {
+        String cacheItemId = this.calculateCacheItemId("isPaginationSupported", recordStoreName);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.isPaginationSupported(recordStoreName);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+    
+    @Override
+    public ResponseBean drillDownCategories(String tableName, String queryAsString) {
+        String cacheItemId = this.calculateCacheItemId("drillDownCategories", tableName, queryAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.drillDownCategories(tableName, queryAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+    
+    @Override
+    public ResponseBean drillDownSearch(String tableName, String queryAsString) {
+        String cacheItemId = this.calculateCacheItemId("drillDownSearch", tableName, queryAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.drillDownSearch(tableName, queryAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+    
+    @Override
+    public ResponseBean drillDownSearchCount(String tableName, String queryAsString) {
+        String cacheItemId = this.calculateCacheItemId("drillDownSearchCount", tableName, queryAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.drillDownSearchCount(tableName, queryAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+    
+    /**
+     * This represents the cache used to hold the data.
+     */
+    public static class AnalyticsCache {
+        
+        private static final String CACHE_MAP_NAME = "CarbonAnalyticsWebServiceConnectorCache";
+
+        private int cacheTimeoutSeconds;
+        
+        private int cacheSizeBytes;
+        
+        private ConcurrentMap<String, byte[]> cache;
+        
+        public AnalyticsCache(int cacheTimeoutSeconds, int cacheSizeBytes) {
+            this.cacheTimeoutSeconds = cacheTimeoutSeconds;
+            this.cacheSizeBytes = cacheSizeBytes;
+            this.initCache();
+        }
+
+        public int getCacheTimeoutSeconds() {
+            return cacheTimeoutSeconds;
+        }
+        
+        public int getCacheSizeBytes() {
+            return cacheSizeBytes;
+        }
+
+        private void initCache() {
+            HazelcastInstance hz = this.loadHazelcast();
+            if (hz != null) {
+                this.initHzCacheMapConfig(hz);
+                this.cache = hz.getMap(CACHE_MAP_NAME);
+            } else {
+                this.cache = CacheBuilder.newBuilder().maximumWeight(
+                        this.getCacheSizeBytes()).weigher(
+                            new Weigher<String, byte[]>() {
+                                public int weigh(String key, byte[] value) {
+                                    return value.length;
+                                }
+                            }).expireAfterWrite(this.getCacheTimeoutSeconds(), 
+                        TimeUnit.SECONDS).build().asMap();
+            }
+        }
+
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+        private HazelcastInstance loadHazelcast() {
+            BundleContext ctx = FrameworkUtil.getBundle(AnalyticsCachedWebServiceConnector.class).getBundleContext();
+            ServiceReference ref = ctx.getServiceReference(HazelcastInstance.class);
+            if (ref != null) {
+                return (HazelcastInstance) ctx.getService(ref);
+            } else {
+                return null;
+            }
+        }
+        
+        private void initHzCacheMapConfig(HazelcastInstance hz) {
+            Map<String, MapConfig> mapConfigs = hz.getConfig().getMapConfigs();
+            if (mapConfigs == null) {
+                mapConfigs = new HashMap<String, MapConfig>();
+                hz.getConfig().setMapConfigs(mapConfigs);
+            }
+            MapConfig config = new MapConfig();
+            config.setTimeToLiveSeconds(this.getCacheTimeoutSeconds());
+            config.setMaxSizeConfig(new MaxSizeConfig(this.getCacheSizeBytes(), MaxSizePolicy.PER_NODE));
+            mapConfigs.put(CACHE_MAP_NAME, config);        
+        }
+        
+        private byte[] serialize(ResponseBean obj) {
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            try {
+                ObjectOutputStream out = new ObjectOutputStream(byteOut);
+                out.writeObject(obj);
+                out.close();
+                return byteOut.toByteArray();
+            } catch (IOException e) {
+                throw new IllegalStateException("Error in serializing: " + e.getMessage(), e);
+            }
+        }
+        
+        private ResponseBean deserialize(byte[] buff) {
+            ByteArrayInputStream byteIn = new ByteArrayInputStream(buff);
+            ObjectInputStream objIn = null;
+            try {
+                objIn = new ObjectInputStream(byteIn);
+                return (ResponseBean) objIn.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new IllegalStateException("Error in deserializing: " + e.getMessage(), e);
+            } finally {
+                if (objIn != null) {
+                    try {
+                        objIn.close();
+                    } catch (IOException ignore) {
+                        /* ignore */
+                    }
+                }
+            }
+        }
+        
+        private ResponseBean lookupCachedValue(String cacheItemId) {
+            byte[] buff = this.cache.get(cacheItemId);
+            if (buff == null) {
+                return null;
+            }
+            return this.deserialize(buff);
+        }
+        
+        private void setCachedValue(String cacheItemId, ResponseBean result) {
+            this.cache.put(cacheItemId, this.serialize(result));
+        }
+        
+    }
+
+}
