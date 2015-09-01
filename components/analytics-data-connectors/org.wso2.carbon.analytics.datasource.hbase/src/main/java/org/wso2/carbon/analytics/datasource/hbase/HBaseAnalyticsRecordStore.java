@@ -181,8 +181,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException {
-        throw new HBaseUnsupportedOperationException("Retrieving row count is not supported " +
-                "for HBase Analytics Record Stores");
+        return -1;
     }
 
     @Override

@@ -179,7 +179,7 @@ public class AnalyticsWebService extends AbstractAdmin {
     /**
      * Returns a list of records containing the aggregate values computed over the given fields map
      * , grouped by a predefined FACET field.
-     * @param aggregateRequest The inputs required for performing aggregation.
+     * @param request The inputs required for performing aggregation.
      * groupByField is used to group the records. It should be a facet field created by the grouping fields.
      * fields attribute represents the record fields and the respective aggregate function.
      * aliases represents the output field names for aggregated values over the fields.
@@ -272,14 +272,11 @@ public class AnalyticsWebService extends AbstractAdmin {
     public long getRecordCount(String tableName, long timeFrom, long timeTo)
             throws AnalyticsWebServiceException {
         try {
-            long recordCount;
-            if (isPaginationSupported(analyticsDataAPI.getRecordStoreNameByTable(getUsername(), tableName))) {
-                recordCount = analyticsDataAPI.getRecordCount(getUsername(), tableName, timeFrom, timeTo);
-            } else {
+            long recordCount = analyticsDataAPI.getRecordCount(getUsername(), tableName, timeFrom, timeTo);
+            if (recordCount == -1) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Pagination not support for table:" + tableName);
+                    logger.debug("Retrieving record count is not supported for table:" + tableName);
                 }
-                recordCount = -1;
             }
             return recordCount;
         } catch (Exception e) {

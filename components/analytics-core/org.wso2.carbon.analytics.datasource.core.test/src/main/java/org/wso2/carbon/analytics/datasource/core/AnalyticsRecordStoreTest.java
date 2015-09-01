@@ -28,11 +28,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotA
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class contains tests related to {@link AnalyticsRecordStore}.
@@ -76,19 +72,19 @@ public class AnalyticsRecordStoreTest {
     public static List<Record> generateRecordsWithFacets(int tenantId, String tableName, int i, int c, long time, int timeOffset) {
         return generateRecordsWithFacets(tenantId, tableName, i, c, time, timeOffset, true);
     }
-    
+
     public static List<Record> generateRecords(int tenantId, String tableName, int i, int c, long time, int timeOffset,
-            boolean generateRecordIds) {
-        List<Record> result = new ArrayList<Record>();
+                                               boolean generateRecordIds) {
+        List<Record> result = new ArrayList<>();
         Map<String, Object> values;
         long timeTmp;
         for (int j = 0; j < c; j++) {
-            values = new HashMap<String, Object>();
+            values = new HashMap<>();
             values.put("server_name", "ESB-" + i);
             values.put("ip", "192.168.0." + (i % 256));
             values.put("tenant", i);
             values.put("spam_index", i + 0.3454452);
-            values.put("important", i % 2 == 0 ? true : false);
+            values.put("important", i % 2 == 0);
             values.put("sequence", i + 104050000L);
             values.put("summary", "Joey asks, how you doing?");
             values.put("log", "Exception in Sequence[" + i + "," + j + "]");
@@ -104,19 +100,19 @@ public class AnalyticsRecordStoreTest {
     }
 
     public static List<Record> generateRecordsWithFacets(int tenantId, String tableName, int i, int c, long time, int timeOffset,
-                                               boolean generateRecordIds) {
-        List<Record> result = new ArrayList<Record>();
+                                                         boolean generateRecordIds) {
+        List<Record> result = new ArrayList<>();
         Map<String, Object> values;
         String afacet;
         long timeTmp;
         for (int j = 0; j < c; j++) {
-            values = new HashMap<String, Object>();
+            values = new HashMap<>();
             afacet = "SomeLocation,SomeInnerLocation,AVillage";
             values.put("server_name", "ESB-" + i);
             values.put("ip", "192.168.0." + (i % 256));
             values.put("tenant", i);
             values.put("spam_index", i + 0.3454452);
-            values.put("important", i % 2 == 0 ? true : false);
+            values.put("important", i % 2 == 0);
             values.put("sequence", i + 104050000L);
             values.put("summary", "Joey asks, how you doing?");
             values.put("location", afacet);
@@ -131,12 +127,12 @@ public class AnalyticsRecordStoreTest {
         }
         return result;
     }
-    
+
     private List<Record> generateRecordsForUpdate(List<Record> recordsIn) {
-        List<Record> result = new ArrayList<Record>();
+        List<Record> result = new ArrayList<>();
         Map<String, Object> values;
         for (Record recordIn : recordsIn) {
-            values = new HashMap<String, Object>();
+            values = new HashMap<>();
             values.put("server_name", "ESB-" + recordIn.getId());
             values.put("ip", "192.168.0." + (recordIn.getTimestamp() % 256));
             values.put("tenant", recordIn.getTenantId());
@@ -175,9 +171,6 @@ public class AnalyticsRecordStoreTest {
         Assert.assertTrue(ok);
         /* this should not throw an exception */
         this.analyticsRS.createTable(250035, "Table1");
-        Record record = this.createRecord(250035, "TABLE2", "S1", "10.0.0.1", 1, "LOG");
-        List<Record> records = new ArrayList<Record>();
-        records.add(record);
         this.analyticsRS.deleteTable(250035, "TABLE2");
         this.analyticsRS.deleteTable(250035, "TABLE1");
         this.analyticsRS.deleteTable(8830, "TABLEX");
@@ -189,7 +182,7 @@ public class AnalyticsRecordStoreTest {
         }
         Assert.assertTrue(ok);
     }
-    
+
     @Test
     public void testLongTableNameCreate() throws AnalyticsException {
         int tenantId = 25;
@@ -205,7 +198,7 @@ public class AnalyticsRecordStoreTest {
         Assert.assertEquals(recordsIn.size(), 1);
         this.analyticsRS.deleteTable(tenantId, tableName);
     }
-    
+
     @Test
     @SuppressWarnings("unchecked")
     public void testDataRecordAddRetrieve() throws AnalyticsException {
@@ -216,11 +209,11 @@ public class AnalyticsRecordStoreTest {
         String log = "Boom!";
         this.analyticsRS.createTable(7, "T1");
         Record record = this.createRecord(7, "T1", serverName, ip, tenant, log);
-        List<Record> records = new ArrayList<Record>();
+        List<Record> records = new ArrayList<>();
         records.add(record);
         this.analyticsRS.put(records);
         String id = record.getId();
-        List<String> ids = new ArrayList<String>();
+        List<String> ids = new ArrayList<>();
         ids.add(id);
         RecordGroup[] rgs = this.analyticsRS.get(7, "T1", 3, null, ids);
         Assert.assertEquals(rgs.length, 1);
@@ -250,14 +243,14 @@ public class AnalyticsRecordStoreTest {
         this.analyticsRS.put(records2);
         List<Record> recordsIn1 = GenericUtils.listRecords(
                 this.analyticsRS, this.analyticsRS.get(t1, tableName, 1, null,
-                Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+                        Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         List<Record> recordsIn2 = GenericUtils.listRecords(
                 this.analyticsRS, this.analyticsRS.get(t2, tableName, 1, null,
-                Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+                        Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(records1.size(), recordsIn1.size());
         Assert.assertEquals(records2.size(), recordsIn2.size());
-        Assert.assertEquals(new HashSet<Record>(records1), new HashSet<Record>(recordsIn1));
-        Assert.assertEquals(new HashSet<Record>(records2), new HashSet<Record>(recordsIn2));
+        Assert.assertEquals(new HashSet<>(records1), new HashSet<>(recordsIn1));
+        Assert.assertEquals(new HashSet<>(records2), new HashSet<>(recordsIn2));
         this.analyticsRS.deleteTable(t1, tableName);
         this.analyticsRS.deleteTable(t2, tableName);
     }
@@ -270,8 +263,8 @@ public class AnalyticsRecordStoreTest {
         this.analyticsRS.put(records);
         List<Record> recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
-        Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
-        List<String> columns = new ArrayList<String>();
+        Assert.assertEquals(new HashSet<>(recordsIn), new HashSet<>(records));
+        List<String> columns = new ArrayList<>();
         columns.add("server_name");
         columns.add("ip");
         columns.add("tenant");
@@ -283,11 +276,11 @@ public class AnalyticsRecordStoreTest {
         columns.add("important");
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 1, columns, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
-        Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
+        Assert.assertEquals(new HashSet<>(recordsIn), new HashSet<>(records));
         columns.remove("ip");
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 4, columns, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
-        Assert.assertNotEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
+        Assert.assertNotEquals(new HashSet<>(recordsIn), new HashSet<>(records));
         this.cleanupT1();
     }
 
@@ -299,26 +292,28 @@ public class AnalyticsRecordStoreTest {
         this.analyticsRS.put(records);
         List<Record> recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(15, "T1", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
-        Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
+        Assert.assertEquals(new HashSet<>(recordsIn), new HashSet<>(records));
         records = this.generateRecordsForUpdate(records);
         this.analyticsRS.put(records);
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(15, "T1", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
-        Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
+        Assert.assertEquals(new HashSet<>(recordsIn), new HashSet<>(records));
         this.cleanupT1();
     }
 
     @Test
     public void testDataRecordCount() throws AnalyticsException {
-        if (!this.analyticsRS.isPaginationSupported()) {
-            return;
-        }
         this.cleanupT1();
         this.analyticsRS.createTable(7, "T1");
         int count = (int) (2000 * Math.random()) + 1;
         List<Record> records = generateRecords(7, "T1", 1, count, -15000, 333);
         this.analyticsRS.put(records);
-        Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", Long.MIN_VALUE, Long.MAX_VALUE), count);
+        long res = this.analyticsRS.getRecordCount(7, "T1", Long.MIN_VALUE, Long.MAX_VALUE);
+        if (res == -1) {
+            this.cleanupT1();
+            return;
+        }
+        Assert.assertEquals(res, count);
         Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", -15000, -14999), 1);
         this.analyticsRS.delete(7, "T1", Long.MIN_VALUE, Long.MAX_VALUE);
         Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", Long.MIN_VALUE, Long.MAX_VALUE), 0);
@@ -335,31 +330,29 @@ public class AnalyticsRecordStoreTest {
         this.analyticsRS.put(records);
         List<Record> recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 2, null, time - 10, time + timeOffset * 100, 0, -1));
-        Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
+        Assert.assertEquals(new HashSet<>(recordsIn), new HashSet<>(records));
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 1, null, time, time + timeOffset * 99 + 1, 0, -1));
-        Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
+        Assert.assertEquals(new HashSet<>(recordsIn), new HashSet<>(records));
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 1, null, time, time + timeOffset * 99, 0, -1));
         Assert.assertEquals(recordsIn.size(), 99);
-        if(this.analyticsRS.isPaginationSupported()){
-            Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", time, time + timeOffset * 99), 99);
-        }
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 2, null, time + 1, time + timeOffset * 99 + 1, 0, -1));
         Assert.assertEquals(recordsIn.size(), 99);
-        if(this.analyticsRS.isPaginationSupported()) {
-            Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", time + 1, time + timeOffset * 99 + 1), 99);
-        }
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 5, null, time + 1, time + timeOffset * 99, 0, -1));
         Assert.assertEquals(recordsIn.size(), 98);
-        if(this.analyticsRS.isPaginationSupported()) {
+        long count = this.analyticsRS.getRecordCount(7, "T1", time, time + timeOffset * 99);
+        if (count != -1) {
+            Assert.assertEquals(count, 99);
+            Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", time + 1, time + timeOffset * 99 + 1), 99);
             Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", time + 1, time + timeOffset * 99), 98);
         }
+
         records.remove(99);
         records.remove(0);
-        Assert.assertEquals(new HashSet<Record>(records), new HashSet<Record>(recordsIn));
+        Assert.assertEquals(new HashSet<>(records), new HashSet<>(recordsIn));
         this.cleanupT1();
     }
 
@@ -374,13 +367,12 @@ public class AnalyticsRecordStoreTest {
         List<Record> recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 2, null, time + 22, time + timeOffset * 100, 0, -1));
         Assert.assertEquals(recordsIn.size(), 97);
-        if(this.analyticsRS.isPaginationSupported()) {
-            Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", time + 22, time + timeOffset * 100), 97);
-        }
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 3, null, time, time + timeOffset * 96 - 2, 0, -1));
         Assert.assertEquals(recordsIn.size(), 96);
-        if(this.analyticsRS.isPaginationSupported()) {
+        long count = this.analyticsRS.getRecordCount(7, "T1", time + 22, time + timeOffset * 100);
+        if (count != -1) {
+            Assert.assertEquals(count, 97);
             Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", time, time + timeOffset * 96 - 2), 96);
         }
         this.cleanupT1();
@@ -397,15 +389,15 @@ public class AnalyticsRecordStoreTest {
         List<Record> recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 1, null, time - 100, time - 10, 0, -1));
         Assert.assertEquals(recordsIn.size(), 0);
-        if(this.analyticsRS.isPaginationSupported()) {
-            Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", time - 100, time - 10), 0);
-        }
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 2, null, time + timeOffset * 103, time + timeOffset * 110, 0, -1));
         Assert.assertEquals(recordsIn.size(), 0);
-        if(this.analyticsRS.isPaginationSupported()) {
+        long count = this.analyticsRS.getRecordCount(7, "T1", time - 100, time - 10);
+        if (count != -1) {
+            Assert.assertEquals(count, 0);
             Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", time + timeOffset * 103, time + timeOffset * 110), 0);
         }
+
         this.cleanupT1();
     }
 
@@ -435,12 +427,12 @@ public class AnalyticsRecordStoreTest {
         recordsIn1 = GenericUtils.listRecords(this.analyticsRS, this.analyticsRS.get(7, "T1", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 55, 73));
         Assert.assertEquals(recordsIn1.size(), 73);
         recordsIn1 = GenericUtils.listRecords(this.analyticsRS, this.analyticsRS.get(7, "T1", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
-        List<Record> recordsIn2 = new ArrayList<Record>();
+        List<Record> recordsIn2 = new ArrayList<>();
         for (int i = 0; i < 200; i += 20) {
             recordsIn2.addAll(GenericUtils.listRecords(this.analyticsRS, this.analyticsRS.get(7, "T1", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, i, 20)));
         }
         Assert.assertEquals(recordsIn2.size(), 200);
-        Assert.assertEquals(new HashSet<Record>(recordsIn1), new HashSet<Record>(recordsIn2));
+        Assert.assertEquals(new HashSet<>(recordsIn1), new HashSet<>(recordsIn2));
         this.cleanupT1();
     }
 
@@ -470,14 +462,14 @@ public class AnalyticsRecordStoreTest {
         recordsIn1 = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 3, null, time + 55, time + timeOffset * 198 - 5, 0, 200));
         Assert.assertEquals(recordsIn1.size(), 192);
-        List<Record> recordsIn2 = new ArrayList<Record>();
+        List<Record> recordsIn2 = new ArrayList<>();
         for (int i = 0; i < 200; i += 10) {
             recordsIn2.addAll(GenericUtils.listRecords(this.analyticsRS,
                     this.analyticsRS.get(7, "T1", 2, null, time + 55, time + timeOffset * 198 - 5, i, 10)));
         }
         Assert.assertEquals(recordsIn2.size(), 192);
-        Assert.assertEquals(new HashSet<Record>(recordsIn1), new HashSet<Record>(recordsIn2));
-        List<String> columns = new ArrayList<String>();
+        Assert.assertEquals(new HashSet<>(recordsIn1), new HashSet<>(recordsIn2));
+        List<String> columns = new ArrayList<>();
         columns.add("tenant");
         columns.add("ip");
         recordsIn1 = GenericUtils.listRecords(this.analyticsRS,
@@ -544,7 +536,7 @@ public class AnalyticsRecordStoreTest {
         this.analyticsRS.put(records);
         Assert.assertEquals(GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1)).size(), 10);
-        List<String> ids = new ArrayList<String>();
+        List<String> ids = new ArrayList<>();
         ids.add(records.get(2).getId());
         ids.add(records.get(5).getId());
         this.analyticsRS.delete(7, "T1", ids);
@@ -580,7 +572,7 @@ public class AnalyticsRecordStoreTest {
         Assert.assertEquals(recordsIn.size(), 98);
         records.remove(0);
         records.remove(0);
-        Assert.assertEquals(new HashSet<Record>(records), new HashSet<Record>(recordsIn));
+        Assert.assertEquals(new HashSet<>(records), new HashSet<>(recordsIn));
         this.analyticsRS.delete(7, "T1", time + timeOffset * 97, time + timeOffset * 101);
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 3, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
@@ -588,14 +580,14 @@ public class AnalyticsRecordStoreTest {
         records.remove(96);
         records.remove(95);
         Assert.assertEquals(recordsIn.size(), records.size());
-        Assert.assertEquals(new HashSet<Record>(records), new HashSet<Record>(recordsIn));
+        Assert.assertEquals(new HashSet<>(records), new HashSet<>(recordsIn));
         this.analyticsRS.delete(7, "T1", time + timeOffset * 5 - 2, time + timeOffset * 7 + 4);
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
                 this.analyticsRS.get(7, "T1", 3, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         records.remove(5);
         records.remove(4);
         records.remove(3);
-        Assert.assertEquals(new HashSet<Record>(records), new HashSet<Record>(recordsIn));
+        Assert.assertEquals(new HashSet<>(records), new HashSet<>(recordsIn));
         this.cleanupT1();
     }
 

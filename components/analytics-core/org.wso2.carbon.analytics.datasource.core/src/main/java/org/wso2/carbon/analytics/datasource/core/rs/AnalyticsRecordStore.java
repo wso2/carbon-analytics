@@ -62,13 +62,13 @@ public interface AnalyticsRecordStore {
     /**
      * Checks whether or not pagination (i.e. jumping to record n and then retrieving k further records)
      * is supported by the underlying record store implementation. Configurable.
-     *
      * @return Pagination/row-count support
      */
     boolean isPaginationSupported();
 
     /**
-     * Returns the number of records in the table with the given category and name.
+     * Returns the number of records in the table with the given category and name, -1 if the number of records cannot
+     * be determined reliably.
      * @param tenantId The tenant which this table belongs to
      * @param tableName The name of the table to get the count from
      * @param timeFrom The starting time to consider the count from, inclusive, relatively to epoch,
@@ -161,7 +161,7 @@ public interface AnalyticsRecordStore {
             throws AnalyticsException, AnalyticsTableNotAvailableException;
 
     /**
-     *  Destroys the AnalyticsRecordStore implementation and closes
+     *  Destroys the AnalyticsRecordStore instance and closes
      *  all connection transients initiated by the AnalyticsRecordStore
      *  implementation
      *  @throws AnalyticsException
