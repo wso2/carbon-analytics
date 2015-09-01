@@ -151,6 +151,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                     this.ringBuffer.publish(sequence);
                     return;
                 } catch (InsufficientCapacityException ignored) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                    }
                 }
             } while (isActiveDataEndpointExists());
         }

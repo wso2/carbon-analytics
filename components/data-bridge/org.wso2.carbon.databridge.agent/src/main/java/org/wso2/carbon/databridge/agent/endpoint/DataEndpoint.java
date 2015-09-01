@@ -77,10 +77,10 @@ public abstract class DataEndpoint {
         if (events.size() >= batchSize) {
             int currentNoOfThreads = threadPoolExecutor.getActiveCount();
             if (currentNoOfThreads < this.maxPoolSize) {
-                if (currentNoOfThreads >= this.maxPoolSize - 1) {
+                if (currentNoOfThreads == this.maxPoolSize - 1) {
                     this.setState(State.BUSY);
                 } else {
-                    this.setState(State.BUSY);
+                    this.setState(State.ACTIVE);
                 }
                 threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
                 events = new ArrayList<>();
@@ -258,6 +258,7 @@ public abstract class DataEndpoint {
                 log.error("Unexpected error occurred while sending the event. ", ex);
                 handleFailedEvents();
             } finally {
+                activate();
                 if (log.isDebugEnabled()) {
                     log.debug("Current threads count is : " + threadPoolExecutor.getActiveCount() + ", maxPoolSize is : " +
                             maxPoolSize + ", therefore state is now : " + getState() + "at time : " + System.nanoTime());
@@ -276,9 +277,6 @@ public abstract class DataEndpoint {
             Object client = getClient();
             send(client, this.events);
             returnClient(client);
-            if (threadPoolExecutor.getActiveCount() <= maxPoolSize) {
-                activate();
-            }
         }
     }
 
