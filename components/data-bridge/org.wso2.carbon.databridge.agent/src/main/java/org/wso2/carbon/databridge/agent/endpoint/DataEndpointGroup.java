@@ -204,7 +204,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
      */
     private DataEndpoint getDataEndpoint(boolean isBusyWait) {
         int startIndex;
-        if (haType.equals(HAType.FAILOVER)) {
+        if (haType.equals(HAType.LOADBALANCE)) {
             startIndex = getDataPublisherIndex();
         } else {
             startIndex = START_INDEX;
