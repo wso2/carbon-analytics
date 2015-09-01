@@ -205,7 +205,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
      */
     private DataEndpoint getDataEndpoint(boolean isBusyWait) {
         int startIndex;
-        if (haType.equals(HAType.FAILOVER)) {
+        if (haType.equals(HAType.LOADBALANCE)) {
             startIndex = getDataPublisherIndex();
         } else {
             startIndex = START_INDEX;
@@ -277,7 +277,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private synchronized int getDataPublisherIndex() {
         int index = currentDataPublisherIndex.getAndIncrement();
-        if (index == maximumDataPublisherIndex.get()) {
+        if (index == maximumDataPublisherIndex.get() - 1) {
             currentDataPublisherIndex.set(START_INDEX);
         }
         return index;
