@@ -59,7 +59,9 @@ public class RDBMSQueryConfigurationEntry {
         
     private int recordBatchSize = RDBMSAnalyticsDSConstants.RECORD_BATCH_SIZE;
 
-    private boolean paginationSupported = true;
+    private boolean paginationSupported;
+
+    private boolean recordCountSupported;
         
     private PaginationMode paginationMode;
     
@@ -360,6 +362,15 @@ public class RDBMSQueryConfigurationEntry {
 
     public void setPaginationSupported(boolean paginationSupported) {
         this.paginationSupported = paginationSupported;
+    }
+
+    @XmlElement(name = "recordCountSupported")
+    public boolean isRecordCountSupported() {
+        return recordCountSupported;
+    }
+
+    public void setRecordCountSupported(boolean recordCountSupported) {
+        this.recordCountSupported = recordCountSupported;
     }
 
     @XmlElement(name = "fetchSize", nillable = true)
