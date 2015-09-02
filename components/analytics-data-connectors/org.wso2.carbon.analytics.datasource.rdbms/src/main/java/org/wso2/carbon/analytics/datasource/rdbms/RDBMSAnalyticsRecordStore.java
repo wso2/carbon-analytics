@@ -643,33 +643,37 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     public boolean isPaginationSupported() {
         return this.rdbmsQueryConfigurationEntry.isPaginationSupported();
     }
-    
+
     @Override
-    public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) 
+    public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        String recordCountQuery = this.getRecordCountQuery(tenantId, tableName);
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        try {
-            conn = this.getConnection();
-            stmt = conn.prepareStatement(recordCountQuery);
-            stmt.setLong(1, timeFrom);
-            stmt.setLong(2, timeTo);
-            rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getLong(1);
-            } else {
-                throw new AnalyticsException("Record count not available for " + 
-                        printableTableName(tenantId, tableName));
+        if (this.rdbmsQueryConfigurationEntry.isRecordCountSupported()) {
+            String recordCountQuery = this.getRecordCountQuery(tenantId, tableName);
+            Connection conn = null;
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+            try {
+                conn = this.getConnection();
+                stmt = conn.prepareStatement(recordCountQuery);
+                stmt.setLong(1, timeFrom);
+                stmt.setLong(2, timeTo);
+                rs = stmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getLong(1);
+                } else {
+                    throw new AnalyticsException("Record count not available for " +
+                            printableTableName(tenantId, tableName));
+                }
+            } catch (SQLException e) {
+                if (conn != null && !this.tableExists(conn, tenantId, tableName)) {
+                    throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+                }
+                throw new AnalyticsException("Error in retrieving record count: " + e.getMessage(), e);
+            } finally {
+                RDBMSUtils.cleanupConnection(rs, stmt, conn);
             }
-        } catch (SQLException e) {
-            if (conn != null && !this.tableExists(conn, tenantId, tableName)) {
-                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
-            }
-            throw new AnalyticsException("Error in retrieving record count: " + e.getMessage(), e);
-        } finally {
-            RDBMSUtils.cleanupConnection(rs, stmt, conn);
+        } else {
+            return -1L;
         }
     }
     
