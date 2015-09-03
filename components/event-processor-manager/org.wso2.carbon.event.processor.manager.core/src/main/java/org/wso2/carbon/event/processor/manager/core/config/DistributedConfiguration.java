@@ -27,7 +27,12 @@ public class DistributedConfiguration implements Serializable {
 
     private boolean workerNode = false;
     private boolean managerNode = false;
+
+
+
+    private boolean presenterNode = false;
     private HostAndPort localManagerConfig = new HostAndPort("localhost", 8904);
+    private HostAndPort localPresenterConfig = new HostAndPort("localhost", 11000);
 
     private List<HostAndPort> managers = new ArrayList<HostAndPort>();
 
@@ -214,6 +219,18 @@ public class DistributedConfiguration implements Serializable {
 
     public void setUpdateRate(int updateRate) {
         this.updateRate = updateRate;
+    }
+
+    public boolean isPresenterNode() { return presenterNode; }
+
+    public void setPresenterNode(boolean presenterNode) { this.presenterNode = presenterNode;}
+
+    public HostAndPort getLocalPresenterConfig() {
+        return localPresenterConfig;
+    }
+
+    public void setLocalPresenterConfig(String host, int port) {
+        this.localPresenterConfig = new HostAndPort(host, port);
     }
 
 }

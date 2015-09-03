@@ -78,6 +78,7 @@ public final class ConfigurationConstants {
     public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE = "tcpEventPublisherSendBufferSize";
     public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET = "tcpEventPublisherCharSet";
     public static final String DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT = "tcpEventReceiverThreadCount";
+    public static final String DISTRIBUTED_NODE_CONFIG_PRESENTER_ELEMENT = "presenter";
 
     public static final String ENABLE_ATTRIBUTE = "enable";
 
