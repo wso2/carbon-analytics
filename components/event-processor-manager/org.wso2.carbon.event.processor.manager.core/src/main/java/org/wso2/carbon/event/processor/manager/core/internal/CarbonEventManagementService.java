@@ -424,7 +424,7 @@ public class CarbonEventManagementService implements EventManagementService {
             haEventPublisherTimeSyncMap = EventManagementServiceValueHolder.getHazelcastInstance()
                     .getMap(ConfigurationConstants.HA_EVENT_PUBLISHER_TIME_SYNC_MAP);
         }
-        Long latestTimePublished = haEventPublisherSyncMap.get(tenantId + "-" + publisherName);
+        Long latestTimePublished = haEventPublisherTimeSyncMap.get(tenantId + "-" + publisherName);
         if (latestTimePublished != null) {
             return latestTimePublished;
         }
