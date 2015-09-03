@@ -254,7 +254,7 @@ public class CarbonEventManagementService implements EventManagementService {
             members = publisherMembers;
         }
         if (members != null) {
-            for (HostAndPort member : receiverMembers) {
+            for (HostAndPort member : members) {
                 TCPEventPublisher publisher = tcpEventPublisherPool.get(member);
                 if (publisher != null) {
                     try {
@@ -322,13 +322,15 @@ public class CarbonEventManagementService implements EventManagementService {
 
                             EventSync eventSync = eventSyncMap.get(streamId);
 
-                            System.out.println("Event Received to :" + streamId);
+                            if (log.isDebugEnabled()) {
+                                log.debug("Event Received to :" + streamId);
+                            }
                             if (eventSync != null) {
                                 eventSync.process(new Event(timestamp, data));
                             }
 
                         } catch (Exception e) {
-                            log.error("Unable to start event adpaters for tenant :" + tenantId, e);
+                            log.error("Unable to start event adaptors for tenant :" + tenantId, e);
                         } finally {
                             PrivilegedCarbonContext.endTenantFlow();
                         }
@@ -386,7 +388,7 @@ public class CarbonEventManagementService implements EventManagementService {
                 }
                 tcpEventPublisherPool.putIfAbsent(member, tcpEventPublisher);
                 log.info("CEP sync publisher initiated to Member '" + member.getHostName() + ":" + member.getPort()
-                        + "'");
+                         + "'");
             }
         } catch (IOException e) {
             log.error("Error occurred while trying to start the publisher: " + e.getMessage(), e);
@@ -419,7 +421,7 @@ public class CarbonEventManagementService implements EventManagementService {
     public void updateLatestEventSentTime(String publisherName, int tenantId, long timestamp) {
 
         stormEventPublisherSyncMap.putAsync(tenantId + "-" + publisherName,
-                EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime());
+                                            EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime());
     }
 
     @Override
@@ -428,9 +430,9 @@ public class CarbonEventManagementService implements EventManagementService {
             stormEventPublisherSyncMap = EventManagementServiceValueHolder.getHazelcastInstance()
                     .getMap(ConfigurationConstants.STORM_EVENT_PUBLISHER_SYNC_MAP);
         }
-        Object latestTimePublished = stormEventPublisherSyncMap.get(tenantId + "-" + publisherName);
+        Long latestTimePublished = stormEventPublisherSyncMap.get(tenantId + "-" + publisherName);
         if (latestTimePublished != null) {
-            return (Long) latestTimePublished;
+            return latestTimePublished;
         }
         return 0;
     }
