@@ -61,6 +61,7 @@ public class AnalyticsComponent {
         }
         try {
             checkAnalyticsEnabled();
+            checkAnalyticsStatsEnabled();
             if (ServiceHolder.isAnalyticsEngineEnabled()) {
                 try {
                     int portOffset = CarbonUtils.getPortFromServerConfig(PORT_OFFSET_SERVER_PROP) + 1;
@@ -159,6 +160,18 @@ public class AnalyticsComponent {
                 if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_SPARK_CTX_JVM_OPTION) != null){
                     if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_SPARK_CTX_JVM_OPTION))) {
                         ServiceHolder.setAnalyticsSparkContextEnabled(false);
+                    }
+                }
+            }
+        }
+    }
+
+    private void checkAnalyticsStatsEnabled(){
+        if (initialized) {
+            if (ServiceHolder.isAnalyticsStatsEnabled()){
+                if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_STATS_OPTION) != null){
+                    if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_STATS_OPTION))) {
+                        ServiceHolder.setAnalyticsStatsEnabled(false);
                     }
                 }
             }
