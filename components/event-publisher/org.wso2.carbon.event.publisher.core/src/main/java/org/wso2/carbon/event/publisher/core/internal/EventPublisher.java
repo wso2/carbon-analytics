@@ -149,7 +149,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
     public void sendEvent(Event event) {
         if (isPolled && sendToOther) {
-            EventPublisherServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Publisher, event);
+            EventPublisherServiceValueHolder.getEventManagementService().syncEvent(syncId, event);
         }
         if (isPolled || !EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
             process(event);
