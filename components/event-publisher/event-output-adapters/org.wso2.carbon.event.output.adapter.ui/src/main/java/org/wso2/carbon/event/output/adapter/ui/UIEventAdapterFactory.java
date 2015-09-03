@@ -71,7 +71,7 @@ public class UIEventAdapterFactory extends OutputEventAdapterFactory {
 
     @Override
     public String getUsageTips() {
-        return resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_PREFIX)  + resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX);
+        return resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_PREFIX) + " "  + resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX);
     }
 
     @Override

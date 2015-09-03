@@ -325,6 +325,14 @@ public class ManagementModeConfigurationLoader {
                 int port = Integer.parseInt(manager.getFirstChildWithName(new QName(ConfigurationConstants.PORT_ELEMENT)).getText());
                 stormDeploymentConfig.setLocalManagerConfig(hostName, port);
             }
+
+            OMElement presenter = node.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_PRESENTER_ELEMENT));
+            if ("true".equalsIgnoreCase(presenter.getAttributeValue(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)))){
+                stormDeploymentConfig.setPresenterNode(true);
+                String hostName = presenter.getFirstChildWithName(new QName(ConfigurationConstants.HOST_NAME_ELEMENT)).getText();
+                int port = Integer.parseInt(presenter.getFirstChildWithName(new QName(ConfigurationConstants.PORT_ELEMENT)).getText());
+                stormDeploymentConfig.setLocalPresenterConfig(hostName, port);
+            }
         } else {
             log.info("No node type configurations provided. Hence using default node type configurations");
         }
