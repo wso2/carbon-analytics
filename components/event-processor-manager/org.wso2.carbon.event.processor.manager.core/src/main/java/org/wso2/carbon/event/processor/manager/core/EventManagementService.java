@@ -45,22 +45,12 @@ public interface EventManagementService {
      * This method syncs a particular event with the other node. Depending on the node type and address, the events
      * will be sent
      * @param syncId    stream id for which StreamRuntimeInfo needed in the StreamRuntimeInfo map
-     * @param type      node type
      * @param event     the event which is syncing with the other node
      */
-    public void syncEvent(String syncId, Manager.ManagerType type, Event event);
-
-
-    /**
-     * This method registers the events in the EventPublisher which needed to be synced
-     * @param eventSync contains the stream id
-     */
+    public void syncEvent(String syncId, Event event);
+    
     public void registerEventSync(EventSync eventSync);
 
-    /**
-     * This method unregisters the events in the EventPublisher which scheduled to be synced
-     * @param syncId id of the events to be synced by the EventPublisher
-     */
     public void unregisterEventSync(String syncId);
 
     /**
