@@ -122,7 +122,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         if (statisticsEnabled) {
             this.statisticsMonitor = EventPublisherServiceValueHolder.getEventStatisticsService().
                     getEventStatisticMonitor(tenantId, EventPublisherConstants.EVENT_PUBLISHER,
-                                             eventPublisherConfiguration.getEventPublisherName(), null);
+                            eventPublisherConfiguration.getEventPublisherName(), null);
         }
         if (traceEnabled) {
             this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER +
@@ -166,7 +166,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
     public void sendEvent(Event event) {
         if (isPolled && sendToOther) {
-            EventPublisherServiceValueHolder.getEventManagementService().syncEvent(syncId, event);
+            EventPublisherServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Publisher, event);
         }
         if (isPolled || !EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
             process(event);
@@ -344,7 +344,8 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     }
 
     public void prepareDestroy() {
-        if (EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA) {
+        if (EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA &&
+                EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getHaConfiguration().isWorkerNode()) {
             EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
                     eventPublisherConfiguration.getEventPublisherName(), tenantId,
                     EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis());

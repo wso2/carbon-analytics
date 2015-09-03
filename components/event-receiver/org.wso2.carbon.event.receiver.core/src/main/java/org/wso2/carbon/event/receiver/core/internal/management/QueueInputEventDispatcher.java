@@ -130,7 +130,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
                         readLock.unlock();
                         callBack.sendEvent(event);
                         if (isSendToOther()) {
-                            EventReceiverServiceValueHolder.getEventManagementService().syncEvent(syncId, event);
+                            EventReceiverServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Receiver, event);
                         }
                     } catch (InterruptedException e) {
                         log.error("Interrupted while waiting to get an event from queue.", e);

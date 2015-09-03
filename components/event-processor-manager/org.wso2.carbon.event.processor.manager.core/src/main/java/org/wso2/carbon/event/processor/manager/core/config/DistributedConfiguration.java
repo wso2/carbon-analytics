@@ -27,9 +27,6 @@ public class DistributedConfiguration implements Serializable {
 
     private boolean workerNode = false;
     private boolean managerNode = false;
-
-
-
     private boolean presenterNode = false;
     private HostAndPort localManagerConfig = new HostAndPort("localhost", 8904);
     private HostAndPort localPresenterConfig = new HostAndPort("localhost", 11000);
@@ -55,6 +52,9 @@ public class DistributedConfiguration implements Serializable {
     private int tcpEventPublisherSendBufferSize = 5242880;
     private String tcpEventPublisherCharSet = "UTF-8";
     private int tcpEventReceiverThreadCount = 10;
+
+    private int presenterServerThreads;
+
 
     /**
      * Status monitor configs
@@ -231,6 +231,14 @@ public class DistributedConfiguration implements Serializable {
 
     public void setLocalPresenterConfig(String host, int port) {
         this.localPresenterConfig = new HostAndPort(host, port);
+    }
+
+    public void setPresenterServerThreads(int presenterServerThreads) {
+        this.presenterServerThreads = presenterServerThreads;
+    }
+
+    public int getPresenterServerThreads() {
+        return presenterServerThreads;
     }
 
 }

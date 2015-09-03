@@ -141,9 +141,9 @@ public class HAManager {
         HashMap<Manager.ManagerType, byte[]> stateMap = new HashMap<Manager.ManagerType, byte[]>();
 
         List<HostAndPort> receiverList = new ArrayList<HostAndPort>();
-        receiverList.add(otherMember.getTransport());
-        eventManagementService.setSyncMembers(receiverList);
-        eventManagementService.addMember(otherMember.getTransport());
+        receiverList.add(otherMember.getEventSyncConfig());
+        eventManagementService.setSyncReceivers(receiverList);
+        eventManagementService.addMember(otherMember.getEventSyncConfig());
 
         if (eventProcessorManagementService != null) {
             eventProcessorManagementService.pause();
@@ -198,9 +198,9 @@ public class HAManager {
                 .getEventPublisherManagementService();
 
         roleToMembershipMap.set(activeId, haConfiguration);
-        eventManagementService.setSyncMembers(new ArrayList<HostAndPort>());
+        eventManagementService.setSyncReceivers(new ArrayList<HostAndPort>());
         if (otherMember != null) {
-            eventManagementService.removeMember(otherMember.getTransport());
+            eventManagementService.removeMember(otherMember.getEventSyncConfig());
         }
         otherMember = null;
 
@@ -223,9 +223,9 @@ public class HAManager {
         final CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder
                 .getCarbonEventManagementService();
         List<HostAndPort> receiverList = new ArrayList<HostAndPort>();
-        receiverList.add(otherMember.getTransport());
-        eventManagementService.setSyncMembers(receiverList);
-        eventManagementService.addMember(otherMember.getTransport());
+        receiverList.add(otherMember.getEventSyncConfig());
+        eventManagementService.setSyncReceivers(receiverList);
+        eventManagementService.addMember(otherMember.getEventSyncConfig());
 
         executorService.execute(new Runnable() {
             @Override
@@ -269,7 +269,7 @@ public class HAManager {
         ManagementServiceClient client = new ManagementServiceClientThriftImpl();
         byte[] state = null;
         try {
-            state = client.getSnapshot(activeMember.getManagement());
+            state = client.getSnapshot(activeMember.getManagementConfig());
         } catch (Throwable e) {
             log.error(e);
         }
@@ -322,7 +322,7 @@ public class HAManager {
 
         public void start(HAConfiguration config) {
 
-            HostAndPort management = config.getManagement();
+            HostAndPort management = config.getManagementConfig();
             try {
                 TServerSocket serverTransport = new TServerSocket(
                         new InetSocketAddress(management.getHostName(), management.getPort()));
