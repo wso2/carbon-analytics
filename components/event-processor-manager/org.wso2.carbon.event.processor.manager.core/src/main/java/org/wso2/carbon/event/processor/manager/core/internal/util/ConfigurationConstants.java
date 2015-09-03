@@ -90,7 +90,7 @@ public final class ConfigurationConstants {
     public static final long AXIS_TIME_INTERVAL_IN_MILLISECONDS = 10000;
     public static enum HAMode {Active, Passive, Backup}
 
-    public static final String STORM_EVENT_PUBLISHER_SYNC_MAP = "stormEventPublisherSyncMap";
+    public static final String HA_EVENT_PUBLISHER_TIME_SYNC_MAP = "haEventPublisherTimeSyncMap";
 
     public static final String PROPERTY_META_PREFIX = "meta_";
     public static final String PROPERTY_CORRELATION_PREFIX = "correlation_";

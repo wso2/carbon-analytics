@@ -141,8 +141,8 @@ public class HAManager {
         HashMap<Manager.ManagerType, byte[]> stateMap = new HashMap<Manager.ManagerType, byte[]>();
 
         List<HostAndPort> receiverList = new ArrayList<HostAndPort>();
-        receiverList.add(passiveMember.getTransport());
-        eventManagementService.setReceiverMembers(receiverList);
+        receiverList.add(otherMember.getTransport());
+        eventManagementService.setSyncMembers(receiverList);
         eventManagementService.addMember(otherMember.getTransport());
 
         if (eventProcessorManagementService != null) {
@@ -198,7 +198,7 @@ public class HAManager {
                 .getEventPublisherManagementService();
 
         roleToMembershipMap.set(activeId, haConfiguration);
-        eventManagementService.setReceiverMembers(new ArrayList<HostAndPort>());
+        eventManagementService.setSyncMembers(new ArrayList<HostAndPort>());
         if (otherMember != null) {
             eventManagementService.removeMember(otherMember.getTransport());
         }
@@ -224,7 +224,7 @@ public class HAManager {
                 .getCarbonEventManagementService();
         List<HostAndPort> receiverList = new ArrayList<HostAndPort>();
         receiverList.add(otherMember.getTransport());
-        eventManagementService.setReceiverMembers(receiverList);
+        eventManagementService.setSyncMembers(receiverList);
         eventManagementService.addMember(otherMember.getTransport());
 
         executorService.execute(new Runnable() {

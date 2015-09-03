@@ -29,7 +29,7 @@ public interface EventManagementService {
 
     public void unsubscribe(Manager manager);
 
-    public void syncEvent(String syncId, Manager.ManagerType type, Event event);
+    public void syncEvent(String syncId, Event event);
 
     public void registerEventSync(EventSync eventSync);
 
