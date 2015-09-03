@@ -44,6 +44,7 @@ public class AnalyticsConstants {
     public static final String DISABLE_ANALYTICS_EXECUTION_JVM_OPTION = "disableAnalyticsExecution";
     public static final String DISABLE_ANALYTICS_ENGINE_JVM_OPTION = "disableAnalyticsEngine";
     public static final String DISABLE_ANALYTICS_SPARK_CTX_JVM_OPTION = "disableAnalyticsSparkCtx";
+    public static final String DISABLE_ANALYTICS_STATS_OPTION = "disableAnalyticsStats";
 
     // spark DataType strings
     public static final String STRING_TYPE = "string";

@@ -62,6 +62,8 @@ public class ServiceHolder {
 
     private static boolean analyticsSparkContextEnabled = true;
 
+    private static boolean analyticsStatsEnabled = true;
+
     public static void setTaskService(TaskService taskService) {
         ServiceHolder.taskService = taskService;
     }
@@ -141,5 +143,14 @@ public class ServiceHolder {
     public static boolean isAnalyticsSparkContextEnabled() {
         return analyticsSparkContextEnabled;
     }
+
+    public static boolean isAnalyticsStatsEnabled() {
+        return analyticsStatsEnabled;
+    }
+
+    public static void setAnalyticsStatsEnabled(boolean analyticsStatsEnabled) {
+        ServiceHolder.analyticsStatsEnabled = analyticsStatsEnabled;
+    }
+
 
 }

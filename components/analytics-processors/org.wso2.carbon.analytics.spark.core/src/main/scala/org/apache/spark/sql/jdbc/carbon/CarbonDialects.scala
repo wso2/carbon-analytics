@@ -29,7 +29,7 @@ case object DialectRegister {
   def register(): Unit = {
     JdbcDialects.registerDialect(PostgresDialect)
     JdbcDialects.registerDialect(OracleDialect)
-    JdbcDialects.registerDialect(MySQLDialect)
+//    JdbcDialects.registerDialect(MySQLDialect)
     JdbcDialects.registerDialect(MSSQLDialect)
     JdbcDialects.registerDialect(DB2Dialect)
   }

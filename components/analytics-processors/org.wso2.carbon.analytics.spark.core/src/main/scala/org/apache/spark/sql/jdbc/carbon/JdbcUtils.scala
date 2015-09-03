@@ -55,13 +55,14 @@ object JdbcUtils {
     //using the rdbms-query-config.xml to get the table exists query
     val qConfEntry = getQueryConfigEntry(conn)
     val query = {
-      qConfEntry.getRecordTableDeleteQueries.head.replace("{{TABLE_NAME}}", table)
+      val queries = qConfEntry.getRecordTableDeleteQueries
+      queries(queries.length - 1).replace("{{TABLE_NAME}}", table)
     }
     conn.prepareStatement(query).executeUpdate()
     conn.commit()
   }
 
-  private def getQueryConfigEntry(conn: Connection): RDBMSQueryConfigurationEntry ={
+  private def getQueryConfigEntry(conn: Connection): RDBMSQueryConfigurationEntry = {
     val qConf = RDBMSUtils.loadQueryConfiguration()
     val dbType = conn.getMetaData.getDatabaseProductName
 
