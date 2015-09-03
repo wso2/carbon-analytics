@@ -134,9 +134,12 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         } catch (OutputEventAdapterException e) {
             throw new EventPublisherConfigurationException("Error in creating Event Publisher :" + eventPublisherConfiguration.getEventPublisherName() + ", " + e.getMessage(), e);
         }
-        syncId = EventManagementUtil.constructEventSyncId(tenantId, eventPublisherConfiguration.getToAdapterConfiguration().getName(), Manager.ManagerType.Publisher);
-        sendToOther = EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.Distributed;
+        syncId = EventManagementUtil.constructEventSyncId(tenantId, eventPublisherConfiguration.getToAdapterConfiguration().getName(),
+                Manager.ManagerType.Publisher);
         streamDefinition = EventManagementUtil.constructStreamDefinition(syncId, inputStreamDefinition);
+        sendToOther = EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.Distributed &&
+                      EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getDistributedConfiguration().isWorkerNode();
+
         EventPublisherServiceValueHolder.getEventManagementService().registerEventSync(this);
     }
 
