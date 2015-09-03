@@ -37,6 +37,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.rdd.AnalyticsRDD;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
+import org.wso2.carbon.analytics.spark.core.util.CarbonScalaUtils;
 import scala.reflect.ClassTag$;
 
 import java.io.Serializable;
@@ -138,11 +139,21 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
                 dataService.createTable(this.tenantId, this.recordStore, this.tableName);
                 dataService.setTableSchema(this.tenantId, this.tableName, tempSchema);
             }
-            data.foreachPartition(new AnalyticsWritingFunction(tenantId, tableName, data.schema()));
+
+            writeDataFrameToDAL(data);
         } catch (AnalyticsException e) {
             String msg = "Error while inserting data into table " + tableName;
             log.error(msg, e);
             throw new RuntimeException(msg, e);
+        }
+    }
+
+    private void writeDataFrameToDAL (DataFrame data){
+        for (int i = 0; i < data.rdd().partitions().length; i++) {
+            data.sqlContext().sparkContext().runJob(data.rdd(),
+                                                    new AnalyticsWritingFunction(tenantId, tableName, data.schema()),
+                                                    CarbonScalaUtils.getNumberSeq(i, i + 1), false,
+                                                    ClassTag$.MODULE$.Unit());
         }
     }
 
