@@ -139,7 +139,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         }
         this.initIndexedTableStore();
         this.indexer = new AnalyticsDataIndexer(this.getIndexStagingRecordStore(), this.analyticsFileSystem, this,
-                                                this.indexedTableStore, config.getShardCount(), luceneAnalyzer);
+                                                this.indexedTableStore, config.getShardCount(), 
+                                                this.calculateIndexingThreadCount(config), luceneAnalyzer);
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
@@ -147,6 +148,17 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         } 
         this.indexer.init();
         this.initDataPurging(config);
+    }
+    
+    private int calculateIndexingThreadCount(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
+        int indexingThreadCount = config.getIndexingThreadCount();
+        if (indexingThreadCount == -1 || indexingThreadCount == 0) {
+            indexingThreadCount = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
+        } else if (indexingThreadCount < 0 || indexingThreadCount > 100) {
+            throw new AnalyticsException("The 'indexingThreadCount' property value must be either -1 "
+                    + "for auto detect or between 1 and 100");
+        }
+        return indexingThreadCount;
     }
     
     private void initIndexedTableStore() throws AnalyticsException {

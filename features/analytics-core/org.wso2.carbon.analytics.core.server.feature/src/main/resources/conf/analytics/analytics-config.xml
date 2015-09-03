@@ -16,11 +16,11 @@
 ~ specific language governing permissions and limitations
 ~ under the License.
 -->
-
-
 <analytics-dataservice-configuration>
    <!-- The name of the primary record store -->
    <primaryRecordStore>EVENT_STORE</primaryRecordStore>
+   <!-- The name of the index staging record store -->
+   <indexStagingRecordStore>EVENT_STORE</indexStagingRecordStore>
    <!-- Analytics File System - properties related to index storage implementation -->
    <analytics-file-system>
       <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsFileSystem</implementation>
@@ -46,8 +46,11 @@
    <analytics-lucene-analyzer>
    	<implementation>org.apache.lucene.analysis.standard.StandardAnalyzer</implementation>
    </analytics-lucene-analyzer>
+   <!-- The maximum number of threads used for indexing per node, -1 signals to aute detect the optimum value,
+        where it would be equal to (number of CPU cores in the system - 1) -->
+   <indexingThreadCount>-1</indexingThreadCount>
    <!-- The number of index shards, should be equal or higher to the number of indexing nodes that is going to be working,
-        ideal count being 'number of indexing nodes * CPU cores' -->
+        ideal count being 'number of indexing nodes * [CPU cores used for indexing per node]' -->
    <shardCount>6</shardCount>
    <!-- Data purging related configuration -->
    <analytics-data-purging>

@@ -183,6 +183,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     private int shardCount;
     
+    private int indexingThreadCount;
+    
     private ExecutorService shardWorkerExecutor;
     
     private List<IndexWorker> workers;
@@ -195,13 +197,15 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     public AnalyticsDataIndexer(AnalyticsRecordStore analyticsRecordStore, 
             AnalyticsFileSystem analyticsFileSystem, AnalyticsDataService analyticsDataService,
-            AnalyticsIndexedTableStore indexedTableStore, int shardCount, Analyzer analyzer) throws AnalyticsException {
+            AnalyticsIndexedTableStore indexedTableStore, int shardCount,
+            int indexingThreadCount, Analyzer analyzer) throws AnalyticsException {
     	this.luceneAnalyzer = analyzer;
         this.analyticsRecordStore = analyticsRecordStore;    	
     	this.analyticsFileSystem = analyticsFileSystem;
         this.analyticsDataService = analyticsDataService;
         this.indexedTableStore = indexedTableStore;
-    	this.shardCount = shardCount;        
+    	this.shardCount = shardCount;
+    	this.indexingThreadCount = indexingThreadCount;
     }
     
     /**
@@ -277,7 +281,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     private int getIndexingThreadCount() {
-        return Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
+        return indexingThreadCount;
     }
     
     public AnalyticsFileSystem getFileSystem() {

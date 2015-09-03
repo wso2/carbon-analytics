@@ -43,6 +43,8 @@ public class AnalyticsDataServiceConfiguration {
     
     private int shardCount;
     
+    private int indexingThreadCount;
+    
     private int recordsBatchSize = Constants.RECORDS_BATCH_SIZE;
     
     @XmlElement (name = "analytics-record-store", nillable = false)
@@ -105,6 +107,15 @@ public class AnalyticsDataServiceConfiguration {
     
     public void setShardCount(int shardCount) {
         this.shardCount = shardCount;
+    }
+    
+    @XmlElement (name = "indexingThreadCount", defaultValue = "-1")
+    public int getIndexingThreadCount() {
+        return indexingThreadCount;
+    }
+    
+    public void setIndexingThreadCount(int indexingThreadCount) {
+        this.indexingThreadCount = indexingThreadCount;
     }
 
     @XmlElement (name = "recordsBatchSize", defaultValue = "1000")
