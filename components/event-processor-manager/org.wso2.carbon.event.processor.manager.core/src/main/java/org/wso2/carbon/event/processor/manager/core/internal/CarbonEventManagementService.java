@@ -326,7 +326,7 @@ public class CarbonEventManagementService implements EventManagementService {
                             }
 
                         } catch (Exception e) {
-                            log.error("Unable to start event adpaters for tenant :" + tenantId, e);
+                            log.error("Unable to start event adaptors for tenant :" + tenantId, e);
                         } finally {
                             PrivilegedCarbonContext.endTenantFlow();
                         }
@@ -424,9 +424,9 @@ public class CarbonEventManagementService implements EventManagementService {
             haEventPublisherTimeSyncMap = EventManagementServiceValueHolder.getHazelcastInstance()
                     .getMap(ConfigurationConstants.HA_EVENT_PUBLISHER_TIME_SYNC_MAP);
         }
-        Object latestTimePublished = haEventPublisherTimeSyncMap.get(tenantId + "-" + publisherName);
+        Long latestTimePublished = haEventPublisherTimeSyncMap.get(tenantId + "-" + publisherName);
         if (latestTimePublished != null) {
-            return (Long) latestTimePublished;
+            return latestTimePublished;
         }
         return 0;
     }
