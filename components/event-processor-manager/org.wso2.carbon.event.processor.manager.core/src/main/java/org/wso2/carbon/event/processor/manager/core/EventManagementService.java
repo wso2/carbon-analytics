@@ -23,38 +23,54 @@ public interface EventManagementService {
 
     /**
      * This method returns the {@link ManagementModeInfo} which contains the node type and its configurations
+     *
      * @return {@link ManagementModeInfo}
      */
     ManagementModeInfo getManagementModeInfo();
 
     /**
      * This method specifies the node type
-     * @param manager   manager node can be either a {@link EventProcessorManagementService},
-     *                  {@link EventReceiverManagementService} or {@link EventPublisherManagementService}
+     *
+     * @param manager manager node can be either a {@link EventProcessorManagementService},
+     *                {@link EventReceiverManagementService} or {@link EventPublisherManagementService}
      */
     void subscribe(Manager manager);
 
     /**
      * This method unsubscribes the node according to the {@link Manager} type
-     * @param manager   manager node can be either a {@link EventProcessorManagementService},
-     *                  {@link EventReceiverManagementService} or {@link EventPublisherManagementService}
+     *
+     * @param manager manager node can be either a {@link EventProcessorManagementService},
+     *                {@link EventReceiverManagementService} or {@link EventPublisherManagementService}
      */
     void unsubscribe(Manager manager);
 
     /**
      * This method syncs a particular event with the other node. Depending on the node type and address, the events
      * will be sent
-     * @param syncId    stream id for which StreamRuntimeInfo needed in the StreamRuntimeInfo map
-     * @param event     the event which is syncing with the other node
+     *
+     * @param syncId stream id for which StreamRuntimeInfo needed in the StreamRuntimeInfo map
+     * @param type   syncing event type
+     * @param event  the event which is syncing with the other node
      */
-    void syncEvent(String syncId, Event event);
-    
+    void syncEvent(String syncId, Manager.ManagerType type, Event event);
+
+    /**
+     * This method registers the events in the EventPublisher which needed to be synced
+     * 
+     * @param eventSync contains the stream id
+     */
     void registerEventSync(EventSync eventSync);
 
+    /**
+     * This method unregisters the events in the EventPublisher which scheduled to be synced
+     * 
+     * @param syncId id of the events to be synced by the EventPublisher
+     */
     void unregisterEventSync(String syncId);
 
     /**
      * This method updates the hazelcast map with the latest processed event details
+     *
      * @param publisherName event publisher name
      * @param tenantId      tenant id
      * @param timestamp     hazelcast cluster time
@@ -63,6 +79,7 @@ public interface EventManagementService {
 
     /**
      * This method gets the latest event processed time
+     *
      * @param publisherName event publisher name
      * @param tenantId      tenant id
      */
