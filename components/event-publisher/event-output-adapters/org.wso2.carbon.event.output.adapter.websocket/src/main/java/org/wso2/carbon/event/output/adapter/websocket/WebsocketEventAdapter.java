@@ -208,10 +208,6 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
                         session.getBasicRemote().sendText(message);
                     } catch (IOException e) {
                         EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to endpoint", e, log, tenantId);
-                        throw new ConnectionUnavailableException(e);
-                    } catch (IllegalStateException ise) {
-                        EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to endpoint", ise, log, tenantId);
-                        throw new ConnectionUnavailableException(ise);
                     }
                 }
             } else if (doLogDroppedMessage) {
