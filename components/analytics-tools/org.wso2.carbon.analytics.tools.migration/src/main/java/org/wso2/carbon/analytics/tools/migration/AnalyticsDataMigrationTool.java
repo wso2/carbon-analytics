@@ -300,7 +300,7 @@ public class AnalyticsDataMigrationTool {
             case DOUBLE_TYPE:
                 return DoubleSerializer.get().fromByteBuffer(bytes);
             default:
-                return StringSerializer.get().fromByteBuffer(bytes);
+                return "";
         }
     }
 }
