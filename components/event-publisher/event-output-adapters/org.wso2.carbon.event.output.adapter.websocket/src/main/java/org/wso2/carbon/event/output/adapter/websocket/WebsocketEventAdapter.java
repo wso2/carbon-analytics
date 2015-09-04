@@ -137,14 +137,11 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
     public void publish(Object message, Map<String, String> dynamicProperties) {
         try {
             if (session == null) {
-                throw new ConnectionUnavailableException("Connection was not available when trying to publish a message via the adapter: "
-                                                         + eventAdapterConfiguration.getName() + ", for tenant ID: " + tenantId
-                                                         + " as the session was null. \n Message: \n" + message);
+                throw new ConnectionUnavailableException("Session was not available when trying to publish via adapter: " + eventAdapterConfiguration.getName() +
+                                                         ", tenant ID: " + tenantId + "\n Event: \n" + message);
             } else if (!session.isOpen()) {
-                throw new ConnectionUnavailableException("Connection was not available when trying to publish a message via the adapter: "
-                                                         + eventAdapterConfiguration.getName() + ", for tenant ID: " + tenantId
-                                                         + " as the session was not open. Session ID:"
-                                                         + session.getId() + " \n Message: \n" + message);
+                throw new ConnectionUnavailableException("Session was not open when trying to publish via adapter: " + eventAdapterConfiguration.getName() +
+                                                         ", for tenant ID: " + tenantId + ". Session ID: " + session.getId() + " \n Event: \n" + message);
             } else {
                 executorService.execute(new WebSocketSender(message.toString()));
             }
