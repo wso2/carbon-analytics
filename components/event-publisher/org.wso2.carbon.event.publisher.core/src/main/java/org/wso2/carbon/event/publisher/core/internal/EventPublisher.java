@@ -155,8 +155,10 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
                                                           eventPublisherConfiguration.getToAdapterConfiguration().getName(),
                                                           Manager.ManagerType.Publisher);
 
-        sendToOther = EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.Distributed;
         streamDefinition = EventManagementUtil.constructStreamDefinition(syncId, inputStreamDefinition);
+        sendToOther = EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.Distributed &&
+                      EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getDistributedConfiguration().isWorkerNode();
+
         EventPublisherServiceValueHolder.getEventManagementService().registerEventSync(this);
     }
 
