@@ -154,6 +154,8 @@ public class AnalyticsDataMigrationTool {
             System.out.println("Intializing [tenant=" + tenantId + "] [serverUrl='" + serverUrl + "'] " +
                                "[port='" + port + "'] [columnFamily='" + columnFamily + "'] " +
                                "[analyticTable='" + analyticTable + "']...");
+
+            //configuring the cassandra cluster and the keyspace
             if (cassandraUser != null && cassandraPassword != null) {
                 Map<String, String> credentials = new HashMap<>();
                 credentials.put("username", cassandraUser);
@@ -229,7 +231,7 @@ public class AnalyticsDataMigrationTool {
                 service.put(records);
                 records.clear();
 
-                // all rows are read
+                // check if all rows are read
                 if (orderedRows.getCount() != batchSize)
                     break;
             }
