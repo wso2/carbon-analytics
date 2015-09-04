@@ -242,7 +242,7 @@ public class HAManager {
                         log.error("CEP HA State syncing failed, " + e.getMessage(), e);
                     }
                     try {
-                        Thread.sleep(haConfiguration.getSyncStateRetryInterval());
+                        Thread.sleep(haConfiguration.getManagementStateSyncRetryInterval());
                     } catch (InterruptedException e) {
                     }
                 }
@@ -314,7 +314,7 @@ public class HAManager {
         public void run() {
             tryChangeState();
             if (!activeLockAcquired) {
-                stateChanger = executorService.schedule(this, haConfiguration.getTryStateChangeInterval(), TimeUnit.MILLISECONDS);
+                stateChanger = executorService.schedule(this, haConfiguration.getManagementTryStateChangeInterval(), TimeUnit.MILLISECONDS);
             }
         }
     }

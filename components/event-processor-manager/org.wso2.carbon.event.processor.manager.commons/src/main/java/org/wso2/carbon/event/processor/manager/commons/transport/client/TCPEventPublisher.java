@@ -20,6 +20,7 @@ package org.wso2.carbon.event.processor.manager.commons.transport.client;
 
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventHandler;
+import com.lmax.disruptor.InsufficientCapacityException;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import org.apache.log4j.Logger;
@@ -138,7 +139,7 @@ public class TCPEventPublisher {
      * @param eventData data to send
      * @throws java.io.IOException
      */
-    public void sendEvent(String streamId, long timestamp, Object[] eventData, boolean flush) throws IOException {
+    public void sendEvent(String streamId, long timestamp, Object[] eventData, boolean flush) throws IOException, InsufficientCapacityException {
         StreamRuntimeInfo streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
 
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
@@ -194,8 +195,8 @@ public class TCPEventPublisher {
         }
     }
 
-    private void publishToDisruptor(byte[] byteArray) {
-        long sequenceNo = ringBuffer.next();
+    private void publishToDisruptor(byte[] byteArray) throws InsufficientCapacityException {
+        long sequenceNo = ringBuffer.tryNext();
         try {
             ByteArrayHolder existingHolder = ringBuffer.get(sequenceNo);
             existingHolder.bytes = byteArray;
@@ -211,7 +212,7 @@ public class TCPEventPublisher {
         }
     }
 
-    private void publishEventAsync(byte[] data, boolean flush) throws IOException {
+    private synchronized void publishEventAsync(byte[] data, boolean flush) throws IOException {
         if (outputStream != null) {
             try {
                 outputStream.write(data);
@@ -352,7 +353,9 @@ public class TCPEventPublisher {
             } catch (IOException e) {
                 log.warn("Ping failed to " + getHostUrl() + " with error: " + e.getMessage());
                 connectionStatusCheckTimer.cancel();
-                failureHandler.onConnectionFail(e);
+                if (failureHandler != null) {
+                    failureHandler.onConnectionFail(e);
+                }
 
             }
         }
