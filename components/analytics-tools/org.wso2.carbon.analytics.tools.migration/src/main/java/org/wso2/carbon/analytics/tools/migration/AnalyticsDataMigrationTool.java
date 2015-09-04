@@ -43,11 +43,10 @@ import org.apache.commons.cli.*;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 /**
- * This class represents the Migration functionality, from Cassandra to new DAL
+ * This class represents the Migration functionality, from Cassandra to new DAL.
  */
 public class AnalyticsDataMigrationTool {
 
@@ -85,6 +84,9 @@ public class AnalyticsDataMigrationTool {
     private static final String TIME_UUID_TYPE = "org.apache.cassandra.db.marshal.TimeUUIDType";
     private static final String ASCII_TYPE = "org.apache.cassandra.db.marshal.AsciiType";
     private static final String BYTE_TYPE = "org.apache.cassandra.db.marshal.ByteType";
+    private static final String BOOLEAN_TYPE = "org.apache.cassandra.db.marshal.BooleanType";
+    private static final String FLOAT_TYPE = "org.apache.cassandra.db.marshal.FloatType";
+    private static final String DOUBLE_TYPE = "org.apache.cassandra.db.marshal.DoubleType";
 
     public static void main(String[] args) throws Exception {
         Options options = new Options();
@@ -289,8 +291,14 @@ public class AnalyticsDataMigrationTool {
                 return AsciiSerializer.get().fromByteBuffer(bytes);
             case BYTE_TYPE:
                 return ByteBufferSerializer.get().fromByteBuffer(bytes);
+            case BOOLEAN_TYPE:
+                return BooleanSerializer.get().fromByteBuffer(bytes);
+            case FLOAT_TYPE:
+                return FloatSerializer.get().fromByteBuffer(bytes);
+            case DOUBLE_TYPE:
+                return DoubleSerializer.get().fromByteBuffer(bytes);
             default:
-                return ByteBufferSerializer.get().fromByteBuffer(bytes);
+                return StringSerializer.get().fromByteBuffer(bytes);
         }
     }
 }
