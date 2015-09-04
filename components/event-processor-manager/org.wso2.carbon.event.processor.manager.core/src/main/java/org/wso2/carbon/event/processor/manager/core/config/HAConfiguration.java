@@ -23,34 +23,69 @@ import java.io.Serializable;
 
 
 public class HAConfiguration implements Serializable {
-    private HostAndPort management;
-    private HostAndPort transport;
-    private int reconnectionInterval;
+
+    private boolean workerNode = false;
+    private boolean presenterNode = false;
+    private HostAndPort localPresenterConfig = new HostAndPort("localhost", 11000);
+
+    private HostAndPort managementConfig;
+    private HostAndPort eventSyncConfig;
+    private int eventSyncReconnectionInterval;
+    private int eventSyncServerThreads;
+    private int presenterServerThreads;
     private String memberUuid;
 
-    public int getReconnectionInterval() {
-        return reconnectionInterval;
+    public boolean isWorkerNode() {
+        return workerNode;
     }
 
-    public void setReconnectionInterval(int reconnectionInterval) {
-        this.reconnectionInterval = reconnectionInterval;
+    public void setWorkerNode(boolean workerNode) {
+        this.workerNode = workerNode;
     }
 
-    public HostAndPort getManagement() {
-        return management;
+    public boolean isPresenterNode() {
+        return presenterNode;
     }
 
-    public HostAndPort getTransport() {
-        return transport;
+    public void setPresenterNode(boolean presenterNode) {
+        this.presenterNode = presenterNode;
+    }
+
+    public HostAndPort getLocalPresenterConfig() {
+        return localPresenterConfig;
+    }
+
+    public void setLocalPresenterConfig(String host, int port) {
+        this.localPresenterConfig = new HostAndPort(host, port);
+    }
+
+    public int getEventSyncReconnectionInterval() {
+        return eventSyncReconnectionInterval;
+    }
+
+    public int getEventSyncServerThreads() {
+        return eventSyncServerThreads;
+    }
+
+    public void setEventSyncServerThreads(int eventSyncServerThreads) {
+        this.eventSyncServerThreads = eventSyncServerThreads;
+    }
+
+    public HostAndPort getManagementConfig() {
+        return managementConfig;
+    }
+
+    public HostAndPort getEventSyncConfig() {
+        return eventSyncConfig;
     }
 
     public void setManagement(String host, int port) {
-        this.management = new HostAndPort(host, port);
+        this.managementConfig = new HostAndPort(host, port);
     }
 
     public void setTransport(String host, int port, int reconnectionInterval) {
-        this.transport = new HostAndPort(host, port);
-        this.reconnectionInterval = reconnectionInterval;
+        this.eventSyncConfig = new HostAndPort(host, port);
+        this.eventSyncReconnectionInterval = reconnectionInterval;
     }
 
     public String getMemberUuid() {
@@ -59,5 +94,13 @@ public class HAConfiguration implements Serializable {
 
     public void setMemberUuid(String memberUuid) {
         this.memberUuid = memberUuid;
+    }
+
+    public void setPresenterServerThreads(int presenterServerThreads) {
+        this.presenterServerThreads = presenterServerThreads;
+    }
+
+    public int getPresenterServerThreads() {
+        return presenterServerThreads;
     }
 }

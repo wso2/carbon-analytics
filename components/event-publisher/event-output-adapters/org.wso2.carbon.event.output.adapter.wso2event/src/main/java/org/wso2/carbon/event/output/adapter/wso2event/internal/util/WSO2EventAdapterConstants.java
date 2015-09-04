@@ -46,7 +46,7 @@ public final class WSO2EventAdapterConstants {
     public static final String ADAPTER_PUBLISHING_MODE_BLOCKING = "blocking";
     public static final String ADAPTER_PUBLISHING_MODE_NON_BLOCKING = "non-blocking";
 
-    public static final String ADAPTOR_CONF_PATH = "config.path";
+    public static final String ADAPTER_CONF_PATH = "config.path";
 
 
     ;
