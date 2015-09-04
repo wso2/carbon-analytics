@@ -29,7 +29,7 @@ public class DistributedConfiguration implements Serializable {
     private boolean managerNode = false;
     private boolean presenterNode = false;
     private HostAndPort localManagerConfig = new HostAndPort("localhost", 8904);
-    private HostAndPort localPresenterConfig = new HostAndPort("localhost", 11000);
+    private HostAndPort localPresenterConfig = new HostAndPort("localhost", -1);
 
     private List<HostAndPort> managers = new ArrayList<HostAndPort>();
 

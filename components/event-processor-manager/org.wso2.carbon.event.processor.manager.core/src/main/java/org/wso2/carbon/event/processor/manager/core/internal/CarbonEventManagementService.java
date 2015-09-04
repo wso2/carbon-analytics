@@ -434,7 +434,7 @@ public class CarbonEventManagementService implements EventManagementService {
                 setSyncReceivers(memberList);
             }
         }
-        if (isPresenterNode && presenters != null) {
+        if (isWorkerNode && presenters != null) {
             if (mode == Mode.Distributed) {
                 List<HostAndPort> memberList = new ArrayList<HostAndPort>(presenters.values());
                 memberList.remove(managementModeInfo.getDistributedConfiguration().getLocalPresenterConfig());
