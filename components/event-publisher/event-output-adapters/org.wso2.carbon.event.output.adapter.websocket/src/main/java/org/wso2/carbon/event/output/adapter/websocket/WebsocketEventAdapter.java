@@ -53,7 +53,8 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
     private static ThreadPoolExecutor executorService;
     private int tenantId;
 
-    public WebsocketEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
+    public WebsocketEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
+                                 Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
         this.doLogDroppedMessage = true;
@@ -64,7 +65,7 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
     public void init() throws OutputEventAdapterException {
         validateOutputEventAdapterConfigurations();
 
-        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         //ExecutorService will be assigned  if it is null
         if (executorService == null) {
@@ -103,7 +104,7 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
             }
 
             executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.MILLISECONDS,
-                    new LinkedBlockingQueue<Runnable>(jobQueSize));
+                                                     new LinkedBlockingQueue<Runnable>(jobQueSize));
         }
 
     }
@@ -121,26 +122,32 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
         try {
             session = client.connectToServer(new WebsocketClient(), clientEndpointConfig, new URI(socketServerUrl));
         } catch (DeploymentException e) {
-            throw new ConnectionUnavailableException("The adaptor " + eventAdapterConfiguration.getName() + " failed to connect to the websocket server " +
-                    socketServerUrl, e);
+            throw new ConnectionUnavailableException("The adapter " + eventAdapterConfiguration.getName() + " failed to connect to the websocket server " +
+                                                     socketServerUrl, e);
         } catch (IOException e) {
-            throw new ConnectionUnavailableException("The adaptor " + eventAdapterConfiguration.getName() + " failed to connect to the websocket server " +
-                    socketServerUrl, e);
+            throw new ConnectionUnavailableException("The adapter " + eventAdapterConfiguration.getName() + " failed to connect to the websocket server " +
+                                                     socketServerUrl, e);
         } catch (URISyntaxException e) {
-            throw new OutputEventAdapterRuntimeException("The adaptor " + eventAdapterConfiguration.getName() + " failed to connect to the websocket server " +
-                    socketServerUrl, e);
+            throw new OutputEventAdapterRuntimeException("The adapter " + eventAdapterConfiguration.getName() + " failed to connect to the websocket server " +
+                                                         socketServerUrl, e);
         }
     }
 
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
-
         try {
-            executorService.execute(new WebSocketSender(message.toString()));
+            if (session == null) {
+                throw new ConnectionUnavailableException("Session was not available when trying to publish via adapter: " + eventAdapterConfiguration.getName() +
+                                                         ", tenant ID: " + tenantId + "\n Event: \n" + message);
+            } else if (!session.isOpen()) {
+                throw new ConnectionUnavailableException("Session was not open when trying to publish via adapter: " + eventAdapterConfiguration.getName() +
+                                                         ", for tenant ID: " + tenantId + ". Session ID: " + session.getId() + " \n Event: \n" + message);
+            } else {
+                executorService.execute(new WebSocketSender(message.toString()));
+            }
         } catch (RejectedExecutionException e) {
             EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
-
     }
 
     @Override
@@ -150,8 +157,8 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
                 session.close();
             }
         } catch (IOException e) {
-            throw new OutputEventAdapterRuntimeException("The adaptor " + eventAdapterConfiguration.getName() + " failed to disconnect from the websocket server " +
-                    socketServerUrl, e);
+            throw new OutputEventAdapterRuntimeException("The adapter " + eventAdapterConfiguration.getName() + " failed to disconnect from the websocket server " +
+                                                         socketServerUrl, e);
         }
     }
 
@@ -168,8 +175,8 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
     private void validateOutputEventAdapterConfigurations() throws OutputEventAdapterException {
         String socketServerUrl = eventAdapterConfiguration.getStaticProperties().get(WebsocketEventAdapterConstants.ADAPTER_SERVER_URL);
         if (!socketServerUrl.startsWith("ws://")) {
-            throw new OutputEventAdapterException("Provided websocket URL - " + socketServerUrl + " is invalid for websocket output adaptor with name" +
-                    eventAdapterConfiguration.getName() + ". The websocket URL should start with 'ws://' prefix.");
+            throw new OutputEventAdapterException("Provided websocket URL - " + socketServerUrl + " is invalid for websocket output adapter with name" +
+                                                  eventAdapterConfiguration.getName() + ". The websocket URL should start with 'ws://' prefix.");
         }
     }
 
@@ -201,9 +208,13 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
                         session.getBasicRemote().sendText(message);
                     } catch (IOException e) {
                         EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to endpoint", e, log, tenantId);
+                        throw new ConnectionUnavailableException(e);
+                    } catch (IllegalStateException ise) {
+                        EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to endpoint", ise, log, tenantId);
+                        throw new ConnectionUnavailableException(ise);
                     }
                 }
-            } else if(doLogDroppedMessage) {
+            } else if (doLogDroppedMessage) {
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send as session not available", log, tenantId);
                 doLogDroppedMessage = false;
             }
