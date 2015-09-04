@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdbms-configuration>
+    <database name = "mysql" category = "large_dataset_optimized">
+        <recordCountSupported>true</recordCountSupported>
+        <paginationSupported>false</paginationSupported>
+        <paginationMode>MODE1</paginationMode>
+        <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
+        <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
+        <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
+        <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
+        <recordMergeQuery>INSERT INTO {{TABLE_NAME}} (partition_key, timestamp, data, record_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE partition_key=VALUES(partition_key), timestamp=VALUES(timestamp), data=VALUES(data)</recordMergeQuery>
+        <forwardOnlyReadEnabled>true</forwardOnlyReadEnabled>
+        <fetchSize>-2147483648</fetchSize>        
+        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE partition_key &gt;= ? and partition_key &lt; ? AND timestamp &gt;= ? AND timestamp &lt; ? LIMIT ?,?</recordRetrievalQuery>
+        <recordRetrievalWithIdsQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordRetrievalWithIdsQuery>
+        <recordTableDeleteQueries>
+            <query>DROP INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}}</query>
+            <query>DROP INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}}</query>
+            <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
+        </recordTableDeleteQueries>
+        <recordTableInitQueries>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data LONGBLOB, partition_key INT, PRIMARY KEY(record_id)) ENGINE='MyISAM'</query>
+            <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
+            <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
+        </recordTableInitQueries>
+        <fsDataChunkSize>10240</fsDataChunkSize>
+        <fsDeletePathQuery>DELETE FROM AN_FS_PATH WHERE path = ?</fsDeletePathQuery>
+        <fsDeleteDataQuery>DELETE FROM AN_FS_DATA WHERE path = ?</fsDeleteDataQuery>
+        <fsUpdateDataPathQuery>UPDATE AN_FS_DATA SET path = ? WHERE path = ?</fsUpdateDataPathQuery>
+        <fsFileLengthRetrievalQuery>SELECT length FROM AN_FS_PATH WHERE path = ?</fsFileLengthRetrievalQuery>
+        <fsInsertPathQuery>INSERT INTO AN_FS_PATH (path,is_directory,length,parent_path) VALUES (?,?,?,?)</fsInsertPathQuery>
+        <fsListFilesQuery>SELECT path FROM AN_FS_PATH WHERE parent_path = ?</fsListFilesQuery>
+        <fsPathRetrievalQuery>SELECT * FROM AN_FS_PATH WHERE path = ?</fsPathRetrievalQuery>
+        <fsReadDataChunkQuery>SELECT data FROM AN_FS_DATA WHERE path = ? AND sequence = ?</fsReadDataChunkQuery>
+        <fsSetFileLengthQuery>UPDATE AN_FS_PATH SET length = ? WHERE path = ?</fsSetFileLengthQuery>
+        <fsTableInitQueries>
+            <query>CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BOOLEAN, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path)) ENGINE='MyISAM'</query>
+            <query>CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data LONGBLOB, PRIMARY KEY (path,sequence)) ENGINE='MyISAM'</query>
+            <query>CREATE INDEX index_parent_id ON AN_FS_PATH(parent_path)</query>
+        </fsTableInitQueries>
+        <fsTablesCheckQuery>SELECT path FROM AN_FS_PATH WHERE path = '/'</fsTablesCheckQuery>
+        <fsMergeDataChunkQuery>INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE data=VALUES(data)</fsMergeDataChunkQuery>        
+    </database>
+    <database name = "mysql" category = "limited_dataset_optimized">
+        <recordCountSupported>true</recordCountSupported>
+        <paginationSupported>false</paginationSupported>
+        <paginationMode>MODE1</paginationMode>
+        <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
+        <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
+        <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
+        <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
+        <recordMergeQuery>INSERT INTO {{TABLE_NAME}} (partition_key, timestamp, data, record_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE partition_key=VALUES(partition_key), timestamp=VALUES(timestamp), data=VALUES(data)</recordMergeQuery>
+        <forwardOnlyReadEnabled>true</forwardOnlyReadEnabled>
+        <fetchSize>-2147483648</fetchSize>        
+        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE partition_key &gt;= ? and partition_key &lt; ? AND timestamp &gt;= ? AND timestamp &lt; ? LIMIT ?,?</recordRetrievalQuery>
+        <recordRetrievalWithIdsQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordRetrievalWithIdsQuery>
+        <recordTableDeleteQueries>
+            <query>DROP INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}}</query>
+            <query>DROP INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}}</query>
+            <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
+        </recordTableDeleteQueries>
+        <recordTableInitQueries>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data LONGBLOB, partition_key INT, PRIMARY KEY(record_id)) ENGINE='InnoDB'</query>
+            <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
+            <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
+        </recordTableInitQueries>
+        <fsDataChunkSize>10240</fsDataChunkSize>
+        <fsDeletePathQuery>DELETE FROM AN_FS_PATH WHERE path = ?</fsDeletePathQuery>
+        <fsDeleteDataQuery>DELETE FROM AN_FS_DATA WHERE path = ?</fsDeleteDataQuery>
+        <fsUpdateDataPathQuery>UPDATE AN_FS_DATA SET path = ? WHERE path = ?</fsUpdateDataPathQuery>
+        <fsFileLengthRetrievalQuery>SELECT length FROM AN_FS_PATH WHERE path = ?</fsFileLengthRetrievalQuery>
+        <fsInsertPathQuery>INSERT INTO AN_FS_PATH (path,is_directory,length,parent_path) VALUES (?,?,?,?)</fsInsertPathQuery>
+        <fsListFilesQuery>SELECT path FROM AN_FS_PATH WHERE parent_path = ?</fsListFilesQuery>
+        <fsPathRetrievalQuery>SELECT * FROM AN_FS_PATH WHERE path = ?</fsPathRetrievalQuery>
+        <fsReadDataChunkQuery>SELECT data FROM AN_FS_DATA WHERE path = ? AND sequence = ?</fsReadDataChunkQuery>
+        <fsSetFileLengthQuery>UPDATE AN_FS_PATH SET length = ? WHERE path = ?</fsSetFileLengthQuery>
+        <fsTableInitQueries>
+            <query>CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BOOLEAN, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path)) ENGINE='InnoDB'</query>
+            <query>CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data LONGBLOB, PRIMARY KEY (path,sequence)) ENGINE='InnoDB'</query>
+            <query>CREATE INDEX index_parent_id ON AN_FS_PATH(parent_path)</query>
+        </fsTableInitQueries>
+        <fsTablesCheckQuery>SELECT path FROM AN_FS_PATH WHERE path = '/'</fsTablesCheckQuery>
+        <fsMergeDataChunkQuery>INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE data=VALUES(data)</fsMergeDataChunkQuery>        
+    </database>    
+</rdbms-configuration>
+
+

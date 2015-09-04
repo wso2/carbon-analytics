@@ -25,7 +25,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -44,16 +47,25 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
  */
 public class RDBMSUtils {
     
+    private static final String VERSION = "Version";
+
+    private static final String DATABASE_PRODUCT_NAME = "Database Product Name";
+
     private static final Log log = LogFactory.getLog(RDBMSUtils.class);
     
-    private static final String RDBMS_QUERY_CONFIG_FILE = "rdbms-query-config.xml";
+    private static final String RDBMS_QUERY_CONFIG_FILE = "rdbms-config.xml";
     
-    public static String lookupDatabaseType(DataSource ds) throws AnalyticsException {
+    private static RDBMSConfigurationMapper mapper;
+    
+    public static Map<String, Object> lookupDatabaseInfo(DataSource ds) throws AnalyticsException {
         Connection conn = null;
         try {
             conn = ds.getConnection();
             DatabaseMetaData dmd = conn.getMetaData();
-            return dmd.getDatabaseProductName();
+            Map<String, Object> result = new HashMap<String, Object>();
+            result.put(DATABASE_PRODUCT_NAME, dmd.getDatabaseProductName());
+            result.put(VERSION, Double.parseDouble(dmd.getDatabaseMajorVersion() + "." + dmd.getDatabaseMinorVersion()));
+            return result;
         } catch (SQLException e) {
             throw new AnalyticsException("Error in looking up database type: " + e.getMessage(), e);
         } finally {
@@ -61,17 +73,27 @@ public class RDBMSUtils {
         }
     }
     
-    public static RDBMSQueryConfigurationEntry lookupCurrentQueryConfigurationEntry(
-            DataSource ds) throws AnalyticsException {
-        String dbType = lookupDatabaseType(ds);
-        RDBMSQueryConfiguration qcon = loadQueryConfiguration();
-        for (RDBMSQueryConfigurationEntry entry : qcon.getDatabases()) {
-            if (entry.getDatabaseName().equalsIgnoreCase(dbType)) {
-                return entry;
-            }
+    private static RDBMSConfigurationMapper loadRDBMSConfigurationMapper() throws AnalyticsException {
+        if (mapper == null) {
+            RDBMSQueryConfiguration config = loadQueryConfiguration();
+            mapper = new RDBMSConfigurationMapper(config);
         }
-        throw new AnalyticsException("Cannot find a database section in the RDBMS "
-                + "query configuration for the database: " + dbType);
+        return mapper;
+    }
+        
+    public static RDBMSQueryConfigurationEntry lookupCurrentQueryConfigurationEntry(
+            DataSource ds, String category) throws AnalyticsException {
+        Map<String, Object> dbInfo = lookupDatabaseInfo(ds);
+        RDBMSConfigurationMapper mapper = loadRDBMSConfigurationMapper();
+        RDBMSQueryConfigurationEntry entry = mapper.lookupEntry((String) dbInfo.get(DATABASE_PRODUCT_NAME), 
+                (double) dbInfo.get(VERSION), category);
+        if (entry != null) {
+            return entry;
+        } else {
+            dbInfo.put("Category", category);
+            throw new AnalyticsException("Cannot find a database section in the RDBMS "
+                    + "configuration for the database: " + dbInfo);
+        }
     }
     
     public static RDBMSQueryConfiguration loadQueryConfiguration() throws AnalyticsException {
@@ -166,5 +188,69 @@ public class RDBMSUtils {
         return result;
     }
 
+    /**
+     * RDBMS configuration mapping class to be used to lookup matching configuration entry with a data source.
+     */
+    private static class RDBMSConfigurationMapper {
+        
+        private Map<String, List<RDBMSQueryConfigurationEntry>> entries = new HashMap<String, List<RDBMSQueryConfigurationEntry>>();
+        
+        public RDBMSConfigurationMapper(RDBMSQueryConfiguration config) {
+            List<RDBMSQueryConfigurationEntry> configs;
+            for (RDBMSQueryConfigurationEntry entry : config.getDatabases()) {
+                configs = this.entries.get(entry.getDatabaseName().toLowerCase());
+                if (configs == null) {
+                    configs = new ArrayList<RDBMSQueryConfigurationEntry>();
+                    this.entries.put(entry.getDatabaseName().toLowerCase(), configs);
+                }
+                configs.add(entry);
+            }
+        }
+        
+        private boolean checkVersion(RDBMSQueryConfigurationEntry entry, double version) {
+            double minVersion = entry.getMinVersion();
+            double maxVersion = entry.getMaxVersion();
+            if (minVersion != 0 && version < minVersion) {
+                return false;
+            }
+            if (maxVersion != 0 && version > maxVersion) {
+                return false;
+            }
+            return true;
+        }
+        
+        public RDBMSQueryConfigurationEntry lookupEntry(String dbName, double version, String category) {
+            List<RDBMSQueryConfigurationEntry> dbResults = this.entries.get(dbName.toLowerCase());
+            if (dbResults == null || dbResults.isEmpty()) {
+                return null;
+            }
+            List<RDBMSQueryConfigurationEntry> versionResults = new ArrayList<RDBMSQueryConfigurationEntry>();
+            for (RDBMSQueryConfigurationEntry entry : dbResults) {
+                if (this.checkVersion(entry, version)) {
+                    versionResults.add(entry);
+                }
+            }
+            if (versionResults.isEmpty()) {
+                return null;
+            }
+            if (category == null) {
+                return versionResults.get(0);
+            } else {
+                RDBMSQueryConfigurationEntry defaultResult = null;
+                /* to put the top most empty category entry as the default one */
+                boolean defaultSet = false;
+                for (RDBMSQueryConfigurationEntry entry : versionResults) {
+                    if (category.equalsIgnoreCase(entry.getCategory())) {
+                        return entry;
+                    } else if (!defaultSet && entry.getCategory() == null) {
+                        defaultResult = entry;
+                        defaultSet = true;
+                    }
+                }
+                return defaultResult;
+            }
+        }
+        
+    }
         
 }

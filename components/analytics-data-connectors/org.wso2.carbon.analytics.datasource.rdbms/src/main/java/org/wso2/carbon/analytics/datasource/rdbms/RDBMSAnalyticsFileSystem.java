@@ -53,7 +53,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     private RDBMSQueryConfigurationEntry rdbmsQueryConfigurationEntry;
     
     private DataSource dataSource;
-    
+        
     private static final Log log = LogFactory.getLog(RDBMSAnalyticsFileSystem.class);
 
     @Override
@@ -69,7 +69,8 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             throw new AnalyticsException("Error in loading data source: " + e.getMessage(), e);
         }
         if (this.rdbmsQueryConfigurationEntry == null) {
-            this.rdbmsQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
+            String category = properties.get(RDBMSAnalyticsDSConstants.CATEGORY);
+            this.rdbmsQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource, category);
         }
         /* create the system tables */
         this.checkAndCreateSystemTables();

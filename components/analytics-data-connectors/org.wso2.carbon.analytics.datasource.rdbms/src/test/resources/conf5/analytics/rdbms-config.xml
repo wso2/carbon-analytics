@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<query-configuration>
-    <database name = "DB2/NT64">
+<rdbms-configuration>
+    <database name = "Microsoft SQL Server">
         <recordCountSupported>true</recordCountSupported>
         <paginationSupported>false</paginationSupported>
-        <paginationMode>MODE1</paginationMode>
+        <paginationMode>MODE2</paginationMode>
         <paginationFirstInclusive>true</paginationFirstInclusive>
         <paginationFirstZeroIndexed>true</paginationFirstZeroIndexed>
         <paginationSecondInclusive>false</paginationSecondInclusive>
         <paginationSecondLength>true</paginationSecondLength>
         <paginationSecondZeroIndexed>false</paginationSecondZeroIndexed>
         <blobLengthRequired>true</blobLengthRequired>
-        <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} FETCH FIRST 1 ROWS ONLY</recordTableCheckQuery>
+        <recordTableCheckQuery>SELECT TOP 1 1 from {{TABLE_NAME}}</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
-        <recordMergeQuery>MERGE INTO {{TABLE_NAME}} AS dest USING (VALUES(?, ?, ?)) AS src (timestamp, data, record_id) ON dest.record_id = src.record_id WHEN MATCHED THEN UPDATE SET dest.timestamp = src.timestamp, dest.data = src.data WHEN NOT MATCHED THEN INSERT (timestamp, data, record_id) VALUES (src.timestamp, src.data, src.record_id)</recordMergeQuery>
+        <recordMergeQuery>MERGE {{TABLE_NAME}} AS dest USING (SELECT ?, ?, ?) AS src (timestamp, data, record_id) ON (dest.record_id = src.record_id) WHEN MATCHED THEN UPDATE SET timestamp = src.timestamp, data = src.data WHEN NOT MATCHED THEN INSERT(timestamp, data, record_id) VALUES (src.timestamp, src.data, src.record_id);</recordMergeQuery>
         <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?)</recordInsertQuery>
         <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
-        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ? LIMIT ?,?</recordRetrievalQuery>
+        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM (SELECT ROW_NUMBER() OVER(ORDER BY record_id) AS rownumber, record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?) AS A WHERE A.rownumber &lt;= ? AND A.rownumber &gt; ?</recordRetrievalQuery>
+        <!--recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ? OFFSET ? ROWS FETCH NEXT ? ROWS ONLY</recordRetrievalQuery-->
         <recordRetrievalWithIdsQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordRetrievalWithIdsQuery>
         <recordTableDeleteQueries>
             <query>DROP TABLE {{TABLE_NAME}}</query>
             <query>DROP INDEX {{TABLE_NAME}}_TIMESTAMP</query>
         </recordTableDeleteQueries>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50) NOT NULL, timestamp BIGINT, data BLOB(2G) NOT LOGGED, PRIMARY KEY(record_id))</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data VARBINARY(max), PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
         </recordTableInitQueries>
         <fsDataChunkSize>10240</fsDataChunkSize>
@@ -38,15 +39,15 @@
         <fsReadDataChunkQuery>SELECT data FROM AN_FS_DATA WHERE path = ? AND sequence = ?</fsReadDataChunkQuery>
         <fsSetFileLengthQuery>UPDATE AN_FS_PATH SET length = ? WHERE path = ?</fsSetFileLengthQuery>
         <fsTableInitQueries>
-            <query>CREATE TABLE AN_FS_PATH (path VARCHAR(256) NOT NULL, is_directory SMALLINT, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path))</query>
-            <query>CREATE TABLE AN_FS_DATA (path VARCHAR(256) NOT NULL, sequence BIGINT NOT NULL, data BLOB(2G) NOT LOGGED, PRIMARY KEY (path,sequence))</query>
+            <query>CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BIT, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path), FOREIGN KEY (parent_path) REFERENCES AN_FS_PATH(path))</query>
+            <query>CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data VARBINARY(max), PRIMARY KEY (path,sequence), FOREIGN KEY (path) REFERENCES AN_FS_PATH(path) ON DELETE CASCADE)</query>
             <query>CREATE INDEX index_parent_id ON AN_FS_PATH(parent_path)</query>
         </fsTableInitQueries>
         <fsTablesCheckQuery>SELECT path FROM AN_FS_PATH WHERE path = '/'</fsTablesCheckQuery>
         <fsUpdateDataChunkQuery>UPDATE AN_FS_DATA SET data = ? WHERE path = ? AND sequence = ?</fsUpdateDataChunkQuery>
         <fsWriteDataChunkQuery>INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?,?,?)</fsWriteDataChunkQuery>
-        <fsMergeDataChunkQuery>MERGE INTO AN_FS_DATA AS dest USING (VALUES(?, ?, ?)) AS src (path, sequence, data) ON (dest.path = src.path AND dest.sequence = src.sequence) WHEN MATCHED THEN UPDATE SET dest.data = src.data WHEN NOT MATCHED THEN INSERT(path, sequence, data) VALUES (src.path, src.sequence, src.data)</fsMergeDataChunkQuery>
+        <fsMergeDataChunkQuery>MERGE AN_FS_DATA AS dest USING (SELECT ?, ?, ?) AS src (path, sequence, data) ON (dest.path = src.path AND dest.sequence = src.sequence) WHEN MATCHED THEN UPDATE SET data = src.data WHEN NOT MATCHED THEN INSERT(path, sequence, data) VALUES (src.path, src.sequence, src.data);</fsMergeDataChunkQuery>
     </database>
-</query-configuration>
+</rdbms-configuration>
 
 

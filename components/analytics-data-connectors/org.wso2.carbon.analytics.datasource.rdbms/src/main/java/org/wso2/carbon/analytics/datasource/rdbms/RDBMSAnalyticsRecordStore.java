@@ -28,6 +28,7 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.ndatasource.common.DataSourceException;
 
 import javax.sql.DataSource;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
@@ -77,7 +78,8 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             throw new AnalyticsException("Error in loading data source: " + e.getMessage(), e);
         }
         if (this.rdbmsQueryConfigurationEntry == null) {
-            this.rdbmsQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
+            String category = properties.get(RDBMSAnalyticsDSConstants.CATEGORY);
+            this.rdbmsQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource, category);
         }
     }
         

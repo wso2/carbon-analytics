@@ -25,6 +25,8 @@ public class RDBMSAnalyticsDSConstants {
 
     public static final String DATASOURCE = "datasource";
     
+    public static final String CATEGORY = "category";
+    
     public static final String PARTITION_COUNT = "partitionCount";
     
     public static final String DEFAULT_CHARSET = "UTF8";

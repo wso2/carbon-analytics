@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<query-configuration>
+<rdbms-configuration>
     <database name = "h2">
         <recordCountSupported>true</recordCountSupported>
         <paginationSupported>false</paginationSupported>
@@ -39,6 +39,6 @@
         <fsTablesCheckQuery>SELECT path FROM AN_FS_PATH WHERE path = '/'</fsTablesCheckQuery>
         <fsMergeDataChunkQuery>MERGE INTO AN_FS_DATA (path,sequence,data) KEY (path,sequence) VALUES (?,?,?)</fsMergeDataChunkQuery>
     </database>
-</query-configuration>
+</rdbms-configuration>
 
 

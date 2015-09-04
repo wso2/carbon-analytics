@@ -1,30 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<query-configuration>
-    <database name = "PostgreSQL">
+<rdbms-configuration>
+    <database name = "h2">
         <recordCountSupported>true</recordCountSupported>
         <paginationSupported>false</paginationSupported>
         <paginationMode>MODE1</paginationMode>
-        <paginationFirstInclusive>true</paginationFirstInclusive>
-        <paginationFirstZeroIndexed>true</paginationFirstZeroIndexed>
-        <paginationSecondInclusive>false</paginationSecondInclusive>
-        <paginationSecondLength>true</paginationSecondLength>
-        <paginationSecondZeroIndexed>false</paginationSecondZeroIndexed>
         <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
-        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?)</recordInsertQuery>
-        <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
-        <!--recordMergeQuery>INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?) ON CONFLICT DO UPDATE timestamp=VALUES(timestamp), data=VALUES(data)</recordMergeQuery-->
-        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ? OFFSET ? LIMIT ?</recordRetrievalQuery>
+        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (partition_key, timestamp, data, record_id) VALUES (?, ?, ?, ?)</recordInsertQuery>
+        <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET partition_key = ?, timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
+        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE partition_key &gt;= ? and partition_key &lt; ? AND timestamp &gt;= ? AND timestamp &lt; ? LIMIT ?,?</recordRetrievalQuery>
         <recordRetrievalWithIdsQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordRetrievalWithIdsQuery>
         <recordTableDeleteQueries>
-            <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
-            <query>DROP INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}}</query>
+            <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>                            
+            <query>DROP INDEX IF EXISTS {{TABLE_NAME}}_TIMESTAMP</query>
+            <query>DROP INDEX IF EXISTS {{TABLE_NAME}}_PARTITION_KEY</query>
         </recordTableDeleteQueries>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BYTEA, PRIMARY KEY(record_id))</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BINARY, partition_key INT, PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
+            <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{PARTITION_KEY}} (partition_key)</query>            
         </recordTableInitQueries>
         <fsDataChunkSize>10240</fsDataChunkSize>
         <fsDeletePathQuery>DELETE FROM AN_FS_PATH WHERE path = ?</fsDeletePathQuery>
@@ -37,15 +33,14 @@
         <fsReadDataChunkQuery>SELECT data FROM AN_FS_DATA WHERE path = ? AND sequence = ?</fsReadDataChunkQuery>
         <fsSetFileLengthQuery>UPDATE AN_FS_PATH SET length = ? WHERE path = ?</fsSetFileLengthQuery>
         <fsTableInitQueries>
-            <query>CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BOOLEAN, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path))</query>
-            <query>CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data BYTEA, PRIMARY KEY (path,sequence))</query>
+            <query>CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BOOLEAN, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path), FOREIGN KEY (parent_path) REFERENCES AN_FS_PATH(path))</query>
+            <query>CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data BINARY, PRIMARY KEY (path,sequence), FOREIGN KEY (path) REFERENCES AN_FS_PATH(path))</query>
             <query>CREATE INDEX index_parent_id ON AN_FS_PATH(parent_path)</query>
         </fsTableInitQueries>
         <fsTablesCheckQuery>SELECT path FROM AN_FS_PATH WHERE path = '/'</fsTablesCheckQuery>
         <fsUpdateDataChunkQuery>UPDATE AN_FS_DATA SET data = ? WHERE path = ? AND sequence = ?</fsUpdateDataChunkQuery>
         <fsWriteDataChunkQuery>INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?,?,?)</fsWriteDataChunkQuery>
-        <!--fsMergeDataChunkQuery>INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?, ?, ?) ON CONFLICT DO UPDATE data=VALUES(data)</fsMergeDataChunkQuery-->
     </database>
-</query-configuration>
+</rdbms-configuration>
 
 

@@ -20,7 +20,7 @@
    <!-- The name of the primary record store -->
    <primaryRecordStore>EVENT_STORE</primaryRecordStore>
    <!-- The name of the index staging record store -->
-   <indexStagingRecordStore>EVENT_STORE</indexStagingRecordStore>
+   <indexStagingRecordStore>INDEX_STAGING_STORE</indexStagingRecordStore>
    <!-- Analytics File System - properties related to index storage implementation -->
    <analytics-file-system>
       <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsFileSystem</implementation>
@@ -34,12 +34,21 @@
       <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
       <properties>
             <property name="datasource">WSO2_ANALYTICS_EVENT_STORE_DB</property>
+            <property name="category">large_dataset_optimized</property>
+      </properties>
+   </analytics-record-store>
+   <analytics-record-store name="INDEX_STAGING_STORE">
+      <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
+      <properties>
+            <property name="datasource">WSO2_ANALYTICS_EVENT_STORE_DB</property>
+            <property name="category">limited_dataset_optimized</property>
       </properties>
    </analytics-record-store>
    <analytics-record-store name = "PROCESSED_DATA_STORE">
       <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
       <properties>
             <property name="datasource">WSO2_ANALYTICS_PROCESSED_DATA_STORE_DB</property>
+            <property name="category">large_dataset_optimized</property>
       </properties>
    </analytics-record-store>
    <!-- The data indexing analyzer implementation -->

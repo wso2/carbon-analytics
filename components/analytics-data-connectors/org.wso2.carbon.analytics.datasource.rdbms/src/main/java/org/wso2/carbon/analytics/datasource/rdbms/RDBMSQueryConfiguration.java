@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * This class contains all the RDBMS query configuration mappings.
  */
-@XmlRootElement (name = "query-configuration")
+@XmlRootElement (name = "rdbms-configuration")
 public class RDBMSQueryConfiguration {
 
     private RDBMSQueryConfigurationEntry[] databases;

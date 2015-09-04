@@ -31,6 +31,12 @@ public class RDBMSQueryConfigurationEntry {
 
     private String databaseName;
     
+    private String category;
+    
+    private double minVersion;
+    
+    private double maxVersion;
+    
     private String recordTableCheckQuery;
     
     private String[] recordTableInitQueries;
@@ -95,7 +101,7 @@ public class RDBMSQueryConfigurationEntry {
 
     private boolean forwardOnlyReadEnabled;
 
-    private int fetchSize = Integer.MIN_VALUE;;
+    private int fetchSize = Integer.MIN_VALUE;
 
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
@@ -104,6 +110,33 @@ public class RDBMSQueryConfigurationEntry {
     @XmlAttribute (name = "name", required = true)
     public String getDatabaseName() {
         return databaseName;
+    }
+    
+    public void setCategory(String category) {
+        this.category = category;
+    }
+    
+    @XmlAttribute (name = "category", required = false)
+    public String getCategory() {
+        return category;
+    }
+    
+    public void setMinVersion(double minVersion) {
+        this.minVersion = minVersion;
+    }
+    
+    @XmlAttribute (name = "minVersion", required = false)
+    public double getMinVersion() {
+        return minVersion;
+    }
+    
+    public void setMaxVersion(double maxVersion) {
+        this.maxVersion = maxVersion;
+    }
+    
+    @XmlAttribute (name = "maxVersion", required = false)
+    public double getMaxVersion() {
+        return maxVersion;
     }
     
     public void setRecordTableCheckQuery(String recordTableCheckQuery) {
