@@ -188,17 +188,6 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
             this.message = message;
         }
 
-        /**
-         * When an object implementing interface <code>Runnable</code> is used
-         * to create a thread, starting the thread causes the object's
-         * <code>run</code> method to be called in that separately executing
-         * thread.
-         * <p/>
-         * The general contract of the method <code>run</code> is that it may
-         * take any action whatsoever.
-         *
-         * @see Thread#run()
-         */
         @Override
         public void run() {
             if (session != null) {
@@ -208,10 +197,8 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
                         session.getBasicRemote().sendText(message);
                     } catch (IOException e) {
                         EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to endpoint", e, log, tenantId);
-                        throw new ConnectionUnavailableException(e);
                     } catch (IllegalStateException ise) {
                         EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to endpoint", ise, log, tenantId);
-                        throw new ConnectionUnavailableException(ise);
                     }
                 }
             } else if (doLogDroppedMessage) {
