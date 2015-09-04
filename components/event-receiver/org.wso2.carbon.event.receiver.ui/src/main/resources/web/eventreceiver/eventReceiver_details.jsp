@@ -48,14 +48,14 @@
 <link rel="stylesheet" type="text/css" href="../resources/css/registry.css"/>
 
 
-<%
-    EventReceiverAdminServiceStub stub = EventReceiverUIUtils.getEventReceiverAdminService(config, session, request);
-    String eventReceiverName = request.getParameter("eventReceiverName");
-    EventReceiverConfigurationDto eventReceiverConfigurationDto = null;
-    if (eventReceiverName != null) {
-        eventReceiverConfigurationDto = stub.getActiveEventReceiverConfiguration(eventReceiverName);
-%>
-<script language="javascript">
+    <%
+        EventReceiverAdminServiceStub stub = EventReceiverUIUtils.getEventReceiverAdminService(config, session, request);
+        String eventReceiverName = request.getParameter("eventReceiverName");
+        EventReceiverConfigurationDto eventReceiverConfigurationDto = null;
+        if (eventReceiverName != null) {
+            eventReceiverConfigurationDto = stub.getActiveEventReceiverConfiguration(eventReceiverName);
+    %>
+    <script language="javascript">
 
     function clearTextIn(obj) {
         if (YAHOO.util.Dom.hasClass(obj, 'initE')) {
@@ -457,7 +457,7 @@
                         <tbody>
                         <%
                             EventMappingPropertyDto[] metaMappingDto = eventReceiverConfigurationDto.getMetaMappingPropertyDtos();
-                            if(metaMappingDto != null && metaMappingDto.length > 0){
+                            if (metaMappingDto != null && metaMappingDto.length > 0) {
                                 for (EventMappingPropertyDto metaEbProperties : metaMappingDto) {
 
                         %>
@@ -478,7 +478,7 @@
                         %>
                         <%
                             EventMappingPropertyDto[] correlationMappingDto = eventReceiverConfigurationDto.getCorrelationMappingPropertyDtos();
-                            if(correlationMappingDto != null && correlationMappingDto.length > 0){
+                            if (correlationMappingDto != null && correlationMappingDto.length > 0) {
                                 for (EventMappingPropertyDto correlationEbProperties : correlationMappingDto) {
                         %>
                         <tr id="mappingRow">
@@ -498,7 +498,7 @@
                         %>
                         <%
                             EventMappingPropertyDto[] payLoadMappingDto = eventReceiverConfigurationDto.getMappingPropertyDtos();
-                            if(payLoadMappingDto != null && payLoadMappingDto.length > 0){
+                            if (payLoadMappingDto != null && payLoadMappingDto.length > 0) {
                                 for (EventMappingPropertyDto payloadEbProperties : payLoadMappingDto) {
                         %>
                         <tr id="mappingRow">
