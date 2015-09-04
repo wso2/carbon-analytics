@@ -20,8 +20,9 @@
             <artifactId>org.wso2.carbon.analytics.datasource.commons</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.datastax.cassandra</groupId>
-            <artifactId>cassandra-driver-core</artifactId>
+            <groupId>me.prettyprint</groupId>
+            <artifactId>hector-core</artifactId>
+            <version>0.7.0-29</version>
         </dependency>
     </dependencies>
     <build>

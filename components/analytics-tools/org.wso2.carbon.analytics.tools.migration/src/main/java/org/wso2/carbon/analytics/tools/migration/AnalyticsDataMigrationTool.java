@@ -69,7 +69,7 @@ public class AnalyticsDataMigrationTool {
     private static final String CASSANDRA_USERNAME_ARG = "username";
     private static final String CASSANDRA_PASSWORD = "password";
     private static final String CASSANDRA_PASSWORD_ARG = "password";
-    private static final String RECORD_BATCH_SIZE = "50";
+    private static final String RECORD_BATCH_SIZE = "1000";
     private static final String BATCH_SIZE = "batchSize";
     private static final String BATCH_SIZE_ARG = "number of rows per fetch";
     private static final String PAYLOAD_PREFIX = "payload_";
@@ -263,7 +263,7 @@ public class AnalyticsDataMigrationTool {
 
             //stripping off the payload prefix
             if (columnName.contains(PAYLOAD_PREFIX)) {
-                columnName = columnName.substring(8);
+                columnName = columnName.substring(PAYLOAD_PREFIX.length());
             }
             Object value = unMarshalValues(validationClass, column.getValueBytes());
             valuesMap.put(columnName, value);
