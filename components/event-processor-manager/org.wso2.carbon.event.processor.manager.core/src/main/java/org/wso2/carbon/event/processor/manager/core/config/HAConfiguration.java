@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.event.processor.manager.core.config;
 
+import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisherConfig;
 import org.wso2.carbon.event.processor.manager.commons.utils.HostAndPort;
 
 import java.io.Serializable;
@@ -34,6 +35,17 @@ public class HAConfiguration implements Serializable {
     private int eventSyncServerThreads;
     private int presenterServerThreads;
     private String memberUuid;
+    private int checkMemberUpdateInterval;
+    private int syncStateRetryInterval = 10000;
+    private long tryStateChangeInterval = 15000;
+    private int presenterPublisherBufferSize;
+    private long presenterPublisherConnectionStatusCheckInterval;
+    private String presenterPublisherCharSet;
+    private int presenterPublisherTcpSendBufferSize;
+    private int eventSyncPublisherBufferSize;
+    private long eventSyncPublisherConnectionStatusCheckInterval;
+    private String eventSyncPublisherCharSet;
+    private int eventSyncPublisherTcpSendBufferSize;
 
     public boolean isWorkerNode() {
         return workerNode;
@@ -103,4 +115,116 @@ public class HAConfiguration implements Serializable {
     public int getPresenterServerThreads() {
         return presenterServerThreads;
     }
+
+    public int getCheckMemberUpdateInterval() {
+        return checkMemberUpdateInterval;
+    }
+
+    public void setCheckMemberUpdateInterval(int checkMemberUpdateInterval) {
+        this.checkMemberUpdateInterval = checkMemberUpdateInterval;
+    }
+
+    public int getSyncStateRetryInterval() {
+        return syncStateRetryInterval;
+    }
+
+    public void setSyncStateRetryInterval(int syncStateRetryInterval) {
+        this.syncStateRetryInterval = syncStateRetryInterval;
+    }
+
+    public long getTryStateChangeInterval() {
+        return tryStateChangeInterval;
+    }
+
+    public void setTryStateChangeInterval(long tryStateChangeInterval) {
+        this.tryStateChangeInterval = tryStateChangeInterval;
+    }
+
+    public int getPresenterPublisherBufferSize() {
+        return presenterPublisherBufferSize;
+    }
+
+    public void setPresenterPublisherBufferSize(int presenterPublisherBufferSize) {
+        this.presenterPublisherBufferSize = presenterPublisherBufferSize;
+    }
+
+    public long getPresenterPublisherConnectionStatusCheckInterval() {
+
+        return presenterPublisherConnectionStatusCheckInterval;
+    }
+
+    public void setPresenterPublisherConnectionStatusCheckInterval(long presenterPublisherConnectionStatusCheckInterval) {
+        this.presenterPublisherConnectionStatusCheckInterval = presenterPublisherConnectionStatusCheckInterval;
+    }
+
+    public String getPresenterPublisherCharSet() {
+
+        return presenterPublisherCharSet;
+    }
+
+    public void setPresenterPublisherCharSet(String presenterPublisherCharSet) {
+        this.presenterPublisherCharSet = presenterPublisherCharSet;
+    }
+
+    public int getPresenterPublisherTcpSendBufferSize() {
+        return presenterPublisherTcpSendBufferSize;
+    }
+
+    public void setPresenterPublisherTcpSendBufferSize(int presenterPublisherTcpSendBufferSize) {
+        this.presenterPublisherTcpSendBufferSize = presenterPublisherTcpSendBufferSize;
+    }
+
+    public int getEventSyncPublisherBufferSize() {
+        return eventSyncPublisherBufferSize;
+    }
+
+    public void setEventSyncPublisherBufferSize(int eventSyncPublisherBufferSize) {
+        this.eventSyncPublisherBufferSize = eventSyncPublisherBufferSize;
+    }
+
+    public long getEventSyncPublisherConnectionStatusCheckInterval() {
+        return eventSyncPublisherConnectionStatusCheckInterval;
+    }
+
+    public void setEventSyncPublisherConnectionStatusCheckInterval(long eventSyncPublisherConnectionStatusCheckInterval) {
+        this.eventSyncPublisherConnectionStatusCheckInterval = eventSyncPublisherConnectionStatusCheckInterval;
+    }
+
+    public String getEventSyncPublisherCharSet() {
+        return eventSyncPublisherCharSet;
+    }
+
+    public void setEventSyncPublisherCharSet(String eventSyncPublisherCharSet) {
+        this.eventSyncPublisherCharSet = eventSyncPublisherCharSet;
+    }
+
+    public int getEventSyncPublisherTcpSendBufferSize() {
+        return eventSyncPublisherTcpSendBufferSize;
+    }
+
+
+    public void setEventSyncPublisherTcpSendBufferSize(int eventSyncPublisherTcpSendBufferSize) {
+        this.eventSyncPublisherTcpSendBufferSize = eventSyncPublisherTcpSendBufferSize;
+    }
+
+    public TCPEventPublisherConfig constructEventSyncPublisherConfig() {
+
+        TCPEventPublisherConfig tcpEventPublisherConfig = new TCPEventPublisherConfig();
+        tcpEventPublisherConfig.setBufferSize(getEventSyncPublisherBufferSize());
+        tcpEventPublisherConfig.setConnectionStatusCheckInterval(getEventSyncPublisherConnectionStatusCheckInterval());
+        tcpEventPublisherConfig.setCharset(getEventSyncPublisherCharSet());
+        tcpEventPublisherConfig.setTcpSendBufferSize(getEventSyncPublisherTcpSendBufferSize());
+        return tcpEventPublisherConfig;
+    }
+
+    public TCPEventPublisherConfig constructPresenterPublisherConfig() {
+
+        TCPEventPublisherConfig tcpEventPublisherConfig = new TCPEventPublisherConfig();
+        tcpEventPublisherConfig.setBufferSize(getPresenterPublisherBufferSize());
+        tcpEventPublisherConfig.setConnectionStatusCheckInterval(getPresenterPublisherConnectionStatusCheckInterval());
+        tcpEventPublisherConfig.setCharset(getPresenterPublisherCharSet());
+        tcpEventPublisherConfig.setTcpSendBufferSize(getPresenterPublisherTcpSendBufferSize());
+        return tcpEventPublisherConfig;
+    }
+
 }

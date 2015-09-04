@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.event.processor.manager.core.config;
 
+import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisherConfig;
 import org.wso2.carbon.event.processor.manager.commons.utils.HostAndPort;
 
 import java.io.Serializable;
@@ -25,71 +26,72 @@ import java.util.List;
 
 public class DistributedConfiguration implements Serializable {
 
+    //nodeType
     private boolean workerNode = false;
+
     private boolean managerNode = false;
-    private boolean presenterNode = false;
     private HostAndPort localManagerConfig = new HostAndPort("localhost", 8904);
+
+    private boolean presenterNode = false;
     private HostAndPort localPresenterConfig = new HostAndPort("localhost", -1);
 
+    //management
     private List<HostAndPort> managers = new ArrayList<HostAndPort>();
-
-    private int transportMaxPort = 15100;
-    private int transportMinPort = 15000;
-    private int transportReconnectInterval = 15000;
-    private String jar;
-
-    private int topologySubmitRetryInterval = 10000;
-    private int heartbeatInterval = 5000;
     private int managementReconnectInterval = 10000;
+    private int managementHeartbeatInterval = 5000;
+    private int topologySubmitRetryInterval = 10000;
 
-    private String distributedUIUrl;
-
+    //transport
+    private int transportMinPort = 15000;
+    private int transportMaxPort = 15100;
+    private int transportReconnectInterval = 15000;
     private int cepReceiverOutputQueueSize = 8192;
     private int stormPublisherOutputQueueSize = 8192;
 
-    private String tcpEventPublisherMode = "blocking";
-    private int tcpEventPublisherOutputQueueSize = 8192;
-    private int tcpEventPublisherSendBufferSize = 5242880;
-    private String tcpEventPublisherCharSet = "UTF-8";
-    private int tcpEventReceiverThreadCount = 10;
+    private int checkMemberUpdateInterval = 10000;
 
-    private int presenterServerThreads;
+    private int transportPublisherTcpSendBufferSize = 5242880;
+    private String transportPublisherCharSet = "UTF-8";
+    private int transportPublisherBufferSize = 1024;
+    private long transportPublisherConnectionStatusCheckInterval = 30000;
+    private int transportReceiverThreads = 10;
 
+    //presentation
+    private int presentationPublisherTcpSendBufferSize = 5242880;
+    private String presentationPublisherCharSet = "UTF-8";
+    private int presentationPublisherBufferSize = 1024;
+    private long presentationPublisherConnectionStatusCheckInterval = 30000;
+    private int presentationReceiverThreads = 10;
 
-    /**
-     * Status monitor configs
-     */
-    private int lockTimeout = 60;   //Lock timeout in seconds.
-    private int updateRate = 60000; //Rate in milliseconds at which the hazelcast map will be updated by each worker.
+    //status
+    private int statusLockTimeout = 60000;   //Lock timeout in milliseconds.
+    private int statusUpdateInterval = 60000; //Rate in milliseconds at which the hazelcast map will be updated by each worker.
 
-    public int getTcpEventReceiverThreadCount() { return tcpEventReceiverThreadCount;}
+    private String jar;
+    private String distributedUIUrl;
 
-    public void setTcpEventReceiverThreadCount(int tcpEventReceiverThreadCount) {
-        this.tcpEventReceiverThreadCount = tcpEventReceiverThreadCount;
+    public int getTransportReceiverThreads() {
+        return transportReceiverThreads;
     }
 
-    public String getTcpEventPublisherCharSet() { return tcpEventPublisherCharSet;}
-
-    public void setTcpEventPublisherCharSet(String tcpEventPublisherCharSet) {
-        this.tcpEventPublisherCharSet = tcpEventPublisherCharSet;
+    public void setTransportReceiverThreads(int transportReceiverThreads) {
+        this.transportReceiverThreads = transportReceiverThreads;
     }
 
-    public int getTcpEventPublisherSendBufferSize() { return tcpEventPublisherSendBufferSize;}
-
-    public void setTcpEventPublisherSendBufferSize(int tcpEventPublisherSendBufferSize) {
-        this.tcpEventPublisherSendBufferSize = tcpEventPublisherSendBufferSize;
+    public String getTransportPublisherCharSet() {
+        return transportPublisherCharSet;
     }
 
-    public int getTcpEventPublisherOutputQueueSize() { return tcpEventPublisherOutputQueueSize;}
-
-    public void setTcpEventPublisherOutputQueueSize(int tcpEventPublisherOutputQueueSize) {
-        this.tcpEventPublisherOutputQueueSize = tcpEventPublisherOutputQueueSize;
+    public void setTransportPublisherCharSet(String transportPublisherCharSet) {
+        this.transportPublisherCharSet = transportPublisherCharSet;
     }
 
-    public String getTcpEventPublisherMode() { return tcpEventPublisherMode; }
+    public int getTransportPublisherTcpSendBufferSize() {
+        return transportPublisherTcpSendBufferSize;
+    }
 
-    public void setTcpEventPublisherMode(String tcpEventPublisherMode) {
-        this.tcpEventPublisherMode = tcpEventPublisherMode;
+    public void setTransportPublisherTcpSendBufferSize(int transportPublisherTcpSendBufferSize) {
+        this.transportPublisherTcpSendBufferSize = transportPublisherTcpSendBufferSize;
     }
 
     public int getCepReceiverOutputQueueSize() {
@@ -109,12 +111,12 @@ public class DistributedConfiguration implements Serializable {
         this.stormPublisherOutputQueueSize = stormPublisherOutputQueueSize;
     }
 
-    public int getHeartbeatInterval() {
-        return heartbeatInterval;
+    public int getManagementHeartbeatInterval() {
+        return managementHeartbeatInterval;
     }
 
-    public void setHeartbeatInterval(int heartbeatInterval) {
-        this.heartbeatInterval = heartbeatInterval;
+    public void setManagementHeartbeatInterval(int managementHeartbeatInterval) {
+        this.managementHeartbeatInterval = managementHeartbeatInterval;
     }
 
     public int getTopologySubmitRetryInterval() {
@@ -205,25 +207,29 @@ public class DistributedConfiguration implements Serializable {
         this.distributedUIUrl = distributedUIUrl;
     }
 
-    public int getLockTimeout() {
-        return lockTimeout;
+    public int getStatusLockTimeout() {
+        return statusLockTimeout;
     }
 
-    public void setLockTimeout(int lockTimeout) {
-        this.lockTimeout = lockTimeout;
+    public void setStatusLockTimeout(int statusLockTimeout) {
+        this.statusLockTimeout = statusLockTimeout;
     }
 
-    public int getUpdateRate() {
-        return updateRate;
+    public int getStatusUpdateInterval() {
+        return statusUpdateInterval;
     }
 
-    public void setUpdateRate(int updateRate) {
-        this.updateRate = updateRate;
+    public void setStatusUpdateInterval(int statusUpdateInterval) {
+        this.statusUpdateInterval = statusUpdateInterval;
     }
 
-    public boolean isPresenterNode() { return presenterNode; }
+    public boolean isPresenterNode() {
+        return presenterNode;
+    }
 
-    public void setPresenterNode(boolean presenterNode) { this.presenterNode = presenterNode;}
+    public void setPresenterNode(boolean presenterNode) {
+        this.presenterNode = presenterNode;
+    }
 
     public HostAndPort getLocalPresenterConfig() {
         return localPresenterConfig;
@@ -233,12 +239,99 @@ public class DistributedConfiguration implements Serializable {
         this.localPresenterConfig = new HostAndPort(host, port);
     }
 
-    public void setPresenterServerThreads(int presenterServerThreads) {
-        this.presenterServerThreads = presenterServerThreads;
+    public int getCheckMemberUpdateInterval() {
+        return checkMemberUpdateInterval;
     }
 
-    public int getPresenterServerThreads() {
-        return presenterServerThreads;
+    public void setCheckMemberUpdateInterval(int checkMemberUpdateInterval) {
+        this.checkMemberUpdateInterval = checkMemberUpdateInterval;
     }
 
+    public int getTransportPublisherBufferSize() {
+        return transportPublisherBufferSize;
+    }
+
+    public long getTransportPublisherConnectionStatusCheckInterval() {
+        return transportPublisherConnectionStatusCheckInterval;
+    }
+
+    public int getPresentationPublisherTcpSendBufferSize() {
+        return presentationPublisherTcpSendBufferSize;
+    }
+
+    public String getPresentationPublisherCharSet() {
+        return presentationPublisherCharSet;
+    }
+
+    public int getPresentationPublisherBufferSize() {
+        return presentationPublisherBufferSize;
+    }
+
+    public long getPresentationPublisherConnectionStatusCheckInterval() {
+        return presentationPublisherConnectionStatusCheckInterval;
+    }
+
+    public int getPresentationReceiverThreads() {
+        return presentationReceiverThreads;
+    }
+
+    public void setLocalManagerConfig(HostAndPort localManagerConfig) {
+        this.localManagerConfig = localManagerConfig;
+    }
+
+    public void setLocalPresenterConfig(HostAndPort localPresenterConfig) {
+        this.localPresenterConfig = localPresenterConfig;
+    }
+
+    public void setManagers(List<HostAndPort> managers) {
+        this.managers = managers;
+    }
+
+    public void setTransportPublisherBufferSize(int transportPublisherBufferSize) {
+        this.transportPublisherBufferSize = transportPublisherBufferSize;
+    }
+
+    public void setTransportPublisherConnectionStatusCheckInterval(long transportPublisherConnectionStatusCheckInterval) {
+        this.transportPublisherConnectionStatusCheckInterval = transportPublisherConnectionStatusCheckInterval;
+    }
+
+    public void setPresentationPublisherTcpSendBufferSize(int presentationPublisherTcpSendBufferSize) {
+        this.presentationPublisherTcpSendBufferSize = presentationPublisherTcpSendBufferSize;
+    }
+
+    public void setPresentationPublisherCharSet(String presentationPublisherCharSet) {
+        this.presentationPublisherCharSet = presentationPublisherCharSet;
+    }
+
+    public void setPresentationPublisherBufferSize(int presentationPublisherBufferSize) {
+        this.presentationPublisherBufferSize = presentationPublisherBufferSize;
+    }
+
+    public void setPresentationPublisherConnectionStatusCheckInterval(long presentationPublisherConnectionStatusCheckInterval) {
+        this.presentationPublisherConnectionStatusCheckInterval = presentationPublisherConnectionStatusCheckInterval;
+    }
+
+    public void setPresentationReceiverThreads(int presentationReceiverThreads) {
+        this.presentationReceiverThreads = presentationReceiverThreads;
+    }
+
+    public TCPEventPublisherConfig constructTransportPublisherConfig() {
+
+        TCPEventPublisherConfig tcpEventPublisherConfig = new TCPEventPublisherConfig();
+        tcpEventPublisherConfig.setBufferSize(getTransportPublisherBufferSize());
+        tcpEventPublisherConfig.setConnectionStatusCheckInterval(getTransportPublisherConnectionStatusCheckInterval());
+        tcpEventPublisherConfig.setCharset(getTransportPublisherCharSet());
+        tcpEventPublisherConfig.setTcpSendBufferSize(getTransportPublisherTcpSendBufferSize());
+        return tcpEventPublisherConfig;
+    }
+
+    public TCPEventPublisherConfig constructPresenterPublisherConfig() {
+
+        TCPEventPublisherConfig tcpEventPublisherConfig = new TCPEventPublisherConfig();
+        tcpEventPublisherConfig.setBufferSize(getPresentationPublisherBufferSize());
+        tcpEventPublisherConfig.setConnectionStatusCheckInterval(getPresentationPublisherConnectionStatusCheckInterval());
+        tcpEventPublisherConfig.setCharset(getPresentationPublisherCharSet());
+        tcpEventPublisherConfig.setTcpSendBufferSize(getPresentationPublisherTcpSendBufferSize());
+        return tcpEventPublisherConfig;
+    }
 }
