@@ -290,7 +290,7 @@ public class EventReceiver implements EventProducer {
 
     public void destroy() {
         EventReceiverServiceValueHolder.getInputEventAdapterService().destroy(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
-        if (inputEventDispatcher instanceof EventSync) {
+        if (mode == Mode.HA && inputEventDispatcher instanceof EventSync) {
             EventReceiverServiceValueHolder.getEventManagementService().unregisterEventSync(((EventSync) inputEventDispatcher).getStreamDefinition().getId());
         }
     }

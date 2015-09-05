@@ -18,7 +18,6 @@
 
 package test.server;
 
-import com.lmax.disruptor.InsufficientCapacityException;
 import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisher;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
@@ -101,8 +100,6 @@ public class TCPEventTestClient {
                     e.printStackTrace();
 //            } catch (InterruptedException e) {
 //                e.printStackTrace();
-                } catch (InsufficientCapacityException e) {
-                    e.printStackTrace();
                 }
             }
         }

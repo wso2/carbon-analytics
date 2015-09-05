@@ -16,7 +16,6 @@
 package org.wso2.carbon.event.processor.manager.core.internal;
 
 import com.hazelcast.core.*;
-import com.lmax.disruptor.InsufficientCapacityException;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisher;
@@ -301,8 +300,6 @@ public class CarbonEventManagementService implements EventManagementService {
                         publisher.sendEvent(syncId, event.getTimestamp(), event.getData(), true);
                     } catch (IOException e) {
                         log.error("Error sending sync events to " + syncId, e);
-                    } catch (InsufficientCapacityException e) {
-                        log.warn("Cannot send event to '" + syncId + "' dropping event due to insufficient capacity :" + event);
                     }
                 }
             }

@@ -20,7 +20,6 @@ package org.wso2.carbon.event.processor.manager.commons.transport.client;
 
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventHandler;
-import com.lmax.disruptor.InsufficientCapacityException;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import org.apache.log4j.Logger;
@@ -139,7 +138,7 @@ public class TCPEventPublisher {
      * @param eventData data to send
      * @throws java.io.IOException
      */
-    public void sendEvent(String streamId, long timestamp, Object[] eventData, boolean flush) throws IOException, InsufficientCapacityException {
+    public void sendEvent(String streamId, long timestamp, Object[] eventData, boolean flush) throws IOException {
         StreamRuntimeInfo streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
 
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
@@ -195,8 +194,8 @@ public class TCPEventPublisher {
         }
     }
 
-    private void publishToDisruptor(byte[] byteArray) throws InsufficientCapacityException {
-        long sequenceNo = ringBuffer.tryNext();
+    private void publishToDisruptor(byte[] byteArray) {
+        long sequenceNo = ringBuffer.next();
         try {
             ByteArrayHolder existingHolder = ringBuffer.get(sequenceNo);
             existingHolder.bytes = byteArray;
