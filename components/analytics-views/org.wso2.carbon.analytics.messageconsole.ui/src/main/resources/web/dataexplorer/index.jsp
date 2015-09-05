@@ -501,14 +501,14 @@
                         <td><input type="checkbox" id="dataPurgingCheckBox"></td>
                     </tr>
                     <tr>
-                        <td>Schedule Time (Either cron string or HH:MM):</td>
+                        <td>Schedule Time (Either cron string or HH:MM)*:</td>
                         <td><input type="text" id="dataPurgingScheudleTime" disabled="disabled"
-                                   class="validate[required]"></td>
+                                   class="validate[required]" data-prompt-position="bottomLeft"></td>
                     </tr>
                     <tr>
-                        <td>Purge Record Older Than (Days)</td>
+                        <td>Purge Record Older Than (Days)*:</td>
                         <td><input type="text" id="dataPurgingDay" disabled="disabled"
-                                   class="validate[custom[integer],min[1]]"></td>
+                                   class="validate[required,custom[integer],min[1]]" data-prompt-position="bottomLeft"></td>
                     </tr>
                     </tbody>
                 </table>

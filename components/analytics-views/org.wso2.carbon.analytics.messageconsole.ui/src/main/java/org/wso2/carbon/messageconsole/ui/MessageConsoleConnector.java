@@ -419,16 +419,21 @@ public class MessageConsoleConnector {
                 cron = time;
             }
         }
-        try {
-            messageConsoleStub.scheduleDataPurging(table, cron, Integer.parseInt(retentionPeriod));
-            if (enable) {
-                msg = "Data purging task for " + table + " scheduled successfully.";
-            } else {
-                msg = "Data purging task for " + table + " removed successfully.";
+
+        if (!retentionPeriod.matches("^-?\\\\d+$")) {
+            msg = "Please enter valid number for \"Purge Record Older Than \" field.";
+        } else {
+            try {
+                messageConsoleStub.scheduleDataPurging(table, cron, Integer.parseInt(retentionPeriod));
+                if (enable) {
+                    msg = "Data purging task for " + table + " scheduled successfully.";
+                } else {
+                    msg = "Data purging task for " + table + " removed successfully.";
+                }
+            } catch (Exception e) {
+                msg = "Unable to schedule task due to " + e.getMessage();
+                log.error("Unable to schedule data puring task for " + table, e);
             }
-        } catch (Exception e) {
-            msg = "Unable to schedule task due to " + e.getMessage();
-            log.error("Unable to schedule data puring task for " + table, e);
         }
         return msg;
     }
