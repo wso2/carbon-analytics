@@ -55,6 +55,7 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.SparkTableNamesHolder;
+import org.wso2.carbon.analytics.spark.utils.ComputeClasspath;
 import org.wso2.carbon.utils.CarbonUtils;
 import scala.None$;
 import scala.Option;
@@ -517,6 +518,23 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         try {
             conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
             conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
+
+            String sparkClasspath = (System.getProperty("SPARK_CLASSPATH") == null) ?
+                                    "" : System.getProperty("SPARK_CLASSPATH");
+            sparkClasspath = ComputeClasspath.getSparkClasspath(sparkClasspath, CarbonUtils.getCarbonHome());
+
+            try {
+                conf.set("spark.executor.extraClassPath", conf.get("spark.executor.extraClassPath") + ";" + sparkClasspath);
+            } catch (NoSuchElementException e) {
+                conf.set("spark.executor.extraClassPath", sparkClasspath);
+            }
+
+            try {
+                conf.set("spark.driver.extraClassPath", conf.get("spark.driver.extraClassPath") + ";" + sparkClasspath);
+            } catch (NoSuchElementException e) {
+                conf.set("spark.driver.extraClassPath", sparkClasspath);
+            }
+
         } catch (Throwable e) {
             logDebug("Spark conf in non-carbon environment");
         }

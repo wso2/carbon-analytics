@@ -265,6 +265,7 @@
                     <include>spark-udf-config.xml</include>
                     <include>wso2server.sh</include>
                     <include>load-spark-env-vars.sh</include>
+                    <include>load-spark-env-vars.bat</include>
                     <include>add-to-spark-classpath.conf</include>
                 </includes>
             </resource>

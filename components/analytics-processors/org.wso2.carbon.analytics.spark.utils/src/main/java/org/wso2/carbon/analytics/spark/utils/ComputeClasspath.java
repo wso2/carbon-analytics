@@ -28,7 +28,7 @@ import java.io.IOException;
  * this class creates the spark classpath by looking at the plugins folder
  */
 public class ComputeClasspath {
-    private static final String[] requiredJars = {
+    private static final String[] REQUIRED_JARS = {
             "apache-zookeeper",
             "cassandra-thrift",
             "chill",
@@ -226,11 +226,21 @@ public class ComputeClasspath {
 
     public static String getSparkClasspath(String sparkClasspath, String carbonHome)
             throws IOException {
-        String str = createSparkClasspath(sparkClasspath, carbonHome, requiredJars);
-        return readFromConfig(str, carbonHome);
+        String cp = createInitialSparkClasspath(sparkClasspath, carbonHome, REQUIRED_JARS);
+        return cp + addJarsFromLib("", carbonHome) + addJarsFromConfig("", carbonHome);
     }
 
-    private static String readFromConfig(String sparkClasspath, String carbonHome)
+    private static String addJarsFromLib(String scp, String carbonHome) {
+        File libDir = new File(carbonHome + File.separator + "repository" + File.separator
+                               + "components" + File.separator + "lib");
+        File[] libJars = listJars(libDir);
+        for (File jar : libJars) {
+            scp = scp + ":" + jar.getAbsolutePath();
+        }
+        return scp;
+    }
+
+    private static String addJarsFromConfig(String scp, String carbonHome)
             throws IOException {
         File cpFile = new File(carbonHome + File.separator + "repository" + File.separator + "conf"
                                + File.separator + "spark" + File.separator + "add-to-spark-classpath.conf");
@@ -251,9 +261,9 @@ public class ComputeClasspath {
                 }
 
                 if (fileExists(line)) {
-                    sparkClasspath = sparkClasspath + ":" + line;
+                    scp = scp + ":" + line;
                 } else if (fileExists(carbonHome + File.separator + line)) {
-                    sparkClasspath = sparkClasspath + ":" + carbonHome + File.separator + line;
+                    scp = scp + ":" + carbonHome + File.separator + line;
                 } else {
                     throw new IOException("File not found : " + line);
                 }
@@ -268,25 +278,28 @@ public class ComputeClasspath {
             }
         }
 
-        return sparkClasspath;
+        return scp;
     }
 
-    private static boolean fileExists( String path ){
+    private static boolean fileExists(String path) {
         File tempFile = new File(path);
         return tempFile.exists() && !tempFile.isDirectory();
     }
 
-    private static String createSparkClasspath(String sparkClasspath, String carbonHome,
-                                               String[] requiredJars) {
-        File pluginsDir = new File(carbonHome + File.separator + "repository" + File.separator
-                                   + "components" + File.separator + "plugins");
-
-        File[] pluginJars = pluginsDir.listFiles(new FilenameFilter() {
+    private static File[] listJars(File dir) {
+        return dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 return name.endsWith(".jar");
             }
         });
+    }
+
+    private static String createInitialSparkClasspath(String sparkClasspath, String carbonHome,
+                                                      String[] requiredJars) {
+        File pluginsDir = new File(carbonHome + File.separator + "repository" + File.separator
+                                   + "components" + File.separator + "plugins");
+        File[] pluginJars = listJars(pluginsDir);
 
         for (String requiredJar : requiredJars) {
             for (File pluginJar : pluginJars) {
