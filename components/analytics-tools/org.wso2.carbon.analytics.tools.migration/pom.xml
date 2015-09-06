@@ -22,7 +22,6 @@
         <dependency>
             <groupId>me.prettyprint</groupId>
             <artifactId>hector-core</artifactId>
-            <version>0.7.0-29</version>
         </dependency>
     </dependencies>
     <build>

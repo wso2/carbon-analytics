@@ -309,6 +309,11 @@
                 <artifactId>org.wso2.carbon.datasource.reader.cassandra</artifactId>
                 <version>${carbon.data.version}</version>
             </dependency>
+            <dependency>
+                <groupId>me.prettyprint</groupId>
+                <artifactId>hector-core</artifactId>
+                <version>${hector.version}</version>
+            </dependency>
             <!--<dependency>-->
                 <!--<groupId>io.netty</groupId>-->
                 <!--<artifactId>netty</artifactId>-->
@@ -1335,7 +1340,7 @@
         <roaringbitmap.version>0.4.5</roaringbitmap.version>
         <roaringbitmap.import.version>[0.4.5, 0.5.0)</roaringbitmap.import.version>
         <objenesis.orbit.version>2.1.wso2v1</objenesis.orbit.version>
-
+        <hector.version>0.7.0-29</hector.version>
         <siddhi.version>3.0.0</siddhi.version>
         <version.noggit>0.6.wso2v1</version.noggit>
 
