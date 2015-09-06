@@ -287,8 +287,6 @@ public class AnalyticsDataMigrationTool {
                 return LongSerializer.get().fromByteBuffer(bytes);
             case INTEGER_TYPE:
                 return IntegerSerializer.get().fromByteBuffer(bytes);
-            case TIME_UUID_TYPE:
-                return TimeUUIDSerializer.get().fromByteBuffer(bytes);
             case ASCII_TYPE:
                 return AsciiSerializer.get().fromByteBuffer(bytes);
             case BYTE_TYPE:
