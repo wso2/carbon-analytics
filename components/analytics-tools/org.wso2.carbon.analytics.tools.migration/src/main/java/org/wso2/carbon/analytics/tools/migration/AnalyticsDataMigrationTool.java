@@ -75,7 +75,9 @@ public class AnalyticsDataMigrationTool {
     private static final String PAYLOAD_PREFIX = "payload_";
     private static final String OLD_VERSION_FIELD = "Version";
     private static final String NEW_VERSION_FIELD = "_version";
-    private static final String CLUSTER_NAME = "cluster1";
+    private static final String DEFAULT_CLUSTER_NAME = "cluster1";
+    private static final String CLUSTER_NAME_ARG = "clusterName";
+    private static final String CLUSTER_NAME = "clusterName";
     private static final String CASSANDRA_KEYSPACE = "EVENT_KS";
 
     private static final String UTF8_TYPE = "org.apache.cassandra.db.marshal.UTF8Type";
@@ -115,6 +117,9 @@ public class AnalyticsDataMigrationTool {
         options.addOption(OptionBuilder.withArgName(CASSANDRA_PORT_ARG).hasArg()
                 .withDescription("specify the cassandra port")
                 .create(CASSANDRA_PORT_ARG));
+        options.addOption(OptionBuilder.withArgName(CLUSTER_NAME_ARG).hasArg()
+                .withDescription("specify the cassandra cluster")
+                .create(CLUSTER_NAME));
         CommandLineParser parser = new BasicParser();
         CommandLine line = parser.parse(options, args);
         if (args.length < 4 ) {
@@ -129,9 +134,10 @@ public class AnalyticsDataMigrationTool {
             String serverUrl;
             String columnFamily;
             String analyticTable;
-            String cassandraUser = null, cassandraPassword = null;
+            String cassandraUser = null, cassandraPassword = null, clusterName = null;
             int tenantId = Integer.parseInt(line.getOptionValue(TENANT_ID, "" + MultitenantConstants.SUPER_TENANT_ID));
             serverUrl = line.getOptionValue(SERVER_URL, DEFAULT_CASSANDRA_SERVER_URL);
+            clusterName = line.getOptionValue(CLUSTER_NAME, DEFAULT_CLUSTER_NAME);
             int port = Integer.parseInt(line.getOptionValue(SERVER_PORT, DEFAULT_CASSANDRA_CQL_PORT));
             int cassandraPort = Integer.parseInt(line.getOptionValue(CASSANDRA_PORT, DEFAULT_CASSANDRA_PORT));
             int batchSize = Integer.parseInt(line.getOptionValue(BATCH_SIZE, RECORD_BATCH_SIZE));
@@ -160,9 +166,9 @@ public class AnalyticsDataMigrationTool {
                 Map<String, String> credentials = new HashMap<>();
                 credentials.put("username", cassandraUser);
                 credentials.put("password", cassandraPassword);
-                cluster = HFactory.getOrCreateCluster(CLUSTER_NAME,new CassandraHostConfigurator(serverUrl+":"+cassandraPort),credentials);
+                cluster = HFactory.getOrCreateCluster(clusterName,new CassandraHostConfigurator(serverUrl+":"+cassandraPort),credentials);
             } else {
-                cluster = HFactory.getOrCreateCluster(CLUSTER_NAME, new CassandraHostConfigurator(serverUrl + ":" + port));
+                cluster = HFactory.getOrCreateCluster(clusterName, new CassandraHostConfigurator(serverUrl + ":" + port));
             }
             Keyspace keyspace = HFactory.createKeyspace(CASSANDRA_KEYSPACE, cluster);
 
