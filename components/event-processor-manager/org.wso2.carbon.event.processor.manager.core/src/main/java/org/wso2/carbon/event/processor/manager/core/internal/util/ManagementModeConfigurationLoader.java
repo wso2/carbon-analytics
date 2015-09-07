@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.event.processor.manager.core.internal.util;
@@ -355,16 +357,54 @@ public class ManagementModeConfigurationLoader {
     }
 
     private static HAConfiguration getHAConfiguration(OMElement processing) {
-        HAConfiguration haConfiguration = new HAConfiguration();
-        OMElement transport = processing.getFirstChildWithName(
-                new QName(ConfigurationConstants.EVENT_SYNC_ELEMENT));
-        haConfiguration.setEventSyncConfig(readHostName(transport),
-                readPort(transport, ConfigurationConstants.HA_DEFAULT_TRANSPORT_PORT));
 
-        OMElement management = processing.getFirstChildWithName(
-                new QName(ConfigurationConstants.MANAGEMENT_ELEMENT));
+        HAConfiguration haConfiguration = new HAConfiguration();
+
+        OMElement nodeType = processing.getFirstChildWithName(new QName(ConfigurationConstants.HA_NODE_TYPE));
+        String isWorkerEnabled = nodeType.getFirstChildWithName(new QName(ConfigurationConstants.HA_WORKER))
+                .getAttribute(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)).getAttributeValue();
+        haConfiguration.setCheckMemberUpdateInterval(Integer.parseInt(readOMElementValue(processing, ConfigurationConstants
+                .HA_NODE_CONFIG_CHECK_MEMBER_UPDATE_INTERVAL)));
+
+        OMElement management = processing.getFirstChildWithName(new QName(ConfigurationConstants.MANAGEMENT_ELEMENT));
         haConfiguration.setManagement(readHostName(management),
-                readPort(management, ConfigurationConstants.HA_DEFAULT_MANAGEMENT_PORT));
+                                      readPort(management, ConfigurationConstants.HA_DEFAULT_MANAGEMENT_PORT));
+        haConfiguration.setManagementTryStateChangeInterval(Integer.parseInt(readOMElementValue(management, ConfigurationConstants
+                .HA_NODE_CONFIG_MANAGEMENT_TRY_STATE_CHANGE_INTERVAL)));
+        haConfiguration.setManagementStateSyncRetryInterval(Integer.parseInt(readOMElementValue(management, ConfigurationConstants
+                .HA_NODE_CONFIG_MANAGEMENT_STATE_RETRY_INTERVAL)));
+
+        if (isWorkerEnabled.equalsIgnoreCase("true")) {
+            haConfiguration.setWorkerNode(true);
+            OMElement eventSync = processing.getFirstChildWithName(new QName(ConfigurationConstants.EVENT_SYNC_ELEMENT));
+            haConfiguration.setEventSyncConfig(readHostName(eventSync),
+                                               readPort(eventSync, ConfigurationConstants.HA_DEFAULT_TRANSPORT_PORT));
+            haConfiguration.setEventSyncPublisherTcpSendBufferSize(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
+                    .HA_NODE_CONFIG_PUBLISHER_TCP_SEND_BUFFER_SIZE)));
+            haConfiguration.setEventSyncPublisherCharSet(readOMElementValue(eventSync, ConfigurationConstants
+                    .HA_NODE_CONFIG_PUBLISHER_CHAR_SET));
+            haConfiguration.setEventSyncPublisherBufferSize(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
+                    .HA_NODE_CONFIG_PUBLISHER_BUFFER_SIZE)));
+            haConfiguration.setEventSyncPublisherConnectionStatusCheckInterval(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
+                    .HA_NODE_CONFIG_PUBLISHER_CONNECTION_STATUS_CHECK_INTERVAL)));
+            haConfiguration.setEventSyncReceiverThreads(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
+                    .HA_NODE_CONFIG_RECEIVER_THREADS)));
+        } else {
+            haConfiguration.setPresenterNode(true);
+            OMElement presentation = processing.getFirstChildWithName(new QName(ConfigurationConstants.PRESENTER_ELEMENT));
+            haConfiguration.setLocalPresenterConfig(readHostName(presentation),
+                                                    readPort(presentation, ConfigurationConstants.HA_DEFAULT_PRESENTER_PORT));
+            haConfiguration.setPresentationPublisherTcpSendBufferSize(Integer.parseInt(readOMElementValue(presentation, ConfigurationConstants
+                    .HA_NODE_CONFIG_PUBLISHER_TCP_SEND_BUFFER_SIZE)));
+            haConfiguration.setPresentationPublisherCharSet(readOMElementValue(presentation, ConfigurationConstants
+                    .HA_NODE_CONFIG_PUBLISHER_CHAR_SET));
+            haConfiguration.setPresentationPublisherBufferSize(Integer.parseInt(readOMElementValue(presentation, ConfigurationConstants
+                    .HA_NODE_CONFIG_PUBLISHER_BUFFER_SIZE)));
+            haConfiguration.setPresentationPublisherConnectionStatusCheckInterval(Integer.parseInt(readOMElementValue(presentation, ConfigurationConstants
+                    .HA_NODE_CONFIG_PUBLISHER_CONNECTION_STATUS_CHECK_INTERVAL)));
+            haConfiguration.setPresentationReceiverThreads(Integer.parseInt(readOMElementValue(presentation, ConfigurationConstants
+                    .HA_NODE_CONFIG_RECEIVER_THREADS)));
+        }
 
         return haConfiguration;
     }
@@ -438,4 +478,12 @@ public class ManagementModeConfigurationLoader {
         return (value == 1);
     }
 
+    public static String readOMElementValue(OMElement parentElement, String elementName) {
+        OMElement element = parentElement.getFirstChildWithName(new QName(elementName));
+        String elementValue = null;
+        if (!"".equals(element.getText().trim())) {
+            elementValue = element.getText();
+        }
+        return elementValue;
+    }
 }

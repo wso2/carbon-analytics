@@ -1,20 +1,20 @@
 /*
-*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.event.processor.manager.core.internal.util;
 
 /**
@@ -37,6 +37,9 @@ public final class ConfigurationConstants {
     public static final String RECONNECTION_INTERVAL_ELEMENT = "reconnectionInterval";
     public static final String TRANSPORT_ELEMENT = "transport";
     public static final String EVENT_SYNC_ELEMENT = "eventSync";
+    public static final String PRESENTER_ELEMENT = "presenter";
+    public static final String HA_WORKER = "worker";
+    public static final String HA_NODE_TYPE = "nodeType";
 
 
     public static final String PROCESSING_MODE_HA = "HA";
@@ -44,6 +47,19 @@ public final class ConfigurationConstants {
     public static final int HA_DEFAULT_TRANSPORT_PORT = 11224;
     public static final int HA_DEFAULT_RECONNECTION_INTERVAL = 20000;
     public static final int HA_DEFAULT_MANAGEMENT_PORT = 11324;
+    public static final int HA_DEFAULT_PRESENTER_PORT = 11000;
+
+    public static final String HA_NODE_CONFIG_PUBLISHER_TCP_SEND_BUFFER_SIZE = "publisherTcpSendBufferSize";
+    public static final String HA_NODE_CONFIG_PUBLISHER_CHAR_SET = "publisherCharSet";
+    public static final String HA_NODE_CONFIG_PUBLISHER_BUFFER_SIZE = "publisherBufferSize";
+    public static final String HA_NODE_CONFIG_PUBLISHER_CONNECTION_STATUS_CHECK_INTERVAL =
+            "publisherConnectionStatusCheckInterval";
+    public static final String HA_NODE_CONFIG_RECEIVER_THREADS = "receiverThreads";
+
+    public static final String HA_NODE_CONFIG_MANAGEMENT_STATE_RETRY_INTERVAL = "stateSyncRetryInterval";
+    public static final String HA_NODE_CONFIG_MANAGEMENT_TRY_STATE_CHANGE_INTERVAL = "tryStateChangeInterval";
+    public static final String HA_NODE_CONFIG_CHECK_MEMBER_UPDATE_INTERVAL = "checkMemberUpdateInterval";
+
 
     public static final String PROCESSING_MODE_SN = "SingleNode";
     public static final String SN_PERSISTENCE_ELEMENT = "persistence";
