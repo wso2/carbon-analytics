@@ -1259,8 +1259,8 @@
         <lucene.orbit.version>5.2.1.wso2v1</lucene.orbit.version>
         <lucene.imp.pkg.version>[5.2.1, 5.3.0)</lucene.imp.pkg.version>
         <asm4.orbit.version>4.1.0.wso2v1</asm4.orbit.version>
-        <carbon.commons.version>4.4.4</carbon.commons.version>
-        <carbon.commons.imp.pkg.version>[4.4.4, 4.5.0)</carbon.commons.imp.pkg.version>
+        <carbon.commons.version>4.4.7</carbon.commons.version>
+        <carbon.commons.imp.pkg.version>[4.4.7, 4.5.0)</carbon.commons.imp.pkg.version>
         <carbon.event-processing.version>2.0.4-SNAPSHOT</carbon.event-processing.version>
         <carbon.analytics.common.version>5.0.1-SNAPSHOT</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[5.0.1-SNAPSHOT, 5.1.0)</carbon.analytics.common.imp.pkg.version>
