@@ -25,6 +25,7 @@ import com.datastax.driver.core.Metadata;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -33,6 +34,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
@@ -43,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This class represents the Migration functionality, from Cassandra to new DAL
+ * This class represents the Migration functionality, from Cassandra to new DAL.
  */
 public class AnalyticsDataMigrationTool {
 
@@ -77,6 +79,7 @@ public class AnalyticsDataMigrationTool {
     private static final String NEW_VERSION_FIELD = "_version";
 
     public static void main(String[] args) throws Exception {
+        System.setProperty(AnalyticsDataIndexer.DISABLE_INDEX_THROTTLING_ENV_PROP, Boolean.TRUE.toString());
         Options options = new Options();
         options.addOption(OptionBuilder.withArgName(SERVER_URL_ARG).hasArg()
                                   .withDescription("Cassandra server url '<default value: localhost>'")

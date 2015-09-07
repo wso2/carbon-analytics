@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfigProperty;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
+import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -91,6 +92,8 @@ public class AnalyticsDataBackupTool {
             if (line.hasOption("enableIndexing")) {
                 System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
                 forceIndexing = true;
+            } else {
+                System.setProperty(AnalyticsDataIndexer.DISABLE_INDEX_THROTTLING_ENV_PROP, Boolean.TRUE.toString());
             }
         }
         if (line.hasOption("backupRecordStore")) {
@@ -329,6 +332,7 @@ public class AnalyticsDataBackupTool {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static List<Record> readRecordFromFile(File file) throws IOException {
         FileInputStream fileIn = null;
         try {
