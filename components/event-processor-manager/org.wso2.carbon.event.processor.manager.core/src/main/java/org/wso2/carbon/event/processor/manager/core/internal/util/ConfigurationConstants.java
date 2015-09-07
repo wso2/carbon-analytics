@@ -37,7 +37,7 @@ public final class ConfigurationConstants {
     public static final String RECONNECTION_INTERVAL_ELEMENT = "reconnectionInterval";
     public static final String TRANSPORT_ELEMENT = "transport";
     public static final String EVENT_SYNC_ELEMENT = "eventSync";
-    public static final String PRESENTER_ELEMENT = "presenter";
+    public static final String PRESENTER_ELEMENT = "presentation";
     public static final String HA_WORKER = "worker";
     public static final String HA_NODE_TYPE = "nodeType";
 
