@@ -420,7 +420,7 @@ public class MessageConsoleConnector {
             }
         }
 
-        if (!retentionPeriod.matches("^-?\\\\d+$")) {
+        if (!retentionPeriod.matches("^-?\\d+$")) {
             msg = "Please enter valid number for \"Purge Record Older Than \" field.";
         } else {
             try {
