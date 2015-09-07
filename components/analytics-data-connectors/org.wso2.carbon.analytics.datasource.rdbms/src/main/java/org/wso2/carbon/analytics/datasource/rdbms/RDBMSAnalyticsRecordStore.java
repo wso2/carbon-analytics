@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
+import com.google.common.collect.Lists;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -414,7 +415,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             return new EmptyResultSetAnalyticsIterator();
         }
         if (ids.size() > this.rdbmsQueryConfigurationEntry.getRecordBatchSize()) {
-            List<List<String>> idsSubLists = getChoppedLists(ids, this.rdbmsQueryConfigurationEntry.getRecordBatchSize());
+            List<List<String>> idsSubLists = Lists.partition(ids, this.rdbmsQueryConfigurationEntry.getRecordBatchSize());
             RDBMSIDsRecordGroup [] rdbmsIDsRecordGroups = new RDBMSIDsRecordGroup[idsSubLists.size()];
             int index = 0;
             for(List<String> idSubList : idsSubLists) {
@@ -445,16 +446,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             }
         }
     }
-    
-    private <T> List<List<T>> getChoppedLists(List<T> list, final int n) {
-        List<List<T>> parts = new ArrayList<List<T>>();
-        final int N = list.size();
-        for (int i = 0; i < N; i += n) {
-            parts.add(new ArrayList<T>(list.subList(i, Math.min(N, i + n))));
-        }
-        return parts;
-    }
-    
+
     @Override
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
@@ -486,7 +478,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             return;
         }
         Connection conn = null;
-        List<List<String>> idsSubLists = getChoppedLists(ids, this.rdbmsQueryConfigurationEntry.getRecordBatchSize());
+        List<List<String>> idsSubLists = Lists.partition(ids, this.rdbmsQueryConfigurationEntry.getRecordBatchSize());
         try {
             conn = this.getConnection();
             for (List<String> idSubList : idsSubLists) {
