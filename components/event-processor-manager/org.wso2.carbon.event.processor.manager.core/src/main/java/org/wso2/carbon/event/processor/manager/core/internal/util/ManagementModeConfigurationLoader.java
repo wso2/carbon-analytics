@@ -200,11 +200,11 @@ public class ManagementModeConfigurationLoader {
         }
 
         if (management.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_HEARTBEAT_INTERVAL_ELEMENT)) != null) {
-            stormDeploymentConfig.setHeartbeatInterval(Integer.parseInt(management.getFirstChildWithName(new QName
+            stormDeploymentConfig.setManagementHeartbeatInterval(Integer.parseInt(management.getFirstChildWithName(new QName
                     (ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_HEARTBEAT_INTERVAL_ELEMENT)).getText()));
         } else {
             log.info("No heartbeat interval provided. Hence using default heartbeat interval "
-                    + stormDeploymentConfig.getHeartbeatInterval());
+                    + stormDeploymentConfig.getManagementHeartbeatInterval());
         }
         if (management.getFirstChildWithName(new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)) != null) {
             stormDeploymentConfig.setManagementReconnectInterval(Integer.parseInt(management.getFirstChildWithName
@@ -266,47 +266,26 @@ public class ManagementModeConfigurationLoader {
         } else {
             log.info("No storm publisher output queue size specified. Hence using default queue size " + stormDeploymentConfig.getStormPublisherOutputQueueSize());
         }
-        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_MODE)) != null){
-            String tcpEventPublisherMode = transport.getFirstChildWithName(
-                    new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_MODE)).getText();
-            stormDeploymentConfig.setTcpEventPublisherMode(tcpEventPublisherMode);
-        }else{
-            log.info("TCP event publisher mode not set. Hence using default value " + stormDeploymentConfig.getTcpEventPublisherMode());
-        }
-        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_QUEUE_SIZE)) != null){
-            int queueSize = Integer.parseInt(transport.getFirstChildWithName(
-                    new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_QUEUE_SIZE)).getText());
-
-            if (isPowerOfTwo(queueSize)){
-                stormDeploymentConfig.setTcpEventPublisherOutputQueueSize(queueSize);
-            }else{
-                // Disruptor queue size only allows powers of two
-                throw new IllegalArgumentException(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_QUEUE_SIZE + " must be a power of two.");
-            }
-
-        } else {
-            log.info("No TCP publisher output queue size specified. Hence using default queue size " + stormDeploymentConfig.getTcpEventPublisherOutputQueueSize());
-        }
         if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE)) != null){
             int bufferSize = Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE)).getText());
-            stormDeploymentConfig.setTcpEventPublisherSendBufferSize(bufferSize);
+            stormDeploymentConfig.setTransportPublisherTcpSendBufferSize(bufferSize);
         } else {
-            log.info("No TCP publisher buffer size not specified. Hence using default buffer size " + stormDeploymentConfig.getTcpEventPublisherSendBufferSize());
+            log.info("No TCP publisher buffer size not specified. Hence using default buffer size " + stormDeploymentConfig.getTransportPublisherTcpSendBufferSize());
         }
         if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET)) != null){
             String tcpEventPublisherCharSet = transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET)).getText();
-            stormDeploymentConfig.setTcpEventPublisherCharSet(tcpEventPublisherCharSet);
+            stormDeploymentConfig.setTransportPublisherCharSet(tcpEventPublisherCharSet);
         }else{
-            log.info("TCP event publisher Char-Set not set. Hence using default value " + stormDeploymentConfig.getTcpEventPublisherCharSet());
+            log.info("TCP event publisher Char-Set not set. Hence using default value " + stormDeploymentConfig.getTransportPublisherCharSet());
         }
         if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)) != null){
             int threadCount = Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)).getText());
-            stormDeploymentConfig.setTcpEventReceiverThreadCount(threadCount);
+            stormDeploymentConfig.setTransportReceiverThreads(threadCount);
         } else {
-            log.info("No TCP receiver thread count not specified. Hence using default thread count " + stormDeploymentConfig.getTcpEventReceiverThreadCount());
+            log.info("No TCP receiver thread count not specified. Hence using default thread count " + stormDeploymentConfig.getTransportReceiverThreads());
         }
 
 
@@ -353,22 +332,22 @@ public class ManagementModeConfigurationLoader {
             OMElement lockTimeoutElement = statusMonitor.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STATUS_MONITOR_LOCK_TIMEOUT));
             if(lockTimeoutElement != null){
                 int lockTimeout = Integer.parseInt(lockTimeoutElement.getText());
-                stormDeploymentConfig.setLockTimeout(lockTimeout);
+                stormDeploymentConfig.setStatusLockTimeout(lockTimeout);
             } else {
                 log.info("No lockTimeout value specified in Status Monitor configurations. Hence using default lock timeout value: "
-                        + stormDeploymentConfig.getLockTimeout() + " seconds.");
+                        + stormDeploymentConfig.getStatusLockTimeout() + " seconds.");
             }
             OMElement updateRateElement = statusMonitor.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STATUS_MONITOR_UPDATE_RATE));
             if(updateRateElement != null){
                 int updateRate =  Integer.parseInt(updateRateElement.getText());
-                stormDeploymentConfig.setUpdateRate(updateRate);
+                stormDeploymentConfig.setStatusUpdateInterval(updateRate);
             } else {
                 log.info("No updateRate value specified in Status Monitor configurations. Hence using default update rate: "
-                        + stormDeploymentConfig.getUpdateRate() + " milliseconds.");
+                        + stormDeploymentConfig.getStatusUpdateInterval() + " milliseconds.");
             }
         } else {
             log.info("No Status Monitor configurations provided. Hence using default Status Monitor configurations. Lock timeout: " +
-            stormDeploymentConfig.getLockTimeout() + " seconds, Update rate: " + stormDeploymentConfig.getUpdateRate() + " milliseconds.");
+            stormDeploymentConfig.getStatusLockTimeout() + " seconds, Update rate: " + stormDeploymentConfig.getStatusUpdateInterval() + " milliseconds.");
         }
 
 
@@ -379,9 +358,8 @@ public class ManagementModeConfigurationLoader {
         HAConfiguration haConfiguration = new HAConfiguration();
         OMElement transport = processing.getFirstChildWithName(
                 new QName(ConfigurationConstants.EVENT_SYNC_ELEMENT));
-        haConfiguration.setTransport(readHostName(transport),
-                readPort(transport, ConfigurationConstants.HA_DEFAULT_TRANSPORT_PORT),
-                readReconnectionInterval(transport));
+        haConfiguration.setEventSyncConfig(readHostName(transport),
+                readPort(transport, ConfigurationConstants.HA_DEFAULT_TRANSPORT_PORT));
 
         OMElement management = processing.getFirstChildWithName(
                 new QName(ConfigurationConstants.MANAGEMENT_ELEMENT));

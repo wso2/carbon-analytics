@@ -63,7 +63,7 @@ public class HAManager {
     private HAConfiguration otherMember;
 
     public HAManager(HazelcastInstance hazelcastInstance, HAConfiguration haConfiguration,
-            ScheduledExecutorService executorService) {
+                     ScheduledExecutorService executorService) {
         this.haConfiguration = haConfiguration;
         this.executorService = executorService;
         activeId = ConfigurationConstants.ACTIVEID;
@@ -143,7 +143,9 @@ public class HAManager {
         List<HostAndPort> receiverList = new ArrayList<HostAndPort>();
         receiverList.add(otherMember.getEventSyncConfig());
         eventManagementService.setSyncReceivers(receiverList);
-        eventManagementService.addMember(otherMember.getEventSyncConfig());
+
+
+        eventManagementService.addMember(otherMember.getEventSyncConfig(), haConfiguration.constructEventSyncPublisherConfig());
 
         if (eventProcessorManagementService != null) {
             eventProcessorManagementService.pause();
@@ -225,7 +227,7 @@ public class HAManager {
         List<HostAndPort> receiverList = new ArrayList<HostAndPort>();
         receiverList.add(otherMember.getEventSyncConfig());
         eventManagementService.setSyncReceivers(receiverList);
-        eventManagementService.addMember(otherMember.getEventSyncConfig());
+        eventManagementService.addMember(otherMember.getEventSyncConfig(), haConfiguration.constructEventSyncPublisherConfig());
 
         executorService.execute(new Runnable() {
             @Override
@@ -240,7 +242,7 @@ public class HAManager {
                         log.error("CEP HA State syncing failed, " + e.getMessage(), e);
                     }
                     try {
-                        Thread.sleep(10000); //Todo move to config file
+                        Thread.sleep(haConfiguration.getManagementStateSyncRetryInterval());
                     } catch (InterruptedException e) {
                     }
                 }
@@ -312,7 +314,7 @@ public class HAManager {
         public void run() {
             tryChangeState();
             if (!activeLockAcquired) {
-                stateChanger = executorService.schedule(this, 15, TimeUnit.SECONDS);
+                stateChanger = executorService.schedule(this, haConfiguration.getManagementTryStateChangeInterval(), TimeUnit.MILLISECONDS);
             }
         }
     }

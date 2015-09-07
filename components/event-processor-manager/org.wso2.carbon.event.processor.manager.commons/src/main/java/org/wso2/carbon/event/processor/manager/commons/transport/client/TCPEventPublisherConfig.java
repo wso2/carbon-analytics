@@ -21,9 +21,9 @@ package org.wso2.carbon.event.processor.manager.commons.transport.client;
 public class TCPEventPublisherConfig {
 
     private int bufferSize = 1024;
-    private String defaultCharset = "UTF-8";
+    private String charset = "UTF-8";
     private int tcpSendBufferSize = 5242880;
-
+    private long connectionStatusCheckInterval = 30 * 1000;
 
     public int getBufferSize() {
         return bufferSize;
@@ -33,12 +33,12 @@ public class TCPEventPublisherConfig {
         this.bufferSize = bufferSize;
     }
 
-    public String getDefaultCharset() {
-        return defaultCharset;
+    public String getCharset() {
+        return charset;
     }
 
-    public void setDefaultCharset(String defaultCharset) {
-        this.defaultCharset = defaultCharset;
+    public void setCharset(String charset) {
+        this.charset = charset;
     }
 
     public int getTcpSendBufferSize() {
@@ -47,5 +47,13 @@ public class TCPEventPublisherConfig {
 
     public void setTcpSendBufferSize(int tcpSendBufferSize) {
         this.tcpSendBufferSize = tcpSendBufferSize;
+    }
+
+    public long getConnectionStatusCheckInterval() {
+        return connectionStatusCheckInterval;
+    }
+
+    public void setConnectionStatusCheckInterval(long connectionStatusCheckInterval) {
+        this.connectionStatusCheckInterval = connectionStatusCheckInterval;
     }
 }

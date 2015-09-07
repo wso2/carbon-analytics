@@ -52,7 +52,7 @@ public class TCPEventPublisher {
     private OutputStream outputStream;
     private Socket clientSocket;
     private TCPEventPublisherConfig publisherConfig;
-    public  String defaultCharset;
+    public String defaultCharset;
     private Timer connectionStatusCheckTimer;
 
     /**
@@ -65,8 +65,8 @@ public class TCPEventPublisher {
      * Callback to handle when the connection fails in middle
      */
     private ConnectionFailureHandler failureHandler = null;
+
     /**
-     *
      * @param hostUrl
      * @param publisherConfig
      * @param isSynchronous
@@ -77,7 +77,7 @@ public class TCPEventPublisher {
             throws IOException {
         this.hostUrl = hostUrl;
         this.publisherConfig = publisherConfig;
-        this.defaultCharset= publisherConfig.getDefaultCharset();
+        this.defaultCharset = publisherConfig.getCharset();
         this.streamRuntimeInfoMap = new ConcurrentHashMap<String, StreamRuntimeInfo>();
         this.isSynchronous = isSynchronous;
         this.connectionCallback = connectionCallback;
@@ -105,12 +105,12 @@ public class TCPEventPublisher {
         this.clientSocket.setSendBufferSize(publisherConfig.getTcpSendBufferSize());
         this.outputStream = new BufferedOutputStream(this.clientSocket.getOutputStream());
         log.info("Connecting to " + hostUrl);
-        if(connectionCallback != null){
+        if (connectionCallback != null) {
             connectionCallback.onCepReceiverConnect();
         }
 
         connectionStatusCheckTimer = new Timer();
-        connectionStatusCheckTimer.schedule(new ConnectionStatusCheckTask(), 30 * 1000, 30 * 1000);
+        connectionStatusCheckTimer.schedule(new ConnectionStatusCheckTask(), publisherConfig.getConnectionStatusCheckInterval(), publisherConfig.getConnectionStatusCheckInterval());
     }
 
     public TCPEventPublisher(String hostUrl, boolean isSynchronous, ConnectionCallback connectionCallback) throws IOException {
@@ -125,7 +125,7 @@ public class TCPEventPublisher {
         streamRuntimeInfoMap.remove(streamDefinition.getId());
     }
 
-    public void registerConnectionFailureHandler(ConnectionFailureHandler failureHandler){
+    public void registerConnectionFailureHandler(ConnectionFailureHandler failureHandler) {
         this.failureHandler = failureHandler;
     }
 
@@ -211,7 +211,7 @@ public class TCPEventPublisher {
         }
     }
 
-    private void publishEventAsync(byte[] data, boolean flush) throws IOException {
+    private synchronized void publishEventAsync(byte[] data, boolean flush) throws IOException {
         if (outputStream != null) {
             try {
                 outputStream.write(data);
@@ -289,7 +289,7 @@ public class TCPEventPublisher {
     /**
      * Immediately shutdown the TCPEventPublisher and discard the data in output buffer.
      */
-    public void terminate(){
+    public void terminate() {
         connectionStatusCheckTimer.cancel();
         if (!isSynchronous) {
             disruptor.shutdown();
@@ -298,7 +298,7 @@ public class TCPEventPublisher {
     }
 
     private void disconnect() {
-        if (connectionStatusCheckTimer != null){
+        if (connectionStatusCheckTimer != null) {
             connectionStatusCheckTimer.cancel();
         }
         try {
@@ -316,8 +316,8 @@ public class TCPEventPublisher {
             }
         } catch (IOException e) {
             log.debug("Error while closing socket to " + hostUrl + " : " + e.getMessage(), e);
-        }  finally {
-            if(connectionCallback != null){
+        } finally {
+            if (connectionCallback != null) {
                 connectionCallback.onCepReceiverDisconnect();
             }
         }
@@ -341,6 +341,7 @@ public class TCPEventPublisher {
             arrayOutputStream.write(buffer.array());
             return arrayOutputStream.toByteArray();
         }
+
         /**
          * The action to be performed by this timer task.
          */
@@ -351,7 +352,9 @@ public class TCPEventPublisher {
             } catch (IOException e) {
                 log.warn("Ping failed to " + getHostUrl() + " with error: " + e.getMessage());
                 connectionStatusCheckTimer.cancel();
-                failureHandler.onConnectionFail(e);
+                if (failureHandler != null) {
+                    failureHandler.onConnectionFail(e);
+                }
 
             }
         }
