@@ -129,6 +129,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class AnalyticsDataIndexer implements GroupEventListener {
 
+    private static final int MAX_NON_TOKENIZED_INDEX_STRING_SIZE = 1000;
+
     private static final String ENABLE_INDEXING_STATS_SYS_PROP = "enableIndexingStats";
 
     private static final Log log = LogFactory.getLog(AnalyticsDataIndexer.class);
@@ -1280,6 +1282,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
     
+    private String trimNonTokenizedIndexStringField(String value) {
+        if (value.length() > MAX_NON_TOKENIZED_INDEX_STRING_SIZE) {
+            return value.substring(0, MAX_NON_TOKENIZED_INDEX_STRING_SIZE);
+        } else {
+            return value;
+        }
+    }
+    
     private void checkAndAddDocEntry(Document doc, AnalyticsSchema.ColumnType type, String name, Object obj)
             throws AnalyticsIndexException {
         FieldType fieldType = new FieldType();
@@ -1295,7 +1305,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         switch (type) {
         case STRING:
             doc.add(new TextField(name, obj.toString(), Store.NO));
-            doc.add(new StringField(Constants.NON_TOKENIZED_FIELD_PREFIX + name, obj.toString(), Store.NO));
+            doc.add(new StringField(Constants.NON_TOKENIZED_FIELD_PREFIX + name, 
+                    this.trimNonTokenizedIndexStringField(obj.toString()), Store.NO));
             break;
         case INTEGER:
             fieldType.setNumericType(FieldType.NumericType.INT);
