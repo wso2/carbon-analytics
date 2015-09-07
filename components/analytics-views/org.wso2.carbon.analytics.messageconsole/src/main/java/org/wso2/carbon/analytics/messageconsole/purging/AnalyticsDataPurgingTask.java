@@ -37,7 +37,7 @@ public class AnalyticsDataPurgingTask extends AbstractTask {
     @Override
     public void execute() {
         if (log.isDebugEnabled()) {
-            log.debug("Staring execution of analytics data purging task");
+            log.debug("Starting execution of analytics data purging task");
         }
         Map<String, String> taskProperties = this.getProperties();
         String retention = taskProperties.get(Constants.RETENTION_PERIOD);
