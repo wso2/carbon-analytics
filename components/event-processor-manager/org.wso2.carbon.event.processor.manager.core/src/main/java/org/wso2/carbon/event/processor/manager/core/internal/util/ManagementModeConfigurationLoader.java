@@ -358,9 +358,8 @@ public class ManagementModeConfigurationLoader {
         HAConfiguration haConfiguration = new HAConfiguration();
         OMElement transport = processing.getFirstChildWithName(
                 new QName(ConfigurationConstants.EVENT_SYNC_ELEMENT));
-        haConfiguration.setTransport(readHostName(transport),
-                readPort(transport, ConfigurationConstants.HA_DEFAULT_TRANSPORT_PORT),
-                readReconnectionInterval(transport));
+        haConfiguration.setEventSyncConfig(readHostName(transport),
+                readPort(transport, ConfigurationConstants.HA_DEFAULT_TRANSPORT_PORT));
 
         OMElement management = processing.getFirstChildWithName(
                 new QName(ConfigurationConstants.MANAGEMENT_ELEMENT));

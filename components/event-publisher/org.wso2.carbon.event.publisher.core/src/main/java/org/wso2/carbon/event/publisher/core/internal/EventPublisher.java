@@ -311,9 +311,10 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     }
 
     public void destroy() {
-        OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();
-        EventPublisherServiceValueHolder.getEventManagementService().unregisterEventSync(syncId);
-        eventAdapterService.destroy(eventPublisherConfiguration.getEventPublisherName());
+        if (mode == Mode.Distributed || mode == Mode.HA) {
+            EventPublisherServiceValueHolder.getEventManagementService().unregisterEventSync(syncId);
+        }
+        EventPublisherServiceValueHolder.getOutputEventAdapterService().destroy(eventPublisherConfiguration.getEventPublisherName());
     }
 
     @Override

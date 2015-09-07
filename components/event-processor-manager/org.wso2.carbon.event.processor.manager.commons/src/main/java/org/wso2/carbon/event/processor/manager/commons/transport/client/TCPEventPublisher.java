@@ -211,7 +211,7 @@ public class TCPEventPublisher {
         }
     }
 
-    private void publishEventAsync(byte[] data, boolean flush) throws IOException {
+    private synchronized void publishEventAsync(byte[] data, boolean flush) throws IOException {
         if (outputStream != null) {
             try {
                 outputStream.write(data);
@@ -352,7 +352,9 @@ public class TCPEventPublisher {
             } catch (IOException e) {
                 log.warn("Ping failed to " + getHostUrl() + " with error: " + e.getMessage());
                 connectionStatusCheckTimer.cancel();
-                failureHandler.onConnectionFail(e);
+                if (failureHandler != null) {
+                    failureHandler.onConnectionFail(e);
+                }
 
             }
         }

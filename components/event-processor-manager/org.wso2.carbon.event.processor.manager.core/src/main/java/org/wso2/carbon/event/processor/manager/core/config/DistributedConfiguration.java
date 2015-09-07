@@ -48,11 +48,8 @@ public class DistributedConfiguration implements Serializable {
     private int cepReceiverOutputQueueSize = 8192;
     private int stormPublisherOutputQueueSize = 8192;
 
-    private int checkMemberUpdateInterval = 10000;
-
     private int transportPublisherTcpSendBufferSize = 5242880;
     private String transportPublisherCharSet = "UTF-8";
-    private int transportPublisherBufferSize = 1024;
     private long transportPublisherConnectionStatusCheckInterval = 30000;
     private int transportReceiverThreads = 10;
 
@@ -66,6 +63,8 @@ public class DistributedConfiguration implements Serializable {
     //status
     private int statusLockTimeout = 60000;   //Lock timeout in milliseconds.
     private int statusUpdateInterval = 60000; //Rate in milliseconds at which the hazelcast map will be updated by each worker.
+
+    private int checkMemberUpdateInterval = 10000;
 
     private String jar;
     private String distributedUIUrl;
@@ -247,10 +246,6 @@ public class DistributedConfiguration implements Serializable {
         this.checkMemberUpdateInterval = checkMemberUpdateInterval;
     }
 
-    public int getTransportPublisherBufferSize() {
-        return transportPublisherBufferSize;
-    }
-
     public long getTransportPublisherConnectionStatusCheckInterval() {
         return transportPublisherConnectionStatusCheckInterval;
     }
@@ -275,20 +270,8 @@ public class DistributedConfiguration implements Serializable {
         return presentationReceiverThreads;
     }
 
-    public void setLocalManagerConfig(HostAndPort localManagerConfig) {
-        this.localManagerConfig = localManagerConfig;
-    }
-
-    public void setLocalPresenterConfig(HostAndPort localPresenterConfig) {
-        this.localPresenterConfig = localPresenterConfig;
-    }
-
     public void setManagers(List<HostAndPort> managers) {
         this.managers = managers;
-    }
-
-    public void setTransportPublisherBufferSize(int transportPublisherBufferSize) {
-        this.transportPublisherBufferSize = transportPublisherBufferSize;
     }
 
     public void setTransportPublisherConnectionStatusCheckInterval(long transportPublisherConnectionStatusCheckInterval) {
@@ -318,7 +301,6 @@ public class DistributedConfiguration implements Serializable {
     public TCPEventPublisherConfig constructTransportPublisherConfig() {
 
         TCPEventPublisherConfig tcpEventPublisherConfig = new TCPEventPublisherConfig();
-        tcpEventPublisherConfig.setBufferSize(getTransportPublisherBufferSize());
         tcpEventPublisherConfig.setConnectionStatusCheckInterval(getTransportPublisherConnectionStatusCheckInterval());
         tcpEventPublisherConfig.setCharset(getTransportPublisherCharSet());
         tcpEventPublisherConfig.setTcpSendBufferSize(getTransportPublisherTcpSendBufferSize());

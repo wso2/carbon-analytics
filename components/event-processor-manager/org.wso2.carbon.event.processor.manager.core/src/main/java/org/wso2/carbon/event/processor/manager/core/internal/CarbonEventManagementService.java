@@ -86,10 +86,10 @@ public class CarbonEventManagementService implements EventManagementService {
             isWorkerNode = haConfiguration.isWorkerNode();
             isPresenterNode = haConfiguration.isPresenterNode();
             if (isWorkerNode) {
-                startServer(haConfiguration.getEventSyncConfig(), haConfiguration.getEventSyncServerThreads());
+                startServer(haConfiguration.getEventSyncConfig(), haConfiguration.getEventSyncReceiverThreads());
             }
             if (isPresenterNode) {
-                startServer(haConfiguration.getLocalPresenterConfig(), haConfiguration.getPresenterServerThreads());
+                startServer(haConfiguration.getLocalPresenterConfig(), haConfiguration.getPresentationReceiverThreads());
             }
         } else if (mode == Mode.SingleNode) {
             PersistenceConfiguration persistConfig = managementModeInfo.getPersistenceConfiguration();

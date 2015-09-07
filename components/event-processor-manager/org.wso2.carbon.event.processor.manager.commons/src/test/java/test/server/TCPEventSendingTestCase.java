@@ -65,7 +65,7 @@ public class TCPEventSendingTestCase {
             TCPEventServer.addStreamDefinition(streamDefinition);
             TCPEventServer.start();
             Thread.sleep(1000);
-            threadPool.submit(new ClientThread(streamDefinition, new SimpleDataProvider(), 100, true, 0));
+            threadPool.submit(new ClientThread(streamDefinition, new SimpleDataProvider(), 100, false, 0));
             Thread.sleep(5000);
             Assert.assertEquals(100, streamCallback.getEventCount());
             log.info("Shutting down server...");
@@ -93,7 +93,7 @@ public class TCPEventSendingTestCase {
             TCPEventServer.start();
             Thread.sleep(1000);
             for (int i = 0; i < TOTAL_CLIENTS; i++) {
-                threadPool.submit(new ClientThread(streamDefinition, new AnalyticStatDataProvider(), EVENTS_PER_CLIENT, true, 0));
+                threadPool.submit(new ClientThread(streamDefinition, new AnalyticStatDataProvider(), EVENTS_PER_CLIENT, false, 0));
             }
             while (streamCallback.getEventCount() < TOTAL_CLIENTS * EVENTS_PER_CLIENT) {
                 Thread.sleep(5000);
@@ -162,15 +162,15 @@ public class TCPEventSendingTestCase {
 
         @Override
         public void run() {
-            TCPEventPublisher TCPEventPublisher = null;
+            TCPEventPublisher tcpEventPublisher = null;
             try {
-                TCPEventPublisher = new TCPEventPublisher("localhost:7612", isSynchronous, null);
-                TCPEventPublisher.addStreamDefinition(streamDefinition);
+                tcpEventPublisher = new TCPEventPublisher("localhost:7612", isSynchronous, null);
+                tcpEventPublisher.addStreamDefinition(streamDefinition);
                 Thread.sleep(1000);
                 log.info("Starting event client to send events to localhost:7612");
 
                 for (int i = 0; i < eventsToSend; i++) {
-                    TCPEventPublisher.sendEvent(streamDefinition.getId(), System.currentTimeMillis(), dataProvider.getEvent(), true);
+                    tcpEventPublisher.sendEvent(streamDefinition.getId(), System.currentTimeMillis(), dataProvider.getEvent(), true);
                     if (delay > 0) {
                         Thread.sleep(delay);
                     }
@@ -180,8 +180,8 @@ public class TCPEventSendingTestCase {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
-                if (TCPEventPublisher != null) {
-                    TCPEventPublisher.shutdown();
+                if (tcpEventPublisher != null) {
+                    tcpEventPublisher.shutdown();
                 }
             }
         }
