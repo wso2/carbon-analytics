@@ -63,6 +63,7 @@ public final class ConfigurationConstants {
     public static final String DISTRIBUTED_NODE_CONFIG_WORKER_ELEMENT = "worker";
     public static final String DISTRIBUTED_NODE_CONFIG_MANAGER_ELEMENT = "manager";
     public static final String DISTRIBUTED_NODE_CONFIG_MANAGERS_ELEMENT = "managers";
+    public static final String DISTRIBUTED_NODE_CONFIG_PRESENTER_ELEMENT = "presenter";
     public static final String DISTRIBUTED_NODE_CONFIG_HEARTBEAT_INTERVAL_ELEMENT = "heartbeatInterval";
     public static final String DISTRIBUTED_NODE_CONFIG_TOPOLOGY_RESUBMIT_INTERVAL_ELEMENT = "topologyResubmitInterval";
     public static final String DISTRIBUTED_NODE_CONFIG_PORT_RANGE_ELEMENT = "portRange";
@@ -73,12 +74,14 @@ public final class ConfigurationConstants {
     public static final String DISTRIBUTED_NODE_CONFIG_STATUS_MONITOR_UPDATE_RATE = "updateRate";
     public static final String DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE = "cepReceiverOutputQueueSize";
     public static final String DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE = "stormPublisherOutputQueueSize";
-    public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_MODE = "tcpEventPublisherMode";
-    public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_QUEUE_SIZE = "tcpEventPublisherOutputQueueSize";
     public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE = "tcpEventPublisherSendBufferSize";
     public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET = "tcpEventPublisherCharSet";
     public static final String DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT = "tcpEventReceiverThreadCount";
-    public static final String DISTRIBUTED_NODE_CONFIG_PRESENTER_ELEMENT = "presenter";
+
+    public static final String DISTRIBUTED_NODE_CONFIG_PRESENTATION_ELEMENT = "presentation";
+    public static final String DISTRIBUTED_NODE_CONFIG_MEMBER_UPDATE_CHECK_INTERVAL = "memberUpdateCheckInterval";
+    public static final String DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL =  "connectionStatusCheckInterval";
+    public static final String DISTRIBUTED_NODE_CONFIG_PRESENTER_QUEUE_SIZE = "presentationOutputQueueSize";
 
     public static final String ENABLE_ATTRIBUTE = "enable";
 

@@ -212,7 +212,7 @@ public class CarbonEventManagementService implements EventManagementService {
         int checkMemberUpdateInterval = 10 * 1000;
         if (mode == Mode.Distributed) {
             DistributedConfiguration distributedConfiguration = managementModeInfo.getDistributedConfiguration();
-            checkMemberUpdateInterval = distributedConfiguration.getCheckMemberUpdateInterval();
+            checkMemberUpdateInterval = distributedConfiguration.getMemberUpdateCheckInterval();
         } else if (mode == Mode.HA) {
             HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
             checkMemberUpdateInterval = haConfiguration.getCheckMemberUpdateInterval();
