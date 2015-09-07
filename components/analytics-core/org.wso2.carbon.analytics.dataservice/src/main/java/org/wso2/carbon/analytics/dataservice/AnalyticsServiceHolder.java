@@ -67,7 +67,6 @@ public class AnalyticsServiceHolder {
     }
 
     private static void checkAndPopulateCustomAnalyticsDS() {
-//        if (!GenericUtils.isCarbonServer()) {
         try {
             if (System.getProperty(FORCE_INDEXING_ENV_PROP) == null) {
                 System.setProperty(AnalyticsDataIndexer.DISABLE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
@@ -77,7 +76,6 @@ public class AnalyticsServiceHolder {
         } catch (AnalyticsException e) {
             throw new RuntimeException("Error in creating analytics data service impl.: " + e.getMessage(), e);
         }
-//        }
     }
 
     public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
