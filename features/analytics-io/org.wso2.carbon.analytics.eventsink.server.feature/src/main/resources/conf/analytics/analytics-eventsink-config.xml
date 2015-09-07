@@ -24,10 +24,10 @@
     <!--There will be each separate queue for each tenant, and events that are received from different sources are put in -->
     <!--the respective tenants queue, so that it can be pushed to event store as collective batch. The below configuration -->
     <!--is to change the default queue size used for above explained purpose.-->
-    <QueueSize>131072</QueueSize>
+    <QueueSize>1024</QueueSize>
 
     <!--The events will be collected as bundles with maximum number of below mentioned events in high traffic.-->
-    <BundleSize>1000</BundleSize>
+    <BundleSize>1024</BundleSize>
 
     <!--The below configuration specified how much workers used to store into the event store with collected events.-->
     <WorkerPoolSize>10</WorkerPoolSize>
