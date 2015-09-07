@@ -390,8 +390,9 @@ public class AnalyticsDataBackupTool {
             nodePath = parentPath + node;
             //convert the filesystem target path to match the filesystem path settings
             fileSystemNodePath = targetBaseDir + nodePath;
-            fileSystemNodePath = fileSystemNodePath.replaceAll("/", File.separator);
-
+            if(!File.separator.equals('/')) {
+                fileSystemNodePath = fileSystemNodePath.replace("/", "\\");
+            }
             if (analyticsFileSystem.length(nodePath) == 0) { // the node is a directory
                 createDirectoryInLocalSystem(fileSystemNodePath);
                 backupFileSystemToLocal(analyticsFileSystem, nodePath, targetBaseDir);
