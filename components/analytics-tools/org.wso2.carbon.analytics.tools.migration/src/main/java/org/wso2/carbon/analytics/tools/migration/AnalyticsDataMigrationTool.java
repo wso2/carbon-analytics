@@ -79,7 +79,7 @@ public class AnalyticsDataMigrationTool {
     private static final String NEW_VERSION_FIELD = "_version";
 
     public static void main(String[] args) throws Exception {
-        System.setProperty(AnalyticsDataIndexer.DISABLE_INDEX_THROTTLING_ENV_PROP, Boolean.TRUE.toString());
+        System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
         Options options = new Options();
         options.addOption(OptionBuilder.withArgName(SERVER_URL_ARG).hasArg()
                                   .withDescription("Cassandra server url '<default value: localhost>'")
