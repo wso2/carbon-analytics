@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.datasource.core.util;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.hazelcast.core.IAtomicLong;
 
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.collections.IteratorUtils;
@@ -50,6 +51,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Generic utility methods for analytics data source implementations.
@@ -695,6 +697,52 @@ public class GenericUtils {
             }
         }
         return result;
+    }
+    
+    /**
+     * Generic Atomic Long class implementation to be used in local and clustered mode.
+     */
+    public static class GenericAtomicLong {
+        
+        private IAtomicLong hzAtomicLong;
+        
+        private AtomicLong atomicLong;
+        
+        private boolean clustered;
+        
+        public GenericAtomicLong() {
+            this.atomicLong = new AtomicLong();
+        }
+        
+        public GenericAtomicLong(IAtomicLong hzAtomicLong) {
+            this.hzAtomicLong = hzAtomicLong;
+            this.clustered = true;
+        }
+        
+        public long addAndGet(long delta) {
+            if (this.clustered) {
+                return this.hzAtomicLong.addAndGet(delta);
+            }  else {
+                return this.atomicLong.addAndGet(delta);
+            }
+        }
+        
+        public long get() {
+            if (this.clustered) {
+                return this.hzAtomicLong.get();
+            }  else {
+                return this.atomicLong.get();
+            }
+        }
+        
+        public void set(long value) {
+            if (this.clustered) {
+                this.hzAtomicLong.set(value);
+            }  else {
+                this.atomicLong.set(value);
+            }
+        }
+        
     }
 
 }

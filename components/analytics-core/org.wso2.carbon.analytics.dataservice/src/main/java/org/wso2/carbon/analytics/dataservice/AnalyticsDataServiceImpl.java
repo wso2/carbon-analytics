@@ -34,9 +34,11 @@ import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataPurgingConfigur
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataPurgingIncludeTable;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfigProperty;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
+import org.wso2.carbon.analytics.dataservice.config.AnalyticsReceiverIndexingFlowControlConfiguration;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsRecordStoreConfiguration;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsIndexedTableStore;
+import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsReceiverIndexingFlowController;
 import org.wso2.carbon.analytics.dataservice.tasks.AnalyticsGlobalDataPurgingTask;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -78,6 +80,16 @@ import java.util.concurrent.Callable;
  * The implementation of {@link AnalyticsDataService}.
  */
 public class AnalyticsDataServiceImpl implements AnalyticsDataService {
+
+    private static final int FLOW_CONTROL_RECEIVE_HIGH_LOWEST = 2000;
+
+    private static final int FLOW_CONTROL_RECEIVE_DEFAULT_MARGIN = 1000;
+
+    private static final int FLOW_CONTROL_RECEIVE_LOW_LOWEST = 1000;
+
+    private static final int FLOW_CONTROL_RECEIVE_LOW_DEFAULT = 30000;
+
+    private static final int FLOW_CONTROL_RECEIVE_HIGH_DEFAULT = 60000;
 
     private static final Log logger = LogFactory.getLog(AnalyticsDataServiceImpl.class);
 
@@ -140,7 +152,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         this.initIndexedTableStore();
         this.indexer = new AnalyticsDataIndexer(this.getIndexStagingRecordStore(), this.analyticsFileSystem, this,
                                                 this.indexedTableStore, config.getShardCount(), 
-                                                this.calculateIndexingThreadCount(config), luceneAnalyzer);
+                                                this.calculateIndexingThreadCount(config), luceneAnalyzer,
+                                                this.createFlowController(config.getAnalyticsReceiverIndexingFlowControlConfiguration()));
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
@@ -148,6 +161,41 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         } 
         this.indexer.init();
         this.initDataPurging(config);
+    }
+    
+    private AnalyticsReceiverIndexingFlowController createFlowController(
+            AnalyticsReceiverIndexingFlowControlConfiguration config) throws AnalyticsException {
+        if (config == null) {
+            config = new AnalyticsReceiverIndexingFlowControlConfiguration();
+            config.setEnabled(true);
+        }
+        if (config.getRecordReceivingHighThreshold() == 0 && config.getRecordReceivingLowThreshold() == 0) {
+            config.setRecordReceivingHighThreshold(FLOW_CONTROL_RECEIVE_HIGH_DEFAULT);
+            config.setRecordReceivingLowThreshold(FLOW_CONTROL_RECEIVE_LOW_DEFAULT);
+        } else if (config.getRecordReceivingHighThreshold() == 0) {
+            if (config.getRecordReceivingLowThreshold() < FLOW_CONTROL_RECEIVE_LOW_LOWEST) {
+                throw new AnalyticsException("The receiver indexing flow control low value cannot be smaller than " + 
+                        FLOW_CONTROL_RECEIVE_LOW_LOWEST);
+            }
+            config.setRecordReceivingHighThreshold(config.getRecordReceivingLowThreshold() + FLOW_CONTROL_RECEIVE_DEFAULT_MARGIN);
+        } else if (config.getRecordReceivingLowThreshold() == 0) {
+            if (config.getRecordReceivingHighThreshold() < FLOW_CONTROL_RECEIVE_HIGH_LOWEST) {
+                throw new AnalyticsException("The receiver indexing flow control high value cannot be smaller than " + 
+                        FLOW_CONTROL_RECEIVE_HIGH_LOWEST);
+            }
+            config.setRecordReceivingLowThreshold(config.getRecordReceivingHighThreshold() - FLOW_CONTROL_RECEIVE_DEFAULT_MARGIN);
+        } else {
+            if (config.getRecordReceivingHighThreshold() - config.getRecordReceivingLowThreshold() < 
+                    FLOW_CONTROL_RECEIVE_DEFAULT_MARGIN) {
+                throw new AnalyticsException("The receiver indexing flow control high / value margin must be bigger than " + 
+                        FLOW_CONTROL_RECEIVE_DEFAULT_MARGIN);
+            }
+            if (config.getRecordReceivingLowThreshold() < FLOW_CONTROL_RECEIVE_LOW_LOWEST) {
+                throw new AnalyticsException("The receiver indexing flow control low value cannot be smaller than " + 
+                        FLOW_CONTROL_RECEIVE_LOW_LOWEST);
+            }
+        }
+        return new AnalyticsReceiverIndexingFlowController(config);
     }
     
     private int calculateIndexingThreadCount(AnalyticsDataServiceConfiguration config) throws AnalyticsException {

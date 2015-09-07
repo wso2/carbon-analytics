@@ -139,6 +139,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     public static final String DISABLE_INDEXING_ENV_PROP = "disableIndexing";
     
+    public static final String DISABLE_INDEX_THROTTLING_ENV_PROP = "disableIndexThrottling";
+    
     private static final int WAIT_INDEX_TIME_INTERVAL = 1000;
 
     private static final String INDEX_OP_DATA_ATTRIBUTE = "__INDEX_OP_DATA__";
@@ -195,10 +197,13 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     private AnalyticsDataIndexingStatsCollector statsCollector;
     
+    private AnalyticsReceiverIndexingFlowController flowController;
+        
     public AnalyticsDataIndexer(AnalyticsRecordStore analyticsRecordStore, 
             AnalyticsFileSystem analyticsFileSystem, AnalyticsDataService analyticsDataService,
             AnalyticsIndexedTableStore indexedTableStore, int shardCount,
-            int indexingThreadCount, Analyzer analyzer) throws AnalyticsException {
+            int indexingThreadCount, Analyzer analyzer,
+            AnalyticsReceiverIndexingFlowController flowController) throws AnalyticsException {
     	this.luceneAnalyzer = analyzer;
         this.analyticsRecordStore = analyticsRecordStore;    	
     	this.analyticsFileSystem = analyticsFileSystem;
@@ -206,6 +211,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         this.indexedTableStore = indexedTableStore;
     	this.shardCount = shardCount;
     	this.indexingThreadCount = indexingThreadCount;
+    	this.flowController = flowController;
     }
     
     /**
@@ -219,7 +225,12 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (this.indexingStatsEnabled) {
             this.statsCollector = new AnalyticsDataIndexingStatsCollector();
         }
-        this.initializeIndexingSchedules();
+        if (this.checkIndexThrottlingDisabledExplicitely()) {
+            this.flowController.getConfig().setEnabled(false);
+        }
+        if (this.checkIfIndexingNode()) {
+            this.initializeIndexingSchedules();
+        }
     }
 
     private boolean checkIfIndexingNode() {
@@ -227,15 +238,17 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return !(indexDisableProp != null && Boolean.parseBoolean(indexDisableProp));
     }
     
+    private boolean checkIndexThrottlingDisabledExplicitely() {
+        String indexDisableProp =  System.getProperty(DISABLE_INDEX_THROTTLING_ENV_PROP);
+        return !(indexDisableProp != null && Boolean.parseBoolean(indexDisableProp));
+    }
+    
     private void initializeIndexingSchedules() throws AnalyticsException {
-        if (!this.checkIfIndexingNode()) {
-            return;
-        }
         this.getAnalyticsRecordStore().createTable(INDEX_DATA_RECORD_TENANT_ID, INDEX_DATA_RECORD_TABLE_NAME);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
             log.info("Analytics Indexing Mode: CLUSTERED");
-            acm.joinGroup(ANALYTICS_INDEXING_GROUP, this);
+            acm.joinGroup(ANALYTICS_INDEXING_GROUP, this);            
         } else {
             log.info("Analytics Indexing Mode: STANDALONE");
             List<Integer[]> indexingSchedule = this.generateIndexWorkerSchedulePlan(1);
@@ -274,6 +287,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             current += range;
         }
         log.info("Processing Analytics Indexing Shards " + shardDetails);
+    }
+    
+    public AnalyticsReceiverIndexingFlowController getFlowController() {
+        return flowController;
     }
     
     public boolean isIndexingStatsEnabled() {
@@ -368,11 +385,13 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private void scheduleIndexUpdate(List<Record> records) throws AnalyticsException {
         List<Record> indexRecords = this.createIndexUpdateRecords(records);
         this.getAnalyticsRecordStore().put(indexRecords);
+        this.getFlowController().receive(indexRecords.size());
     }
     
     private void scheduleIndexDelete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
         List<Record> indexRecords = this.createIndexDeleteRecords(tenantId, tableName, ids);
         this.getAnalyticsRecordStore().put(indexRecords);
+        this.getFlowController().receive(indexRecords.size());
     }
     
     private void processIndexOperations(int shardIdFrom, int shardRange) throws AnalyticsException {
@@ -415,8 +434,16 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 }                
             }
         }
-        this.deleteIndexRecords(processedIds);
-        return indexRecords.size();
+        try {
+            this.deleteIndexRecords(processedIds);
+            return indexRecords.size();
+        } finally {
+            /* this is to make sure, all or a partial delete records is recorded
+             * in the flow controller, marking more is better than marking less,
+             * or else, the global count in flow controller may keep growing when it
+             * is actually less */
+            this.getFlowController().processed(processedIds.size());
+        }
     }
     
     private Map<Integer, List<Record>> groupByShards(List<Record> records) {
@@ -1468,6 +1495,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     public void stopAndCleanupIndexProcessing() {
+        this.getFlowController().stop();
         if (this.shardWorkerExecutor != null) {
             this.shardWorkerExecutor.shutdown();
             for (IndexWorker worker : this.workers) {
@@ -1489,7 +1517,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         this.stopAndCleanupIndexProcessing();
         this.closeAndRemoveIndexDirs(new HashSet<String>(this.indexDirs.keySet()));
     }
-    
+        
     public void waitForIndexing(long maxWait) throws AnalyticsException, AnalyticsTimeoutException {
         for (IndexedTableId indexedTableId : this.indexedTableStore.getAllIndexedTables()) {
             this.waitForIndexing(indexedTableId.getTenantId(), indexedTableId.getTableName(), maxWait);
@@ -1497,7 +1525,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     public void waitForIndexing(int tenantId, String tableName, long maxWait) 
-            throws AnalyticsException, AnalyticsTimeoutException {
+            throws AnalyticsException {
         if (maxWait < 0) {
             maxWait = Long.MAX_VALUE;
         }
@@ -1805,4 +1833,5 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
         }
     }
+    
 }

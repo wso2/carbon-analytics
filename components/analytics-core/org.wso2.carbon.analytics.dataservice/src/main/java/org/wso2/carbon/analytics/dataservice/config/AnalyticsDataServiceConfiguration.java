@@ -37,6 +37,8 @@ public class AnalyticsDataServiceConfiguration {
 
     private AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration;
     
+    private AnalyticsReceiverIndexingFlowControlConfiguration receiverIndexingFlowControlConfiguration;
+    
     private String primaryRecordStore;
     
     private String indexStagingRecordStore;
@@ -135,6 +137,16 @@ public class AnalyticsDataServiceConfiguration {
     public void setAnalyticsDataPurgingConfiguration(
             AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration) {
         this.analyticsDataPurgingConfiguration = analyticsDataPurgingConfiguration;
+    }
+    
+    @XmlElement(name = "analytics-receiver-indexing-flow-control")
+    public AnalyticsReceiverIndexingFlowControlConfiguration getAnalyticsReceiverIndexingFlowControlConfiguration() {
+        return receiverIndexingFlowControlConfiguration;
+    }
+
+    public void setAnalyticsReceiverIndexingFlowControlConfiguration(
+            AnalyticsReceiverIndexingFlowControlConfiguration receiverIndexingFlowControlConfiguration) {
+        this.receiverIndexingFlowControlConfiguration = receiverIndexingFlowControlConfiguration;
     }
     
 }

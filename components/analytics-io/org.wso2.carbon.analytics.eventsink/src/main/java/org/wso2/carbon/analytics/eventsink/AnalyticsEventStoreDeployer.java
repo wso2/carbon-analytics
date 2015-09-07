@@ -42,8 +42,8 @@ import java.util.List;
 /**
  * Analytics Event Store deployer which basically combines the streams and tables connectivity.
  */
-
 public class AnalyticsEventStoreDeployer extends AbstractDeployer {
+
     private static Log log = LogFactory.getLog(AnalyticsEventStoreDeployer.class);
     private static List<DeploymentFileData> pausedDeployments = new ArrayList<>();
     private boolean eventSinkEnabled;
@@ -59,14 +59,14 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
                 getTenantId()) + AnalyticsEventSinkConstants.DEPLOYMENT_DIR_NAME);
         if (!deployementDir.exists()) {
             if (!deployementDir.mkdir()) {
-                log.warn("Unable to create the deployment dir at : " + deployementDir.getPath());
+                log.warn("Unable to create the deployment dir at: " + deployementDir.getPath());
             }
         }
     }
 
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
         if (AnalyticsEventSinkServerStartupObserver.getInstance().isServerStarted()) {
-            log.info("Deploying analytics event store :" + deploymentFileData.getName());
+            log.info("Deploying analytics event store: " + deploymentFileData.getName());
             int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
             try {
                 AnalyticsEventStore eventStoreConfiguration = AnalyticsEventStoreManager.getInstance()
@@ -77,18 +77,18 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
                 } else {
                     throw new AnalyticsEventStoreDeploymentException("Invalid configuration provided! File name: " +
                             AnalyticsEventSinkUtil.getAnalyticsEventStoreName(deploymentFileData.getName() + " should be " +
-                                    "matched with deduced table name : " + eventStoreConfiguration.getName() + " for the streams"));
+                                    "matched with deduced table name: " + eventStoreConfiguration.getName() + " for the streams"));
                 }
             } catch (AnalyticsEventStoreException e) {
-                String errMsg = "Error while deploying file : " + deploymentFileData.getName() + " for tenant id : " + tenantId;
+                String errMsg = "Error while deploying file: " + deploymentFileData.getName() + " for tenant id: " + tenantId;
                 log.error(errMsg, e);
                 throw new AnalyticsEventStoreDeploymentException(errMsg, e);
             } catch (Throwable throwable) {
-                String errorMsg = "Unable to deploy the event store : " + deploymentFileData.getName() + ". " + throwable.getMessage();
+                String errorMsg = "Unable to deploy the event store: " + deploymentFileData.getName() + ". " + throwable.getMessage();
                 log.error(errorMsg, throwable);
                 throw new AnalyticsEventStoreDeploymentException(errorMsg, throwable);
             }
-            log.info("Deployed successfully analytics event store :" + deploymentFileData.getName());
+            log.info("Deployed successfully analytics event store: " + deploymentFileData.getName());
         } else {
             pausedDeployments.add(deploymentFileData);
         }
@@ -114,22 +114,22 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
                     }
                 }
             } else {
-                    log.info("Event store is disabled in this node, hence ignoring the event sink configuration - "
+                    log.info("Event store is disabled in this node, hence ignoring the event sink configuration: "
                             + eventStore.getName());
             }
         } catch (AnalyticsException e) {
-            String errorMsg = "Error while creating the table Or setting the schema for table :" + eventStore.getName();
+            String errorMsg = "Error while creating the table Or setting the schema for table: " + eventStore.getName();
             log.error(errorMsg, e);
             throw new AnalyticsEventStoreException(errorMsg, e);
         } catch (StreamDefinitionStoreException e) {
-            String errorMsg = "Error when subscribing to the stream." + e.getMessage();
+            String errorMsg = "Error when subscribing to the stream: " + e.getMessage();
             log.error(errorMsg, e);
             throw new AnalyticsEventStoreException(errorMsg, e);
         }
     }
 
     public void undeploy(String fileName) throws DeploymentException {
-        log.info("Undeploying analytics event store : " + fileName);
+        log.info("Undeploying analytics event store: " + fileName);
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         String eventStoreName = AnalyticsEventSinkUtil.getAnalyticsEventStoreName(new File(fileName).getName());
         AnalyticsEventStore existingEventStore = AnalyticsEventStoreManager.getInstance().removeEventStoreConfiguration(tenantId,
@@ -140,10 +140,10 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
                     ServiceHolder.getAnalyticsEventStreamListener().unsubscribeFromStream(tenantId, streamId);
                 }
             }
-        }else {
-            log.info("Ignored event sink configuration - "+ fileName+ " since the event sink is disabled in this node.");
+        } else {
+            log.info("Ignored event sink configuration: " + fileName + " since the event sink is disabled in this node.");
         }
-        log.info("Undeployed successfully analytics event store : " + fileName);
+        log.info("Undeployed successfully analytics event store: " + fileName);
     }
 
     public static List<DeploymentFileData> getPausedDeployments() {
@@ -156,11 +156,10 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
 
     @Override
     public void setDirectory(String s) {
-
     }
 
     @Override
     public void setExtension(String s) {
-
     }
+
 }

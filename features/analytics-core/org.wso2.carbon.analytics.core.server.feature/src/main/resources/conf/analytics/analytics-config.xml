@@ -75,4 +75,11 @@
       <!-- All records that insert before the specified retention time will be eligible to purge -->
       <data-retention-days>365</data-retention-days>
    </analytics-data-purging>
+   <!-- Receiver/Indexing flow-control configuration -->
+   <analytics-receiver-indexing-flow-control enabled = "true">
+       <!-- maximum number of records that can be in index staging area before receiving is throttled -->
+       <recordReceivingHighThreshold>60000</recordReceivingHighThreshold>
+       <!-- the limit on number of records to be lower than, to reduce throttling -->
+       <recordReceivingLowThreshold>30000</recordReceivingLowThreshold>    
+   </analytics-receiver-indexing-flow-control>
 </analytics-dataservice-configuration>
