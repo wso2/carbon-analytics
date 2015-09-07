@@ -1,16 +1,19 @@
 /*
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.wso2.carbon.event.stream.core.internal;
 
@@ -20,10 +23,17 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
-import org.wso2.carbon.event.stream.core.*;
+import org.wso2.carbon.event.stream.core.EventProducer;
+import org.wso2.carbon.event.stream.core.EventStreamConfiguration;
+import org.wso2.carbon.event.stream.core.EventStreamListener;
+import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.wso2.carbon.event.stream.core.SiddhiEventConsumer;
+import org.wso2.carbon.event.stream.core.WSO2EventConsumer;
+import org.wso2.carbon.event.stream.core.WSO2EventListConsumer;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.event.stream.core.exception.StreamDefinitionAlreadyDefinedException;
 import org.wso2.carbon.event.stream.core.internal.ds.EventStreamServiceValueHolder;
@@ -32,7 +42,10 @@ import org.wso2.carbon.event.stream.core.internal.util.SampleEventGenerator;
 import org.wso2.carbon.event.stream.core.internal.util.helper.EventStreamConfigurationFileSystemInvoker;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CarbonEventStreamService implements EventStreamService {
@@ -303,7 +316,7 @@ public class CarbonEventStreamService implements EventStreamService {
     }
 
 
-    public boolean isEventStreamExist(String eventStreamFileName) {
+    public boolean isEventStreamFileExists(String eventStreamFileName) {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
         if (eventStreamConfigs != null) {
@@ -316,4 +329,50 @@ public class CarbonEventStreamService implements EventStreamService {
         return false;
     }
 
+    public boolean isMatchForStreamDefinition(StreamDefinition streamDefinition, StreamDefinition existingStreamDefinition) {
+        if (streamDefinition == null || existingStreamDefinition == null) {
+            throw new IllegalArgumentException("Stream definitions passed in cannot be null!");
+        }
+        List<Attribute> existingStreamMetaData = existingStreamDefinition.getMetaData();
+        List<Attribute> incomingStreamMetaData = streamDefinition.getMetaData();
+        if (existingStreamMetaData != null && incomingStreamMetaData != null) {
+            if (incomingStreamMetaData.size() != existingStreamMetaData.size()) {
+                return false;
+            }
+            for (int i = 0; i < existingStreamMetaData.size(); i++) {
+                Attribute attribute = existingStreamMetaData.get(i);
+                if (incomingStreamMetaData.get(i) == null || !incomingStreamMetaData.get(i).equals(attribute)) {
+                    return false;
+                }
+            }
+        }
+        List<Attribute> existingStreamCorrelationData = existingStreamDefinition.getCorrelationData();
+        List<Attribute> incomingStreamCorrelationData = streamDefinition.getCorrelationData();
+        if (existingStreamCorrelationData != null && incomingStreamCorrelationData != null) {
+
+            if (incomingStreamCorrelationData.size() != existingStreamCorrelationData.size()) {
+                return false;
+            }
+            for (int i = 0; i < existingStreamCorrelationData.size(); i++) {
+                Attribute attribute = existingStreamCorrelationData.get(i);
+                if (incomingStreamCorrelationData.get(i) == null || !incomingStreamCorrelationData.get(i).equals(attribute)) {
+                    return false;
+                }
+            }
+        }
+        List<Attribute> existingStreamPayloadData = existingStreamDefinition.getPayloadData();
+        List<Attribute> incomingStreamPayloadData = streamDefinition.getPayloadData();
+        if (existingStreamPayloadData != null && incomingStreamPayloadData != null) {
+            if (incomingStreamPayloadData.size() != existingStreamPayloadData.size()) {
+                return false;
+            }
+            for (int i = 0; i < existingStreamPayloadData.size(); i++) {
+                Attribute attribute = existingStreamPayloadData.get(i);
+                if (incomingStreamPayloadData.get(i) == null || !incomingStreamPayloadData.get(i).equals(attribute)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
