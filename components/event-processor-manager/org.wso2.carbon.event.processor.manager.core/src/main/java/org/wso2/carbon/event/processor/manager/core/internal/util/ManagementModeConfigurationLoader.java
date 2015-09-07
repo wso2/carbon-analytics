@@ -289,6 +289,14 @@ public class ManagementModeConfigurationLoader {
         } else {
             log.info("No TCP receiver thread count not specified. Hence using default thread count " + stormDeploymentConfig.getTransportReceiverThreads());
         }
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL)) != null){
+            int connectionStatusCheckInterval = Integer.parseInt(transport.getFirstChildWithName(
+                    new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL)).getText());
+            stormDeploymentConfig.setTransportPublisherConnectionStatusCheckInterval(connectionStatusCheckInterval);
+        }  else {
+            log.info("No transport connection status check interval specified. Hence using default interval "
+                    + stormDeploymentConfig.getTransportPublisherConnectionStatusCheckInterval() + "ms");
+        }
 
 
         //Reading node info
@@ -324,9 +332,70 @@ public class ManagementModeConfigurationLoader {
             stormDeploymentConfig.setDistributedUIUrl(url);
         }
 
+        OMElement memberUpdateCheckInterval = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_MEMBER_UPDATE_CHECK_INTERVAL));
+        if (memberUpdateCheckInterval != null){
+            int interval = Integer.parseInt(memberUpdateCheckInterval.getText());
+            stormDeploymentConfig.setMemberUpdateCheckInterval(interval);
+        } else{
+            log.info("No member update check interval specified. Hence using default interval " + stormDeploymentConfig.getMemberUpdateCheckInterval());
+        }
+
         //Get Jar name
         OMElement jar = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_JAR_ELEMENT));
         stormDeploymentConfig.setJar(jar.getText());
+
+        OMElement presentation = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_PRESENTATION_ELEMENT));
+        if (presentation != null){
+
+            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_PRESENTER_QUEUE_SIZE)) != null){
+                int queueSize = Integer.parseInt(presentation.getFirstChildWithName(
+                        new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_PRESENTER_QUEUE_SIZE)).getText());
+
+                if (isPowerOfTwo(queueSize)){
+                    stormDeploymentConfig.setPresentationOutputQueueSize(queueSize);
+                }else{
+                    // Disruptor queue size only allows powers of two
+                    throw new IllegalArgumentException(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_PRESENTER_QUEUE_SIZE + " must be a power of two.");
+                }
+            } else{
+                log.info("No presentation output queue size provided. Hence using default queue size " + stormDeploymentConfig.getPresentationOutputQueueSize());
+            }
+
+            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE)) != null){
+                int bufferSize = Integer.parseInt(transport.getFirstChildWithName(
+                        new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE)).getText());
+                stormDeploymentConfig.setPresentationPublisherTcpSendBufferSize(bufferSize);
+            } else {
+                log.info("No TCP publisher buffer size not specified for presenter. Hence using default buffer size " + stormDeploymentConfig.getPresentationPublisherTcpSendBufferSize());
+            }
+
+            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET)) != null){
+                String tcpEventPublisherCharSet = transport.getFirstChildWithName(
+                        new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET)).getText();
+                stormDeploymentConfig.setPresentationPublisherCharSet(tcpEventPublisherCharSet);
+            }else{
+                log.info("TCP event publisher Char-Set not set for presenter. Hence using default value " + stormDeploymentConfig.getPresentationPublisherCharSet());
+            }
+
+            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)) != null){
+                int threadCount = Integer.parseInt(transport.getFirstChildWithName(
+                        new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)).getText());
+                stormDeploymentConfig.setPresentationReceiverThreads(threadCount);
+            } else {
+                log.info("No TCP receiver thread count not specified for presenter. Hence using default thread count " + stormDeploymentConfig.getPresentationReceiverThreads());
+            }
+
+            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL)) != null){
+                int connectionStatusCheckInterval = Integer.parseInt(transport.getFirstChildWithName(
+                        new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL)).getText());
+                stormDeploymentConfig.setPresentationPublisherConnectionStatusCheckInterval(connectionStatusCheckInterval);
+            }  else {
+                log.info("No transport connection status check interval specified for presenter. Hence using default interval "
+                        + stormDeploymentConfig.getPresentationPublisherConnectionStatusCheckInterval() + "ms");
+            }
+        }else{
+            log.info("No presentation configurations provided. Hence using default configurations");
+        }
 
         //Reading Status Monitor Info
         OMElement statusMonitor = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STATUS_MONITOR_ELEMENT));

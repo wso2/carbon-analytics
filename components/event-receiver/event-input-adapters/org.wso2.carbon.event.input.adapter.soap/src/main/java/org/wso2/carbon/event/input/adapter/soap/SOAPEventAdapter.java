@@ -141,7 +141,7 @@ public final class SOAPEventAdapter implements InputEventAdapter {
             transports.add("https");
             transports.add("local");
         } else {
-            transports.add(SOAPEventAdapterConstants.EXPOSED_TRANSPORTS);
+            transports.add(exposedTransports);
         }
         axisService.setExposedTransports(transports);
         axisConfiguration.addService(axisService);
