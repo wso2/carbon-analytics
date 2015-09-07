@@ -87,9 +87,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     private static final int FLOW_CONTROL_RECEIVE_LOW_LOWEST = 1000;
 
-    private static final int FLOW_CONTROL_RECEIVE_LOW_DEFAULT = 30000;
+    private static final int FLOW_CONTROL_RECEIVE_LOW_DEFAULT = 5000;
 
-    private static final int FLOW_CONTROL_RECEIVE_HIGH_DEFAULT = 60000;
+    private static final int FLOW_CONTROL_RECEIVE_HIGH_DEFAULT = 10000;
 
     private static final Log logger = LogFactory.getLog(AnalyticsDataServiceImpl.class);
 
