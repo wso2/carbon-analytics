@@ -1186,10 +1186,23 @@
     </profiles>
 
     <properties>
-        <!-- Carbon platform version comes here-->
+
+        <!-- carbon-analytics repo versions -->
+        <carbon.analytics.version>1.0.3-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.imp.pkg.version>[1.0.3-SNAPSHOT, 1.1.0)</carbon.analytics.imp.pkg.version>
+
+        <!-- Carbon platform version -->
         <carbon.kernel.version>4.4.1</carbon.kernel.version>
         <carbon.kernel.version.import.version.range>[4.4.0, 4.5.0)
         </carbon.kernel.version.import.version.range>
+
+        <!-- WSO2 repository versions -->
+        <carbon.commons.version>4.4.7</carbon.commons.version>
+        <carbon.commons.imp.pkg.version>[4.4.7, 4.5.0)</carbon.commons.imp.pkg.version>
+        <carbon.event-processing.version>2.0.4-SNAPSHOT</carbon.event-processing.version>
+        <carbon.analytics.common.version>5.0.1-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.analytics.common.imp.pkg.version>[5.0.1-SNAPSHOT, 5.1.0)</carbon.analytics.common.imp.pkg.version>
+        <carbon.data.version>4.3.1-SNAPSHOT</carbon.data.version>
 
         <!-- Axis2 Version -->
         <axis2.version>1.6.1-wso2v11</axis2.version>
@@ -1264,16 +1277,6 @@
         <lucene.orbit.version>5.2.1.wso2v1</lucene.orbit.version>
         <lucene.imp.pkg.version>[5.2.1, 5.3.0)</lucene.imp.pkg.version>
         <asm4.orbit.version>4.1.0.wso2v1</asm4.orbit.version>
-        <carbon.commons.version>4.4.7</carbon.commons.version>
-        <carbon.commons.imp.pkg.version>[4.4.7, 4.5.0)</carbon.commons.imp.pkg.version>
-        <carbon.event-processing.version>2.0.4-SNAPSHOT</carbon.event-processing.version>
-        <carbon.analytics.common.version>5.0.1-SNAPSHOT</carbon.analytics.common.version>
-        <carbon.analytics.common.imp.pkg.version>[5.0.1-SNAPSHOT, 5.1.0)</carbon.analytics.common.imp.pkg.version>
-
-        <carbon.data.version>4.3.1-SNAPSHOT</carbon.data.version>
-
-        <carbon.analytics.version>1.0.3-SNAPSHOT</carbon.analytics.version>
-        <carbon.analytics.imp.pkg.version>[1.0.3-SNAPSHOT, 1.1.0)</carbon.analytics.imp.pkg.version>
 
         <!--analytics processors -->
         <spark.orbit.version>1.4.1.wso2v1</spark.orbit.version>
