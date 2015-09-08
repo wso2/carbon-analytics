@@ -113,7 +113,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
         if (fileName != null) {
             EventReceiverConfigurationFileSystemInvoker.delete(fileName);
         } else {
-            throw new EventReceiverConfigurationException("Couldn't undeploy the Event Receiver configuration : " + eventReceiverName);
+            throw new EventReceiverConfigurationException("Couldn't undeploy the Event Receiver configuration: " + eventReceiverName);
         }
 
     }
@@ -377,7 +377,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
             try {
                 EventReceiverConfigurationFileSystemInvoker.reload(receiverConfigurationFile);
             } catch (Exception e) {
-                log.error("Exception occurred while trying to deploy the Event Receiver configuration file : " + receiverConfigurationFile.getFileName(), e);
+                log.error("Exception occurred while trying to deploy the Event Receiver configuration file: " + receiverConfigurationFile.getFileName(), e);
             }
         }
     }
@@ -402,7 +402,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
             try {
                 EventReceiverConfigurationFileSystemInvoker.reload(receiverConfigurationFile);
             } catch (Exception e) {
-                log.error("Exception occurred while trying to deploy the Event Receiver configuration file : " + receiverConfigurationFile.getFileName(), e);
+                log.error("Exception occurred while trying to deploy the Event Receiver configuration file: " + receiverConfigurationFile.getFileName(), e);
             }
         }
     }
@@ -434,7 +434,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
 
         for (EventReceiverConfigurationFile receiverConfigurationFile : fileList) {
             EventReceiverConfigurationFileSystemInvoker.reload(receiverConfigurationFile);
-            log.info("Event receiver : " + receiverConfigurationFile.getEventReceiverName() + " in inactive state because dependency could not be found : " + dependency);
+            log.info("Event receiver : " + receiverConfigurationFile.getEventReceiverName() + " in inactive state because dependency could not be found: " + dependency);
         }
     }
 
@@ -463,7 +463,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
         }
         for (EventReceiverConfigurationFile receiverConfigurationFile : fileList) {
             EventReceiverConfigurationFileSystemInvoker.reload(receiverConfigurationFile);
-            log.info("Event receiver : " + receiverConfigurationFile.getEventReceiverName() + " in inactive state because event stream dependency  could not be found : " + streamId);
+            log.info("Event receiver : " + receiverConfigurationFile.getEventReceiverName() + " in inactive state because event stream dependency  could not be found: " + streamId);
         }
     }
 
@@ -554,7 +554,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
                 throw new EventReceiverConfigurationException("Mapping type of the Event Receiver " + originalEventReceiverName + " cannot be null");
             }
         } catch (XMLStreamException e) {
-            throw new EventReceiverConfigurationException("Error while building XML configuration :" + e.getMessage(), e);
+            throw new EventReceiverConfigurationException("Error while building XML configuration: " + e.getMessage(), e);
         }
     }
 
