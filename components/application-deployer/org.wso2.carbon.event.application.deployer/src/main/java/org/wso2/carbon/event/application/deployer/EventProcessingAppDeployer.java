@@ -224,20 +224,15 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
         if (artifact == null) {
             return false;
         }
-
-        if (!isAccepted(artifact.getType())) {
-            log.warn("Can't deploy artifact : " + artifact.getName() + " of type : " +
-                    artifact.getType() + ". Required features are not installed in the system");
-            return false;
+        if (isAccepted(artifact.getType())) {
+            List<CappFile> files = artifact.getFiles();
+            if (files.size() != 1) {
+                log.error("Synapse artifact types must have a single file to " +
+                        "be deployed. But " + files.size() + " files found.");
+                return false;
+            }
+            return true;
         }
-
-        List<CappFile> files = artifact.getFiles();
-        if (files.size() != 1) {
-            log.error("Synapse artifact types must have a single file to " +
-                    "be deployed. But " + files.size() + " files found.");
-            return false;
-        }
-
-        return true;
+        return false;
     }
 }
