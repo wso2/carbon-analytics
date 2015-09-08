@@ -68,7 +68,7 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
                     " for tenant " + tenantId);
         } else {
             this.init(conn, tenantId, tableName, columns, recordsCount, batchSize);
-            if (timeFrom == Long.MIN_VALUE) {
+            if (timeFrom <= 0) {
                 this.noStartTime = true;
                 /* Setting param to null, to recognize the first ever run. It will never become null after the first run. */
                 this.latestRow = null;
@@ -76,7 +76,7 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
                 /* Setting the initial row to start time -1 because it will soon be incremented by 1L. */
                 this.latestRow = HBaseUtils.encodeLong(timeFrom - POSTFIX);
             }
-            if (timeFrom == Long.MAX_VALUE) {
+            if (timeFrom >= Long.MAX_VALUE - 1) {
                 this.noStopTime = true;
             } else {
                 this.endRow = HBaseUtils.encodeLong(timeTo);

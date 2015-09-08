@@ -229,6 +229,9 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         for (Record record : records) {
             String recordId = record.getId();
             long timestamp = record.getTimestamp();
+            if (timestamp < 0L) {
+                throw new AnalyticsException("HBase Analytics Record store does not support negative UNIX timestamps");
+            }
             Map<String, Object> columns = record.getValues();
             if ((columns == null) || columns.isEmpty()) {
                 data = new byte[]{};
@@ -286,7 +289,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         if (!this.tableExists(tenantId, tableName)) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
-        if ((timeFrom == Long.MIN_VALUE) && (timeTo == Long.MAX_VALUE) && (numPartitionsHint > 1)) {
+        if ((timeFrom <= 0) && (timeTo >= Long.MAX_VALUE - 1) && (numPartitionsHint > 1)) {
             log.debug("Performing GET on region split contours for table " + tableName + " and tenantID " + tenantId);
             return this.computeRegionSplits(tenantId, tableName, columns, recordsCount);
         } else {
