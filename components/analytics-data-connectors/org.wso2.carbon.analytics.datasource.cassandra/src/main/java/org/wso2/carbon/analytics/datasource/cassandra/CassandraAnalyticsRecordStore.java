@@ -27,6 +27,7 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.TokenRange;
+import com.google.common.cache.CacheBuilder;
 
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -42,14 +43,13 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * This class represents the Cassandra implementation of {@link AnalyticsRecordStore}.
@@ -58,7 +58,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
     private static final int STREAMING_BATCH_SIZE = 1000;
     
-    private static final int RECORD_INSERT_STATEMENTS_CACHE_SIZE = 10000;
+    private static final int RECORD_INSERT_STATEMENTS_CACHE_SIZE = 5000;
 
     private static final int TS_MULTIPLIER = (int) Math.pow(2, 30);
 
@@ -70,13 +70,8 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     
     private PreparedStatement timestampRecordAddStmt;
     
-    private Map<String, PreparedStatement> recordInsertStmtMap = Collections.synchronizedMap(new LinkedHashMap<String, PreparedStatement>() {
-        private static final long serialVersionUID = 1L;
-        @Override
-        protected boolean removeEldestEntry(final Map.Entry<String, PreparedStatement> eldest) {
-            return super.size() > RECORD_INSERT_STATEMENTS_CACHE_SIZE;
-        }
-    });
+    private ConcurrentMap<Object, Object> recordInsertStmtMap = CacheBuilder.newBuilder().maximumSize(
+            RECORD_INSERT_STATEMENTS_CACHE_SIZE).build().asMap();
 
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
@@ -113,9 +108,10 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     private PreparedStatement retrieveRecordInsertStmt(String dataTable) {
-        PreparedStatement stmt = this.recordInsertStmtMap.get(dataTable);
+        PreparedStatement stmt = (PreparedStatement) this.recordInsertStmtMap.get(dataTable);
         if (stmt == null) {
             synchronized (this.recordInsertStmtMap) {
+                stmt = (PreparedStatement) this.recordInsertStmtMap.get(dataTable);
                 if (stmt == null) {
                     stmt = session.prepare("INSERT INTO ARS." + dataTable + " (id, timestamp, data) VALUES (?, ?, ?)");
                     this.recordInsertStmtMap.put(dataTable, stmt);
