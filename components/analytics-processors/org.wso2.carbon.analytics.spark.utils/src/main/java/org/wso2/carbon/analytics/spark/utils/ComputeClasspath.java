@@ -213,6 +213,8 @@ public class ComputeClasspath {
             "config"
     };
 
+    private static String SEP = System.getProperty("os.name").toLowerCase().contains("win") ? ";" : ":";
+
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
             throw new Exception("Arguments to the main method should not be empty");
@@ -226,13 +228,13 @@ public class ComputeClasspath {
 
     public static String getSparkClasspath(String sparkClasspath, String carbonHome)
             throws IOException {
-        String cp = createInitialSparkClasspath(sparkClasspath, carbonHome, REQUIRED_JARS);
-        return cp + addJarsFromLib("", carbonHome) + addJarsFromConfig("", carbonHome);
+        String cp = createInitialSparkClasspath(sparkClasspath, carbonHome, REQUIRED_JARS, SEP);
+        return cp + addJarsFromLib("", carbonHome, SEP) + addJarsFromConfig("", carbonHome, SEP);
     }
 
     public static String[] getSparkClasspathJarsArray(String sparkClasspath, String carbonHome)
             throws IOException {
-        return getSparkClasspath(sparkClasspath, carbonHome).split(":");
+        return getSparkClasspath(sparkClasspath, carbonHome).split(SEP);
     }
 
     public static String getSparkClasspathAbsolute(String sparkClasspath, String carbonHome)
@@ -244,20 +246,20 @@ public class ComputeClasspath {
         }
     }
 
-    private static String addJarsFromLib(String scp, String carbonHome) {
+    private static String addJarsFromLib(String scp, String carbonHome, String separator) {
         File libDir = new File(carbonHome + File.separator + "repository" + File.separator
-                               + "components" + File.separator + "lib");
+                + "components" + File.separator + "lib");
         File[] libJars = listJars(libDir);
         for (File jar : libJars) {
-            scp = scp + ":" + jar.getAbsolutePath();
+            scp = scp + separator + jar.getAbsolutePath();
         }
         return scp;
     }
 
-    private static String addJarsFromConfig(String scp, String carbonHome)
+    private static String addJarsFromConfig(String scp, String carbonHome, String separator)
             throws IOException {
         File cpFile = new File(carbonHome + File.separator + "repository" + File.separator + "conf"
-                               + File.separator + "spark" + File.separator + "add-to-spark-classpath.conf");
+                + File.separator + "spark" + File.separator + "add-to-spark-classpath.conf");
 
         BufferedReader reader = null;
         try {
@@ -275,9 +277,9 @@ public class ComputeClasspath {
                 }
 
                 if (fileExists(line)) {
-                    scp = scp + ":" + line;
+                    scp = scp + separator + line;
                 } else if (fileExists(carbonHome + File.separator + line)) {
-                    scp = scp + ":" + carbonHome + File.separator + line;
+                    scp = scp + separator + carbonHome + File.separator + line;
                 } else {
                     throw new IOException("File not found : " + line);
                 }
@@ -310,9 +312,9 @@ public class ComputeClasspath {
     }
 
     private static String createInitialSparkClasspath(String sparkClasspath, String carbonHome,
-                                                      String[] requiredJars) {
+                                                      String[] requiredJars, String separator) {
         File pluginsDir = new File(carbonHome + File.separator + "repository" + File.separator
-                                   + "components" + File.separator + "plugins");
+                + "components" + File.separator + "plugins");
         File[] pluginJars = listJars(pluginsDir);
 
         for (String requiredJar : requiredJars) {
@@ -322,7 +324,7 @@ public class ComputeClasspath {
                     if (sparkClasspath.isEmpty()) {
                         sparkClasspath = pluginJar.getAbsolutePath();
                     } else {
-                        sparkClasspath = sparkClasspath + ":" + pluginJar.getAbsolutePath();
+                        sparkClasspath = sparkClasspath + separator + pluginJar.getAbsolutePath();
                     }
                 }
             }
