@@ -39,6 +39,7 @@ public final class ConfigurationConstants {
     public static final String EVENT_SYNC_ELEMENT = "eventSync";
     public static final String PRESENTER_ELEMENT = "presentation";
     public static final String HA_WORKER = "worker";
+    public static final String HA_PRESENTER = "presenter";
     public static final String HA_NODE_TYPE = "nodeType";
 
 

@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.wso2.carbon.event.processor.manager.core.internal;
 
@@ -22,6 +24,7 @@ import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
+import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisher;
 import org.wso2.carbon.event.processor.manager.commons.utils.ByteSerializer;
 import org.wso2.carbon.event.processor.manager.commons.utils.HostAndPort;
 import org.wso2.carbon.event.processor.manager.core.EventProcessorManagementService;
@@ -40,6 +43,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -61,9 +65,11 @@ public class HAManager {
     private String passiveId;
 
     private HAConfiguration otherMember;
+    private ConcurrentHashMap<HostAndPort, TCPEventPublisher> receiverTcpEventPublisherPool;
 
     public HAManager(HazelcastInstance hazelcastInstance, HAConfiguration haConfiguration,
-                     ScheduledExecutorService executorService) {
+                     ScheduledExecutorService executorService,
+                     ConcurrentHashMap<HostAndPort, TCPEventPublisher> receiverTcpEventPublisherPool) {
         this.haConfiguration = haConfiguration;
         this.executorService = executorService;
         activeId = ConfigurationConstants.ACTIVEID;
@@ -84,7 +90,7 @@ public class HAManager {
             }
 
         }, activeId, false);
-
+        this.receiverTcpEventPublisherPool = receiverTcpEventPublisherPool;
     }
 
     public void init() {
@@ -144,8 +150,8 @@ public class HAManager {
         receiverList.add(otherMember.getEventSyncConfig());
         eventManagementService.setSyncReceivers(receiverList);
 
-
-        eventManagementService.addMember(otherMember.getEventSyncConfig(), haConfiguration.constructEventSyncPublisherConfig());
+        eventManagementService.addMember(otherMember.getEventSyncConfig(), haConfiguration
+                .constructEventSyncPublisherConfig(), receiverTcpEventPublisherPool);
 
         if (eventProcessorManagementService != null) {
             eventProcessorManagementService.pause();
@@ -202,7 +208,7 @@ public class HAManager {
         roleToMembershipMap.set(activeId, haConfiguration);
         eventManagementService.setSyncReceivers(new ArrayList<HostAndPort>());
         if (otherMember != null) {
-            eventManagementService.removeMember(otherMember.getEventSyncConfig());
+            eventManagementService.removeMember(otherMember.getEventSyncConfig(), receiverTcpEventPublisherPool);
         }
         otherMember = null;
 
@@ -227,7 +233,8 @@ public class HAManager {
         List<HostAndPort> receiverList = new ArrayList<HostAndPort>();
         receiverList.add(otherMember.getEventSyncConfig());
         eventManagementService.setSyncReceivers(receiverList);
-        eventManagementService.addMember(otherMember.getEventSyncConfig(), haConfiguration.constructEventSyncPublisherConfig());
+        eventManagementService.addMember(otherMember.getEventSyncConfig(), haConfiguration
+                .constructEventSyncPublisherConfig(), receiverTcpEventPublisherPool);
 
         executorService.execute(new Runnable() {
             @Override
