@@ -219,6 +219,8 @@ public class AnalyticsCachedWebServiceConnector extends AnalyticsWebServiceConne
      */
     public static class AnalyticsCache {
         
+        private static final String ENABLE_DISTRIBUTED_WEB_SERVICE_CONNECTOR_CACHE = "enableDistributedWebServiceConnectorCache";
+
         private static final String CACHE_MAP_NAME = "CarbonAnalyticsWebServiceConnectorCache";
 
         private int cacheTimeoutSeconds;
@@ -243,7 +245,8 @@ public class AnalyticsCachedWebServiceConnector extends AnalyticsWebServiceConne
 
         private void initCache() {
             HazelcastInstance hz = this.loadHazelcast();
-            if (hz != null) {
+            String enableDCache = System.getProperty(ENABLE_DISTRIBUTED_WEB_SERVICE_CONNECTOR_CACHE);
+            if (hz != null && enableDCache != null) {
                 this.initHzCacheMapConfig(hz);
                 this.cache = hz.getMap(CACHE_MAP_NAME);
             } else {
