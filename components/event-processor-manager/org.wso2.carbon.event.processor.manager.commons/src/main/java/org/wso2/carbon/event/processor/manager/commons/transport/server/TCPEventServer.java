@@ -96,7 +96,7 @@ public class TCPEventServer {
         public void run() {
             try {
                 InetAddress inetAddress = InetAddress.getByName(tcpEventServerConfig.getHostName());
-                log.info("EventServer starting event listener on " + inetAddress + ":" + tcpEventServerConfig.getPort());
+                log.info("EventServer starting event listener on " + inetAddress.getHostAddress() + ":" + tcpEventServerConfig.getPort());
                 isRunning = true;
                 receiverSocket = new ServerSocket(tcpEventServerConfig.getPort(), 50, inetAddress);
                 receiverSocket.setReuseAddress(true);
