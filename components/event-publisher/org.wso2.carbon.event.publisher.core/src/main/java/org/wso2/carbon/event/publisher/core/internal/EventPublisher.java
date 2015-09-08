@@ -169,7 +169,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
             } else if (mode == Mode.HA && managementModeInfo.getHaConfiguration().isWorkerNode()) {
                 sendToOther = true;
             }
-            EventPublisherServiceValueHolder.getEventManagementService().registerEventSync(this);
+            EventPublisherServiceValueHolder.getEventManagementService().registerEventSync(this, Manager.ManagerType.Publisher);
         }
     }
 
@@ -312,7 +312,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
     public void destroy() {
         if (mode == Mode.Distributed || mode == Mode.HA) {
-            EventPublisherServiceValueHolder.getEventManagementService().unregisterEventSync(syncId);
+            EventPublisherServiceValueHolder.getEventManagementService().unregisterEventSync(syncId, Manager.ManagerType.Publisher);
         }
         EventPublisherServiceValueHolder.getOutputEventAdapterService().destroy(eventPublisherConfiguration.getEventPublisherName());
     }

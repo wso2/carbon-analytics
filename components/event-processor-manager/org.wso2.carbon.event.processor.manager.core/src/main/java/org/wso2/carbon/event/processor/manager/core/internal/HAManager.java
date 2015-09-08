@@ -24,7 +24,6 @@ import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
-import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisher;
 import org.wso2.carbon.event.processor.manager.commons.utils.ByteSerializer;
 import org.wso2.carbon.event.processor.manager.commons.utils.HostAndPort;
 import org.wso2.carbon.event.processor.manager.core.EventProcessorManagementService;
@@ -40,10 +39,7 @@ import org.wso2.carbon.event.processor.manager.core.internal.thrift.service.Mana
 import org.wso2.carbon.event.processor.manager.core.internal.util.ConfigurationConstants;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -53,6 +49,7 @@ public class HAManager {
 
     private HAConfiguration haConfiguration;
     private final ScheduledExecutorService executorService;
+    private final EventHandler receiverEventHandler;
     private boolean activeLockAcquired;
     private boolean passiveLockAcquired;
     private ILock activeLock;
@@ -65,17 +62,17 @@ public class HAManager {
     private String passiveId;
 
     private HAConfiguration otherMember;
-    private ConcurrentHashMap<HostAndPort, TCPEventPublisher> receiverTcpEventPublisherPool;
 
     public HAManager(HazelcastInstance hazelcastInstance, HAConfiguration haConfiguration,
                      ScheduledExecutorService executorService,
-                     ConcurrentHashMap<HostAndPort, TCPEventPublisher> receiverTcpEventPublisherPool) {
+                     EventHandler receiverEventHandler) {
         this.haConfiguration = haConfiguration;
         this.executorService = executorService;
-        activeId = ConfigurationConstants.ACTIVEID;
-        passiveId = ConfigurationConstants.PASSIVEID;
-        activeLock = hazelcastInstance.getLock(activeId);
-        passiveLock = hazelcastInstance.getLock(passiveId);
+        this.receiverEventHandler = receiverEventHandler;
+        this.activeId = ConfigurationConstants.ACTIVEID;
+        this.passiveId = ConfigurationConstants.PASSIVEID;
+        this.activeLock = hazelcastInstance.getLock(activeId);
+        this.passiveLock = hazelcastInstance.getLock(passiveId);
         this.haConfiguration.setMemberUuid(hazelcastInstance.getCluster().getLocalMember().getUuid());
 
         snapshotServer = new SnapshotServer();
@@ -90,7 +87,6 @@ public class HAManager {
             }
 
         }, activeId, false);
-        this.receiverTcpEventPublisherPool = receiverTcpEventPublisherPool;
     }
 
     public void init() {
@@ -146,12 +142,7 @@ public class HAManager {
         otherMember = passiveMember;
         HashMap<Manager.ManagerType, byte[]> stateMap = new HashMap<Manager.ManagerType, byte[]>();
 
-        List<HostAndPort> receiverList = new ArrayList<HostAndPort>();
-        receiverList.add(otherMember.getEventSyncConfig());
-        eventManagementService.setSyncReceivers(receiverList);
-
-        eventManagementService.addMember(otherMember.getEventSyncConfig(), haConfiguration
-                .constructEventSyncPublisherConfig(), receiverTcpEventPublisherPool);
+        receiverEventHandler.addEventPublisher(passiveMember.getEventSyncConfig());
 
         if (eventProcessorManagementService != null) {
             eventProcessorManagementService.pause();
@@ -206,10 +197,6 @@ public class HAManager {
                 .getEventPublisherManagementService();
 
         roleToMembershipMap.set(activeId, haConfiguration);
-        eventManagementService.setSyncReceivers(new ArrayList<HostAndPort>());
-        if (otherMember != null) {
-            eventManagementService.removeMember(otherMember.getEventSyncConfig(), receiverTcpEventPublisherPool);
-        }
         otherMember = null;
 
         if (eventPublisherManagementService != null) {
@@ -230,11 +217,7 @@ public class HAManager {
         // Send non-duplicate events to active member
         final CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder
                 .getCarbonEventManagementService();
-        List<HostAndPort> receiverList = new ArrayList<HostAndPort>();
-        receiverList.add(otherMember.getEventSyncConfig());
-        eventManagementService.setSyncReceivers(receiverList);
-        eventManagementService.addMember(otherMember.getEventSyncConfig(), haConfiguration
-                .constructEventSyncPublisherConfig(), receiverTcpEventPublisherPool);
+        receiverEventHandler.addEventPublisher(activeMember.getEventSyncConfig());
 
         executorService.execute(new Runnable() {
             @Override
@@ -282,8 +265,7 @@ public class HAManager {
         } catch (Throwable e) {
             log.error(e);
         }
-        HashMap<Manager.ManagerType, byte[]> stateMap = (HashMap<Manager.ManagerType, byte[]>) ByteSerializer
-                .BToO(state);
+        HashMap<Manager.ManagerType, byte[]> stateMap = (HashMap<Manager.ManagerType, byte[]>) ByteSerializer.BToO(state);
         // Synchronize the duplicate events with active member
         try {
             if (eventProcessorManagementService != null) {

@@ -56,17 +56,19 @@ public interface EventManagementService {
 
     /**
      * This method registers the events in the EventPublisher which needed to be synced
-     * 
+     *
      * @param eventSync contains the stream id
+     * @param type
      */
-    void registerEventSync(EventSync eventSync);
+    void registerEventSync(EventSync eventSync, Manager.ManagerType type);
 
     /**
      * This method unregisters the events in the EventPublisher which scheduled to be synced
-     * 
+     *
      * @param syncId id of the events to be synced by the EventPublisher
+     * @param type
      */
-    void unregisterEventSync(String syncId);
+    void unregisterEventSync(String syncId, Manager.ManagerType type);
 
     /**
      * This method updates the hazelcast map with the latest processed event details

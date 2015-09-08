@@ -60,7 +60,7 @@ public class TCPEventSendingTestCase {
                 .attribute("att4", Attribute.Type.INT);
 
         TestStreamCallback streamCallback = new TestStreamCallback();
-        TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig(7612), streamCallback, null);
+        TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig("0.0.0.0", 7612), streamCallback, null);
         try {
             TCPEventServer.addStreamDefinition(streamDefinition);
             TCPEventServer.start();
@@ -87,7 +87,7 @@ public class TCPEventSendingTestCase {
                 .attribute("searchTerms", Attribute.Type.STRING);
 
         TestStreamCallback streamCallback = new TestStreamCallback();
-        TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig(7612), streamCallback, null);
+        TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig("0.0.0.0", 7612), streamCallback, null);
         try {
             TCPEventServer.addStreamDefinition(streamDefinition);
             TCPEventServer.start();
@@ -117,7 +117,7 @@ public class TCPEventSendingTestCase {
                 .attribute("att4", Attribute.Type.INT);
 
         TestStreamCallback streamCallback = new TestStreamCallback();
-        TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig(7612), streamCallback, null);
+        TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig("0.0.0.0", 7612), streamCallback, null);
         try {
             threadPool.submit(new ClientThread(streamDefinition, new SimpleDataProvider(), 100, false, 1000));
             Thread.sleep(10000);

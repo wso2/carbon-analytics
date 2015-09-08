@@ -37,7 +37,7 @@
         </nodeType>
         <checkMemberUpdateInterval>10000</checkMemberUpdateInterval>
         <eventSync>
-            <hostName>localhost</hostName>
+            <hostName>0.0.0.0</hostName>
             <port>11224</port>
             <reconnectionInterval>20000</reconnectionInterval>
             <serverThreads>20000</serverThreads>
@@ -51,13 +51,13 @@
             <publisherConnectionStatusCheckInterval>30000</publisherConnectionStatusCheckInterval>
         </eventSync>
         <management>
-            <hostName>localhost</hostName>
+            <hostName>0.0.0.0</hostName>
             <port>10005</port>
             <tryStateChangeInterval>15000</tryStateChangeInterval>
             <stateSyncRetryInterval>10000</stateSyncRetryInterval>
         </management>
         <presentation>
-            <hostName>localhost</hostName>
+            <hostName>0.0.0.0</hostName>
             <port>11000</port>
             <!--Size of TCP event publishing client's send buffer in bytes-->
             <publisherTcpSendBufferSize>5242880</publisherTcpSendBufferSize>
@@ -77,11 +77,11 @@
         <nodeType>
             <worker enable="true"/>
             <manager enable="true">
-                <hostName>localhost</hostName>
+                <hostName>0.0.0.0</hostName>
                 <port>8904</port>
             </manager>
 	        <presenter enable="false">
-                <hostName>localhost</hostName>
+                <hostName>0.0.0.0</hostName>
                 <port>11000</port>
             </presenter>
         </nodeType>

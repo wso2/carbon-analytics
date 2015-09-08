@@ -28,6 +28,7 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -40,7 +41,7 @@ import java.util.concurrent.Executors;
 
 public class TCPEventServer {
     private static Logger log = Logger.getLogger(TCPEventServer.class);
-    private TCPEventServerConfig tcpEventServerConfig = new TCPEventServerConfig(7211);
+    private TCPEventServerConfig tcpEventServerConfig = new TCPEventServerConfig("0.0.0.0", 7211);
     private ExecutorService executorService;
     private StreamCallback streamCallback;
     private ConnectionCallback connectionCallback;
@@ -94,9 +95,10 @@ public class TCPEventServer {
         @Override
         public void run() {
             try {
-                log.info("EventServer starting event listener on port " + tcpEventServerConfig.getPort());
+                InetAddress inetAddress = InetAddress.getByName(tcpEventServerConfig.getHostName());
+                log.info("EventServer starting event listener on " + inetAddress + ":" + tcpEventServerConfig.getPort());
                 isRunning = true;
-                receiverSocket = new ServerSocket(tcpEventServerConfig.getPort());
+                receiverSocket = new ServerSocket(tcpEventServerConfig.getPort(), 50, inetAddress);
                 receiverSocket.setReuseAddress(true);
                 while (isRunning) {
                     final Socket connectionSocket = receiverSocket.accept();
@@ -130,7 +132,7 @@ public class TCPEventServer {
             @Override
             public void run() {
                 try {
-                    if(connectionCallback != null){
+                    if (connectionCallback != null) {
                         connectionCallback.onPublisherBoltConnect();
                     }
                     BufferedInputStream in = new BufferedInputStream(connectionSocket.getInputStream());
@@ -139,7 +141,7 @@ public class TCPEventServer {
                         byte[] streamNameByteSize = loadData(in, new byte[4]);
                         ByteBuffer sizeBuf = ByteBuffer.wrap(streamNameByteSize);
                         int streamNameSize = sizeBuf.getInt();
-                        if  (streamNameSize == TCPEventPublisher.PING_HEADER_VALUE){
+                        if (streamNameSize == TCPEventPublisher.PING_HEADER_VALUE) {
                             continue;
                         }
                         byte[] streamNameData = loadData(in, new byte[streamNameSize]);
@@ -200,7 +202,7 @@ public class TCPEventServer {
                 } catch (Throwable t) {
                     log.error("Error :" + t.getMessage(), t);
                 } finally {
-                    if(connectionCallback != null){
+                    if (connectionCallback != null) {
                         connectionCallback.onPublisherBoltDisconnect();
                     }
                 }
