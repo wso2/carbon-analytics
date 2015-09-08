@@ -238,7 +238,7 @@ public class ComputeClasspath {
     public static String getSparkClasspathAbsolute(String sparkClasspath, String carbonHome)
             throws IOException {
         if (carbonHome.endsWith(File.separator)) {
-            return getSparkClasspath(sparkClasspath, carbonHome).replace(carbonHome, "."+File.separator);
+            return getSparkClasspath(sparkClasspath, carbonHome).replace(carbonHome, "." + File.separator);
         } else {
             return getSparkClasspath(sparkClasspath, carbonHome).replace(carbonHome, ".");
         }
