@@ -91,7 +91,6 @@ public class HAManager {
 
         }, activeId, false);
         this.receiverTcpEventPublisherPool = receiverTcpEventPublisherPool;
-
     }
 
     public void init() {
@@ -150,7 +149,6 @@ public class HAManager {
         List<HostAndPort> receiverList = new ArrayList<HostAndPort>();
         receiverList.add(otherMember.getEventSyncConfig());
         eventManagementService.setSyncReceivers(receiverList);
-
 
         eventManagementService.addMember(otherMember.getEventSyncConfig(), haConfiguration
                 .constructEventSyncPublisherConfig(), receiverTcpEventPublisherPool);

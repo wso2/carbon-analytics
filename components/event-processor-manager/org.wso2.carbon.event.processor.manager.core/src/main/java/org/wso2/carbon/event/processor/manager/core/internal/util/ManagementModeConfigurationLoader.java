@@ -432,6 +432,8 @@ public class ManagementModeConfigurationLoader {
         OMElement nodeType = processing.getFirstChildWithName(new QName(ConfigurationConstants.HA_NODE_TYPE));
         String isWorkerEnabled = nodeType.getFirstChildWithName(new QName(ConfigurationConstants.HA_WORKER))
                 .getAttribute(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)).getAttributeValue();
+        String isPresenterEnabled = nodeType.getFirstChildWithName(new QName(ConfigurationConstants.HA_PRESENTER))
+                .getAttribute(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)).getAttributeValue();
         haConfiguration.setCheckMemberUpdateInterval(Integer.parseInt(readOMElementValue(processing, ConfigurationConstants
                 .HA_NODE_CONFIG_CHECK_MEMBER_UPDATE_INTERVAL)));
 
@@ -458,7 +460,8 @@ public class ManagementModeConfigurationLoader {
                     .HA_NODE_CONFIG_PUBLISHER_CONNECTION_STATUS_CHECK_INTERVAL)));
             haConfiguration.setEventSyncReceiverThreads(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
                     .HA_NODE_CONFIG_RECEIVER_THREADS)));
-        } else {
+        }
+        if(isPresenterEnabled.equalsIgnoreCase("true")) {
             haConfiguration.setPresenterNode(true);
             OMElement presentation = processing.getFirstChildWithName(new QName(ConfigurationConstants.PRESENTER_ELEMENT));
             haConfiguration.setLocalPresenterConfig(readHostName(presentation),
