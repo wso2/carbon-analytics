@@ -230,6 +230,20 @@ public class ComputeClasspath {
         return cp + addJarsFromLib("", carbonHome) + addJarsFromConfig("", carbonHome);
     }
 
+    public static String[] getSparkClasspathJarsArray(String sparkClasspath, String carbonHome)
+            throws IOException {
+        return getSparkClasspath(sparkClasspath, carbonHome).split(":");
+    }
+
+    public static String getSparkClasspathAbsolute(String sparkClasspath, String carbonHome)
+            throws IOException {
+        if (carbonHome.endsWith(File.separator)) {
+            return getSparkClasspath(sparkClasspath, carbonHome).replace(carbonHome, "."+File.separator);
+        } else {
+            return getSparkClasspath(sparkClasspath, carbonHome).replace(carbonHome, ".");
+        }
+    }
+
     private static String addJarsFromLib(String scp, String carbonHome) {
         File libDir = new File(carbonHome + File.separator + "repository" + File.separator
                                + "components" + File.separator + "lib");
