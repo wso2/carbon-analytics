@@ -50,7 +50,7 @@ public abstract class DataEndpoint {
 
     private int batchSize;
 
-    private ThreadPoolExecutor threadPoolExecutor;
+    private EventPublisherThreadPoolExecutor threadPoolExecutor;
 
     private DataEndpointFailureCallback dataEndpointFailureCallback;
 
@@ -75,16 +75,9 @@ public abstract class DataEndpoint {
     void collectAndSend(Event event) {
         events.add(event);
         if (events.size() >= batchSize) {
-            int currentNoOfThreads = threadPoolExecutor.getActiveCount();
-            if (currentNoOfThreads < this.maxPoolSize) {
-                if (currentNoOfThreads == this.maxPoolSize - 1) {
-                    this.setState(State.BUSY);
-                } else {
-                    this.setState(State.ACTIVE);
-                }
-                threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
-                events = new ArrayList<>();
-            } else {
+            boolean isFull = threadPoolExecutor.submitJobAndReturnState(new Thread(new EventPublisher(events)));
+            events = new ArrayList<>();
+            if (isFull) {
                 this.setState(State.BUSY);
             }
         }
@@ -92,19 +85,11 @@ public abstract class DataEndpoint {
 
     void flushEvents() {
         if (events.size() != 0) {
-            int currentNoOfThreads = threadPoolExecutor.getActiveCount();
-            if (currentNoOfThreads >= maxPoolSize - 1) {
-                this.setState(State.BUSY);
-            } else {
-                this.setState(State.ACTIVE);
-            }
-            threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
+            boolean isFull = threadPoolExecutor.submitJobAndReturnState(new Thread(new EventPublisher(events)));
             events = new ArrayList<>();
-            if (log.isDebugEnabled()) {
-                log.debug("Flush events from thread  name: " + Thread.currentThread().getName() + " , thread id : "
-                        + Thread.currentThread().getId());
+            if (isFull) {
+                this.setState(State.BUSY);
             }
-
         }
     }
 
@@ -131,10 +116,9 @@ public abstract class DataEndpoint {
         this.batchSize = dataEndpointConfiguration.getBatchSize();
         this.connectionWorker = new DataEndpointConnectionWorker();
         this.connectionWorker.initialize(this, dataEndpointConfiguration);
-        this.threadPoolExecutor = new ThreadPoolExecutor(dataEndpointConfiguration.getCorePoolSize(),
+        this.threadPoolExecutor = new EventPublisherThreadPoolExecutor(dataEndpointConfiguration.getCorePoolSize(),
                 dataEndpointConfiguration.getMaxPoolSize(), dataEndpointConfiguration.getKeepAliveTimeInPool(),
-                TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
-                new DataBridgeThreadFactory(dataEndpointConfiguration.getReceiverURL()));
+                dataEndpointConfiguration.getReceiverURL());
         this.connectionService = Executors.newSingleThreadExecutor(new DataBridgeThreadFactory("ConnectionService-" +
                 dataEndpointConfiguration.getReceiverURL()));
         this.maxPoolSize = dataEndpointConfiguration.getCorePoolSize();
@@ -258,7 +242,11 @@ public abstract class DataEndpoint {
                 log.error("Unexpected error occurred while sending the event. ", ex);
                 handleFailedEvents();
             } finally {
-                activate();
+                //If any processing error occurred the state will be changed to unavailable,
+                // Hence the state switch should be happening only in busy state where the publishing was success.
+                if (state.equals(State.BUSY)) {
+                    activate();
+                }
                 if (log.isDebugEnabled()) {
                     log.debug("Current threads count is : " + threadPoolExecutor.getActiveCount() + ", maxPoolSize is : " +
                             maxPoolSize + ", therefore state is now : " + getState() + "at time : " + System.nanoTime());
