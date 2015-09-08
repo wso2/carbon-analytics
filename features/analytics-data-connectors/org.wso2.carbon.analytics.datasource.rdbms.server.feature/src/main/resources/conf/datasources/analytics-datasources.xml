@@ -131,7 +131,7 @@
                     <username>admin</username>
                     <password>admin</password>
                     <clusterName>cluster1</clusterName>
-                    <compression>none</compression>
+                    <compression>NONE</compression>
                     <poolingOptions>
                         <coreConnectionsPerHost hostDistance="LOCAL">8</coreConnectionsPerHost>
                         <maxSimultaneousRequestsPerHostThreshold hostDistance="LOCAL">1024</maxSimultaneousRequestsPerHostThreshold>
