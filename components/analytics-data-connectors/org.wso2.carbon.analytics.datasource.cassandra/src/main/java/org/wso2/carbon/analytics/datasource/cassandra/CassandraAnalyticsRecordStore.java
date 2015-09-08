@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -576,14 +577,16 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         
         private String tableName;
         
-        private List<String> columns;
+        private Set<String> columns;
         
         private Iterator<Row> resultSetItr;
         
         public CassandraDirectDataIterator(int tenantId, String tableName, Iterator<Row> resultSetItr, List<String> columns) {
             this.tenantId = tenantId;
             this.tableName = tableName;
-            this.columns = columns;
+            if (columns != null) {
+                this.columns = new HashSet<String>(columns);
+            }
             this.resultSetItr = resultSetItr;
         }
         
@@ -610,9 +613,9 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
                 }
             } else {
                 values = new HashMap<String, Object>(this.columns.size());
-                for (String column : this.columns) {
-                    if (binaryValues.containsKey(column)) {
-                        values.put(column, GenericUtils.deserializeObject(this.extractBytes(binaryValues.get(column))));
+                for (Map.Entry<String, ByteBuffer> binaryValue : binaryValues.entrySet()) {
+                    if (this.columns.contains(binaryValue.getKey())) {
+                        values.put(binaryValue.getKey(), GenericUtils.deserializeObject(this.extractBytes(binaryValue.getValue())));
                     }
                 }
             }

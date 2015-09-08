@@ -81,11 +81,13 @@ import java.util.concurrent.Callable;
  */
 public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
-    private static final int FLOW_CONTROL_RECEIVE_HIGH_LOWEST = 2000;
+    private static final int FLOW_CONTROL_RECEIVE_HIGH_LOWEST = 20;
 
     private static final int FLOW_CONTROL_RECEIVE_DEFAULT_MARGIN = 1000;
+    
+    private static final int FLOW_CONTROL_RECEIVE_LOWEST_MARGIN = 5;
 
-    private static final int FLOW_CONTROL_RECEIVE_LOW_LOWEST = 1000;
+    private static final int FLOW_CONTROL_RECEIVE_LOW_LOWEST = 10;
 
     private static final int FLOW_CONTROL_RECEIVE_LOW_DEFAULT = 5000;
 
@@ -186,9 +188,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             config.setRecordReceivingLowThreshold(config.getRecordReceivingHighThreshold() - FLOW_CONTROL_RECEIVE_DEFAULT_MARGIN);
         } else {
             if (config.getRecordReceivingHighThreshold() - config.getRecordReceivingLowThreshold() < 
-                    FLOW_CONTROL_RECEIVE_DEFAULT_MARGIN) {
+                    FLOW_CONTROL_RECEIVE_LOWEST_MARGIN) {
                 throw new AnalyticsException("The receiver indexing flow control high / value margin must be bigger than " + 
-                        FLOW_CONTROL_RECEIVE_DEFAULT_MARGIN);
+                        FLOW_CONTROL_RECEIVE_LOWEST_MARGIN);
             }
             if (config.getRecordReceivingLowThreshold() < FLOW_CONTROL_RECEIVE_LOW_LOWEST) {
                 throw new AnalyticsException("The receiver indexing flow control low value cannot be smaller than " + 
