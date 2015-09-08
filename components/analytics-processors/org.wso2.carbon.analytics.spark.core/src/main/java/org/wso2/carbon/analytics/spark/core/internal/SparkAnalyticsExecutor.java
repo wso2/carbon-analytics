@@ -606,14 +606,15 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
 
         long start = System.currentTimeMillis();
-        DataFrame result = this.sqlCtx.sql(query);
-        long end = System.currentTimeMillis();
-
-        if (ServiceHolder.isAnalyticsStatsEnabled()) {
-            log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds");
+        try {
+            DataFrame result = this.sqlCtx.sql(query);
+            return toResult(result);
+        } finally {
+            long end = System.currentTimeMillis();
+            if (ServiceHolder.isAnalyticsStatsEnabled()) {
+                log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
+            }
         }
-
-        return toResult(result);
     }
 
     private String encodeQueryWithTenantId(int tenantId, String query)
