@@ -150,7 +150,10 @@ public class MQTTEventAdapter implements OutputEventAdapter {
     @Override
     public void disconnect() {
         try {
-            mqttAdapterPublisher.close();
+            if (mqttAdapterPublisher != null) {
+                mqttAdapterPublisher.close();
+                mqttAdapterPublisher = null;
+            }
         } catch (OutputEventAdapterException e) {
             log.error("Exception when closing the mqtt publisher connection on Output MQTT Adapter '" + eventAdapterConfiguration.getName() + "'", e);
         }
