@@ -469,7 +469,6 @@ public class CarbonEventManagementService implements EventManagementService {
                 } else if (mode == Mode.HA) {
                     List<HostAndPort> memberList = new ArrayList<HostAndPort>(presenters.values());
                     memberList.remove(managementModeInfo.getHaConfiguration().getLocalPresenterConfig());
-                    // todo check whether localPresenterConfig (STILL DEFAULT) is equal to the portOffset value
                     updateMembers(memberList, managementModeInfo.getHaConfiguration()
                             .constructPresenterPublisherConfig(), presenterTcpEventPublisherPool);
                     setSyncPresenters(memberList);
