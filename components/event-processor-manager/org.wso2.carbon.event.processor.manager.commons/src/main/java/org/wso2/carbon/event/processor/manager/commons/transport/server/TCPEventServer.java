@@ -146,7 +146,7 @@ public class TCPEventServer {
                         String streamId = new String(streamNameData, 0, streamNameData.length);
                         StreamRuntimeInfo streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
                         while (streamRuntimeInfo == null) {
-                            Thread.sleep(100);
+                            Thread.sleep(1000);
                             log.warn("TCP server on port :'" + tcpEventServerConfig.getPort() + "' waiting for streamId:'" + streamId + "' to process incoming events");
                             streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
                         }

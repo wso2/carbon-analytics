@@ -26,7 +26,7 @@ public interface EventManagementService {
      *
      * @return {@link ManagementModeInfo}
      */
-    public ManagementModeInfo getManagementModeInfo();
+    ManagementModeInfo getManagementModeInfo();
 
     /**
      * This method specifies the node type
@@ -34,7 +34,7 @@ public interface EventManagementService {
      * @param manager manager node can be either a {@link EventProcessorManagementService},
      *                {@link EventReceiverManagementService} or {@link EventPublisherManagementService}
      */
-    public void subscribe(Manager manager);
+    void subscribe(Manager manager);
 
     /**
      * This method unsubscribes the node according to the {@link Manager} type
@@ -42,7 +42,7 @@ public interface EventManagementService {
      * @param manager manager node can be either a {@link EventProcessorManagementService},
      *                {@link EventReceiverManagementService} or {@link EventPublisherManagementService}
      */
-    public void unsubscribe(Manager manager);
+    void unsubscribe(Manager manager);
 
     /**
      * This method syncs a particular event with the other node. Depending on the node type and address, the events
@@ -52,11 +52,21 @@ public interface EventManagementService {
      * @param type   syncing event type
      * @param event  the event which is syncing with the other node
      */
-    public void syncEvent(String syncId, Manager.ManagerType type, Event event);
+    void syncEvent(String syncId, Manager.ManagerType type, Event event);
 
-    public void registerEventSync(EventSync eventSync);
+    /**
+     * This method registers the events in the EventPublisher which needed to be synced
+     * 
+     * @param eventSync contains the stream id
+     */
+    void registerEventSync(EventSync eventSync);
 
-    public void unregisterEventSync(String syncId);
+    /**
+     * This method unregisters the events in the EventPublisher which scheduled to be synced
+     * 
+     * @param syncId id of the events to be synced by the EventPublisher
+     */
+    void unregisterEventSync(String syncId);
 
     /**
      * This method updates the hazelcast map with the latest processed event details
@@ -65,7 +75,7 @@ public interface EventManagementService {
      * @param tenantId      tenant id
      * @param timestamp     hazelcast cluster time
      */
-    public void updateLatestEventSentTime(String publisherName, int tenantId, long timestamp);
+    void updateLatestEventSentTime(String publisherName, int tenantId, long timestamp);
 
     /**
      * This method gets the latest event processed time
@@ -73,11 +83,11 @@ public interface EventManagementService {
      * @param publisherName event publisher name
      * @param tenantId      tenant id
      */
-    public long getLatestEventSentTime(String publisherName, int tenantId);
+    long getLatestEventSentTime(String publisherName, int tenantId);
 
     /**
      * This method return hazelcast cluster time
      */
-    public long getClusterTimeInMillis();
+    long getClusterTimeInMillis();
 
 }
