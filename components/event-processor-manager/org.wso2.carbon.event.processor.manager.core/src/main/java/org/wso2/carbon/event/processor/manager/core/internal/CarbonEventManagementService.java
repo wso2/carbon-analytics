@@ -120,7 +120,7 @@ public class CarbonEventManagementService implements EventManagementService {
                 }
             }
             presenterEventHandler.init(ConfigurationConstants.PRESENTERS, haConfiguration.getLocalPresenterConfig(),
-                                       haConfiguration.constructPresenterPublisherConfig(), isPresenterNode);
+                                       haConfiguration.constructPresenterPublisherConfig(), isPresenterNode && !isWorkerNode);
             checkMemberUpdate();
         } else if (mode == Mode.Distributed) {
             if (stormReceiverCoordinator != null) {
