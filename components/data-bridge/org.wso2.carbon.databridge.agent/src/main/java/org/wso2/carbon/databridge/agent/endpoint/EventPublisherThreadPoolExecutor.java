@@ -48,10 +48,12 @@ public class EventPublisherThreadPoolExecutor extends ThreadPoolExecutor {
         super.execute(task);
     }
 
-    public boolean submitJobAndReturnState(Thread thread) {
-        submit(thread);
+    public void submitJobAndSetState(Thread thread, DataEndpoint dataEndpoint) {
         int permits = semaphore.availablePermits();
-        return permits <= 0;
+        if (permits <= 1){
+            dataEndpoint.setState(DataEndpoint.State.BUSY);
+        }
+        submit(thread);
     }
 
     @Override

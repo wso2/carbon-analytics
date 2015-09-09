@@ -75,25 +75,19 @@ public abstract class DataEndpoint {
     void collectAndSend(Event event) {
         events.add(event);
         if (events.size() >= batchSize) {
-            boolean isFull = threadPoolExecutor.submitJobAndReturnState(new Thread(new EventPublisher(events)));
+            threadPoolExecutor.submitJobAndSetState(new Thread(new EventPublisher(events)), this);
             events = new ArrayList<>();
-            if (isFull) {
-                this.setState(State.BUSY);
-            }
         }
     }
 
     void flushEvents() {
         if (events.size() != 0) {
-            boolean isFull = threadPoolExecutor.submitJobAndReturnState(new Thread(new EventPublisher(events)));
+            threadPoolExecutor.submitJobAndSetState(new Thread(new EventPublisher(events)), this);
             events = new ArrayList<>();
-            if (isFull) {
-                this.setState(State.BUSY);
-            }
         }
     }
 
-    private void setState(State state) {
+    void setState(State state) {
         if (!this.state.equals(state)) {
             this.state = state;
         }
