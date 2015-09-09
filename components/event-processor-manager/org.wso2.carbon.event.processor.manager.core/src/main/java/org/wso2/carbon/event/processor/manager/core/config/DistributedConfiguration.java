@@ -19,6 +19,7 @@ package org.wso2.carbon.event.processor.manager.core.config;
 
 import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisherConfig;
 import org.wso2.carbon.event.processor.manager.commons.utils.HostAndPort;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -68,6 +69,8 @@ public class DistributedConfiguration implements Serializable {
 
     private String jar;
     private String distributedUIUrl;
+
+    private static final int portOffset = Integer.parseInt(CarbonUtils.getServerConfiguration().getFirstProperty("Ports.Offset"));
 
     public int getTransportReceiverThreads() {
         return transportReceiverThreads;
@@ -137,7 +140,7 @@ public class DistributedConfiguration implements Serializable {
         return localManagerConfig;
     }
     public void setLocalManagerConfig(String hostName, int port) {
-        this.localManagerConfig = new HostAndPort(hostName, port);
+        this.localManagerConfig = new HostAndPort(hostName, port + portOffset);
     }
 
     public List<HostAndPort> getManagers() {return managers;}
@@ -219,7 +222,7 @@ public class DistributedConfiguration implements Serializable {
         return localPresenterConfig;
     }
     public void setLocalPresenterConfig(String host, int port) {
-        this.localPresenterConfig = new HostAndPort(host, port);
+        this.localPresenterConfig = new HostAndPort(host, port + portOffset);
     }
 
     public int getMemberUpdateCheckInterval() {
