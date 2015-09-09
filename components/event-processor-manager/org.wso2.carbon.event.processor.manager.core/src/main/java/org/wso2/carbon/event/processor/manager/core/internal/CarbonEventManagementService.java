@@ -76,7 +76,7 @@ public class CarbonEventManagementService implements EventManagementService {
             if (isWorkerNode) {
                 receiverEventHandler.startServer(haConfiguration.getEventSyncConfig(), haConfiguration.getEventSyncReceiverThreads());
             }
-            if (isPresenterNode) {
+            if (isPresenterNode && !isWorkerNode) {
                 presenterEventHandler.startServer(haConfiguration.getLocalPresenterConfig(), haConfiguration.getPresentationReceiverThreads());
             }
         } else if (mode == Mode.SingleNode) {
@@ -112,13 +112,13 @@ public class CarbonEventManagementService implements EventManagementService {
             HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
             if (isWorkerNode) {
                 receiverEventHandler.init(ConfigurationConstants.RECEIVERS, haConfiguration.getEventSyncConfig(), haConfiguration.constructEventSyncPublisherConfig());
-                haManager = new HAManager(hazelcastInstance, haConfiguration, executorService, receiverEventHandler);
+                haManager = new HAManager(hazelcastInstance, haConfiguration, executorService, receiverEventHandler,presenterEventHandler);
                 haManager.init();
                 if (haEventPublisherTimeSyncMap == null) {
                     haEventPublisherTimeSyncMap = EventManagementServiceValueHolder.getHazelcastInstance().getMap(ConfigurationConstants.HA_EVENT_PUBLISHER_TIME_SYNC_MAP);
                 }
             }
-            if (isPresenterNode) {
+            if (isPresenterNode && !isWorkerNode) {
                 presenterEventHandler.init(ConfigurationConstants.PRESENTERS, haConfiguration.getLocalPresenterConfig(), haConfiguration.constructPresenterPublisherConfig());
             }
             checkMemberUpdate();

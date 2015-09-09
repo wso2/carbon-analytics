@@ -80,7 +80,7 @@
                 <hostName>0.0.0.0</hostName>
                 <port>8904</port>
             </manager>
-	    <presenter enable="false">
+            <presenter enable="false">
                 <hostName>0.0.0.0</hostName>
                 <port>11000</port>
             </presenter>

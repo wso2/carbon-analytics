@@ -50,6 +50,7 @@ public class HAManager {
     private HAConfiguration haConfiguration;
     private final ScheduledExecutorService executorService;
     private final EventHandler receiverEventHandler;
+    private final EventHandler presenterEventHandler;
     private boolean activeLockAcquired;
     private boolean passiveLockAcquired;
     private ILock activeLock;
@@ -65,16 +66,18 @@ public class HAManager {
 
     public HAManager(HazelcastInstance hazelcastInstance, HAConfiguration haConfiguration,
                      ScheduledExecutorService executorService,
-                     EventHandler receiverEventHandler) {
+                     EventHandler receiverEventHandler, EventHandler presenterEventHandler) {
         this.haConfiguration = haConfiguration;
         this.executorService = executorService;
         this.receiverEventHandler = receiverEventHandler;
+        this.presenterEventHandler = presenterEventHandler;
         this.activeId = ConfigurationConstants.ACTIVEID;
         this.passiveId = ConfigurationConstants.PASSIVEID;
         this.activeLock = hazelcastInstance.getLock(activeId);
         this.passiveLock = hazelcastInstance.getLock(passiveId);
         this.haConfiguration.setMemberUuid(hazelcastInstance.getCluster().getLocalMember().getUuid());
 
+        presenterEventHandler.allowEventSync(false);
         snapshotServer = new SnapshotServer();
         snapshotServer.start(haConfiguration);
 
@@ -205,6 +208,7 @@ public class HAManager {
         if (eventReceiverManagementService != null) {
             eventReceiverManagementService.start();
         }
+        presenterEventHandler.allowEventSync(true);
         log.info("Became CEP HA Active Member");
     }
 
@@ -218,7 +222,7 @@ public class HAManager {
         final CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder
                 .getCarbonEventManagementService();
         receiverEventHandler.addEventPublisher(activeMember.getEventSyncConfig());
-
+        presenterEventHandler.allowEventSync(false);
         executorService.execute(new Runnable() {
             @Override
             public void run() {

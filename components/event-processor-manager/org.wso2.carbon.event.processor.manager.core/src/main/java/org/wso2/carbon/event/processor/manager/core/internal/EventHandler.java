@@ -49,6 +49,7 @@ public class EventHandler {
     private ConcurrentHashMap<String, EventSync> eventSyncMap = new ConcurrentHashMap<String, EventSync>();
     private HostAndPort localMember;
     private TCPEventPublisherConfig localEventPublisherConfiguration;
+    private boolean allowEventSync = true;
 
     public void init(String memberType, HostAndPort localMember,
                      TCPEventPublisherConfig localEventPublisherConfiguration) {
@@ -79,12 +80,14 @@ public class EventHandler {
     }
 
     public void syncEvent(String syncId, Event event) {
-        for (TCPEventPublisher publisher : tcpEventPublisherPool.values()) {
-            if (publisher != null) {
-                try {
-                    publisher.sendEvent(syncId, event.getTimestamp(), event.getData(), true);
-                } catch (IOException e) {
-                    log.error("Error sending sync events to " + syncId, e);
+        if (allowEventSync) {
+            for (TCPEventPublisher publisher : tcpEventPublisherPool.values()) {
+                if (publisher != null) {
+                    try {
+                        publisher.sendEvent(syncId, event.getTimestamp(), event.getData(), true);
+                    } catch (IOException e) {
+                        log.error("Error sending sync events to " + syncId, e);
+                    }
                 }
             }
         }
@@ -214,4 +217,7 @@ public class EventHandler {
         }
     }
 
+    public void allowEventSync(boolean allowEventSync) {
+        this.allowEventSync = allowEventSync;
+    }
 }
