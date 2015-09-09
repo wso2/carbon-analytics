@@ -137,12 +137,15 @@ public class CarbonEventManagementService implements EventManagementService {
         hazelcastInstance.getCluster().addMembershipListener(new MembershipListener() {
             @Override
             public void memberAdded(MembershipEvent membershipEvent) {
+                presenterEventHandler.registerLocalMember();
+                receiverEventHandler.registerLocalMember();
                 checkMemberUpdate();
                 if (mode == Mode.HA) {
                     if (isWorkerNode && haManager != null) {
                         haManager.verifyState();
                     }
                 }
+
             }
 
             @Override

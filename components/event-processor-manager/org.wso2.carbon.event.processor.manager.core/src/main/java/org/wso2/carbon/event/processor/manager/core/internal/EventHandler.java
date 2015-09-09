@@ -50,17 +50,22 @@ public class EventHandler {
     private HostAndPort localMember;
     private TCPEventPublisherConfig localEventPublisherConfiguration;
     private boolean allowEventSync = true;
+    private boolean isMemberNode;
 
     public void init(String memberType, HostAndPort localMember,
                      TCPEventPublisherConfig localEventPublisherConfiguration, boolean isMemberNode) {
+        this.isMemberNode = isMemberNode;
         HazelcastInstance hazelcastInstance = EventManagementServiceValueHolder.getHazelcastInstance();
         this.members = hazelcastInstance.getMap(memberType);
         this.localMember = localMember;
-        if (isMemberNode) {
-            this.members.set(hazelcastInstance.getCluster().getLocalMember().getUuid(), localMember);
-        }
+        registerLocalMember();
         this.localEventPublisherConfiguration = localEventPublisherConfiguration;
+    }
 
+    public void registerLocalMember(){
+        if (isMemberNode && members != null) {
+            this.members.set(EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().getUuid(), localMember);
+        }
     }
 
     public void removeMember(String uuid) {
