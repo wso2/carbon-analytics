@@ -21,6 +21,7 @@ package org.apache.spark.sql.jdbc.carbon
 import java.util.Properties
 import javax.sql.DataSource
 
+import org.apache.commons.logging.{LogFactory, Log}
 import org.apache.spark.Partition
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.expressions.Row
@@ -29,6 +30,7 @@ import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -129,42 +131,66 @@ case class JDBCRelation(
 
   override val needConversion: Boolean = false
 
-  override val schema: StructType = JDBCRDDCarbonUtils.resolveTable(dataSource, tableName)
+  private final val log: Log = LogFactory.getLog(classOf[JDBCRelation])
+
+  override val schema: StructType = {
+    try {
+      JDBCRDDCarbonUtils.resolveTable(dataSource, tableName)
+    }
+    catch {
+      case e: Exception =>
+        log.error(e.getMessage, e)
+        throw new RuntimeException(e.getMessage, e)
+    }
+  }
 
   override def buildScan(requiredColumns: Array[String], filters: Array[Filter]): RDD[Row] = {
-    JDBCRDDCarbonUtils.scanTable(
-      sqlContext.sparkContext,
-      schema,
-      dataSource,
-      tableName,
-      requiredColumns,
-      filters,
-      parts)
+    try {
+      JDBCRDDCarbonUtils.scanTable(
+        sqlContext.sparkContext,
+        schema,
+        dataSource,
+        tableName,
+        requiredColumns,
+        filters,
+        parts)
+    }
+    catch {
+      case e: Exception =>
+        log.error(e.getMessage, e)
+        throw new RuntimeException(e.getMessage, e)
+    }
   }
 
   override def insert(data: DataFrame, overwrite: Boolean): Unit = {
-
-    val conn = GenericUtils.loadGlobalDataSource(dataSource).asInstanceOf[DataSource].getConnection
-
     try {
-      var tableExists = JdbcUtils.tableExists(conn, tableName)
+      val conn = GenericUtils.loadGlobalDataSource(dataSource).asInstanceOf[DataSource].getConnection
 
-      if (overwrite && tableExists) {
-        JdbcUtils.dropTable(conn, tableName)
-        tableExists = false
+      try {
+        var tableExists = JdbcUtils.tableExists(conn, tableName)
+
+        if (overwrite && tableExists) {
+          JdbcUtils.dropTable(conn, tableName)
+          tableExists = false
+        }
+
+        // Create the table if the table didn't exist.
+        if (!tableExists) {
+          val schema = JDBCWriteDetails.schemaString(data, conn.getMetaData.getURL)
+          val sql = s"CREATE TABLE $tableName ($schema)"
+          conn.prepareStatement(sql).executeUpdate()
+          conn.commit()
+        }
+      } finally {
+        conn.close()
       }
 
-      // Create the table if the table didn't exist.
-      if (!tableExists) {
-        val schema = JDBCWriteDetails.schemaString(data, conn.getMetaData.getURL)
-        val sql = s"CREATE TABLE $tableName ($schema)"
-        conn.prepareStatement(sql).executeUpdate()
-        conn.commit()
-      }
-    } finally {
-      conn.close()
+      JDBCWriteDetails.saveTable(data, dataSource, tableName)
     }
-
-    JDBCWriteDetails.saveTable(data, dataSource, tableName)
+    catch {
+      case e: Exception =>
+        log.error(e.getMessage, e)
+        throw new RuntimeException(e.getMessage, e)
+    }
   }
 }
