@@ -50,7 +50,8 @@ public class EventHandler {
     private HostAndPort localMember;
     private TCPEventPublisherConfig localEventPublisherConfiguration;
 
-    public void init(String memberType, HostAndPort localMember, TCPEventPublisherConfig localEventPublisherConfiguration) {
+    public void init(String memberType, HostAndPort localMember,
+                     TCPEventPublisherConfig localEventPublisherConfiguration) {
         HazelcastInstance hazelcastInstance = EventManagementServiceValueHolder.getHazelcastInstance();
         this.members = hazelcastInstance.getMap(memberType);
         this.localMember = localMember;
@@ -157,16 +158,18 @@ public class EventHandler {
     }
 
     private synchronized void updateEventPublishers() {
-        List<HostAndPort> memberList = new ArrayList<HostAndPort>(members.values());
-        memberList.remove(localMember);
-        List<HostAndPort> currentMembers = new ArrayList<>(tcpEventPublisherPool.keySet());
-        for (HostAndPort member : memberList) {
-            if (!currentMembers.remove(member)) {
-                addEventPublisher(member);
+        if (members != null) {
+            List<HostAndPort> memberList = new ArrayList<HostAndPort>(members.values());
+            memberList.remove(localMember);
+            List<HostAndPort> currentMembers = new ArrayList<>(tcpEventPublisherPool.keySet());
+            for (HostAndPort member : memberList) {
+                if (!currentMembers.remove(member)) {
+                    addEventPublisher(member);
+                }
             }
-        }
-        for (HostAndPort member : currentMembers) {
-            removeEventPublisher(member);
+            for (HostAndPort member : currentMembers) {
+                removeEventPublisher(member);
+            }
         }
     }
 
@@ -174,7 +177,7 @@ public class EventHandler {
         try {
             if (!tcpEventPublisherPool.containsKey(member)) {
                 TCPEventPublisher tcpEventPublisher = new TCPEventPublisher(member.getHostName() + ":" + member.getPort(),
-                        localEventPublisherConfiguration, false, null);
+                                                                            localEventPublisherConfiguration, false, null);
                 for (EventSync eventSync : eventSyncMap.values()) {
                     tcpEventPublisher.addStreamDefinition(eventSync.getStreamDefinition());
                 }
@@ -195,13 +198,13 @@ public class EventHandler {
     }
 
     private void cleanupMembers() {
-        Set<String> activeMemberUuidSet = new HashSet<String>();
-
-        for (Member member : EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getMembers()) {
-            activeMemberUuidSet.add(member.getUuid());
-        }
-
         if (members != null) {
+            Set<String> activeMemberUuidSet = new HashSet<String>();
+
+            for (Member member : EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getMembers()) {
+                activeMemberUuidSet.add(member.getUuid());
+            }
+
             List<String> currentMemberUuidList = new ArrayList<String>(members.keySet());
             for (String memberUuid : currentMemberUuidList) {
                 if (!activeMemberUuidSet.contains(memberUuid)) {
