@@ -63,7 +63,7 @@ public class SparkScriptCAppDeployer implements AppDeploymentHandler {
                     String fileName = files.get(0).getName();
                     String artifactPath = artifact.getExtractedPath() + File.separator + fileName;
                     try {
-                        deploy(artifactPath);
+                        deploy(artifactPath, carbonApplication.getAppName());
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                     } catch (DeploymentException e) {
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
@@ -77,7 +77,7 @@ public class SparkScriptCAppDeployer implements AppDeploymentHandler {
         }
     }
 
-    private void deploy(String scriptFilePath) throws SparkScriptDeploymentException {
+    private void deploy(String scriptFilePath, String carbonAppName) throws SparkScriptDeploymentException {
         File deploymentFileData = new File(scriptFilePath);
         try {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -87,7 +87,7 @@ public class SparkScriptCAppDeployer implements AppDeploymentHandler {
             AnalyticsScript script = (AnalyticsScript) un.unmarshal(deploymentFileData);
             script.setName(getScriptName(deploymentFileData.getName()));
             AnalyticsPersistenceManager.getInstance().putScript(tenantId, script.getName(), script.getScriptContent(),
-                    script.getCronExpression(), false);
+                    script.getCronExpression(), carbonAppName, false);
         } catch (JAXBException e) {
             String errorMsg = "Error while reading the analytics script : "
                     + deploymentFileData.getAbsolutePath();

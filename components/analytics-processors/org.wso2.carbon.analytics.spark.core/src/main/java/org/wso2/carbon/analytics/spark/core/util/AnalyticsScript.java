@@ -26,6 +26,7 @@ public class AnalyticsScript {
     private String scriptContent;
     private String cronExpression;
     private boolean editable;
+    private String carbonApplicationFileName;
 
     public AnalyticsScript(String name) {
         this.name = name;
@@ -67,5 +68,14 @@ public class AnalyticsScript {
 
     public void setEditable(boolean editable) {
         this.editable = editable;
+    }
+
+    @XmlElement (name = "CarbonAppName")
+    public String getCarbonApplicationFileName() {
+        return carbonApplicationFileName;
+    }
+
+    public void setCarbonApplicationFileName(String carbonApplicationFileName) {
+        this.carbonApplicationFileName = carbonApplicationFileName;
     }
 }

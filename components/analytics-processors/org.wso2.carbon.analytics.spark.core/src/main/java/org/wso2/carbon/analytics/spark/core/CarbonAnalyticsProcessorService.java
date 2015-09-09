@@ -50,7 +50,7 @@ public class CarbonAnalyticsProcessorService implements AnalyticsProcessorServic
     public void saveScript(int tenantId, String scriptName, String scriptContent, String cronExpression)
             throws AnalyticsPersistenceException {
         try {
-            AnalyticsPersistenceManager.getInstance().saveScript(tenantId, scriptName, scriptContent, cronExpression, true);
+            AnalyticsPersistenceManager.getInstance().saveScript(tenantId, scriptName, scriptContent, cronExpression, null, true);
         } catch (AnalyticsPersistenceException e) {
             log.error("Error occurred when persisting the script. " + e.getMessage(), e);
             throw e;
@@ -86,7 +86,8 @@ public class CarbonAnalyticsProcessorService implements AnalyticsProcessorServic
     public void updateScript(int tenantId, String scriptName, String scriptContent, String cronExpression)
             throws AnalyticsPersistenceException {
         try {
-            AnalyticsPersistenceManager.getInstance().putScript(tenantId, scriptName, scriptContent, cronExpression, true);
+            AnalyticsPersistenceManager.getInstance().putScript(tenantId, scriptName, scriptContent, cronExpression,
+                    null, true);
         } catch (AnalyticsPersistenceException e) {
             log.error("Error while updating the script : " + scriptName, e);
             throw e;
@@ -153,7 +154,7 @@ public class CarbonAnalyticsProcessorService implements AnalyticsProcessorServic
                 log.error("Error while retrieving the script : " + scriptName, e);
                 throw e;
             }
-        }else {
+        } else {
             String errorMsg = "Analytics query execution is disabled in this node. Therefore cannot executed the script " +
                     " - " + scriptName;
             log.error(errorMsg);
