@@ -111,25 +111,24 @@ public class CarbonEventManagementService implements EventManagementService {
         if (mode == Mode.HA) {
             HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
             if (isWorkerNode) {
-                receiverEventHandler.init(ConfigurationConstants.RECEIVERS, haConfiguration.getEventSyncConfig(), haConfiguration.constructEventSyncPublisherConfig());
+                receiverEventHandler.init(ConfigurationConstants.RECEIVERS, haConfiguration.getEventSyncConfig(),
+                                          haConfiguration.constructEventSyncPublisherConfig(), isWorkerNode);
                 haManager = new HAManager(hazelcastInstance, haConfiguration, executorService, receiverEventHandler,presenterEventHandler);
                 haManager.init();
                 if (haEventPublisherTimeSyncMap == null) {
                     haEventPublisherTimeSyncMap = EventManagementServiceValueHolder.getHazelcastInstance().getMap(ConfigurationConstants.HA_EVENT_PUBLISHER_TIME_SYNC_MAP);
                 }
             }
-            if (isPresenterNode && !isWorkerNode) {
-                presenterEventHandler.init(ConfigurationConstants.PRESENTERS, haConfiguration.getLocalPresenterConfig(), haConfiguration.constructPresenterPublisherConfig());
-            }
+            presenterEventHandler.init(ConfigurationConstants.PRESENTERS, haConfiguration.getLocalPresenterConfig(),
+                                       haConfiguration.constructPresenterPublisherConfig(), isPresenterNode);
             checkMemberUpdate();
         } else if (mode == Mode.Distributed) {
             if (stormReceiverCoordinator != null) {
                 stormReceiverCoordinator.tryBecomeCoordinator();
             }
             DistributedConfiguration distributedConfiguration = managementModeInfo.getDistributedConfiguration();
-            if (isPresenterNode) {
-                presenterEventHandler.init(ConfigurationConstants.PRESENTERS, distributedConfiguration.getLocalPresenterConfig(), distributedConfiguration.constructPresenterPublisherConfig());
-            }
+            presenterEventHandler.init(ConfigurationConstants.PRESENTERS, distributedConfiguration
+                    .getLocalPresenterConfig(), distributedConfiguration.constructPresenterPublisherConfig(), isPresenterNode);
             checkMemberUpdate();
         } else if (mode == Mode.SingleNode) {
             log.warn("CEP started with clustering enabled, but SingleNode configuration given.");
