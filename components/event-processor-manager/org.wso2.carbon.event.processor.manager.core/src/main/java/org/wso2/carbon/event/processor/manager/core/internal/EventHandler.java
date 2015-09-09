@@ -52,11 +52,13 @@ public class EventHandler {
     private boolean allowEventSync = true;
 
     public void init(String memberType, HostAndPort localMember,
-                     TCPEventPublisherConfig localEventPublisherConfiguration) {
+                     TCPEventPublisherConfig localEventPublisherConfiguration, boolean isMemberNode) {
         HazelcastInstance hazelcastInstance = EventManagementServiceValueHolder.getHazelcastInstance();
         this.members = hazelcastInstance.getMap(memberType);
         this.localMember = localMember;
-        this.members.set(hazelcastInstance.getCluster().getLocalMember().getUuid(), localMember);
+        if (isMemberNode) {
+            this.members.set(hazelcastInstance.getCluster().getLocalMember().getUuid(), localMember);
+        }
         this.localEventPublisherConfiguration = localEventPublisherConfiguration;
 
     }
