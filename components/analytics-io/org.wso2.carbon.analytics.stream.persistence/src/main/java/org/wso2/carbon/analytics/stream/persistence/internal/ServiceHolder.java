@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.analytics.stream.persistence.internal;
 
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 

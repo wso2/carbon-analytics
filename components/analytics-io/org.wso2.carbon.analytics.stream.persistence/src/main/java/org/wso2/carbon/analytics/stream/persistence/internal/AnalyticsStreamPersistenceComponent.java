@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.analytics.stream.persistence.internal;
 
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 
@@ -26,7 +26,7 @@ import org.wso2.carbon.event.stream.core.EventStreamService;
  * This class represents the analytics stream persistence service declarative services component.
  *
  * @scr.component name="analytics.stream.persistence.component" immediate="true"
- * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.dataservice.AnalyticsDataService"
+ * @scr.reference name="analytics.component" interface="AnalyticsDataService"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
  * @scr.reference name="eventStreamManager.component"
  * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
