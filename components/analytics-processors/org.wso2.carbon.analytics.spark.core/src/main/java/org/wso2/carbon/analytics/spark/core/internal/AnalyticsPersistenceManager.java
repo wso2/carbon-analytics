@@ -21,7 +21,7 @@ import org.wso2.carbon.analytics.spark.core.AnalyticsTask;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
-import org.wso2.carbon.application.deployer.AppDeployerUtils;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.registry.core.Collection;
@@ -30,6 +30,7 @@ import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -98,7 +99,7 @@ public class AnalyticsPersistenceManager {
                 userRegistry.put(scriptLocation, resource);
                 try {
                     scheduleTask(tenantId, script);
-                }catch (AnalyticsPersistenceException ex){
+                } catch (AnalyticsPersistenceException ex) {
                     deleteScript(tenantId, scriptName);
                     throw ex;
                 }
@@ -237,15 +238,16 @@ public class AnalyticsPersistenceManager {
         JAXBContext context = JAXBContext.newInstance(AnalyticsScript.class);
         Unmarshaller un = context.createUnmarshaller();
         AnalyticsScript analyticsScript = (AnalyticsScript) un.unmarshal(new StringReader(config));
-        if (!analyticsScript.isEditable()){
+        if (!analyticsScript.isEditable()) {
             if (analyticsScript.getCarbonApplicationFileName() != null &&
                     !analyticsScript.getCarbonApplicationFileName().trim().isEmpty()) {
-                String carbonAppLocation = AppDeployerUtils.getApplicationLocation() + File.separator
-                        + analyticsScript.getCarbonApplicationFileName()+ AnalyticsConstants.CARBON_APPLICATION_EXT;
+                String carbonAppLocation = MultitenantUtils.getAxis2RepositoryPath(PrivilegedCarbonContext.
+                        getThreadLocalCarbonContext().getTenantId()) + File.separator + AnalyticsConstants.CARBON_APPLICATION_DEPLOYMENT_DIR
+                        + File.separator + analyticsScript.getCarbonApplicationFileName() + AnalyticsConstants.CARBON_APPLICATION_EXT;
                 if (!new File(carbonAppLocation).exists()) {
                     analyticsScript.setEditable(true);
                 }
-            }else {
+            } else {
                 analyticsScript.setEditable(true);
             }
         }
@@ -269,13 +271,13 @@ public class AnalyticsPersistenceManager {
             if (userRegistry.resourceExists(scriptLocation)) {
                 Resource resource = userRegistry.get(scriptLocation);
                 AnalyticsScript script = processAndGetAnalyticsScript(scriptName, scriptContent,
-                        cron, carbonAppName, editable,getAnalyticsScript(RegistryUtils.decodeBytes((byte[]) userRegistry.get(scriptLocation).getContent())));
+                        cron, carbonAppName, editable, getAnalyticsScript(RegistryUtils.decodeBytes((byte[]) userRegistry.get(scriptLocation).getContent())));
                 resource.setContent(getConfiguration(script));
                 resource.setMediaType(AnalyticsConstants.ANALYTICS_MEDIA_TYPE);
                 userRegistry.put(scriptLocation, resource);
                 scheduleTask(tenantId, script);
             } else {
-                this.saveScript(tenantId, scriptName, scriptContent, cron,carbonAppName,  editable);
+                this.saveScript(tenantId, scriptName, scriptContent, cron, carbonAppName, editable);
             }
         } catch (RegistryException e) {
             throw new AnalyticsPersistenceException("Error while loading the registry for tenant :" + tenantId, e);

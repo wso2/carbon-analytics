@@ -23,8 +23,8 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.servlet.*;
 import org.wso2.carbon.identity.authentication.AuthenticationService;
@@ -41,7 +41,7 @@ import java.util.Hashtable;
  * @scr.reference name="org.wso2.carbon.identity.authentication.internal.AuthenticationServiceComponent"
  * interface="org.wso2.carbon.identity.authentication.AuthenticationService"
  * cardinality="1..1" policy="dynamic" bind="setAuthenticationService"  unbind="unsetAuthenticationService"
- * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.dataservice.AnalyticsDataService"
+ * @scr.reference name="analytics.component" interface="AnalyticsDataService"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
  * @scr.reference name="http.service" interface="org.osgi.service.http.HttpService"
  * cardinality="1..1" policy="dynamic" bind="setHttpService" unbind="unsetHttpService"
@@ -49,7 +49,7 @@ import java.util.Hashtable;
  * cardinality="0..1" policy="dynamic" bind="setHazelcastInstance" unbind="unsetHazelcastInstance"
  * @scr.reference name="user.realmservice.default" interface="org.wso2.carbon.user.core.service.RealmService"
  * cardinality="1..1" policy="dynamic" bind="setRealmService" unbind="unsetRealmService"
- * @scr.reference name="analytics.secure.component" interface="org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService"
+ * @scr.reference name="analytics.secure.component" interface="SecureAnalyticsDataService"
  * cardinality="1..1" policy="dynamic"  bind="setSecureAnalyticsDataService" unbind="unsetSecureAnalyticsDataService"
  */
 public class AnalyticsDataServiceServletDS {

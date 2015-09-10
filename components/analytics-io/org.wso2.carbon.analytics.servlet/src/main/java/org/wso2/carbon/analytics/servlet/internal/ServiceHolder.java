@@ -19,8 +19,8 @@ package org.wso2.carbon.analytics.servlet.internal;
 
 import com.hazelcast.core.HazelcastInstance;
 import org.osgi.service.http.HttpService;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.SecureAnalyticsDataService;
 import org.wso2.carbon.identity.authentication.AuthenticationService;
 import org.wso2.carbon.user.core.service.RealmService;
 
