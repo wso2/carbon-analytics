@@ -16,37 +16,33 @@
  *  under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.indexing.aggregates;
+package org.wso2.carbon.analytics.dataservice.core.indexing.aggregates;
 
-import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 import java.util.Map;
 
 /**
- * This class represents the AVERAGE aggregate which computes average over a record field
+ * This class represents the MAX aggregate which returns the maximum value of a record field.
  */
-public class AVGAggregateFunction implements AggregateFunction {
-
-    private double sum;
-    private double count;
-
+public class MAXAggregateFunction implements AggregateFunction {
+    private double maxValue;
     @Override
-    public AVGAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
-        //No optional params are passed in initializing
-        sum = 0;
-        count = optionalParams.get(Constants.AggregateOptionalParams.COUNT).doubleValue();
+    public MAXAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
+        maxValue = Double.MIN_VALUE;
         return this;
     }
 
     @Override
     public void process(Number value, Map<String, Number> optionalParams)
             throws AnalyticsException {
-        sum += value.doubleValue();
+            if (maxValue > value.doubleValue()) {
+                maxValue = value.doubleValue();
+            }
     }
 
     @Override
     public Number finish() throws AnalyticsException {
-        return sum / count;
+        return maxValue;
     }
 }

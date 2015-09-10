@@ -16,7 +16,7 @@
  *  under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.indexing.aggregates;
+package org.wso2.carbon.analytics.dataservice.core.indexing.aggregates;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -16,32 +16,36 @@
  *  under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.indexing.aggregates;
+package org.wso2.carbon.analytics.dataservice.core.indexing.aggregates;
 
+import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 import java.util.Map;
 
 /**
- * This class represents the SUM aggregate which performs summation over a record field
+ * This class represents the COUNT aggregate which COUNT the records
  */
-public class SUMAggregateFunction implements AggregateFunction {
+public class COUNTAggregateFunction implements AggregateFunction {
 
-    private double sum;
+    private Number count;
     @Override
-    public SUMAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
-        sum = 0;
+    public COUNTAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
+        count = optionalParams.get(Constants.AggregateOptionalParams.COUNT);
+        if (count == null) {
+            count = 0;
+        }
         return this;
     }
 
     @Override
     public void process(Number value, Map<String, Number> optionalParams)
             throws AnalyticsException {
-        sum += value.doubleValue();
+        //no specific processing
     }
 
     @Override
     public Number finish() throws AnalyticsException {
-        return sum;
+        return count;
     }
 }

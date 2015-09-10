@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.dataservice.indexing;
+package org.wso2.carbon.analytics.dataservice.core.indexing;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.logging.Log;
@@ -71,13 +71,6 @@ import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NoLockFactory;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDirectory;
-import org.wso2.carbon.analytics.dataservice.AnalyticsQueryParser;
-import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
-import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateField;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
@@ -89,9 +82,16 @@ import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
-import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsIndexedTableStore.IndexedTableId;
-import org.wso2.carbon.analytics.dataservice.indexing.aggregates.AggregateFunction;
-import org.wso2.carbon.analytics.dataservice.indexing.aggregates.AggregateFunctionFactory;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDirectory;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsQueryParser;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
+import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
+import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsIndexedTableStore.IndexedTableId;
+import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunction;
+import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunctionFactory;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
@@ -1789,6 +1789,80 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             ids.add(searchResult.getId());
         }
         return ids;
+    }
+
+    private static class AggregateRecordIterator implements AnalyticsIterator<Record> {
+
+        private static Log logger = LogFactory.getLog(AggregateRecordIterator.class);
+        private AggregateRequest request;
+        private List<SubCategories> groupings;
+        private int tenantId;
+        private SubCategories currentSubCategories;
+        private List<CategorySearchResultEntry> currentResultEntries;
+        private CategorySearchResultEntry resultEntry;
+        private String[] parentPath;
+        private AnalyticsDataIndexer indexer;
+        public AggregateRecordIterator(int tenantId, List<SubCategories> uniqueGroupings,
+                                       AggregateRequest request, AnalyticsDataIndexer indexer) {
+            this.request = request;
+            this.tenantId = tenantId;
+            this.groupings = uniqueGroupings;
+            this.indexer = indexer;
+        }
+
+        @Override
+        public void close() throws IOException {
+            request = null;
+            resultEntry = null;
+            currentResultEntries = null;
+            parentPath = null;
+            currentSubCategories = null;
+            groupings = null;
+
+        }
+
+        @Override
+        public synchronized boolean hasNext() {
+            if (groupings!= null && !groupings.isEmpty()) {
+                currentSubCategories = groupings.get(0);
+                if (currentSubCategories != null && currentSubCategories.getCategories() != null
+                    && !currentSubCategories.getCategories().isEmpty()) {
+                    parentPath = currentSubCategories.getPath();
+                    currentResultEntries = currentSubCategories.getCategories();
+                    resultEntry = currentResultEntries.get(0);
+                    if (resultEntry.getCategoryValue() != null && !resultEntry.getCategoryValue().isEmpty()) {
+                        return true;
+                    } else {
+                        currentResultEntries.remove(resultEntry);
+                        this.hasNext();
+                    }
+                } else {
+                    groupings.remove(currentSubCategories);
+                    return this.hasNext();
+                }
+            } else {
+                return false;
+            }
+            return false;
+        }
+
+        @Override
+        public synchronized Record next() {
+            if (hasNext()) {
+                try {
+                    return indexer.aggregatePerGrouping(tenantId, resultEntry, parentPath, request);
+                } catch (AnalyticsException e) {
+                    logger.error("Failed to create aggregated record: " + e.getMessage(), e);
+                    throw new RuntimeException("Error while iterating aggregate records: " + e.getMessage(), e);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public void remove() {
+            //This will not work in this iterator
+        }
     }
 
     /**

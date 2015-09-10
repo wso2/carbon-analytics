@@ -506,7 +506,7 @@ public class Utils {
         for (AggregateField field : fields) {
             AnalyticsAggregateField aggregateField = new AnalyticsAggregateField();
             aggregateField.setFieldName(field.getFieldName());
-            aggregateField.setAggregateFunction(field.getAggregate());
+            aggregateField.setAggregate(field.getAggregate());
             aggregateField.setAlias(field.getAlias());
             analyticsAggregateFields.add(aggregateField);
         }

@@ -16,17 +16,32 @@
  *  under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.indexing.aggregates;
+package org.wso2.carbon.analytics.dataservice.core.indexing.aggregates;
 
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 import java.util.Map;
 
 /**
- * This interface is used to implement custom aggregates over the record fields.
+ * This class represents the SUM aggregate which performs summation over a record field
  */
-public interface AggregateFunction {
-    public AggregateFunction init (Map<String, Number> optionalParams) throws AnalyticsException;
-    public void process( Number value, Map<String, Number> optionalParams) throws AnalyticsException;
-    public Number finish() throws AnalyticsException;
+public class SUMAggregateFunction implements AggregateFunction {
+
+    private double sum;
+    @Override
+    public SUMAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
+        sum = 0;
+        return this;
+    }
+
+    @Override
+    public void process(Number value, Map<String, Number> optionalParams)
+            throws AnalyticsException {
+        sum += value.doubleValue();
+    }
+
+    @Override
+    public Number finish() throws AnalyticsException {
+        return sum;
+    }
 }

@@ -16,34 +16,17 @@
  *  under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.indexing.aggregates;
+package org.wso2.carbon.analytics.dataservice.core.indexing.aggregates;
 
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 import java.util.Map;
 
 /**
- * This class represents the MIN aggregate which returns the minimum value of a record field.
+ * This interface is used to implement custom aggregates over the record fields.
  */
-public class MINAggregateFunction implements AggregateFunction {
-
-    private double minValue;
-    @Override
-    public MINAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
-        minValue = Double.MAX_VALUE;
-        return this;
-    }
-
-    @Override
-    public void process(Number value, Map<String, Number> optionalParams)
-            throws AnalyticsException {
-        if (minValue < value.doubleValue()) {
-            minValue = value.doubleValue();
-        }
-    }
-
-    @Override
-    public Number finish() throws AnalyticsException {
-        return minValue;
-    }
+public interface AggregateFunction {
+    public AggregateFunction init (Map<String, Number> optionalParams) throws AnalyticsException;
+    public void process( Number value, Map<String, Number> optionalParams) throws AnalyticsException;
+    public Number finish() throws AnalyticsException;
 }
