@@ -68,7 +68,7 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
                     " for tenant " + tenantId);
         } else {
             this.init(conn, tenantId, tableName, columns, recordsCount, batchSize);
-            if (timeFrom <= 0) {
+            if (timeFrom < 0) {
                 this.noStartTime = true;
                 /* Setting param to null, to recognize the first ever run. It will never become null after the first run. */
                 this.latestRow = null;
