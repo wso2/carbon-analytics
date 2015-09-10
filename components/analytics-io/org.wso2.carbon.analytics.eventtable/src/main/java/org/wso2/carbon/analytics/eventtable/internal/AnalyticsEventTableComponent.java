@@ -20,12 +20,12 @@ package org.wso2.carbon.analytics.eventtable.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 
 /**
  * This class represents the analytics event table component class.
  * @scr.component name="analytics.eventstable.comp" immediate="true"
- * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.dataservice.AnalyticsDataService"
+ * @scr.reference name="analytics.component" interface="AnalyticsDataService"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataservice" unbind="unsetAnalyticsDataservice"
  */
 public class AnalyticsEventTableComponent {
