@@ -26,6 +26,7 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
@@ -109,24 +110,33 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                 }
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.SEARCH_WITH_AGGREGATES_OPERATION)) {
                 try {
-                    List<Record> aggregatedResults;
+                    Gson gson = new Gson();
+                    AnalyticsIterator<Record> iterator;
                     String groupByField = req.getParameter(AnalyticsAPIConstants.GROUP_BY_FIELD_PARAM);
                     Type aggregateFieldsMapType = new TypeToken<List<AggregateField>>() {}.getType();
-                    Gson gson = new Gson();
                     List<AggregateField> fields = gson.fromJson(req.getParameter(AnalyticsAPIConstants.AGGREGATING_FIELDS),
-                                                                             aggregateFieldsMapType);
+                                                                aggregateFieldsMapType);
+                    String parentPathAsString = req.getParameter(AnalyticsAPIConstants.AGGREGATE_PARENT_PATH);
+                    Type aggregateParentPath = new TypeToken<List<String>>(){}.getType();
+                    List<String> parentPath = gson.fromJson(parentPathAsString, aggregateParentPath);
+                    int aggregateLevel = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.AGGREGATE_LEVEL));
                     AggregateRequest aggregateRequest = new AggregateRequest();
                     aggregateRequest.setTableName(tableName);
                     aggregateRequest.setQuery(query);
                     aggregateRequest.setFields(fields);
                     aggregateRequest.setGroupByField(groupByField);
-                    if (!securityEnabled) aggregatedResults = ServiceHolder.getAnalyticsDataService()
+                    aggregateRequest.setAggregateLevel(aggregateLevel);
+                    aggregateRequest.setParentPath(parentPath);
+                    if (!securityEnabled) iterator = ServiceHolder.getAnalyticsDataService()
                             .searchWithAggregates(tenantIdParam, aggregateRequest);
                     else
-                        aggregatedResults = ServiceHolder.getSecureAnalyticsDataService().searchWithAggregates(userName,
+                        iterator = ServiceHolder.getSecureAnalyticsDataService().searchWithAggregates(userName,
                                                                                                                aggregateRequest);
-                    aggregatedResults = new ArrayList<>(aggregatedResults);
-                    resp.getOutputStream().write(GenericUtils.serializeObject(aggregatedResults));
+                    while (iterator.hasNext()) {
+                        Record record = iterator.next();
+                        GenericUtils.serializeObject(record, resp.getOutputStream());
+                    }
+                    iterator.close();
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());

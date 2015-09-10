@@ -328,7 +328,7 @@ public interface AnalyticsDataService {
      * aliases represents the output field names for aggregated values over the fields.
      * @return List of records of which the record values will be the aggregate values of the given fields
      */
-    public List<Record> searchWithAggregates(int tenantId, AggregateRequest aggregateRequest) throws AnalyticsException;
+    public AnalyticsIterator<Record> searchWithAggregates(int tenantId, AggregateRequest aggregateRequest) throws AnalyticsException;
     
     /**
      * This method waits until the current indexing operations for the system is done.

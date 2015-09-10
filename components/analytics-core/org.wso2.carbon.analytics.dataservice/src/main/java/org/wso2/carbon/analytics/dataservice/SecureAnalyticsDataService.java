@@ -339,7 +339,7 @@ public interface SecureAnalyticsDataService {
      * aliases represents the output field names for aggregated values over the fields.
      * @return List of records of which the record values will be the aggregate values of the given fields
      */
-    List<Record> searchWithAggregates(String username, AggregateRequest aggregateRequest) throws AnalyticsException;
+    AnalyticsIterator<Record> searchWithAggregates(String username, AggregateRequest aggregateRequest) throws AnalyticsException;
     /**
      * Destroys and frees any resources taken up by the analytics data service implementation.
      */

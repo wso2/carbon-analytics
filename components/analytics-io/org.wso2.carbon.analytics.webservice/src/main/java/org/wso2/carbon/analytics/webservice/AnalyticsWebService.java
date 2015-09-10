@@ -29,6 +29,7 @@ import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsAggregateRequest;
@@ -190,8 +191,8 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
 
             AggregateRequest aggregateRequest = Utils.getAggregateRequest(request);
-            List<Record> records = analyticsDataAPI.searchWithAggregates(getUsername(), aggregateRequest);
-            List<RecordBean> recordBeans = Utils.createRecordBeans(records);
+            AnalyticsIterator<Record> iterator= analyticsDataAPI.searchWithAggregates(getUsername(), aggregateRequest);
+            List<RecordBean> recordBeans = Utils.createRecordBeans(Utils.createList(iterator));
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
         } catch (Exception e) {

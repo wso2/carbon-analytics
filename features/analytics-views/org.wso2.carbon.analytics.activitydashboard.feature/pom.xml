@@ -32,7 +32,7 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics Activity Dashboard Aggregate Feature</name>
     <description>
-        This feature is a aggregate feature of both activity dashboard server and UI features.
+        This feature is a aggregateFunction feature of both activity dashboard server and UI features.
     </description>
 
     <dependencies>

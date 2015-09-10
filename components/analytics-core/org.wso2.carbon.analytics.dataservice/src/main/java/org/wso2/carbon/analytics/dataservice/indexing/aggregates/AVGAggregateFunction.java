@@ -18,26 +18,35 @@
 
 package org.wso2.carbon.analytics.dataservice.indexing.aggregates;
 
-import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**
- * This class represents the MIN aggregate which returns the minimum value of a record field.
+ * This class represents the AVERAGE aggregate which computes average over a record field
  */
-public class MINAggregate implements Aggregate {
+public class AVGAggregateFunction implements AggregateFunction {
+
+    private double sum;
+    private double count;
+
     @Override
-    public Object aggregate(Iterator<Record> iterator, String fieldName, Map<String, Object> params)
+    public AVGAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
+        //No optional params are passed in initializing
+        sum = 0;
+        count = optionalParams.get(Constants.AggregateOptionalParams.COUNT).doubleValue();
+        return this;
+    }
+
+    @Override
+    public void process(Number value, Map<String, Number> optionalParams)
             throws AnalyticsException {
-        double min = Double.MAX_VALUE;
-        while (iterator.hasNext()) {
-            double value = ((Number) iterator.next().getValue(fieldName)).doubleValue();
-            if (min > value) {
-                min = value;
-            }
-        }
-        return min;
+        sum += value.doubleValue();
+    }
+
+    @Override
+    public Number finish() throws AnalyticsException {
+        return sum / count;
     }
 }

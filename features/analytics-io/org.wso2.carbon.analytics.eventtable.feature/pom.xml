@@ -29,7 +29,7 @@
     <artifactId>org.wso2.carbon.analytics.eventtable.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics Event Table Feature</name>
-    <description>This feature contains the aggregate event table features</description>
+    <description>This feature contains the aggregateFunction event table features</description>
 
     <dependencies>
         <dependency>

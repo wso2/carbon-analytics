@@ -29,6 +29,7 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -949,7 +950,7 @@ public class AnalyticsResource extends AbstractResource {
     @Consumes({ MediaType.APPLICATION_JSON})
     @Produces({ MediaType.APPLICATION_JSON })
     @Path(Constants.ResourcePath.AGGREGATES)
-    public Response searchWithAggregates(AggregateRequestBean aggregateRequestBean,
+    public StreamingOutput searchWithAggregates(AggregateRequestBean aggregateRequestBean,
                                 @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
         if (logger.isDebugEnabled()) {
@@ -959,9 +960,29 @@ public class AnalyticsResource extends AbstractResource {
         String username = authenticate(authHeader);
         if (aggregateRequestBean != null) {
             AggregateRequest aggregateRequest = Utils.createAggregateRequest(aggregateRequestBean);
-            List<Record> aggregatesRecords = analyticsDataService.searchWithAggregates(username, aggregateRequest);
-            List<RecordBean> recordBeans = Utils.createRecordBeans(aggregatesRecords);
-            return Response.ok(recordBeans).build();
+            final AnalyticsIterator<Record> iterator = analyticsDataService.searchWithAggregates(username, aggregateRequest);
+            return new StreamingOutput() {
+                @Override
+                public void write(OutputStream outputStream)
+                        throws IOException, WebApplicationException {
+                    Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+                    recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
+                    while (iterator.hasNext()) {
+                        Record record = iterator.next();
+                        RecordBean recordBean = Utils.createRecordBean(record);
+                        recordWriter.write(gson.toJson(recordBean));
+                        if (iterator.hasNext()) {
+                            recordWriter.write(STR_JSON_COMMA);
+                        }
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Retrieved -- Record Id: " + recordBean.getId() + " values :" +
+                                         recordBean.toString());
+                        }
+                    }
+                    recordWriter.write(STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET);
+                    recordWriter.flush();
+                }
+            };
         } else {
             throw new AnalyticsException("Search parameters not found");
         }

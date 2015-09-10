@@ -434,6 +434,8 @@ public class Utils {
         request.setQuery(aggregateRequestBean.getQuery());
         request.setGroupByField(aggregateRequestBean.getGroupByField());
         request.setFields(createAggregatingFields(aggregateRequestBean.getFields()));
+        request.setAggregateLevel(aggregateRequestBean.getAggregateLevel());
+        request.setParentPath(aggregateRequestBean.getParentPath());
         return request;
     }
 

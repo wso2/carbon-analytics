@@ -18,23 +18,34 @@
 
 package org.wso2.carbon.analytics.dataservice.indexing.aggregates;
 
-import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**
- * This class represents the SUM aggregate which performs summation over a record field
+ * This class represents the COUNT aggregate which COUNT the records
  */
-public class SUMAggregate implements Aggregate {
+public class COUNTAggregateFunction implements AggregateFunction {
 
-    public Number aggregate(Iterator<Record> iterator,
-                            String fieldName, Map<String, Object> params) throws AnalyticsException {
-        double sum = 0;
-        while (iterator.hasNext()) {
-            sum += ((Number) iterator.next().getValue(fieldName)).doubleValue();
+    private Number count;
+    @Override
+    public COUNTAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
+        count = optionalParams.get(Constants.AggregateOptionalParams.COUNT);
+        if (count == null) {
+            count = 0;
         }
-        return sum;
+        return this;
+    }
+
+    @Override
+    public void process(Number value, Map<String, Number> optionalParams)
+            throws AnalyticsException {
+        //no specific processing
+    }
+
+    @Override
+    public Number finish() throws AnalyticsException {
+        return count;
     }
 }

@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.analytics.api.feature</artifactId>
     <name>WSO2 Carbon - Analytics API Aggregate Feature</name>
-    <description>This feature contains the aggregate core bundles required for analytics api aggregate functionality</description>
+    <description>This feature contains the aggregateFunction core bundles required for analytics api aggregateFunction functionality</description>
 
     <dependencies>
         <dependency>

@@ -525,7 +525,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public List<Record> searchWithAggregates(String username, AggregateRequest aggregateRequest)
+    public AnalyticsIterator<Record> searchWithAggregates(String username, AggregateRequest aggregateRequest)
             throws AnalyticsException {
         if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().searchWithAggregates(username, aggregateRequest);
@@ -644,7 +644,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public List<Record> searchWithAggregates(int tenantId, AggregateRequest aggregateRequest)
+    public AnalyticsIterator<Record> searchWithAggregates(int tenantId, AggregateRequest aggregateRequest)
             throws AnalyticsException {
         if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().searchWithAggregates(tenantId, aggregateRequest);

@@ -30,7 +30,7 @@
     <artifactId>org.wso2.carbon.analytics.core.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics Core Feature</name>
-    <description>This feature contains the aggregate core bundles required for analytics functionality</description>
+    <description>This feature contains the aggregateFunction core bundles required for analytics functionality</description>
 
     <dependencies>
         <dependency>

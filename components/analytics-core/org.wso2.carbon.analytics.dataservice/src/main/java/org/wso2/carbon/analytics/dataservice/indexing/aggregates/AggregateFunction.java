@@ -18,27 +18,15 @@
 
 package org.wso2.carbon.analytics.dataservice.indexing.aggregates;
 
-import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**
- * This class represents the MAX aggregate which returns the maximum value of a record field.
+ * This interface is used to implement custom aggregates over the record fields.
  */
-public class MAXAggregate implements Aggregate
-{
-    @Override
-    public Object aggregate(Iterator<Record> iterator, String fieldName, Map<String, Object> params)
-            throws AnalyticsException {
-        double max = Double.MIN_VALUE;
-        while (iterator.hasNext()) {
-            double value = ((Number) iterator.next().getValue(fieldName)).doubleValue();
-            if (max < value) {
-                max = value;
-            }
-        }
-        return max;
-    }
+public interface AggregateFunction {
+    public AggregateFunction init (Map<String, Number> optionalParams) throws AnalyticsException;
+    public void process( Number value, Map<String, Number> optionalParams) throws AnalyticsException;
+    public Number finish() throws AnalyticsException;
 }

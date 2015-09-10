@@ -18,25 +18,30 @@
 
 package org.wso2.carbon.analytics.dataservice.indexing.aggregates;
 
-import org.wso2.carbon.analytics.dataservice.commons.Constants;
-import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**
- * This class represents the AVERAGE aggregate which computes average over a record field
+ * This class represents the SUM aggregate which performs summation over a record field
  */
-public class AVGAggregate implements Aggregate {
+public class SUMAggregateFunction implements AggregateFunction {
+
+    private double sum;
     @Override
-    public Object aggregate(Iterator<Record> iterator, String fieldName, Map<String, Object> params)
+    public SUMAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
+        sum = 0;
+        return this;
+    }
+
+    @Override
+    public void process(Number value, Map<String, Number> optionalParams)
             throws AnalyticsException {
-        double sum = 0;
-        double count = (Double)params.get(Constants.AggregateOptionalParams.COUNT);
-        while (iterator.hasNext()) {
-            sum += ((Number) iterator.next().getValue(fieldName)).doubleValue();
-        }
-        return sum / count;
+        sum += value.doubleValue();
+    }
+
+    @Override
+    public Number finish() throws AnalyticsException {
+        return sum;
     }
 }

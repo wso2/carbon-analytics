@@ -908,7 +908,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public List<Record> searchWithAggregates(int tenantId, AggregateRequest aggregateRequest)
+    public AnalyticsIterator<Record> searchWithAggregates(int tenantId, AggregateRequest aggregateRequest)
             throws AnalyticsException {
         aggregateRequest.setTableName(GenericUtils.normalizeTableName(aggregateRequest.getTableName()));
         return this.getIndexer().searchWithAggregates(tenantId, aggregateRequest);

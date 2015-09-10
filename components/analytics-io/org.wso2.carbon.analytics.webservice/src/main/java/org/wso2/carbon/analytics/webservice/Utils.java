@@ -16,9 +16,11 @@
 
 package org.wso2.carbon.analytics.webservice;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateField;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -561,5 +563,11 @@ public class Utils {
             }
         }
         return  aggregateFields;
+    }
+
+    public static List createList(AnalyticsIterator<Record> iterator) {
+        List<Record> records = new ArrayList<>();
+        records.addAll(IteratorUtils.toList(iterator));
+        return records;
     }
 }

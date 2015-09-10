@@ -18,20 +18,32 @@
 
 package org.wso2.carbon.analytics.dataservice.indexing.aggregates;
 
-import org.wso2.carbon.analytics.dataservice.commons.Constants;
-import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**
- * This class represents the COUNT aggregate which COUNT the records
+ * This class represents the MIN aggregate which returns the minimum value of a record field.
  */
-public class COUNTAggregate implements Aggregate {
+public class MINAggregateFunction implements AggregateFunction {
+
+    private double minValue;
     @Override
-    public Object aggregate(Iterator<Record> iterator, String fieldName, Map<String, Object> params)
+    public MINAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
+        minValue = Double.MAX_VALUE;
+        return this;
+    }
+
+    @Override
+    public void process(Number value, Map<String, Number> optionalParams)
             throws AnalyticsException {
-        return params.get(Constants.AggregateOptionalParams.COUNT);
+        if (minValue < value.doubleValue()) {
+            minValue = value.doubleValue();
+        }
+    }
+
+    @Override
+    public Number finish() throws AnalyticsException {
+        return minValue;
     }
 }
