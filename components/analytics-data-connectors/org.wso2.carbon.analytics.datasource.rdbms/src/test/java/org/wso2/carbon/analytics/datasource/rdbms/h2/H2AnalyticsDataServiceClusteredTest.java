@@ -24,9 +24,9 @@ import javax.naming.NamingException;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
-import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataServiceTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
