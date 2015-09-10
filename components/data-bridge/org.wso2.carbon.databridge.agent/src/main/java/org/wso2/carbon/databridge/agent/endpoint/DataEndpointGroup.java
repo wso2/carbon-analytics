@@ -135,8 +135,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                     }
                     try {
                         Thread.sleep(1);
-                    } catch (InterruptedException e) {
-
+                    } catch (InterruptedException ignored) {
                     }
                 }
             }
@@ -151,10 +150,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                     bufferedEvent.setEvent(event);
                     this.ringBuffer.publish(sequence);
                     return;
-                } catch (InsufficientCapacityException ignored) {
+                } catch (InsufficientCapacityException ex) {
                     try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
+                        Thread.sleep(2);
+                    } catch (InterruptedException ignored) {
                     }
                 }
             } while (isActiveDataEndpointExists());
