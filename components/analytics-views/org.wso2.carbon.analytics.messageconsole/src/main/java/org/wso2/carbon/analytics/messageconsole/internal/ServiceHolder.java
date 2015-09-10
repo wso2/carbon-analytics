@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.analytics.messageconsole.internal;
 
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.ntask.core.service.TaskService;
 
 /**

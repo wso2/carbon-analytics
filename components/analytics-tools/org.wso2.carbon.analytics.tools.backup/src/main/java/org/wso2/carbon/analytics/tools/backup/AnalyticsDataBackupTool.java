@@ -27,12 +27,12 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.cli.*;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
-import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfigProperty;
-import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
-import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
+import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataServiceConfigProperty;
+import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataServiceConfiguration;
+import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
