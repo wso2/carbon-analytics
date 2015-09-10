@@ -22,7 +22,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.MultiMap;
-import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 
 import java.io.Serializable;
 import java.util.Collection;
