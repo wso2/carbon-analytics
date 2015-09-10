@@ -86,7 +86,7 @@ public class ComputeClasspath {
             "org.scala-lang.scala-reflect",
             "org.spark-project.protobuf.java",
             "org.wso2.carbon.analytics.api",
-            "org.wso2.carbon.analytics.dataservice",
+            "org.wso2.carbon.analytics.dataservice.core",
             "org.wso2.carbon.analytics.dataservice.commons",
             "org.wso2.carbon.analytics.datasource.cassandra",
             "org.wso2.carbon.datasource.reader.cassandra",

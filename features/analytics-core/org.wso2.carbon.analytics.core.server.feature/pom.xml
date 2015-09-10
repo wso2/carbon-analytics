@@ -48,7 +48,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
+            <artifactId>org.wso2.carbon.analytics.dataservice.core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
@@ -132,7 +132,7 @@
                                 <bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.core
                                 </bundleDef>
-                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice</bundleDef>
+                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice.core</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.tools.backup</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.tools.migration</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice.commons
