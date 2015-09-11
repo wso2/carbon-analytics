@@ -45,7 +45,11 @@ import org.wso2.carbon.event.publisher.core.internal.util.helper.EventPublisherC
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -78,6 +82,7 @@ public class EventPublisherDeployer extends AbstractDeployer implements EventPro
             try {
                 processDeployment(deploymentFileData);
             } catch (Throwable e) {
+                log.error("Could not deploy event publisher file: " + deploymentFileData.getName(), e);
                 throw new DeploymentException("Event publisher file " + deploymentFileData.getName() + " is not deployed ", e);
             }
         } else {
@@ -140,6 +145,7 @@ public class EventPublisherDeployer extends AbstractDeployer implements EventPro
             try {
                 processUndeployment(filePath);
             } catch (Throwable e) {
+                log.error("Could not undeploy event publisher file: " + new File(filePath).getName(), e);
                 throw new DeploymentException("Event publisher file " + new File(filePath).getName() + " is not undeployed properly", e);
             }
         } else {

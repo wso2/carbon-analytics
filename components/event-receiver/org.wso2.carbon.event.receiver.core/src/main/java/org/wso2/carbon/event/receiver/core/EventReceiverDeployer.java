@@ -46,7 +46,11 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -81,7 +85,8 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
             try {
                 processDeployment(deploymentFileData);
             } catch (Throwable e) {
-                throw new DeploymentException("Event publisher file " + deploymentFileData.getName() + " is not deployed ", e);
+                log.error("Could not deploy event receiver file: " + deploymentFileData.getName(), e);
+                throw new DeploymentException("Event receiver file " + deploymentFileData.getName() + " is not deployed ", e);
             }
         } else {
             deployedEventReceiverFilePaths.remove(path);
@@ -141,6 +146,7 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
             try {
                 processUndeployment(filePath);
             } catch (Throwable e) {
+                log.error("Could not undeploy event receiver file: " + new File(filePath).getName(), e);
                 throw new DeploymentException("Event receiver file " + new File(filePath).getName() + " is not undeployed properly", e);
             }
         } else {
