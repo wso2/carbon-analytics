@@ -20,13 +20,10 @@ package org.wso2.carbon.analytics.dataservice.core.indexing.aggregates;
 
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
-import java.util.Map;
-
 /**
  * This interface is used to implement custom aggregates over the record fields.
  */
 public interface AggregateFunction {
-    public void init(Map<String, Number> optionalParams) throws AnalyticsException;
-    public void process( Number value, Map<String, Number> optionalParams) throws AnalyticsException;
+    public void process(Number value) throws AnalyticsException;
     public Number finish() throws AnalyticsException;
 }

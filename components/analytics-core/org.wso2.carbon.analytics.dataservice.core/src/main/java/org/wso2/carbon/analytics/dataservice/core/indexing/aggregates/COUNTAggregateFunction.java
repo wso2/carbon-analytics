@@ -29,8 +29,8 @@ import java.util.Map;
 public class COUNTAggregateFunction implements AggregateFunction {
 
     private Number count;
-    @Override
-    public void init(Map<String, Number> optionalParams) throws AnalyticsException {
+
+    public COUNTAggregateFunction(Map<String, Number> optionalParams) {
         count = optionalParams.get(Constants.AggregateOptionalParams.COUNT);
         if (count == null) {
             count = 0;
@@ -38,7 +38,7 @@ public class COUNTAggregateFunction implements AggregateFunction {
     }
 
     @Override
-    public void process(Number value, Map<String, Number> optionalParams)
+    public void process(Number value)
             throws AnalyticsException {
         //no specific processing
     }

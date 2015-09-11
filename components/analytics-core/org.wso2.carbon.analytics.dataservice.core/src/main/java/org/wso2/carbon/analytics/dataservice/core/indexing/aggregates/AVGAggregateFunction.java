@@ -31,15 +31,14 @@ public class AVGAggregateFunction implements AggregateFunction {
     private double sum;
     private double count;
 
-    @Override
-    public void init(Map<String, Number> optionalParams) throws AnalyticsException {
+    public AVGAggregateFunction(Map<String, Number> optionalParams) {
         //No optional params are passed in initializing
         sum = 0;
         count = optionalParams.get(Constants.AggregateOptionalParams.COUNT).doubleValue();
     }
 
     @Override
-    public void process(Number value, Map<String, Number> optionalParams)
+    public void process(Number value)
             throws AnalyticsException {
         sum += value.doubleValue();
     }

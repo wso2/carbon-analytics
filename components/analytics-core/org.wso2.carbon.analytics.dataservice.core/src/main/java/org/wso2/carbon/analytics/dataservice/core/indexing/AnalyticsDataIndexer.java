@@ -1640,7 +1640,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                                                                         category.getCategoryValue()));
                     groupings.add(this.drilldownCategories(tenantId, categoryDrillDownRequest));
                 }
-                subCategories = groupings.get(0);
+                if (!groupings.isEmpty()) {
+                    subCategories = groupings.get(0);
+                } else {
+                    subCategories = null;
+                }
             }
             while (subCategories != null && subCategories.getPath().length < totalAggregateLevel);
             return groupings;
@@ -1719,7 +1723,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             for (AggregateField field : aggregateRequest.getFields()) {
                 Number value = (Number) record.getValue(field.getFieldName());
                 AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
-                function.process(value, optionalParams);
+                function.process(value);
             }
         }
         Map<String, Object> aggregatedValues = generateAggregateRecordValues(facetValue, path,
@@ -1748,7 +1752,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             throws AnalyticsException {
         Map<String, AggregateFunction> perAliasAggregateFunction = new HashMap<>();
         for (AggregateField field : aggregateRequest.getFields()) {
-            AggregateFunction function = getAggregateFunctionFactory().create(field.getAggregateFunction());
+            AggregateFunction function = getAggregateFunctionFactory().create(field.getAggregateFunction(), optionalParams);
             if (function == null) {
                 throw new AnalyticsException("Unknown aggregate function!");
             } else if (field.getFieldName() == null || field.getFieldName().isEmpty()) {
@@ -1756,7 +1760,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             } else if (field.getAlias() == null || field.getAlias().isEmpty()) {
                 throw new AnalyticsException("One of the aggregating field alias is not provided");
             }
-            function.init(optionalParams);
             perAliasAggregateFunction.put(field.getAlias(), function);
         }
         return perAliasAggregateFunction;

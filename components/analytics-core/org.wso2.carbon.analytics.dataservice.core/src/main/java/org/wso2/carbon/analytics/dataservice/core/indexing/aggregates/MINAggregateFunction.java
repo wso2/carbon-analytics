@@ -28,13 +28,13 @@ import java.util.Map;
 public class MINAggregateFunction implements AggregateFunction {
 
     private double minValue;
-    @Override
-    public void init(Map<String, Number> optionalParams) throws AnalyticsException {
+
+    public MINAggregateFunction(Map<String, Number> optionalParams) {
         minValue = Double.MAX_VALUE;
     }
 
     @Override
-    public void process(Number value, Map<String, Number> optionalParams)
+    public void process(Number value)
             throws AnalyticsException {
         if (minValue < value.doubleValue()) {
             minValue = value.doubleValue();

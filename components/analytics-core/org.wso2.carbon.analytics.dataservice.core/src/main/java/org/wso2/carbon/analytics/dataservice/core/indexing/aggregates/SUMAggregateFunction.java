@@ -28,13 +28,13 @@ import java.util.Map;
 public class SUMAggregateFunction implements AggregateFunction {
 
     private double sum;
-    @Override
-    public void init(Map<String, Number> optionalParams) throws AnalyticsException {
+
+    public SUMAggregateFunction(Map<String, Number> optionalParams) {
         sum = 0;
     }
 
     @Override
-    public void process(Number value, Map<String, Number> optionalParams)
+    public void process(Number value)
             throws AnalyticsException {
         sum += value.doubleValue();
     }
