@@ -31,13 +31,15 @@ public class DataBridgeConfiguration {
 
     private List<DataReceiver> dataReceivers;
     private int workerThreads;
+    private int maxEventBufferCapacity;
     private int eventBufferSize;
     private int clientTimeoutMin;
 
     public DataBridgeConfiguration(){
         this.workerThreads = 10;
         this.clientTimeoutMin = 30;
-        this.eventBufferSize = 50 * (1000000); //100MB
+        this.maxEventBufferCapacity = 50 * (1000000); //100MB
+        this.eventBufferSize = 2000;
     }
 
     @XmlElement(name = "dataReceiver")
@@ -58,14 +60,14 @@ public class DataBridgeConfiguration {
         this.workerThreads = workerThreads;
     }
 
-    @XmlElement(name = "eventBufferSize")
-    public int getEventBufferSize() {
-        return eventBufferSize;
+    @XmlElement(name = "maxEventBufferCapacity")
+    public int getMaxEventBufferCapacity() {
+        return maxEventBufferCapacity;
     }
 
-    public void setEventBufferSize(int eventBufferSize) {
+    public void setMaxEventBufferCapacity(int maxEventBufferCapacity) {
         // to change it to MB
-        this.eventBufferSize = eventBufferSize * (1000000);
+        this.maxEventBufferCapacity = maxEventBufferCapacity * (1000000);
     }
 
     @XmlElement(name = "clientTimeoutMin")
@@ -84,5 +86,14 @@ public class DataBridgeConfiguration {
             }
         }
         return null;
+    }
+
+    public int getEventBufferSize() {
+        return eventBufferSize;
+    }
+
+    @XmlElement(name = "eventBufferSize")
+    public void setEventBufferSize(int eventBufferSize) {
+        this.eventBufferSize = eventBufferSize;
     }
 }

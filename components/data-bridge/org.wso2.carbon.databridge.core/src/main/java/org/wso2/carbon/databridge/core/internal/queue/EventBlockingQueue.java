@@ -38,10 +38,10 @@ public class EventBlockingQueue extends ArrayBlockingQueue<EventComposite> {
     private int maxSize;
     private Semaphore semaphore;
 
-    public EventBlockingQueue(int maxSize) {
-        super(maxSize);
+    public EventBlockingQueue(int maxQueueSize, int maxSizeCapacity) {
+        super(maxQueueSize);
         this.currentSize = new AtomicInteger(0);
-        this.maxSize = maxSize;
+        this.maxSize = maxSizeCapacity;
         this.semaphore = new Semaphore(1);
     }
 
