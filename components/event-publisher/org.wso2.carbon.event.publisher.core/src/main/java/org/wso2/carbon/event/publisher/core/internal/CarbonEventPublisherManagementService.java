@@ -23,7 +23,6 @@ import org.wso2.carbon.event.processor.manager.core.EventPublisherManagementServ
 
 public class CarbonEventPublisherManagementService extends EventPublisherManagementService {
     private boolean isDrop = false;
-    private boolean isSent = false;
 
     public CarbonEventPublisherManagementService() {
 
