@@ -8,6 +8,7 @@
         <xs:all>
             <xs:element type="xs:string" name="StreamDefinitionStore"/>
             <xs:element type="xs:int" name="workerThreads"/>
+            <xs:element type="xs:int" name="maxEventBufferCapacity"/>
             <xs:element type="xs:int" name="eventBufferSize"/>
             <xs:element type="xs:int" name="clientTimeoutMS"/>
             <xs:element type="even:thriftDataReceiverType" name="thriftDataReceiver"

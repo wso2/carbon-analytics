@@ -51,7 +51,8 @@ public class EventQueue {
         this.rawDataSubscribers = rawDataSubscribers;
         // Note : Using a fixed worker thread pool and a bounded queue to prevent the server dying if load is too high
         executorService = Executors.newFixedThreadPool(dataBridgeConfiguration.getWorkerThreads(), new DataBridgeThreadFactory("Core"));
-        eventQueue = new EventBlockingQueue(dataBridgeConfiguration.getEventBufferSize());
+        eventQueue = new EventBlockingQueue(dataBridgeConfiguration.getEventBufferSize(),
+                dataBridgeConfiguration.getMaxEventBufferCapacity());
     }
 
     public void publish(EventComposite eventComposite) {
