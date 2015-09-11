@@ -1194,7 +1194,7 @@
         <org.glassfish.tyrus.wso2.version>1.7-wso2v1</org.glassfish.tyrus.wso2.version>
         <google.jsmpp.version>2.0.1</google.jsmpp.version>
         <apache.servicemix.version>4.0-m1</apache.servicemix.version>
-        <httpclient.wso2.version>4.2.5.wso2v1</httpclient.wso2.version>
+        <!--<httpclient.wso2.version>4.2.5.wso2v1</httpclient.wso2.version>-->
         <jsonpath.version>0.9.1</jsonpath.version>
         <jsonsmart.version>1.2</jsonsmart.version>
         <javax.websocket.version>1.0</javax.websocket.version>
@@ -1204,7 +1204,7 @@
         <version.equinox.osgi.services>3.3.100.v20120522-1822</version.equinox.osgi.services>
         <slf4j.wso2.version>1.5.10.wso2v1</slf4j.wso2.version>
         <google.guava.version>15.0</google.guava.version>
-        <commons.pool.version>1.5.0.wso2v1</commons.pool.version>
+        <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
         <cassandra.thrift.wso2.version>1.2.13.wso2v4</cassandra.thrift.wso2.version>
 
         <httpclient.httpcomponents.wso2.version>4.3.1.wso2v2</httpclient.httpcomponents.wso2.version>
