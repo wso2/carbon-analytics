@@ -17,7 +17,9 @@
 <dataBridgeConfiguration>
 
     <workerThreads>10</workerThreads>
-    <eventBufferCapacity>1000</eventBufferCapacity>
+
+    <!--Maximum amount of messages that can be queued internally in MB-->
+    <eventBufferSize>50</eventBufferSize>
     <clientTimeoutMin>30</clientTimeoutMin>
 
     <dataReceiver name="Thrift">

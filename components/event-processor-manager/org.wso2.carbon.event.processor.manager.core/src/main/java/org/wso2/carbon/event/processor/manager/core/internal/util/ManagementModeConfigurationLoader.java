@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.processor.manager.commons.utils.Utils;
 import org.wso2.carbon.event.processor.manager.core.config.*;
 import org.wso2.carbon.event.processor.manager.core.exception.ManagementConfigurationException;
+import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ServerConstants;
 
 import javax.xml.namespace.QName;
@@ -43,7 +44,8 @@ public class ManagementModeConfigurationLoader {
 
     private static final Log log = LogFactory.getLog(ManagementModeConfigurationLoader.class);
 
-    public static ManagementModeInfo loadManagementModeInfo() throws ManagementConfigurationException {
+    public static ManagementModeInfo loadManagementModeInfo()
+            throws ManagementConfigurationException {
         ManagementModeInfo managementModeInfo = new ManagementModeInfo();
         OMElement omElement = ManagementModeConfigurationLoader.loadConfigXML();
 
@@ -57,7 +59,7 @@ public class ManagementModeConfigurationLoader {
             String attribute = processingMode.getAttribute(new QName(ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE)).getAttributeValue();
 
             if (processingMode.getAttribute(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)) == null) {
-                throw new ManagementConfigurationException("Invalid Mode Element '"+attribute+"' with no mode attribute '" + ConfigurationConstants.ENABLE_ATTRIBUTE + "' in file " + ConfigurationConstants.CEP_MANAGEMENT_XML);
+                throw new ManagementConfigurationException("Invalid Mode Element '" + attribute + "' with no mode attribute '" + ConfigurationConstants.ENABLE_ATTRIBUTE + "' in file " + ConfigurationConstants.CEP_MANAGEMENT_XML);
             }
             String enabled = processingMode.getAttribute(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)).getAttributeValue();
 
@@ -117,7 +119,8 @@ public class ManagementModeConfigurationLoader {
         }
     }
 
-    private static boolean nodeType(String elementName, OMElement element) throws ManagementConfigurationException {
+    private static boolean nodeType(String elementName, OMElement element)
+            throws ManagementConfigurationException {
         OMAttribute attribute = element.getAttribute(new QName(elementName));
         if (attribute != null) {
             return attribute.getAttributeValue().equalsIgnoreCase("True");
@@ -173,7 +176,8 @@ public class ManagementModeConfigurationLoader {
 
     }
 
-    private static DistributedConfiguration getDistributedConfiguration(OMElement processingElement) {
+    private static DistributedConfiguration getDistributedConfiguration(
+            OMElement processingElement) {
 
         DistributedConfiguration stormDeploymentConfig = new DistributedConfiguration();
 
@@ -187,10 +191,10 @@ public class ManagementModeConfigurationLoader {
                 int port = 8904;
                 stormDeploymentConfig.addManager(hostName, port);
                 log.info("No storm managers are provided. Hence automatically electing " + hostName + ":" + port + " node as " +
-                        "manager");
+                         "manager");
             } catch (SocketException e) {
                 log.error("Error while automatically populating storm managers. Please check the event-processor.xml" +
-                        " at CARBON_HOME/repository/conf", e);
+                          " at CARBON_HOME/repository/conf", e);
                 return null;
             }
         }
@@ -203,24 +207,24 @@ public class ManagementModeConfigurationLoader {
 
         if (management.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_HEARTBEAT_INTERVAL_ELEMENT)) != null) {
             stormDeploymentConfig.setManagementHeartbeatInterval(Integer.parseInt(management.getFirstChildWithName(new QName
-                    (ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_HEARTBEAT_INTERVAL_ELEMENT)).getText()));
+                                                                                                                   (ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_HEARTBEAT_INTERVAL_ELEMENT)).getText()));
         } else {
             log.info("No heartbeat interval provided. Hence using default heartbeat interval "
-                    + stormDeploymentConfig.getManagementHeartbeatInterval());
+                     + stormDeploymentConfig.getManagementHeartbeatInterval());
         }
         if (management.getFirstChildWithName(new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)) != null) {
             stormDeploymentConfig.setManagementReconnectInterval(Integer.parseInt(management.getFirstChildWithName
                     (new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)).getText()));
         } else {
             log.info("No reconnection interval provided. Hence using default reconnection interval "
-                    + stormDeploymentConfig.getManagementReconnectInterval());
+                     + stormDeploymentConfig.getManagementReconnectInterval());
         }
         if (management.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TOPOLOGY_RESUBMIT_INTERVAL_ELEMENT)) != null) {
             stormDeploymentConfig.setTopologySubmitRetryInterval(Integer.parseInt(management.getFirstChildWithName(new QName
-                    (ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TOPOLOGY_RESUBMIT_INTERVAL_ELEMENT)).getText()));
+                                                                                                                   (ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TOPOLOGY_RESUBMIT_INTERVAL_ELEMENT)).getText()));
         } else {
             log.info("No topology resubmit interval provided. Hence using default topology resubmit interval "
-                    + stormDeploymentConfig.getTopologySubmitRetryInterval());
+                     + stormDeploymentConfig.getTopologySubmitRetryInterval());
         }
 
         //Reading transport
@@ -231,22 +235,22 @@ public class ManagementModeConfigurationLoader {
             stormDeploymentConfig.setTransportMinPort(Integer.parseInt(portRange.getFirstChildWithName(new QName("min")).getText()));
         } else {
             log.info("No port information provided. Hence using default port range " +
-            stormDeploymentConfig.getTransportMinPort() + " - " + stormDeploymentConfig.getTransportMaxPort());
+                     stormDeploymentConfig.getTransportMinPort() + " - " + stormDeploymentConfig.getTransportMaxPort());
         }
         if (transport.getFirstChildWithName(new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)) != null) {
             stormDeploymentConfig.setTransportReconnectInterval(Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)).getText()));
         } else {
             log.info("No transport reconnection interval provided. Hence using default reconnection interval "
-                    + stormDeploymentConfig.getTransportReconnectInterval());
+                     + stormDeploymentConfig.getTransportReconnectInterval());
         }
-        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE)) != null){
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE)) != null) {
             int queueSize = Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE)).getText());
 
-            if (isPowerOfTwo(queueSize)){
+            if (isPowerOfTwo(queueSize)) {
                 stormDeploymentConfig.setCepReceiverOutputQueueSize(queueSize);
-            }else{
+            } else {
                 // Disruptor queue size only allows powers of two
                 throw new IllegalArgumentException(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE + " must be a power of two.");
             }
@@ -254,13 +258,13 @@ public class ManagementModeConfigurationLoader {
         } else {
             log.info("No CEP receiver output queue size specified. Hence using default queue size " + stormDeploymentConfig.getCepReceiverOutputQueueSize());
         }
-        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE)) != null){
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE)) != null) {
             int queueSize = Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE)).getText());
 
-            if (isPowerOfTwo(queueSize)){
+            if (isPowerOfTwo(queueSize)) {
                 stormDeploymentConfig.setStormPublisherOutputQueueSize(queueSize);
-            }else{
+            } else {
                 // Disruptor queue size only allows powers of two
                 throw new IllegalArgumentException(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CEP_RECEIVER_QUEUE_SIZE + " must be a power of two.");
             }
@@ -268,39 +272,40 @@ public class ManagementModeConfigurationLoader {
         } else {
             log.info("No storm publisher output queue size specified. Hence using default queue size " + stormDeploymentConfig.getStormPublisherOutputQueueSize());
         }
-        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE)) != null){
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE)) != null) {
             int bufferSize = Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE)).getText());
             stormDeploymentConfig.setTransportPublisherTcpSendBufferSize(bufferSize);
         } else {
             log.info("No TCP publisher buffer size not specified. Hence using default buffer size " + stormDeploymentConfig.getTransportPublisherTcpSendBufferSize());
         }
-        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET)) != null){
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET)) != null) {
             String tcpEventPublisherCharSet = transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET)).getText();
             stormDeploymentConfig.setTransportPublisherCharSet(tcpEventPublisherCharSet);
-        }else{
+        } else {
             log.info("TCP event publisher Char-Set not set. Hence using default value " + stormDeploymentConfig.getTransportPublisherCharSet());
         }
-        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)) != null){
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)) != null) {
             int threadCount = Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)).getText());
             stormDeploymentConfig.setTransportReceiverThreads(threadCount);
         } else {
             log.info("No TCP receiver thread count not specified. Hence using default thread count " + stormDeploymentConfig.getTransportReceiverThreads());
         }
-        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL)) != null){
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL)) != null) {
             int connectionStatusCheckInterval = Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL)).getText());
             stormDeploymentConfig.setTransportPublisherConnectionStatusCheckInterval(connectionStatusCheckInterval);
-        }  else {
+        } else {
             log.info("No transport connection status check interval specified. Hence using default interval "
-                    + stormDeploymentConfig.getTransportPublisherConnectionStatusCheckInterval() + "ms");
+                     + stormDeploymentConfig.getTransportPublisherConnectionStatusCheckInterval() + "ms");
         }
 
 
         //Reading node info
         OMElement node = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_ELEMENT));
+        int portOffset = Integer.parseInt(CarbonUtils.getServerConfiguration().getFirstProperty(ConfigurationConstants.CARBON_CONFIG_PORT_OFFSET_NODE));
         if (node != null) {
             OMElement worker = node.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_WORKER_ELEMENT));
             if ("true".equalsIgnoreCase(worker.getAttributeValue(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)))) {
@@ -312,15 +317,15 @@ public class ManagementModeConfigurationLoader {
                 stormDeploymentConfig.setManagerNode(true);
                 String hostName = manager.getFirstChildWithName(new QName(ConfigurationConstants.HOST_NAME_ELEMENT)).getText();
                 int port = Integer.parseInt(manager.getFirstChildWithName(new QName(ConfigurationConstants.PORT_ELEMENT)).getText());
-                stormDeploymentConfig.setLocalManagerConfig(hostName, port);
+                stormDeploymentConfig.setLocalManagerConfig(hostName, port + portOffset);
             }
 
             OMElement presenter = node.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_PRESENTER_ELEMENT));
-            if ("true".equalsIgnoreCase(presenter.getAttributeValue(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)))){
+            if ("true".equalsIgnoreCase(presenter.getAttributeValue(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)))) {
                 stormDeploymentConfig.setPresenterNode(true);
                 String hostName = presenter.getFirstChildWithName(new QName(ConfigurationConstants.HOST_NAME_ELEMENT)).getText();
                 int port = Integer.parseInt(presenter.getFirstChildWithName(new QName(ConfigurationConstants.PORT_ELEMENT)).getText());
-                stormDeploymentConfig.setLocalPresenterConfig(hostName, port);
+                stormDeploymentConfig.setLocalPresenterConfig(hostName, port + portOffset);
             }
         } else {
             log.info("No node type configurations provided. Hence using default node type configurations");
@@ -333,10 +338,10 @@ public class ManagementModeConfigurationLoader {
         }
 
         OMElement memberUpdateCheckInterval = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_MEMBER_UPDATE_CHECK_INTERVAL));
-        if (memberUpdateCheckInterval != null){
+        if (memberUpdateCheckInterval != null) {
             int interval = Integer.parseInt(memberUpdateCheckInterval.getText());
             stormDeploymentConfig.setMemberUpdateCheckInterval(interval);
-        } else{
+        } else {
             log.info("No member update check interval specified. Hence using default interval " + stormDeploymentConfig.getMemberUpdateCheckInterval());
         }
 
@@ -345,23 +350,23 @@ public class ManagementModeConfigurationLoader {
         stormDeploymentConfig.setJar(jar.getText());
 
         OMElement presentation = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_PRESENTATION_ELEMENT));
-        if (presentation != null){
+        if (presentation != null) {
 
-            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_PRESENTER_QUEUE_SIZE)) != null){
+            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_PRESENTER_QUEUE_SIZE)) != null) {
                 int queueSize = Integer.parseInt(presentation.getFirstChildWithName(
                         new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_PRESENTER_QUEUE_SIZE)).getText());
 
-                if (isPowerOfTwo(queueSize)){
+                if (isPowerOfTwo(queueSize)) {
                     stormDeploymentConfig.setPresentationOutputQueueSize(queueSize);
-                }else{
+                } else {
                     // Disruptor queue size only allows powers of two
                     throw new IllegalArgumentException(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_PRESENTER_QUEUE_SIZE + " must be a power of two.");
                 }
-            } else{
+            } else {
                 log.info("No presentation output queue size provided. Hence using default queue size " + stormDeploymentConfig.getPresentationOutputQueueSize());
             }
 
-            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE)) != null){
+            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE)) != null) {
                 int bufferSize = Integer.parseInt(transport.getFirstChildWithName(
                         new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE)).getText());
                 stormDeploymentConfig.setPresentationPublisherTcpSendBufferSize(bufferSize);
@@ -369,15 +374,15 @@ public class ManagementModeConfigurationLoader {
                 log.info("No TCP publisher buffer size not specified for presenter. Hence using default buffer size " + stormDeploymentConfig.getPresentationPublisherTcpSendBufferSize());
             }
 
-            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET)) != null){
+            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET)) != null) {
                 String tcpEventPublisherCharSet = transport.getFirstChildWithName(
                         new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET)).getText();
                 stormDeploymentConfig.setPresentationPublisherCharSet(tcpEventPublisherCharSet);
-            }else{
+            } else {
                 log.info("TCP event publisher Char-Set not set for presenter. Hence using default value " + stormDeploymentConfig.getPresentationPublisherCharSet());
             }
 
-            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)) != null){
+            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)) != null) {
                 int threadCount = Integer.parseInt(transport.getFirstChildWithName(
                         new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)).getText());
                 stormDeploymentConfig.setPresentationReceiverThreads(threadCount);
@@ -385,40 +390,40 @@ public class ManagementModeConfigurationLoader {
                 log.info("No TCP receiver thread count not specified for presenter. Hence using default thread count " + stormDeploymentConfig.getPresentationReceiverThreads());
             }
 
-            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL)) != null){
+            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL)) != null) {
                 int connectionStatusCheckInterval = Integer.parseInt(transport.getFirstChildWithName(
                         new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL)).getText());
                 stormDeploymentConfig.setPresentationPublisherConnectionStatusCheckInterval(connectionStatusCheckInterval);
-            }  else {
+            } else {
                 log.info("No transport connection status check interval specified for presenter. Hence using default interval "
-                        + stormDeploymentConfig.getPresentationPublisherConnectionStatusCheckInterval() + "ms");
+                         + stormDeploymentConfig.getPresentationPublisherConnectionStatusCheckInterval() + "ms");
             }
-        }else{
+        } else {
             log.info("No presentation configurations provided. Hence using default configurations");
         }
 
         //Reading Status Monitor Info
         OMElement statusMonitor = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STATUS_MONITOR_ELEMENT));
-        if(statusMonitor != null){
+        if (statusMonitor != null) {
             OMElement lockTimeoutElement = statusMonitor.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STATUS_MONITOR_LOCK_TIMEOUT));
-            if(lockTimeoutElement != null){
+            if (lockTimeoutElement != null) {
                 int lockTimeout = Integer.parseInt(lockTimeoutElement.getText());
                 stormDeploymentConfig.setStatusLockTimeout(lockTimeout);
             } else {
                 log.info("No lockTimeout value specified in Status Monitor configurations. Hence using default lock timeout value: "
-                        + stormDeploymentConfig.getStatusLockTimeout() + " seconds.");
+                         + stormDeploymentConfig.getStatusLockTimeout() + " seconds.");
             }
             OMElement updateRateElement = statusMonitor.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STATUS_MONITOR_UPDATE_RATE));
-            if(updateRateElement != null){
-                int updateRate =  Integer.parseInt(updateRateElement.getText());
+            if (updateRateElement != null) {
+                int updateRate = Integer.parseInt(updateRateElement.getText());
                 stormDeploymentConfig.setStatusUpdateInterval(updateRate);
             } else {
                 log.info("No updateRate value specified in Status Monitor configurations. Hence using default update rate: "
-                        + stormDeploymentConfig.getStatusUpdateInterval() + " milliseconds.");
+                         + stormDeploymentConfig.getStatusUpdateInterval() + " milliseconds.");
             }
         } else {
             log.info("No Status Monitor configurations provided. Hence using default Status Monitor configurations. Lock timeout: " +
-            stormDeploymentConfig.getStatusLockTimeout() + " seconds, Update rate: " + stormDeploymentConfig.getStatusUpdateInterval() + " milliseconds.");
+                     stormDeploymentConfig.getStatusLockTimeout() + " seconds, Update rate: " + stormDeploymentConfig.getStatusUpdateInterval() + " milliseconds.");
         }
 
 
@@ -461,7 +466,7 @@ public class ManagementModeConfigurationLoader {
             haConfiguration.setEventSyncReceiverThreads(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
                     .HA_NODE_CONFIG_RECEIVER_THREADS)));
         }
-        if(isPresenterEnabled.equalsIgnoreCase("true")) {
+        if (isPresenterEnabled.equalsIgnoreCase("true")) {
             haConfiguration.setPresenterNode(true);
             OMElement presentation = processing.getFirstChildWithName(new QName(ConfigurationConstants.PRESENTER_ELEMENT));
             haConfiguration.setLocalPresenterConfig(readHostName(presentation),
@@ -486,7 +491,7 @@ public class ManagementModeConfigurationLoader {
                 new QName(ConfigurationConstants.HOST_NAME_ELEMENT));
         String hostName = null;
         if (receiverHostName != null && receiverHostName.getText() != null
-                && !receiverHostName.getText().trim().equals("")) {
+            && !receiverHostName.getText().trim().equals("")) {
             hostName = receiverHostName.getText();
         }
         if (hostName == null) {
@@ -502,20 +507,16 @@ public class ManagementModeConfigurationLoader {
     private static int readPort(OMElement transport, int defaultPort) {
         OMElement receiverPort = transport.getFirstChildWithName(
                 new QName(ConfigurationConstants.PORT_ELEMENT));
-        int portOffset = haReadPortOffset();
-        int port;
         if (receiverPort != null) {
             try {
-                return (Integer.parseInt(receiverPort.getText()) + portOffset);
+                return (Integer.parseInt(receiverPort.getText()));
             } catch (NumberFormatException e) {
-                port = defaultPort + portOffset;
-                log.warn("Invalid port for HA configuration. Using default port " + port, e);
+                log.warn("Invalid port for HA configuration. Using default port " + defaultPort, e);
             }
         } else {
-            port = defaultPort + portOffset;
-            log.warn("Missing port for HA configuration. Using default port" + port);
+            log.warn("Missing port for HA configuration. Using default port" + defaultPort);
         }
-        return port;
+        return defaultPort;
     }
 
     private static int readReconnectionInterval(OMElement transport) {
@@ -523,7 +524,7 @@ public class ManagementModeConfigurationLoader {
                 new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT));
         int interval;
         if (reconnectionInterval != null && reconnectionInterval.getText() != null
-                && !reconnectionInterval.getText().trim().equals("")) {
+            && !reconnectionInterval.getText().trim().equals("")) {
             try {
                 return Integer.parseInt(reconnectionInterval.getText().trim());
             } catch (NumberFormatException e) {
@@ -537,16 +538,10 @@ public class ManagementModeConfigurationLoader {
         return interval;
     }
 
-
-    public static int haReadPortOffset() {
-        return org.wso2.carbon.utils.CarbonUtils.
-                getPortFromServerConfig(ConfigurationConstants.CARBON_CONFIG_PORT_OFFSET_NODE) + 1;
-    }
-
-    public static boolean isPowerOfTwo ( int value)
-    {
-        while (((value % 2) == 0) && value > 1) /* While x is even and > 1 */
+    public static boolean isPowerOfTwo(int value) {
+        while (((value % 2) == 0) && value > 1) /* While x is even and > 1 */ {
             value /= 2;
+        }
         return (value == 1);
     }
 

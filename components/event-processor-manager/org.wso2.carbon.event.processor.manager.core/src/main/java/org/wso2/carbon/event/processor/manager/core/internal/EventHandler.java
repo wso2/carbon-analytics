@@ -62,7 +62,7 @@ public class EventHandler {
         this.localEventPublisherConfiguration = localEventPublisherConfiguration;
     }
 
-    public void registerLocalMember(){
+    public void registerLocalMember() {
         if (isMemberNode && members != null) {
             this.members.set(EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().getUuid(), localMember);
         }
@@ -147,7 +147,7 @@ public class EventHandler {
                             }
 
                         } catch (Exception e) {
-                            log.error("Unable to start event adaptors for tenant :" + tenantId, e);
+                            log.error("Unable to process events for tenant :" + tenantId + " on stream:" + streamId.substring(index), e);
                         } finally {
                             PrivilegedCarbonContext.endTenantFlow();
                         }
@@ -157,8 +157,12 @@ public class EventHandler {
             for (EventSync eventSync : eventSyncMap.values()) {
                 tcpEventServer.addStreamDefinition(eventSync.getStreamDefinition());
             }
-            tcpEventServer.start();
-            log.info("Event Management TCPEventServer for EventReceiver started on port " + member.getPort());
+            try {
+                tcpEventServer.start();
+                log.info("Event Management TCPEventServer for EventReceiver started on port " + member.getPort());
+            } catch (IOException e) {
+                log.error("Unable to start TCPEventServer for EventReceiver started on port " + member.getPort());
+            }
         }
     }
 
@@ -187,7 +191,7 @@ public class EventHandler {
         try {
             if (!tcpEventPublisherPool.containsKey(member)) {
                 TCPEventPublisher tcpEventPublisher = new TCPEventPublisher(member.getHostName() + ":" + member.getPort(),
-                                                                            localEventPublisherConfiguration, false, null);
+                        localEventPublisherConfiguration, false, null);
                 for (EventSync eventSync : eventSyncMap.values()) {
                     tcpEventPublisher.addStreamDefinition(eventSync.getStreamDefinition());
                 }

@@ -65,13 +65,14 @@ public class TCPEventServer {
         this.streamRuntimeInfoMap.remove(streamId);
     }
 
-    public void start() {
+    public synchronized void start() throws IOException {
         if (!serverWorker.isRunning()) {
+            serverWorker.startServerWorker();
             new Thread(serverWorker).start();
         }
     }
 
-    public void shutdown() {
+    public synchronized void shutdown() {
         serverWorker.shutdownServerWorker();
     }
 
@@ -83,10 +84,20 @@ public class TCPEventServer {
             return isRunning;
         }
 
+        public void startServerWorker() throws IOException {
+            InetAddress inetAddress = InetAddress.getByName(tcpEventServerConfig.getHostName());
+            log.info("EventServer starting event listener on " + inetAddress.getHostAddress() + ":" + tcpEventServerConfig.getPort());
+            receiverSocket = new ServerSocket(tcpEventServerConfig.getPort(), 50, inetAddress);
+            isRunning = true;
+            receiverSocket.setReuseAddress(true);
+        }
+
         public void shutdownServerWorker() {
             isRunning = false;
             try {
-                receiverSocket.close();
+                if (receiverSocket != null) {
+                    receiverSocket.close();
+                }
             } catch (IOException e) {
                 log.error("Error occurred while trying to shutdown socket: " + e.getMessage(), e);
             }
@@ -95,11 +106,7 @@ public class TCPEventServer {
         @Override
         public void run() {
             try {
-                InetAddress inetAddress = InetAddress.getByName(tcpEventServerConfig.getHostName());
-                log.info("EventServer starting event listener on " + inetAddress.getHostAddress() + ":" + tcpEventServerConfig.getPort());
-                isRunning = true;
-                receiverSocket = new ServerSocket(tcpEventServerConfig.getPort(), 50, inetAddress);
-                receiverSocket.setReuseAddress(true);
+
                 while (isRunning) {
                     final Socket connectionSocket = receiverSocket.accept();
                     connectionSocket.setKeepAlive(true);

@@ -17,9 +17,27 @@
 */
 package org.wso2.carbon.databridge.commons.utils;
 
+import org.wso2.carbon.databridge.commons.Event;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+import java.util.Set;
+
 public class DataBridgeCommonsUtils {
 
     public static final String STREAM_NAME_VERSION_SPLITTER = ":";
+    private static final String JVM_BIT_ARCH_SYSTEM_PROPERTY = "sun.arch.data.model";
+    private static int referenceSize;
+
+    static {
+        String arch = System.getProperty(JVM_BIT_ARCH_SYSTEM_PROPERTY);
+        if (arch.equals("32")){
+            //32-bit architecture
+            referenceSize = 4;
+        }else {
+            referenceSize = 8;
+        }
+    }
 
     public static String generateStreamId(String streamName, String streamVersion) {
         return streamName + STREAM_NAME_VERSION_SPLITTER + streamVersion;
@@ -39,4 +57,71 @@ public class DataBridgeCommonsUtils {
         return streamId.split(STREAM_NAME_VERSION_SPLITTER)[1];
     }
 
+    public static int getSize(Event event){
+        int size = event.getStreamId().getBytes().length;
+        size += 8; // for timestamp.
+        if (event.getPayloadData() != null) {
+            size += getSize(event.getPayloadData());
+        }
+        if (event.getMetaData() != null){
+            size += getSize(event.getMetaData());
+        }
+        if (event.getCorrelationData() != null){
+            size += getSize(event.getCorrelationData());
+        }
+        if (event.getArbitraryDataMap() != null){
+            size += getSize(event.getArbitraryDataMap());
+        }
+        return size;
+    }
+
+    public static int getSize(Map<String, String> arbitraryData) {
+        int totalSize = 0;
+        Set<Map.Entry<String, String>> entrySet = arbitraryData.entrySet();
+        for (Map.Entry<String, String> anEntry : entrySet) {
+            totalSize += getSize(anEntry.getKey());
+            totalSize += getSize(anEntry.getValue());
+        }
+        totalSize += referenceSize * arbitraryData.size() * 2; // for the object references.
+        return totalSize;
+    }
+
+    private static int getSize(Object[] objects){
+        int size = 0;
+        for (Object object : objects){
+            if (object != null) {
+                if (object instanceof Integer) {
+                    size += 4;
+                } else if (object instanceof Long) {
+                    size += 8;
+                } else if (object instanceof Boolean) {
+                    size += 1;
+                } else if (object instanceof Double) {
+                    size += 8;
+                } else if (object instanceof Float) {
+                    size += 4;
+                } else if (object instanceof String) {
+                    size += getSize(object.toString());
+                }
+            }
+        }
+        size += referenceSize * objects.length; // for the object reference holders
+        return size;
+    }
+
+    public static int getSize(String value){
+        int size = 0;
+        if (value != null) {
+            try {
+                size = value.getBytes("UTF8").length;
+            } catch (UnsupportedEncodingException e) {
+                size = value.getBytes().length;
+            }
+        }
+        return size;
+    }
+
+    public static int getReferenceSize(){
+        return referenceSize;
+    }
 }
