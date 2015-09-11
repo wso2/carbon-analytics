@@ -138,8 +138,7 @@ public class DistributedConfiguration implements Serializable {
         return localManagerConfig;
     }
     public void setLocalManagerConfig(String hostName, int port) {
-        int portOffset = Integer.parseInt(CarbonUtils.getServerConfiguration().getFirstProperty("Ports.Offset"));
-        this.localManagerConfig = new HostAndPort(hostName, port + portOffset);
+        this.localManagerConfig = new HostAndPort(hostName, port);
     }
 
     public List<HostAndPort> getManagers() {return managers;}
@@ -221,8 +220,7 @@ public class DistributedConfiguration implements Serializable {
         return localPresenterConfig;
     }
     public void setLocalPresenterConfig(String host, int port) {
-        int portOffset = Integer.parseInt(CarbonUtils.getServerConfiguration().getFirstProperty("Ports.Offset"));
-        this.localPresenterConfig = new HostAndPort(host, port + portOffset);
+        this.localPresenterConfig = new HostAndPort(host, port);
     }
 
     public int getMemberUpdateCheckInterval() {
