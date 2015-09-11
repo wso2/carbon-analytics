@@ -623,7 +623,7 @@
 
         function showStreamDefinitionNotFoundError() {
             CARBON.showErrorDialog("Event stream definition not found", function () {
-                window.location.href = "../eventstream/index.jsp?region=region1&item=eventstream_menu";
+                window.location.href = "../eventstream/index.jsp?region=region1&item=eventstream_menu.jsp";
             });
         }
     </script>
