@@ -38,7 +38,7 @@ public class DataBridgeConfiguration {
     public DataBridgeConfiguration(){
         this.workerThreads = 10;
         this.clientTimeoutMin = 30;
-        this.maxEventBufferCapacity = 50 * (1000000); //100MB
+        this.maxEventBufferCapacity = 50 * (1000000); //50MB
         this.eventBufferSize = 2000;
     }
 
