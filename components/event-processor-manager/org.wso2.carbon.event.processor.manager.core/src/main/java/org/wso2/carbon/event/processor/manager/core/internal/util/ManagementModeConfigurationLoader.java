@@ -507,20 +507,16 @@ public class ManagementModeConfigurationLoader {
     private static int readPort(OMElement transport, int defaultPort) {
         OMElement receiverPort = transport.getFirstChildWithName(
                 new QName(ConfigurationConstants.PORT_ELEMENT));
-        int portOffset = haReadPortOffset();
-        int port;
         if (receiverPort != null) {
             try {
-                return (Integer.parseInt(receiverPort.getText()) + portOffset);
+                return (Integer.parseInt(receiverPort.getText()));
             } catch (NumberFormatException e) {
-                port = defaultPort + portOffset;
-                log.warn("Invalid port for HA configuration. Using default port " + port, e);
+                log.warn("Invalid port for HA configuration. Using default port " + defaultPort, e);
             }
         } else {
-            port = defaultPort + portOffset;
-            log.warn("Missing port for HA configuration. Using default port" + port);
+            log.warn("Missing port for HA configuration. Using default port" + defaultPort);
         }
-        return port;
+        return defaultPort;
     }
 
     private static int readReconnectionInterval(OMElement transport) {
@@ -540,12 +536,6 @@ public class ManagementModeConfigurationLoader {
             log.warn("Missing reconnection interval for HA configuration. Using default: " + interval);
         }
         return interval;
-    }
-
-
-    public static int haReadPortOffset() {
-        return org.wso2.carbon.utils.CarbonUtils.
-                getPortFromServerConfig(ConfigurationConstants.CARBON_CONFIG_PORT_OFFSET_NODE) + 1;
     }
 
     public static boolean isPowerOfTwo(int value) {
