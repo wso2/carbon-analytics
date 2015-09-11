@@ -51,7 +51,7 @@ public class BinaryEventConverter implements EventConverter {
         byteBuffer.get(new byte[sessionIdSize]);
         int events = byteBuffer.getInt();
 
-        List<Event> eventList = new ArrayList<Event>();
+        List<Event> eventList = new ArrayList<>();
         for (int i = 0; i < events; i++) {
             int eventSize = byteBuffer.getInt();
             byte[] bytes= new byte[eventSize];
@@ -63,6 +63,11 @@ public class BinaryEventConverter implements EventConverter {
     }
 
     @Override
+    public int getSize(Object eventBundle) {
+        return ((byte[])eventBundle).length;
+    }
+
+    @Override
     public int getNumberOfEvents(Object eventBundle) {
         ByteBuffer byteBuffer = ByteBuffer.wrap((byte[]) eventBundle);
         int sessionIdSize = byteBuffer.getInt();
@@ -71,8 +76,6 @@ public class BinaryEventConverter implements EventConverter {
     }
 
     public Event getEvent(ByteBuffer byteBuffer, StreamTypeHolder streamTypeHolder) throws MalformedEventException {
-
-
         long timeStamp = byteBuffer.getLong();
         int streamIdSize = byteBuffer.getInt();
         String streamId = BinaryMessageConverterUtil.getString(byteBuffer, streamIdSize);

@@ -19,8 +19,6 @@
  */
 package org.wso2.carbon.databridge.core.conf;
 
-import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
@@ -33,8 +31,14 @@ public class DataBridgeConfiguration {
 
     private List<DataReceiver> dataReceivers;
     private int workerThreads;
-    private int eventBufferCapacity;
+    private int eventBufferSize;
     private int clientTimeoutMin;
+
+    public DataBridgeConfiguration(){
+        this.workerThreads = 10;
+        this.clientTimeoutMin = 30;
+        this.eventBufferSize = 50 * (1000000); //100MB
+    }
 
     @XmlElement(name = "dataReceiver")
     public List<DataReceiver> getDataReceivers() {
@@ -54,13 +58,14 @@ public class DataBridgeConfiguration {
         this.workerThreads = workerThreads;
     }
 
-    @XmlElement(name = "eventBufferCapacity")
-    public int getEventBufferCapacity() {
-        return eventBufferCapacity;
+    @XmlElement(name = "eventBufferSize")
+    public int getEventBufferSize() {
+        return eventBufferSize;
     }
 
-    public void setEventBufferCapacity(int eventBufferCapacity) {
-        this.eventBufferCapacity = eventBufferCapacity;
+    public void setEventBufferSize(int eventBufferSize) {
+        // to change it to MB
+        this.eventBufferSize = eventBufferSize * (1000000);
     }
 
     @XmlElement(name = "clientTimeoutMin")
