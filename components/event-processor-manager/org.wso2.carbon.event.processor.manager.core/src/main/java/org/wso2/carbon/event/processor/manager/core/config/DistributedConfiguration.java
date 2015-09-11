@@ -19,7 +19,6 @@ package org.wso2.carbon.event.processor.manager.core.config;
 
 import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisherConfig;
 import org.wso2.carbon.event.processor.manager.commons.utils.HostAndPort;
-import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -73,6 +72,7 @@ public class DistributedConfiguration implements Serializable {
     public int getTransportReceiverThreads() {
         return transportReceiverThreads;
     }
+
     public void setTransportReceiverThreads(int transportReceiverThreads) {
         this.transportReceiverThreads = transportReceiverThreads;
     }
@@ -80,6 +80,7 @@ public class DistributedConfiguration implements Serializable {
     public String getTransportPublisherCharSet() {
         return transportPublisherCharSet;
     }
+
     public void setTransportPublisherCharSet(String transportPublisherCharSet) {
         this.transportPublisherCharSet = transportPublisherCharSet;
     }
@@ -87,6 +88,7 @@ public class DistributedConfiguration implements Serializable {
     public int getTransportPublisherTcpSendBufferSize() {
         return transportPublisherTcpSendBufferSize;
     }
+
     public void setTransportPublisherTcpSendBufferSize(int transportPublisherTcpSendBufferSize) {
         this.transportPublisherTcpSendBufferSize = transportPublisherTcpSendBufferSize;
     }
@@ -94,6 +96,7 @@ public class DistributedConfiguration implements Serializable {
     public int getCepReceiverOutputQueueSize() {
         return cepReceiverOutputQueueSize;
     }
+
     public void setCepReceiverOutputQueueSize(int cepReceiverOutputQueueSize) {
 
         this.cepReceiverOutputQueueSize = cepReceiverOutputQueueSize;
@@ -102,6 +105,7 @@ public class DistributedConfiguration implements Serializable {
     public int getStormPublisherOutputQueueSize() {
         return stormPublisherOutputQueueSize;
     }
+
     public void setStormPublisherOutputQueueSize(int stormPublisherOutputQueueSize) {
         this.stormPublisherOutputQueueSize = stormPublisherOutputQueueSize;
     }
@@ -109,6 +113,7 @@ public class DistributedConfiguration implements Serializable {
     public int getManagementHeartbeatInterval() {
         return managementHeartbeatInterval;
     }
+
     public void setManagementHeartbeatInterval(int managementHeartbeatInterval) {
         this.managementHeartbeatInterval = managementHeartbeatInterval;
     }
@@ -116,6 +121,7 @@ public class DistributedConfiguration implements Serializable {
     public int getTopologySubmitRetryInterval() {
         return topologySubmitRetryInterval;
     }
+
     public void setTopologySubmitRetryInterval(int topologySubmitRetryInterval) {
         this.topologySubmitRetryInterval = topologySubmitRetryInterval;
     }
@@ -123,6 +129,7 @@ public class DistributedConfiguration implements Serializable {
     public boolean isWorkerNode() {
         return workerNode;
     }
+
     public void setWorkerNode(boolean workerNode) {
         this.workerNode = workerNode;
     }
@@ -130,6 +137,7 @@ public class DistributedConfiguration implements Serializable {
     public boolean isManagerNode() {
         return managerNode;
     }
+
     public void setManagerNode(boolean managerNode) {
         this.managerNode = managerNode;
     }
@@ -137,12 +145,15 @@ public class DistributedConfiguration implements Serializable {
     public HostAndPort getLocalManagerConfig() {
         return localManagerConfig;
     }
+
     public void setLocalManagerConfig(String hostName, int port) {
-        int portOffset = Integer.parseInt(CarbonUtils.getServerConfiguration().getFirstProperty("Ports.Offset"));
-        this.localManagerConfig = new HostAndPort(hostName, port + portOffset);
+        this.localManagerConfig = new HostAndPort(hostName, port);
     }
 
-    public List<HostAndPort> getManagers() {return managers;}
+    public List<HostAndPort> getManagers() {
+        return managers;
+    }
+
     public void addManager(String hostName, int port) {
         this.managers.add(new HostAndPort(hostName, port));
     }
@@ -150,6 +161,7 @@ public class DistributedConfiguration implements Serializable {
     public int getManagementReconnectInterval() {
         return managementReconnectInterval;
     }
+
     public void setManagementReconnectInterval(int managementReconnectInterval) {
         this.managementReconnectInterval = managementReconnectInterval;
     }
@@ -157,6 +169,7 @@ public class DistributedConfiguration implements Serializable {
     public int getTransportMaxPort() {
         return transportMaxPort;
     }
+
     public void setTransportMaxPort(int transportMaxPort) {
         this.transportMaxPort = transportMaxPort;
     }
@@ -164,6 +177,7 @@ public class DistributedConfiguration implements Serializable {
     public int getTransportMinPort() {
         return transportMinPort;
     }
+
     public void setTransportMinPort(int transportMinPort) {
         this.transportMinPort = transportMinPort;
     }
@@ -171,6 +185,7 @@ public class DistributedConfiguration implements Serializable {
     public int getTransportReconnectInterval() {
         return transportReconnectInterval;
     }
+
     public void setTransportReconnectInterval(int transportReconnectInterval) {
         this.transportReconnectInterval = transportReconnectInterval;
     }
@@ -178,13 +193,16 @@ public class DistributedConfiguration implements Serializable {
     public long getTransportPublisherConnectionStatusCheckInterval() {
         return transportPublisherConnectionStatusCheckInterval;
     }
-    public void setTransportPublisherConnectionStatusCheckInterval(int transportPublisherConnectionStatusCheckInterval) {
+
+    public void setTransportPublisherConnectionStatusCheckInterval(
+            int transportPublisherConnectionStatusCheckInterval) {
         this.transportPublisherConnectionStatusCheckInterval = transportPublisherConnectionStatusCheckInterval;
     }
 
     public void setJar(String jar) {
         this.jar = jar;
     }
+
     public String getJar() {
         return jar;
     }
@@ -192,6 +210,7 @@ public class DistributedConfiguration implements Serializable {
     public String getDistributedUIUrl() {
         return distributedUIUrl;
     }
+
     public void setDistributedUIUrl(String distributedUIUrl) {
         this.distributedUIUrl = distributedUIUrl;
     }
@@ -199,6 +218,7 @@ public class DistributedConfiguration implements Serializable {
     public int getStatusLockTimeout() {
         return statusLockTimeout;
     }
+
     public void setStatusLockTimeout(int statusLockTimeout) {
         this.statusLockTimeout = statusLockTimeout;
     }
@@ -206,6 +226,7 @@ public class DistributedConfiguration implements Serializable {
     public int getStatusUpdateInterval() {
         return statusUpdateInterval;
     }
+
     public void setStatusUpdateInterval(int statusUpdateInterval) {
         this.statusUpdateInterval = statusUpdateInterval;
     }
@@ -213,6 +234,7 @@ public class DistributedConfiguration implements Serializable {
     public boolean isPresenterNode() {
         return presenterNode;
     }
+
     public void setPresenterNode(boolean presenterNode) {
         this.presenterNode = presenterNode;
     }
@@ -220,14 +242,15 @@ public class DistributedConfiguration implements Serializable {
     public HostAndPort getLocalPresenterConfig() {
         return localPresenterConfig;
     }
+
     public void setLocalPresenterConfig(String host, int port) {
-        int portOffset = Integer.parseInt(CarbonUtils.getServerConfiguration().getFirstProperty("Ports.Offset"));
-        this.localPresenterConfig = new HostAndPort(host, port + portOffset);
+        this.localPresenterConfig = new HostAndPort(host, port);
     }
 
     public int getMemberUpdateCheckInterval() {
         return memberUpdateCheckInterval;
     }
+
     public void setMemberUpdateCheckInterval(int memberUpdateCheckInterval) {
         this.memberUpdateCheckInterval = memberUpdateCheckInterval;
     }
@@ -235,13 +258,16 @@ public class DistributedConfiguration implements Serializable {
     public int getPresentationPublisherTcpSendBufferSize() {
         return presentationPublisherTcpSendBufferSize;
     }
-    public void setPresentationPublisherTcpSendBufferSize(int presentationPublisherTcpSendBufferSize) {
+
+    public void setPresentationPublisherTcpSendBufferSize(
+            int presentationPublisherTcpSendBufferSize) {
         this.presentationPublisherTcpSendBufferSize = presentationPublisherTcpSendBufferSize;
     }
 
     public String getPresentationPublisherCharSet() {
         return presentationPublisherCharSet;
     }
+
     public void setPresentationPublisherCharSet(String presentationPublisherCharSet) {
         this.presentationPublisherCharSet = presentationPublisherCharSet;
     }
@@ -249,6 +275,7 @@ public class DistributedConfiguration implements Serializable {
     public int getPresentationOutputQueueSize() {
         return presentationOutputQueueSize;
     }
+
     public void setPresentationOutputQueueSize(int presentationOutputQueueSize) {
         this.presentationOutputQueueSize = presentationOutputQueueSize;
     }
@@ -256,13 +283,16 @@ public class DistributedConfiguration implements Serializable {
     public long getPresentationPublisherConnectionStatusCheckInterval() {
         return presentationPublisherConnectionStatusCheckInterval;
     }
-    public void setPresentationPublisherConnectionStatusCheckInterval(int presentationPublisherConnectionStatusCheckInterval) {
+
+    public void setPresentationPublisherConnectionStatusCheckInterval(
+            int presentationPublisherConnectionStatusCheckInterval) {
         this.presentationPublisherConnectionStatusCheckInterval = presentationPublisherConnectionStatusCheckInterval;
     }
 
     public int getPresentationReceiverThreads() {
         return presentationReceiverThreads;
     }
+
     public void setPresentationReceiverThreads(int presentationReceiverThreads) {
         this.presentationReceiverThreads = presentationReceiverThreads;
     }
