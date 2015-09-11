@@ -43,7 +43,6 @@ import java.util.Map;
 public class ManagementModeConfigurationLoader {
 
     private static final Log log = LogFactory.getLog(ManagementModeConfigurationLoader.class);
-    private static final String CARBON_CONFIG_PORT_OFFSET = "Ports.Offset";
 
     public static ManagementModeInfo loadManagementModeInfo()
             throws ManagementConfigurationException {
@@ -306,7 +305,7 @@ public class ManagementModeConfigurationLoader {
 
         //Reading node info
         OMElement node = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_ELEMENT));
-        int portOffset = Integer.parseInt(CarbonUtils.getServerConfiguration().getFirstProperty(CARBON_CONFIG_PORT_OFFSET));
+        int portOffset = Integer.parseInt(CarbonUtils.getServerConfiguration().getFirstProperty(ConfigurationConstants.CARBON_CONFIG_PORT_OFFSET_NODE));
         if (node != null) {
             OMElement worker = node.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_WORKER_ELEMENT));
             if ("true".equalsIgnoreCase(worker.getAttributeValue(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)))) {
