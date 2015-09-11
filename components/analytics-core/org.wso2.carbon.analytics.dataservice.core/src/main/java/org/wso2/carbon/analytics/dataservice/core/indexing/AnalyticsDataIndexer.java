@@ -1629,22 +1629,35 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             throws AnalyticsIndexException {
         List<SubCategories> groupings = new ArrayList<>();
         groupings.add(this.drilldownCategories(tenantId, categoryDrillDownRequest));
-        SubCategories subCategories;
-        do {
-            try {
+        try {
+            int totalAggregateLevel = getTotalAggregateLevel(aggregateRequest);
+            SubCategories subCategories;
+            do {
                 subCategories = groupings.remove(0);
-            } catch (ArrayIndexOutOfBoundsException e) {
-                throw new AnalyticsIndexException("The field: " + aggregateRequest.getGroupByField() +
-                    " do not have " + aggregateRequest.getAggregateLevel() + " layers of sub categories");
+                List<CategorySearchResultEntry> categoryResults = subCategories.getCategories();
+                for (CategorySearchResultEntry category : categoryResults) {
+                    categoryDrillDownRequest.setPath(addCategoryToArray(subCategories.getPath(),
+                                                                        category.getCategoryValue()));
+                    groupings.add(this.drilldownCategories(tenantId, categoryDrillDownRequest));
+                }
+                subCategories = groupings.get(0);
             }
-            List<CategorySearchResultEntry> categoryResults = subCategories.getCategories();
-            for (CategorySearchResultEntry category : categoryResults) {
-                categoryDrillDownRequest.setPath(addCategoryToArray(subCategories.getPath(),
-                                                                    category.getCategoryValue()));
-                groupings.add(this.drilldownCategories(tenantId, categoryDrillDownRequest));
-            }
-        } while (subCategories.getPath().length < aggregateRequest.getAggregateLevel());
-        return groupings;
+            while (subCategories != null && subCategories.getPath().length < totalAggregateLevel);
+            return groupings;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new AnalyticsIndexException("The field: " + aggregateRequest.getGroupByField() +
+                                              " do not have " + aggregateRequest.getAggregateLevel() +
+                                              " layers of sub categories");
+        }
+    }
+
+    private int getTotalAggregateLevel(AggregateRequest aggregateRequest) {
+        int totalAggregateLevel = 0;
+        if (aggregateRequest.getParentPath() != null) {
+            totalAggregateLevel = aggregateRequest.getParentPath().size();
+        }
+        totalAggregateLevel += aggregateRequest.getAggregateLevel();
+        return totalAggregateLevel;
     }
 
     private CategoryDrillDownRequest createCategoryDrilldownRequest(
@@ -1702,8 +1715,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         Iterator<Record> iterator = IteratorUtils.chainedIterator(this.getRecordIterators(tenantId,
                                                                                           facetValue, path, aggregateRequest));
         while (iterator.hasNext()) {
+            Record record = iterator.next();
             for (AggregateField field : aggregateRequest.getFields()) {
-                Record record = iterator.next();
                 Number value = (Number) record.getValue(field.getFieldName());
                 AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
                 function.process(value, optionalParams);
@@ -1854,6 +1867,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 } catch (AnalyticsException e) {
                     logger.error("Failed to create aggregated record: " + e.getMessage(), e);
                     throw new RuntimeException("Error while iterating aggregate records: " + e.getMessage(), e);
+                } finally {
+                    currentResultEntries.remove(resultEntry);
                 }
             }
             return null;

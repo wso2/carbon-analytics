@@ -30,12 +30,11 @@ public class COUNTAggregateFunction implements AggregateFunction {
 
     private Number count;
     @Override
-    public COUNTAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
+    public void init(Map<String, Number> optionalParams) throws AnalyticsException {
         count = optionalParams.get(Constants.AggregateOptionalParams.COUNT);
         if (count == null) {
             count = 0;
         }
-        return this;
     }
 
     @Override

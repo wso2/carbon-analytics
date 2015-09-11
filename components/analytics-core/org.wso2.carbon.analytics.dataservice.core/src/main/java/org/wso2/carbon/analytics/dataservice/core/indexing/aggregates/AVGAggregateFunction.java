@@ -32,11 +32,10 @@ public class AVGAggregateFunction implements AggregateFunction {
     private double count;
 
     @Override
-    public AVGAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
+    public void init(Map<String, Number> optionalParams) throws AnalyticsException {
         //No optional params are passed in initializing
         sum = 0;
         count = optionalParams.get(Constants.AggregateOptionalParams.COUNT).doubleValue();
-        return this;
     }
 
     @Override

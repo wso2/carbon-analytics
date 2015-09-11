@@ -29,9 +29,8 @@ public class MINAggregateFunction implements AggregateFunction {
 
     private double minValue;
     @Override
-    public MINAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
+    public void init(Map<String, Number> optionalParams) throws AnalyticsException {
         minValue = Double.MAX_VALUE;
-        return this;
     }
 
     @Override

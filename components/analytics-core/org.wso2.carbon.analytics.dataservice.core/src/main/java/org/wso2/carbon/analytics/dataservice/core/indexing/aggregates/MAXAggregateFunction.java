@@ -28,15 +28,14 @@ import java.util.Map;
 public class MAXAggregateFunction implements AggregateFunction {
     private double maxValue;
     @Override
-    public MAXAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
+    public void init(Map<String, Number> optionalParams) throws AnalyticsException {
         maxValue = Double.MIN_VALUE;
-        return this;
     }
 
     @Override
     public void process(Number value, Map<String, Number> optionalParams)
             throws AnalyticsException {
-            if (maxValue > value.doubleValue()) {
+            if (maxValue < value.doubleValue()) {
                 maxValue = value.doubleValue();
             }
     }

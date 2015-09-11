@@ -29,9 +29,8 @@ public class SUMAggregateFunction implements AggregateFunction {
 
     private double sum;
     @Override
-    public SUMAggregateFunction init(Map<String, Number> optionalParams) throws AnalyticsException {
+    public void init(Map<String, Number> optionalParams) throws AnalyticsException {
         sum = 0;
-        return this;
     }
 
     @Override
