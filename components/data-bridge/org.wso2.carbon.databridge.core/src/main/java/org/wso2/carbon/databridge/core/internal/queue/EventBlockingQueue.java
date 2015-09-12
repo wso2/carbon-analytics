@@ -63,18 +63,18 @@ public class EventBlockingQueue extends ArrayBlockingQueue<EventComposite> {
         }
         try {
             super.put(eventComposite);
+            if (currentSize.addAndGet(eventComposite.getSize()) >= maxSize) {
+                try {
+                    semaphore.acquire();
+                } catch (InterruptedException ignored) {
+                }
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("current queue size in bytes : " + currentSize + " , elements : " + size());
+            }
         } catch (InterruptedException e) {
             String logMessage = "Failure to insert event into queue";
             log.warn(logMessage);
-        }
-        if (currentSize.addAndGet(eventComposite.getSize()) >= maxSize) {
-            try {
-                semaphore.acquire();
-            } catch (InterruptedException ignored) {
-            }
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("current queue size in bytes : " + currentSize + " , elements : " + size());
         }
     }
 
