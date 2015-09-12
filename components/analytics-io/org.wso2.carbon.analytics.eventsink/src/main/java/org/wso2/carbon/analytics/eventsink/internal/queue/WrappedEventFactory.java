@@ -29,6 +29,7 @@ public class WrappedEventFactory implements EventFactory<WrappedEventFactory.Wra
     public class WrappedEvent {
 
         private Event event;
+        private int size;
 
         public Event getEvent() {
             return event;
@@ -43,6 +44,14 @@ public class WrappedEventFactory implements EventFactory<WrappedEventFactory.Wra
             return "WrappedEvent{" +
                     "event=" + event +
                     "}";
+        }
+
+        public int getSize() {
+            return size;
+        }
+
+        public void setSize(int size) {
+            this.size = size;
         }
     }
 

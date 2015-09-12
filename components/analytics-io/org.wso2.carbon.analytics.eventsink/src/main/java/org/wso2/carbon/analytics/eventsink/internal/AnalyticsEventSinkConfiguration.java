@@ -29,13 +29,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "AnalyticsEventSinkConfiguration")
 public class AnalyticsEventSinkConfiguration {
     private int queueSize;
-    private int bundleSize;
+    private int batchSize;
     private int workerPoolSize;
+    private int maxQueueCapacity;
 
     public AnalyticsEventSinkConfiguration() {
         this.queueSize = AnalyticsEventSinkConstants.DEFAULT_EVENT_QUEUE_SIZE;
-        this.bundleSize = AnalyticsEventSinkConstants.DEFAULT_BUNDLE_SIZE;
+        this.batchSize = AnalyticsEventSinkConstants.DEFAULT_BATCH_SIZE * 1000;
         this.workerPoolSize = AnalyticsEventSinkConstants.DEFAULT_WORKER_POOL_SIZE;
+        this.maxQueueCapacity = AnalyticsEventSinkConstants.DEFAULT_MAX_QUEUE_CAPACITY * 1000000;
     }
 
     @XmlElement(name = "QueueSize")
@@ -47,13 +49,13 @@ public class AnalyticsEventSinkConfiguration {
         this.queueSize = queueSize;
     }
 
-    @XmlElement(name = "BundleSize")
-    public int getBundleSize() {
-        return bundleSize;
+    @XmlElement(name = "BatchSize")
+    public int getBatchSize() {
+        return batchSize;
     }
 
-    public void setBundleSize(int bundleSize) {
-        this.bundleSize = bundleSize;
+    public void setBatchSize(int batchSize) {
+        this.batchSize = batchSize * 1000;
     }
 
     @XmlElement(name = "WorkerPoolSize")
@@ -63,5 +65,14 @@ public class AnalyticsEventSinkConfiguration {
 
     public void setWorkerPoolSize(int workerPoolSize) {
         this.workerPoolSize = workerPoolSize;
+    }
+
+    @XmlElement(name = "MaxQueueCapacity")
+    public int getMaxQueueCapacity() {
+        return maxQueueCapacity;
+    }
+
+    public void setMaxQueueCapacity(int maxQueueCapacity) {
+        this.maxQueueCapacity = maxQueueCapacity * 1000000;
     }
 }

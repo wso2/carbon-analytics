@@ -23,9 +23,10 @@ package org.wso2.carbon.analytics.eventsink.internal.util;
 public class AnalyticsEventSinkConstants {
     public static final String ANALYTICS_CONF_DIR = "analytics";
     public static final String EVENT_SINK_CONFIGURATION_FILE_NAME = "analytics-eventsink-config.xml";
-    public static final int DEFAULT_EVENT_QUEUE_SIZE = 131072; // This value need to be power of 2
-    public static final int DEFAULT_BUNDLE_SIZE = 1024;
+    public static final int DEFAULT_EVENT_QUEUE_SIZE = 2048; // This value need to be power of 2
+    public static final int DEFAULT_BATCH_SIZE = 10;
     public static final int DEFAULT_WORKER_POOL_SIZE = 10;
+    public static final int DEFAULT_MAX_QUEUE_CAPACITY = 50;
 
     public static final String EVENT_META_DATA_TYPE = "meta";
     public static final String EVENT_CORRELATION_DATA_TYPE = "correlation";

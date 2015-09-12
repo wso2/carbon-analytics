@@ -23,8 +23,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
 import org.wso2.carbon.databridge.commons.Event;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
+import org.wso2.carbon.databridge.core.Utils.DataBridgeUtils;
+import org.wso2.carbon.databridge.core.Utils.EventComposite;
 
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This is the Queue which is created per tenant basis, and it will buffer all the events received for the tenant,
@@ -34,25 +39,68 @@ import java.util.concurrent.Executors;
 public class AnalyticsEventQueue {
     private static final Log log = LogFactory.getLog(AnalyticsEventQueue.class);
     private RingBuffer<WrappedEventFactory.WrappedEvent> ringBuffer;
+    private AtomicInteger currentSize;
+    private int currentEventSize;
+    private int maxSize;
+    private Semaphore semaphore;
+    private final Object lock = new Object();
 
     @SuppressWarnings("unchecked")
     public AnalyticsEventQueue(int tenantId) {
-        Disruptor<WrappedEventFactory.WrappedEvent> eventQueue = new Disruptor<>(new WrappedEventFactory(), ServiceHolder.
-                getAnalyticsEventSinkConfiguration().getQueueSize(), Executors.newCachedThreadPool());
-        eventQueue.handleEventsWith(new AnalyticsEventQueueWorker(tenantId));
+        Disruptor<WrappedEventFactory.WrappedEvent> eventQueue = new Disruptor<>(new WrappedEventFactory(),
+                ServiceHolder.getAnalyticsEventSinkConfiguration().getQueueSize(),
+                Executors.newCachedThreadPool());
+        eventQueue.handleEventsWith(new AnalyticsEventQueueWorker(tenantId, this));
+        this.currentEventSize = 0;
         this.ringBuffer = eventQueue.start();
+        this.currentSize = new AtomicInteger(0);
+        this.maxSize = ServiceHolder.getAnalyticsEventSinkConfiguration().getMaxQueueCapacity();
+        this.semaphore = new Semaphore(1);
         if (log.isDebugEnabled()) {
             log.debug("Event Queue Size = " + ServiceHolder.getAnalyticsEventSinkConfiguration().getQueueSize());
         }
     }
 
-    public void put(Event event) {
-        if (log.isDebugEnabled()) {
-            log.debug("Adding an event to the event queue");
+    public synchronized void put(Event event) {
+        this.currentEventSize = DataBridgeCommonsUtils.getSize(event) + 4; //for the int value for size field.
+        if (currentSize.get() >= maxSize) {
+            try {
+                semaphore.acquire();
+                if (semaphore.availablePermits() == 0) {
+                    synchronized (lock) {
+                        if (semaphore.availablePermits() == 0) {
+                            semaphore.release();
+                        }
+                    }
+                }
+            } catch (InterruptedException ignored) {
+            }
         }
         long sequence = this.ringBuffer.next();
         WrappedEventFactory.WrappedEvent bufferedEvent = this.ringBuffer.get(sequence);
         bufferedEvent.setEvent(event);
+        bufferedEvent.setSize(this.currentEventSize);
         this.ringBuffer.publish(sequence);
+        if (currentSize.addAndGet(this.currentEventSize) >= maxSize) {
+            try {
+                semaphore.acquire();
+            } catch (InterruptedException ignored) {
+            }
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("current queue size in bytes : " + currentSize + ", remaining capacity : " +
+                    this.ringBuffer.remainingCapacity());
+        }
+    }
+
+    public void notifyReleasedEvent(WrappedEventFactory.WrappedEvent wrappedEvent, boolean endOfBatch) {
+        currentSize.addAndGet(-wrappedEvent.getSize());
+        if (semaphore.availablePermits() == 0 && ((currentEventSize + currentSize.get()) < maxSize) || endOfBatch) {
+            synchronized (lock) {
+                if (semaphore.availablePermits() == 0 && ((currentEventSize + currentSize.get()) < maxSize) || endOfBatch) {
+                    semaphore.release();
+                }
+            }
+        }
     }
 }
