@@ -51,15 +51,13 @@ public class EventBlockingQueue extends ArrayBlockingQueue<EventComposite> {
         if (currentSize.get() >= maxSize) {
             try {
                 semaphore.acquire();
-            } catch (InterruptedException ignored) {
-            }
-        }
-        if (log.isDebugEnabled()) {
-           log.debug("current queue size in bytes : " + currentSize + " , elements : " + size());
-        }
-        if (currentSize.addAndGet(eventComposite.getSize()) >= maxSize) {
-            try {
-                semaphore.acquire();
+                if (semaphore.availablePermits() == 0) {
+                    synchronized (lock) {
+                        if (semaphore.availablePermits() == 0) {
+                            semaphore.release();
+                        }
+                    }
+                }
             } catch (InterruptedException ignored) {
             }
         }
@@ -69,14 +67,23 @@ public class EventBlockingQueue extends ArrayBlockingQueue<EventComposite> {
             String logMessage = "Failure to insert event into queue";
             log.warn(logMessage);
         }
+        if (currentSize.addAndGet(eventComposite.getSize()) >= maxSize) {
+            try {
+                semaphore.acquire();
+            } catch (InterruptedException ignored) {
+            }
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("current queue size in bytes : " + currentSize + " , elements : " + size());
+        }
     }
 
     public EventComposite poll() {
         EventComposite eventComposite = super.poll();
         currentSize.addAndGet(-eventComposite.getSize());
-        if (semaphore.availablePermits() == 0 && (currentEventCompositeSize + currentSize.get()) < maxSize) {
+        if (semaphore.availablePermits() == 0 && ((currentEventCompositeSize + currentSize.get()) < maxSize) || isEmpty()) {
             synchronized (lock) {
-                if (semaphore.availablePermits() == 0 && (currentEventCompositeSize + currentSize.get()) < maxSize) {
+                if (semaphore.availablePermits() == 0 && ((currentEventCompositeSize + currentSize.get()) < maxSize) || isEmpty()) {
                     semaphore.release();
                 }
             }
