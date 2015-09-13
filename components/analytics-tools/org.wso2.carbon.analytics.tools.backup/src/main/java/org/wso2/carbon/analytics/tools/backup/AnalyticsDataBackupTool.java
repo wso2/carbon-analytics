@@ -445,9 +445,10 @@ public class AnalyticsDataBackupTool {
             } else {                                          // the node is a file
                 AnalyticsFileSystem.DataInput input = analyticsFileSystem.createInput(nodePath);
                 byte[] dataInBuffer = new byte[READ_BUFFER_SIZE];
+                int len;
                 try (FileOutputStream out = new FileOutputStream(fileSystemNodePath)) {
-                    while (input.read(dataInBuffer, 0, dataInBuffer.length) > 0) {
-                        out.write(dataInBuffer);
+                    while ((len = input.read(dataInBuffer, 0, dataInBuffer.length)) > 0) {
+                        out.write(dataInBuffer, 0, len);
                     }
                 } catch (IOException e) {
                     throw new IOException("Could not write to the output file: " + e.getMessage(), e);
