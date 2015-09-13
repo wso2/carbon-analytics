@@ -175,6 +175,8 @@ public class AnalyticsDataBackupTool {
                     reindexData(service, tenantId, specificTables[i]);
                 }
             }
+            /* to let DBs such as H2 flush their buffer, H2 behaves in a weird way sometimes */
+            Thread.sleep(2000);
             System.out.println("Done.");
         } finally {
             if (service != null) {
@@ -185,10 +187,18 @@ public class AnalyticsDataBackupTool {
             }
         }
     }
+    
+    private static void checkBaseDir(File baseDir) {
+        if (baseDir == null) {
+            System.out.println("The basedir must be given.");
+            System.exit(1);
+        }
+    }
 
     private static void backupRecordStore(AnalyticsDataService service, int tenantId, File baseDir,
                                           long timeFrom, long timeTo, String[] specificTables)
             throws AnalyticsException {
+        checkBaseDir(baseDir);
         if (specificTables != null) {
             for (String specificTable : specificTables) {
                 backupTable(service, tenantId, specificTable, baseDir, timeFrom, timeTo);
@@ -205,6 +215,7 @@ public class AnalyticsDataBackupTool {
     private static void restoreRecordStore(AnalyticsDataService service, int tenantId, File baseDir,
                                            long timeFrom, long timeTo, String[] specificTables)
             throws IOException {
+        checkBaseDir(baseDir);
         if (specificTables != null) {
             for (String specificTable : specificTables) {
                 restoreTable(service, tenantId, specificTable, baseDir, timeFrom, timeTo);
@@ -221,6 +232,7 @@ public class AnalyticsDataBackupTool {
     private static void restoreTable(AnalyticsDataService service, int tenantId, String table, File baseDir,
                                      long timeFrom, long timeTo) {
         try {
+            checkBaseDir(baseDir);
             System.out.print("Restoring table '" + table + "'..");
             service.createTable(tenantId, table);
             File myDir = new File(baseDir.getAbsolutePath() + File.separator + table);
@@ -276,6 +288,7 @@ public class AnalyticsDataBackupTool {
     private static void backupTable(AnalyticsDataService service, int tenantId, String table, File basedir,
                                     long timeFrom, long timeTo) {
         try {
+            checkBaseDir(basedir);
             System.out.print("Backing up table '" + table + "'..");
             File myDir = new File(basedir.getAbsolutePath() + File.separator + table);
             if (!myDir.exists()) {
@@ -429,6 +442,7 @@ public class AnalyticsDataBackupTool {
                 } catch (IOException e) {
                     throw new IOException("Could not write to the output file: " + e.getMessage(), e);
                 }
+                System.out.println(nodePath);
             }
         }
     }
@@ -469,6 +483,7 @@ public class AnalyticsDataBackupTool {
             try (OutputStream out = analyticsFileSystem.createOutput(relativePath)) {
                 out.write(data, 0, data.length);
                 out.flush();
+                System.out.println(relativePath);
             } catch (IOException e) {
                 throw new IOException("Error in restoring the file to the filesystem: " + e.getMessage(), e);
             }
@@ -483,12 +498,11 @@ public class AnalyticsDataBackupTool {
      * @throws IOException
      */
     private static byte[] readFile(File file) throws IOException {
-
         byte[] buffer = new byte[READ_BUFFER_SIZE];
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try (InputStream inputStream = new FileInputStream(file)) {
             int nRead;
-            while ((nRead = inputStream.read(buffer, 0, (int) file.length())) != -1) {
+            while ((nRead = inputStream.read(buffer, 0, buffer.length)) != -1) {
                 byteArrayOutputStream.write(buffer, 0, nRead);
             }
         } catch (FileNotFoundException e) {
@@ -528,7 +542,7 @@ public class AnalyticsDataBackupTool {
                                 "the analytics data service configuration file cannot be found at: " +
                                 confFile.getPath());
             }
-            System.out.printf("conf: " + confFile.getAbsolutePath());
+            System.out.println("conf: " + confFile.getAbsolutePath());
             JAXBContext ctx = JAXBContext.newInstance(AnalyticsDataServiceConfiguration.class);
             Unmarshaller unmarshaller = ctx.createUnmarshaller();
             return (AnalyticsDataServiceConfiguration) unmarshaller.unmarshal(confFile);

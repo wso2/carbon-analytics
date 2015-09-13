@@ -692,6 +692,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
             return result;
         } catch (Exception e) {
+            log.error("Error in index search: " + e.getMessage(), e);
             throw new AnalyticsIndexException("Error in index search: " + e.getMessage(), e);
         } finally {
             if (reader != null) {
