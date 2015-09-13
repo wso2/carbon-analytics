@@ -82,7 +82,7 @@ public class EventPublisherDeployer extends AbstractDeployer implements EventPro
             try {
                 processDeployment(deploymentFileData);
             } catch (Throwable e) {
-                log.error("Could not deploy event publisher file: " + deploymentFileData.getName(), e);
+                log.error("Cannot deploy event publisher : " + deploymentFileData.getName(), e);
                 throw new DeploymentException("Event publisher file " + deploymentFileData.getName() + " is not deployed ", e);
             }
         } else {
@@ -145,7 +145,7 @@ public class EventPublisherDeployer extends AbstractDeployer implements EventPro
             try {
                 processUndeployment(filePath);
             } catch (Throwable e) {
-                log.error("Could not undeploy event publisher file: " + new File(filePath).getName(), e);
+                log.error("Cannot undeploy event publisher : " + new File(filePath).getName(), e);
                 throw new DeploymentException("Event publisher file " + new File(filePath).getName() + " is not undeployed properly", e);
             }
         } else {

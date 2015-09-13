@@ -85,7 +85,7 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
             try {
                 processDeployment(deploymentFileData);
             } catch (Throwable e) {
-                log.error("Could not deploy event receiver file: " + deploymentFileData.getName(), e);
+                log.error("Cannot deploy event receiver : " + deploymentFileData.getName(), e);
                 throw new DeploymentException("Event receiver file " + deploymentFileData.getName() + " is not deployed ", e);
             }
         } else {
@@ -146,7 +146,7 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
             try {
                 processUndeployment(filePath);
             } catch (Throwable e) {
-                log.error("Could not undeploy event receiver file: " + new File(filePath).getName(), e);
+                log.error("Cannot undeploy event receiver : " + new File(filePath).getName(), e);
                 throw new DeploymentException("Event receiver file " + new File(filePath).getName() + " is not undeployed properly", e);
             }
         } else {
