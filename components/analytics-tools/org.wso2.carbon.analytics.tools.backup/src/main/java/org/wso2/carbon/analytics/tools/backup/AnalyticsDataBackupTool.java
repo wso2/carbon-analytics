@@ -44,6 +44,7 @@ import org.wso2.carbon.base.MultitenantConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -66,47 +67,64 @@ import java.util.Map;
  */
 public class AnalyticsDataBackupTool {
 
+    private static final String TIME_PATTERN = "yy-mm-dd hh:mm:ss";
+    private static final String DIR = "dir";
+    private static final String TABLES = "tables";
+    private static final String TIMETO = "timeTo";
+    private static final String TIMEFROM = "timeFrom";
+    private static final String TENANT_ID = "tenantId";
+    private static final String BATCH_SIZE = "batchSize";
+    private static final String REINDEX_EVENTS = "reindexEvents";
+    private static final String RESTORE_FILE_SYSTEM = "restoreFileSystem";
+    private static final String RESTORE_RECORD_STORE = "restoreRecordStore";
+    private static final String BACKUP_FILE_SYSTEM = "backupFileSystem";
+    private static final String BACKUP_RECORD_STORE = "backupRecordStore";
     private static final String TABLE_SCHEMA_FILE_NAME = "__TABLE_SCHEMA__";
     private static final String ANALYTICS_DS_CONFIG_FILE = "analytics-config.xml";
     private static final int INDEX_PROCESS_WAIT_TIME = -1;
     private static final String RECORD_BATCH_SIZE = "1000";
     private static int batchSize = 0;
     private static boolean forceIndexing = false;
-    private static final int READ_BUFFER_SIZE = 10;
+    private static final int READ_BUFFER_SIZE = 10240;
     private static final int RECORD_INDEX_CHUNK_SIZE = 1000;
 
     @SuppressWarnings("static-access")
-    public static void main(String[] args) throws Exception {
-        String timePattern = "yy-mm-dd hh:mm:ss";
+    private static Options populateOptions() {
         Options options = new Options();
-        options.addOption(new Option("backupRecordStore", false, "backup analytics data"));
-        options.addOption(new Option("backupFileSystem", false, "backup filesystem data"));
+        options.addOption(new Option(BACKUP_RECORD_STORE, false, "backup analytics data"));
+        options.addOption(new Option(BACKUP_FILE_SYSTEM, false, "backup filesystem data"));
 
-        options.addOption(new Option("restoreRecordStore", false, "restores analytics data"));
-        options.addOption(new Option("restoreFileSystem", false, "restores filesystem data"));
+        options.addOption(new Option(RESTORE_RECORD_STORE, false, "restores analytics data"));
+        options.addOption(new Option(RESTORE_FILE_SYSTEM, false, "restores filesystem data"));
 
-        options.addOption(new Option("reindexEvents", false, "re-indexes records in the given table data"));
+        options.addOption(new Option(REINDEX_EVENTS, false, "re-indexes records in the given table data"));
 
         options.addOption(new Option("enableIndexing", false, "enables indexing while restoring"));
         options.addOption(OptionBuilder.withArgName("directory").hasArg().withDescription(
-                "source/target directory").create("dir"));
+                "source/target directory").create(DIR));
         options.addOption(OptionBuilder.withArgName("table list").hasArg().withDescription(
-                "analytics tables (comma separated) to backup/restore").create("tables"));
-        options.addOption(OptionBuilder.withArgName(timePattern).hasArg().withDescription(
-                "consider records from this time (inclusive)").create("timefrom"));
-        options.addOption(OptionBuilder.withArgName(timePattern).hasArg().withDescription(
-                "consider records to this time (non-inclusive)").create("timeto"));
+                "analytics tables (comma separated) to backup/restore").create(TABLES));
+        options.addOption(OptionBuilder.withArgName(TIME_PATTERN).hasArg().withDescription(
+                "consider records from this time (inclusive)").create(TIMEFROM));
+        options.addOption(OptionBuilder.withArgName(TIME_PATTERN).hasArg().withDescription(
+                "consider records to this time (non-inclusive)").create(TIMETO));
         options.addOption(OptionBuilder.withArgName("tenant id (default is super tenant)").hasArg().withDescription(
-                "specify tenant id of the tenant considered").create("tenant_id"));
-        options.addOption(OptionBuilder.withArgName("restore record batch size (default is 1000)").hasArg().withDescription(
-                "specify the number of records per batch for backup").create("batch"));
+                "specify tenant id of the tenant considered").create(TENANT_ID));
+        options.addOption(OptionBuilder.withArgName("restore record batch size (default is " + 
+                RECORD_BATCH_SIZE + ")").hasArg().withDescription(
+                        "specify the number of records per batch for backup").create(BATCH_SIZE));
+        return options;
+    }
+    
+    public static void main(String[] args) throws Exception {
+        Options options = populateOptions();
         CommandLineParser parser = new BasicParser();
         CommandLine line = parser.parse(options, args);
         if (args.length < 2) {
             new HelpFormatter().printHelp("analytics-backup.sh|cmd", options);
             System.exit(1);
         }
-        if (line.hasOption("restoreRecordStore")) {
+        if (line.hasOption(RESTORE_RECORD_STORE)) {
             if (line.hasOption("enableIndexing")) {
                 System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
                 forceIndexing = true;
@@ -114,8 +132,8 @@ public class AnalyticsDataBackupTool {
                 System.setProperty(AnalyticsDataIndexer.DISABLE_INDEX_THROTTLING_ENV_PROP, Boolean.TRUE.toString());
             }
         }
-        if (line.hasOption("backupRecordStore")) {
-            batchSize = Integer.parseInt(line.getOptionValue("batch", RECORD_BATCH_SIZE));
+        if (line.hasOption(BACKUP_RECORD_STORE)) {
+            batchSize = Integer.parseInt(line.getOptionValue(BATCH_SIZE, RECORD_BATCH_SIZE));
         }
         AnalyticsDataService service = null;
         AnalyticsFileSystem analyticsFileSystem = null;
@@ -123,61 +141,54 @@ public class AnalyticsDataBackupTool {
             AnalyticsDataServiceConfiguration config = loadAnalyticsDataServiceConfig();
             String afsClass = config.getAnalyticsFileSystemConfiguration().getImplementation();
             analyticsFileSystem = (AnalyticsFileSystem) Class.forName(afsClass).newInstance();
-            analyticsFileSystem.init(convertToMap(config.getAnalyticsFileSystemConfiguration()
-                    .getProperties()));
+            analyticsFileSystem.init(convertToMap(config.getAnalyticsFileSystemConfiguration().getProperties()));
             service = AnalyticsServiceHolder.getAnalyticsDataService();
 
-            int tenantId = Integer.parseInt(line.getOptionValue("tenant_id", "" + MultitenantConstants.SUPER_TENANT_ID));
-            SimpleDateFormat dateFormat = new SimpleDateFormat(timePattern);
+            int tenantId = Integer.parseInt(line.getOptionValue(TENANT_ID, "" + MultitenantConstants.SUPER_TENANT_ID));
+            SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
             long timeFrom = Long.MIN_VALUE;
             String tfStr = "-~";
-            if (line.hasOption("timefrom")) {
-                tfStr = line.getOptionValue("timefrom");
+            if (line.hasOption(TIMEFROM)) {
+                tfStr = line.getOptionValue(TIMEFROM);
                 timeFrom = dateFormat.parse(tfStr).getTime();
             }
             long timeTo = Long.MAX_VALUE;
             String ttStr = "+~";
-            if (line.hasOption("timeto")) {
-                ttStr = line.getOptionValue("timeto");
+            if (line.hasOption(TIMETO)) {
+                ttStr = line.getOptionValue(TIMETO);
                 timeTo = dateFormat.parse(ttStr).getTime();
             }
             String[] specificTables = null;
-            if (line.hasOption("tables")) {
-                specificTables = line.getOptionValue("tables").split(",");
+            if (line.hasOption(TABLES)) {
+                specificTables = line.getOptionValue(TABLES).split(",");
             }
 
             File baseDir;
-            String baseDirPath;
-            if(line.getOptionValue("dir") != null){
-                baseDir = new File(line.getOptionValue("dir"));
-                baseDirPath = baseDir.getAbsolutePath();
+            if (line.getOptionValue(DIR) != null){
+                baseDir = new File(line.getOptionValue(DIR));
                 if (!baseDir.exists()) {
                     baseDir.mkdirs();
                 }
             } else {
                 baseDir = null;
-                baseDirPath = "Not specified";
             }
 
-            System.out.println("Intializing [tenant=" + tenantId + "] [timefrom='" + tfStr + "'] [timeto='" + ttStr + "'] [dir='" + baseDirPath + "']" +
+            System.out.println("Intializing [tenant=" + tenantId + "] [timefrom='" + tfStr + "'] [timeto='" + ttStr + "'] [dir='" + baseDir + "']" +
                     (specificTables != null ? (" [table=" + Arrays.toString(specificTables) + "]") : "") + "...");
-            if (line.hasOption("backupRecordStore")) {
+            if (line.hasOption(BACKUP_RECORD_STORE)) {
                 backupRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
-            } else if (line.hasOption("backupFileSystem")) {
+            } else if (line.hasOption(BACKUP_FILE_SYSTEM)) {
                 backupFileSystem(analyticsFileSystem, tenantId, baseDir);
-            } else if (line.hasOption("restoreRecordStore")) {
+            } else if (line.hasOption(RESTORE_RECORD_STORE)) {
                 restoreRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
-            } else if (line.hasOption("restoreFileSystem")) {
+            } else if (line.hasOption(RESTORE_FILE_SYSTEM)) {
                 restoreFileSystem(analyticsFileSystem, baseDir);
-            } else if (line.hasOption("reindexEvents")) {
+            } else if (line.hasOption(REINDEX_EVENTS)) {
                 for (int i = 0; i < specificTables.length; i++) {
                     System.out.printf("Reindexing data for the table: " + specificTables[i]);
                     reindexData(service, tenantId, specificTables[i]);
                 }
             }
-            /* to let DBs such as H2 flush their buffer, H2 behaves in a weird way sometimes */
-            Thread.sleep(2000);
-            System.out.println("Done.");
         } finally {
             if (service != null) {
                 service.destroy();
@@ -185,7 +196,9 @@ public class AnalyticsDataBackupTool {
             if (analyticsFileSystem != null) {
                 analyticsFileSystem.destroy();
             }
+            Thread.sleep(2000);
         }
+        System.out.println("Done.");
     }
     
     private static void checkBaseDir(File baseDir) {
@@ -425,13 +438,10 @@ public class AnalyticsDataBackupTool {
             nodePath = parentPath + node;
             //convert the filesystem target path to match the filesystem path settings
             fileSystemNodePath = targetBaseDir + nodePath;
-            if(!File.separator.equals('/')) {
-                fileSystemNodePath = fileSystemNodePath.replace("/", "\\");
-            }
+            fileSystemNodePath = fileSystemNodePath.replace("/", File.separator);
             if (analyticsFileSystem.length(nodePath) == 0) { // the node is a directory
                 createDirectoryInLocalSystem(fileSystemNodePath);
                 backupFileSystemToLocal(analyticsFileSystem, nodePath, targetBaseDir);
-
             } else {                                          // the node is a file
                 AnalyticsFileSystem.DataInput input = analyticsFileSystem.createInput(nodePath);
                 byte[] dataInBuffer = new byte[READ_BUFFER_SIZE];
@@ -442,7 +452,7 @@ public class AnalyticsDataBackupTool {
                 } catch (IOException e) {
                     throw new IOException("Could not write to the output file: " + e.getMessage(), e);
                 }
-                System.out.println(nodePath);
+                System.out.println(nodePath + " -> " + fileSystemNodePath);
             }
         }
     }
@@ -483,7 +493,7 @@ public class AnalyticsDataBackupTool {
             try (OutputStream out = analyticsFileSystem.createOutput(relativePath)) {
                 out.write(data, 0, data.length);
                 out.flush();
-                System.out.println(relativePath);
+                System.out.println(node.getAbsoluteFile() + " -> " + relativePath);
             } catch (IOException e) {
                 throw new IOException("Error in restoring the file to the filesystem: " + e.getMessage(), e);
             }
