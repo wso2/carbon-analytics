@@ -31,7 +31,7 @@ import java.util.Map;
  * Represents the factory class for each aggregate function
  */
 public class AggregateFunctionFactory {
-    private Map<String, Class> aggregateFunctions;
+    private Map<String, Class<? extends AggregateFunction>> aggregateFunctions;
     private Log logger = LogFactory.getLog(AggregateFunctionFactory.class);
     public AggregateFunctionFactory() {
         this.aggregateFunctions = new HashMap<>();

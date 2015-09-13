@@ -190,6 +190,7 @@ public class AnalyticsDirectory extends Directory {
             try {
                 in = new AnalyticsIndexInputAdaptor(this.path, this.dataInput.makeCopy(),
                         this.offset, this.length, this.toString());
+                in.seek(this.getFilePointer());
                 this.clonedInputs.add(in);
                 return in;
             } catch (IOException e) {
