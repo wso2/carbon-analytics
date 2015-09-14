@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Pair;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -194,6 +195,8 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         }
         Map<String, List<Record>> recordBatches = this.generateRecordBatches(records);
         try {
+            /* Check incoming records to eliminate any residual entries on the index table */
+            this.policeIncomingRecords(recordBatches);
             /* iterating over record batches */
             for (Map.Entry<String, List<Record>> entry : recordBatches.entrySet()) {
                 tenantId = HBaseUtils.inferTenantId(entry.getKey());
@@ -277,6 +280,65 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     private String inferRecordIdentity(Record record) {
         return HBaseUtils.generateGenericTableName(record.getTenantId(), record.getTableName());
+    }
+
+    private void policeIncomingRecords(Map<String, List<Record>> recordBatches) throws AnalyticsException {
+        int tenantId;
+        String tableName;
+        Table recordTable = null;
+        Table indexTable = null;
+
+        for (Map.Entry<String, List<Record>> entry : recordBatches.entrySet()) {
+            tenantId = HBaseUtils.inferTenantId(entry.getKey());
+            tableName = HBaseUtils.inferTableName(entry.getKey());
+            try {
+                /* Surveil */
+                recordTable = this.conn.getTable(TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName,
+                        HBaseAnalyticsDSConstants.TableType.DATA)));
+                indexTable = this.conn.getTable(TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName,
+                        HBaseAnalyticsDSConstants.TableType.INDEX)));
+                List<Get> suspects = new ArrayList<>();
+                for (Record record : recordBatches.get(entry.getKey())) {
+                    Get get = new Get(Bytes.toBytes(record.getId()));
+                    get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
+                    suspects.add(get);
+                }
+                /* Arrest */
+                List<byte[]> criminals = new ArrayList<>();
+                Result[] results = recordTable.get(suspects);
+                for (Result currentResult : results) {
+                    if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME)) {
+                        Cell dataCell = currentResult.getColumnLatestCell
+                                (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                                        HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
+                        byte[] data = CellUtil.cloneValue(dataCell);
+                        if (data.length > 0) {
+                            criminals.add(data);
+                        }
+                    }
+                }
+                /* Produce before courts */
+                if (log.isDebugEnabled()) {
+                    log.debug("Found " + criminals.size() + " obsolete entries on the index table for " + tableName
+                            + " for tenant" + tenantId);
+                }
+                /* Sentence */
+                List<Delete> convicts = new ArrayList<>();
+                for (byte[] timestamp : criminals) {
+                    Delete delete = new Delete(timestamp);
+                    convicts.add(delete);
+                }
+                indexTable.delete(convicts);
+            } catch (IOException e) {
+                throw new AnalyticsException("Error while pruning obsolete entries from table " + tableName + " for tenant " + tenantId);
+            } finally {
+                GenericUtils.closeQuietly(recordTable);
+                GenericUtils.closeQuietly(indexTable);
+            }
+        }
+
     }
 
     @Override
@@ -425,11 +487,11 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             dataTable.delete(dataDeletes);
             log.debug("Processed deletion of " + dataDeletes.size() + " records from table " + tableName + "for tenant " + tenantId);
             //TODO: HBase bug in delete propagation. WORKAROUND BELOW
-/*            try {
+            try {
                 Thread.sleep(1000L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }*/
+            }
         } catch (IOException e) {
             throw new AnalyticsException("Error deleting records from " + tableName + " for tenant " + tenantId + " : "
                     + e.getMessage(), e);
