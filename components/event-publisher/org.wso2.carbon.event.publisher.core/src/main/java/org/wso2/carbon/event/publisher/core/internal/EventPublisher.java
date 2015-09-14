@@ -187,7 +187,6 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
             process(event);
         } else {
             if (!EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
-                process(event);
                 if (mode == Mode.HA) {
                     //is queue not empty send events from last time
                     long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis();
@@ -204,6 +203,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
                     EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
                             eventPublisherConfiguration.getEventPublisherName(), tenantId, currentTime);
                 }
+                process(event);
             } else {
                 if (mode == Mode.HA) {
                     //add to Queue
