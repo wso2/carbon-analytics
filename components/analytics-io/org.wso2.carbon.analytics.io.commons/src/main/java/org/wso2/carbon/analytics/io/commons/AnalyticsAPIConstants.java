@@ -47,9 +47,9 @@ public class AnalyticsAPIConstants {
     public static final String KEY_VALUE_PARAM = "keyValues";
     public static final String GROUP_BY_FIELD_PARAM = "groupByField";
     public static final String AGGREGATING_FIELDS = "aggregatingFields";
-    public static final String ALIASES = "aliases";
-
-
+    public static final String AGGREGATE_LEVEL = "aggregateLevel";
+    public static final String AGGREGATE_PARENT_PATH = "aggregateParentPath";
+            ;
     public static final String OPERATION = "__operation";
     public static final String SESSION_ID = "__sessionId";
     public static final String PAGINATION_SUPPORT = "__paginationSupport";

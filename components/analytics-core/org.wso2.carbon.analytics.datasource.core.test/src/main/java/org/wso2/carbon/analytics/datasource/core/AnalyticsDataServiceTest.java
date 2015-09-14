@@ -20,12 +20,12 @@ package org.wso2.carbon.analytics.datasource.core;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceUtils;
-import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
-import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
-import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterException;
+import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
+import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;

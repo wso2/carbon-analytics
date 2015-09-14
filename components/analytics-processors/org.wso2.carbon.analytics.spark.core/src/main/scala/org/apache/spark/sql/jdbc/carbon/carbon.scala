@@ -23,6 +23,7 @@ import java.sql.{Connection, PreparedStatement}
 import org.apache.spark.Logging
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row}
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsDatasourceWrapper
 
 package object carbon {
@@ -78,34 +79,40 @@ package object carbon {
       val rddSchema = df.schema
       val dsWrapper = new AnalyticsDatasourceWrapper(dataSource)
 
-      val conn = dsWrapper.getConnection
       try {
-        val dialect = JdbcDialects.get(conn.getMetaData.getURL)
-        val nullTypes: Array[Int] = df.schema.fields.map { field =>
-          dialect.getJDBCType(field.dataType).map(_.jdbcNullType).getOrElse(
-            field.dataType match {
-              case IntegerType => java.sql.Types.INTEGER
-              case LongType => java.sql.Types.BIGINT
-              case DoubleType => java.sql.Types.DOUBLE
-              case FloatType => java.sql.Types.REAL
-              case ShortType => java.sql.Types.INTEGER
-              case ByteType => java.sql.Types.INTEGER
-              case BooleanType => java.sql.Types.BIT
-              case StringType => java.sql.Types.CLOB
-              case BinaryType => java.sql.Types.BLOB
-              case TimestampType => java.sql.Types.TIMESTAMP
-              case DateType => java.sql.Types.DATE
-              case DecimalType.Fixed(precision, scale) =>  java.sql.Types.NUMERIC
-              case DecimalType.Unlimited => java.sql.Types.NUMERIC
-              case _ => throw new IllegalArgumentException(
-                s"Can't translate null value for field $field")
-            })
+        val conn = dsWrapper.getConnection
+        try {
+          val dialect = JdbcDialects.get(conn.getMetaData.getURL)
+          val nullTypes: Array[Int] = df.schema.fields.map { field =>
+            dialect.getJDBCType(field.dataType).map(_.jdbcNullType).getOrElse(
+              field.dataType match {
+                case IntegerType => java.sql.Types.INTEGER
+                case LongType => java.sql.Types.BIGINT
+                case DoubleType => java.sql.Types.DOUBLE
+                case FloatType => java.sql.Types.REAL
+                case ShortType => java.sql.Types.INTEGER
+                case ByteType => java.sql.Types.INTEGER
+                case BooleanType => java.sql.Types.BIT
+                case StringType => java.sql.Types.CLOB
+                case BinaryType => java.sql.Types.BLOB
+                case TimestampType => java.sql.Types.TIMESTAMP
+                case DateType => java.sql.Types.DATE
+                case DecimalType.Fixed(precision, scale) => java.sql.Types.NUMERIC
+                case DecimalType.Unlimited => java.sql.Types.NUMERIC
+                case _ => throw new IllegalArgumentException(
+                  s"Can't translate null value for field $field")
+              })
+                                                           }
+          df.foreachPartition { iterator =>
+            JDBCWriteDetails.savePartition(dsWrapper.getConnection, tableName, iterator, rddSchema, nullTypes)
+                              }
+        } finally {
+          conn.close()
         }
-        df.foreachPartition { iterator =>
-          JDBCWriteDetails.savePartition(dsWrapper.getConnection, tableName, iterator, rddSchema, nullTypes)
-                            }
-      } finally {
-        conn.close()
+      }
+      catch {
+        case e: Exception =>
+          throw new AnalyticsExecutionException ("Error while saving data to the table " + tableName, e)
       }
     }
 

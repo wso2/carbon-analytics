@@ -2,9 +2,9 @@
 
     <providers>
         <provider>org.wso2.carbon.ndatasource.rdbms.RDBMSDataSourceReader</provider>
-        <provider>org.wso2.carbon.datasource.reader.hadoop.HDFSDataSourceReader</provider>
-        <provider>org.wso2.carbon.datasource.reader.hadoop.HBaseDataSourceReader</provider>
-        <provider>org.wso2.carbon.datasource.reader.cassandra.CassandraDataSourceReader</provider>
+        <!--<provider>org.wso2.carbon.datasource.reader.hadoop.HDFSDataSourceReader</provider>-->
+        <!--<provider>org.wso2.carbon.datasource.reader.hadoop.HBaseDataSourceReader</provider>-->
+        <!--<provider>org.wso2.carbon.datasource.reader.cassandra.CassandraDataSourceReader</provider>-->
     </providers>
 
     <datasources>
@@ -131,7 +131,7 @@
                     <username>admin</username>
                     <password>admin</password>
                     <clusterName>cluster1</clusterName>
-                    <compression>none</compression>
+                    <compression>NONE</compression>
                     <poolingOptions>
                         <coreConnectionsPerHost hostDistance="LOCAL">8</coreConnectionsPerHost>
                         <maxSimultaneousRequestsPerHostThreshold hostDistance="LOCAL">1024</maxSimultaneousRequestsPerHostThreshold>

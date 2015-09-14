@@ -21,7 +21,7 @@ package org.wso2.carbon.analytics.messageconsole.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.messageconsole.Constants;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.service.TaskService;
@@ -30,7 +30,7 @@ import org.wso2.carbon.ntask.core.service.TaskService;
  * This class represents the analytics message console service declarative services component.
  *
  * @scr.component name="messageconsole.component" immediate="true"
- * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.dataservice.AnalyticsDataService"
+ * @scr.reference name="analytics.component" interface="AnalyticsDataService"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
  * @scr.reference name="ntask.component" interface="org.wso2.carbon.ntask.core.service.TaskService"
  * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
@@ -40,7 +40,7 @@ public class MessageConsoleServiceComponent {
 
     protected void activate(ComponentContext ctx) {
         try {
-            boolean dataPurgingEnable = !Boolean.getBoolean(org.wso2.carbon.analytics.dataservice.Constants.DISABLE_ANALYTICS_DATA_PURGING_JVM_OPTION);
+            boolean dataPurgingEnable = !Boolean.getBoolean(org.wso2.carbon.analytics.dataservice.core.Constants.DISABLE_ANALYTICS_DATA_PURGING_JVM_OPTION);
             if (dataPurgingEnable) {
                 ServiceHolder.getTaskService().registerTaskType(Constants.ANALYTICS_DATA_PURGING);
             }

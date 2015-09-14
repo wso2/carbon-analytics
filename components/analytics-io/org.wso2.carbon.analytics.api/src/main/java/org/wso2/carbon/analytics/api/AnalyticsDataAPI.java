@@ -17,8 +17,8 @@
 */
 package org.wso2.carbon.analytics.api;
 
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.SecureAnalyticsDataService;
 
 /**
  * This is the interface which expose the operations to perform on the Analytics.

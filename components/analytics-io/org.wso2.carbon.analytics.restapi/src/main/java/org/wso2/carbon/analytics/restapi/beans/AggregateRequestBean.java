@@ -35,6 +35,8 @@ import java.util.List;
 public class AggregateRequestBean {
     private String tableName;
     private String groupByField;
+    private int aggregateLevel;
+    private List<String> parentPath;
     private String query;
     @XmlElement(name = "aggregateFields", required = true)
     private List<AggregateFieldBean> fields;
@@ -81,6 +83,22 @@ public class AggregateRequestBean {
 
     public void setFields(List<AggregateFieldBean> fields) {
         this.fields = fields;
+    }
+
+    public int getAggregateLevel() {
+        return aggregateLevel;
+    }
+
+    public void setAggregateLevel(int aggregateLevel) {
+        this.aggregateLevel = aggregateLevel;
+    }
+
+    public List<String> getParentPath() {
+        return parentPath;
+    }
+
+    public void setParentPath(List<String> parentPath) {
+        this.parentPath = parentPath;
     }
 }
 

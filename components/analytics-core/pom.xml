@@ -35,7 +35,7 @@
     <modules>
         <module>org.wso2.carbon.analytics.datasource.commons</module>
         <module>org.wso2.carbon.analytics.dataservice.commons</module>
-        <module>org.wso2.carbon.analytics.dataservice</module>
+        <module>org.wso2.carbon.analytics.dataservice.core</module>
         <module>org.wso2.carbon.analytics.datasource.core</module>
         <module>org.wso2.carbon.analytics.datasource.core.test</module>
         <!--<module>org.wso2.carbon.analytics.api</module>-->

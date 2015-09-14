@@ -29,6 +29,7 @@ import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types._
 import org.apache.spark.{Logging, Partition, SparkContext}
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsDatasourceWrapper
 
 object JDBCRDDCarbonUtils extends Logging {
@@ -46,36 +47,44 @@ object JDBCRDDCarbonUtils extends Logging {
    * @throws SQLException if the table contains an unsupported type.
    */
   def resolveTable(dataSource: String, table: String): StructType = {
-    val conn: Connection = GenericUtils.loadGlobalDataSource(dataSource).asInstanceOf[DataSource].getConnection
-    val dialect = JdbcDialects.get(conn.getMetaData.getURL)
     try {
-      val rs = conn.prepareStatement(s"SELECT * FROM $table WHERE 1=0").executeQuery()
+      val conn: Connection = GenericUtils.loadGlobalDataSource(dataSource).asInstanceOf[DataSource].getConnection
+      val dialect = JdbcDialects.get(conn.getMetaData.getURL)
       try {
-        val rsmd = rs.getMetaData
-        val ncols = rsmd.getColumnCount
-        val fields = new Array[StructField](ncols)
-        var i = 0
-        while (i < ncols) {
-          val columnName = rsmd.getColumnLabel(i + 1)
-          val dataType = rsmd.getColumnType(i + 1)
-          val typeName = rsmd.getColumnTypeName(i + 1)
-          val fieldSize = rsmd.getPrecision(i + 1)
-          val fieldScale = rsmd.getScale(i + 1)
-          val isSigned = rsmd.isSigned(i + 1)
-          val nullable = rsmd.isNullable(i + 1) != ResultSetMetaData.columnNoNulls
-          val metadata = new MetadataBuilder().putString("name", columnName)
-          val columnType =
-            dialect.getCatalystType(dataType, typeName, fieldSize, metadata).getOrElse(
-              getCatalystType(dataType, fieldSize, fieldScale, isSigned))
-          fields(i) = StructField(columnName, columnType, nullable, metadata.build())
-          i = i + 1
+        val rs = conn.prepareStatement(s"SELECT * FROM $table WHERE 1=0").executeQuery()
+        try {
+          val rsmd = rs.getMetaData
+          val ncols = rsmd.getColumnCount
+          val fields = new Array[StructField](ncols)
+          var i = 0
+          while (i < ncols) {
+            val columnName = rsmd.getColumnLabel(i + 1)
+            val dataType = rsmd.getColumnType(i + 1)
+            val typeName = rsmd.getColumnTypeName(i + 1)
+            val fieldSize = rsmd.getPrecision(i + 1)
+            val fieldScale = rsmd.getScale(i + 1)
+            val isSigned = rsmd.isSigned(i + 1)
+            val nullable = rsmd.isNullable(i + 1) != ResultSetMetaData.columnNoNulls
+            val metadata = new MetadataBuilder().putString("name", columnName)
+            val columnType =
+              dialect.getCatalystType(dataType, typeName, fieldSize, metadata).getOrElse(
+                getCatalystType(dataType, fieldSize, fieldScale, isSigned))
+            fields(i) = StructField(columnName, columnType, nullable, metadata.build())
+            i = i + 1
+          }
+          return new StructType(fields)
+        } finally {
+          rs.close()
         }
-        return new StructType(fields)
       } finally {
-        rs.close()
+        conn.close()
       }
-    } finally {
-      conn.close()
+    } catch {
+      case e: SQLException => throw new
+          AnalyticsExecutionException("Error while connecting to datasource " + dataSource , e)
+      case e: Exception => throw new
+          AnalyticsExecutionException("Error while resolving the table " + table +
+                                      " in datasource " + dataSource, e)
     }
 
     throw new RuntimeException("This line is unreachable.")
@@ -87,6 +96,9 @@ object JDBCRDDCarbonUtils extends Logging {
    *
    * @param sqlType - A field of java.sql.Types
    * @return The Catalyst type corresponding to sqlType.
+   *         6
+   *         9+9
+   *
    */
   private def getCatalystType(
                                sqlType: Int,
@@ -191,7 +203,14 @@ object JDBCRDDCarbonUtils extends Logging {
         filters,
         parts,
         new Properties)
-    } finally {
+    } catch {
+      case e: SQLException => throw new
+          AnalyticsExecutionException("Error while connecting to datasource " + dataSource , e)
+      case e: Exception => throw new
+          AnalyticsExecutionException("Error while scanning the table " + fqTable +
+                                      " in datasource " + dataSource, e)
+    }
+    finally {
       conn.close()
     }
   }

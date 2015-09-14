@@ -20,7 +20,7 @@ package org.wso2.carbon.analytics.messageconsole;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.CarbonConstants;
-import org.wso2.carbon.analytics.dataservice.Constants;
+import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.messageconsole.beans.PermissionBean;
 import org.wso2.carbon.analytics.messageconsole.beans.ScheduleTaskInfo;
 import org.wso2.carbon.analytics.messageconsole.exception.MessageConsoleException;

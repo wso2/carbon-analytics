@@ -17,8 +17,8 @@
 */
 package org.wso2.carbon.analytics.api.internal;
 
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.SecureAnalyticsDataService;
 
 /**
  * This class holds the OSGI services which was required for the analytics api operation.

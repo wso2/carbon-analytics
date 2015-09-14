@@ -27,14 +27,15 @@ import java.util.List;
  * fields attribute represents the record fields and the respective aggregate function.
  * aliases represents the output field names for aggregated values over the fields.
  */
-
 public class AggregateRequest implements Serializable {
 
     private static final long serialVersionUID = 9136244323619811830L;
     private String tableName;
     private String groupByField;
+    private List<String> parentPath;
     private String query;
     private List<AggregateField> fields;
+    private int aggregateLevel;
 
     public AggregateRequest() {
     }
@@ -69,5 +70,21 @@ public class AggregateRequest implements Serializable {
 
     public void setFields(List<AggregateField> fields) {
         this.fields = fields;
+    }
+
+    public List<String> getParentPath() {
+        return parentPath;
+    }
+
+    public void setParentPath(List<String> parentPath) {
+        this.parentPath = parentPath;
+    }
+
+    public int getAggregateLevel() {
+        return aggregateLevel;
+    }
+
+    public void setAggregateLevel(int aggregateLevel) {
+        this.aggregateLevel = aggregateLevel;
     }
 }

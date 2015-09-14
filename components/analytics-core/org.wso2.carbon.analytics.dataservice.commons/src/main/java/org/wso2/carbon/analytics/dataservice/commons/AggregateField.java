@@ -28,17 +28,17 @@ public class AggregateField implements Serializable {
 
     private static final long serialVersionUID = 3077504068553108030L;
     private String fieldName;
-    private String aggregate;
+    private String aggregateFunction;
     private String alias;
 
-    public AggregateField(){
+    public AggregateField() {
 
     }
 
-    public AggregateField(String fieldName, String aggregate, String alias) {
+    public AggregateField(String fieldName, String aggregateFunction, String alias) {
         this.fieldName = fieldName;
         this.alias = alias;
-        this.aggregate = aggregate.toUpperCase();
+        this.aggregateFunction = aggregateFunction.toUpperCase();
     }
 
     public String getFieldName() {
@@ -49,12 +49,12 @@ public class AggregateField implements Serializable {
         this.fieldName = fieldName;
     }
 
-    public String getAggregate() {
-        return aggregate;
+    public String getAggregateFunction() {
+        return aggregateFunction;
     }
 
-    public void setAggregate(String aggregate) {
-        this.aggregate = aggregate.toUpperCase();
+    public void setAggregateFunction(String aggregateFunction) {
+        this.aggregateFunction = aggregateFunction.toUpperCase();
     }
 
     public String getAlias() {

@@ -18,7 +18,7 @@ package org.wso2.carbon.analytics.restapi.providers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.dataservice.AnalyticsUnauthorizedAccessException;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsUnauthorizedAccessException;
 import org.wso2.carbon.analytics.restapi.Constants;
 import org.wso2.carbon.analytics.restapi.beans.ResponseBean;
 

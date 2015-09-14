@@ -95,7 +95,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
+            <artifactId>org.wso2.carbon.analytics.dataservice.core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

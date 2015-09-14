@@ -30,7 +30,7 @@
     <artifactId>org.wso2.carbon.analytics.datasource.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics Data Source Feature</name>
-    <description>This feature contains the aggregate data source features</description>
+    <description>This feature contains the aggregateFunction data source features</description>
 
     <dependencies>
         <dependency>

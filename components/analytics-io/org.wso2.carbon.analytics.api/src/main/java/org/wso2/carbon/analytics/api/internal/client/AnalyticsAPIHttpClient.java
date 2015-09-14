@@ -1222,7 +1222,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public List<Record> searchWithAggregates(int tenantId, String username,
+    public AnalyticsIterator<Record> searchWithAggregates(int tenantId, String username,
                                                              AggregateRequest aggregateRequest,
                                                              boolean securityEnabled) {
         URIBuilder builder = new URIBuilder();
@@ -1232,7 +1232,9 @@ public class AnalyticsAPIHttpClient {
                 .addParameter(AnalyticsAPIConstants.GROUP_BY_FIELD_PARAM, aggregateRequest.getGroupByField())
                 .addParameter(AnalyticsAPIConstants.QUERY, aggregateRequest.getQuery())
                 .addParameter(AnalyticsAPIConstants.AGGREGATING_FIELDS, gson.toJson(aggregateRequest.getFields()))
-                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, aggregateRequest.getTableName());
+                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, aggregateRequest.getTableName())
+                .addParameter(AnalyticsAPIConstants.AGGREGATE_LEVEL, String.valueOf(aggregateRequest.getAggregateLevel()))
+                .addParameter(AnalyticsAPIConstants.AGGREGATE_PARENT_PATH, gson.toJson(aggregateRequest.getParentPath()));
         if (!securityEnabled) {
             builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
         } else {
@@ -1246,14 +1248,7 @@ public class AnalyticsAPIHttpClient {
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Error while searching with aggregates. " + response);
             } else {
-                Object searchResultListObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
-                EntityUtils.consumeQuietly(httpResponse.getEntity());
-                if (searchResultListObj != null && searchResultListObj instanceof List) {
-                    return (List<Record>) searchResultListObj;
-                } else {
-                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("preforming search with aggregates",
-                        aggregateRequest.getTableName(), "list of search result entry", searchResultListObj));
-                }
+                return new RemoteRecordIterator(httpResponse.getEntity().getContent());
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);

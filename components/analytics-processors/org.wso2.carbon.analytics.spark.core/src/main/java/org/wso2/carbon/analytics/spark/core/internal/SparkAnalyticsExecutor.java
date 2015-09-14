@@ -34,10 +34,10 @@ import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.jdbc.carbon.AnalyticsJDBCRelationProvider;
 import org.apache.spark.sql.jdbc.carbon.DialectRegister;
 import org.apache.spark.util.Utils;
-import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
-import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
-import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterException;
+import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
+import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionCall;
@@ -606,14 +606,15 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
 
         long start = System.currentTimeMillis();
-        DataFrame result = this.sqlCtx.sql(query);
-        long end = System.currentTimeMillis();
-
-        if (ServiceHolder.isAnalyticsStatsEnabled()) {
-            log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds");
+        try {
+            DataFrame result = this.sqlCtx.sql(query);
+            return toResult(result);
+        } finally {
+            long end = System.currentTimeMillis();
+            if (ServiceHolder.isAnalyticsStatsEnabled()) {
+                log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
+            }
         }
-
-        return toResult(result);
     }
 
     private String encodeQueryWithTenantId(int tenantId, String query)

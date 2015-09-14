@@ -30,7 +30,7 @@
     <artifactId>org.wso2.carbon.analytics.eventsink.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics Event Sink Feature</name>
-    <description>This feature contains the aggregate event sink features</description>
+    <description>This feature contains the aggregateFunction event sink features</description>
 
     <dependencies>
         <dependency>

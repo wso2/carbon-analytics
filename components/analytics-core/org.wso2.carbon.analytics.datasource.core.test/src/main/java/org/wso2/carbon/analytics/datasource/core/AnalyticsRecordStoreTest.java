@@ -306,7 +306,7 @@ public class AnalyticsRecordStoreTest {
         this.cleanupT1();
         this.analyticsRS.createTable(7, "T1");
         int count = (int) (2000 * Math.random()) + 1;
-        List<Record> records = generateRecords(7, "T1", 1, count, -15000, 333);
+        List<Record> records = generateRecords(7, "T1", 1, count, 15000, 333);
         this.analyticsRS.put(records);
         long res = this.analyticsRS.getRecordCount(7, "T1", Long.MIN_VALUE, Long.MAX_VALUE);
         if (res == -1) {
@@ -314,7 +314,7 @@ public class AnalyticsRecordStoreTest {
             return;
         }
         Assert.assertEquals(res, count);
-        Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", -15000, -14999), 1);
+        Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", 14999, 15001), 1);
         this.analyticsRS.delete(7, "T1", Long.MIN_VALUE, Long.MAX_VALUE);
         Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", Long.MIN_VALUE, Long.MAX_VALUE), 0);
         this.cleanupT1();

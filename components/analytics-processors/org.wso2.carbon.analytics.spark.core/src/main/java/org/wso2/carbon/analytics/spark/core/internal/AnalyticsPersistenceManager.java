@@ -21,6 +21,7 @@ import org.wso2.carbon.analytics.spark.core.AnalyticsTask;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.registry.core.Collection;
@@ -29,11 +30,13 @@ import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -82,21 +85,21 @@ public class AnalyticsPersistenceManager {
      * @param cron          Cron expression for the rate of the script execution task.
      * @throws AnalyticsPersistenceException
      */
-    public void saveScript(int tenantId, String scriptName, String scriptContent, String cron, boolean editable)
+    public void saveScript(int tenantId, String scriptName, String scriptContent, String cron, String carbonAppName, boolean editable)
             throws AnalyticsPersistenceException {
         try {
             UserRegistry userRegistry = ServiceHolder.getTenantConfigRegistry(tenantId);
             createScriptsCollectionIfNotExists(userRegistry);
             String scriptLocation = getScriptLocation(scriptName);
             if (!userRegistry.resourceExists(scriptLocation)) {
-                AnalyticsScript script = processAndGetAnalyticsScript(scriptName, scriptContent, cron, editable, null);
+                AnalyticsScript script = processAndGetAnalyticsScript(scriptName, scriptContent, cron, carbonAppName, editable, null);
                 Resource resource = userRegistry.newResource();
                 resource.setContent(getConfiguration(script));
                 resource.setMediaType(AnalyticsConstants.ANALYTICS_MEDIA_TYPE);
                 userRegistry.put(scriptLocation, resource);
                 try {
                     scheduleTask(tenantId, script);
-                }catch (AnalyticsPersistenceException ex){
+                } catch (AnalyticsPersistenceException ex) {
                     deleteScript(tenantId, scriptName);
                     throw ex;
                 }
@@ -123,8 +126,8 @@ public class AnalyticsPersistenceManager {
      *                      If this is null, and new object will be created with passed information.
      * @return New populated analytics script with provided information.
      */
-    private AnalyticsScript processAndGetAnalyticsScript(String scriptName, String scriptContent, String cron, boolean editable,
-                                                         AnalyticsScript script) {
+    private AnalyticsScript processAndGetAnalyticsScript(String scriptName, String scriptContent, String cron,
+                                                         String carbonAppName, boolean editable, AnalyticsScript script) {
         if (script == null) {
             script = new AnalyticsScript(scriptName);
         }
@@ -135,6 +138,7 @@ public class AnalyticsPersistenceManager {
             script.setCronExpression(cron);
         }
         script.setEditable(editable);
+        script.setCarbonApplicationFileName(carbonAppName);
         return script;
     }
 
@@ -233,7 +237,21 @@ public class AnalyticsPersistenceManager {
     private AnalyticsScript getAnalyticsScript(String config) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(AnalyticsScript.class);
         Unmarshaller un = context.createUnmarshaller();
-        return (AnalyticsScript) un.unmarshal(new StringReader(config));
+        AnalyticsScript analyticsScript = (AnalyticsScript) un.unmarshal(new StringReader(config));
+        if (!analyticsScript.isEditable()) {
+            if (analyticsScript.getCarbonApplicationFileName() != null &&
+                    !analyticsScript.getCarbonApplicationFileName().trim().isEmpty()) {
+                String carbonAppLocation = MultitenantUtils.getAxis2RepositoryPath(PrivilegedCarbonContext.
+                        getThreadLocalCarbonContext().getTenantId()) + File.separator + AnalyticsConstants.CARBON_APPLICATION_DEPLOYMENT_DIR
+                        + File.separator + analyticsScript.getCarbonApplicationFileName() + AnalyticsConstants.CARBON_APPLICATION_EXT;
+                if (!new File(carbonAppLocation).exists()) {
+                    analyticsScript.setEditable(true);
+                }
+            } else {
+                analyticsScript.setEditable(true);
+            }
+        }
+        return analyticsScript;
     }
 
     /**
@@ -245,7 +263,7 @@ public class AnalyticsPersistenceManager {
      * @param cron          New cron expression of the script.
      * @throws AnalyticsPersistenceException
      */
-    public void putScript(int tenantId, String scriptName, String scriptContent, String cron, boolean editable)
+    public void putScript(int tenantId, String scriptName, String scriptContent, String cron, String carbonAppName, boolean editable)
             throws AnalyticsPersistenceException {
         try {
             UserRegistry userRegistry = ServiceHolder.getTenantConfigRegistry(tenantId);
@@ -253,13 +271,13 @@ public class AnalyticsPersistenceManager {
             if (userRegistry.resourceExists(scriptLocation)) {
                 Resource resource = userRegistry.get(scriptLocation);
                 AnalyticsScript script = processAndGetAnalyticsScript(scriptName, scriptContent,
-                        cron, editable,getAnalyticsScript(RegistryUtils.decodeBytes((byte[]) userRegistry.get(scriptLocation).getContent())));
+                        cron, carbonAppName, editable, getAnalyticsScript(RegistryUtils.decodeBytes((byte[]) userRegistry.get(scriptLocation).getContent())));
                 resource.setContent(getConfiguration(script));
                 resource.setMediaType(AnalyticsConstants.ANALYTICS_MEDIA_TYPE);
                 userRegistry.put(scriptLocation, resource);
                 scheduleTask(tenantId, script);
             } else {
-                this.saveScript(tenantId, scriptName, scriptContent, cron, editable);
+                this.saveScript(tenantId, scriptName, scriptContent, cron, carbonAppName, editable);
             }
         } catch (RegistryException e) {
             throw new AnalyticsPersistenceException("Error while loading the registry for tenant :" + tenantId, e);

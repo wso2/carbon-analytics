@@ -20,8 +20,8 @@ import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateField;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
-import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.core.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
@@ -434,6 +434,8 @@ public class Utils {
         request.setQuery(aggregateRequestBean.getQuery());
         request.setGroupByField(aggregateRequestBean.getGroupByField());
         request.setFields(createAggregatingFields(aggregateRequestBean.getFields()));
+        request.setAggregateLevel(aggregateRequestBean.getAggregateLevel());
+        request.setParentPath(aggregateRequestBean.getParentPath());
         return request;
     }
 

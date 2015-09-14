@@ -17,7 +17,7 @@
 */
 package org.wso2.carbon.analytics.eventtable.internal;
 
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 
 /**
  * This class holds all the OSGi services registered within the component.
