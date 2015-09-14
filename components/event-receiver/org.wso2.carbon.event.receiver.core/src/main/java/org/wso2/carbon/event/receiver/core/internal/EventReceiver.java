@@ -27,6 +27,7 @@ import org.wso2.carbon.event.processor.manager.core.EventManagementUtil;
 import org.wso2.carbon.event.processor.manager.core.EventSync;
 import org.wso2.carbon.event.processor.manager.core.Manager;
 import org.wso2.carbon.event.processor.manager.core.config.DistributedConfiguration;
+import org.wso2.carbon.event.processor.manager.core.config.HAConfiguration;
 import org.wso2.carbon.event.processor.manager.core.config.Mode;
 import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
@@ -131,8 +132,9 @@ public class EventReceiver implements EventProducer {
             }
             this.mode = mode;
             if (mode == Mode.HA) {
+                HAConfiguration haConfiguration = EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getHaConfiguration();
                 Lock readLock = EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().getReadLock();
-                inputEventDispatcher = new QueueInputEventDispatcher(tenantId, EventManagementUtil.constructEventSyncId(tenantId, eventReceiverConfiguration.getEventReceiverName(), Manager.ManagerType.Receiver), readLock, exportedStreamDefinition);
+                inputEventDispatcher = new QueueInputEventDispatcher(tenantId, EventManagementUtil.constructEventSyncId(tenantId, eventReceiverConfiguration.getEventReceiverName(), Manager.ManagerType.Receiver), readLock, exportedStreamDefinition, haConfiguration.getEventSyncReceiverQueueSize());
                 inputEventDispatcher.setSendToOther(!isEventDuplicatedInCluster);
                 EventReceiverServiceValueHolder.getEventManagementService().registerEventSync((EventSync) inputEventDispatcher, Manager.ManagerType.Receiver);
             } else {

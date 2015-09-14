@@ -42,6 +42,7 @@ import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationExcep
 import org.wso2.siddhi.core.event.Event;
 
 import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
@@ -68,8 +69,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     private String syncId;
     private boolean sendToOther = false;
     private org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition;
-
-    private Queue<EventWrapper> eventQueue = new LinkedList<EventWrapper>();
+    private LinkedBlockingQueue<EventWrapper> eventQueue;
 
 
     public EventPublisher(EventPublisherConfiguration eventPublisherConfiguration)
@@ -168,6 +168,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
                 sendToOther = true;
             } else if (mode == Mode.HA && managementModeInfo.getHaConfiguration().isWorkerNode()) {
                 sendToOther = true;
+                eventQueue = new LinkedBlockingQueue<EventWrapper>(managementModeInfo.getHaConfiguration().getEventSyncPublisherQueueSize());
             }
             EventPublisherServiceValueHolder.getEventManagementService().registerEventSync(this, Manager.ManagerType.Publisher);
         }
@@ -208,7 +209,12 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
                     //add to Queue
                     long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis();
                     EventWrapper eventWrapper = new EventWrapper(event, currentTime);
-                    eventQueue.add(eventWrapper);
+                    while (!eventQueue.offer(eventWrapper)) {
+                        EventWrapper wrapper = eventQueue.poll();
+                        if (log.isDebugEnabled()) {
+                            log.debug("Dropping event arrived at " + wrapper.getTimestampInMillis() + " due to insufficient capacity at Event Publisher Queue, dropped event: " + wrapper.getEvent());
+                        }
+                    }
 
                     // get last processed time and remove old events from the queue
                     long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService().getLatestEventSentTime(

@@ -465,6 +465,10 @@ public class ManagementModeConfigurationLoader {
                     .HA_NODE_CONFIG_PUBLISHER_CONNECTION_STATUS_CHECK_INTERVAL)));
             haConfiguration.setEventSyncReceiverThreads(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
                     .HA_NODE_CONFIG_RECEIVER_THREADS)));
+            haConfiguration.setEventSyncReceiverQueueSize(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
+                    .HA_NODE_CONFIG_RECEIVER_QUEUE_SIZE)));
+            haConfiguration.setEventSyncPublisherQueueSize(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
+                    .HA_NODE_CONFIG_PUBLISHER_QUEUE_SIZE)));
         }
         if (isPresenterEnabled.equalsIgnoreCase("true")) {
             haConfiguration.setPresenterNode(true);

@@ -56,6 +56,8 @@ public final class ConfigurationConstants {
     public static final String HA_NODE_CONFIG_PUBLISHER_CONNECTION_STATUS_CHECK_INTERVAL =
             "publisherConnectionStatusCheckInterval";
     public static final String HA_NODE_CONFIG_RECEIVER_THREADS = "receiverThreads";
+    public static final String HA_NODE_CONFIG_RECEIVER_QUEUE_SIZE = "receiverQueueSize";
+    public static final String HA_NODE_CONFIG_PUBLISHER_QUEUE_SIZE = "publisherQueueSize";
 
     public static final String HA_NODE_CONFIG_MANAGEMENT_STATE_RETRY_INTERVAL = "stateSyncRetryInterval";
     public static final String HA_NODE_CONFIG_MANAGEMENT_TRY_STATE_CHANGE_INTERVAL = "tryStateChangeInterval";
@@ -67,7 +69,7 @@ public final class ConfigurationConstants {
     public static final String SN_PERSISTENCE_PERSIST_CLASS_ELEMENT = "persister";
     public static final String SN_PERSISTENCE_CLASS_ATTRIBUTE = "class";
     public static final String SN_PERSISTENCE_INTERVAL_ELEMENT = "persistenceIntervalInMinutes";
-    public static final String SN_PERSISTENCE_THREAD_POOL_SIZE  = "persisterSchedulerPoolSize" ;
+    public static final String SN_PERSISTENCE_THREAD_POOL_SIZE = "persisterSchedulerPoolSize";
     public static final String SN_PERSISTENCE_PERSIST_CLASS_PROPERTY = "property";
     public static final String SN_PERSISTENCE_PERSIST_CLASS_PROPERTY_KEY = "key";
     public static final String SN_DEFAULT_PERSISTENCE_STORE =
@@ -97,7 +99,7 @@ public final class ConfigurationConstants {
 
     public static final String DISTRIBUTED_NODE_CONFIG_PRESENTATION_ELEMENT = "presentation";
     public static final String DISTRIBUTED_NODE_CONFIG_MEMBER_UPDATE_CHECK_INTERVAL = "memberUpdateCheckInterval";
-    public static final String DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL =  "connectionStatusCheckInterval";
+    public static final String DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL = "connectionStatusCheckInterval";
     public static final String DISTRIBUTED_NODE_CONFIG_PRESENTER_QUEUE_SIZE = "presentationOutputQueueSize";
 
     public static final String ENABLE_ATTRIBUTE = "enable";
