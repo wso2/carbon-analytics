@@ -314,7 +314,7 @@ public class AnalyticsRecordStoreTest {
             return;
         }
         Assert.assertEquals(res, count);
-        Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", -15000, -14999), 1);
+        Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", 14999, 15001), 1);
         this.analyticsRS.delete(7, "T1", Long.MIN_VALUE, Long.MAX_VALUE);
         Assert.assertEquals(this.analyticsRS.getRecordCount(7, "T1", Long.MIN_VALUE, Long.MAX_VALUE), 0);
         this.cleanupT1();
