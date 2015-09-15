@@ -40,6 +40,7 @@ import org.wso2.carbon.event.processor.manager.core.internal.util.ConfigurationC
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -196,14 +197,16 @@ public class HAManager {
                 .getCarbonEventManagementService();
         EventReceiverManagementService eventReceiverManagementService = eventManagementService
                 .getEventReceiverManagementService();
-        EventPublisherManagementService eventPublisherManagementService = eventManagementService
+        List<EventPublisherManagementService> eventPublisherManagementService = eventManagementService
                 .getEventPublisherManagementService();
 
         roleToMembershipMap.set(activeId, haConfiguration);
         otherMember = null;
 
         if (eventPublisherManagementService != null) {
-            eventPublisherManagementService.setDrop(false);
+            for (EventPublisherManagementService service: eventPublisherManagementService){
+                service.setDrop(false);
+            }
         }
         if (eventReceiverManagementService != null) {
             eventReceiverManagementService.start();
@@ -213,36 +216,40 @@ public class HAManager {
     }
 
     private void becomePassive() {
-        roleToMembershipMap.set(passiveId, haConfiguration);
+        try {
+            roleToMembershipMap.set(passiveId, haConfiguration);
 
-        final HAConfiguration activeMember = roleToMembershipMap.get(activeId);
-        otherMember = activeMember;
+            final HAConfiguration activeMember = roleToMembershipMap.get(activeId);
+            otherMember = activeMember;
 
-        // Send non-duplicate events to active member
-        final CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder
-                .getCarbonEventManagementService();
-        receiverEventHandler.addEventPublisher(activeMember.getEventSyncConfig());
-        presenterEventHandler.allowEventSync(false);
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        log.info("CEP HA State syncing started..");
-                        syncState(activeMember, eventManagementService);
-                        log.info("CEP HA State successfully synced.");
-                        return;
-                    } catch (EventManagementException e) {
-                        log.error("CEP HA State syncing failed, " + e.getMessage(), e);
-                    }
-                    try {
-                        Thread.sleep(haConfiguration.getManagementStateSyncRetryInterval());
-                    } catch (InterruptedException e) {
+            // Send non-duplicate events to active member
+            final CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder
+                    .getCarbonEventManagementService();
+            receiverEventHandler.addEventPublisher(activeMember.getEventSyncConfig());
+            presenterEventHandler.allowEventSync(false);
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+                        try {
+                            log.info("CEP HA State syncing started..");
+                            syncState(activeMember, eventManagementService);
+                            log.info("CEP HA State successfully synced.");
+                            return;
+                        } catch (EventManagementException e) {
+                            log.error("CEP HA State syncing failed, " + e.getMessage(), e);
+                        }
+                        try {
+                            Thread.sleep(haConfiguration.getManagementStateSyncRetryInterval());
+                        } catch (InterruptedException e) {
+                        }
                     }
                 }
-            }
-        });
-        log.info("Became CEP HA Passive Member");
+            });
+            log.info("Became CEP HA Passive Member");
+        }catch (Exception ex){
+            log.error("Error while setting the member as passive member. ", ex);
+        }
     }
 
     private void syncState(HAConfiguration activeMember, CarbonEventManagementService eventManagementService) {
@@ -250,7 +257,7 @@ public class HAManager {
                 .getEventReceiverManagementService();
         EventProcessorManagementService eventProcessorManagementService = eventManagementService
                 .getEventProcessorManagementService();
-        EventPublisherManagementService eventPublisherManagementService = eventManagementService
+        List<EventPublisherManagementService> eventPublisherManagementService = eventManagementService
                 .getEventPublisherManagementService();
         if (eventReceiverManagementService != null) {
             eventReceiverManagementService.start();
@@ -260,7 +267,9 @@ public class HAManager {
             eventProcessorManagementService.pause();
         }
         if (eventPublisherManagementService != null) {
-            eventPublisherManagementService.setDrop(true);
+            for (EventPublisherManagementService service: eventPublisherManagementService){
+                service.setDrop(true);
+            }
         }
         ManagementServiceClient client = new ManagementServiceClientThriftImpl();
         byte[] state = null;

@@ -552,7 +552,7 @@ public class ManagementModeConfigurationLoader {
     public static String readOMElementValue(OMElement parentElement, String elementName) {
         OMElement element = parentElement.getFirstChildWithName(new QName(elementName));
         String elementValue = null;
-        if (!"".equals(element.getText().trim())) {
+        if (!element.getText().trim().isEmpty()) {
             elementValue = element.getText();
         }
         return elementValue;

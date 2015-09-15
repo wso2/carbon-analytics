@@ -29,10 +29,8 @@ import org.wso2.carbon.event.processor.manager.core.internal.util.ManagementMode
 import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.siddhi.core.event.Event;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class CarbonEventManagementService implements EventManagementService {
 
@@ -43,7 +41,7 @@ public class CarbonEventManagementService implements EventManagementService {
 
     private EventProcessorManagementService processorManager;
     private EventReceiverManagementService receiverManager;
-    private EventPublisherManagementService publisherManager;
+    private List<EventPublisherManagementService> publisherManager;
 
     private EventHandler receiverEventHandler = new EventHandler();
     private EventHandler presenterEventHandler = new EventHandler();
@@ -66,6 +64,7 @@ public class CarbonEventManagementService implements EventManagementService {
         try {
             managementModeInfo = ManagementModeConfigurationLoader.loadManagementModeInfo();
             mode = managementModeInfo.getMode();
+            publisherManager = new CopyOnWriteArrayList<>();
         } catch (ManagementConfigurationException e) {
             throw new EventManagementException("Error getting management mode information", e);
         }
@@ -102,12 +101,9 @@ public class CarbonEventManagementService implements EventManagementService {
                 presenterEventHandler.startServer(distributedConfiguration.getLocalPresenterConfig(), distributedConfiguration.getPresentationReceiverThreads());
             }
         }
-
-
     }
 
     public void init(HazelcastInstance hazelcastInstance) {
-
         if (mode == Mode.HA) {
             HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
             if (isWorkerNode) {
@@ -247,7 +243,7 @@ public class CarbonEventManagementService implements EventManagementService {
         } else if (manager.getType() == Manager.ManagerType.Receiver) {
             this.receiverManager = (EventReceiverManagementService) manager;
         } else if (manager.getType() == Manager.ManagerType.Publisher) {
-            this.publisherManager = (EventPublisherManagementService) manager;
+            this.publisherManager.add((EventPublisherManagementService) manager);
         }
     }
 
@@ -258,7 +254,7 @@ public class CarbonEventManagementService implements EventManagementService {
         } else if (manager.getType() == Manager.ManagerType.Receiver) {
             this.receiverManager = null;
         } else if (manager.getType() == Manager.ManagerType.Publisher) {
-            this.publisherManager = null;
+            this.publisherManager.remove((EventPublisherManagementService)manager);
         }
     }
 
@@ -297,7 +293,7 @@ public class CarbonEventManagementService implements EventManagementService {
         return receiverManager;
     }
 
-    public EventPublisherManagementService getEventPublisherManagementService() {
+    public List<EventPublisherManagementService> getEventPublisherManagementService() {
         return publisherManager;
     }
 
