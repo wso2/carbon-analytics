@@ -68,7 +68,7 @@ public class AnalyticsEventSinkComponent {
                 log.debug("Started the Analytics Event Sink component");
             }
             ServiceHolder.setAnalyticsEventSinkService(new AnalyticsEventSinkServiceImpl());
-            ServiceHolder.setEventSinkManagementService(new CarbonEventSinkManagementService());
+            ServiceHolder.setEventPublisherManagementService(new CarbonEventSinkManagementService());
             componentContext.getBundleContext().registerService(EventStreamListener.class.getName(),
                     ServiceHolder.getAnalyticsEventStreamListener(), null);
             componentContext.getBundleContext().registerService(AnalyticsEventSinkService.class.getName(),
@@ -77,7 +77,7 @@ public class AnalyticsEventSinkComponent {
                     AnalyticsEventSinkServerStartupObserver.getInstance(), null);
             componentContext.getBundleContext().registerService(
                     AppDeploymentHandler.class.getName(), new AnalyticsEventStoreCAppDeployer(), null);
-            ServiceHolder.getEventManagementService().subscribe(ServiceHolder.getEventSinkManagementService());
+            ServiceHolder.getEventManagementService().subscribe(ServiceHolder.getEventPublisherManagementService());
             this.loadAnalyticsEventSinkConfiguration();
             ServiceHolder.setAnalyticsDSConnector(new AnalyticsDSConnector());
         } catch (Throwable e) {

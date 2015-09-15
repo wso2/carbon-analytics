@@ -55,7 +55,7 @@ public class AnalyticsDSConnector {
 
     public void insertEvents(int tenantId, List<Event> events) throws StreamDefinitionStoreException,
             AnalyticsException {
-        if (!ServiceHolder.getEventSinkManagementService().isDrop()) {
+        if (!ServiceHolder.getEventPublisherManagementService().isDrop()) {
             //In CEP HA setup the same event will be sent along the cluster, and hence only the leader
             // will need to store the event to avoid the duplicate events stored..
             ServiceHolder.getAnalyticsDataAPI().put(convertEventsToRecord(tenantId, events));

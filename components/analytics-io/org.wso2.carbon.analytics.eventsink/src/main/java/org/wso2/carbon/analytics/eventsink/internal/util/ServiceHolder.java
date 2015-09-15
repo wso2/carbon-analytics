@@ -39,7 +39,7 @@ public class ServiceHolder {
     private static AbstractStreamDefinitionStore streamDefinitionStoreService;
     private static AnalyticsEventSinkService analyticsEventSinkService;
     private static EventManagementService eventManagementService;
-    private static EventPublisherManagementService eventSinkManagementService;
+    private static EventPublisherManagementService eventPublisherManagementService;
     private static AnalyticsEventSinkConfiguration analyticsEventSinkConfiguration;
 
     private ServiceHolder(){}
@@ -100,12 +100,12 @@ public class ServiceHolder {
         ServiceHolder.eventManagementService = eventManagementService;
     }
 
-    public static EventPublisherManagementService getEventSinkManagementService() {
-        return eventSinkManagementService;
+    public static EventPublisherManagementService getEventPublisherManagementService() {
+        return eventPublisherManagementService;
     }
 
-    public static void setEventSinkManagementService(EventPublisherManagementService eventSinkManagementService) {
-        ServiceHolder.eventSinkManagementService = eventSinkManagementService;
+    public static void setEventPublisherManagementService(EventPublisherManagementService eventPublisherManagementService) {
+        ServiceHolder.eventPublisherManagementService = eventPublisherManagementService;
     }
 
     public static AnalyticsEventSinkConfiguration getAnalyticsEventSinkConfiguration() {
