@@ -65,7 +65,7 @@ public class UIEventAdapter implements OutputEventAdapter {
     @Override
     public void init() throws OutputEventAdapterException {
 
-        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         //ExecutorService will be assigned  if it is null
         if (executorService == null) {
@@ -153,10 +153,10 @@ public class UIEventAdapter implements OutputEventAdapter {
         }
 
         if (globalProperties.get(UIEventAdapterConstants.ADAPTER_EVENT_QUEUE_SIZE_NAME) != null) {
-            try{
+            try {
                 queueSize = Integer.parseInt(globalProperties.get(UIEventAdapterConstants.ADAPTER_EVENT_QUEUE_SIZE_NAME));
-            } catch (NumberFormatException e){
-                log.error("String does not have the appropriate format for conversion."+e.getMessage());
+            } catch (NumberFormatException e) {
+                log.error("String does not have the appropriate format for conversion." + e.getMessage());
                 queueSize = UIEventAdapterConstants.EVENTS_QUEUE_SIZE;
             }
         } else {
@@ -254,13 +254,13 @@ public class UIEventAdapter implements OutputEventAdapter {
 
         ConcurrentHashMap<String, String> tenantSpecificAdapterMap = UIEventAdaptorServiceInternalValueHolder
                 .getTenantSpecificOutputEventStreamAdapterMap().get(tenantId);
-        if(tenantSpecificAdapterMap != null){
+        if (tenantSpecificAdapterMap != null && streamId != null) {
             tenantSpecificAdapterMap.remove(streamId);      //Removing outputadapter and streamId
         }
 
         ConcurrentHashMap<String, LinkedBlockingDeque<Object>> tenantSpecificStreamEventMap =
                 UIEventAdaptorServiceInternalValueHolder.getTenantSpecificStreamEventMap().get(tenantId);
-        if(tenantSpecificStreamEventMap != null){
+        if (tenantSpecificStreamEventMap != null && streamId != null) {
             tenantSpecificStreamEventMap.remove(streamId);  //Removing the streamId and events registered for the output adapter
         }
     }
@@ -305,7 +305,7 @@ public class UIEventAdapter implements OutputEventAdapter {
                         }
                     }
                 }
-            } else if(doLogDroppedMessage) {
+            } else if (doLogDroppedMessage) {
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "No clients registered", log, tenantId);
                 doLogDroppedMessage = false;
             }
