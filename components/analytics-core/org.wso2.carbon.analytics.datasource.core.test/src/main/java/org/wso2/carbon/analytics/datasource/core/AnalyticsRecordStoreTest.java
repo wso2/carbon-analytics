@@ -592,6 +592,27 @@ public class AnalyticsRecordStoreTest {
     }
 
     @Test
+    public void testDuplicateRecordSearch() throws AnalyticsException {
+        this.cleanupT1();
+        this.analyticsRS.createTable(7, "T1");
+        List<Record> list = new ArrayList<>();
+        Record testRecord = new Record("MyRecord", 7, "T1", new HashMap<String, Object>(), 10000);
+        list.add(testRecord);
+        this.analyticsRS.put(list);
+        Assert.assertEquals(GenericUtils.listRecords(this.analyticsRS,
+                this.analyticsRS.get(7, "T1", 1, null, 9000, 11000, 0, -1)).size(), 1);
+        list.clear();
+        Record testRecord2 = new Record("MyRecord", 7, "T1", new HashMap<String, Object>(), 20000);
+        list.add(testRecord2);
+        this.analyticsRS.put(list);
+        Assert.assertEquals(GenericUtils.listRecords(this.analyticsRS,
+                this.analyticsRS.get(7, "T1", 1, null, 19000, 21000, 0, -1)).size(), 1);
+        Assert.assertEquals(GenericUtils.listRecords(this.analyticsRS,
+                this.analyticsRS.get(7, "T1", 1, null, 9000, 11000, 0, -1)).size(), 0);
+        this.cleanupT1();
+    }
+
+    @Test
     public void testDataRecordAddReadPerformance() throws AnalyticsException {
         System.out.println("\n************** START RECORD PERF TEST [" + this.getImplementationName() + "] **************");
         this.cleanupT1();
