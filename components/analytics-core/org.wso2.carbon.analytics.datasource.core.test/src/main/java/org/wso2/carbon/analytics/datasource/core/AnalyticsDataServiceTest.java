@@ -428,6 +428,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), n);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         this.service.delete(tenantId, tableName, 1030, 1060);
         recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 5, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
