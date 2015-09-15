@@ -91,8 +91,16 @@
 
         $(document).ready(function () {
             loadTableSelect();
-            jQuery('#timeFrom').datetimepicker();
-            jQuery('#timeTo').datetimepicker();
+            timeFromObj = jQuery('#timeFrom').datetimepicker({
+                controlType: 'select',
+                oneLine: true,
+                timeFormat: 'hh:mm tt'
+            });
+            timeToObj = jQuery('#timeTo').datetimepicker({
+                controlType: 'select',
+                oneLine: true,
+                timeFormat: 'hh:mm tt'
+            });
             $("#purgeRecordDialog").dialog({
                 autoOpen: false
             });
@@ -324,18 +332,14 @@
                                           list: val.display,
                                           key: val.key
                                       };
-                                      if (val.type == 'FACET') {
-                                          fields[val.name].placeholder = '{&quot;path&quot;:[&quot;Category 1&quot;, &quot;Category 2&quot;]}';
-                                      } else {
-                                          fields[val.name].placeholder = val.type;
-                                      }
                                       if (val.type == 'STRING' || val.type == 'FACET') {
                                           fields[val.name].type = 'textarea';
-                                      } else if (val.type == 'INTEGER' || val.type == 'LONG') {
+                                      }
+                                      /*else if (val.type == 'INTEGER' || val.type == 'LONG') {
                                           fields[val.name].inputClass = 'validate[custom[integer]]';
                                       } else if (val.type == 'FLOAT' || val.type == 'DOUBLE') {
                                           fields[val.name].inputClass = 'validate[custom[number]]';
-                                      }
+                                       }*/
                                   }
                                   if (val.name == '_unique_rec_id' || val.name == '_timestamp') {
                                       fields[val.name].edit = false;

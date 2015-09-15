@@ -1,6 +1,8 @@
 var tableLoaded = false;
 var facetAvailable = false;
 var arbitraryColumnName;
+var timeFromObj;
+var timeToObj;
 
 function getArbitraryFields(rowData) {
     var $img =
@@ -101,34 +103,40 @@ function listActionMethod(jtParams) {
     postData["jtStartIndex"] = jtParams.jtStartIndex;
     postData["jtPageSize"] = jtParams.jtPageSize;
     postData["tableName"] = $("#tableSelect").val();
-    postData["timeFrom"] = fromTimeStamp;
-    postData["timeTo"] = toTimeStamp;
-    postData["query"] = $("#query").val();
-    var facets = [];
-    $('#facetSearchTable > tbody  > tr').each(function () {
-        var facet = {};
-        var row = $(this);
-        facet.field = row.find("label").text();
-        facet.path = [];
-        row.find("select").each(function (index, node) {
-            if ($(node).val() != '-1') {
-                facet.path.push($(node).val());
+    var searchOption = $('input[name=group1]:radio:checked').val();
+    if ('time' == searchOption) {
+        postData["timeFrom"] = fromTimeStamp;
+        postData["timeTo"] = toTimeStamp;
+    } else if ('query' == searchOption) {
+        postData["query"] = $("#query").val();
+        var facets = [];
+        $('#facetSearchTable > tbody  > tr').each(function () {
+            var facet = {};
+            var row = $(this);
+            facet.field = row.find("label").text();
+            facet.path = [];
+            row.find("select").each(function (index, node) {
+                if ($(node).val() != '-1') {
+                    facet.path.push($(node).val());
+                }
+            });
+            facets.push(facet);
+        });
+        postData["facets"] = JSON.stringify(facets);
+    } else if ('primary' == searchOption) {
+        var primaryKeys = [];
+        $('#primaryKeyTable > tbody  > tr').each(function () {
+            var primary = {};
+            var row = $(this);
+            primary.key = row.find("label").text();
+            primary.value = row.find("input").val();
+            if (primary.value != '') {
+                primaryKeys.push(primary);
             }
         });
-        facets.push(facet);
-    });
-    postData["facets"] = JSON.stringify(facets);
-    var primaryKeys = [];
-    $('#primaryKeyTable > tbody  > tr').each(function () {
-        var primary = {};
-        var row = $(this);
-        primary.key = row.find("label").text();
-        primary.value = row.find("input").val();
-        if (primary.value != '') {
-            primaryKeys.push(primary);
-        }
-    });
-    postData["primary"] = JSON.stringify(primaryKeys);
+        postData["primary"] = JSON.stringify(primaryKeys);
+    }
+
     return $.Deferred(function ($dfd) {
         $.ajax({
                     url: '/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeListRecord,
@@ -278,4 +286,6 @@ function reset() {
     document.getElementById('facetSearchCombo').style.display = 'none';
     document.getElementById('facetSearchTableRow').style.display = 'none';
     document.getElementById('resultsTable').style.display = 'none';
+    timeFromObj.datetimepicker('setDate', '');
+    timeToObj.datetimepicker('setDate', '');
 }
