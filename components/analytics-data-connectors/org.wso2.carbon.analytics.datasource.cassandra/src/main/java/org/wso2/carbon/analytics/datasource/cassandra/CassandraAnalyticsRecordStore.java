@@ -215,14 +215,18 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     public void delete(int tenantId, String tableName, List<String> ids) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
-        ResultSet rs = this.session.execute("SELECT id, timestamp FROM ARS." + dataTable + " WHERE id IN ?", ids);
+        this.deleteTSEntries(tenantId, tableName, dataTable, ids);
+        this.session.execute("DELETE FROM ARS." + dataTable + " WHERE id IN ?", ids);
+    }
+    
+    private void deleteTSEntries(int tenantId, String tableName, String dataTable, List<String> recordIds) {
+        ResultSet rs = this.session.execute("SELECT id, timestamp FROM ARS." + dataTable + " WHERE id IN ?", recordIds);
         List<BigInteger> tsTableTimestamps = this.extractTSTableTimestampList(rs);        
         BatchStatement stmt = new BatchStatement();
         for (BigInteger ts : tsTableTimestamps) {
             stmt.add(this.timestampRecordDeleteStmt.bind(tenantId, tableName, ts));
         }
         this.session.execute(stmt);
-        this.session.execute("DELETE FROM ARS." + dataTable + " WHERE id IN ?", ids);
     }
 
     @Override
@@ -370,24 +374,23 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
                 BigInteger.valueOf(Math.abs(id.hashCode() % TS_MULTIPLIER)));
     }
     
+    private List<String> extractRecordIds(List<Record> batch) {
+        List<String> result = new ArrayList<String>(batch.size());
+        for (Record record : batch) {
+            result.add(record.getId());
+        }
+        return result;
+    }
+    
     private void addBatch(List<Record> batch) throws AnalyticsException, AnalyticsTableNotAvailableException {
         Record firstRecord = batch.get(0);
         int tenantId = firstRecord.getTenantId();
         String tableName = firstRecord.getTableName();
-        try {                
-            String dataTable = this.generateTargetDataTableName(tenantId, tableName);
-            PreparedStatement ps = this.retrieveRecordInsertStmt(dataTable);
-            BatchStatement stmt = new BatchStatement();
-            for (Record record : batch) {
-                stmt.add(ps.bind(record.getId(), record.getTimestamp(), this.getDataMapFromValues(record.getValues())));
-            }
-            this.session.execute(stmt);
-            stmt = new BatchStatement();
-            for (Record record : batch) {
-                stmt.add(this.timestampRecordAddStmt.bind(tenantId, tableName, this.toTSTableTimestamp(record.getTimestamp(), 
-                        record.getId()), record.getId()));
-            }
-            this.session.execute(stmt);
+        String dataTable = this.generateTargetDataTableName(tenantId, tableName);
+        try {
+            this.deleteTSEntries(tenantId, tableName, dataTable, this.extractRecordIds(batch));
+            this.addRawRecordBatch(dataTable, batch);
+            this.addTSRecordBatch(tenantId, tableName, batch);
         } catch (Exception e) {
             if (!this.tableExists(tenantId, tableName)) {
                 throw new AnalyticsTableNotAvailableException(tenantId, tableName);
@@ -395,6 +398,24 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
                 throw new AnalyticsException("Error in adding record batch: " + e.getMessage(), e);
             }
         }
+    }
+    
+    private void addRawRecordBatch(String dataTable, List<Record> batch) {
+        PreparedStatement ps = this.retrieveRecordInsertStmt(dataTable);
+        BatchStatement stmt = new BatchStatement();
+        for (Record record : batch) {
+            stmt.add(ps.bind(record.getId(), record.getTimestamp(), this.getDataMapFromValues(record.getValues())));
+        }
+        this.session.execute(stmt);
+    }
+        
+    private void addTSRecordBatch(int tenantId, String tableName, List<Record> batch) {
+        BatchStatement stmt = new BatchStatement();
+        for (Record record : batch) {
+            stmt.add(this.timestampRecordAddStmt.bind(tenantId, tableName, this.toTSTableTimestamp(record.getTimestamp(), 
+                    record.getId()), record.getId()));
+        }
+        this.session.execute(stmt);
     }
 
     private boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
