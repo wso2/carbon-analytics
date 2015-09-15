@@ -347,7 +347,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         if (!this.tableExists(tenantId, tableName)) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
-        if ((timeFrom < 0) && (timeTo >= Long.MAX_VALUE - 1) && (numPartitionsHint > 1)) {
+        if ((timeFrom < 0) && (timeTo >= Long.MAX_VALUE - 1)) {
             log.debug("Performing GET on region split contours for table " + tableName + " and tenantID " + tenantId);
             return this.computeRegionSplits(tenantId, tableName, columns, recordsCount);
         } else {
