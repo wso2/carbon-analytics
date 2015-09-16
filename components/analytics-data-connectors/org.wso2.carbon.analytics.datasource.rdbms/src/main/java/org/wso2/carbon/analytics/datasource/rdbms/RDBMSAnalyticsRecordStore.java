@@ -637,6 +637,11 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     public boolean isPaginationSupported() {
         return this.rdbmsQueryConfigurationEntry.isPaginationSupported();
     }
+    
+    @Override
+    public boolean isRecordCountSupported() {
+        return this.rdbmsQueryConfigurationEntry.isRecordCountSupported();
+    }
 
     @Override
     public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo)

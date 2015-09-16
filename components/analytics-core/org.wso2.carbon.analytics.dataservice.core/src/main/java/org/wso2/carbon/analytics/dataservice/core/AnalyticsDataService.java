@@ -219,14 +219,22 @@ public interface AnalyticsDataService {
     /**
      * Checks whether or not pagination (i.e. jumping to record n and then retrieving k further records)
      * is supported by the given record store implementation.
-     * Also returns false if the total record count in a table cannot be determined.
      * @param recordStoreName The record store name
      *
-     * @return Pagination/row-count support
+     * @return Pagination support
      * @throws AnalyticsException
      */
     boolean isPaginationSupported(String recordStoreName) throws AnalyticsException;
-
+    
+    /**
+     * Checks whether or not record count operation is supported by the given record store implementation.
+     * @param recordStoreName The record store name
+     *
+     * @return Record count support
+     * @throws AnalyticsException
+     */
+    boolean isRecordCountSupported(String recordStoreName) throws AnalyticsException;
+    
     /**
      * Deletes a set of records in the table.
      * @param tenantId The tenant which this table belongs to

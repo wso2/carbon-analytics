@@ -211,6 +211,15 @@ public interface SecureAnalyticsDataService {
      * @throws AnalyticsException
      */
     boolean isPaginationSupported(String recordStoreName) throws AnalyticsException;
+    
+    /**
+     * Checks whether or not record count operation is supported by the given record store implementation.
+     * @param recordStoreName The record store name
+     *
+     * @return Record count support
+     * @throws AnalyticsException
+     */
+    boolean isRecordCountSupported(String recordStoreName) throws AnalyticsException;
 
     /**
      * Deletes a set of records in the table.

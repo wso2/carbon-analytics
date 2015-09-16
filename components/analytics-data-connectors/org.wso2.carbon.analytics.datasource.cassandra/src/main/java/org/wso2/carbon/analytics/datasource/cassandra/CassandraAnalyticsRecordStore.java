@@ -354,6 +354,11 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     @Override
+    public boolean isRecordCountSupported() {
+        return false;
+    }
+    
+    @Override
     public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
         Collection<List<Record>> batches = GenericUtils.generateRecordBatches(records);
         for (List<Record> batch : batches) {

@@ -183,6 +183,11 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     public boolean isPaginationSupported(String recordStoreName) throws AnalyticsException {
         return analyticsDataService.isPaginationSupported(recordStoreName);
     }
+    
+    @Override
+    public boolean isRecordCountSupported(String recordStoreName) throws AnalyticsException {
+        return analyticsDataService.isRecordCountSupported(recordStoreName);
+    }
 
     @Override
     public void delete(String username, String tableName, long timeFrom, long timeTo)

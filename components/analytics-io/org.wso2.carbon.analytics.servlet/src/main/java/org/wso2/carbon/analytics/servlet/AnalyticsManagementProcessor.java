@@ -36,6 +36,8 @@ import java.io.PrintWriter;
  */
 public class AnalyticsManagementProcessor extends HttpServlet {
 
+    private static final long serialVersionUID = 1239990860409556231L;
+
     /**
      * Login operation for remote analytics api servlet.
      *
@@ -79,6 +81,27 @@ public class AnalyticsManagementProcessor extends HttpServlet {
                 boolean isSupported = ServiceHolder.getAnalyticsDataService().isPaginationSupported(recordStoreName);
                 PrintWriter writer = resp.getWriter();
                 writer.print(AnalyticsAPIConstants.PAGINATION_SUPPORT + AnalyticsAPIConstants.SEPARATOR + isSupported);
+                resp.setStatus(HttpServletResponse.SC_OK);
+            } catch (AnalyticsException e) {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            }
+        } else if (operation != null && operation.equalsIgnoreCase(AnalyticsAPIConstants.IS_RECORD_COUNT_SUPPORTED_OPERATION)) {
+            String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
+            if (sessionId == null || sessionId.trim().isEmpty()) {
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+            } else {
+                try {
+                    ServiceHolder.getAuthenticator().validateSessionId(sessionId);
+                } catch (AnalyticsAPIAuthenticationException e) {
+                    resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+                }
+            }
+            String recordStoreName = req.getParameter(AnalyticsAPIConstants.RECORD_STORE_NAME_PARAM);
+
+            try {
+                boolean isSupported = ServiceHolder.getAnalyticsDataService().isRecordCountSupported(recordStoreName);
+                PrintWriter writer = resp.getWriter();
+                writer.print(AnalyticsAPIConstants.RECORD_COUNT_SUPPORT + AnalyticsAPIConstants.SEPARATOR + isSupported);
                 resp.setStatus(HttpServletResponse.SC_OK);
             } catch (AnalyticsException e) {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
