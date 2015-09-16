@@ -53,6 +53,7 @@ public class AnalyticsAPIConstants {
     public static final String OPERATION = "__operation";
     public static final String SESSION_ID = "__sessionId";
     public static final String PAGINATION_SUPPORT = "__paginationSupport";
+    public static final String RECORD_COUNT_SUPPORT = "__recordCountSupport";
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BASIC_AUTH_HEADER = "Basic ";
     public static final String SEPARATOR = ":";
@@ -86,6 +87,7 @@ public class AnalyticsAPIConstants {
     public static final String GET_RECORDS_WITH_KEY_VALUES_OPERATION = "__get_records_with_key_values_opr";
     public static final String GET_IDS_RECORD_GROUP_OPERATION = "__get_ids_record_group_opr";
     public static final String IS_PAGINATION_SUPPORTED_OPERATION = "__is_pagination_supported_opr";
+    public static final String IS_RECORD_COUNT_SUPPORTED_OPERATION = "__is_record_count_supported_opr";
     public static final String GET_RECORD_STORE_OF_TABLE_OPERATION = "__get_record_store_opr";
     public static final String LIST_RECORD_STORES_OPERATION = "__list_record_stores_opr";
     public static final String ANALYTICS_REMOTE_API_INVOCATION_PERMISSION = "/permission/admin/manage/analytics/api";

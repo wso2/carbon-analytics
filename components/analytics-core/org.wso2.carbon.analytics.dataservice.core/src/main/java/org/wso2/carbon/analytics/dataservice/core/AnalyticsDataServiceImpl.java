@@ -827,6 +827,11 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public boolean isPaginationSupported(String recordStoreName) throws AnalyticsException {
         return this.getAnalyticsRecordStore(recordStoreName).isPaginationSupported();
     }
+    
+    @Override
+    public boolean isRecordCountSupported(String recordStoreName) throws AnalyticsException {
+        return this.getAnalyticsRecordStore(recordStoreName).isRecordCountSupported();
+    }
 
     @Override
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException,

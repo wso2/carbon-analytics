@@ -65,6 +65,14 @@ public interface AnalyticsRecordStore {
      * @return Pagination/row-count support
      */
     boolean isPaginationSupported();
+    
+    /**
+     * Checks whether or not record count operation is supported.
+     *
+     * @return Record count support
+     * @throws AnalyticsException
+     */
+    boolean isRecordCountSupported() throws AnalyticsException;
 
     /**
      * Returns the number of records in the table with the given category and name, -1 if the number of records cannot

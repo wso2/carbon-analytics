@@ -420,6 +420,17 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             return AnalyticsAPIHttpClient.getInstance().isPaginationSupported(recordStoreName);
         }
     }
+    
+    @Override
+    public boolean isRecordCountSupported(String recordStoreName) throws AnalyticsException {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
+            return ServiceHolder.getAnalyticsDataService().isRecordCountSupported(recordStoreName);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                    analyticsDataConfiguration.getPassword());
+            return AnalyticsAPIHttpClient.getInstance().isRecordCountSupported(recordStoreName);
+        }
+    }
 
     @Override
     public void delete(String username, String tableName, long timeFrom, long timeTo) throws AnalyticsException {

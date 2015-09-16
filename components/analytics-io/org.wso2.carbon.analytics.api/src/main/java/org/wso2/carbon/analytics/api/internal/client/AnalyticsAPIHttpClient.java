@@ -1066,6 +1066,40 @@ public class AnalyticsAPIHttpClient {
                     + e.getMessage(), e);
         }
     }
+    
+    public boolean isRecordCountSupported(String recordStoreName) {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(this.protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.MANAGEMENT_SERVICE_URI)
+                .setParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.IS_RECORD_COUNT_SUPPORTED_OPERATION)
+                .addParameter(AnalyticsAPIConstants.RECORD_STORE_NAME_PARAM, recordStoreName);
+        try {
+            HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
+            HttpResponse httpResponse = httpClient.execute(getMethod);
+            String response = getResponseString(httpResponse);
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                throw new AnalyticsServiceException("Error while checking the record count support. " + response);
+            }
+            if (response.startsWith(AnalyticsAPIConstants.RECORD_COUNT_SUPPORT)) {
+                String[] reponseElements = response.split(AnalyticsAPIConstants.SEPARATOR);
+                if (reponseElements.length == 2) {
+                    return Boolean.parseBoolean(reponseElements[1]);
+                } else {
+                    throw new AnalyticsServiceAuthenticationException("Invalid response returned, cannot find " +
+                            "record count support element. Response:" + response);
+                }
+            } else {
+                throw new AnalyticsServiceAuthenticationException("Invalid response returned, no record count support found!"
+                        + response);
+            }
+        } catch (URISyntaxException e) {
+            throw new AnalyticsServiceException("Malformed URL provided for record count support checking. "
+                    + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AnalyticsServiceException("Error while connecting to the remote service. "
+                    + e.getMessage(), e);
+        }
+    }
 
     @SuppressWarnings("unchecked")
     public List<SearchResultEntry> drillDownSearch(int tenantId, String username,
