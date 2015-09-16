@@ -183,7 +183,7 @@
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
-        <recordMergeQuery>MERGE {{TABLE_NAME}} AS dest USING (SELECT ?, ?, ?, ?) AS src (partition_key, timestamp, data, record_id) ON (dest.record_id = src.record_id) WHEN MATCHED THEN UPDATE SET partition_key = src.partition_key, timestamp = src.timestamp, data = src.data WHEN NOT MATCHED THEN INSERT(partition_key, timestamp, data, record_id) VALUES (src.partition_key, src.timestamp, src.data, src.record_id);</recordMergeQuery>
+        <!--recordMergeQuery>MERGE {{TABLE_NAME}} AS dest USING (SELECT ?, ?, ?, ?) AS src (partition_key, timestamp, data, record_id) ON (dest.record_id = src.record_id) WHEN MATCHED THEN UPDATE SET partition_key = src.partition_key, timestamp = src.timestamp, data = src.data WHEN NOT MATCHED THEN INSERT(partition_key, timestamp, data, record_id) VALUES (src.partition_key, src.timestamp, src.data, src.record_id);</recordMergeQuery-->
         <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (partition_key, timestamp, data, record_id) VALUES (?, ?, ?, ?)</recordInsertQuery>
         <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET partition_key = ?, timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
         <recordRetrievalQuery>SELECT record_id, timestamp, data FROM (SELECT ROW_NUMBER() OVER(ORDER BY record_id) AS rownumber, record_id, timestamp, data FROM {{TABLE_NAME}} WHERE partition_key &gt;= ? and partition_key &lt; ? AND timestamp &gt;= ? AND timestamp &lt; ?) AS A WHERE A.rownumber &lt;= ? AND A.rownumber &gt; ?</recordRetrievalQuery>
@@ -217,7 +217,7 @@
         <fsTablesCheckQuery>SELECT path FROM AN_FS_PATH WHERE path = '/'</fsTablesCheckQuery>
         <fsUpdateDataChunkQuery>UPDATE AN_FS_DATA SET data = ? WHERE path = ? AND sequence = ?</fsUpdateDataChunkQuery>
         <fsWriteDataChunkQuery>INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?,?,?)</fsWriteDataChunkQuery>
-        <fsMergeDataChunkQuery>MERGE AN_FS_DATA AS dest USING (SELECT ?, ?, ?) AS src (path, sequence, data) ON (dest.path = src.path AND dest.sequence = src.sequence) WHEN MATCHED THEN UPDATE SET data = src.data WHEN NOT MATCHED THEN INSERT(path, sequence, data) VALUES (src.path, src.sequence, src.data);</fsMergeDataChunkQuery>
+        <!--fsMergeDataChunkQuery>MERGE AN_FS_DATA AS dest USING (SELECT ?, ?, ?) AS src (path, sequence, data) ON (dest.path = src.path AND dest.sequence = src.sequence) WHEN MATCHED THEN UPDATE SET data = src.data WHEN NOT MATCHED THEN INSERT(path, sequence, data) VALUES (src.path, src.sequence, src.data);</fsMergeDataChunkQuery-->
     </database>
     <database name = "PostgreSQL">
         <recordCountSupported>false</recordCountSupported>
