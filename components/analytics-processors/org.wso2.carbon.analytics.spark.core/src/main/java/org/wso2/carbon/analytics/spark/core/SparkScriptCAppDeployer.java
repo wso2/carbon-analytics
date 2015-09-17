@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.exception.SparkScriptDeploymentException;
 import org.wso2.carbon.analytics.spark.core.internal.AnalyticsPersistenceManager;
+import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.application.deployer.AppDeployerConstants;
@@ -49,6 +50,13 @@ public class SparkScriptCAppDeployer implements AppDeploymentHandler {
     @Override
     public void deployArtifacts(CarbonApplication carbonApplication, AxisConfiguration axisConfiguration)
             throws DeploymentException {
+        // disabling spark scripts deploying if analytics execution is disabled DAS-133
+        if (!ServiceHolder.isAnalyticsExecutionEnabled()) {
+            if(log.isDebugEnabled()){
+                log.debug("Spark Script deployment is omitted because Analytics Execution is disabled");
+            }
+            return;
+        }
         List<Artifact.Dependency> artifacts = carbonApplication.getAppConfig().getApplicationArtifact()
                 .getDependencies();
         // loop through all artifacts
