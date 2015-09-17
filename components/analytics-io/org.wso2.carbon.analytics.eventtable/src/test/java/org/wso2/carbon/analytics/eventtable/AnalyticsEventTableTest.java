@@ -92,6 +92,8 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
         Thread.sleep(4000);
+        executionPlanRuntime.shutdown();
+        siddhiManager.shutdown();
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 2);
@@ -117,6 +119,8 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
         Thread.sleep(4000);
+        executionPlanRuntime.shutdown();
+        siddhiManager.shutdown();
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 2);
@@ -143,6 +147,8 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
         Thread.sleep(4000);
+        executionPlanRuntime.shutdown();
+        siddhiManager.shutdown();
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 2);
@@ -217,6 +223,7 @@ public class AnalyticsEventTableTest {
         Assert.assertEquals(true, this.eventArrived);
 
         executionPlanRuntime.shutdown();
+        siddhiManager.shutdown();
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
@@ -289,6 +296,7 @@ public class AnalyticsEventTableTest {
         Assert.assertEquals(this.eventArrived, true);
 
         executionPlanRuntime.shutdown();
+        siddhiManager.shutdown();
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
@@ -361,6 +369,7 @@ public class AnalyticsEventTableTest {
         Assert.assertEquals(this.eventArrived, true);
 
         executionPlanRuntime.shutdown();
+        siddhiManager.shutdown();
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
@@ -433,6 +442,7 @@ public class AnalyticsEventTableTest {
         Assert.assertEquals(this.eventArrived, true);
 
         executionPlanRuntime.shutdown();
+        siddhiManager.shutdown();
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
@@ -566,6 +576,7 @@ public class AnalyticsEventTableTest {
         Assert.assertEquals(eventArrived, true);
 
         executionPlanRuntime.shutdown();
+        siddhiManager.shutdown();
 
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
@@ -618,6 +629,8 @@ public class AnalyticsEventTableTest {
         Assert.assertEquals(recordsIn.size(), 2);
 
         executionPlanRuntime.shutdown();
+        siddhiManager.shutdown();
+        
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
