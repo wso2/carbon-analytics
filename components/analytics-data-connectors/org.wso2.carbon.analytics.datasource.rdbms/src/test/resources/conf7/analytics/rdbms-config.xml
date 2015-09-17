@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rdbms-configuration>
-    <database name = "DB2/NT64">
+    <database name = "DB2.*">
         <recordCountSupported>true</recordCountSupported>
         <paginationSupported>false</paginationSupported>
         <paginationMode>MODE1</paginationMode>
-        <paginationFirstInclusive>true</paginationFirstInclusive>
-        <paginationFirstZeroIndexed>true</paginationFirstZeroIndexed>
-        <paginationSecondInclusive>false</paginationSecondInclusive>
-        <paginationSecondLength>true</paginationSecondLength>
-        <paginationSecondZeroIndexed>false</paginationSecondZeroIndexed>
         <blobLengthRequired>true</blobLengthRequired>
         <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} FETCH FIRST 1 ROWS ONLY</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>

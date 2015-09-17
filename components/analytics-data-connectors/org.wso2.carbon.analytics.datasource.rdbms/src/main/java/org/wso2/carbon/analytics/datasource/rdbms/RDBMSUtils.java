@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBContext;
@@ -41,6 +42,8 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+
+import com.google.common.collect.Maps;
 
 /**
  * Utility methods for RDBMS based operations for analytics data source.
@@ -193,17 +196,12 @@ public class RDBMSUtils {
      */
     private static class RDBMSConfigurationMapper {
         
-        private Map<String, List<RDBMSQueryConfigurationEntry>> entries = new HashMap<String, List<RDBMSQueryConfigurationEntry>>();
+        private List<Map.Entry<Pattern, RDBMSQueryConfigurationEntry>> entries = 
+                new ArrayList<Map.Entry<Pattern, RDBMSQueryConfigurationEntry>>();
         
         public RDBMSConfigurationMapper(RDBMSQueryConfiguration config) {
-            List<RDBMSQueryConfigurationEntry> configs;
             for (RDBMSQueryConfigurationEntry entry : config.getDatabases()) {
-                configs = this.entries.get(entry.getDatabaseName().toLowerCase());
-                if (configs == null) {
-                    configs = new ArrayList<RDBMSQueryConfigurationEntry>();
-                    this.entries.put(entry.getDatabaseName().toLowerCase(), configs);
-                }
-                configs.add(entry);
+                this.entries.add(Maps.immutableEntry(Pattern.compile(entry.getDatabaseName().toLowerCase()), entry));
             }
         }
         
@@ -219,8 +217,18 @@ public class RDBMSUtils {
             return true;
         }
         
+        private List<RDBMSQueryConfigurationEntry> extractMatchingConfigEntries(String dbName) {
+            List<RDBMSQueryConfigurationEntry> result = new ArrayList<RDBMSQueryConfigurationEntry>();
+            for (Map.Entry<Pattern, RDBMSQueryConfigurationEntry> entry : this.entries) {
+                if (entry.getKey().matcher(dbName).find()) {
+                    result.add(entry.getValue());
+                }
+            }
+            return result;
+        }
+        
         public RDBMSQueryConfigurationEntry lookupEntry(String dbName, double version, String category) {
-            List<RDBMSQueryConfigurationEntry> dbResults = this.entries.get(dbName.toLowerCase());
+            List<RDBMSQueryConfigurationEntry> dbResults = this.extractMatchingConfigEntries(dbName.toLowerCase());
             if (dbResults == null || dbResults.isEmpty()) {
                 return null;
             }
