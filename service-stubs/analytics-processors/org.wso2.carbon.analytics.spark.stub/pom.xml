@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>analytics-processor-service-stubs</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -33,12 +33,12 @@
                                     <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar" />
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg line="-uri src/main/resources/AnalyticsProcessorAdminService.wsdl -uw -o target/generated-code -p org.wso2.carbon.analytics.spark.admin.stub                                     -ns2p http://utils.carbon.wso2.org/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.carbon,http://util.java/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.carbon,http://spark.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.carbon,http://org.apache.axis2/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.axis2,http://neethi.apache.org/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.neethi" />
+                                    <arg line="-uri src/main/resources/AnalyticsProcessorAdminService.wsdl -uw -o target/generated-code -p org.wso2.carbon.analytics.spark.admin.stub -ns2p http://utils.carbon.wso2.org/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.carbon,http://util.java/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.carbon,http://spark.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.carbon,http://org.apache.axis2/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.axis2,http://neethi.apache.org/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.neethi" />
                                     <classpath refid="wsdl2java.classpath" />
                                 </java>
 
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg line="-uri src/main/resources/AnalyticsProcessorAdminService.wsdl -uw -o target/generated-code -p org.wso2.carbon.analytics.spark.admin.stub                                     -ns2p http://utils.carbon.wso2.org/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.carbon,http://util.java/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.carbon,http://spark.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.carbon,http://org.apache.axis2/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.axis2,http://neethi.apache.org/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.neethi" />
+                                    <arg line="-uri src/main/resources/AnalyticsProcessorAdminService.wsdl -uw -o target/generated-code -p org.wso2.carbon.analytics.spark.admin.stub -ns2p http://utils.carbon.wso2.org/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.carbon,http://util.java/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.carbon,http://spark.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.carbon,http://org.apache.axis2/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.axis2,http://neethi.apache.org/xsd=org.wso2.carbon.analytics.spark.admin.stub.types.neethi" />
                                     <classpath refid="wsdl2java.classpath" />
                                 </java>
                             </tasks>
