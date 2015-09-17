@@ -17,13 +17,11 @@
  ~ under the License.
  -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>analytics-views-stubs</artifactId>
         <groupId>org.wso2.carbon.analytics</groupId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>1.0.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.analytics.activitydashboard.stub</artifactId>
@@ -50,8 +48,7 @@
 
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg
-                                            line="-uri src/main/resources/ActivityDashboardAdminService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.activitydashboard.stub -ns2p http://org.apache.axis2/xsd=org.wso2.carbon.analytics.activitydashboard.stub.axis2,http://admin.activitydashboard.analytics.carbon.wso2.org=org.wso2.carbon.analytics.activitydashboard.stub,http://admin.activitydashboard.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.activitydashboard.stub,http://bean.admin.activitydashboard.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.activitydashboard.stub.bean" />
+                                    <arg line="-uri src/main/resources/ActivityDashboardAdminService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.activitydashboard.stub -ns2p http://org.apache.axis2/xsd=org.wso2.carbon.analytics.activitydashboard.stub.axis2,http://admin.activitydashboard.analytics.carbon.wso2.org=org.wso2.carbon.analytics.activitydashboard.stub,http://admin.activitydashboard.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.activitydashboard.stub,http://bean.admin.activitydashboard.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.activitydashboard.stub.bean" />
                                     <classpath refid="wsdl2java.classpath" />
                                 </java>
                             </tasks>
