@@ -1187,7 +1187,7 @@
 
         <!-- carbon-analytics repo versions -->
         <carbon.analytics.version>1.0.4-SNAPSHOT</carbon.analytics.version>
-        <carbon.analytics.imp.pkg.version>[1.0.3, 1.1.0)</carbon.analytics.imp.pkg.version>
+        <carbon.analytics.imp.pkg.version>[1.0.4-SNAPSHOT, 1.1.0)</carbon.analytics.imp.pkg.version>
 
         <!-- Carbon platform version -->
         <carbon.kernel.version>4.4.1</carbon.kernel.version>
