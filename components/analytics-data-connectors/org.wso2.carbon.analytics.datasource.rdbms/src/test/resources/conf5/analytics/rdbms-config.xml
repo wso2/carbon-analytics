@@ -4,11 +4,6 @@
         <recordCountSupported>true</recordCountSupported>
         <paginationSupported>false</paginationSupported>
         <paginationMode>MODE2</paginationMode>
-        <paginationFirstInclusive>true</paginationFirstInclusive>
-        <paginationFirstZeroIndexed>true</paginationFirstZeroIndexed>
-        <paginationSecondInclusive>false</paginationSecondInclusive>
-        <paginationSecondLength>true</paginationSecondLength>
-        <paginationSecondZeroIndexed>false</paginationSecondZeroIndexed>
         <blobLengthRequired>true</blobLengthRequired>
         <recordTableCheckQuery>SELECT TOP 1 1 from {{TABLE_NAME}}</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>

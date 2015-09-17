@@ -4,11 +4,6 @@
         <recordCountSupported>true</recordCountSupported>
         <paginationSupported>false</paginationSupported>
         <paginationMode>MODE1</paginationMode>
-        <paginationFirstInclusive>true</paginationFirstInclusive>
-        <paginationFirstZeroIndexed>true</paginationFirstZeroIndexed>
-        <paginationSecondInclusive>false</paginationSecondInclusive>
-        <paginationSecondLength>true</paginationSecondLength>
-        <paginationSecondZeroIndexed>false</paginationSecondZeroIndexed>
         <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>

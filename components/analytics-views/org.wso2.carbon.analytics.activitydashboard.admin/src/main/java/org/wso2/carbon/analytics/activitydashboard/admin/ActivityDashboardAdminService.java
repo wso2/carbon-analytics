@@ -47,6 +47,17 @@ import java.util.*;
  */
 public class ActivityDashboardAdminService extends AbstractAdmin {
     private static final Log logger = LogFactory.getLog(ActivityDashboardAdminService.class);
+    private static final String AT_SIGN = "@";
+
+    /**
+     * This method is use to get logged in username with tenant domain
+     *
+     * @return Username with tenant domain
+     */
+    @Override
+    protected String getUsername() {
+        return super.getUsername() + AT_SIGN + super.getTenantDomain();
+    }
 
     public String[] getActivities(ActivitySearchRequest activitySearchRequest)
             throws ActivityDashboardException {

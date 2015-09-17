@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rdbms-configuration>
-    <database name = "h2" minVersion = "1.0" maxVersion = "10.0">
+    <database name = "h2.*" minVersion = "1.0" maxVersion = "10.0">
         <recordCountSupported>true</recordCountSupported>
         <paginationSupported>false</paginationSupported>
         <paginationMode>MODE1</paginationMode>
