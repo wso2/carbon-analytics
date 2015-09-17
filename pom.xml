@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2</groupId>
@@ -12,7 +10,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>carbon-analytics</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4-SNAPSHOT</version>
     <name>WSO2 Carbon - Analytics Platform Aggregator Pom</name>
     <url>http://wso2.org</url>
 
@@ -1188,8 +1186,8 @@
     <properties>
 
         <!-- carbon-analytics repo versions -->
-        <carbon.analytics.version>1.0.3-SNAPSHOT</carbon.analytics.version>
-        <carbon.analytics.imp.pkg.version>[1.0.3-SNAPSHOT, 1.1.0)</carbon.analytics.imp.pkg.version>
+        <carbon.analytics.version>1.0.4-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.imp.pkg.version>[1.0.4-SNAPSHOT, 1.1.0)</carbon.analytics.imp.pkg.version>
 
         <!-- Carbon platform version -->
         <carbon.kernel.version>4.4.1</carbon.kernel.version>
