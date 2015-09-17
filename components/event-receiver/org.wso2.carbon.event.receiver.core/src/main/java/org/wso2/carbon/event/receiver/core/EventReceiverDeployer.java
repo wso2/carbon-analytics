@@ -233,7 +233,7 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
                 throw new EventReceiverConfigurationException(e);
             }
         } else {
-            log.info("Event Receiver " + eventReceiverFile.getName() + " is already registered with this tenant (" + tenantId + "), hence ignoring redeployment");
+            throw new EventReceiverConfigurationException("Event Receiver " + eventReceiverFile.getName() + " is already registered with this tenant (" + tenantId + ")");
         }
     }
 

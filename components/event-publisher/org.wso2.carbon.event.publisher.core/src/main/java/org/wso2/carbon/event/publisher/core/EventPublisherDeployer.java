@@ -223,7 +223,7 @@ public class EventPublisherDeployer extends AbstractDeployer implements EventPro
                 throw new EventPublisherConfigurationException(e);
             }
         } else {
-            log.info("Event Publisher " + eventPublisherFile.getName() + " is already registered with this tenant (" + tenantId + "), hence ignoring redeployment");
+            throw new EventPublisherConfigurationException("Event Publisher " + eventPublisherFile.getName() + " is already registered with this tenant (" + tenantId + ")");
         }
     }
 

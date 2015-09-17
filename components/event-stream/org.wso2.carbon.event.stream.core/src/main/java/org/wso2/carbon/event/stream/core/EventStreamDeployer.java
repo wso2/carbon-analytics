@@ -15,6 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.event.stream.core;
 
 import org.apache.axis2.context.ConfigurationContext;
@@ -110,14 +111,7 @@ public class EventStreamDeployer extends AbstractDeployer implements EventProces
             StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(content);
             StreamDefinition existingStreamDefinition = carbonEventStreamService.getStreamDefinition(streamDefinition.getStreamId());
             if (existingStreamDefinition != null) {
-                if (carbonEventStreamService.isMatchForStreamDefinition(streamDefinition, existingStreamDefinition)) {
-                    log.info("Event stream " + streamDefinition.getStreamId() + " with same attributes " +
-                            " already exists.");
-                    return;
-                } else {
-                    throw new EventStreamConfigurationException("Stream with same stream id, but different " +
-                            "attributes already exist for stream: " + streamDefinition.getStreamId());
-                }
+                throw new EventStreamConfigurationException("Event stream already exists for stream id: " + streamDefinition.getStreamId());
             }
             if (!carbonEventStreamService.isEventStreamFileExists(eventStreamFile.getName())) {
                 EventStreamConfiguration eventStreamConfiguration = new EventStreamConfiguration();
