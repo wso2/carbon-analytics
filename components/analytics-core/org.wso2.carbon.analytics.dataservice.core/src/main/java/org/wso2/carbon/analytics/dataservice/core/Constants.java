@@ -37,5 +37,9 @@ public class Constants {
     public static final String INCLUDE_CLASS_SPLITTER = "###";
     public static final String DISABLE_ANALYTICS_DATA_PURGING_JVM_OPTION = "disableDataPurging";
     public static final int RECORDS_BATCH_SIZE = 1000;
+    public static final String ANALYTICS_DATA_PURGING = "ANALYTICS_DATA_PURGING";
+    public static final String TABLE = "table";
+    public static final String TENANT_ID = "tenantId";
+    public static final String CRON_STRING = "cronString";
     
 }

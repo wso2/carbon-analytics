@@ -20,17 +20,19 @@ package org.wso2.carbon.analytics.dataservice.core.config;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * This class represents the configuration for analytics data purging.
  */
+@XmlRootElement(name = "analytics-data-purging")
 public class AnalyticsDataPurgingConfiguration {
     private boolean enable;
     private String cronExpression;
     private int retentionDays;
     private AnalyticsDataPurgingIncludeTable[] purgingIncludeTables;
 
-    @XmlElement(name = "purging-enable", nillable = false)
+    @XmlElement(name = "purging-enable", required=false)
     public boolean isEnable() {
         return enable;
     }
@@ -57,7 +59,7 @@ public class AnalyticsDataPurgingConfiguration {
         this.retentionDays = retentionDays;
     }
 
-    @XmlElementWrapper(name = "purge-include-table-patterns")
+    @XmlElementWrapper(name = "purge-include-tables")
     @XmlElement(name = "table")
     public AnalyticsDataPurgingIncludeTable[] getPurgingIncludeTables() {
         return purgingIncludeTables;

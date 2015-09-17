@@ -21,11 +21,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.analytics.dataservice.core.Constants;
+import org.wso2.carbon.analytics.dataservice.core.tasks.AnalyticsDataPurgingTask;
 import org.wso2.carbon.analytics.messageconsole.beans.PermissionBean;
 import org.wso2.carbon.analytics.messageconsole.beans.ScheduleTaskInfo;
 import org.wso2.carbon.analytics.messageconsole.exception.MessageConsoleException;
 import org.wso2.carbon.analytics.messageconsole.internal.ServiceHolder;
-import org.wso2.carbon.analytics.messageconsole.purging.AnalyticsDataPurgingTask;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.ntask.common.TaskException;
@@ -100,13 +100,12 @@ public class MessageConsoleService extends AbstractAdmin {
             throws MessageConsoleException {
         try {
             TaskInfo taskInfo = createDataPurgingTask(table, cronString, retentionPeriod);
-            TaskManager taskManager = ServiceHolder.getTaskService().getTaskManager(org.wso2.carbon.analytics.messageconsole.Constants
-                                                                                            .ANALYTICS_DATA_PURGING);
+            TaskManager taskManager = ServiceHolder.getTaskService().getTaskManager(Constants.ANALYTICS_DATA_PURGING);
             if (taskManager != null) {
                 taskManager.deleteTask(taskInfo.getName());
                 if (cronString != null) {
                     taskManager.registerTask(taskInfo);
-                    taskManager.scheduleTask(taskInfo.getName());
+                    taskManager.rescheduleTask(taskInfo.getName());
                 }
             } else {
                 log.warn("TaskManager instance is null");
@@ -127,14 +126,12 @@ public class MessageConsoleService extends AbstractAdmin {
     public ScheduleTaskInfo getDataPurgingDetails(String table) throws MessageConsoleException {
         ScheduleTaskInfo taskInfo = new ScheduleTaskInfo();
         try {
-            TaskManager taskManager = ServiceHolder.getTaskService().getTaskManager(org.wso2.carbon.analytics.messageconsole.Constants
-                                                                                            .ANALYTICS_DATA_PURGING);
+            TaskManager taskManager = ServiceHolder.getTaskService().getTaskManager(Constants.ANALYTICS_DATA_PURGING);
             if (taskManager != null && taskManager.isTaskScheduled(getDataPurgingTaskName(table))) {
                 TaskInfo task = taskManager.getTask(getDataPurgingTaskName(table));
                 if (task != null) {
-                    taskInfo.setCronString(task.getProperties().get(org.wso2.carbon.analytics.messageconsole.Constants.CRON_STRING));
-                    taskInfo.setRetentionPeriod(Integer.parseInt(task.getProperties().get(org.wso2.carbon.analytics.messageconsole.Constants
-                                                                                                  .RETENTION_PERIOD)));
+                    taskInfo.setCronString(task.getProperties().get(Constants.CRON_STRING));
+                    taskInfo.setRetentionPeriod(Integer.parseInt(task.getProperties().get(Constants.RETENTION_PERIOD)));
                 }
             }
         } catch (TaskException e) {
@@ -148,11 +145,11 @@ public class MessageConsoleService extends AbstractAdmin {
         String taskName = getDataPurgingTaskName(table);
         TaskInfo.TriggerInfo triggerInfo = new TaskInfo.TriggerInfo(cronString);
         Map<String, String> taskProperties = new HashMap<>(4);
-        taskProperties.put(org.wso2.carbon.analytics.messageconsole.Constants.RETENTION_PERIOD, String
+        taskProperties.put(Constants.RETENTION_PERIOD, String
                 .valueOf(retentionPeriod));
-        taskProperties.put(org.wso2.carbon.analytics.messageconsole.Constants.TABLE, table);
-        taskProperties.put(org.wso2.carbon.analytics.messageconsole.Constants.TENANT_ID, String.valueOf(CarbonContext.getThreadLocalCarbonContext().getTenantId()));
-        taskProperties.put(org.wso2.carbon.analytics.messageconsole.Constants.CRON_STRING, cronString);
+        taskProperties.put(Constants.TABLE, table);
+        taskProperties.put(Constants.TENANT_ID, String.valueOf(CarbonContext.getThreadLocalCarbonContext().getTenantId()));
+        taskProperties.put(Constants.CRON_STRING, cronString);
         return new TaskInfo(taskName, AnalyticsDataPurgingTask.class.getName(), taskProperties, triggerInfo);
     }
 

@@ -69,10 +69,10 @@
       <purging-enable>false</purging-enable>
       <cron-expression>0 0 0 * * ?</cron-expression>
       <!-- Tables that need include to purging. Use regex expression to specify the table name that need include to purging.-->
-      <purge-include-table-patterns>
+      <purge-include-tables>
          <table>.*</table>
          <!--<table>.*jmx.*</table>-->
-      </purge-include-table-patterns>
+      </purge-include-tables>
       <!-- All records that insert before the specified retention time will be eligible to purge -->
       <data-retention-days>365</data-retention-days>
    </analytics-data-purging>

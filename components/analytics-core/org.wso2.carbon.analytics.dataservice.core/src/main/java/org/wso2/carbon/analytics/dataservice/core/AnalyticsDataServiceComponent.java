@@ -29,6 +29,7 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService;
+import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.user.core.service.RealmService;
 
@@ -61,8 +62,10 @@ public class AnalyticsDataServiceComponent {
             AnalyticsServiceHolder.setAnalyticsClusterManager(clusterManager);
             AnalyticsDataService analyticsDataService = new AnalyticsDataServiceImpl();
             SecureAnalyticsDataServiceImpl secureAnalyticsDataService = new SecureAnalyticsDataServiceImpl(analyticsDataService);
+            AnalyticsDataPurgingDeployer dataPurgingDeployer = new AnalyticsDataPurgingDeployer();
             bundleContext.registerService(AnalyticsDataService.class, analyticsDataService, null);
             bundleContext.registerService(SecureAnalyticsDataService.class, secureAnalyticsDataService, null);
+            bundleContext.registerService(AppDeploymentHandler.class.getName(), dataPurgingDeployer, null);
             if (log.isDebugEnabled()) {
                 log.debug("Finished AnalyticsDataServiceComponent#activate");
             }

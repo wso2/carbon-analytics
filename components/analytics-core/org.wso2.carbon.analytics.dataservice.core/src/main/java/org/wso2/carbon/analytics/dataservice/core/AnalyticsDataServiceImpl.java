@@ -238,15 +238,21 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private boolean isTableIndexed(AnalyticsTableInfo tableInfo) {
         return tableInfo.getSchema().getIndexedColumns().size() > 0;
     }
-    
+
     private void initDataPurging(AnalyticsDataServiceConfiguration config) {
         boolean dataPurgingEnable = !Boolean.getBoolean(Constants.DISABLE_ANALYTICS_DATA_PURGING_JVM_OPTION);
         logger.info("Data purging is " + (dataPurgingEnable ? "enabled" : "disabled") + " in this node");
         if (dataPurgingEnable) {
-            if (config.getAnalyticsDataPurgingConfiguration() != null) {
-                final AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration = config.getAnalyticsDataPurgingConfiguration();
-                TaskService taskService = AnalyticsServiceHolder.getTaskService();
-                if (taskService != null) {
+            TaskService taskService = AnalyticsServiceHolder.getTaskService();
+            if (taskService != null) {
+                // Registering task type for CApp based purging operations
+                try {
+                    taskService.registerTaskType(Constants.ANALYTICS_DATA_PURGING);
+                } catch (TaskException e) {
+                    logger.error("Unable to registry task type for CApp based purging operations: " + e.getMessage(), e);
+                }
+                if (config.getAnalyticsDataPurgingConfiguration() != null) {
+                    final AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration = config.getAnalyticsDataPurgingConfiguration();
                     if (analyticsDataPurgingConfiguration.isEnable()) {
                         try {
                             taskService.registerTaskType(ANALYTICS_DATA_PURGING_GLOBAL);

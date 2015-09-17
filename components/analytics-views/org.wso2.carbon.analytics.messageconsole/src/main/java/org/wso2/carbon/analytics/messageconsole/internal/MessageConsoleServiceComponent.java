@@ -22,8 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
-import org.wso2.carbon.analytics.messageconsole.Constants;
-import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.service.TaskService;
 
 /**
@@ -39,14 +37,6 @@ public class MessageConsoleServiceComponent {
     private static final Log log = LogFactory.getLog(MessageConsoleServiceComponent.class);
 
     protected void activate(ComponentContext ctx) {
-        try {
-            boolean dataPurgingEnable = !Boolean.getBoolean(org.wso2.carbon.analytics.dataservice.core.Constants.DISABLE_ANALYTICS_DATA_PURGING_JVM_OPTION);
-            if (dataPurgingEnable) {
-                ServiceHolder.getTaskService().registerTaskType(Constants.ANALYTICS_DATA_PURGING);
-            }
-        } catch (TaskException e) {
-            log.error("Unable to register analytics data purging task type", e);
-        }
     }
 
     protected void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
