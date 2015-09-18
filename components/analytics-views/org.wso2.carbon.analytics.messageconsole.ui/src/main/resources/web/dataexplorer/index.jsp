@@ -212,34 +212,19 @@
                 $(this).parent().parent().remove();
             });
         });
-        function createMainJTable(fields, paginationSupport) {
-            if (paginationSupport) {
-                $('#AnalyticsTableContainer').jtable({
-                    title: $("#tableSelect").val(),
-                    paging: true,
-                    pageSize: 25,
-                    actions: {
-                        // For Details: http://jtable.org/Demo/FunctionsAsActions
-                        listAction: function (postData, jtParams) {
-                            return listActionMethod(jtParams);
-                        }
-                    },
-                    fields: fields
-                });
-            } else {
-                $('#AnalyticsTableContainer').jtable({
-                    title: $("#tableSelect").val(),
-                    paging: false,
-                    pageSize: 50,
-                    actions: {
-                        // For Details: http://jtable.org/Demo/FunctionsAsActions
-                        listAction: function (postData, jtParams) {
-                            return listActionMethod(jtParams);
-                        }
-                    },
-                    fields: fields
-                });
-            }
+        function createMainJTable(fields) {
+            $('#AnalyticsTableContainer').jtable({
+                title: $("#tableSelect").val(),
+                paging: true,
+                pageSize: 50,
+                actions: {
+                    // For Details: http://jtable.org/Demo/FunctionsAsActions
+                    listAction: function (postData, jtParams) {
+                        return listActionMethod(jtParams);
+                    }
+                },
+                fields: fields
+            });
             $('#AnalyticsTableContainer').jtable('load');
             tableLoaded = true;
             $("#resultsTable").show();
@@ -351,8 +336,7 @@
                                       $('#AnalyticsTableContainer').jtable('destroy');
                                       tableLoaded = false;
                                   }
-                                  var paginateSupport = ($("#query").val() != '') || data.paginationSupport;
-                                  createMainJTable(fields, paginateSupport);
+                                  createMainJTable(fields);
                               }
                           }
                 );
@@ -484,7 +468,12 @@
             <tbody>
             <tr>
                 <td>
-                    <div id="AnalyticsTableContainer" class="overflowAuto"></div>
+                    <div><label id="searchStat"></label></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                <div id="AnalyticsTableContainer" class="overflowAuto"></div>
                 </td>
             </tr>
             </tbody>

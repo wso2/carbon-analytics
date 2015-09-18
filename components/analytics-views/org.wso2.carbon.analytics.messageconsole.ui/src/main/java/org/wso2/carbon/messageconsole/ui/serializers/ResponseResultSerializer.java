@@ -36,6 +36,7 @@ public class ResponseResultSerializer implements JsonSerializer<ResponseResult> 
     private static final String RESULT = "Result";
     private static final String MESSAGE = "Message";
     private static final String TOTAL_RECORD_COUNT = "TotalRecordCount";
+    private static final String ACTUAL_RECORD_COUNT = "ActualRecordCount";
     private static final String RECORDS = "Records";
 
     public ResponseResultSerializer() {
@@ -50,9 +51,8 @@ public class ResponseResultSerializer implements JsonSerializer<ResponseResult> 
         jsonObject.addProperty(RESULT, responseResult.getResult());
         jsonObject.addProperty(MESSAGE, responseResult.getMessage());
         jsonObject.addProperty(TOTAL_RECORD_COUNT, responseResult.getTotalRecordCount());
-
+        jsonObject.addProperty(ACTUAL_RECORD_COUNT, responseResult.getActualRecordCount());
         JsonArray records = new JsonArray();
-
         if (responseResult.getRecords() != null) {
             for (Record record : responseResult.getRecords()) {
                 JsonObject jsonRecord = new JsonObject();
@@ -64,9 +64,7 @@ public class ResponseResultSerializer implements JsonSerializer<ResponseResult> 
                 records.add(jsonRecord);
             }
         }
-
         jsonObject.add(RECORDS, records);
-
         return jsonObject;
     }
 }

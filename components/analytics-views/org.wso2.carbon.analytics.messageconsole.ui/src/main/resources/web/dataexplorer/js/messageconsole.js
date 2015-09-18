@@ -145,6 +145,9 @@ function listActionMethod(jtParams) {
                     data: postData,
                     success: function (data) {
                         $dfd.resolve(data);
+                        if (data.ActualRecordCount != -1) {
+                            $('#searchStat').text('Total Records: ' + data.ActualRecordCount);
+                        }
                     },
                     error: function () {
                         $dfd.reject();
@@ -288,4 +291,5 @@ function reset() {
     document.getElementById('resultsTable').style.display = 'none';
     timeFromObj.datetimepicker('setDate', '');
     timeToObj.datetimepicker('setDate', '');
+    $('#searchStat').text('');
 }

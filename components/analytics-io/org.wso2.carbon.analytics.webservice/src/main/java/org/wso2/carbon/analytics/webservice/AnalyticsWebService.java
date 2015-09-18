@@ -21,7 +21,6 @@ package org.wso2.carbon.analytics.webservice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
@@ -29,6 +28,7 @@ import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -310,9 +310,9 @@ public class AnalyticsWebService extends AbstractAdmin {
             if (columns != null && columns.length != 0) {
                 columnList = new ArrayList<>(Arrays.asList(columns));
             }
-            if (!isPaginationSupported(analyticsDataAPI.getRecordStoreNameByTable(getUsername(), tableName))) {
+            /*if (!isPaginationSupported(analyticsDataAPI.getRecordStoreNameByTable(getUsername(), tableName))) {
                 recordsFrom = 0;
-            }
+            }*/
             List<Record> records = AnalyticsDataServiceUtils.
                     listRecords(analyticsDataAPI,
                                 analyticsDataAPI.get(getUsername(), tableName, numPartitionsHint, columnList, timeFrom, timeTo, recordsFrom,
@@ -348,8 +348,8 @@ public class AnalyticsWebService extends AbstractAdmin {
             List<Map<String, Object>> valuesBatch = Utils.getValuesBatch(valuesBatchBeans,
                                                                          analyticsDataAPI.getTableSchema(getUsername(), tableName));
             List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI,
-                                                            analyticsDataAPI.getWithKeyValues(getUsername(), tableName, numPartitionsHint,
-                                                                                              columnList, valuesBatch));
+                                                                         analyticsDataAPI.getWithKeyValues(getUsername(), tableName, numPartitionsHint,
+                                                                                                           columnList, valuesBatch));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
@@ -525,6 +525,22 @@ public class AnalyticsWebService extends AbstractAdmin {
     public boolean isPaginationSupported(String recordStoreName) throws AnalyticsWebServiceException {
         try {
             return analyticsDataAPI.isPaginationSupported(recordStoreName);
+        } catch (Exception e) {
+            logger.error("An exception occurred: " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("An exception occurred: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Check whether under laying data layer implementation support for get total record count operation or not.
+     *
+     * @param recordStoreName Record store name
+     * @return Record store support for record count or not.
+     * @throws AnalyticsWebServiceException
+     */
+    public boolean isRecordCountSupported(String recordStoreName) throws AnalyticsWebServiceException {
+        try {
+            return analyticsDataAPI.isRecordCountSupported(recordStoreName);
         } catch (Exception e) {
             logger.error("An exception occurred: " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("An exception occurred: " + e.getMessage(), e);

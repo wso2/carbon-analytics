@@ -73,6 +73,9 @@ public class MessageConsoleConnector {
     private static final String ANALYTICS_WEB_SERVICE = "AnalyticsWebService";
     private static final String OK = "OK";
     private static final String ERROR = "ERROR";
+    private static int NON_PAGINATE_RANGE_RECORD_COUNT = 1000;
+    private static int PAGINATE_SEARCH_RECORD_COUNT = 5000;
+    private static int PAGINATE_RECORD_COUNT = 100000;
 
     public static final String RECORD_ID = "_unique_rec_id";
     public static final String TIMESTAMP = "_timestamp";
@@ -187,13 +190,43 @@ public class MessageConsoleConnector {
             } else if (facetsList != null && !facetsList.isEmpty()) {
                 AnalyticsDrillDownRequestBean requestBean = getAnalyticsDrillDownRequestBean(tableName, startIndex, pageSize, searchQuery, facetsList);
                 resultRecordBeans = analyticsWebServiceStub.drillDownSearch(requestBean);
-                responseResult.setTotalRecordCount(new Double(analyticsWebServiceStub.drillDownSearchCount(requestBean)).intValue());
+                responseResult.setActualRecordCount(new Double(analyticsWebServiceStub.drillDownSearchCount(requestBean)).intValue());
+                if (responseResult.getActualRecordCount() > PAGINATE_SEARCH_RECORD_COUNT) {
+                    responseResult.setTotalRecordCount(PAGINATE_SEARCH_RECORD_COUNT);
+                } else {
+                    responseResult.setTotalRecordCount(new Double(analyticsWebServiceStub.drillDownSearchCount(requestBean)).intValue());
+                }
             } else if (searchQuery != null && !searchQuery.isEmpty()) {
                 resultRecordBeans = analyticsWebServiceStub.search(tableName, searchQuery, startIndex, pageSize);
-                responseResult.setTotalRecordCount(analyticsWebServiceStub.searchCount(tableName, searchQuery));
+                responseResult.setActualRecordCount(analyticsWebServiceStub.searchCount(tableName, searchQuery));
+                if (responseResult.getActualRecordCount() > PAGINATE_SEARCH_RECORD_COUNT) {
+                    responseResult.setTotalRecordCount(PAGINATE_SEARCH_RECORD_COUNT);
+                } else {
+                    responseResult.setTotalRecordCount(analyticsWebServiceStub.searchCount(tableName, searchQuery));
+                }
             } else {
                 resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex, pageSize);
-                responseResult.setTotalRecordCount(analyticsWebServiceStub.getRecordCount(tableName, timeFrom, timeTo));
+                String recordStoreName = analyticsWebServiceStub.getRecordStoreNameByTable(tableName);
+                boolean isRecordCountSupported = analyticsWebServiceStub.isRecordCountSupported(recordStoreName);
+                long totalRecordCount = -1;
+                if (isRecordCountSupported) {
+                    totalRecordCount = analyticsWebServiceStub.getRecordCount(tableName, timeFrom, timeTo);
+                }
+                responseResult.setActualRecordCount(totalRecordCount);
+                if (isRecordCountSupported && analyticsWebServiceStub.isPaginationSupported(recordStoreName)) {
+                    if (totalRecordCount > PAGINATE_RECORD_COUNT) {
+                        responseResult.setTotalRecordCount(PAGINATE_RECORD_COUNT);
+                    } else {
+                        responseResult.setTotalRecordCount(totalRecordCount);
+                    }
+                } else {
+                    responseResult.setTotalRecordCount(NON_PAGINATE_RANGE_RECORD_COUNT);
+                    if (resultRecordBeans == null) {
+                        responseResult.setTotalRecordCount(-1);
+                    } else if (resultRecordBeans.length < pageSize) {
+                        responseResult.setTotalRecordCount(resultRecordBeans.length);
+                    }
+                }
             }
             List<Record> records = new ArrayList<>();
             if (resultRecordBeans != null) {
