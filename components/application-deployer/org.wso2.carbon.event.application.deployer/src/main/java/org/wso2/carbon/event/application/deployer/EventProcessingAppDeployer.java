@@ -1,16 +1,19 @@
 /*
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.event.application.deployer;
@@ -24,10 +27,10 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.application.deployer.AppDeployerConstants;
 import org.wso2.carbon.application.deployer.AppDeployerUtils;
 import org.wso2.carbon.application.deployer.CarbonApplication;
-import org.wso2.carbon.event.application.deployer.internal.EventProcessingAppDeployerDS;
 import org.wso2.carbon.application.deployer.config.Artifact;
 import org.wso2.carbon.application.deployer.config.CappFile;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
+import org.wso2.carbon.event.application.deployer.internal.EventProcessingAppDeployerDS;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -78,11 +81,6 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
                     EventProcessingAppDeployerConstants.CEP_EXECUTION_PLAN_DIR,
                     EventProcessingAppDeployerConstants.FILE_TYPE_SIDDHIQL);
         } catch (Exception e) {
-            try {
-                undeployArtifacts(carbonApp, axisConfig);
-            } catch (Exception _e) {
-                //ignore
-            }
             throw new DeploymentException(e.getMessage(), e);
         } finally {
             executionPlans.clear();
@@ -148,13 +146,13 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
 
         try {
             undeployTypeSpecifiedArtifacts(eventStreams, axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_STREAM_DIR,
-                                           EventProcessingAppDeployerConstants.FILE_TYPE_JSON);
+                    EventProcessingAppDeployerConstants.FILE_TYPE_JSON);
             undeployTypeSpecifiedArtifacts(eventReceivers, axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_RECEIVER_DIR,
-                                           EventProcessingAppDeployerConstants.FILE_TYPE_XML);
+                    EventProcessingAppDeployerConstants.FILE_TYPE_XML);
             undeployTypeSpecifiedArtifacts(eventPublishers, axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_PUBLISHER_DIR,
-                                           EventProcessingAppDeployerConstants.FILE_TYPE_XML);
+                    EventProcessingAppDeployerConstants.FILE_TYPE_XML);
             undeployTypeSpecifiedArtifacts(executionPlans, axisConfig, EventProcessingAppDeployerConstants.CEP_EXECUTION_PLAN_DIR,
-                                           EventProcessingAppDeployerConstants.FILE_TYPE_SIDDHIQL);
+                    EventProcessingAppDeployerConstants.FILE_TYPE_SIDDHIQL);
         } finally {
             executionPlans.clear();
             eventStreams.clear();
@@ -169,8 +167,7 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
             deployer = (EventProcessingDeployer) AppDeployerUtils.getArtifactDeployer(axisConfig,
                     directory, fileType);
             if (deployer != null &&
-                    (AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED.equals(artifact.getDeploymentStatus()) ||
-                            AppDeployerConstants.DEPLOYMENT_STATUS_FAILED.equals(artifact.getDeploymentStatus()))) {
+                    AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED.equals(artifact.getDeploymentStatus())) {
                 undeploy(deployer, artifact);
             }
 
@@ -214,7 +211,7 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
     private boolean isAccepted(String serviceType) {
         if (acceptanceList == null) {
             acceptanceList = AppDeployerUtils.buildAcceptanceList(EventProcessingAppDeployerDS
-                                                                          .getRequiredFeatures());
+                    .getRequiredFeatures());
         }
         Boolean acceptance = acceptanceList.get(serviceType);
         return (Boolean.TRUE.equals(acceptance));

@@ -44,6 +44,7 @@ public final class HTTPEventAdapter implements InputEventAdapter {
     private final String id = UUID.randomUUID().toString();
     public static ExecutorService executorService;
     private static final Log log = LogFactory.getLog(HTTPEventAdapter.class);
+    private boolean isConnected = false;
 
     public HTTPEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
             Map<String, String> globalProperties) {
@@ -117,11 +118,15 @@ public final class HTTPEventAdapter implements InputEventAdapter {
     @Override
     public void connect() {
         registerDynamicEndpoint(eventAdapterConfiguration.getName());
+        isConnected = true;
     }
 
     @Override
     public void disconnect() {
-        unregisterDynamicEndpoint(eventAdapterConfiguration.getName());
+        if (isConnected){
+            isConnected = false;
+            unregisterDynamicEndpoint(eventAdapterConfiguration.getName());
+        }
     }
 
     @Override
