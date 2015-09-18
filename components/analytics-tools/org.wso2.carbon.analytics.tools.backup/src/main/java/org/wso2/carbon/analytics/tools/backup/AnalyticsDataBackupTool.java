@@ -31,10 +31,7 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataServiceConfigProperty;
 import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsDataIndexer;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
-import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.*;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
@@ -75,6 +72,7 @@ public class AnalyticsDataBackupTool {
     private static final String TENANT_ID = "tenantId";
     private static final String BATCH_SIZE = "batchSize";
     private static final String REINDEX_EVENTS = "reindexEvents";
+    private static final String DISABLE_STAGING = "disableStaging";
     private static final String RESTORE_FILE_SYSTEM = "restoreFileSystem";
     private static final String RESTORE_RECORD_STORE = "restoreRecordStore";
     private static final String BACKUP_FILE_SYSTEM = "backupFileSystem";
@@ -100,6 +98,7 @@ public class AnalyticsDataBackupTool {
         options.addOption(new Option(REINDEX_EVENTS, false, "re-indexes records in the given table data"));
 
         options.addOption(new Option("enableIndexing", false, "enables indexing while restoring"));
+        options.addOption(new Option(DISABLE_STAGING, false, "disables staging while restoring"));
         options.addOption(OptionBuilder.withArgName("directory").hasArg().withDescription(
                 "source/target directory").create(DIR));
         options.addOption(OptionBuilder.withArgName("table list").hasArg().withDescription(
@@ -110,7 +109,7 @@ public class AnalyticsDataBackupTool {
                 "consider records to this time (non-inclusive)").create(TIMETO));
         options.addOption(OptionBuilder.withArgName("tenant id (default is super tenant)").hasArg().withDescription(
                 "specify tenant id of the tenant considered").create(TENANT_ID));
-        options.addOption(OptionBuilder.withArgName("restore record batch size (default is " + 
+        options.addOption(OptionBuilder.withArgName("restore record batch size (default is " +
                 RECORD_BATCH_SIZE + ")").hasArg().withDescription(
                         "specify the number of records per batch for backup").create(BATCH_SIZE));
         return options;
@@ -144,6 +143,8 @@ public class AnalyticsDataBackupTool {
             analyticsFileSystem.init(convertToMap(config.getAnalyticsFileSystemConfiguration().getProperties()));
             service = AnalyticsServiceHolder.getAnalyticsDataService();
 
+            // this flag is used to control the staging for the records
+            boolean disableStaging = line.hasOption(DISABLE_STAGING);
             int tenantId = Integer.parseInt(line.getOptionValue(TENANT_ID, "" + MultitenantConstants.SUPER_TENANT_ID));
             SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
             long timeFrom = Long.MIN_VALUE;
@@ -180,7 +181,7 @@ public class AnalyticsDataBackupTool {
             } else if (line.hasOption(BACKUP_FILE_SYSTEM)) {
                 backupFileSystem(analyticsFileSystem, tenantId, baseDir);
             } else if (line.hasOption(RESTORE_RECORD_STORE)) {
-                restoreRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
+                restoreRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables,disableStaging);
             } else if (line.hasOption(RESTORE_FILE_SYSTEM)) {
                 restoreFileSystem(analyticsFileSystem, baseDir);
             } else if (line.hasOption(REINDEX_EVENTS)) {
@@ -226,24 +227,24 @@ public class AnalyticsDataBackupTool {
     }
 
     private static void restoreRecordStore(AnalyticsDataService service, int tenantId, File baseDir,
-                                           long timeFrom, long timeTo, String[] specificTables)
+                                           long timeFrom, long timeTo, String[] specificTables, boolean disableStaging)
             throws IOException {
         checkBaseDir(baseDir);
         if (specificTables != null) {
             for (String specificTable : specificTables) {
-                restoreTable(service, tenantId, specificTable, baseDir, timeFrom, timeTo);
+                restoreTable(service, tenantId, specificTable, baseDir, timeFrom, timeTo, disableStaging);
             }
         } else {
             String[] tables = baseDir.list();
             System.out.println(tables.length + " table(s) available.");
             for (String table : tables) {
-                restoreTable(service, tenantId, table, baseDir, timeFrom, timeTo);
+                restoreTable(service, tenantId, table, baseDir, timeFrom, timeTo, disableStaging);
             }
         }
     }
 
     private static void restoreTable(AnalyticsDataService service, int tenantId, String table, File baseDir,
-                                     long timeFrom, long timeTo) {
+                                     long timeFrom, long timeTo, boolean disableStaging) {
         try {
             checkBaseDir(baseDir);
             System.out.print("Restoring table '" + table + "'..");
@@ -253,7 +254,15 @@ public class AnalyticsDataBackupTool {
                 System.out.println(myDir.getAbsolutePath() + " is not a directory to contain table data, skipping.");
                 return;
             }
-            AnalyticsSchema schema = readTableSchema(baseDir.getAbsolutePath() + File.separator + table);
+
+            // enabling/disabling the staging for the table
+            AnalyticsSchema currentSchema = readTableSchema(baseDir.getAbsolutePath() + File.separator + table);
+            AnalyticsSchema schema;
+            if (disableStaging)
+                schema = removeIndexingFromSchema(currentSchema);
+            else
+                schema = currentSchema;
+
             service.setTableSchema(tenantId, table, schema);
             File[] files = myDir.listFiles();
             int count = 0;
@@ -577,6 +586,29 @@ public class AnalyticsDataBackupTool {
         }
     }
 
+    /**
+     * Returns an indexing disabled schema from the provided Analytics Schema.
+     * @param schema
+     * @return AnalyticsSchema in which the indexing of the columns are set to false
+     */
+    private static AnalyticsSchema removeIndexingFromSchema(AnalyticsSchema schema) {
+        AnalyticsSchema indexLessSchema = null;
+        List<ColumnDefinition> indexLessColumns = new ArrayList<>();
+
+        if (schema != null) {
+            List<String> primaryKeys = schema.getPrimaryKeys();
+            Map<String, ColumnDefinition> columns = schema.getColumns();
+            for (Map.Entry<String, ColumnDefinition> entry : columns.entrySet()) {
+                ColumnDefinition columnDefinition = entry.getValue();
+                if (columnDefinition.isIndexed()) {
+                    columnDefinition.setIndexed(false);
+                }
+                indexLessColumns.add(columnDefinition);
+            }
+            indexLessSchema = new AnalyticsSchema(indexLessColumns, primaryKeys);
+        }
+        return indexLessSchema;
+    }
     /**
      * Re-indexes the published events.
      * @param dataService
