@@ -169,9 +169,9 @@ public class AnalyticsComponent {
     private void checkAnalyticsStatsEnabled(){
         if (initialized) {
             if (ServiceHolder.isAnalyticsStatsEnabled()){
-                if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_STATS_OPTION) != null){
-                    if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_STATS_OPTION))) {
-                        ServiceHolder.setAnalyticsStatsEnabled(false);
+                if (System.getProperty(AnalyticsConstants.ENABLE_ANALYTICS_STATS_OPTION) != null){
+                    if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.ENABLE_ANALYTICS_STATS_OPTION))) {
+                        ServiceHolder.setAnalyticsStatsEnabled(true);
                     }
                 }
             }
