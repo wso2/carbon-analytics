@@ -806,7 +806,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private void electSuitableLeader() throws AnalyticsClusterException {
         HazelcastInstance hz = AnalyticsServiceHolder.getHazelcastInstance();
         IMap<String, Object> masterMap = hz.getMap(AnalyticsConstants.SPARK_MASTER_MAP);
-        List<Object> masterMembers = (List<Object>) masterMap.values();
+        List<Object> masterMembers = new ArrayList<>(masterMap.values());
 
         List<Object> groupMembers = acm.getMembers(CLUSTER_GROUP_NAME);
 
