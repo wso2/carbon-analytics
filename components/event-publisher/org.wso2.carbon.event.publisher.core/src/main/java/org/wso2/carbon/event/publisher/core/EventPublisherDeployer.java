@@ -204,9 +204,11 @@ public class EventPublisherDeployer extends AbstractDeployer implements EventPro
                             "since it does not contain a proper mapping type : " + eventPublisherFile.getName());
                 }
             } catch (EventPublisherConfigurationException ex) {
-                log.error("Error, Event Publisher not deployed and in inactive state, " + ex.getMessage(), ex);
-                carbonEventPublisherService.addEventPublisherConfigurationFile(createEventPublisherConfigurationFile(eventPublisherName, deploymentFileData.getFile(),
-                        EventPublisherConfigurationFile.Status.ERROR, tenantId, "Exception when deploying event publisher configuration file:\n" + ex.getMessage(), null), tenantId);
+                if (isEditable) {
+                    log.error("Error, Event Publisher not deployed and in inactive state, " + ex.getMessage(), ex);
+                    carbonEventPublisherService.addEventPublisherConfigurationFile(createEventPublisherConfigurationFile(eventPublisherName, deploymentFileData.getFile(),
+                            EventPublisherConfigurationFile.Status.ERROR, tenantId, "Exception when deploying event publisher configuration file:\n" + ex.getMessage(), null), tenantId);
+                }
                 throw new EventPublisherConfigurationException(ex.getMessage(), ex);
             } catch (EventPublisherValidationException ex) {
                 carbonEventPublisherService.addEventPublisherConfigurationFile(createEventPublisherConfigurationFile(eventPublisherName, deploymentFileData.getFile(),
@@ -217,9 +219,11 @@ public class EventPublisherDeployer extends AbstractDeployer implements EventPro
                         EventPublisherConfigurationFile.Status.WAITING_FOR_STREAM_DEPENDENCY, tenantId, e.getMessage(), e.getDependency()), tenantId);
                 log.info("Event Publisher deployment held back and in inactive state :" + eventPublisherFile.getName() + ", Stream validation exception : " + e.getMessage());
             } catch (Throwable e) {
-                log.error("Event Publisher not deployed, invalid configuration found at " + eventPublisherFile.getName() + ", and in inactive state, " + e.getMessage(), e);
-                carbonEventPublisherService.addEventPublisherConfigurationFile(createEventPublisherConfigurationFile(eventPublisherName,
-                        deploymentFileData.getFile(), EventPublisherConfigurationFile.Status.ERROR, tenantId, "Deployment exception: " + e.getMessage(), null), tenantId);
+                if (isEditable) {
+                    log.error("Event Publisher not deployed, invalid configuration found at " + eventPublisherFile.getName() + ", and in inactive state, " + e.getMessage(), e);
+                    carbonEventPublisherService.addEventPublisherConfigurationFile(createEventPublisherConfigurationFile(eventPublisherName,
+                            deploymentFileData.getFile(), EventPublisherConfigurationFile.Status.ERROR, tenantId, "Deployment exception: " + e.getMessage(), null), tenantId);
+                }
                 throw new EventPublisherConfigurationException(e);
             }
         } else {
