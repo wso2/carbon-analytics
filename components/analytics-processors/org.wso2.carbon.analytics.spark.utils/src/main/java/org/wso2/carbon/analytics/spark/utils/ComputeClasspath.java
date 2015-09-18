@@ -41,6 +41,7 @@ public class ComputeClasspath {
             "com.google.guava",
             "com.google.protobuf",
             "com.jayway.jsonpath.json-path",
+            "commons-codec",
             "commons-collections",
             "commons-configuration",
             "commons-httpclient",
