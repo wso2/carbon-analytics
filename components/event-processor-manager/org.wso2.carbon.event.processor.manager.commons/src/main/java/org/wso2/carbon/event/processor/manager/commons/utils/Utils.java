@@ -44,11 +44,12 @@ public class Utils {
         }
     }
 
-    public static boolean isPortUsed(final int portNumber) {
+    public static boolean isPortUsed(final int portNumber, final String host) {
         boolean isPortUsed;
         ServerSocket serverSocket = null;
         try {
-            serverSocket = new ServerSocket(portNumber);
+            InetAddress inetAddress = InetAddress.getByName(host);
+            serverSocket = new ServerSocket(portNumber, 50, inetAddress);
             isPortUsed = false;
         } catch (IOException ignored) {
             isPortUsed = true;
