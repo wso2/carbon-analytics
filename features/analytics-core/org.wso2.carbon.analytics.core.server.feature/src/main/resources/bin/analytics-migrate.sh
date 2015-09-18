@@ -334,6 +334,10 @@ for t in "$CARBON_HOME"/repository/components/plugins/*objenesis*.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done
+for t in "$CARBON_HOME"/repository/components/plugins/*google*.jar
+do
+    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
+done
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
   JAVA_HOME=`cygpath --absolute --windows "$JAVA_HOME"`
