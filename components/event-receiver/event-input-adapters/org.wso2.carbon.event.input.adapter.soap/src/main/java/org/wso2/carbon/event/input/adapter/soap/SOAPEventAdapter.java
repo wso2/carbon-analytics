@@ -50,6 +50,7 @@ public final class SOAPEventAdapter implements InputEventAdapter {
     private final Map<String, String> globalProperties;
     private InputEventAdapterListener eventAdaptorListener;
     private final String id = UUID.randomUUID().toString();
+    private boolean isConnected = false;
 
     public SOAPEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
             Map<String, String> globalProperties) {
@@ -67,10 +68,10 @@ public final class SOAPEventAdapter implements InputEventAdapter {
 
     @Override public void connect() {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-
         try {
             registerService(eventAdaptorListener, eventAdapterConfiguration.getName(),
                     EventAdapterUtil.getAxisConfiguration());
+            isConnected = true;
         } catch (AxisFault axisFault) {
             throw new InputEventAdapterRuntimeException("Cannot register Input Adapter " +
                     eventAdapterConfiguration.getName() + " on tenant " + tenantId, axisFault);
@@ -78,13 +79,15 @@ public final class SOAPEventAdapter implements InputEventAdapter {
     }
 
     @Override public void disconnect() {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-
-        try {
-            unregisterService(eventAdapterConfiguration.getName(), EventAdapterUtil.getAxisConfiguration());
-        } catch (AxisFault axisFault) {
-            throw new InputEventAdapterRuntimeException("Cannot un-register Input Adapter " +
-                    eventAdapterConfiguration.getName() + " on tenant " + tenantId, axisFault);
+        if (isConnected){
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            try {
+                unregisterService(eventAdapterConfiguration.getName(), EventAdapterUtil.getAxisConfiguration());
+                isConnected = false;
+            } catch (AxisFault axisFault) {
+                throw new InputEventAdapterRuntimeException("Cannot un-register Input Adapter " +
+                        eventAdapterConfiguration.getName() + " on tenant " + tenantId, axisFault);
+            }
         }
     }
 
