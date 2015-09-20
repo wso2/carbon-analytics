@@ -261,7 +261,7 @@
                     <include>protobuf-java-2.5.0.jar</include>
                     <include>spark-defaults.conf</include>
                     <include>spark-udf-config.xml</include>
-                    <include>add-to-spark-classpath.conf</include>
+                    <include>external-spark-classpath.conf</include>
                     <!-- moved to product-das DAS-110 -->
                     <!--<include>wso2server.sh</include>-->
                     <!--<include>wso2server.bat</include>-->
