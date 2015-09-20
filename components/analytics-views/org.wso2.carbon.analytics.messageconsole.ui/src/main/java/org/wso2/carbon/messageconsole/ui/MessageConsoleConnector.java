@@ -73,8 +73,8 @@ public class MessageConsoleConnector {
     private static final String ANALYTICS_WEB_SERVICE = "AnalyticsWebService";
     private static final String OK = "OK";
     private static final String ERROR = "ERROR";
-    private static int NON_PAGINATE_RANGE_RECORD_COUNT = 1000;
-    private static int PAGINATE_SEARCH_RECORD_COUNT = 5000;
+    private static int NON_PAGINATE_RANGE_RECORD_COUNT = 6000;
+    private static int PAGINATE_SEARCH_RECORD_COUNT = 6000;
     private static int PAGINATE_RECORD_COUNT = 100000;
 
     public static final String RECORD_ID = "_unique_rec_id";
