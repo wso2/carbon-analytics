@@ -90,7 +90,16 @@
                                href="executeScript.jsp?scriptName=<%=aScript.getName()%>"
                                style="background: url('../spark-management/images/execute.gif') no-repeat;">
                                 Execute</a>
-                            <% }%>
+                            <%if (!client.isAnalyticsScriptExecuting(aScript.getName())) {%>
+                            <a class="icon-link"
+                               href="executeScriptInBackground.jsp?scriptName=<%=aScript.getName()%>"
+                               style="background: url('../spark-management/images/execute.gif') no-repeat;">
+                                Execute in Background</a>
+                            <% } else {%>
+                            <a class="icon-link"
+                                style="background: url('../spark-management/images/execute.gif') no-repeat; color: #808080; cursor:default;">
+                                Executing in Background</a>
+                            <%}}%>
                                 <%--<a class="icon-link" style="background: url('images/tasks-icon.gif') no-repeat;"--%>
                                 <%--href="">Schedule--%>
                                 <%--Script--%>
