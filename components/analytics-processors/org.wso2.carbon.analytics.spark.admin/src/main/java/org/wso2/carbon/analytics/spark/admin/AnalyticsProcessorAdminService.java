@@ -222,6 +222,7 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
                     try {
                         if (!AnalyticsProcessorUtils.getRunningScriptsMap().containsKey(script.getName())) {
                             AnalyticsProcessorUtils.getRunningScriptsMap().put(script.getName(), script.getName());
+                            log.info("Started executing the script : " + script.getName());
                             execute(script.getScriptContent(), tenantId);
                         }
                     } catch (AnalyticsProcessorAdminException e) {
@@ -277,6 +278,7 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
                 @Override
                 public void run() {
                     try {
+                        log.info("Started executing the script...");
                         String[] queries = ServiceHolder.getAnalyticsProcessorService().getQueries(scriptContent);
                         for (String query : queries) {
                             executeQuery(query, tenantId);

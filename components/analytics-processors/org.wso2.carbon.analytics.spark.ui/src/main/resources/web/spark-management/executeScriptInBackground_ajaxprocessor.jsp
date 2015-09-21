@@ -37,15 +37,14 @@
     try {
         AnalyticsExecutionClient client = new AnalyticsExecutionClient(cookie, serverURL, configContext);
         if (null != scriptName && !scriptName.trim().isEmpty()) {
-
             client.executeScriptInBackground(scriptName);
-        }else if (null != scriptContent && !scriptContent.trim().isEmpty()) {
+        } else if (null != scriptContent && !scriptContent.trim().isEmpty()) {
             client.executeScriptContentInBackground(scriptContent);
         }
 %>
 <div id="returnedResults">
         <br/>
-        <span class="queryInfo">Query execution started in background. Refer tables for results.</span>
+        <span class="queryInfo">Script execution started in background. Refer tables for results.</span>
         <br/>
 
 </div>

@@ -129,6 +129,7 @@
                         var endIndex = allPage.indexOf(closeDivText, temp);
                         var queryResults = allPage.substring(startIndex, endIndex);
                         document.getElementById('analyticsResult').innerHTML = queryResults;
+                        CARBON.showInfoDialog("Successfully started executing the script in background.");
                     },
                     onFailure: function (transport) {
                         closeProgrsssBar();

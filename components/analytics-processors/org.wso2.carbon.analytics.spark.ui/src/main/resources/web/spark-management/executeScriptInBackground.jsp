@@ -37,10 +37,21 @@
         String scriptName = request.getParameter("scriptName");
         try {
             client.executeScriptInBackground(scriptName);
-        } catch (Exception ignore) {
-        }
+        } catch (AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException e) {
     %>
     <script type="text/javascript">
         location.href = "listScripts.jsp";
+        CARBON.showErrorDialog('Error while executing the script <%=scriptName%> in background. <%=e.getFaultMessage().
+        getAnalyticsProcessorAdminException().getMessage()%>');
+    </script>
+    <%
+        }
+    %>
+    <script type="text/javascript">
+        CARBON.showInfoDialog('Successfully started executing the script: <%=scriptName%> in background.', function () {
+            location.href = "listScripts.jsp";
+        }, function () {
+            location.href = "listScripts.jsp";
+        });
     </script>
 </fmt:bundle>
