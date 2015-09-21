@@ -205,7 +205,6 @@ public class MessageConsoleConnector {
                     responseResult.setTotalRecordCount(analyticsWebServiceStub.searchCount(tableName, searchQuery));
                 }
             } else {
-                resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex, pageSize);
                 String recordStoreName = analyticsWebServiceStub.getRecordStoreNameByTable(tableName);
                 boolean isRecordCountSupported = analyticsWebServiceStub.isRecordCountSupported(recordStoreName);
                 long totalRecordCount = -1;
@@ -214,17 +213,23 @@ public class MessageConsoleConnector {
                 }
                 responseResult.setActualRecordCount(totalRecordCount);
                 if (isRecordCountSupported && analyticsWebServiceStub.isPaginationSupported(recordStoreName)) {
+                    resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex, pageSize);
                     if (totalRecordCount > PAGINATE_RECORD_COUNT) {
                         responseResult.setTotalRecordCount(PAGINATE_RECORD_COUNT);
                     } else {
                         responseResult.setTotalRecordCount(totalRecordCount);
                     }
                 } else {
+                    resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, 0,
+                                                                           NON_PAGINATE_RANGE_RECORD_COUNT);
                     responseResult.setTotalRecordCount(NON_PAGINATE_RANGE_RECORD_COUNT);
                     if (resultRecordBeans == null) {
                         responseResult.setTotalRecordCount(-1);
-                    } else if (resultRecordBeans.length < pageSize) {
+                    } else if (resultRecordBeans.length < NON_PAGINATE_RANGE_RECORD_COUNT) {
                         responseResult.setTotalRecordCount(resultRecordBeans.length);
+                    }
+                    if (resultRecordBeans != null) {
+                        resultRecordBeans = Arrays.copyOfRange(resultRecordBeans, startIndex, startIndex + pageSize);
                     }
                 }
             }
@@ -234,8 +239,10 @@ public class MessageConsoleConnector {
                     log.debug("Result size: " + resultRecordBeans.length);
                 }
                 for (RecordBean recordBean : resultRecordBeans) {
-                    Record record = getRecord(recordBean, true);
-                    records.add(record);
+                    if (recordBean != null) {
+                        Record record = getRecord(recordBean, true);
+                        records.add(record);
+                    }
                 }
                 responseResult.setRecords(records);
             }
