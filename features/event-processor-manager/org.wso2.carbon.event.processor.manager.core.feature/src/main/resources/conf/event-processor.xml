@@ -125,8 +125,7 @@
             <tcpEventPublisherSendBufferSize>5242880</tcpEventPublisherSendBufferSize>
             <!--Character encoding of TCP event publishing client-->
             <tcpEventPublisherCharSet>UTF-8</tcpEventPublisherCharSet>
-            <!--Size of the output queue of each "Storm Publisher" which stores events to be published into "CEP Publisher" .
-            This must be a power of two-->
+            <!--Size of the event queue in each storm spout which stores events to be processed by storm bolts -->
             <stormSpoutBufferSize>10000</stormSpoutBufferSize>
 
             <connectionStatusCheckInterval>20000</connectionStatusCheckInterval>
