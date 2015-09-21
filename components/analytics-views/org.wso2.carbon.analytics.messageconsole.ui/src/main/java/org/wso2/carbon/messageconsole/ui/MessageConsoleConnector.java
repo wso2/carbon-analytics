@@ -209,9 +209,10 @@ public class MessageConsoleConnector {
                 boolean isRecordCountSupported = analyticsWebServiceStub.isRecordCountSupported(recordStoreName);
                 long totalRecordCount = -1;
                 if (isRecordCountSupported) {
-                    totalRecordCount = analyticsWebServiceStub.getRecordCount(tableName, timeFrom, timeTo);
+                    responseResult.setActualRecordCount(analyticsWebServiceStub.getRecordCount(tableName, timeFrom, timeTo));
+                } else {
+                    responseResult.setActualRecordCount(totalRecordCount);
                 }
-                responseResult.setActualRecordCount(totalRecordCount);
                 if (isRecordCountSupported && analyticsWebServiceStub.isPaginationSupported(recordStoreName)) {
                     resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex, pageSize);
                     if (totalRecordCount > PAGINATE_RECORD_COUNT) {
