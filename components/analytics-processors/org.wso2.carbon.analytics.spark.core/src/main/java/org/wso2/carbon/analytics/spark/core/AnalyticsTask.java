@@ -31,8 +31,8 @@ import java.util.Map;
  * This is the task implementation to execute the tasks registered
  * to trigger the spark script execution.
  */
-
 public class AnalyticsTask implements Task {
+
     private static final Log log = LogFactory.getLog(AnalyticsTask.class);
 
     private int tenantId;
@@ -46,24 +46,24 @@ public class AnalyticsTask implements Task {
 
     @Override
     public void init() {
-
     }
 
     @Override
     public void execute() {
         if (ServiceHolder.isAnalyticsExecutionEnabled()) {
             try {
-                log.info("Executing the schedule task for :" + scriptName + " for tenant id :" + tenantId);
+                log.info("Executing the schedule task for: " + scriptName + " for tenant id: " + tenantId);
                 if (ServiceHolder.getAnalyticsProcessorService() != null) {
                     ServiceHolder.getAnalyticsProcessorService().executeScript(tenantId, this.scriptName);
                 } else {
                     log.warn("Analytics Processor inactive now, and hence ignoring the triggered execution");
                 }
             } catch (AnalyticsExecutionException | AnalyticsPersistenceException e) {
-                log.error("Error while executing the scheduled task for the script : " + scriptName, e);
+                log.error("Error while executing the scheduled task for the script: " + scriptName, e);
             }
-        }else {
+        } else {
             log.warn("Analytics is disabled in this node, therefore ignoring the triggered execution.");
         }
     }
+
 }
