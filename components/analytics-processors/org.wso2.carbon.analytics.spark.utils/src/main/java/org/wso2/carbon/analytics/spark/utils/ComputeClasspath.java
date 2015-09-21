@@ -260,7 +260,8 @@ public class ComputeClasspath {
     private static String addJarsFromConfig(String scp, String carbonHome, String separator)
             throws IOException {
         File cpFile = new File(carbonHome + File.separator + "repository" + File.separator + "conf"
-                + File.separator + "spark" + File.separator + "external-spark-classpath.conf");
+                               + File.separator + "analytics" + File.separator +  "spark"
+                               + File.separator + "external-spark-classpath.conf");
 
         BufferedReader reader = null;
         try {
