@@ -50,15 +50,14 @@ public class DistributedConfiguration implements Serializable {
 
     private int transportPublisherTcpSendBufferSize = 5242880;
     private String transportPublisherCharSet = "UTF-8";
-    private int transportReceiverThreads = 10;
     private int transportPublisherConnectionStatusCheckInterval = 30000;
+    private int stormSpoutBufferSize = 10000;
 
     //presentation
     private int presentationPublisherTcpSendBufferSize = 5242880;
     private String presentationPublisherCharSet = "UTF-8";
     private int presentationOutputQueueSize = 1024;
     private int presentationPublisherConnectionStatusCheckInterval = 30000;
-    private int presentationReceiverThreads = 10;
 
     //status
     private int statusLockTimeout = 60000;   //Lock timeout in milliseconds.
@@ -68,14 +67,6 @@ public class DistributedConfiguration implements Serializable {
 
     private String jar;
     private String distributedUIUrl;
-
-    public int getTransportReceiverThreads() {
-        return transportReceiverThreads;
-    }
-
-    public void setTransportReceiverThreads(int transportReceiverThreads) {
-        this.transportReceiverThreads = transportReceiverThreads;
-    }
 
     public String getTransportPublisherCharSet() {
         return transportPublisherCharSet;
@@ -289,14 +280,6 @@ public class DistributedConfiguration implements Serializable {
         this.presentationPublisherConnectionStatusCheckInterval = presentationPublisherConnectionStatusCheckInterval;
     }
 
-    public int getPresentationReceiverThreads() {
-        return presentationReceiverThreads;
-    }
-
-    public void setPresentationReceiverThreads(int presentationReceiverThreads) {
-        this.presentationReceiverThreads = presentationReceiverThreads;
-    }
-
     public TCPEventPublisherConfig constructTransportPublisherConfig() {
         TCPEventPublisherConfig tcpEventPublisherConfig = new TCPEventPublisherConfig();
         tcpEventPublisherConfig.setConnectionStatusCheckInterval(getTransportPublisherConnectionStatusCheckInterval());
@@ -312,5 +295,13 @@ public class DistributedConfiguration implements Serializable {
         tcpEventPublisherConfig.setCharset(getPresentationPublisherCharSet());
         tcpEventPublisherConfig.setTcpSendBufferSize(getPresentationPublisherTcpSendBufferSize());
         return tcpEventPublisherConfig;
+    }
+
+    public int getStormSpoutBufferSize() {
+        return stormSpoutBufferSize;
+    }
+
+    public void setStormSpoutBufferSize(int stormSpoutBufferSize) {
+        this.stormSpoutBufferSize = stormSpoutBufferSize;
     }
 }

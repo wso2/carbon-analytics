@@ -55,7 +55,6 @@ public final class ConfigurationConstants {
     public static final String HA_NODE_CONFIG_PUBLISHER_BUFFER_SIZE = "publisherBufferSize";
     public static final String HA_NODE_CONFIG_PUBLISHER_CONNECTION_STATUS_CHECK_INTERVAL =
             "publisherConnectionStatusCheckInterval";
-    public static final String HA_NODE_CONFIG_RECEIVER_THREADS = "receiverThreads";
     public static final String HA_NODE_CONFIG_RECEIVER_QUEUE_SIZE = "receiverQueueSize";
     public static final String HA_NODE_CONFIG_PUBLISHER_QUEUE_SIZE = "publisherQueueSize";
 
@@ -95,7 +94,7 @@ public final class ConfigurationConstants {
     public static final String DISTRIBUTED_NODE_CONFIG_STORM_PUBLISHER_QUEUE_SIZE = "stormPublisherOutputQueueSize";
     public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE = "tcpEventPublisherSendBufferSize";
     public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET = "tcpEventPublisherCharSet";
-    public static final String DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT = "tcpEventReceiverThreadCount";
+    public static final String DISTRIBUTED_NODE_CONFIG_STORM_SPOUT_BUFFER_SIZE = "stormSpoutBufferSize";
 
     public static final String DISTRIBUTED_NODE_CONFIG_PRESENTATION_ELEMENT = "presentation";
     public static final String DISTRIBUTED_NODE_CONFIG_MEMBER_UPDATE_CHECK_INTERVAL = "memberUpdateCheckInterval";

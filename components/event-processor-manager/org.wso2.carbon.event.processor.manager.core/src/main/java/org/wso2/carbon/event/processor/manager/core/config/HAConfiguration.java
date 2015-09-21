@@ -42,18 +42,14 @@ public class HAConfiguration implements Serializable {
     private String eventSyncPublisherCharSet = "UTF-8";
     private int eventSyncPublisherBufferSize = 1024;
     private long eventSyncPublisherConnectionStatusCheckInterval = 30000;
-    private int eventSyncReceiverThreads = 10;
     private int eventSyncReceiverQueueSize = 1000000;
     private int eventSyncPublisherQueueSize = 1000000;
-
 
     //presentation
     private int presentationPublisherTcpSendBufferSize = 5242880;
     private String presentationPublisherCharSet = "UTF-8";
     private int presentationPublisherBufferSize = 1024;
     private long presentationPublisherConnectionStatusCheckInterval = 30000;
-    private int presentationReceiverThreads = 10;
-
 
     private int checkMemberUpdateInterval = 10000;
 
@@ -81,14 +77,6 @@ public class HAConfiguration implements Serializable {
 
     public void setLocalPresenterConfig(String host, int port) {
         this.localPresenterConfig = new HostAndPort(host, port);
-    }
-
-    public int getEventSyncReceiverThreads() {
-        return eventSyncReceiverThreads;
-    }
-
-    public void setEventSyncReceiverThreads(int eventSyncReceiverThreads) {
-        this.eventSyncReceiverThreads = eventSyncReceiverThreads;
     }
 
     public HostAndPort getManagementConfig() {
@@ -187,10 +175,6 @@ public class HAConfiguration implements Serializable {
         return presentationPublisherConnectionStatusCheckInterval;
     }
 
-    public int getPresentationReceiverThreads() {
-        return presentationReceiverThreads;
-    }
-
     public void setPresentationPublisherTcpSendBufferSize(int presentationPublisherTcpSendBufferSize) {
         this.presentationPublisherTcpSendBufferSize = presentationPublisherTcpSendBufferSize;
     }
@@ -205,10 +189,6 @@ public class HAConfiguration implements Serializable {
 
     public void setPresentationPublisherConnectionStatusCheckInterval(long presentationPublisherConnectionStatusCheckInterval) {
         this.presentationPublisherConnectionStatusCheckInterval = presentationPublisherConnectionStatusCheckInterval;
-    }
-
-    public void setPresentationReceiverThreads(int presentationReceiverThreads) {
-        this.presentationReceiverThreads = presentationReceiverThreads;
     }
 
     public TCPEventPublisherConfig constructEventSyncPublisherConfig() {

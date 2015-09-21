@@ -73,10 +73,10 @@ public class CarbonEventManagementService implements EventManagementService {
             isWorkerNode = haConfiguration.isWorkerNode();
             isPresenterNode = haConfiguration.isPresenterNode();
             if (isWorkerNode) {
-                receiverEventHandler.startServer(haConfiguration.getEventSyncConfig(), haConfiguration.getEventSyncReceiverThreads());
+                receiverEventHandler.startServer(haConfiguration.getEventSyncConfig());
             }
             if (isPresenterNode && !isWorkerNode) {
-                presenterEventHandler.startServer(haConfiguration.getLocalPresenterConfig(), haConfiguration.getPresentationReceiverThreads());
+                presenterEventHandler.startServer(haConfiguration.getLocalPresenterConfig());
             }
         } else if (mode == Mode.SingleNode) {
             PersistenceConfiguration persistConfig = managementModeInfo.getPersistenceConfiguration();
@@ -98,7 +98,7 @@ public class CarbonEventManagementService implements EventManagementService {
             }
             isPresenterNode = distributedConfiguration.isPresenterNode();
             if (isPresenterNode) {
-                presenterEventHandler.startServer(distributedConfiguration.getLocalPresenterConfig(), distributedConfiguration.getPresentationReceiverThreads());
+                presenterEventHandler.startServer(distributedConfiguration.getLocalPresenterConfig());
             }
         }
     }

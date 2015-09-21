@@ -45,8 +45,6 @@
             <publisherTcpSendBufferSize>5242880</publisherTcpSendBufferSize>
             <!--Character encoding of TCP event publishing client-->
             <publisherCharSet>UTF-8</publisherCharSet>
-            <!--Number of threads to be used by TCPEvent Server to publish events to the CEP nodes-->
-            <receiverThreads>10</receiverThreads>
             <publisherBufferSize>1024</publisherBufferSize>
             <publisherConnectionStatusCheckInterval>30000</publisherConnectionStatusCheckInterval>
             <!--Number of events that could be queued at receiver before they are synced between CEP nodes-->
@@ -67,8 +65,6 @@
             <publisherTcpSendBufferSize>5242880</publisherTcpSendBufferSize>
             <!--Character encoding of TCP event publishing client-->
             <publisherCharSet>UTF-8</publisherCharSet>
-            <!--Number of threads to be used by TCPEvent Server to publish events to the CEP nodes-->
-            <receiverThreads>10</receiverThreads>
             <publisherBufferSize>1024</publisherBufferSize>
             <publisherConnectionStatusCheckInterval>30000</publisherConnectionStatusCheckInterval>
         </presentation>
@@ -123,14 +119,15 @@
             This must be a power of two-->
             <cepReceiverOutputQueueSize>8192</cepReceiverOutputQueueSize>
             <!--Size of the output queue of each "Storm Publisher" which stores events to be published into "CEP Publisher" .
-           This must be a power of two-->
+            This must be a power of two-->
             <stormPublisherOutputQueueSize>8192</stormPublisherOutputQueueSize>
             <!--Size of TCP event publishing client's send buffer in bytes-->
             <tcpEventPublisherSendBufferSize>5242880</tcpEventPublisherSendBufferSize>
             <!--Character encoding of TCP event publishing client-->
             <tcpEventPublisherCharSet>UTF-8</tcpEventPublisherCharSet>
-            <!--Number of threads to be used by event receiving servers in "Storm Receivers" and "CEP Publishers"-->
-            <tcpEventReceiverThreadCount>10</tcpEventReceiverThreadCount>
+            <!--Size of the output queue of each "Storm Publisher" which stores events to be published into "CEP Publisher" .
+            This must be a power of two-->
+            <stormSpoutBufferSize>10000</stormSpoutBufferSize>
 
             <connectionStatusCheckInterval>20000</connectionStatusCheckInterval>
         </transport>
@@ -141,8 +138,6 @@
             <tcpEventPublisherSendBufferSize>5242880</tcpEventPublisherSendBufferSize>
             <!--Character encoding of TCP event publishing client-->
             <tcpEventPublisherCharSet>UTF-8</tcpEventPublisherCharSet>
-            <!--Number of threads to be used by event receiving servers in "Storm Receivers" and "CEP Publishers"-->
-            <tcpEventReceiverThreadCount>10</tcpEventReceiverThreadCount>
 
             <connectionStatusCheckInterval>20000</connectionStatusCheckInterval>
         </presentation>

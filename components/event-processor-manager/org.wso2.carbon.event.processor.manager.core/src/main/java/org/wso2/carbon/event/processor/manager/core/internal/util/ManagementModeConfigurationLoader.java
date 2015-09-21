@@ -285,12 +285,12 @@ public class ManagementModeConfigurationLoader {
         } else {
             log.info("TCP event publisher Char-Set not set. Hence using default value " + stormDeploymentConfig.getTransportPublisherCharSet());
         }
-        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)) != null) {
-            int threadCount = Integer.parseInt(transport.getFirstChildWithName(
-                    new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)).getText());
-            stormDeploymentConfig.setTransportReceiverThreads(threadCount);
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_SPOUT_BUFFER_SIZE)) != null) {
+            int bufferSize = Integer.parseInt(transport.getFirstChildWithName(
+                    new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_STORM_SPOUT_BUFFER_SIZE)).getText());
+            stormDeploymentConfig.setStormSpoutBufferSize(bufferSize);
         } else {
-            log.info("No TCP receiver thread count not specified. Hence using default thread count " + stormDeploymentConfig.getTransportReceiverThreads());
+            log.info("No Storm Spout buffer size not specified. Hence using default buffer size " + stormDeploymentConfig.getStormSpoutBufferSize());
         }
         if (transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL)) != null) {
             int connectionStatusCheckInterval = Integer.parseInt(transport.getFirstChildWithName(
@@ -300,7 +300,6 @@ public class ManagementModeConfigurationLoader {
             log.info("No transport connection status check interval specified. Hence using default interval "
                     + stormDeploymentConfig.getTransportPublisherConnectionStatusCheckInterval() + "ms");
         }
-
 
         //Reading node info
         OMElement node = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_ELEMENT));
@@ -380,14 +379,6 @@ public class ManagementModeConfigurationLoader {
                 log.info("TCP event publisher Char-Set not set for presenter. Hence using default value " + stormDeploymentConfig.getPresentationPublisherCharSet());
             }
 
-            if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)) != null) {
-                int threadCount = Integer.parseInt(transport.getFirstChildWithName(
-                        new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_TCP_RECEIVER_THREAD_COUNT)).getText());
-                stormDeploymentConfig.setPresentationReceiverThreads(threadCount);
-            } else {
-                log.info("No TCP receiver thread count not specified for presenter. Hence using default thread count " + stormDeploymentConfig.getPresentationReceiverThreads());
-            }
-
             if (presentation.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL)) != null) {
                 int connectionStatusCheckInterval = Integer.parseInt(transport.getFirstChildWithName(
                         new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL)).getText());
@@ -461,8 +452,6 @@ public class ManagementModeConfigurationLoader {
                     .HA_NODE_CONFIG_PUBLISHER_BUFFER_SIZE)));
             haConfiguration.setEventSyncPublisherConnectionStatusCheckInterval(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
                     .HA_NODE_CONFIG_PUBLISHER_CONNECTION_STATUS_CHECK_INTERVAL)));
-            haConfiguration.setEventSyncReceiverThreads(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
-                    .HA_NODE_CONFIG_RECEIVER_THREADS)));
             haConfiguration.setEventSyncReceiverQueueSize(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
                     .HA_NODE_CONFIG_RECEIVER_QUEUE_SIZE)));
             haConfiguration.setEventSyncPublisherQueueSize(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
@@ -481,8 +470,6 @@ public class ManagementModeConfigurationLoader {
                     .HA_NODE_CONFIG_PUBLISHER_BUFFER_SIZE)));
             haConfiguration.setPresentationPublisherConnectionStatusCheckInterval(Integer.parseInt(readOMElementValue(presentation, ConfigurationConstants
                     .HA_NODE_CONFIG_PUBLISHER_CONNECTION_STATUS_CHECK_INTERVAL)));
-            haConfiguration.setPresentationReceiverThreads(Integer.parseInt(readOMElementValue(presentation, ConfigurationConstants
-                    .HA_NODE_CONFIG_RECEIVER_THREADS)));
         }
 
         return haConfiguration;

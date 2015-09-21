@@ -122,10 +122,9 @@ public class EventHandler {
         }
     }
 
-    public void startServer(HostAndPort member, int threads) {
+    public void startServer(HostAndPort member) {
         if (tcpEventServer == null) {
             TCPEventServerConfig tcpEventServerConfig = new TCPEventServerConfig(member.getHostName(), member.getPort());
-            tcpEventServerConfig.setNumberOfThreads(threads);
             tcpEventServer = new TCPEventServer(tcpEventServerConfig, new StreamCallback() {
                 @Override
                 public void receive(String streamId, long timestamp, Object[] data) {
