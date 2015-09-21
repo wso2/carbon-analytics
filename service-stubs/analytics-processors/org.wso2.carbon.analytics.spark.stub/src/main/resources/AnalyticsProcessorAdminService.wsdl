@@ -50,39 +50,11 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="updateScript">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="cronExpression" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllScripts">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllScriptsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax221:AnalyticsScriptDto"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="saveScriptContent">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteScript">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -102,6 +74,34 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="updateScript">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="cronExpression" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteScript">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllScripts">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllScriptsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax221:AnalyticsScriptDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="executeScript">
                 <xs:complexType>
                     <xs:sequence>
@@ -116,12 +116,40 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="executeScriptInBackground">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="executeInBackground">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="isAnalyticsExecutionEnabled">
                 <xs:complexType>
                     <xs:sequence/>
                 </xs:complexType>
             </xs:element>
             <xs:element name="isAnalyticsExecutionEnabledResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isAnalyticsScriptExecuting">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isAnalyticsScriptExecutingResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
@@ -184,6 +212,9 @@
     <wsdl:message name="getScriptResponse">
         <wsdl:part name="parameters" element="ns:getScriptResponse"/>
     </wsdl:message>
+    <wsdl:message name="executeScriptInBackgroundRequest">
+        <wsdl:part name="parameters" element="ns:executeScriptInBackground"/>
+    </wsdl:message>
     <wsdl:message name="saveScriptRequest">
         <wsdl:part name="parameters" element="ns:saveScript"/>
     </wsdl:message>
@@ -211,6 +242,12 @@
     <wsdl:message name="updateScriptTaskRequest">
         <wsdl:part name="parameters" element="ns:updateScriptTask"/>
     </wsdl:message>
+    <wsdl:message name="isAnalyticsScriptExecutingRequest">
+        <wsdl:part name="parameters" element="ns:isAnalyticsScriptExecuting"/>
+    </wsdl:message>
+    <wsdl:message name="isAnalyticsScriptExecutingResponse">
+        <wsdl:part name="parameters" element="ns:isAnalyticsScriptExecutingResponse"/>
+    </wsdl:message>
     <wsdl:message name="executeQueryRequest">
         <wsdl:part name="parameters" element="ns:executeQuery"/>
     </wsdl:message>
@@ -229,6 +266,9 @@
     <wsdl:message name="deleteScriptRequest">
         <wsdl:part name="parameters" element="ns:deleteScript"/>
     </wsdl:message>
+    <wsdl:message name="executeInBackgroundRequest">
+        <wsdl:part name="parameters" element="ns:executeInBackground"/>
+    </wsdl:message>
     <wsdl:portType name="AnalyticsProcessorAdminServicePortType">
         <wsdl:operation name="updateScript">
             <wsdl:input message="ns:updateScriptRequest" wsaw:Action="urn:updateScript"/>
@@ -238,6 +278,10 @@
             <wsdl:input message="ns:getScriptRequest" wsaw:Action="urn:getScript"/>
             <wsdl:output message="ns:getScriptResponse" wsaw:Action="urn:getScriptResponse"/>
             <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:getScriptAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="executeScriptInBackground">
+            <wsdl:input message="ns:executeScriptInBackgroundRequest" wsaw:Action="urn:executeScriptInBackground"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:executeScriptInBackgroundAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
         </wsdl:operation>
         <wsdl:operation name="saveScript">
             <wsdl:input message="ns:saveScriptRequest" wsaw:Action="urn:saveScript"/>
@@ -265,6 +309,10 @@
             <wsdl:input message="ns:updateScriptTaskRequest" wsaw:Action="urn:updateScriptTask"/>
             <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:updateScriptTaskAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
         </wsdl:operation>
+        <wsdl:operation name="isAnalyticsScriptExecuting">
+            <wsdl:input message="ns:isAnalyticsScriptExecutingRequest" wsaw:Action="urn:isAnalyticsScriptExecuting"/>
+            <wsdl:output message="ns:isAnalyticsScriptExecutingResponse" wsaw:Action="urn:isAnalyticsScriptExecutingResponse"/>
+        </wsdl:operation>
         <wsdl:operation name="executeQuery">
             <wsdl:input message="ns:executeQueryRequest" wsaw:Action="urn:executeQuery"/>
             <wsdl:output message="ns:executeQueryResponse" wsaw:Action="urn:executeQueryResponse"/>
@@ -282,6 +330,10 @@
         <wsdl:operation name="deleteScript">
             <wsdl:input message="ns:deleteScriptRequest" wsaw:Action="urn:deleteScript"/>
             <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:deleteScriptAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="executeInBackground">
+            <wsdl:input message="ns:executeInBackgroundRequest" wsaw:Action="urn:executeInBackground"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:executeInBackgroundAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="AnalyticsProcessorAdminServiceSoap11Binding" type="ns:AnalyticsProcessorAdminServicePortType">
@@ -303,6 +355,15 @@
             <wsdl:output>
                 <soap:body use="literal"/>
             </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="executeScriptInBackground">
+            <soap:operation soapAction="urn:executeScriptInBackground" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
             <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
                 <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
             </wsdl:fault>
@@ -367,6 +428,15 @@
                 <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="isAnalyticsScriptExecuting">
+            <soap:operation soapAction="urn:isAnalyticsScriptExecuting" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="executeQuery">
             <soap:operation soapAction="urn:executeQuery" style="document"/>
             <wsdl:input>
@@ -409,6 +479,15 @@
                 <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="executeInBackground">
+            <soap:operation soapAction="urn:executeInBackground" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="AnalyticsProcessorAdminServiceSoap12Binding" type="ns:AnalyticsProcessorAdminServicePortType">
         <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
@@ -429,6 +508,15 @@
             <wsdl:output>
                 <soap12:body use="literal"/>
             </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="executeScriptInBackground">
+            <soap12:operation soapAction="urn:executeScriptInBackground" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
             <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
                 <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
             </wsdl:fault>
@@ -493,6 +581,15 @@
                 <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="isAnalyticsScriptExecuting">
+            <soap12:operation soapAction="urn:isAnalyticsScriptExecuting" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="executeQuery">
             <soap12:operation soapAction="urn:executeQuery" style="document"/>
             <wsdl:input>
@@ -535,6 +632,15 @@
                 <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="executeInBackground">
+            <soap12:operation soapAction="urn:executeInBackground" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="AnalyticsProcessorAdminServiceHttpBinding" type="ns:AnalyticsProcessorAdminServicePortType">
         <http:binding verb="POST"/>
@@ -552,6 +658,12 @@
             <wsdl:output>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="executeScriptInBackground">
+            <http:operation location="executeScriptInBackground"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
         </wsdl:operation>
         <wsdl:operation name="saveScript">
             <http:operation location="saveScript"/>
@@ -598,6 +710,15 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
         </wsdl:operation>
+        <wsdl:operation name="isAnalyticsScriptExecuting">
+            <http:operation location="isAnalyticsScriptExecuting"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="executeQuery">
             <http:operation location="executeQuery"/>
             <wsdl:input>
@@ -628,16 +749,22 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
         </wsdl:operation>
+        <wsdl:operation name="executeInBackground">
+            <http:operation location="executeInBackground"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="AnalyticsProcessorAdminService">
         <wsdl:port name="AnalyticsProcessorAdminServiceHttpsSoap11Endpoint" binding="ns:AnalyticsProcessorAdminServiceSoap11Binding">
-            <soap:address location="https://10.100.1.138:9443/services/AnalyticsProcessorAdminService.AnalyticsProcessorAdminServiceHttpsSoap11Endpoint/"/>
+            <soap:address location="https://192.168.219.1:9443/services/AnalyticsProcessorAdminService.AnalyticsProcessorAdminServiceHttpsSoap11Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="AnalyticsProcessorAdminServiceHttpsSoap12Endpoint" binding="ns:AnalyticsProcessorAdminServiceSoap12Binding">
-            <soap12:address location="https://10.100.1.138:9443/services/AnalyticsProcessorAdminService.AnalyticsProcessorAdminServiceHttpsSoap12Endpoint/"/>
+            <soap12:address location="https://192.168.219.1:9443/services/AnalyticsProcessorAdminService.AnalyticsProcessorAdminServiceHttpsSoap12Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="AnalyticsProcessorAdminServiceHttpsEndpoint" binding="ns:AnalyticsProcessorAdminServiceHttpBinding">
-            <http:address location="https://10.100.1.138:9443/services/AnalyticsProcessorAdminService.AnalyticsProcessorAdminServiceHttpsEndpoint/"/>
+            <http:address location="https://192.168.219.1:9443/services/AnalyticsProcessorAdminService.AnalyticsProcessorAdminServiceHttpsEndpoint/"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

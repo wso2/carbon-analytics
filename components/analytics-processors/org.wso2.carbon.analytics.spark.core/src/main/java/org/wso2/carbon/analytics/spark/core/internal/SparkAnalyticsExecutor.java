@@ -131,6 +131,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         // sends this host name and base master port to initialize the spark conf
         String propsFile = GenericUtils.getAnalyticsConfDirectory() + File.separator +
+                           "analytics" + File.separator +
                            AnalyticsConstants.SPARK_CONF_DIR + File.separator +
                            AnalyticsConstants.SPARK_DEFAULTS_FILE;
         if (!new File(propsFile).exists()) {
@@ -269,6 +270,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private UDFConfiguration loadUDFConfiguration() throws AnalyticsException {
         try {
             File confFile = new File(GenericUtils.getAnalyticsConfDirectory() +
+                                     File.separator + "analytics" +
                                      File.separator + AnalyticsConstants.SPARK_CONF_DIR +
                                      File.separator + AnalyticsConstants.SPARK_UDF_CONF_FILE);
             if (!confFile.exists()) {

@@ -67,9 +67,19 @@ public class AnalyticsExecutionClient {
         return stub.execute(scriptContent);
     }
 
+    public void executeScriptContentInBackground(String scriptContent) throws RemoteException,
+            AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+        stub.executeInBackground(scriptContent);
+    }
+
     public AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] executeScript(String scriptName)
             throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
         return stub.executeScript(scriptName);
+    }
+
+    public void executeScriptInBackground(String scriptName)
+            throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+        stub.executeScriptInBackground(scriptName);
     }
 
     public void deleteScript(String scriptName) throws RemoteException,
@@ -157,5 +167,9 @@ public class AnalyticsExecutionClient {
 
     public boolean isAnalyticsExecutionEnabled() throws RemoteException {
         return stub.isAnalyticsExecutionEnabled();
+    }
+
+    public boolean isAnalyticsScriptExecuting(String scriptName) throws RemoteException {
+        return stub.isAnalyticsScriptExecuting(scriptName);
     }
 }

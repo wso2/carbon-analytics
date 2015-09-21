@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.analytics.spark.admin.internal;
 
+import com.hazelcast.core.HazelcastInstance;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 
 /**
@@ -31,6 +32,7 @@ public class ServiceHolder {
     }
 
     private static AnalyticsProcessorService analyticsProcessorService;
+    private static HazelcastInstance hazelcastInstance;
 
     public static AnalyticsProcessorService getAnalyticsProcessorService() {
         return analyticsProcessorService;
@@ -38,5 +40,13 @@ public class ServiceHolder {
 
     public static void setAnalyticsProcessorService(AnalyticsProcessorService analyticsProcessorService) {
         ServiceHolder.analyticsProcessorService = analyticsProcessorService;
+    }
+
+    public static HazelcastInstance getHazelcastInstance() {
+        return hazelcastInstance;
+    }
+
+    public static void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
+        ServiceHolder.hazelcastInstance = hazelcastInstance;
     }
 }

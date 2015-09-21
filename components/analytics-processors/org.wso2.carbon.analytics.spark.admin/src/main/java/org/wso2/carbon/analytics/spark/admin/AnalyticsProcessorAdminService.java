@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.admin.dto.AnalyticsScriptDto;
 import org.wso2.carbon.analytics.spark.admin.internal.AnalyticsResultConverter;
 import org.wso2.carbon.analytics.spark.admin.internal.ServiceHolder;
+import org.wso2.carbon.analytics.spark.admin.util.AnalyticsProcessorUtils;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
@@ -31,6 +32,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Admin service exposed to do the AnalyticsProcessor Service to
@@ -204,6 +206,38 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
     }
 
     /**
+     * Execute the script with given script name in a different thread in background.
+     *
+     * @param scriptName Name of the script.
+     * @throws AnalyticsProcessorAdminException
+     */
+    public void executeScriptInBackground(String scriptName) throws AnalyticsProcessorAdminException {
+        final int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        try {
+            final AnalyticsScript script = ServiceHolder.getAnalyticsProcessorService().getScript(tenantId, scriptName);
+            ExecutorService executor = AnalyticsProcessorUtils.getExecutorServiceInstance();
+            executor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (!AnalyticsProcessorUtils.getRunningScriptsMap().containsKey(script.getName())) {
+                            AnalyticsProcessorUtils.getRunningScriptsMap().put(script.getName(), script.getName());
+                            execute(script.getScriptContent(), tenantId);
+                        }
+                    } catch (AnalyticsProcessorAdminException e) {
+                        log.error("Error while running the script : " + script.getName(), e);
+                    } finally {
+                        AnalyticsProcessorUtils.getRunningScriptsMap().remove(script.getName());
+                    }
+                }
+            });
+        } catch (AnalyticsPersistenceException e) {
+            log.error("Error while running the script : " + scriptName, e);
+            throw new AnalyticsProcessorAdminException("Error while running the script : " + scriptName, e);
+        }
+    }
+
+    /**
      * Execute the given script content.
      *
      * @param scriptContent queries content to be executed.
@@ -217,6 +251,63 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
             int index = 0;
             for (String query : queries) {
                 AnalyticsQueryResultDto queryResult = executeQuery(query);
+                if (queryResult == null) queryResult = new AnalyticsQueryResultDto(query);
+                results[index] = queryResult;
+                index++;
+            }
+            return results;
+        } else {
+            log.error("No queries provided to execute at tenant id :" + PrivilegedCarbonContext.
+                    getThreadLocalCarbonContext().getTenantId());
+            throw new AnalyticsProcessorAdminException("No queries provided to execute.");
+        }
+    }
+
+    /**
+     * Execute the given script content in a different background thread.
+     *
+     * @param scriptContent queries content to be executed.
+     * @throws AnalyticsProcessorAdminException
+     */
+    public void executeInBackground(final String scriptContent) throws AnalyticsProcessorAdminException {
+        final int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        if (scriptContent != null && !scriptContent.trim().isEmpty()) {
+            ExecutorService executor = AnalyticsProcessorUtils.getExecutorServiceInstance();
+            executor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        String[] queries = ServiceHolder.getAnalyticsProcessorService().getQueries(scriptContent);
+                        for (String query : queries) {
+                            executeQuery(query, tenantId);
+                        }
+                    } catch (AnalyticsProcessorAdminException e) {
+                        log.error("Error while running the scriptContent at tenant id  : " + tenantId, e);
+                    }
+                }
+            });
+        } else {
+            log.error("No queries provided to execute at tenant id :" + PrivilegedCarbonContext.
+                    getThreadLocalCarbonContext().getTenantId());
+            throw new AnalyticsProcessorAdminException("No queries provided to execute.");
+        }
+    }
+
+    /**
+     * Overloaded execute method which execute given script content
+     *
+     * @param scriptContent queries content to be executed.
+     * @param tenantId
+     * @return Result returned from the execution
+     * @throws AnalyticsProcessorAdminException
+     */
+    private AnalyticsQueryResultDto[] execute(String scriptContent, int tenantId) throws AnalyticsProcessorAdminException {
+        if (scriptContent != null && !scriptContent.trim().isEmpty()) {
+            String[] queries = ServiceHolder.getAnalyticsProcessorService().getQueries(scriptContent);
+            AnalyticsQueryResultDto[] results = new AnalyticsQueryResultDto[queries.length];
+            int index = 0;
+            for (String query : queries) {
+                AnalyticsQueryResultDto queryResult = executeQuery(query, tenantId);
                 if (queryResult == null) queryResult = new AnalyticsQueryResultDto(query);
                 results[index] = queryResult;
                 index++;
@@ -256,11 +347,47 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
     }
 
     /**
+     * Overloaded executeQuery method which execute the provided query and return the result for the query.
+     *
+     * @param query Query which needs to be executed.
+     * @param tenantId
+     * @return Result for the query execution.
+     * @throws AnalyticsProcessorAdminException
+     */
+    private AnalyticsQueryResultDto executeQuery(String query, int tenantId) throws AnalyticsProcessorAdminException {
+        if (query != null && !query.trim().isEmpty()) {
+            try {
+                AnalyticsQueryResultDto queryResult = AnalyticsResultConverter.convertResults(ServiceHolder.
+                        getAnalyticsProcessorService().executeQuery(tenantId, query));
+                if (queryResult != null) queryResult.setQuery(query);
+                return queryResult;
+            } catch (AnalyticsExecutionException e) {
+                log.error("Error while executing query : " + query, e);
+                throw new AnalyticsProcessorAdminException("Error while executing query : " + query, e);
+            }
+        } else {
+            log.error("No queries provided to execute at tenant id :" + PrivilegedCarbonContext.
+                    getThreadLocalCarbonContext().getTenantId());
+            throw new AnalyticsProcessorAdminException("No queries provided to execute.");
+        }
+    }
+
+    /**
      * Checks and returns whether analytics execution is enabled for this node.
      *
      * @return
      */
     public boolean isAnalyticsExecutionEnabled() {
         return ServiceHolder.getAnalyticsProcessorService().isAnalyticsExecutionEnabled();
+    }
+
+    /**
+     * Checks and returns whether particular analytics script is running in background
+     *
+     * @param scriptName
+     * @return
+     */
+    public boolean isAnalyticsScriptExecuting(String scriptName) {
+        return AnalyticsProcessorUtils.getRunningScriptsMap().containsKey(scriptName);
     }
 }

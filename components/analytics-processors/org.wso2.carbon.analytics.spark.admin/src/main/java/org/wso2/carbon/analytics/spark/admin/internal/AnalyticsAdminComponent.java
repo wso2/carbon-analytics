@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.analytics.spark.admin.internal;
 
+import com.hazelcast.core.HazelcastInstance;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 
@@ -24,6 +25,8 @@ import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
  * @scr.component name="analytics.admin" immediate="true"
  * @scr.reference name="analytics.core" interface="org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsProcessorService" unbind="unsetAnalyticsProcessorService"
+ * @scr.reference name="hazelcast.instance.service" interface="com.hazelcast.core.HazelcastInstance"
+ * cardinality="0..1" policy="dynamic" bind="setHazelcastInstance" unbind="unsetHazelcastInstance"
  */
 public class AnalyticsAdminComponent {
 
@@ -37,5 +40,12 @@ public class AnalyticsAdminComponent {
     protected void unsetAnalyticsProcessorService(AnalyticsProcessorService analyticsService) {
         ServiceHolder.setAnalyticsProcessorService(null);
     }
-    
+
+    protected void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
+        ServiceHolder.setHazelcastInstance(hazelcastInstance);
+    }
+
+    protected void unsetHazelcastInstance(HazelcastInstance hazelcastInstance) {
+        ServiceHolder.setHazelcastInstance(null);
+    }
 }

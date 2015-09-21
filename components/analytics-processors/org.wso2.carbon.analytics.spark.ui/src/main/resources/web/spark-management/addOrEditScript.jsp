@@ -80,11 +80,42 @@
         function executeQuery() {
             var scriptContent = editAreaLoader.getValue("allcommands");
             if (scriptContent == null || scriptContent == '') {
-                CARBON.showErrorDialog("No queries enteren in the window! Please enter some queries and try again!");
+                CARBON.showErrorDialog("No queries entered in the window! Please enter some queries and try again!");
             } else {
                 document.getElementById('middle').style.cursor = 'wait';
                 openProgressBar();
                 new Ajax.Request('executeScript_ajaxprocessor.jsp', {
+                    method: 'post',
+                    parameters: {scriptContent: scriptContent},
+                    onSuccess: function (transport) {
+                        closeProgrsssBar();
+                        document.getElementById('middle').style.cursor = '';
+                        var allPage = transport.responseText;
+                        var divText = '<div id="returnedResults">';
+                        var closeDivText = '</div>';
+                        var temp = allPage.indexOf(divText, 0);
+                        var startIndex = temp + divText.length;
+                        var endIndex = allPage.indexOf(closeDivText, temp);
+                        var queryResults = allPage.substring(startIndex, endIndex);
+                        document.getElementById('analyticsResult').innerHTML = queryResults;
+                    },
+                    onFailure: function (transport) {
+                        closeProgrsssBar();
+                        document.getElementById('middle').style.cursor = '';
+                        CARBON.showErrorDialog(transport.responseText);
+                    }
+                });
+            }
+        }
+
+        function executeQueryInBackground() {
+            var scriptContent = editAreaLoader.getValue("allcommands");
+            if (scriptContent == null || scriptContent == '') {
+                CARBON.showErrorDialog("No queries entered in the window! Please enter some queries and try again!");
+            } else {
+                document.getElementById('middle').style.cursor = 'wait';
+                openProgressBar();
+                new Ajax.Request('executeScriptInBackground_ajaxprocessor.jsp', {
                     method: 'post',
                     parameters: {scriptContent: scriptContent},
                     onSuccess: function (transport) {
@@ -279,6 +310,8 @@
                 %>
                 <input class="button" type="button" onclick="executeQuery()"
                        value="<fmt:message key="spark.script.execute"/>"/>
+                <input class="button" type="button" onclick="executeQueryInBackground()"
+                       value="<fmt:message key="spark.script.execute.in.background"/>"/>
                 <%
                     }
                 %>

@@ -94,12 +94,12 @@
             timeFromObj = jQuery('#timeFrom').datetimepicker({
                 controlType: 'select',
                 oneLine: true,
-                timeFormat: 'hh:mm tt'
+                timeFormat: 'HH:mm:ss tt'
             });
             timeToObj = jQuery('#timeTo').datetimepicker({
                 controlType: 'select',
                 oneLine: true,
-                timeFormat: 'hh:mm tt'
+                timeFormat: 'HH:mm:ss tt'
             });
             $("#purgeRecordDialog").dialog({
                 autoOpen: false
