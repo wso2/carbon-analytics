@@ -95,6 +95,7 @@ public class AnalyticsEventQueue {
 
     public void notifyReleasedEvent(WrappedEventFactory.WrappedEvent wrappedEvent, boolean endOfBatch) {
         currentSize.addAndGet(-wrappedEvent.getSize());
+        wrappedEvent.setEvent(null);
         if (semaphore.availablePermits() == 0 && ((currentEventSize + currentSize.get()) < maxSize) || endOfBatch) {
             synchronized (lock) {
                 if (semaphore.availablePermits() == 0 && ((currentEventSize + currentSize.get()) < maxSize) || endOfBatch) {
