@@ -229,7 +229,12 @@ public class ComputeClasspath {
 
     public static String getSparkClasspath(String sparkClasspath, String carbonHome)
             throws IOException {
-        String cp = createInitialSparkClasspath(sparkClasspath, carbonHome, REQUIRED_JARS, SEP);
+        return  getSparkClasspath(sparkClasspath, carbonHome, new String[0]);
+    }
+
+    public static String getSparkClasspath(String sparkClasspath, String carbonHome, String[] excludeJars)
+            throws IOException {
+        String cp = createInitialSparkClasspath(sparkClasspath, carbonHome, REQUIRED_JARS, SEP, excludeJars);
         return cp + addJarsFromLib("", carbonHome, SEP) + addJarsFromConfig("", carbonHome, SEP);
     }
 
@@ -249,7 +254,7 @@ public class ComputeClasspath {
 
     private static String addJarsFromLib(String scp, String carbonHome, String separator) {
         File libDir = new File(carbonHome + File.separator + "repository" + File.separator
-                + "components" + File.separator + "lib");
+                               + "components" + File.separator + "lib");
         File[] libJars = listJars(libDir);
         for (File jar : libJars) {
             scp = scp + separator + jar.getAbsolutePath();
@@ -260,7 +265,7 @@ public class ComputeClasspath {
     private static String addJarsFromConfig(String scp, String carbonHome, String separator)
             throws IOException {
         File cpFile = new File(carbonHome + File.separator + "repository" + File.separator + "conf"
-                               + File.separator + "analytics" + File.separator +  "spark"
+                               + File.separator + "analytics" + File.separator + "spark"
                                + File.separator + "external-spark-classpath.conf");
 
         BufferedReader reader = null;
@@ -314,15 +319,22 @@ public class ComputeClasspath {
     }
 
     private static String createInitialSparkClasspath(String sparkClasspath, String carbonHome,
-                                                      String[] requiredJars, String separator) {
+                                                      String[] requiredJars, String separator,
+                                                      String[] excludeJars) {
         File pluginsDir = new File(carbonHome + File.separator + "repository" + File.separator
-                + "components" + File.separator + "plugins");
+                                   + "components" + File.separator + "plugins");
         File[] pluginJars = listJars(pluginsDir);
 
         for (String requiredJar : requiredJars) {
             for (File pluginJar : pluginJars) {
                 String plugin = pluginJar.getName();
-                if (plugin.split("_")[0].equals(requiredJar)) {
+                String jarName = plugin.split("_")[0];
+
+                if (containsInArray(excludeJars, jarName)) {
+                    continue;
+                }
+
+                if (jarName.equals(requiredJar)) {
                     if (sparkClasspath.isEmpty()) {
                         sparkClasspath = pluginJar.getAbsolutePath();
                     } else {
@@ -332,5 +344,14 @@ public class ComputeClasspath {
             }
         }
         return sparkClasspath;
+    }
+
+    private static boolean containsInArray(String[] arr, String str) {
+        for (String s : arr) {
+            if (s.equals(str)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -523,8 +523,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
             String sparkClasspath = (System.getProperty("SPARK_CLASSPATH") == null) ?
                                     "" : System.getProperty("SPARK_CLASSPATH");
-            sparkClasspath = ComputeClasspath.getSparkClasspath(sparkClasspath, CarbonUtils.getCarbonHome());
-
+            if ( this.sparkMaster.trim().toLowerCase().startsWith("spark")){
+                sparkClasspath = ComputeClasspath.getSparkClasspath(sparkClasspath, CarbonUtils.getCarbonHome(), new String[]{"slf4j"});
+            } else {
+                sparkClasspath = ComputeClasspath.getSparkClasspath(sparkClasspath, CarbonUtils.getCarbonHome());
+            }
             try {
                 conf.set("spark.executor.extraClassPath", conf.get("spark.executor.extraClassPath") + ";" + sparkClasspath);
             } catch (NoSuchElementException e) {
