@@ -481,7 +481,13 @@
             <tbody>
             <tr>
                 <td>
-                    <div><label id="searchStat"></label></div>
+                    <div>
+                        <label id="searchStat"></label>
+                        <label id="countLabel"
+                               style="display: none font-size: 11px !important; color: #aaaaaa;">
+                            Note: Total record count for the table is not available.
+                        </label>
+                    </div>
                 </td>
             </tr>
             <tr>

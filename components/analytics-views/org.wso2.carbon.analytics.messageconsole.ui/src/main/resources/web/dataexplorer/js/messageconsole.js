@@ -172,6 +172,7 @@ function tableSelectChange() {
         $('#query').val('');
         document.getElementById('searchControl').style.display = 'none';
         document.getElementById('resultCount').style.display = 'none';
+        document.getElementById('countLabel').style.display = 'none';
     }
     document.getElementById('dataRangeSearch').style.display = 'none';
     document.getElementById('primaryKeySearch').style.display = 'none';
@@ -262,8 +263,9 @@ function checkTotalCountSupport() {
     document.getElementById('radioQuery').style.display = '';
     $.get('/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeCheckTotalCount + '&tableName=' + $("#tableSelect").val(),
           function (result) {
-              if (result == 'true') {
-                  document.getElementById('resultCount').style.display = 'none';
+              if (result.trim() != 'true') {
+                  document.getElementById('resultCount').style.display = '';
+                  document.getElementById('countLabel').style.display = '';
               }
           }
     );
@@ -300,6 +302,7 @@ function reset() {
     loadTableSelect();
     document.getElementById('searchControl').style.display = 'none';
     document.getElementById('resultCount').style.display = 'none';
+    document.getElementById('countLabel').style.display = 'none';
     document.getElementById('dataRangeSearch').style.display = 'none';
     document.getElementById('querySearch').style.display = 'none';
     document.getElementById('primaryKeySearch').style.display = 'none';
