@@ -2,7 +2,7 @@
 <rdbms-configuration>
     <database name = "h2">
         <recordCountSupported>false</recordCountSupported>
-        <paginationSupported>false</paginationSupported>
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE1</paginationMode>
         <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
@@ -41,7 +41,7 @@
     </database>
     <database name = "mysql" category = "large_dataset_optimized">
         <recordCountSupported>false</recordCountSupported>
-        <paginationSupported>false</paginationSupported>
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE1</paginationMode>
         <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
@@ -82,7 +82,7 @@
     </database>
     <database name = "mysql" category = "limited_dataset_optimized">
         <recordCountSupported>false</recordCountSupported>
-        <paginationSupported>false</paginationSupported>
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE1</paginationMode>
         <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
@@ -123,7 +123,7 @@
     </database>
     <database name = "oracle">
         <recordCountSupported>false</recordCountSupported>
-        <paginationSupported>false</paginationSupported>
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE2</paginationMode>
         <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} WHERE rownum=1</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
@@ -166,7 +166,7 @@
     </database>
     <database name = "Microsoft SQL Server">
         <recordCountSupported>false</recordCountSupported>
-        <paginationSupported>false</paginationSupported>
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE2</paginationMode>
         <blobLengthRequired>true</blobLengthRequired>
         <recordTableCheckQuery>SELECT TOP 1 1 from {{TABLE_NAME}}</recordTableCheckQuery>
@@ -211,7 +211,7 @@
     </database>
     <database name = "PostgreSQL">
         <recordCountSupported>false</recordCountSupported>
-        <paginationSupported>false</paginationSupported>
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE1</paginationMode>
         <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
@@ -256,7 +256,7 @@
     </database>
     <database name = "DB2.*">
         <recordCountSupported>false</recordCountSupported>
-        <paginationSupported>false</paginationSupported>
+        <paginationSupported>true</paginationSupported>
         <paginationMode>MODE1</paginationMode>
         <blobLengthRequired>true</blobLengthRequired>
         <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} FETCH FIRST 1 ROWS ONLY</recordTableCheckQuery>
