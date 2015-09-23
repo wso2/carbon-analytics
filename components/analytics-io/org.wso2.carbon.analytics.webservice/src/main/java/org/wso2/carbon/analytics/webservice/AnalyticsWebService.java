@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
@@ -32,6 +33,7 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsAggregateRequest;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRangeBean;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRequestBean;
@@ -55,6 +57,7 @@ import org.wso2.carbon.event.stream.core.EventStreamService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -315,20 +318,21 @@ public class AnalyticsWebService extends AbstractAdmin {
                 recordsCount = recordsFrom + recordsCount;
                 recordsFrom = 0;
             }
-            List<Record> records = AnalyticsDataServiceUtils.
-                    listRecords(analyticsDataAPI,
-                                analyticsDataAPI.get(getUsername(), tableName, numPartitionsHint, columnList, timeFrom, timeTo, recordsFrom,
-                                                     recordsCount));
+            AnalyticsDataResponse response = analyticsDataAPI.get(getUsername(), tableName, numPartitionsHint,
+                                                                  columnList, timeFrom, timeTo, recordsFrom,
+                                                                  recordsCount);
+            List<Record> records;
             if (!isPaginationSupported(getRecordStoreNameByTable(tableName))) {
-                int upperLimit = originalFrom + recordsCount;
-                if (upperLimit > records.size()) {
-                    upperLimit = records.size() - recordsFrom;
+                Iterator<Record> itr = AnalyticsDataServiceUtils.responseToIterator(analyticsDataAPI, response);
+                records = new ArrayList<>();
+                for (int i = 0; i < originalFrom && itr.hasNext(); i++) {
+                    itr.next();
                 }
-                if (originalFrom < upperLimit) {
-                    records = records.subList(originalFrom, upperLimit);
-                } else {
-                    records.clear();
+                for (int i = 0; i < recordsCount && itr.hasNext(); i++) {
+                    records.add(itr.next());
                 }
+            } else {
+                records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, response);
             }
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];

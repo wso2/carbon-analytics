@@ -60,6 +60,7 @@
         var typeGetFacetNameList = '<%= MessageConsoleConnector.TYPE_GET_FACET_NAME_LIST%>';
         var typeGetFacetCategories = '<%= MessageConsoleConnector.TYPE_GET_FACET_CATEGORIES%>';
         var typeGetPrymaryKeyList = '<%= MessageConsoleConnector.TYPE_GET_PRIMARY_KEY_LIST%>';
+        var typeCheckTotalCount = '<%= MessageConsoleConnector.TYPE_CHECK_TOTAL_COUNT_SUPPORT%>';
 
         var tablePopupAction;
 
@@ -216,7 +217,7 @@
             $('#AnalyticsTableContainer').jtable({
                 title: $("#tableSelect").val(),
                 paging: true,
-                pageSize: 50,
+                pageSize: 10,
                 actions: {
                     // For Details: http://jtable.org/Demo/FunctionsAsActions
                     listAction: function (postData, jtParams) {

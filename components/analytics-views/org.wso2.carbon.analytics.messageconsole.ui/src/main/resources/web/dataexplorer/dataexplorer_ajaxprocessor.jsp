@@ -49,7 +49,10 @@
             }
             String facets = request.getParameter("facets");
             String primary = request.getParameter("primary");
-            int resultCountLimit = Integer.parseInt(request.getParameter("resultCountLimit"));
+            int resultCountLimit = 100;
+            if (request.getParameter("resultCountLimit") != null) {
+                resultCountLimit = Integer.parseInt(request.getParameter("resultCountLimit"));
+            }
             out.print(connector.getRecords(tableName, from, to, startIndex, pageSize, query, facets, primary, resultCountLimit));
             break;
         }
@@ -91,7 +94,7 @@
             break;
         }
         case MessageConsoleConnector.TYPE_CHECK_TOTAL_COUNT_SUPPORT: {
-            out.print(connector.getPrimaryKeys(tableName));
+            out.print(connector.isRecordCountSupported(tableName));
             break;
         }
 

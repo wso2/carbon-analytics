@@ -217,8 +217,8 @@ public class MessageConsoleConnector {
                     responseResult.setActualRecordCount(totalRecordCount);
                     responseResult.setTotalRecordCount(resultCountLimit);
                 }
-                if (analyticsWebServiceStub.isPaginationSupported(recordStoreName)) {
-                    resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex, pageSize);
+                resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex, pageSize);
+                /*if (analyticsWebServiceStub.isPaginationSupported(recordStoreName)) {
                 } else {
                     int requestingPageSize = pageSize;
                     if (startIndex + pageSize > resultCountLimit) {
@@ -227,7 +227,7 @@ public class MessageConsoleConnector {
                     resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex,
                                                                            requestingPageSize);
                     responseResult.setTotalRecordCount(resultCountLimit);
-                }
+                }*/
             }
             List<Record> records = new ArrayList<>();
             if (resultRecordBeans != null) {
@@ -544,7 +544,7 @@ public class MessageConsoleConnector {
 
     public boolean isRecordCountSupported(String tableName) {
         try {
-            return analyticsWebServiceStub.isRecordCountSupported(tableName);
+            return analyticsWebServiceStub.isRecordCountSupported(analyticsWebServiceStub.getRecordStoreNameByTable(tableName));
         } catch (Exception e) {
             log.error("Unable to check record count support status for table " + tableName, e);
             return false;

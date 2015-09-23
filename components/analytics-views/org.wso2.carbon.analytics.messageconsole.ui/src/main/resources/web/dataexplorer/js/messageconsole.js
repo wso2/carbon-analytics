@@ -162,10 +162,10 @@ function tableSelectChange() {
     var table = $("#tableSelect").val();
     if (table != '-1') {
         document.getElementById('searchControl').style.display = '';
-        document.getElementById('resultCount').style.display = '';
         $("#purgeRecordButton").show();
         loadPrimaryKeys();
         loadFacetNames();
+        checkTotalCountSupport();
     } else {
         $("#purgeRecordButton").hide();
         $('#facetListSelect').find('option:gt(0)').remove();
@@ -252,6 +252,19 @@ function loadFacetNames() {
               });
               facetAvailable = resultObj.length > 0;
               $("#facetListSelect").append(facetNames);
+          }
+    );
+}
+
+function checkTotalCountSupport() {
+    $('#facetSearchTable tr').remove();
+    $('#facetListSelect').find('option:gt(0)').remove();
+    document.getElementById('radioQuery').style.display = '';
+    $.get('/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeCheckTotalCount + '&tableName=' + $("#tableSelect").val(),
+          function (result) {
+              if (result == 'true') {
+                  document.getElementById('resultCount').style.display = 'none';
+              }
           }
     );
 }
