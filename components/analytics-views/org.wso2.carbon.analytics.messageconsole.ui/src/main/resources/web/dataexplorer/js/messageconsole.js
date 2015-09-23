@@ -146,7 +146,10 @@ function listActionMethod(jtParams) {
                     data: postData,
                     success: function (data) {
                         $dfd.resolve(data);
-                        if (data.ActualRecordCount != -1) {
+                        if (data.ActualRecordCount != -1 && data.SearchTime != -1) {
+                            $('#searchStat').text('Total Records: ' + data.ActualRecordCount + ' (' + data.SearchTime +
+                                                  ' milliseconds)');
+                        } else if (data.ActualRecordCount != -1) {
                             $('#searchStat').text('Total Records: ' + data.ActualRecordCount);
                         }
                     },
@@ -174,6 +177,8 @@ function tableSelectChange() {
         document.getElementById('resultCount').style.display = 'none';
         document.getElementById('countLabel').style.display = 'none';
     }
+    $('#searchStat').text('');
+    document.getElementById('countLabel').style.display = 'none';
     document.getElementById('dataRangeSearch').style.display = 'none';
     document.getElementById('primaryKeySearch').style.display = 'none';
     document.getElementById('querySearch').style.display = 'none';

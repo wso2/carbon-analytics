@@ -175,6 +175,7 @@ public class MessageConsoleConnector {
             RecordBean[] resultRecordBeans;
             List<Column> primaryKeys = new Gson().fromJson(primarySearchString, PRIMARY_KEYS_TYPE);
             List<FacetBean> facetsList = new Gson().fromJson(facetsJsonString, FACET_LIST_TYPE);
+            responseResult.setSearchTime(-1);
             if (primaryKeys != null && !primaryKeys.isEmpty()) {
                 ValuesBatchBean[] batchBeans = new ValuesBatchBean[1];
                 ValuesBatchBean batchBean = new ValuesBatchBean();
@@ -190,9 +191,11 @@ public class MessageConsoleConnector {
                 batchBean.setKeyValues(valueEntryBeans);
                 resultRecordBeans = analyticsWebServiceStub.getWithKeyValues(tableName, 1, null, batchBeans);
             } else if (facetsList != null && !facetsList.isEmpty()) {
+                long startingTime = System.currentTimeMillis();
                 AnalyticsDrillDownRequestBean requestBean = getAnalyticsDrillDownRequestBean(tableName, startIndex, pageSize, searchQuery, facetsList);
                 resultRecordBeans = analyticsWebServiceStub.drillDownSearch(requestBean);
                 long searchCount = new Double(analyticsWebServiceStub.drillDownSearchCount(requestBean)).intValue();
+                responseResult.setSearchTime(System.currentTimeMillis() - startingTime);
                 responseResult.setActualRecordCount(searchCount);
                 if (responseResult.getActualRecordCount() > resultCountLimit) {
                     responseResult.setTotalRecordCount(resultCountLimit);
@@ -200,8 +203,10 @@ public class MessageConsoleConnector {
                     responseResult.setTotalRecordCount(searchCount);
                 }
             } else if (searchQuery != null && !searchQuery.isEmpty()) {
+                long startingTime = System.currentTimeMillis();
                 resultRecordBeans = analyticsWebServiceStub.search(tableName, searchQuery, startIndex, pageSize);
                 long searchCount = analyticsWebServiceStub.searchCount(tableName, searchQuery);
+                responseResult.setSearchTime(System.currentTimeMillis() - startingTime);
                 responseResult.setActualRecordCount(searchCount);
                 if (responseResult.getActualRecordCount() > resultCountLimit) {
                     responseResult.setTotalRecordCount(resultCountLimit);

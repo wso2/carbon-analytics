@@ -29,6 +29,7 @@ public class ResponseResult {
     private String message;
     private long totalRecordCount;
     private long actualRecordCount;
+    private long searchTime;
     private List<Record> records = new ArrayList<>();
 
     public ResponseResult() {
@@ -64,6 +65,14 @@ public class ResponseResult {
 
     public void setActualRecordCount(long actualRecordCount) {
         this.actualRecordCount = actualRecordCount;
+    }
+
+    public long getSearchTime() {
+        return searchTime;
+    }
+
+    public void setSearchTime(long searchTime) {
+        this.searchTime = searchTime;
     }
 
     public List<Record> getRecords() {
