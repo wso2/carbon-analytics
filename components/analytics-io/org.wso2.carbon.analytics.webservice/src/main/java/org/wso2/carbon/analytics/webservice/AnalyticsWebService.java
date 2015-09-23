@@ -312,6 +312,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             }
             int originalFrom = recordsFrom;
             if (!isPaginationSupported(getRecordStoreNameByTable(tableName))) {
+                recordsCount = recordsFrom + recordsCount;
                 recordsFrom = 0;
             }
             List<Record> records = AnalyticsDataServiceUtils.

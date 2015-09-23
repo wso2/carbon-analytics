@@ -384,6 +384,18 @@
                                     </c:if>
                                 </td>
                             </tr>
+                            <tr id="resultCount" style="display: none">
+                                <td width="10%">Maximum Result Count</td>
+                                <td>
+                                    <select id="resultCountSelect">
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                        <option value="1000" selected="selected">1000</option>
+                                        <option value="10000">10000</option>
+                                        <option value="100000">100000</option>
+                                    </select>
+                                </td>
+                            </tr>
                             <tr id="searchControl" style="display: none">
                                 <td>Search</td>
                                 <td>

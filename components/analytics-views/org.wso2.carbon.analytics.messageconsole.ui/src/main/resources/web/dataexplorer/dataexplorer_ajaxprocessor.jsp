@@ -49,7 +49,8 @@
             }
             String facets = request.getParameter("facets");
             String primary = request.getParameter("primary");
-            out.print(connector.getRecords(tableName, from, to, startIndex, pageSize, query, facets, primary));
+            int resultCountLimit = Integer.parseInt(request.getParameter("resultCountLimit"));
+            out.print(connector.getRecords(tableName, from, to, startIndex, pageSize, query, facets, primary, resultCountLimit));
             break;
         }
         case MessageConsoleConnector.TYPE_TABLE_INFO: {
@@ -89,6 +90,11 @@
             out.print(connector.getPrimaryKeys(tableName));
             break;
         }
+        case MessageConsoleConnector.TYPE_CHECK_TOTAL_COUNT_SUPPORT: {
+            out.print(connector.getPrimaryKeys(tableName));
+            break;
+        }
+
     }
 
     // Preventing page getting cache

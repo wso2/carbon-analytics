@@ -73,9 +73,6 @@ public class MessageConsoleConnector {
     private static final String ANALYTICS_WEB_SERVICE = "AnalyticsWebService";
     private static final String OK = "OK";
     private static final String ERROR = "ERROR";
-    private static int NON_PAGINATE_RANGE_RECORD_COUNT = 6000;
-    private static int PAGINATE_SEARCH_RECORD_COUNT = 6000;
-    private static int PAGINATE_RECORD_COUNT = 100000;
 
     public static final String RECORD_ID = "_unique_rec_id";
     public static final String TIMESTAMP = "_timestamp";
@@ -89,6 +86,7 @@ public class MessageConsoleConnector {
     public static final int TYPE_GET_FACET_NAME_LIST = 16;
     public static final int TYPE_GET_FACET_CATEGORIES = 17;
     public static final int TYPE_GET_PRIMARY_KEY_LIST = 18;
+    public static final int TYPE_CHECK_TOTAL_COUNT_SUPPORT = 19;
 
     private static final GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
                                                                                                      new ResponseResultSerializer());
@@ -158,7 +156,8 @@ public class MessageConsoleConnector {
     }
 
     public String getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int pageSize,
-                             String searchQuery, String facetsJsonString, String primarySearchString) {
+                             String searchQuery, String facetsJsonString, String primarySearchString,
+                             int resultCountLimit) {
         if (log.isDebugEnabled()) {
             log.debug("Search Query: " + searchQuery);
             log.debug("timeFrom: " + timeFrom);
@@ -190,18 +189,19 @@ public class MessageConsoleConnector {
             } else if (facetsList != null && !facetsList.isEmpty()) {
                 AnalyticsDrillDownRequestBean requestBean = getAnalyticsDrillDownRequestBean(tableName, startIndex, pageSize, searchQuery, facetsList);
                 resultRecordBeans = analyticsWebServiceStub.drillDownSearch(requestBean);
-                responseResult.setActualRecordCount(new Double(analyticsWebServiceStub.drillDownSearchCount(requestBean)).intValue());
-                if (responseResult.getActualRecordCount() > PAGINATE_SEARCH_RECORD_COUNT) {
-                    responseResult.setTotalRecordCount(PAGINATE_SEARCH_RECORD_COUNT);
+                long searchCount = new Double(analyticsWebServiceStub.drillDownSearchCount(requestBean)).intValue();
+                responseResult.setActualRecordCount(searchCount);
+                if (responseResult.getActualRecordCount() > resultCountLimit) {
+                    responseResult.setTotalRecordCount(resultCountLimit);
                 } else {
-                    responseResult.setTotalRecordCount(new Double(analyticsWebServiceStub.drillDownSearchCount(requestBean)).intValue());
+                    responseResult.setTotalRecordCount(searchCount);
                 }
             } else if (searchQuery != null && !searchQuery.isEmpty()) {
                 resultRecordBeans = analyticsWebServiceStub.search(tableName, searchQuery, startIndex, pageSize);
                 long searchCount = analyticsWebServiceStub.searchCount(tableName, searchQuery);
                 responseResult.setActualRecordCount(searchCount);
-                if (responseResult.getActualRecordCount() > PAGINATE_SEARCH_RECORD_COUNT) {
-                    responseResult.setTotalRecordCount(PAGINATE_SEARCH_RECORD_COUNT);
+                if (responseResult.getActualRecordCount() > resultCountLimit) {
+                    responseResult.setTotalRecordCount(resultCountLimit);
                 } else {
                     responseResult.setTotalRecordCount(searchCount);
                 }
@@ -212,21 +212,21 @@ public class MessageConsoleConnector {
                 if (isRecordCountSupported) {
                     totalRecordCount = analyticsWebServiceStub.getRecordCount(tableName, timeFrom, timeTo);
                     responseResult.setActualRecordCount(totalRecordCount);
-                    if (totalRecordCount > PAGINATE_RECORD_COUNT) {
-                        responseResult.setTotalRecordCount(PAGINATE_RECORD_COUNT);
-                    } else {
-                        responseResult.setTotalRecordCount(responseResult.getActualRecordCount());
-                    }
+                    responseResult.setTotalRecordCount(totalRecordCount);
                 } else {
                     responseResult.setActualRecordCount(totalRecordCount);
-                    responseResult.setTotalRecordCount(PAGINATE_RECORD_COUNT);
+                    responseResult.setTotalRecordCount(resultCountLimit);
                 }
                 if (analyticsWebServiceStub.isPaginationSupported(recordStoreName)) {
                     resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex, pageSize);
                 } else {
+                    int requestingPageSize = pageSize;
+                    if (startIndex + pageSize > resultCountLimit) {
+                        requestingPageSize = resultCountLimit - startIndex;
+                    }
                     resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex,
-                                                                           startIndex + pageSize);
-                    responseResult.setTotalRecordCount(NON_PAGINATE_RANGE_RECORD_COUNT);
+                                                                           requestingPageSize);
+                    responseResult.setTotalRecordCount(resultCountLimit);
                 }
             }
             List<Record> records = new ArrayList<>();
@@ -540,5 +540,14 @@ public class MessageConsoleConnector {
                       "path[" + categoryPaths + "]", e);
         }
         return new Gson().toJson(categories);
+    }
+
+    public boolean isRecordCountSupported(String tableName) {
+        try {
+            return analyticsWebServiceStub.isRecordCountSupported(tableName);
+        } catch (Exception e) {
+            log.error("Unable to check record count support status for table " + tableName, e);
+            return false;
+        }
     }
 }
