@@ -77,7 +77,7 @@ FOR %%D in ("%CARBON_HOME%\lib\commons-lang*.jar") DO set CARBON_CLASSPATH=!CARB
 rem ----- Process the input command -------------------------------------------
 
 rem Slurp the command line arguments. This loop allows for an unlimited number
-rem of arguments (up to the command line limit, anyway).
+rem of arguments (the length is limited by the maximum length allowed by the command line).
 
 
 :setupArgs
