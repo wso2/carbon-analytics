@@ -646,18 +646,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     public List<SearchResultEntry> search(int tenantId, String tableName, String query,
             int start, int count) throws AnalyticsIndexException {
-
-        List<SearchResultEntry> result = new ArrayList<>();
+        List<SearchResultEntry> result = new ArrayList<>(count);
         result.addAll(this.doSearch(tenantId, tableName, query, start, count));
-        Collections.sort(result);
-        if (result.size() < start) {
-            return new ArrayList<SearchResultEntry>();
-        }
-        if (result.size() >= count + start) {
-            result = result.subList(start, start + count);
-        } else {
-            result = result.subList(start, result.size());
-        }
         return result;
     }
 
@@ -682,7 +672,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             if (count <= 0) {
                 log.warn("Record Count/Page size is ZERO!. Please set Record count/Page size.");
             }
-            TopScoreDocCollector collector = TopScoreDocCollector.create(count);
+            TopScoreDocCollector collector = TopScoreDocCollector.create(start + count);
             searcher.search(indexQuery, collector);
             ScoreDoc[] hits = collector.topDocs(start).scoreDocs;
             Document indexDoc;
