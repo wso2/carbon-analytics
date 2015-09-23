@@ -61,7 +61,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class will expose all the MessageConsoleService stub operations.
@@ -99,6 +101,7 @@ public class MessageConsoleConnector {
     }.getType();
     public static final Type PRIMARY_KEYS_TYPE = new TypeToken<List<Column>>() {
     }.getType();
+    private static final int MAX_CELL_LENGTH = 100;
 
     private MessageConsoleStub messageConsoleStub;
     private AnalyticsWebServiceStub analyticsWebServiceStub;
@@ -218,16 +221,6 @@ public class MessageConsoleConnector {
                     responseResult.setTotalRecordCount(resultCountLimit);
                 }
                 resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex, pageSize);
-                /*if (analyticsWebServiceStub.isPaginationSupported(recordStoreName)) {
-                } else {
-                    int requestingPageSize = pageSize;
-                    if (startIndex + pageSize > resultCountLimit) {
-                        requestingPageSize = resultCountLimit - startIndex;
-                    }
-                    resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex,
-                                                                           requestingPageSize);
-                    responseResult.setTotalRecordCount(resultCountLimit);
-                }*/
             }
             List<Record> records = new ArrayList<>();
             if (resultRecordBeans != null) {
@@ -237,6 +230,16 @@ public class MessageConsoleConnector {
                 for (RecordBean recordBean : resultRecordBeans) {
                     if (recordBean != null) {
                         Record record = getRecord(recordBean, true);
+                        if (record.getColumns() != null && !record.getColumns().isEmpty()) {
+                            for (Column column : record.getColumns()) {
+                                if ("STRING".equals(column.getType())) {
+                                    if (column.getValue() != null && !column.getValue().isEmpty() &&
+                                        column.getValue().length() > MAX_CELL_LENGTH) {
+                                        column.setValue(column.getValue().substring(0, MAX_CELL_LENGTH).concat("..."));
+                                    }
+                                }
+                            }
+                        }
                         records.add(record);
                     }
                 }
@@ -398,7 +401,7 @@ public class MessageConsoleConnector {
         }
         ResponseArbitraryField responseArbitraryField = new ResponseArbitraryField();
         responseArbitraryField.setResult(OK);
-        List<Column> resultColumns = new ArrayList<>();
+        Set<Column> resultColumns = new HashSet<>();
         try {
             Record originalRecord = getRecord(table, recordId, false);
             AnalyticsSchemaBean schema = analyticsWebServiceStub.getTableSchema(table);
@@ -432,8 +435,18 @@ public class MessageConsoleConnector {
                         }
                     }
                 }
+                if (columns != null && !columns.isEmpty()) {
+                    for (Column column : columns) {
+                        if ("STRING".equals(column.getType())) {
+                            if (column.getValue() != null && !column.getValue().isEmpty() &&
+                                column.getValue().length() > MAX_CELL_LENGTH) {
+                                resultColumns.add(column);
+                            }
+                        }
+                    }
+                }
             }
-            responseArbitraryField.setColumns(resultColumns);
+            responseArbitraryField.setColumns(new ArrayList<>(resultColumns));
         } catch (Exception e) {
             String errorMsg = "Unable to get arbitrary fields for record[" + recordId + "] in table[" + table + "]";
             log.error(errorMsg, e);
