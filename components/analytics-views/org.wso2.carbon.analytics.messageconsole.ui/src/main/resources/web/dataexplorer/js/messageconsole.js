@@ -220,6 +220,7 @@ function updateSearchOption(ele) {
             document.getElementById('querySearch').style.display = 'none';
             document.getElementById('facetSearchCombo').style.display = 'none';
             document.getElementById('facetSearchTableRow').style.display = 'none';
+            $('#searchStat').text('');
             break;
         case 'primary':
             document.getElementById('primaryKeySearch').style.display = '';
@@ -227,6 +228,7 @@ function updateSearchOption(ele) {
             document.getElementById('querySearch').style.display = 'none';
             document.getElementById('facetSearchTableRow').style.display = 'none';
             document.getElementById('facetSearchCombo').style.display = 'none';
+            document.getElementById('countLabel').style.display = 'none';
             break;
         case 'query':
             document.getElementById('querySearch').style.display = '';
@@ -236,6 +238,7 @@ function updateSearchOption(ele) {
             }
             document.getElementById('primaryKeySearch').style.display = 'none';
             document.getElementById('dataRangeSearch').style.display = 'none';
+            document.getElementById('countLabel').style.display = 'none';
             break;
     }
 }
@@ -265,10 +268,7 @@ function checkTotalCountSupport() {
           function (result) {
               if (result.trim() != 'true') {
                   document.getElementById('resultCount').style.display = '';
-                  var searchOption = $('input[name=group1]:radio:checked').val();
-                  if ('query' != searchOption && 'primary' != searchOption) {
-                      document.getElementById('countLabel').style.display = '';
-                  }
+                  document.getElementById('countLabel').style.display = '';
               }
           }
     );
