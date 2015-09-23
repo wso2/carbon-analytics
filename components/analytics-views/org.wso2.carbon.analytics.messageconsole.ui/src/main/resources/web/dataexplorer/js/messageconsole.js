@@ -265,7 +265,10 @@ function checkTotalCountSupport() {
           function (result) {
               if (result.trim() != 'true') {
                   document.getElementById('resultCount').style.display = '';
-                  document.getElementById('countLabel').style.display = '';
+                  var searchOption = $('input[name=group1]:radio:checked').val();
+                  if ('query' != searchOption && 'primary' != searchOption) {
+                      document.getElementById('countLabel').style.display = '';
+                  }
               }
           }
     );

@@ -484,7 +484,7 @@
                     <div>
                         <label id="searchStat"></label>
                         <label id="countLabel"
-                               style="display: none font-size: 11px !important; color: #aaaaaa;">
+                               style="display: none; font-size: 11px !important; color: #aaaaaa; font-style: italic;">
                             Note: Total record count for the table is not available.
                         </label>
                     </div>
