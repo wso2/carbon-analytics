@@ -198,40 +198,35 @@ public class MessageConsoleConnector {
                 }
             } else if (searchQuery != null && !searchQuery.isEmpty()) {
                 resultRecordBeans = analyticsWebServiceStub.search(tableName, searchQuery, startIndex, pageSize);
-                responseResult.setActualRecordCount(analyticsWebServiceStub.searchCount(tableName, searchQuery));
+                long searchCount = analyticsWebServiceStub.searchCount(tableName, searchQuery);
+                responseResult.setActualRecordCount(searchCount);
                 if (responseResult.getActualRecordCount() > PAGINATE_SEARCH_RECORD_COUNT) {
                     responseResult.setTotalRecordCount(PAGINATE_SEARCH_RECORD_COUNT);
                 } else {
-                    responseResult.setTotalRecordCount(analyticsWebServiceStub.searchCount(tableName, searchQuery));
+                    responseResult.setTotalRecordCount(searchCount);
                 }
             } else {
                 String recordStoreName = analyticsWebServiceStub.getRecordStoreNameByTable(tableName);
                 boolean isRecordCountSupported = analyticsWebServiceStub.isRecordCountSupported(recordStoreName);
                 long totalRecordCount = -1;
                 if (isRecordCountSupported) {
-                    responseResult.setActualRecordCount(analyticsWebServiceStub.getRecordCount(tableName, timeFrom, timeTo));
-                } else {
+                    totalRecordCount = analyticsWebServiceStub.getRecordCount(tableName, timeFrom, timeTo);
                     responseResult.setActualRecordCount(totalRecordCount);
-                }
-                if (isRecordCountSupported && analyticsWebServiceStub.isPaginationSupported(recordStoreName)) {
-                    resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex, pageSize);
                     if (totalRecordCount > PAGINATE_RECORD_COUNT) {
                         responseResult.setTotalRecordCount(PAGINATE_RECORD_COUNT);
                     } else {
-                        responseResult.setTotalRecordCount(totalRecordCount);
+                        responseResult.setTotalRecordCount(responseResult.getActualRecordCount());
                     }
                 } else {
-                    resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, 0,
-                                                                           NON_PAGINATE_RANGE_RECORD_COUNT);
+                    responseResult.setActualRecordCount(totalRecordCount);
+                    responseResult.setTotalRecordCount(PAGINATE_RECORD_COUNT);
+                }
+                if (analyticsWebServiceStub.isPaginationSupported(recordStoreName)) {
+                    resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex, pageSize);
+                } else {
+                    resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex,
+                                                                           startIndex + pageSize);
                     responseResult.setTotalRecordCount(NON_PAGINATE_RANGE_RECORD_COUNT);
-                    if (resultRecordBeans == null) {
-                        responseResult.setTotalRecordCount(-1);
-                    } else if (resultRecordBeans.length < NON_PAGINATE_RANGE_RECORD_COUNT) {
-                        responseResult.setTotalRecordCount(resultRecordBeans.length);
-                    }
-                    if (resultRecordBeans != null) {
-                        resultRecordBeans = Arrays.copyOfRange(resultRecordBeans, startIndex, startIndex + pageSize);
-                    }
                 }
             }
             List<Record> records = new ArrayList<>();

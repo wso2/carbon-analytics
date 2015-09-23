@@ -310,13 +310,25 @@ public class AnalyticsWebService extends AbstractAdmin {
             if (columns != null && columns.length != 0) {
                 columnList = new ArrayList<>(Arrays.asList(columns));
             }
-            /*if (!isPaginationSupported(analyticsDataAPI.getRecordStoreNameByTable(getUsername(), tableName))) {
+            int originalFrom = recordsFrom;
+            if (!isPaginationSupported(getRecordStoreNameByTable(tableName))) {
                 recordsFrom = 0;
-            }*/
+            }
             List<Record> records = AnalyticsDataServiceUtils.
                     listRecords(analyticsDataAPI,
                                 analyticsDataAPI.get(getUsername(), tableName, numPartitionsHint, columnList, timeFrom, timeTo, recordsFrom,
                                                      recordsCount));
+            if (!isPaginationSupported(getRecordStoreNameByTable(tableName))) {
+                int upperLimit = originalFrom + recordsCount;
+                if (upperLimit > records.size()) {
+                    upperLimit = records.size() - recordsFrom;
+                }
+                if (originalFrom < upperLimit) {
+                    records = records.subList(originalFrom, upperLimit);
+                } else {
+                    records.clear();
+                }
+            }
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
