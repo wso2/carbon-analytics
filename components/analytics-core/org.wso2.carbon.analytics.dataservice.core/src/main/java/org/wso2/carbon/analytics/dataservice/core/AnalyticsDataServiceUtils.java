@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.dataservice.core;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -116,6 +117,73 @@ public class AnalyticsDataServiceUtils {
             }
         }
         return result;
+    }
+    
+	public static Iterator<Record> responseToIterator(AnalyticsDataService service, AnalyticsDataResponse response)
+			throws AnalyticsException {
+		return new ResponseIterator(service, response);
+	}
+    
+    /**
+     * This class exposes an {@link AnalyticsDataResponse} as a record iterator.
+     */
+    public static class ResponseIterator implements Iterator<Record> {
+
+        private String recordStoreName;
+
+        private RecordGroup[] rgs;
+
+        private Iterator<Record> itr;
+        
+        private AnalyticsDataService service;
+
+        private int index = -1;
+
+        public ResponseIterator(AnalyticsDataService service, AnalyticsDataResponse response)
+                throws AnalyticsException {
+            this.service = service;
+            this.recordStoreName = response.getRecordStoreName();
+            this.rgs = response.getRecordGroups();
+        }
+
+        @Override
+        public boolean hasNext() {
+            boolean result;
+            if (this.itr == null) {
+                result = false;
+            } else {
+                result = this.itr.hasNext();
+            }
+            if (result) {
+                return true;
+            } else {
+                if (this.rgs.length > this.index + 1) {
+                    try {
+                        this.index++;
+                        this.itr = this.service.readRecords(this.recordStoreName, this.rgs[index]);
+                    } catch (AnalyticsException e) {
+                        throw new IllegalStateException("Error in traversing record group: " + e.getMessage(), e);
+                    }
+                    return this.hasNext();
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        @Override
+        public Record next() {
+            if (this.hasNext()) {
+                return this.itr.next();
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public void remove() {
+            /* ignored */
+        }
     }
     
 }
