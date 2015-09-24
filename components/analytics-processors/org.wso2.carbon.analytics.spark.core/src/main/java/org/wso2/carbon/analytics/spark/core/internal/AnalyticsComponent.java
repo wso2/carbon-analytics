@@ -32,7 +32,8 @@ import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.utils.CarbonUtils;
-import org.wso2.carbon.utils.NetworkUtils;
+
+import java.net.SocketException;
 
 /**
  * Declarative service component for spark analytics.
@@ -66,7 +67,7 @@ public class AnalyticsComponent {
                 try {
                     int portOffset = CarbonUtils.getPortFromServerConfig(PORT_OFFSET_SERVER_PROP) + 1;
                     ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor(
-                            NetworkUtils.getLocalHostname(), portOffset));
+                            this.getLocalHostname(), portOffset));
                     ServiceHolder.getAnalyticskExecutor().initializeSparkServer();
                 } catch (Throwable e) {
                     String msg = "Error initializing analytics executor: " + e.getMessage();
@@ -176,5 +177,12 @@ public class AnalyticsComponent {
                 }
             }
         }
+    }
+
+    private String getLocalHostname() throws SocketException {
+//        this is removed because, NetworkUtils.getLocalHostname() would return the carbon.xml
+//        hostname if provided. but in the spark environment, it would need a unique hostname DAS-171
+//        return NetworkUtils.getLocalHostname();
+        return org.apache.axis2.util.Utils.getIpAddress();
     }
 }
