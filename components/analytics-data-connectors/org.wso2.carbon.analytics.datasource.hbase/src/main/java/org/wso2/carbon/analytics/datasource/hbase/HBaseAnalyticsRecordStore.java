@@ -176,12 +176,13 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public boolean isPaginationSupported() {
-        /* Pagination & determination of record counts are not supported for this implementation. */
+        /* Pagination is not supported for this implementation. */
         return false;
     }
-    
+
     @Override
     public boolean isRecordCountSupported() {
+        /* Determination of record counts is not supported for this implementation. */
         return false;
     }
 
@@ -250,9 +251,9 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             }
             Put put = new Put(recordId.getBytes(StandardCharsets.UTF_8));
             put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                    HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME, timestamp, data);
+                    HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME, data);
             put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                    HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME, timestamp, HBaseUtils.encodeLong(timestamp));
+                    HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME, Bytes.toBytes(timestamp));
             indexPuts.add(this.putIndexData(record));
             puts.add(put);
         }
