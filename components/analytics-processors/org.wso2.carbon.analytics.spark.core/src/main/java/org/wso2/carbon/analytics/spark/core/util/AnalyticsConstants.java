@@ -84,6 +84,7 @@ public class AnalyticsConstants {
     //Carbon Spark properties strings
     public static final String CARBON_SPARK_MASTER_COUNT = "carbon.spark.master.count";
     public static final String CARBON_SPARK_MASTER = "carbon.spark.master";
+    public static final String CARBON_DAS_SYMBOLIC_LINK = "carbon.das.symbolic.link";
 
     public static final int SPARK_PERSISTENCE_TENANT_ID = -5000;
     public static final String SPARK_MASTER_MAP = "__SPARK_MASTER_MAP__";
