@@ -104,7 +104,6 @@ public class HBaseUtils {
             throws AnalyticsException {
         byte[] rowId = currentResult.getRow();
         Map<String, Object> values;
-        long timestamp;
         if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
                 HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME)) {
             Cell dataCell = currentResult.getColumnLatestCell
@@ -116,8 +115,15 @@ public class HBaseUtils {
             } else {
                 values = new HashMap<>();
             }
-            timestamp = dataCell.getTimestamp();
-            return new Record(new String(rowId, StandardCharsets.UTF_8), tenantId, tableName, values, timestamp);
+            if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                    HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME)) {
+                Cell tsCell = currentResult.getColumnLatestCell(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                        HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
+                byte[] timestamp = CellUtil.cloneValue(tsCell);
+                if (timestamp.length > 0) {
+                    return new Record(new String(rowId, StandardCharsets.UTF_8), tenantId, tableName, values, Bytes.toLong(timestamp));
+                }
+            }
         }
         return null;
     }

@@ -103,17 +103,15 @@ public class HBaseRecordIterator implements AnalyticsIterator<Record> {
 
         for (String currentId : currentBatch) {
             Get get = new Get(Bytes.toBytes(currentId));
+            get.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME);
+            gets.add(get);
+        }
+
+        try {
             /* if the list of columns to be retrieved is null, retrieve ALL columns. */
             if (this.columns != null && this.columns.size() > 0) {
                 colSet = new HashSet<>(this.columns);
-                get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                        HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME);
-            } else {
-                get.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME);
             }
-            gets.add(get);
-        }
-        try {
             Result[] results = this.table.get(gets);
             for (Result currentResult : results) {
                 if (!currentResult.isEmpty()) {

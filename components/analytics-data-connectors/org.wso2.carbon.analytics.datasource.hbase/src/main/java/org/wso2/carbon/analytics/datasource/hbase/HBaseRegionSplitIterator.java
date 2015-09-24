@@ -66,19 +66,18 @@ public class HBaseRegionSplitIterator implements AnalyticsIterator<Record> {
         } finally {
             GenericUtils.closeQuietly(admin);
         }
+        if (columns != null && columns.size() > 0) {
+            this.colSet = new HashSet<>(columns);
+        }
+
         Scan splitScan = new Scan();
         splitScan.setStartRow(startRow);
         splitScan.setStopRow(endRow);
         if (recordsCount > 0) {
             splitScan.setFilter(new PageFilter(recordsCount));
         }
-        if (columns != null && columns.size() > 0) {
-            this.colSet = new HashSet<>(columns);
-            splitScan.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                    HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME);
-        } else {
-            splitScan.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME);
-        }
+        splitScan.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME);
+
         try {
             ResultScanner scanner = table.getScanner(splitScan);
             this.resultIterator = scanner.iterator();
