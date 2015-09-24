@@ -36,8 +36,8 @@ public class ResponseResultSerializer implements JsonSerializer<ResponseResult> 
     private static final String RESULT = "Result";
     private static final String MESSAGE = "Message";
     private static final String TOTAL_RECORD_COUNT = "TotalRecordCount";
-    private static final String SEARCH_TIME = "ActualRecordCount";
-    private static final String ACTUAL_RECORD_COUNT = "SearchTime";
+    private static final String ACTUAL_RECORD_COUNT = "ActualRecordCount";
+    private static final String SEARCH_TIME = "SearchTime";
     private static final String RECORDS = "Records";
 
     public ResponseResultSerializer() {
