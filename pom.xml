@@ -947,6 +947,12 @@
                 <artifactId>org.wso2.carbon.analytics.common.jmx.agent.stub</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
+            <dependency>
+                <groupId>xerces</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>2.11.0</version>
+                <scope>test</scope>
+            </dependency>
 
             <!--carbon-deployment features start-->
             <!--<dependency>-->
@@ -1206,6 +1212,7 @@
         <google.guava.version>15.0</google.guava.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
         <cassandra.thrift.wso2.version>1.2.13.wso2v4</cassandra.thrift.wso2.version>
+        <xerces.xercesImpl.version>2.11.0</xerces.xercesImpl.version>
 
         <httpclient.httpcomponents.wso2.version>4.3.1.wso2v2</httpclient.httpcomponents.wso2.version>
         <httpcore.httpcomponents.wso2.version>4.3.3.wso2v1</httpcore.httpcomponents.wso2.version>
