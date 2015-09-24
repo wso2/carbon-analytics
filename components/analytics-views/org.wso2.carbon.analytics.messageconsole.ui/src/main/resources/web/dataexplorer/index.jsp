@@ -231,57 +231,6 @@
             $("#resultsTable").show();
         }
 
-        function getArbitraryFields(rowData) {
-            var $img =
-                    $('<img src="/carbon/dataexplorer/themes/metro/list_metro.png" title="Show Arbitrary Fields"/>');
-            $img.click(function () {
-                $('#AnalyticsTableContainer').jtable('openChildTable',
-                                                     $img.closest('tr'), //Parent row
-                        {
-                            title: 'Arbitrary Fields',
-                            paging: false,
-                            selecting: true,
-                            messages: {
-                                addNewRecord: 'Add new arbitrary field'
-                            },
-                            actions: {
-                                // For Details: http://jtable.org/Demo/FunctionsAsActions
-                                listAction: function (postData, jtParams) {
-                                    var postData = {};
-                                    postData['tableName'] = $("#tableSelect").val();
-                                    postData['_unique_rec_id'] = rowData.record._unique_rec_id;
-                                    return arbitraryFieldListActionMethod(postData, jtParams);
-                                }
-                            },
-                            fields: {
-                                _unique_rec_id: {
-                                    type: 'hidden',
-                                    key: true,
-                                    list: false,
-                                    defaultValue: rowData.record._unique_rec_id
-                                },
-                                Name: {
-                                    title: 'Name',
-                                    inputClass: 'validate[required]'
-                                },
-                                Value: {
-                                    title: 'Value'
-                                },
-                                Type: {
-                                    title: 'Type',
-                                    options: ["STRING", "INTEGER", "LONG", "BOOLEAN", "FLOAT", "DOUBLE"],
-                                    list: false
-                                }
-                            }
-                        },
-                                                     function (data) { //opened handler
-                                                         data.childTable.jtable('load');
-                                                     }
-                );
-            });
-            return $img;
-        }
-
         function createJTable() {
             $("#resultsTable").show();
             var workAreaWidth = $(".styledLeft").width();
@@ -321,11 +270,6 @@
                                       if (val.type == 'STRING' || val.type == 'FACET') {
                                           fields[val.name].type = 'textarea';
                                       }
-                                      /*else if (val.type == 'INTEGER' || val.type == 'LONG') {
-                                          fields[val.name].inputClass = 'validate[custom[integer]]';
-                                      } else if (val.type == 'FLOAT' || val.type == 'DOUBLE') {
-                                          fields[val.name].inputClass = 'validate[custom[number]]';
-                                       }*/
                                   }
                                   if (val.name == '_unique_rec_id' || val.name == '_timestamp') {
                                       fields[val.name].edit = false;

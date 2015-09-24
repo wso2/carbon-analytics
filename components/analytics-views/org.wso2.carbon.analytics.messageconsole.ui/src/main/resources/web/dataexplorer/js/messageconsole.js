@@ -1,21 +1,16 @@
 var tableLoaded = false;
 var facetAvailable = false;
-var arbitraryColumnName;
 var timeFromObj;
 var timeToObj;
 
 function getArbitraryFields(rowData) {
     var $img =
-            $('<img src="/carbon/dataexplorer/themes/metro/list_metro.png" title="Show Arbitrary Fields"/>');
+            $('<img src="/carbon/dataexplorer/themes/metro/list_metro.png" title="Show Arbitrary Fields / Extended Fields"/>');
     $img.click(function () {
-        $('#AnalyticsTableContainer').jtable('openChildTable',
-                                             $img.closest('tr'), //Parent row
+        $('#AnalyticsTableContainer').jtable('openChildTable', $img.closest('tr'), //Parent row
                 {
-                    title: 'Arbitrary Fields',
+                    title: 'Arbitrary Fields / Extended fields',
                     selecting: true,
-                    messages: {
-                        addNewRecord: 'Add new arbitrary field'
-                    },
                     actions: {
                         // For Details: http://jtable.org/Demo/FunctionsAsActions
                         listAction: function (postData, jtParams) {
@@ -25,24 +20,6 @@ function getArbitraryFields(rowData) {
                             return arbitraryFieldListActionMethod(postData, jtParams);
                         }
                     },
-                    deleteConfirmation: function (data) {
-                        arbitraryColumnName = data.record.Name;
-                    },
-                    rowsRemoved: function (event, data) {
-                        arbitraryColumnName = "";
-                    },
-                    formCreated: function (event, data) {
-                        data.form.validationEngine();
-                    },
-                    //Validate form when it is being submitted
-                    formSubmitting: function (event, data) {
-                        return data.form.validationEngine('validate');
-                    },
-                    //Dispose validation logic when form is closed
-                    formClosed: function (event, data) {
-                        data.form.validationEngine('hide');
-                        data.form.validationEngine('detach');
-                    },
                     fields: {
                         _unique_rec_id: {
                             type: 'hidden',
@@ -51,8 +28,7 @@ function getArbitraryFields(rowData) {
                             defaultValue: rowData.record._unique_rec_id
                         },
                         Name: {
-                            title: 'Name',
-                            inputClass: 'validate[required]'
+                            title: 'Name'
                         },
                         Value: {
                             title: 'Value'
@@ -148,7 +124,7 @@ function listActionMethod(jtParams) {
                         $dfd.resolve(data);
                         if (data.ActualRecordCount != -1 && data.SearchTime != -1) {
                             $('#searchStat').text('Total Records: ' + data.ActualRecordCount + ' (' + data.SearchTime +
-                                                  ' milliseconds)');
+                                                  ' ms)');
                         } else if (data.ActualRecordCount != -1) {
                             $('#searchStat').text('Total Records: ' + data.ActualRecordCount);
                         }
