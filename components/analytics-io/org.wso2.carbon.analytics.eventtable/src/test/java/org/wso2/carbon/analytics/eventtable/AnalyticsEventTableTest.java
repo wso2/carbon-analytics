@@ -47,7 +47,9 @@ import org.wso2.siddhi.core.util.EventPrinter;
  */
 public class AnalyticsEventTableTest {
 
-    private AnalyticsDataService service;
+    private static final int DEFAULT_WAIT_TIME = 6000;
+
+	private AnalyticsDataService service;
     
     private int inEventCount = 0;
     
@@ -91,7 +93,7 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         executionPlanRuntime.shutdown();
         siddhiManager.shutdown();
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
@@ -118,7 +120,7 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         executionPlanRuntime.shutdown();
         siddhiManager.shutdown();
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
@@ -146,7 +148,7 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         executionPlanRuntime.shutdown();
         siddhiManager.shutdown();
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
@@ -213,10 +215,10 @@ public class AnalyticsEventTableTest {
 
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         
         checkStockStream.send(new Object[] { "WSO2" });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
 
         Assert.assertEquals(2, this.inEventCount);
         Assert.assertEquals(0, this.removeEventCount);
@@ -286,10 +288,10 @@ public class AnalyticsEventTableTest {
 
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         
         checkStockStream.send(new Object[] { "WSO2" });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         
         Assert.assertEquals(this.inEventCount, 1);
         Assert.assertEquals(this.removeEventCount, 0);
@@ -359,10 +361,10 @@ public class AnalyticsEventTableTest {
 
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         
         checkStockStream.send(new Object[] { "WSO2" });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         
         Assert.assertEquals(this.inEventCount, 1);
         Assert.assertEquals(this.removeEventCount, 0);
@@ -432,10 +434,10 @@ public class AnalyticsEventTableTest {
 
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         
         checkStockStream.send(new Object[] { "WSO2" });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         
         Assert.assertEquals(this.inEventCount, 1);
         Assert.assertEquals(this.removeEventCount, 0);
@@ -478,10 +480,10 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         
         updateStockStream.send(new Object[] { "IBM", 99.6f, 100l });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
@@ -562,14 +564,14 @@ public class AnalyticsEventTableTest {
 
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 155.6f, 100l });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         checkStockStream.send(new Object[] { "IBM", 100l, 155.6f });
         checkStockStream.send(new Object[] { "WSO2", 100l, 155.6f });
         updateStockStream.send(new Object[] { "IBM", 200l });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         checkStockStream.send(new Object[] { "IBM", 200l, 154.6f });
         checkStockStream.send(new Object[] { "WSO2", 100l, 44.6f });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         
         Assert.assertEquals(inEventCount, 2);
         Assert.assertEquals(removeEventCount, 0);
@@ -620,9 +622,9 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         deleteStockStream.send(new Object[] { "IBM", 57.6f, 100l });
-        Thread.sleep(4000);
+        Thread.sleep(DEFAULT_WAIT_TIME);
         
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
