@@ -103,6 +103,16 @@ public abstract class DataEndpoint {
         }
     }
 
+    synchronized void syncConnect(String oldSessionId) throws DataEndpointException {
+        if (oldSessionId == null || oldSessionId.equalsIgnoreCase(getDataEndpointConfiguration().getSessionId())) {
+            if (connectionWorker != null) {
+                connectionWorker.run();
+            } else {
+                throw new DataEndpointException("Data Endpoint is not initialized");
+            }
+        }
+    }
+
     public void initialize(DataEndpointConfiguration dataEndpointConfiguration)
             throws DataEndpointException, DataEndpointAuthenticationException,
             TransportException {
@@ -215,11 +225,14 @@ public abstract class DataEndpoint {
 
         @Override
         public void run() {
+            String sessionId = getDataEndpointConfiguration().getSessionId();
             try {
                 publish();
             } catch (SessionTimeoutException e) {
                 try {
-                    connect();
+                    if (sessionId == null || sessionId.equalsIgnoreCase(getDataEndpointConfiguration().getSessionId())) {
+                        syncConnect(sessionId);
+                    }
                     publish();
                 } catch (UndefinedEventTypeException ex) {
                     log.error("Unable to process this event.", ex);
