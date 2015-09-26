@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 
 import javax.naming.NamingException;
@@ -261,12 +262,14 @@ public class AnalyticsSparkExecutorTest {
                 "schema \"server_name STRING -sp, ip STRING, tenant INTEGER, sequence LONG, summary STRING\", " +
                 "primaryKeys \"ip, log\"" +
                 ")";
+        boolean success = false;
         try {
             ex.executeQuery(1, query);
-        } catch (Exception e) {
+        } catch (AnalyticsExecutionException e) {
             System.out.println("Query failed with : " + e.getMessage());
-            Assert.assertEquals("Score-param assigned to a non-numeric ColumnType", e.getMessage());
+            success = true;
         }
+        Assert.assertTrue(success, "Query did not fail!");
 
         query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
                 "OPTIONS" +
@@ -274,12 +277,14 @@ public class AnalyticsSparkExecutorTest {
                 "schema \"server_name STRING -XX, ip STRING, tenant INTEGER, sequence LONG, summary STRING\", " +
                 "primaryKeys \"ip, log\"" +
                 ")";
+        success = false;
         try {
             ex.executeQuery(1, query);
-        } catch (Exception e) {
+        } catch (AnalyticsExecutionException e) {
             System.out.println("Query failed with : " + e.getMessage());
-            Assert.assertEquals("Invalid option for ColumnType", e.getMessage());
+            success = true;
         }
+        Assert.assertTrue(success, "Query did not fail!");
 
         query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
                 "OPTIONS" +
@@ -287,12 +292,14 @@ public class AnalyticsSparkExecutorTest {
                 "schema \"server_name STRING -xx xx, ip STRING, tenant INTEGER, sequence LONG, summary STRING\", " +
                 "primaryKeys \"ip, log\"" +
                 ")";
+        success = false;
         try {
             ex.executeQuery(1, query);
-        } catch (Exception e) {
+        } catch (AnalyticsExecutionException e) {
             System.out.println("Query failed with : " + e.getMessage());
-            Assert.assertEquals("Invalid ColumnType", e.getMessage());
+            success = true;
         }
+        Assert.assertTrue(success, "Query did not fail!");
 
         this.service.deleteTable(1, "Log");
         System.out.println(testString("end : create temp table with column options test"));
@@ -340,12 +347,14 @@ public class AnalyticsSparkExecutorTest {
                 "recordStore \"XXX\", " +
                 "primaryKeys \"ip, log\"" +
                 ")";
+        boolean success = false;
         try {
             ex.executeQuery(1, query);
-        } catch (Exception e) {
+        } catch (AnalyticsExecutionException e) {
             System.out.println("Query failed with : " + e.getMessage());
-            Assert.assertEquals("Unknown data store name", e.getMessage());
+            success = true;
         }
+        Assert.assertTrue(success, "Query did not fail!");
         this.cleanupTable(1, "Log");
 
         System.out.println(testString("end : create temp table with multiple record stores test"));

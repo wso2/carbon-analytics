@@ -75,6 +75,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -522,15 +526,15 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
 
             String carbonHome;
-            try{
-                carbonHome= conf.get(AnalyticsConstants.CARBON_DAS_SYMBOLIC_LINK);
+            try {
+                carbonHome = conf.get(AnalyticsConstants.CARBON_DAS_SYMBOLIC_LINK);
             } catch (NoSuchElementException e) {
                 carbonHome = CarbonUtils.getCarbonHome();
             }
 
             String sparkClasspath = (System.getProperty("SPARK_CLASSPATH") == null) ?
                                     "" : System.getProperty("SPARK_CLASSPATH");
-            if ( this.sparkMaster.trim().toLowerCase().startsWith("spark")){
+            if (this.sparkMaster.trim().toLowerCase().startsWith("spark")) {
                 sparkClasspath = ComputeClasspath.getSparkClasspath(sparkClasspath, carbonHome, new String[]{"slf4j"});
             } else {
                 sparkClasspath = ComputeClasspath.getSparkClasspath(sparkClasspath, carbonHome);
@@ -617,15 +621,31 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             log.debug("Executing : " + query);
         }
 
+//        long start = System.currentTimeMillis();
+//        try {
+//            DataFrame result = this.sqlCtx.sql(query);
+//            return toResult(result);
+//        } finally {
+//            long end = System.currentTimeMillis();
+//            if (ServiceHolder.isAnalyticsStatsEnabled()) {
+//                log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
+//            }
+//        }
+
+        ExecutorService newThread = Executors.newSingleThreadExecutor();
         long start = System.currentTimeMillis();
+
+        Future result = newThread.submit(new QueryExecutionTask(this.sqlCtx, query));
         try {
-            DataFrame result = this.sqlCtx.sql(query);
-            return toResult(result);
+            return toResult((DataFrame) result.get());
+        } catch (InterruptedException | ExecutionException e) {
+            throw new AnalyticsExecutionException("Error in executing the query " + origQuery, e);
         } finally {
             long end = System.currentTimeMillis();
             if (ServiceHolder.isAnalyticsStatsEnabled()) {
                 log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
             }
+            newThread.shutdown();
         }
     }
 
