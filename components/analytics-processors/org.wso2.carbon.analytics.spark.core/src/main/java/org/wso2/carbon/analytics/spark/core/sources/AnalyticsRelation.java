@@ -90,7 +90,11 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         try {
             AnalyticsSchema analyticsSchema = ServiceHolder.getAnalyticsDataService().getTableSchema(
                     tenantId, tableName);
-            this.schema = new StructType(extractFieldsFromColumns(analyticsSchema.getColumns()));
+            if (analyticsSchema == null) {
+                throw new AnalyticsException("No schema information available for table " + tableName);
+            } else {
+                this.schema = new StructType(extractFieldsFromColumns(analyticsSchema.getColumns()));
+            }
         } catch (AnalyticsException e) {
             String msg = "Failed to load the schema for table " + tableName;
             log.error(msg, e);
@@ -148,7 +152,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         }
     }
 
-    private void writeDataFrameToDAL (DataFrame data){
+    private void writeDataFrameToDAL(DataFrame data) {
         for (int i = 0; i < data.rdd().partitions().length; i++) {
             data.sqlContext().sparkContext().runJob(data.rdd(),
                                                     new AnalyticsWritingFunction(tenantId, tableName, data.schema()),
