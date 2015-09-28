@@ -29,7 +29,7 @@ public final class WebsocketLocalEventAdapterConstants {
     public static final int DEFAULT_HTTP_PORT = 9763;
     public static final int DEFAULT_HTTPS_PORT = 9443;
 
-    public static final String ADAPTOR_USAGE_TIPS_PREFIX = "Following url formats are used to receive events:</br>&nbsp;&nbsp;<i>ws://localhost:";
-    public static final String ADAPTER_USAGE_TIPS_MID = "/inputwebsocket/&lt;receiver_name&gt;</i></br>&nbsp;&nbsp;<i>wss://localhost:";
-    public static final String ADAPTER_USAGE_TIPS_POSTFIX = "/inputwebsocket/&lt;receiver_name&gt;</i>";
+    public static final String ADAPTOR_USAGE_TIPS_PREFIX = "websocket.local.usage.tips.prefix";
+    public static final String ADAPTER_USAGE_TIPS_MID = "websocket.local.usage.tips.mid";
+    public static final String ADAPTER_USAGE_TIPS_POSTFIX = "websocket.local.usage.tips.postfix";
 }
