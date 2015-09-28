@@ -96,7 +96,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
                 this.schema = new StructType(extractFieldsFromColumns(analyticsSchema.getColumns()));
             }
         } catch (AnalyticsException e) {
-            String msg = "Failed to load the schema for table " + tableName;
+            String msg = "Failed to load the schema for table " + tableName + ":" + e.getMessage();
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }
@@ -146,7 +146,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
 
             writeDataFrameToDAL(data);
         } catch (AnalyticsException e) {
-            String msg = "Error while inserting data into table " + tableName;
+            String msg = "Error while inserting data into table " + this.tableName + ":" + e.getMessage();
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }

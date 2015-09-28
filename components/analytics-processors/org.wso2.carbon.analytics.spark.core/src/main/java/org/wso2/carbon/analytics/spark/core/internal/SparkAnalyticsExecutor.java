@@ -75,10 +75,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -621,31 +617,15 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             log.debug("Executing : " + query);
         }
 
-//        long start = System.currentTimeMillis();
-//        try {
-//            DataFrame result = this.sqlCtx.sql(query);
-//            return toResult(result);
-//        } finally {
-//            long end = System.currentTimeMillis();
-//            if (ServiceHolder.isAnalyticsStatsEnabled()) {
-//                log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
-//            }
-//        }
-
-        ExecutorService newThread = Executors.newSingleThreadExecutor();
         long start = System.currentTimeMillis();
-
-        Future result = newThread.submit(new QueryExecutionTask(this.sqlCtx, query));
         try {
-            return toResult((DataFrame) result.get());
-        } catch (InterruptedException | ExecutionException e) {
-            throw new AnalyticsExecutionException("Error in executing the query " + origQuery, e);
+            DataFrame result = this.sqlCtx.sql(query);
+            return toResult(result);
         } finally {
             long end = System.currentTimeMillis();
             if (ServiceHolder.isAnalyticsStatsEnabled()) {
                 log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
             }
-            newThread.shutdown();
         }
     }
 
@@ -722,7 +702,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             Class.forName(className);
             this.shorthandStringsMap.put(shorthand, className);
         } catch (ClassNotFoundException e) {
-            log.error(className + " class is not available", e);
+            log.error(e);
         }
     }
 

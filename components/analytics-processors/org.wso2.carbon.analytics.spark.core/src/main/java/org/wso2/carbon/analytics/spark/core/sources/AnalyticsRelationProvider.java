@@ -108,7 +108,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
                     this.dataService.createTable(this.tenantId, this.recordStore, this.tableName);
                 }
             } catch (AnalyticsException e) {
-                log.error("Error while accessing tables", e);
+                log.error("Error while accessing tables: " + e.getMessage(), e);
             }
         } else if (!this.streamName.isEmpty()) {
             try {
@@ -120,8 +120,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
                     this.dataService.createTable(this.tenantId, this.recordStore, this.tableName);
                 }
             } catch (AnalyticsException e) {
-                log.error("Error while accessing tables", e);
-
+                log.error("Error while accessing tables: " + e.getMessage(), e);
             }
         } else {
             throw new RuntimeException("Empty " + AnalyticsConstants.TABLE_NAME + " OR "
@@ -146,7 +145,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
             try {
                 this.dataService.setTableSchema(this.tenantId, this.tableName, analyticsSchema);
             } catch (AnalyticsException e) {
-                log.error("Error while setting table schema ", e);
+                log.error("Error while setting table schema: " + e.getMessage(), e);
             }
         } else {
             if (!this.primaryKeys.isEmpty()) {
@@ -266,8 +265,8 @@ public class AnalyticsRelationProvider implements RelationProvider,
                 throw new RuntimeException("Incompatible schemas for the tables");
             }
         } catch (AnalyticsException e) {
-            log.error("Failed to load the schema for table " + tableName, e);
-            throw new RuntimeException("Failed to load the schema for table " + tableName);
+            log.error("Failed to load the schema for table " + tableName + ": " + e.getMessage(), e);
+            throw new RuntimeException("Failed to load the schema for table " + tableName + ": " + e.getMessage());
         }
 
         return new AnalyticsRelation(this.tenantId, this.tableName, this.recordStore, sqlContext,

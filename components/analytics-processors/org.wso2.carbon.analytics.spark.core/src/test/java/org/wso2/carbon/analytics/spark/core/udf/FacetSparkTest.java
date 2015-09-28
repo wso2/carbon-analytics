@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.SparkTestBase;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.internal.SparkAnalyticsExecutor;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
@@ -78,7 +79,7 @@ public class FacetSparkTest extends SparkTestBase {
      * tests if the Facet UDFs fails if given the wrong number of parameters.
      * @throws AnalyticsException
      */
-    @Test (expectedExceptions = ClassCastException.class)
+    @Test (expectedExceptions = AnalyticsExecutionException.class)
     public void testFacetUDFWrongNumberOfParameters() throws AnalyticsException {
         System.out.println(testString("START : Facet UDF fail tester"));
         final int INFO_MESSAGES = 10;
@@ -99,8 +100,7 @@ public class FacetSparkTest extends SparkTestBase {
                         + ")");
 
         // for a single facet
-        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT facet3(tenant,log_level) from Log");
-        Assert.assertEquals(result.getRows().size(), INFO_MESSAGES + ERROR_MESSAGES);
+        ex.executeQuery(1, "SELECT facet3(tenant,log_level) from Log");
 
         this.service.deleteTable(1, "Log");
 

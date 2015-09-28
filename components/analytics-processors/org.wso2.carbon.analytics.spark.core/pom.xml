@@ -292,7 +292,7 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
-                    <debugForkedProcess>true</debugForkedProcess>
+                    <!--<debugForkedProcess>true</debugForkedProcess>-->
                 </configuration>
             </plugin>
 

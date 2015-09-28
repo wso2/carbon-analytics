@@ -78,7 +78,7 @@ public class AnalyticsWritingFunction extends AbstractFunction1<Iterator<Row>, B
                     try {
                         ads.put(records);
                     } catch (AnalyticsException e) {
-                        String msg = "Error while inserting data into table " + this.tName;
+                        String msg = "Error while inserting data into table " + this.tName + ": " + e.getMessage();
                         log.error(msg, e);
                         throw new RuntimeException(msg, e);
                     }
@@ -91,8 +91,8 @@ public class AnalyticsWritingFunction extends AbstractFunction1<Iterator<Row>, B
             try {
                 ads.put(records);
             } catch (AnalyticsException e) {
-                log.error("Error while pushing data to the dataservice ", e);
-                throw new RuntimeException("Error while pushing data to the dataservice ", e);
+                log.error("Error while pushing data to the dataservice: " + e.getMessage(), e);
+                throw new RuntimeException("Error while pushing data to the dataservice: " + e.getMessage(), e);
             }
         }
         return BoxedUnit.UNIT;
