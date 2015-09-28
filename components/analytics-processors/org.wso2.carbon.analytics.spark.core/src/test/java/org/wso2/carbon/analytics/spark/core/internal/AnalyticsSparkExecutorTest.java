@@ -265,7 +265,7 @@ public class AnalyticsSparkExecutorTest {
         boolean success = false;
         try {
             ex.executeQuery(1, query);
-        } catch (AnalyticsExecutionException e) {
+        } catch (Exception e) {
             System.out.println("Query failed with : " + e.getMessage());
             success = true;
         }
@@ -280,7 +280,7 @@ public class AnalyticsSparkExecutorTest {
         success = false;
         try {
             ex.executeQuery(1, query);
-        } catch (AnalyticsExecutionException e) {
+        } catch (Exception e) {
             System.out.println("Query failed with : " + e.getMessage());
             success = true;
         }
@@ -295,7 +295,7 @@ public class AnalyticsSparkExecutorTest {
         success = false;
         try {
             ex.executeQuery(1, query);
-        } catch (AnalyticsExecutionException e) {
+        } catch (Exception e) {
             System.out.println("Query failed with : " + e.getMessage());
             success = true;
         }
@@ -350,7 +350,7 @@ public class AnalyticsSparkExecutorTest {
         boolean success = false;
         try {
             ex.executeQuery(1, query);
-        } catch (AnalyticsExecutionException e) {
+        } catch (Exception e) {
             System.out.println("Query failed with : " + e.getMessage());
             success = true;
         }
@@ -379,7 +379,7 @@ public class AnalyticsSparkExecutorTest {
         colDefs.add(new ColumnDefinition("sequence", AnalyticsSchema.ColumnType.LONG));
         colDefs.add(new ColumnDefinition("summary", AnalyticsSchema.ColumnType.STRING));
         AnalyticsSchema schema = new AnalyticsSchema(colDefs, Collections.<String>emptyList());
-        this.service.setTableSchema(1,"Log", schema);
+        this.service.setTableSchema(1, "Log", schema);
 
         ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
                            "OPTIONS" +
