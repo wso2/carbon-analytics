@@ -125,7 +125,8 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     @Override
     public RDD<Row> buildScan() {
         if (isEmptySchema(this.schema)) {
-            throw new RuntimeException("No schema is available for table " + this.tableName);
+            throw new RuntimeException("Unable to scan through the table as the schema " +
+                                       "is unavailable for " + this.tableName);
         }
         return new AnalyticsRDD(this.tenantId, this.tableName,
                                 new ArrayList<>(Arrays.asList(this.schema.fieldNames())),
@@ -151,7 +152,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     @Override
     public StructType schema() {
         if (isEmptySchema(this.schema)) {
-            logDebug("No schema is available for table " + this.tableName);
+            log.warn("No schema is available for table " + this.tableName);
         }
         return schema;
     }
@@ -162,10 +163,8 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         try {
             AnalyticsSchema tempSchema = dataService.getTableSchema(this.tenantId, this.tableName);
             if (isEmptyAnalyticsSchema(tempSchema)) {
-                logDebug("Empty schema for the table " + this.tableName + ". " +
-                         "Hence inferring the schema from the resultant dataframe");
-                this.schema = data.schema();
-                tempSchema = analyticsSchemaFromStructType(data.schema());
+                throw new RuntimeException("Unable to insert data to the table as the AnalyticsSchema " +
+                                           "is unavailable for " + this.tableName);
             }
             if (overwrite && dataService.tableExists(this.tenantId, this.tableName)) {
                 dataService.deleteTable(this.tenantId, this.tableName);

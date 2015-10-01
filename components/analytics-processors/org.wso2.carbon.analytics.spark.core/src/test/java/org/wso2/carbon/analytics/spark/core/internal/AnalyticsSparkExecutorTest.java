@@ -32,7 +32,6 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 
 import javax.naming.NamingException;
@@ -528,6 +527,57 @@ public class AnalyticsSparkExecutorTest {
             this.service.deleteTable(tenantId, tableName);
         }
     }
+
+    @Test
+    public void testCreateTableWithNoSchema() throws AnalyticsException {
+        System.out.println(testString("start : create temp table with no schema test"));
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
+        this.service.deleteTable(1, "Log");
+        this.service.createTable(1, "Log");
+        this.service.put(records);
+        String query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                       "OPTIONS" +
+                       "(tableName \"Log\"" +
+                       ")";
+        ex.executeQuery(1, query);
+        boolean success = false;
+        try {
+            ex.executeQuery(1, "SELECT ip FROM Log");
+        } catch (Exception e){
+            System.out.println("Query failed with : " + e.getMessage());
+            success = true;
+        }
+        Assert.assertTrue(success, "Query did not fail!");
+
+        query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Log\"," +
+                "schema \"server_name STRING -sp, ip STRING, tenant INTEGER, sequence LONG, summary STRING\", " +
+                "primaryKeys \"ip, log\"" +
+                ")";
+        success = false;
+        try {
+            ex.executeQuery(1, query);
+        } catch (Exception e) {
+            System.out.println("Query failed with : " + e.getMessage());
+            success = true;
+        }
+        Assert.assertTrue(success, "Query did not fail!");
+
+        success = false;
+        try {
+            ex.executeQuery(1,"insert into table Log select 1");
+        } catch (Exception e) {
+            System.out.println("Query failed with : " + e.getMessage());
+            success = true;
+        }
+        Assert.assertTrue(success, "Query did not fail!");
+
+        this.service.deleteTable(1, "Log");
+        System.out.println(testString("end : create temp table with column options test"));
+    }
+
 
 
     @BeforeClass
