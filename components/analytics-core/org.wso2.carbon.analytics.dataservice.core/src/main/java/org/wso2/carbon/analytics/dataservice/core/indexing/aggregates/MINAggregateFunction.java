@@ -36,7 +36,7 @@ public class MINAggregateFunction implements AggregateFunction {
     @Override
     public void process(Number value)
             throws AnalyticsException {
-        if (minValue < value.doubleValue()) {
+        if (value.doubleValue() < minValue) {
             minValue = value.doubleValue();
         }
     }
