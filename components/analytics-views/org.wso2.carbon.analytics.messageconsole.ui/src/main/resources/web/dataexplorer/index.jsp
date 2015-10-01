@@ -232,10 +232,14 @@
         }
 
         function createJTable() {
+            var table = $("#tableSelect").val();
+            if (table == '-1') {
+                CARBON.showErrorDialog("Please select a table", null, null);
+                return;
+            }
             $("#resultsTable").show();
             var workAreaWidth = $(".styledLeft").width();
             $("#AnalyticsTableContainer").width(workAreaWidth - 20);
-            var table = $("#tableSelect").val();
             if (table != '-1') {
                 $.getJSON("/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=" + typeTableInfo + "&tableName=" + table,
                           function (data, status) {
