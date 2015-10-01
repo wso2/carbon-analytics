@@ -112,9 +112,11 @@ public class JmxTask extends AbstractTask {
         EventStreamService eventStreamService = JmxTaskServiceComponent.getEventStreamService();
         if (eventStreamService != null) {
             try {
-                eventStreamService.addEventStreamDefinition(streamDef);
-                if (log.isDebugEnabled()) {
-                    log.debug("Added stream definition to event publisher service.");
+                if (eventStreamService.getStreamDefinition(streamDef.getStreamId()) == null) {
+                    eventStreamService.addEventStreamDefinition(streamDef);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Added stream definition to event publisher service.");
+                    }
                 }
             } catch (EventStreamConfigurationException e) {
                 log.error("Error in adding stream definition to service:" + e.getMessage(), e);
