@@ -266,7 +266,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
             }
         } catch (AnalyticsException e) {
             log.error("Failed to load the schema for table " + tableName + ": " + e.getMessage(), e);
-            throw new RuntimeException("Failed to load the schema for table " + tableName + ": " + e.getMessage());
+            throw new RuntimeException("Failed to load the schema for table " + tableName + ": " + e.getMessage(), e);
         }
 
         return new AnalyticsRelation(this.tenantId, this.tableName, this.recordStore, sqlContext,
