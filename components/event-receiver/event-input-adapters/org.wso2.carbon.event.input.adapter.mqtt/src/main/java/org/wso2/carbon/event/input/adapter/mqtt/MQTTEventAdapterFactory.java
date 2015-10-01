@@ -22,6 +22,9 @@ import org.wso2.carbon.event.input.adapter.mqtt.internal.util.MQTTEventAdapterCo
 
 import java.util.*;
 
+/**
+ * The mqtt event adapter factory class to create a mqtt input adapter
+ */
 public class MQTTEventAdapterFactory extends InputEventAdapterFactory {
 
     private ResourceBundle resourceBundle = ResourceBundle.getBundle

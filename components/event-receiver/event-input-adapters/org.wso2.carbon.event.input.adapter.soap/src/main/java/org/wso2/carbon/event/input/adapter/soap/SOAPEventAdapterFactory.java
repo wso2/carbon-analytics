@@ -24,7 +24,9 @@ import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.*;
 
-
+/**
+ * The soap event adapter factory class to create a soap input adapter
+ */
 public class SOAPEventAdapterFactory extends InputEventAdapterFactory {
     private ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.input.adapter.soap.i18n.Resources", Locale.getDefault());
     private int httpPort;

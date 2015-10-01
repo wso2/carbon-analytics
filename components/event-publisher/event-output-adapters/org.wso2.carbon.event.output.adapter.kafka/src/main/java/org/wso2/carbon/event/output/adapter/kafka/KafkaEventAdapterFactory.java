@@ -24,6 +24,9 @@ import org.wso2.carbon.event.output.adapter.kafka.internal.util.KafkaEventAdapte
 
 import java.util.*;
 
+/**
+ * The kafka event adapter factory class to create a kafka output adapter
+ */
 public class KafkaEventAdapterFactory extends OutputEventAdapterFactory {
     private static final Log log = LogFactory.getLog(KafkaEventAdapterFactory.class);
 

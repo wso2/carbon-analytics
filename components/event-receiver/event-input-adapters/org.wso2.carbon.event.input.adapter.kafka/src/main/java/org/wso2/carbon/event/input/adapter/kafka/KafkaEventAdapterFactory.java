@@ -20,7 +20,9 @@ import org.wso2.carbon.event.input.adapter.kafka.internal.util.KafkaEventAdapter
 
 import java.util.*;
 
-
+/**
+ * The kafka event adapter factory class to create a kafka input adapter
+ */
 public class KafkaEventAdapterFactory extends InputEventAdapterFactory {
     private ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.input.adapter.kafka.i18n.Resources", Locale.getDefault());
 

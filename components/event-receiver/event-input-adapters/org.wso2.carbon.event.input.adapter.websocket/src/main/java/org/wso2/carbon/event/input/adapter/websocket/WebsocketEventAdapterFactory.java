@@ -23,6 +23,9 @@ import org.wso2.carbon.event.input.adapter.websocket.internal.util.WebsocketEven
 
 import java.util.*;
 
+/**
+ * The websocket event adapter factory class to create a websocket input adapter
+ */
 public class WebsocketEventAdapterFactory extends InputEventAdapterFactory {
     private ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.input.adapter.websocket.i18n.Resources", Locale.getDefault());
 

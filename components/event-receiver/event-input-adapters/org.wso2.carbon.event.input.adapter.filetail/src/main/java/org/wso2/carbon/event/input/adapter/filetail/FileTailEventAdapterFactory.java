@@ -20,6 +20,9 @@ import org.wso2.carbon.event.input.adapter.filetail.internal.util.FileTailEventA
 
 import java.util.*;
 
+/**
+ * The filetail event adapter factory class to create a filetail input adapter
+ */
 public class FileTailEventAdapterFactory extends InputEventAdapterFactory {
 
     private ResourceBundle resourceBundle = ResourceBundle.getBundle
