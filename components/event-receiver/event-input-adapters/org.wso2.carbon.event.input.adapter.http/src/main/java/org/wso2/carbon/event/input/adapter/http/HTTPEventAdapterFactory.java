@@ -21,7 +21,9 @@ import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.*;
 
-
+/**
+ * The http event adapter factory class to create a http input adapter
+ */
 public class HTTPEventAdapterFactory extends InputEventAdapterFactory {
 
     private ResourceBundle resourceBundle =

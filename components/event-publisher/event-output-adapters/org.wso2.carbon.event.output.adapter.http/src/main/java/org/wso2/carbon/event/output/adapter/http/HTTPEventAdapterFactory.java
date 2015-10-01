@@ -22,6 +22,9 @@ import org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterC
 
 import java.util.*;
 
+/**
+ * The http event adapter factory class to create a http output adapter
+ */
 public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
     private ResourceBundle resourceBundle =
             ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.http.i18n.Resources", Locale.getDefault());

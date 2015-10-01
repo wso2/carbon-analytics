@@ -33,6 +33,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+/**
+ * The UI event adapter factory class to create a UI output adapter
+ */
 public class UIEventAdapterFactory extends OutputEventAdapterFactory {
 
     private ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.ui.i18n" +
@@ -71,7 +74,7 @@ public class UIEventAdapterFactory extends OutputEventAdapterFactory {
 
     @Override
     public String getUsageTips() {
-        return resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_PREFIX) + " "  + resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX);
+        return resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_PREFIX) + " " + resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX);
     }
 
     @Override

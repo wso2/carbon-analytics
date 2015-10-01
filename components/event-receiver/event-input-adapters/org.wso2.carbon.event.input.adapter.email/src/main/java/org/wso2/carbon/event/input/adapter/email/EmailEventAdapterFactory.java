@@ -22,6 +22,9 @@ import org.wso2.carbon.event.input.adapter.email.internal.util.EmailEventAdapter
 
 import java.util.*;
 
+/**
+ * The email event adapter factory class to create an email input adapter
+ */
 public class EmailEventAdapterFactory extends InputEventAdapterFactory {
 
     private ResourceBundle resourceBundle = ResourceBundle.getBundle

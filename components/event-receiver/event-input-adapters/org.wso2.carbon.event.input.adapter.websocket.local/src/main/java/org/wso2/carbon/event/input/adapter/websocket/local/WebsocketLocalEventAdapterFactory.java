@@ -24,6 +24,9 @@ import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.*;
 
+/**
+ * The websocket local event adapter factory class to create a websocket local input adapter
+ */
 public class WebsocketLocalEventAdapterFactory extends InputEventAdapterFactory {
     ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.input.adapter.websocket.local.i18n.Resources", Locale.getDefault());
     private int httpPort;

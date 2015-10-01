@@ -22,6 +22,9 @@ import org.wso2.carbon.event.output.adapter.mqtt.internal.util.MQTTEventAdapterC
 
 import java.util.*;
 
+/**
+ * The mqtt event adapter factory class to create a mqtt output adapter
+ */
 public class MQTTEventAdapterFactory extends OutputEventAdapterFactory {
     private ResourceBundle resourceBundle =
             ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.mqtt.i18n.Resources", Locale.getDefault());
