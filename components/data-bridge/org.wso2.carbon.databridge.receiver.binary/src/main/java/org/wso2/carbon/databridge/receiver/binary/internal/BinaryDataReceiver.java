@@ -64,8 +64,9 @@ public class BinaryDataReceiver {
     }
 
     public void stop() {
-        sslReceiverExecutorService.shutdownNow();
-        tcpReceiverExecutorService.shutdownNow();
+        log.info("Stopping Binary Server..");
+        sslReceiverExecutorService.shutdown();
+        tcpReceiverExecutorService.shutdown();
     }
 
     private void startSecureTransmission() throws IOException, DataBridgeException {

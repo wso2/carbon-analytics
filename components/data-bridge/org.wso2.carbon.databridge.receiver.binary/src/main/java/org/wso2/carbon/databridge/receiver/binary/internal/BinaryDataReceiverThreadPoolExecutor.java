@@ -23,14 +23,17 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BinaryDataReceiverThreadPoolExecutor extends ThreadPoolExecutor {
     private final Semaphore semaphore;
+    private AtomicBoolean isShutdown;
 
     public BinaryDataReceiverThreadPoolExecutor(int poolSize, String threadName) {
         super(poolSize, poolSize, 0L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
                 new DataBridgeThreadFactory(threadName));
         semaphore = new Semaphore(poolSize);
+        isShutdown = new AtomicBoolean(false);
     }
 
     @Override
@@ -44,12 +47,19 @@ public class BinaryDataReceiverThreadPoolExecutor extends ThreadPoolExecutor {
                 // Do nothing
             }
         } while (!acquired);
-        super.execute(task);
+        if (!isShutdown.get()) {
+            super.execute(task);
+        }
     }
 
     @Override
     protected void afterExecute(final Runnable r, final Throwable t) {
         super.afterExecute(r, t);
         semaphore.release();
+    }
+
+    public void shutdown() {
+        isShutdown.set(true);
+        super.shutdown();
     }
 }
