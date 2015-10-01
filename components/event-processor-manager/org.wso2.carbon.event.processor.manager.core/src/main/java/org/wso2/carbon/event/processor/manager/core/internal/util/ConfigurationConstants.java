@@ -56,7 +56,9 @@ public final class ConfigurationConstants {
     public static final String HA_NODE_CONFIG_PUBLISHER_CONNECTION_STATUS_CHECK_INTERVAL =
             "publisherConnectionStatusCheckInterval";
     public static final String HA_NODE_CONFIG_RECEIVER_QUEUE_SIZE = "receiverQueueSize";
+    public static final String HA_NODE_CONFIG_RECEIVER_QUEUE_MAX_SIZE_MB = "receiverQueueMaxSizeMb";
     public static final String HA_NODE_CONFIG_PUBLISHER_QUEUE_SIZE = "publisherQueueSize";
+    public static final String HA_NODE_CONFIG_PUBLISHER_QUEUE_MAX_SIZE_MB = "publisherQueueMaxSizeMb";
 
     public static final String HA_NODE_CONFIG_MANAGEMENT_STATE_RETRY_INTERVAL = "stateSyncRetryInterval";
     public static final String HA_NODE_CONFIG_MANAGEMENT_TRY_STATE_CHANGE_INTERVAL = "tryStateChangeInterval";

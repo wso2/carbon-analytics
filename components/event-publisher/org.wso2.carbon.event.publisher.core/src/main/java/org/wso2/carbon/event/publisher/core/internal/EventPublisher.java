@@ -28,6 +28,7 @@ import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterExc
 import org.wso2.carbon.event.processor.manager.core.EventManagementUtil;
 import org.wso2.carbon.event.processor.manager.core.EventSync;
 import org.wso2.carbon.event.processor.manager.core.Manager;
+import org.wso2.carbon.event.processor.manager.core.config.HAConfiguration;
 import org.wso2.carbon.event.processor.manager.core.config.ManagementModeInfo;
 import org.wso2.carbon.event.processor.manager.core.config.Mode;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
@@ -42,6 +43,7 @@ import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationExcep
 import org.wso2.siddhi.core.event.Event;
 
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class EventPublisher implements SiddhiEventConsumer, EventSync {
@@ -69,7 +71,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     private String syncId;
     private boolean sendToOther = false;
     private org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition;
-    private LinkedBlockingQueue<EventWrapper> eventQueue;
+    private BlockingEventQueue eventQueue;
 
 
     public EventPublisher(EventPublisherConfiguration eventPublisherConfiguration)
@@ -168,7 +170,8 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
                 sendToOther = true;
             } else if (mode == Mode.HA && managementModeInfo.getHaConfiguration().isWorkerNode()) {
                 sendToOther = true;
-                eventQueue = new LinkedBlockingQueue<EventWrapper>(managementModeInfo.getHaConfiguration().getEventSyncPublisherQueueSize());
+                HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
+                eventQueue = new BlockingEventQueue(haConfiguration.getEventSyncPublisherMaxQueueSizeInMb(), haConfiguration.getEventSyncPublisherQueueSize());
             }
             EventPublisherServiceValueHolder.getEventManagementService().registerEventSync(this, Manager.ManagerType.Publisher);
         }
@@ -377,6 +380,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
         private Event event;
         private long timestampInMillis;
+        private int size;
 
         public EventWrapper(Event event, long timestamp) {
             this.event = event;
@@ -385,6 +389,14 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
         public Event getEvent() {
             return event;
+        }
+
+        public int getSize() {
+            return size;
+        }
+
+        public void setSize(int size) {
+            this.size = size;
         }
 
         public long getTimestampInMillis() {

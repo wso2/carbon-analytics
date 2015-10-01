@@ -39,18 +39,20 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
 
     private final StreamDefinition streamDefinition;
     private Logger log = Logger.getLogger(AbstractInputEventDispatcher.class);
-    private final BlockingQueue<Event> eventQueue;
+    private final BlockingEventQueue eventQueue;
     private Lock readLock;
     private String syncId;
     private int tenantId;
     private ReentrantLock threadBarrier = new ReentrantLock();
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    public QueueInputEventDispatcher(int tenantId, String syncId, Lock readLock, org.wso2.carbon.databridge.commons.StreamDefinition exportedStreamDefinition, int eventSyncQueueSize) {
+    public QueueInputEventDispatcher(int tenantId, String syncId, Lock readLock,
+                                     org.wso2.carbon.databridge.commons.StreamDefinition exportedStreamDefinition,
+                                     int eventQueueSizeMb, int eventSyncQueueSize) {
         this.readLock = readLock;
         this.tenantId = tenantId;
         this.syncId = syncId;
-        this.eventQueue = new LinkedBlockingQueue<Event>(eventSyncQueueSize);
+        this.eventQueue = new BlockingEventQueue(eventQueueSizeMb ,eventSyncQueueSize);
         this.streamDefinition = EventManagementUtil.constructStreamDefinition(syncId, exportedStreamDefinition);
         executorService.submit(new QueueInputEventDispatcherWorker());
     }

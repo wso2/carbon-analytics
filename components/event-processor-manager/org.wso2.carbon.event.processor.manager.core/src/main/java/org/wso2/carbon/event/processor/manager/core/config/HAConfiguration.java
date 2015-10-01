@@ -44,6 +44,8 @@ public class HAConfiguration implements Serializable {
     private long eventSyncPublisherConnectionStatusCheckInterval = 30000;
     private int eventSyncReceiverQueueSize = 1000000;
     private int eventSyncPublisherQueueSize = 1000000;
+    private int eventSyncReceiverMaxQueueSizeInMb = 50;
+    private int eventSyncPublisherMaxQueueSizeInMb = 50;
 
     //presentation
     private int presentationPublisherTcpSendBufferSize = 5242880;
@@ -225,5 +227,21 @@ public class HAConfiguration implements Serializable {
 
     public void setEventSyncPublisherQueueSize(int eventSyncPublisherQueueSize) {
         this.eventSyncPublisherQueueSize = eventSyncPublisherQueueSize;
+    }
+
+    public int getEventSyncReceiverMaxQueueSizeInMb() {
+        return eventSyncReceiverMaxQueueSizeInMb;
+    }
+
+    public void setEventSyncReceiverMaxQueueSizeInMb(int eventSyncReceiverMaxQueueSizeInMb) {
+        this.eventSyncReceiverMaxQueueSizeInMb = eventSyncReceiverMaxQueueSizeInMb;
+    }
+
+    public int getEventSyncPublisherMaxQueueSizeInMb() {
+        return eventSyncPublisherMaxQueueSizeInMb;
+    }
+
+    public void setEventSyncPublisherMaxQueueSizeInMb(int eventSyncPublisherMaxQueueSizeInMb) {
+        this.eventSyncPublisherMaxQueueSizeInMb = eventSyncPublisherMaxQueueSizeInMb;
     }
 }
