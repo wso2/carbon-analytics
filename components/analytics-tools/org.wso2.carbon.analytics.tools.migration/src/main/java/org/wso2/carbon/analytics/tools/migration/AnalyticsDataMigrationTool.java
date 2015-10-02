@@ -219,6 +219,7 @@ public class AnalyticsDataMigrationTool {
             Record record;
             String lastKey;
 
+            long totalRecordCount = 0;
             //exectuting the query batch by batch ( using the specified batch size) and publishing to the server
             List<Record> records = new ArrayList<Record>();
             while (true) {
@@ -235,8 +236,10 @@ public class AnalyticsDataMigrationTool {
                 rangeQuery.setKeys(lastKey, "");
 
                 //putting the records to the Data Analtycs Server
+                totalRecordCount += records.size();
                 service.put(records);
                 records.clear();
+                System.out.println("Number of records migrated: " + totalRecordCount);
 
                 // check if all rows are read
                 if (orderedRows.getCount() != batchSize)
