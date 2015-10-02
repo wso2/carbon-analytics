@@ -409,9 +409,10 @@
             </tr>
 
             <%
-                String toStreamProperties[] = eventReceiverConfigurationDto.getToStreamNameWithVersion().split(":");
-                String toEventStreamName = toStreamProperties[0];
-                String toEventStreamVersion = toStreamProperties[1];
+                //get from stream properties for WSO2Event custom mapping
+                String fromStreamProperties[] = eventReceiverConfigurationDto.getFromStreamNameWithVersion().split(":");
+                String fromEventStreamName = fromStreamProperties[0];
+                String fromEventStreamVersion = fromStreamProperties[1];
             %>
 
 
@@ -422,7 +423,7 @@
                 <td>
                     <input type="text" name="outputStreamName" id="outputStreamNameId"
                            class="initE"
-                           value="<%=toEventStreamName%>"
+                           value="<%=fromEventStreamName%>"
                            style="width:75%" disabled="disabled"/>
                 </td>
             </tr>
@@ -433,7 +434,7 @@
                 <td>
                     <input type="text" name="outputStreamVersion" id="outputStreamVersionId"
                            class="initE"
-                           value="<%=toEventStreamVersion%>"
+                           value="<%=fromEventStreamVersion%>"
                            style="width:75%" disabled="disabled"/>
                 </td>
             </tr>
