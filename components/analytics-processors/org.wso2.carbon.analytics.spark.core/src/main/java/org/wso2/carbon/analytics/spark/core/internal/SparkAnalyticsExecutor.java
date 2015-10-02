@@ -518,15 +518,16 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                           AnalyticsRecoveryModeFactory.class.getName());
 
         try {
-            conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
-            conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
-
             String carbonHome;
             try {
                 carbonHome = conf.get(AnalyticsConstants.CARBON_DAS_SYMBOLIC_LINK);
             } catch (NoSuchElementException e) {
                 carbonHome = CarbonUtils.getCarbonHome();
             }
+            String carbonConf = carbonHome + File.separator + "repository" + File.separator + "conf";
+
+            conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + carbonConf);
+            conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + carbonConf);
 
             String sparkClasspath = (System.getProperty("SPARK_CLASSPATH") == null) ?
                                     "" : System.getProperty("SPARK_CLASSPATH");
