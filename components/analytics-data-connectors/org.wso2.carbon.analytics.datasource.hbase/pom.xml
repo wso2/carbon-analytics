@@ -25,9 +25,21 @@
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
+            <version>${hbase.client.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>${hadoop.client.260.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
         </dependency>
         <dependency>
@@ -84,8 +96,8 @@
                             org.wso2.carbon.analytics.datasource.hbase.*
                         </Export-Package>
                         <Import-Package>
-                            org.apache.hadoop.hbase*;version="[1.0.0, 1.1.0)",
-                            org.apache.hadoop.*;version="[2.6.0, 2.7.0)"
+                            org.apache.hadoop.hbase*;version="${hbase.client.import.version}",
+                            org.apache.hadoop.*;version="${hadoop.client.import.version}"
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

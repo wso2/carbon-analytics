@@ -45,43 +45,19 @@
         <dependency>
             <groupId>org.wso2.orbit.org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
-            <version>2.6.0.wso2v1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.org.apache.htrace</groupId>
-            <artifactId>htrace-core-apache</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.org.htrace</groupId>
-            <artifactId>htrace-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.com.google.protobuf.fragment</groupId>
-            <artifactId>protobuf-java-fragment</artifactId>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.zookeeper.wso2</groupId>
-            <artifactId>apache-zookeeper</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec.wso2</groupId>
-            <artifactId>commons-codec</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.core.server.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.data</groupId>
+            <artifactId>org.wso2.carbon.datasource.reader.hadoop.server.feature</artifactId>
             <type>zip</type>
         </dependency>
     </dependencies>
@@ -116,20 +92,10 @@
                                 <bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.hbase
                                 </bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.hadoop:hadoop-client</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.hbase:hbase-client</bundleDef>
-                                <bundleDef>
-                                    org.wso2.orbit.com.google.protobuf.fragment:protobuf-java-fragment
-                                </bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.htrace:htrace-core-apache</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.htrace:htrace-core</bundleDef>
-                                <bundleDef>com.google.protobuf:protobuf-java</bundleDef>
-                                <bundleDef>commons-codec.wso2:commons-codec</bundleDef>
-                                <bundleDef>com.google.guava:guava</bundleDef>
-                                <bundleDef>org.apache.zookeeper.wso2:apache-zookeeper</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.datasource.reader.hadoop.server:${carbon.data.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.analytics.core.server:${carbon.analytics.version}
                                 </importFeatureDef>
                             </importFeatures>
