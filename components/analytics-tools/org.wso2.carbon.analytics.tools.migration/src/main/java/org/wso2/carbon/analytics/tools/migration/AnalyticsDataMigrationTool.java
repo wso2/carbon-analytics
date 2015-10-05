@@ -54,12 +54,14 @@ public class AnalyticsDataMigrationTool {
     private static final String DEFAULT_CASSANDRA_PORT = "9160";
     private static final String DEFAULT_CASSANDRA_SERVER_URL = "localhost" ;
     private static final String SERVER_URL = "serverUrl";
+    private static final String CASSANDRA_URL = "cassandraUrl";
     private static final String SERVER_PORT = "serverPort";
     private static final String CASSANDRA_PORT = "cassandraPort";
     private static final String COLUMN_FAMILY = "columnFamily";
     private static final String ANALYTIC_TABLE = "analyticTable";
     private static final String TENANT_ID = "tenantId";
     private static final String SERVER_URL_ARG = "server url";
+    private static final String CASSANDRA_URL_ARG = "cassandra host url";
     private static final String SERVER_PORT_ARG = "serverPort";
     private static final String CASSANDRA_PORT_ARG = "cassandraPort";
     private static final String COLUMN_FAMILY_NAME_ARG = "column family name";
@@ -94,8 +96,11 @@ public class AnalyticsDataMigrationTool {
         System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
         Options options = new Options();
         options.addOption(OptionBuilder.withArgName(SERVER_URL_ARG).hasArg()
-                .withDescription("Cassandra server url '<default value: localhost>'")
+                .withDescription("DAS server url '<default value: localhost>'")
                 .create(SERVER_URL));
+        options.addOption(OptionBuilder.withArgName(CASSANDRA_URL_ARG).hasArg()
+                .withDescription("Cassandra server url '<default value: localhost>'")
+                .create(CASSANDRA_URL));
         options.addOption(OptionBuilder.withArgName(SERVER_PORT_ARG).hasArg()
                 .withDescription("Cassandra server port '<default value: 9042'").create(SERVER_PORT));
         options.addOption(OptionBuilder.withArgName(COLUMN_FAMILY_NAME_ARG).hasArg()
@@ -133,11 +138,14 @@ public class AnalyticsDataMigrationTool {
         try {
             service = AnalyticsServiceHolder.getAnalyticsDataService();
             String serverUrl;
+            String cassandraUrl;
             String columnFamily;
             String analyticTable;
             String cassandraUser = null, cassandraPassword = null, clusterName = null;
             int tenantId = Integer.parseInt(line.getOptionValue(TENANT_ID, "" + MultitenantConstants.SUPER_TENANT_ID));
             serverUrl = line.getOptionValue(SERVER_URL, DEFAULT_CASSANDRA_SERVER_URL);
+            //if no cassandra URL is provided use the server URL
+            cassandraUrl = line.getOptionValue(CASSANDRA_URL, serverUrl);
             clusterName = line.getOptionValue(CLUSTER_NAME, DEFAULT_CLUSTER_NAME);
             int port = Integer.parseInt(line.getOptionValue(SERVER_PORT, DEFAULT_CASSANDRA_CQL_PORT));
             int cassandraPort = Integer.parseInt(line.getOptionValue(CASSANDRA_PORT, DEFAULT_CASSANDRA_PORT));
@@ -167,9 +175,9 @@ public class AnalyticsDataMigrationTool {
                 Map<String, String> credentials = new HashMap<>();
                 credentials.put("username", cassandraUser);
                 credentials.put("password", cassandraPassword);
-                cluster = HFactory.getOrCreateCluster(clusterName,new CassandraHostConfigurator(serverUrl+":"+cassandraPort),credentials);
+                cluster = HFactory.getOrCreateCluster(clusterName,new CassandraHostConfigurator(cassandraUrl+":"+cassandraPort),credentials);
             } else {
-                cluster = HFactory.getOrCreateCluster(clusterName, new CassandraHostConfigurator(serverUrl + ":" + port));
+                cluster = HFactory.getOrCreateCluster(clusterName, new CassandraHostConfigurator(cassandraUrl + ":" + port));
             }
             Keyspace keyspace = HFactory.createKeyspace(CASSANDRA_KEYSPACE, cluster);
 
