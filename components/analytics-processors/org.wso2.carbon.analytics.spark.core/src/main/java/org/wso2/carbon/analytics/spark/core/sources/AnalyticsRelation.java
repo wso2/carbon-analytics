@@ -95,14 +95,14 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             AnalyticsSchema analyticsSchema = ServiceHolder.getAnalyticsDataService().getTableSchema(
                     tenantId, tableName);
             if (isEmptyAnalyticsSchema(analyticsSchema)) {
-                logDebug("Analytics Relation created with an empty schema for table " + this.tableName);
+                log.warn("Analytics Relation created with an empty schema for table " + this.tableName);
                 this.schema = new StructType(new StructField[]{new StructField(
                         DUMMY_COLUMN, DataTypes.NullType, true, Metadata.empty())});
             } else {
                 this.schema = new StructType(extractFieldsFromColumns(analyticsSchema.getColumns()));
             }
         } catch (AnalyticsException e) {
-            String msg = "Failed to load the schema for table " + tableName + ":" + e.getMessage();
+            String msg = "Failed to load the schema for table " + tableName + " : " + e.getMessage();
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }
@@ -169,7 +169,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             if (overwrite && dataService.tableExists(this.tenantId, this.tableName)) {
                 dataService.deleteTable(this.tenantId, this.tableName);
                 if (!dataService.listRecordStoreNames().contains(this.recordStore)) {
-                    throw new RuntimeException("Unknown data store name");
+                    throw new RuntimeException("Unknown data store name " + this.recordStore);
                 }
                 dataService.createTable(this.tenantId, this.recordStore, this.tableName);
                 dataService.setTableSchema(this.tenantId, this.tableName, tempSchema);
@@ -177,7 +177,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
 
             writeDataFrameToDAL(data);
         } catch (AnalyticsException e) {
-            String msg = "Error while inserting data into table " + this.tableName + ":" + e.getMessage();
+            String msg = "Error while inserting data into table " + this.tableName + " : " + e.getMessage();
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }

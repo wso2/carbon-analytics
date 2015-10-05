@@ -89,7 +89,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private static final Log log = LogFactory.getLog(SparkAnalyticsExecutor.class);
 
-    private String sparkMaster = "local";
+    private String sparkMaster;
 
     private SparkConf sparkConf;
 
@@ -531,7 +531,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
             String sparkClasspath = (System.getProperty("SPARK_CLASSPATH") == null) ?
                                     "" : System.getProperty("SPARK_CLASSPATH");
-            if (this.sparkMaster.trim().toLowerCase().startsWith("spark")) {
+
+            // if the master url starts with "spark", this means that the cluster would be pointed
+            // an external cluster. in an external cluster, having more than one implementations of
+            // sl4j is not possible. hence, it would be removed from the executor cp. DAS-199
+            if (conf.get(AnalyticsConstants.CARBON_SPARK_MASTER).trim().toLowerCase().startsWith("spark")) {
                 sparkClasspath = ComputeClasspath.getSparkClasspath(sparkClasspath, carbonHome, new String[]{"slf4j"});
             } else {
                 sparkClasspath = ComputeClasspath.getSparkClasspath(sparkClasspath, carbonHome);

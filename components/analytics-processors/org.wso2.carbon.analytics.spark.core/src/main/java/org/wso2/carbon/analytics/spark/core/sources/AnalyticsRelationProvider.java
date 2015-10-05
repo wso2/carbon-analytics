@@ -102,25 +102,26 @@ public class AnalyticsRelationProvider implements RelationProvider,
             try {
                 // if table does not exists, create table
                 if (!this.dataService.tableExists(this.tenantId, this.tableName)) {
+                    logDebug(this.tableName + " table does not exists. Hence creating it");
                     if (!this.dataService.listRecordStoreNames().contains(this.recordStore)) {
-                        throw new RuntimeException("Unknown data store name");
+                        throw new RuntimeException("Unknown data store name " + this.recordStore);
                     }
                     this.dataService.createTable(this.tenantId, this.recordStore, this.tableName);
                 }
             } catch (AnalyticsException e) {
-                log.error("Error while accessing tables: " + e.getMessage(), e);
+                log.error("Error while accessing table " + this.tableName + " : " + e.getMessage(), e);
             }
         } else if (!this.streamName.isEmpty()) {
             try {
                 this.tableName = AnalyticsCommonUtils.convertStreamNameToTableName(this.streamName);
                 if (!this.dataService.tableExists(this.tenantId, this.tableName)) {
                     if (!this.dataService.listRecordStoreNames().contains(this.recordStore)) {
-                        throw new RuntimeException("Unknown data store name");
+                        throw new RuntimeException("Unknown data store name " + this.recordStore);
                     }
                     this.dataService.createTable(this.tenantId, this.recordStore, this.tableName);
                 }
             } catch (AnalyticsException e) {
-                log.error("Error while accessing tables: " + e.getMessage(), e);
+                log.error("Error while accessing table " + this.tableName + " : " + e.getMessage(), e);
             }
         } else {
             throw new RuntimeException("Empty " + AnalyticsConstants.TABLE_NAME + " OR "
@@ -145,7 +146,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
             try {
                 this.dataService.setTableSchema(this.tenantId, this.tableName, analyticsSchema);
             } catch (AnalyticsException e) {
-                log.error("Error while setting table schema: " + e.getMessage(), e);
+                log.error("Error while setting " + this.tableName + " table schema: " + e.getMessage(), e);
             }
         } else {
             if (!this.primaryKeys.isEmpty()) {
@@ -274,6 +275,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
     }
 
 //    todo: Implement the creatable relation
+
     /**
      * Creates a relation with the given parameters based on the contents of the given
      * DataFrame. The mode specifies the expected behavior of createRelation when
@@ -293,9 +295,8 @@ public class AnalyticsRelationProvider implements RelationProvider,
 //        //extract data from the dataframe, save it using the savemode and create the relation using the first initializer
 //        throw new RuntimeException("Creatable relation is not implemented as yet");
 //    }
-
-    private void logDebug (String msg){
-        if (log.isDebugEnabled()){
+    private void logDebug(String msg) {
+        if (log.isDebugEnabled()) {
             log.debug(msg);
         }
     }
