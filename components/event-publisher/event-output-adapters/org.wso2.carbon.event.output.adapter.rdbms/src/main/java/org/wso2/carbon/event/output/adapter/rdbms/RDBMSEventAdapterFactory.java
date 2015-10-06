@@ -33,6 +33,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+/**
+ * The rdbms event adapter factory class to create a rdbms output adapter
+ */
 public class RDBMSEventAdapterFactory extends OutputEventAdapterFactory {
 
     private ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.rdbms.i18n" +
@@ -95,6 +98,7 @@ public class RDBMSEventAdapterFactory extends OutputEventAdapterFactory {
     public String getUsageTips() {
         return null;
     }
+
     @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                                                  Map<String, String> globalProperties) {

@@ -63,7 +63,7 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
         validateOutputEventAdapterConfigurations();
         tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
-        String configPath = globalProperties.get(ADAPTOR_CONF_PATH);
+        String configPath = globalProperties.get(ADAPTER_CONF_PATH);
         if (configPath != null) {
             AgentHolder.setConfigPath(configPath);
         }
@@ -171,14 +171,14 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
     private void throwRuntimeException(String receiverUrl, String authUrl, String protocol, String userName,
                                        Exception e) {
         throw new OutputEventAdapterRuntimeException(
-                "Error in data-bridge config for adaptor " + eventAdapterConfiguration.getName()
+                "Error in data-bridge config for adapter " + eventAdapterConfiguration.getName()
                         + " with the receiverUrl:" + receiverUrl + " authUrl:" + authUrl + " protocol:" + protocol
                         + " and userName:" + userName + "," + e.getMessage(), e);
     }
 
     private void logException(String message, String receiverUrl, String authUrl, String protocol, String userName,
                               Exception e) {
-        log.error(message + " for adaptor " + eventAdapterConfiguration.getName()
+        log.error(message + " for adapter " + eventAdapterConfiguration.getName()
                 + " with the receiverUrl:" + receiverUrl + " authUrl:" + authUrl + " protocol:" + protocol
                 + " and userName:" + userName + "," + e.getMessage(), e);
     }
@@ -186,7 +186,7 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
     private void throwConnectionException(String receiverUrl, String authUrl, String protocol, String userName,
                                           Exception e) {
         throw new ConnectionUnavailableException(
-                "Connection not available for adaptor " + eventAdapterConfiguration.getName()
+                "Connection not available for adapter " + eventAdapterConfiguration.getName()
                         + " with the receiverUrl:" + receiverUrl + " authUrl:" + authUrl + " protocol:" + protocol
                         + " and userName:" + userName + "," + e.getMessage(), e);
     }

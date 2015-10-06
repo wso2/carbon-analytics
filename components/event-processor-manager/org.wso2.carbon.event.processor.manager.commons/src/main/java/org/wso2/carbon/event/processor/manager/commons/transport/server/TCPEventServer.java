@@ -19,6 +19,7 @@
 package org.wso2.carbon.event.processor.manager.commons.transport.server;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisher;
 import org.wso2.carbon.event.processor.manager.commons.transport.common.EventServerUtils;
 import org.wso2.carbon.event.processor.manager.commons.transport.common.StreamRuntimeInfo;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -27,6 +28,7 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -39,15 +41,17 @@ import java.util.concurrent.Executors;
 
 public class TCPEventServer {
     private static Logger log = Logger.getLogger(TCPEventServer.class);
-    private TCPEventServerConfig tcpEventServerConfig = new TCPEventServerConfig(7211);
+    private TCPEventServerConfig tcpEventServerConfig = new TCPEventServerConfig("0.0.0.0", 7211);
     private ExecutorService executorService;
     private StreamCallback streamCallback;
+    private ConnectionCallback connectionCallback;
     private ServerWorker serverWorker;
     private Map<String, StreamRuntimeInfo> streamRuntimeInfoMap = new ConcurrentHashMap<String, StreamRuntimeInfo>();
 
-    public TCPEventServer(TCPEventServerConfig tcpEventServerConfig, StreamCallback streamCallback) {
-        this.tcpEventServerConfig = tcpEventServerConfig;
+    public TCPEventServer(TCPEventServerConfig tcpeventserverconfig, StreamCallback streamCallback, ConnectionCallback connectionCallback) {
+        this.tcpEventServerConfig = tcpeventserverconfig;
         this.streamCallback = streamCallback;
+        this.connectionCallback = connectionCallback;
         this.serverWorker = new ServerWorker();
         this.executorService = Executors.newCachedThreadPool();
     }
@@ -61,13 +65,14 @@ public class TCPEventServer {
         this.streamRuntimeInfoMap.remove(streamId);
     }
 
-    public void start() {
+    public synchronized void start() throws IOException {
         if (!serverWorker.isRunning()) {
+            serverWorker.startServerWorker();
             new Thread(serverWorker).start();
         }
     }
 
-    public void shutdown() {
+    public synchronized void shutdown() {
         serverWorker.shutdownServerWorker();
     }
 
@@ -79,10 +84,20 @@ public class TCPEventServer {
             return isRunning;
         }
 
+        public void startServerWorker() throws IOException {
+            InetAddress inetAddress = InetAddress.getByName(tcpEventServerConfig.getHostName());
+            log.info("EventServer starting event listener on " + inetAddress.getHostAddress() + ":" + tcpEventServerConfig.getPort());
+            receiverSocket = new ServerSocket(tcpEventServerConfig.getPort(), 50, inetAddress);
+            isRunning = true;
+            receiverSocket.setReuseAddress(true);
+        }
+
         public void shutdownServerWorker() {
             isRunning = false;
             try {
-                receiverSocket.close();
+                if (receiverSocket != null) {
+                    receiverSocket.close();
+                }
             } catch (IOException e) {
                 log.error("Error occurred while trying to shutdown socket: " + e.getMessage(), e);
             }
@@ -91,9 +106,7 @@ public class TCPEventServer {
         @Override
         public void run() {
             try {
-                log.info("EventServer starting event listener on port " + tcpEventServerConfig.getPort());
-                isRunning = true;
-                receiverSocket = new ServerSocket(tcpEventServerConfig.getPort());
+
                 while (isRunning) {
                     final Socket connectionSocket = receiverSocket.accept();
                     connectionSocket.setKeepAlive(true);
@@ -126,16 +139,26 @@ public class TCPEventServer {
             @Override
             public void run() {
                 try {
+                    if (connectionCallback != null) {
+                        connectionCallback.onPublisherBoltConnect();
+                    }
                     BufferedInputStream in = new BufferedInputStream(connectionSocket.getInputStream());
                     while (true) {
 
                         byte[] streamNameByteSize = loadData(in, new byte[4]);
                         ByteBuffer sizeBuf = ByteBuffer.wrap(streamNameByteSize);
                         int streamNameSize = sizeBuf.getInt();
+                        if (streamNameSize == TCPEventPublisher.PING_HEADER_VALUE) {
+                            continue;
+                        }
                         byte[] streamNameData = loadData(in, new byte[streamNameSize]);
                         String streamId = new String(streamNameData, 0, streamNameData.length);
                         StreamRuntimeInfo streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
-
+                        while (streamRuntimeInfo == null) {
+                            Thread.sleep(1000);
+                            log.warn("TCP server on port :'" + tcpEventServerConfig.getPort() + "' waiting for streamId:'" + streamId + "' to process incoming events");
+                            streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
+                        }
                         Object[] eventData = new Object[streamRuntimeInfo.getNoOfAttributes()];
                         byte[] fixedMessageData = loadData(in, new byte[8 + streamRuntimeInfo.getFixedMessageSize()]);
 
@@ -185,6 +208,10 @@ public class TCPEventServer {
                     log.error("Error reading data from receiver socket:" + e.getMessage(), e);
                 } catch (Throwable t) {
                     log.error("Error :" + t.getMessage(), t);
+                } finally {
+                    if (connectionCallback != null) {
+                        connectionCallback.onPublisherBoltDisconnect();
+                    }
                 }
             }
 

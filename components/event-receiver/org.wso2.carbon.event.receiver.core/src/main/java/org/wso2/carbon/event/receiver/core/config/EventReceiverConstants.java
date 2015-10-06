@@ -127,5 +127,6 @@ public final class EventReceiverConstants {
 
     }
 
+    public static final String HTTP_RECEIVER_ENDPOINT_PREFIX = "endpoints";
 
 }

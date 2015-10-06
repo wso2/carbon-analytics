@@ -46,7 +46,11 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -81,7 +85,8 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
             try {
                 processDeployment(deploymentFileData);
             } catch (Throwable e) {
-                throw new DeploymentException("Event publisher file " + deploymentFileData.getName() + " is not deployed ", e);
+                log.error("Cannot deploy event receiver : " + deploymentFileData.getName(), e);
+                throw new DeploymentException("Event receiver file " + deploymentFileData.getName() + " is not deployed ", e);
             }
         } else {
             deployedEventReceiverFilePaths.remove(path);
@@ -107,7 +112,7 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
             log.error(errorMessage, e);
             throw new DeploymentException(errorMessage, e);
         } catch (Exception e) {
-            String errorMessage = "Error parsing configuration syntax : " + ebConfigFile.getName();
+            String errorMessage = "Error parsing configuration syntax: " + ebConfigFile.getName();
             log.error(errorMessage, e);
             throw new DeploymentException(errorMessage, e);
         } finally {
@@ -141,6 +146,7 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
             try {
                 processUndeployment(filePath);
             } catch (Throwable e) {
+                log.error("Cannot undeploy event receiver : " + new File(filePath).getName(), e);
                 throw new DeploymentException("Event receiver file " + new File(filePath).getName() + " is not undeployed properly", e);
             }
         } else {
@@ -197,37 +203,41 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
                         carbonEventReceiverService.addEventReceiverConfiguration(eventReceiverConfiguration);
                         carbonEventReceiverService.addEventReceiverConfigurationFile(createEventReceiverConfigurationFile(eventReceiverName,
                                 deploymentFileData.getFile(), EventReceiverConfigurationFile.Status.DEPLOYED, tenantId, null, null), tenantId);
-                        log.info("Event Receiver configuration successfully deployed and in active state : " + eventReceiverName);
+                        log.info("Event Receiver configuration successfully deployed and in active state: " + eventReceiverName);
                     } else {
                         throw new EventReceiverConfigurationException("Event Receiver not deployed and in inactive state," +
-                                " since there is a event receiver registered with the same name in this tenant :" + eventReceiverFile.getName());
+                                " since there is a event receiver registered with the same name in this tenant:" + eventReceiverFile.getName());
                     }
                 } else {
                     throw new EventReceiverConfigurationException("Event Receiver not deployed and in inactive state, " +
                             "since it does not contain a proper mapping type : " + eventReceiverFile.getName());
                 }
             } catch (EventReceiverConfigurationException e) {
-                log.error("Error, Event Receiver not deployed and in inactive state, " + e.getMessage(), e);
-                carbonEventReceiverService.addEventReceiverConfigurationFile(createEventReceiverConfigurationFile(eventReceiverName, deploymentFileData.getFile(),
-                        EventReceiverConfigurationFile.Status.ERROR, tenantId, "Exception when deploying event receiver configuration file:\n" + e.getMessage(), null), tenantId);
+                if (isEditable) {
+                    log.error("Error, Event Receiver not deployed and in inactive state, " + e.getMessage(), e);
+                    carbonEventReceiverService.addEventReceiverConfigurationFile(createEventReceiverConfigurationFile(eventReceiverName, deploymentFileData.getFile(),
+                            EventReceiverConfigurationFile.Status.ERROR, tenantId, "Exception when deploying event receiver configuration file: " + e.getMessage(), null), tenantId);
+                }
                 throw new EventReceiverConfigurationException(e.getMessage(), e);
             } catch (EventReceiverValidationException e) {
                 carbonEventReceiverService.addEventReceiverConfigurationFile(createEventReceiverConfigurationFile(eventReceiverName, deploymentFileData.getFile(),
                         EventReceiverConfigurationFile.Status.WAITING_FOR_DEPENDENCY, tenantId, e.getMessage(), e.getDependency()), tenantId);
-                log.info("Event receiver deployment held back and in inactive state :" + eventReceiverFile.getName() + ", waiting for Input Event Adapter dependency :" + e.getDependency());
+                log.info("Event receiver deployment held back and in inactive state: " + eventReceiverFile.getName() + ", waiting for Input Event Adapter dependency: " + e.getDependency());
             } catch (EventReceiverStreamValidationException e) {
                 carbonEventReceiverService.addEventReceiverConfigurationFile(createEventReceiverConfigurationFile(eventReceiverName, deploymentFileData.getFile(),
                         EventReceiverConfigurationFile.Status.WAITING_FOR_STREAM_DEPENDENCY, tenantId, e.getMessage(), e.getDependency()), tenantId);
-                log.info("Event receiver deployment held back and in inactive state :" + eventReceiverFile.getName() + ", Stream validation exception :" + e.getMessage());
+                log.info("Event receiver deployment held back and in inactive state: " + eventReceiverFile.getName() + ", Stream validation exception: " + e.getMessage());
 
             } catch (Throwable e) {
-                log.error("Event Receiver not deployed, invalid configuration found at " + eventReceiverFile.getName() + ", and in inactive state, " + e.getMessage(), e);
-                carbonEventReceiverService.addEventReceiverConfigurationFile(createEventReceiverConfigurationFile(eventReceiverName, deploymentFileData.getFile(),
-                        EventReceiverConfigurationFile.Status.ERROR, tenantId, "Deployment exception: " + e.getMessage(), null), tenantId);
+                if (isEditable) {
+                    log.error("Event Receiver not deployed, invalid configuration found at " + eventReceiverFile.getName() + ", and in inactive state, " + e.getMessage(), e);
+                    carbonEventReceiverService.addEventReceiverConfigurationFile(createEventReceiverConfigurationFile(eventReceiverName, deploymentFileData.getFile(),
+                            EventReceiverConfigurationFile.Status.ERROR, tenantId, "Deployment exception: " + e.getMessage(), null), tenantId);
+                }
                 throw new EventReceiverConfigurationException(e);
             }
         } else {
-            log.info("Event Receiver " + eventReceiverFile.getName() + " is already registered with this tenant (" + tenantId + "), hence ignoring redeployment");
+            throw new EventReceiverConfigurationException("Event Receiver " + eventReceiverFile.getName() + " is already registered with this tenant (" + tenantId + ")");
         }
     }
 
@@ -252,7 +262,7 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
 
     public void processUndeployment(String filePath) throws EventReceiverConfigurationException {
         String fileName = new File(filePath).getName();
-        log.info("Event Receiver undeployed successfully : " + fileName);
+        log.info("Event Receiver undeployed successfully: " + fileName);
         CarbonEventReceiverService carbonEventReceiverService = EventReceiverServiceValueHolder.getCarbonEventReceiverService();
         carbonEventReceiverService.removeEventReceiverConfigurationFile(fileName);
     }
@@ -262,7 +272,7 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
         try {
             processDeployment(deploymentFileData);
         } catch (DeploymentException e) {
-            throw new EventReceiverConfigurationException("Error while attempting manual deployment :" + e.getMessage(), e);
+            throw new EventReceiverConfigurationException("Error while attempting manual deployment: " + e.getMessage(), e);
         }
     }
 

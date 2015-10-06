@@ -150,6 +150,8 @@ public class WSO2EventInputMapper implements InputMapper {
             if (importedStreamDefinition.getPayloadData() != null ? !importedStreamDefinition.getPayloadData().equals(exportedStreamDefinition.getPayloadData()) : exportedStreamDefinition.getPayloadData() != null) {
                 throw new EventReceiverStreamValidationException("Input stream definition : " + importedStreamDefinition + " not matching with output stream definition : " + exportedStreamDefinition + " to create pass-through link ", importedStreamDefinition.getStreamId());
             }
+        } else {
+            throw new EventReceiverStreamValidationException("Error while retrieving stream definition : " + fromStreamName + ":" + fromStreamVersion);
         }
     }
 

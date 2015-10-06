@@ -45,7 +45,7 @@ public class TCPEventTestServer {
         streamDefinition1.attribute("att5", Attribute.Type.BOOL);
 
 
-        TCPEventServer eventServer = new TCPEventServer(new TCPEventServerConfig(7612), new StreamCallback() {
+        TCPEventServer eventServer = new TCPEventServer(new TCPEventServerConfig("0.0.0.0", 7612), new StreamCallback() {
 
             public int count;
             public long start=System.currentTimeMillis();
@@ -72,7 +72,7 @@ public class TCPEventTestServer {
 //                    e.printStackTrace();
 //                }
             }
-        });
+        }, null);
 
         eventServer.addStreamDefinition(streamDefinition);
         eventServer.addStreamDefinition(streamDefinition1);

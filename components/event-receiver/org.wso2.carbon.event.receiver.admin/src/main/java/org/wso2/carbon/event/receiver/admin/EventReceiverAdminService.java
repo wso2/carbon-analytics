@@ -134,7 +134,8 @@ public class EventReceiverAdminService extends AbstractAdmin {
                     EventReceiverConfigurationFileDto[eventReceiverConfigurationFileList.size()];
 
             for (int index = 0; index < eventReceiverFileDtoArray.length; index++) {
-                EventReceiverConfigurationFile eventReceiverConfigurationFile = eventReceiverConfigurationFileList.get(index);
+                EventReceiverConfigurationFile eventReceiverConfigurationFile = eventReceiverConfigurationFileList.get(
+                        index);
                 String fileName = eventReceiverConfigurationFile.getFileName();
                 String eventReceiverName = eventReceiverConfigurationFile.getEventReceiverName();
                 String statusMsg = eventReceiverConfigurationFile.getDeploymentStatusMessage();
@@ -162,7 +163,8 @@ public class EventReceiverAdminService extends AbstractAdmin {
 
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
 
-        EventReceiverConfiguration eventReceiverConfiguration = eventReceiverService.getActiveEventReceiverConfiguration(eventReceiverName);
+        EventReceiverConfiguration eventReceiverConfiguration = eventReceiverService.getActiveEventReceiverConfiguration(
+                eventReceiverName);
         if (eventReceiverConfiguration != null) {
             EventReceiverConfigurationDto eventReceiverConfigurationDto = new EventReceiverConfigurationDto();
             eventReceiverConfigurationDto.setEventReceiverName(eventReceiverConfiguration.getEventReceiverName());
@@ -219,6 +221,12 @@ public class EventReceiverAdminService extends AbstractAdmin {
                     eventReceiverConfigurationDto.setMetaMappingPropertyDtos(metaMappingPropertyDtos.toArray(new EventMappingPropertyDto[metaMappingPropertyDtos.size()]));
                     eventReceiverConfigurationDto.setCorrelationMappingPropertyDtos(correlationMappingPropertyDtos.toArray(new EventMappingPropertyDto[correlationMappingPropertyDtos.size()]));
                     eventReceiverConfigurationDto.setMappingPropertyDtos(payloadMappingPropertyDtos.toArray(new EventMappingPropertyDto[payloadMappingPropertyDtos.size()]));
+
+                    //Get fromStreamNameWithVersion for WSO2Event type custom mapping
+                    WSO2EventInputMapping wso2EventInputMapping = (WSO2EventInputMapping) inputMapping;
+                    String fromStreamNameWithVersion = wso2EventInputMapping.getFromEventName() + ":" + wso2EventInputMapping.getFromEventVersion();
+                    eventReceiverConfigurationDto.setFromStreamNameWithVersion(fromStreamNameWithVersion);
+
                 } else if (inputMapping.getMappingType().equalsIgnoreCase(EventReceiverConstants.ER_XML_MAPPING_TYPE)) {
 
                     List<EventMappingPropertyDto> xPathDefinitions = new ArrayList<EventMappingPropertyDto>();
@@ -735,5 +743,52 @@ public class EventReceiverAdminService extends AbstractAdmin {
         eventReceiverConfiguration.setFromAdapterConfiguration(inputEventAdapterConfiguration);
     }
 
+    public boolean isReceiverEditable(String eventReceiverName) {
+        EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
+        List<EventReceiverConfiguration> eventReceiverConfigurationList = null;
+        boolean isEditable = false;
+        eventReceiverConfigurationList = eventReceiverService.getAllActiveEventReceiverConfigurations();
+        Iterator eventReceiverConfigurationIterator = eventReceiverConfigurationList.iterator();
+        while (eventReceiverConfigurationIterator.hasNext()) {
+            EventReceiverConfiguration eventReceiverConfiguration =
+                    (EventReceiverConfiguration) eventReceiverConfigurationIterator.next();
+            if (eventReceiverConfiguration.getEventReceiverName().equalsIgnoreCase(eventReceiverName)) {
+                isEditable = eventReceiverConfiguration.isEditable();
+            }
+        }
+        return isEditable;
+    }
+
+    public boolean isReceiverStatisticsEnabled(String eventReceiverName) {
+        EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
+        List<EventReceiverConfiguration> eventReceiverConfigurationList = null;
+        boolean isStatisticsEnabled = false;
+        eventReceiverConfigurationList = eventReceiverService.getAllActiveEventReceiverConfigurations();
+        Iterator eventReceiverConfigurationIterator = eventReceiverConfigurationList.iterator();
+        while (eventReceiverConfigurationIterator.hasNext()) {
+            EventReceiverConfiguration eventReceiverConfiguration =
+                    (EventReceiverConfiguration) eventReceiverConfigurationIterator.next();
+            if (eventReceiverConfiguration.getEventReceiverName().equalsIgnoreCase(eventReceiverName)) {
+                isStatisticsEnabled = eventReceiverConfiguration.isStatisticsEnabled();
+            }
+        }
+        return isStatisticsEnabled;
+    }
+
+    public boolean isReceiverTraceEnabled(String eventReceiverName) {
+        EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
+        List<EventReceiverConfiguration> eventReceiverConfigurationList = null;
+        boolean isTraceEnabled = false;
+        eventReceiverConfigurationList = eventReceiverService.getAllActiveEventReceiverConfigurations();
+        Iterator eventReceiverConfigurationIterator = eventReceiverConfigurationList.iterator();
+        while (eventReceiverConfigurationIterator.hasNext()) {
+            EventReceiverConfiguration eventReceiverConfiguration =
+                    (EventReceiverConfiguration) eventReceiverConfigurationIterator.next();
+            if (eventReceiverConfiguration.getEventReceiverName().equalsIgnoreCase(eventReceiverName)) {
+                isTraceEnabled = eventReceiverConfiguration.isTraceEnabled();
+            }
+        }
+        return isTraceEnabled;
+    }
 
 }

@@ -22,12 +22,27 @@ import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
 import org.wso2.carbon.event.receiver.core.config.InputMapping;
 import org.wso2.carbon.event.receiver.core.config.InputMappingAttribute;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
+import org.wso2.siddhi.core.event.Event;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EventReceiverUtil {
+
+    private static final String JVM_BIT_ARCH_SYSTEM_PROPERTY = "sun.arch.data.model";
+    private static int referenceSize;
+
+    static {
+        String arch = System.getProperty(JVM_BIT_ARCH_SYSTEM_PROPERTY);
+        if (arch.equals("32")){
+            //32-bit architecture
+            referenceSize = 4;
+        }else {
+            referenceSize = 8;
+        }
+    }
 
     public static Object getConvertedAttributeObject(String value, AttributeType type) {
         switch (type) {
@@ -221,4 +236,47 @@ public class EventReceiverUtil {
 
         return -1;
     }
+
+    public static int getSize(Event event){
+        int size = 8; // For long timestamp field
+        size += getSize(event.getData());
+        size += 1; // for expired field
+        return size;
+    }
+
+    private static int getSize(Object[] objects){
+        int size = 0;
+        for (Object object : objects){
+            if (object != null) {
+                if (object instanceof Integer) {
+                    size += 4;
+                } else if (object instanceof Long) {
+                    size += 8;
+                } else if (object instanceof Boolean) {
+                    size += 1;
+                } else if (object instanceof Double) {
+                    size += 8;
+                } else if (object instanceof Float) {
+                    size += 4;
+                } else if (object instanceof String) {
+                    size += getSize(object.toString());
+                }
+            }
+        }
+        size += referenceSize * objects.length; // for the object reference holders
+        return size;
+    }
+
+    public static int getSize(String value){
+        int size = 0;
+        if (value != null) {
+            try {
+                size = value.getBytes("UTF8").length;
+            } catch (UnsupportedEncodingException e) {
+                size = value.getBytes().length;
+            }
+        }
+        return size;
+    }
+
 }

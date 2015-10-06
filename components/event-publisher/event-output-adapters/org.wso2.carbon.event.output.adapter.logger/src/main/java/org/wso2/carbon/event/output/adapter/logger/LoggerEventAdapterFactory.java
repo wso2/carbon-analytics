@@ -24,6 +24,9 @@ import org.wso2.carbon.event.output.adapter.logger.internal.util.LoggerEventAdap
 
 import java.util.*;
 
+/**
+ * The logger event adapter factory class to create a logger output adapter
+ */
 public class LoggerEventAdapterFactory extends OutputEventAdapterFactory {
     private ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.logger.i18n.Resources", Locale.getDefault());
 

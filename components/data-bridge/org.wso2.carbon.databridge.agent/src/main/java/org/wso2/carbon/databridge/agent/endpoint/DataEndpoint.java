@@ -50,7 +50,7 @@ public abstract class DataEndpoint {
 
     private int batchSize;
 
-    private ThreadPoolExecutor threadPoolExecutor;
+    private EventPublisherThreadPoolExecutor threadPoolExecutor;
 
     private DataEndpointFailureCallback dataEndpointFailureCallback;
 
@@ -75,40 +75,19 @@ public abstract class DataEndpoint {
     void collectAndSend(Event event) {
         events.add(event);
         if (events.size() >= batchSize) {
-            int currentNoOfThreads = threadPoolExecutor.getActiveCount();
-            if (currentNoOfThreads < this.maxPoolSize) {
-                if (currentNoOfThreads >= this.maxPoolSize - 1) {
-                    this.setState(State.BUSY);
-                } else {
-                    this.setState(State.BUSY);
-                }
-                threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
-                events = new ArrayList<>();
-            } else {
-                this.setState(State.BUSY);
-            }
+            threadPoolExecutor.submitJobAndSetState(new Thread(new EventPublisher(events)), this);
+            events = new ArrayList<>();
         }
     }
 
     void flushEvents() {
         if (events.size() != 0) {
-            int currentNoOfThreads = threadPoolExecutor.getActiveCount();
-            if (currentNoOfThreads >= maxPoolSize - 1) {
-                this.setState(State.BUSY);
-            } else {
-                this.setState(State.ACTIVE);
-            }
-            threadPoolExecutor.submit(new Thread(new EventPublisher(events)));
+            threadPoolExecutor.submitJobAndSetState(new Thread(new EventPublisher(events)), this);
             events = new ArrayList<>();
-            if (log.isDebugEnabled()) {
-                log.debug("Flush events from thread  name: " + Thread.currentThread().getName() + " , thread id : "
-                        + Thread.currentThread().getId());
-            }
-
         }
     }
 
-    private void setState(State state) {
+    void setState(State state) {
         if (!this.state.equals(state)) {
             this.state = state;
         }
@@ -124,6 +103,16 @@ public abstract class DataEndpoint {
         }
     }
 
+    synchronized void syncConnect(String oldSessionId) throws DataEndpointException {
+        if (oldSessionId == null || oldSessionId.equalsIgnoreCase(getDataEndpointConfiguration().getSessionId())) {
+            if (connectionWorker != null) {
+                connectionWorker.run();
+            } else {
+                throw new DataEndpointException("Data Endpoint is not initialized");
+            }
+        }
+    }
+
     public void initialize(DataEndpointConfiguration dataEndpointConfiguration)
             throws DataEndpointException, DataEndpointAuthenticationException,
             TransportException {
@@ -131,10 +120,9 @@ public abstract class DataEndpoint {
         this.batchSize = dataEndpointConfiguration.getBatchSize();
         this.connectionWorker = new DataEndpointConnectionWorker();
         this.connectionWorker.initialize(this, dataEndpointConfiguration);
-        this.threadPoolExecutor = new ThreadPoolExecutor(dataEndpointConfiguration.getCorePoolSize(),
+        this.threadPoolExecutor = new EventPublisherThreadPoolExecutor(dataEndpointConfiguration.getCorePoolSize(),
                 dataEndpointConfiguration.getMaxPoolSize(), dataEndpointConfiguration.getKeepAliveTimeInPool(),
-                TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
-                new DataBridgeThreadFactory(dataEndpointConfiguration.getReceiverURL()));
+                dataEndpointConfiguration.getReceiverURL());
         this.connectionService = Executors.newSingleThreadExecutor(new DataBridgeThreadFactory("ConnectionService-" +
                 dataEndpointConfiguration.getReceiverURL()));
         this.maxPoolSize = dataEndpointConfiguration.getCorePoolSize();
@@ -207,12 +195,18 @@ public abstract class DataEndpoint {
             transportPool.returnObject(getDataEndpointConfiguration().getPublisherKey(), client);
         } catch (Exception e) {
             log.warn("Error occurred while returning object to connection pool", e);
-            discardClient();
+            discardClient(client);
         }
     }
 
-    private void discardClient() {
-        transportPool.clear(getDataEndpointConfiguration().getPublisherKey());
+    private void discardClient(Object client) {
+        if (client != null) {
+            try {
+                transportPool.invalidateObject(getDataEndpointConfiguration().getPublisherKey(), client);
+            } catch (Exception e) {
+                log.error("Error while invalidating the client ", e);
+            }
+        }
     }
 
     void registerDataEndpointFailureCallback(DataEndpointFailureCallback callback) {
@@ -231,11 +225,14 @@ public abstract class DataEndpoint {
 
         @Override
         public void run() {
+            String sessionId = getDataEndpointConfiguration().getSessionId();
             try {
                 publish();
             } catch (SessionTimeoutException e) {
                 try {
-                    connect();
+                    if (sessionId == null || sessionId.equalsIgnoreCase(getDataEndpointConfiguration().getSessionId())) {
+                        syncConnect(sessionId);
+                    }
                     publish();
                 } catch (UndefinedEventTypeException ex) {
                     log.error("Unable to process this event.", ex);
@@ -252,6 +249,11 @@ public abstract class DataEndpoint {
                 log.error("Unexpected error occurred while sending the event. ", ex);
                 handleFailedEvents();
             } finally {
+                //If any processing error occurred the state will be changed to unavailable,
+                // Hence the state switch should be happening only in busy state where the publishing was success.
+                if (state.equals(State.BUSY)) {
+                    activate();
+                }
                 if (log.isDebugEnabled()) {
                     log.debug("Current threads count is : " + threadPoolExecutor.getActiveCount() + ", maxPoolSize is : " +
                             maxPoolSize + ", therefore state is now : " + getState() + "at time : " + System.nanoTime());
@@ -270,9 +272,6 @@ public abstract class DataEndpoint {
             Object client = getClient();
             send(client, this.events);
             returnClient(client);
-            if (threadPoolExecutor.getActiveCount() <= maxPoolSize) {
-                activate();
-            }
         }
     }
 

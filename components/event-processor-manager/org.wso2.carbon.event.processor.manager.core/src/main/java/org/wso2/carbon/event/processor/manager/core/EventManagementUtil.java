@@ -16,6 +16,7 @@
 package org.wso2.carbon.event.processor.manager.core;
 
 import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.event.processor.manager.core.internal.util.ConfigurationConstants;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import java.util.ArrayList;
@@ -30,17 +31,21 @@ public class EventManagementUtil {
         return tenantId + "/" + type + "/" + name;
     }
 
-    public static StreamDefinition constructStreamDefinition(String syncId, org.wso2.carbon.databridge.commons.StreamDefinition inStreamDefinition){
+    public static StreamDefinition constructStreamDefinition(String syncId, org.wso2.carbon.databridge.commons.StreamDefinition inStreamDefinition) {
 
         org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition = new org.wso2.siddhi.query.api.definition.StreamDefinition();
         streamDefinition.setId(syncId);
 
         List<Attribute> attributes = new ArrayList<Attribute>();
         if (inStreamDefinition.getMetaData() != null) {
-            attributes.addAll(inStreamDefinition.getMetaData());
+            for (Attribute attr : inStreamDefinition.getMetaData()) {
+                attributes.add(new Attribute(ConfigurationConstants.PROPERTY_META_PREFIX + attr.getName(), attr.getType()));
+            }
         }
         if (inStreamDefinition.getCorrelationData() != null) {
-            attributes.addAll(inStreamDefinition.getCorrelationData());
+            for (Attribute attr : inStreamDefinition.getCorrelationData()) {
+                attributes.add(new Attribute(ConfigurationConstants.PROPERTY_CORRELATION_PREFIX + attr.getName(), attr.getType()));
+            }
         }
         if (inStreamDefinition.getPayloadData() != null) {
             attributes.addAll(inStreamDefinition.getPayloadData());

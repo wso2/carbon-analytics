@@ -98,7 +98,7 @@ public final class KafkaEventAdapter implements InputEventAdapter {
             if (optionalConfigs != null) {
                 String[] optionalProperties = optionalConfigs.split(",");
 
-                if (optionalProperties != null && optionalProperties.length > 0) {
+                if (optionalProperties != null) {
                     for (String header : optionalProperties) {
                         String[] configPropertyWithValue = header.split(":", 2);
                         if (configPropertyWithValue.length == 2) {

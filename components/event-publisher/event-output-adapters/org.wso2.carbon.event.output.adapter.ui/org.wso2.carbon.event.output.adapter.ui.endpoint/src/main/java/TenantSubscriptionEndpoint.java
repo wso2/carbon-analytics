@@ -52,11 +52,14 @@ public class TenantSubscriptionEndpoint extends SubscriptionEndpoint {
         if (log.isDebugEnabled()) {
             log.debug("WebSocket opened, for Session id: "+session.getId()+", for the Stream:"+streamName);
         }
-        PrivilegedCarbonContext.startTenantFlow();
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tdomain,true);
-        PrivilegedCarbonContext.startTenantFlow();
-        uiOutputCallbackControllerService.subscribeWebsocket(streamName, version, session);
-        PrivilegedCarbonContext.endTenantFlow();
+
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tdomain, true);
+            uiOutputCallbackControllerService.subscribeWebsocket(streamName, version, session);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
     }
 
     /**
@@ -84,11 +87,14 @@ public class TenantSubscriptionEndpoint extends SubscriptionEndpoint {
     @OnClose
     public void onClose (Session session, CloseReason reason, @PathParam("streamname") String streamName,
             @PathParam("version") String version, @PathParam("tdomain") String tdomain) {
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        carbonContext.startTenantFlow();
-        carbonContext.setTenantDomain(tdomain,true);
-        super.onClose(session, reason, streamName, version);
-        carbonContext.endTenantFlow();
+
+        try {
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tdomain,true);
+            super.onClose(session, reason, streamName, version);
+        } finally {
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().endTenantFlow();
+        }
     }
 
     /**
@@ -102,10 +108,13 @@ public class TenantSubscriptionEndpoint extends SubscriptionEndpoint {
     @OnError
     public void onError (Session session, Throwable throwable, @PathParam("streamname") String streamName,
             @PathParam("version") String version, @PathParam("tdomain") String tdomain) {
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        carbonContext.startTenantFlow();
-        carbonContext.setTenantDomain(tdomain,true);
-        super.onError(session, throwable, streamName,version);
-        carbonContext.endTenantFlow();
+
+        try {
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tdomain, true);
+            super.onError(session, throwable, streamName, version);
+        } finally {
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().endTenantFlow();
+        }
     }
 }

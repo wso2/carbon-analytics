@@ -22,9 +22,12 @@ import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSSLTransportFactory;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
+import org.wso2.carbon.databridge.agent.AgentHolder;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointSecurityException;
 import org.wso2.carbon.databridge.agent.client.AbstractSecureClientPoolFactory;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
+import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEventTransmissionService;
 
 
@@ -45,11 +48,13 @@ public class ThriftSecureClientPoolFactory extends AbstractSecureClientPoolFacto
 
     @Override
     public Object createClient(String protocol, String hostName, int port) throws
-            DataEndpointSecurityException {
+            DataEndpointSecurityException, DataEndpointAgentConfigurationException {
         if (protocol.equalsIgnoreCase(DataEndpointConfiguration.Protocol.SSL.toString())) {
+            int timeout = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.THRIFT_DATA_AGENT_TYPE).
+                    getAgentConfiguration().getSocketTimeoutMS();
             try {
                 TTransport receiverTransport = TSSLTransportFactory.
-                        getClientSocket(hostName, port, 0, params);
+                        getClientSocket(hostName, port, timeout, params );
                 TProtocol tProtocol = new TBinaryProtocol(receiverTransport);
                 return new ThriftSecureEventTransmissionService.Client(tProtocol);
             } catch (TTransportException e) {

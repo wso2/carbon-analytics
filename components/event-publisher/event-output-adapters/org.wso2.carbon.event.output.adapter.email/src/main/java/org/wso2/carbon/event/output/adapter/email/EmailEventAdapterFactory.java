@@ -24,6 +24,9 @@ import org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapte
 
 import java.util.*;
 
+/**
+ * The email event adapter factory class to create an email output adapter
+ */
 public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
     private ResourceBundle resourceBundle =
             ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.email.i18n.Resources", Locale.getDefault());

@@ -24,6 +24,9 @@ import org.wso2.carbon.event.output.adapter.sms.internal.util.SMSEventAdapterCon
 
 import java.util.*;
 
+/**
+ * The sms event adapter factory class to create a sms output adapter
+ */
 public class SMSEventAdapterFactory extends OutputEventAdapterFactory {
     private ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.sms.i18n.Resources", Locale.getDefault());
 

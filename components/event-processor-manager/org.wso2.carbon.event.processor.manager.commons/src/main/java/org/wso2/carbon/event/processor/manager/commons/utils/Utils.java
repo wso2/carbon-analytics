@@ -44,20 +44,39 @@ public class Utils {
         }
     }
 
-    public static boolean isPortUsed(final int portNumber){
+    public static boolean isPortUsed(final int portNumber, final String host) {
         boolean isPortUsed;
-        ServerSocket socket = null;
+        ServerSocket serverSocket = null;
         try {
-            socket = new ServerSocket(portNumber);
+            InetAddress inetAddress = InetAddress.getByName(host);
+            serverSocket = new ServerSocket(portNumber, 50, inetAddress);
             isPortUsed = false;
         } catch (IOException ignored) {
-            isPortUsed =  true;
+            isPortUsed = true;
         } finally {
-            if (socket != null){
+            if (serverSocket != null) {
                 try {
-                    socket.close();
+                    serverSocket.close();
                 } catch (IOException e) {
                     isPortUsed = true;
+                }
+            }
+        }
+        if (!isPortUsed) {
+            Socket socket = null;
+            try {
+                socket = new Socket("localhost", portNumber);
+                isPortUsed = true;
+            } catch (IOException ignored) {
+                isPortUsed = false;
+            } finally {
+                if (socket != null) {
+                    try {
+                        socket.close();
+                        isPortUsed = true;
+                    } catch (IOException e) {
+                        isPortUsed = true;
+                    }
                 }
             }
         }

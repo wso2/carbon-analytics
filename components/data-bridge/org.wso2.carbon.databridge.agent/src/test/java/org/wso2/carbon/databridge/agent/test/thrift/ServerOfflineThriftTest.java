@@ -80,7 +80,7 @@ public class ServerOfflineThriftTest {
             DataEndpointException, DataEndpointConfigurationException, SocketException {
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7611",
+        DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":8611",
                 "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));

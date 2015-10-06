@@ -39,12 +39,14 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
     private static ThreadPoolExecutor executorService;
+    private boolean doLogDroppedMessage;
 
     private int tenantId;
 
     public WebsocketLocalEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
+        this.doLogDroppedMessage = true;
     }
 
 
@@ -96,7 +98,7 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
 
     @Override
     public void testConnect() throws TestConnectionNotSupportedException {
-        //Not applicable.
+        throw new TestConnectionNotSupportedException("Test connection is not available");
     }
 
     @Override
@@ -153,6 +155,7 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
             WebsocketLocalOutputCallbackRegisterServiceImpl websocketLocalOutputCallbackRegisterServiceImpl = WebsocketLocalEventAdaptorServiceInternalValueHolder.getWebsocketLocalOutputCallbackRegisterServiceImpl();
             CopyOnWriteArrayList<Session> sessions = websocketLocalOutputCallbackRegisterServiceImpl.getSessions(tenantId, eventAdapterConfiguration.getName());
             if (sessions != null) {
+                doLogDroppedMessage = true;
                 for (Session session : sessions) {
                     synchronized (session) {
                         try {
@@ -162,8 +165,9 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
                         }
                     }
                 }
-            } else {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send as session not available", log, tenantId);
+            } else if(doLogDroppedMessage) {
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "No clients registered", log, tenantId);
+                doLogDroppedMessage = false;
             }
 
         }

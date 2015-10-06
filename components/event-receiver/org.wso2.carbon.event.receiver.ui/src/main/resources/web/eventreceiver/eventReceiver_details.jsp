@@ -1,16 +1,17 @@
 <%--
-  ~ Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
-  ~ use this file except in compliance with the License. You may obtain a copy
-  ~ of the License at
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
   ~
-  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~     http://www.apache.org/licenses/LICENSE-2.0
   ~
-  ~ Unless required by applicable law or agreed to in writing, software distributed
-  ~ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-  ~ CONDITIONS OF ANY KIND, either express or implied.  See the License for the
-  ~ specific language governing permissions and limitations under the License.
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
   --%>
 <%@ page
         import="org.wso2.carbon.event.receiver.stub.EventReceiverAdminServiceStub" %>
@@ -47,10 +48,14 @@
 <link rel="stylesheet" type="text/css" href="../resources/css/registry.css"/>
 
 
-<%
-    EventReceiverAdminServiceStub stub = EventReceiverUIUtils.getEventReceiverAdminService(config, session, request);
-%>
-<script language="javascript">
+    <%
+        EventReceiverAdminServiceStub stub = EventReceiverUIUtils.getEventReceiverAdminService(config, session, request);
+        String eventReceiverName = request.getParameter("eventReceiverName");
+        EventReceiverConfigurationDto eventReceiverConfigurationDto = null;
+        if (eventReceiverName != null) {
+            eventReceiverConfigurationDto = stub.getActiveEventReceiverConfiguration(eventReceiverName);
+    %>
+    <script language="javascript">
 
     function clearTextIn(obj) {
         if (YAHOO.util.Dom.hasClass(obj, 'initE')) {
@@ -71,9 +76,136 @@
     }
 </script>
 
+<script type="text/javascript">
+    function doDelete(eventReceiverName) {
+
+        CARBON.showConfirmationDialog("Are you sure want to delete event receiver:" + eventReceiverName,
+                function () {
+                    new Ajax.Request('../eventreceiver/delete_event_receiver_ajaxprocessor.jsp', {
+                        method: 'POST',
+                        asynchronous: false,
+                        parameters: {
+                            eventReceiverName: eventReceiverName
+                        }, onSuccess: function (msg) {
+                            if ("success" == msg.responseText.trim()) {
+                                CARBON.showInfoDialog("Event receiver successfully deleted.", function () {
+                                    window.location.href = "../eventreceiver/index.jsp?region=region1&item=eventreceiver_menu.jsp";
+                                });
+                            } else {
+                                CARBON.showErrorDialog("Failed to delete event receiver, Exception: " + msg.responseText.trim());
+                            }
+                        }
+                    })
+                }, null, null);
+    }
+
+</script>
+
 
 <div id="middle">
-<h2><fmt:message key="event.receiver.details"/></h2>
+<h2 style="padding-bottom: 7px">
+    <fmt:message key="event.receiver.details"/>
+    <span style="float: right; font-size:75%">
+        <% if (stub.isReceiverEditable(eventReceiverName)) { %>
+            <% if (stub.isReceiverStatisticsEnabled(eventReceiverName)) {%>
+            <div style="display: inline-block">
+                <div id="disableStat<%= eventReceiverName%>">
+                    <a href="#"
+                       onclick="disableReceiverStat('<%= eventReceiverName %>')"
+                       class="icon-link"
+                       style="background-image:url(../admin/images/static-icon.gif);"><fmt:message
+                            key="stat.disable.link"/></a>
+                </div>
+                <div id="enableStat<%= eventReceiverName%>"
+                     style="display:none;">
+                    <a href="#"
+                       onclick="enableReceiverStat('<%= eventReceiverName %>')"
+                       class="icon-link"
+                       style="background-image:url(../admin/images/static-icon-disabled.gif);"><fmt:message
+                            key="stat.enable.link"/></a>
+                </div>
+            </div>
+            <% } else { %>
+            <div style="display: inline-block">
+                <div id="enableStat<%= eventReceiverName%>">
+                    <a href="#"
+                       onclick="enableReceiverStat('<%= eventReceiverName %>')"
+                       class="icon-link"
+                       style="background-image:url(../admin/images/static-icon-disabled.gif);"><fmt:message
+                            key="stat.enable.link"/></a>
+                </div>
+                <div id="disableStat<%= eventReceiverName%>"
+                     style="display:none">
+                    <a href="#"
+                       onclick="disableReceiverStat('<%= eventReceiverName %>')"
+                       class="icon-link"
+                       style="background-image:url(../admin/images/static-icon.gif);"><fmt:message
+                            key="stat.disable.link"/></a>
+                </div>
+            </div>
+            <% }
+                if (stub.isReceiverTraceEnabled(eventReceiverName)) {%>
+            <div style="display: inline-block">
+                <div id="disableTracing<%= eventReceiverName%>">
+                    <a href="#"
+                       onclick="disableReceiverTracing('<%= eventReceiverName %>')"
+                       class="icon-link"
+                       style="background-image:url(../admin/images/trace-icon.gif);"><fmt:message
+                            key="trace.disable.link"/></a>
+                </div>
+                <div id="enableTracing<%= eventReceiverName%>"
+                     style="display:none;">
+                    <a href="#"
+                       onclick="enableReceiverTracing('<%= eventReceiverName %>')"
+                       class="icon-link"
+                       style="background-image:url(../admin/images/trace-icon-disabled.gif);"><fmt:message
+                            key="trace.enable.link"/></a>
+                </div>
+            </div>
+            <% } else { %>
+            <div style="display: inline-block">
+                <div id="enableTracing<%= eventReceiverName%>">
+                    <a href="#"
+                       onclick="enableReceiverTracing('<%= eventReceiverName %>')"
+                       class="icon-link"
+                       style="background-image:url(../admin/images/trace-icon-disabled.gif);"><fmt:message
+                            key="trace.enable.link"/></a>
+                </div>
+                <div id="disableTracing<%= eventReceiverName%>"
+                     style="display:none">
+                    <a href="#"
+                       onclick="disableReceiverTracing('<%= eventReceiverName %>')"
+                       class="icon-link"
+                       style="background-image:url(../admin/images/trace-icon.gif);"><fmt:message
+                            key="trace.disable.link"/></a>
+                </div>
+            </div>
+
+            <% } %>
+
+            <div style="display: inline-block">
+                <a style="background-image: url(../admin/images/delete.gif);"
+                   class="icon-link"
+                   onclick="doDelete('<%=eventReceiverName%>')"><font
+                        color="#4682b4">Delete</font></a>
+            </div>
+            <div style="display: inline-block">
+                <a style="background-image: url(../admin/images/edit.gif);"
+                   class="icon-link"
+                   href="edit_event_receiver_details.jsp?ordinal=1&eventReceiverName=<%=eventReceiverName%>"><font
+                        color="#4682b4">Edit</font></a>
+            </div>
+
+            <% } else { %>
+                <div style="display: inline-block">
+                    <div id="cappArtifact<%= eventReceiverName%>">
+                        <div style="background-image: url(images/capp.gif);" class="icon-nolink-nofloat">
+                            <fmt:message key="capp.artifact.message"/></div>
+                    </div>
+                </div>
+            <% } %>
+    </span>
+</h2>
 
 <div id="workArea">
 
@@ -84,10 +216,6 @@
     <th><fmt:message key="title.event.receiver.details"/></th>
 </tr>
 </thead>
-<% String eventReceiverName = request.getParameter("eventReceiverName");
-    if (eventReceiverName != null) {
-        EventReceiverConfigurationDto eventReceiverConfigurationDto = stub.getActiveEventReceiverConfiguration(eventReceiverName);
-%>
 <tbody>
 <tr>
 <td class="formRaw">
@@ -281,9 +409,10 @@
             </tr>
 
             <%
-                String toStreamProperties[] = eventReceiverConfigurationDto.getToStreamNameWithVersion().split(":");
-                String toEventStreamName = toStreamProperties[0];
-                String toEventStreamVersion = toStreamProperties[1];
+                //get from stream properties for WSO2Event custom mapping
+                String fromStreamProperties[] = eventReceiverConfigurationDto.getFromStreamNameWithVersion().split(":");
+                String fromEventStreamName = fromStreamProperties[0];
+                String fromEventStreamVersion = fromStreamProperties[1];
             %>
 
 
@@ -294,7 +423,7 @@
                 <td>
                     <input type="text" name="outputStreamName" id="outputStreamNameId"
                            class="initE"
-                           value="<%=toEventStreamName%>"
+                           value="<%=fromEventStreamName%>"
                            style="width:75%" disabled="disabled"/>
                 </td>
             </tr>
@@ -305,7 +434,7 @@
                 <td>
                     <input type="text" name="outputStreamVersion" id="outputStreamVersionId"
                            class="initE"
-                           value="<%=toEventStreamVersion%>"
+                           value="<%=fromEventStreamVersion%>"
                            style="width:75%" disabled="disabled"/>
                 </td>
             </tr>
@@ -329,7 +458,7 @@
                         <tbody>
                         <%
                             EventMappingPropertyDto[] metaMappingDto = eventReceiverConfigurationDto.getMetaMappingPropertyDtos();
-                            if(metaMappingDto != null && metaMappingDto.length > 0){
+                            if (metaMappingDto != null && metaMappingDto.length > 0) {
                                 for (EventMappingPropertyDto metaEbProperties : metaMappingDto) {
 
                         %>
@@ -350,7 +479,7 @@
                         %>
                         <%
                             EventMappingPropertyDto[] correlationMappingDto = eventReceiverConfigurationDto.getCorrelationMappingPropertyDtos();
-                            if(correlationMappingDto != null && correlationMappingDto.length > 0){
+                            if (correlationMappingDto != null && correlationMappingDto.length > 0) {
                                 for (EventMappingPropertyDto correlationEbProperties : correlationMappingDto) {
                         %>
                         <tr id="mappingRow">
@@ -370,7 +499,7 @@
                         %>
                         <%
                             EventMappingPropertyDto[] payLoadMappingDto = eventReceiverConfigurationDto.getMappingPropertyDtos();
-                            if(payLoadMappingDto != null && payLoadMappingDto.length > 0){
+                            if (payLoadMappingDto != null && payLoadMappingDto.length > 0) {
                                 for (EventMappingPropertyDto payloadEbProperties : payLoadMappingDto) {
                         %>
                         <tr id="mappingRow">

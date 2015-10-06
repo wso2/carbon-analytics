@@ -22,6 +22,9 @@ import org.wso2.carbon.event.input.adapter.jms.internal.util.JMSEventAdapterCons
 
 import java.util.*;
 
+/**
+ * The jms event adapter factory class to create a jms input adapter
+ */
 public class JMSEventAdapterFactory extends InputEventAdapterFactory {
 
     private ResourceBundle resourceBundle = ResourceBundle.getBundle

@@ -44,7 +44,7 @@ public class TCPEventTestClient {
         streamDefinition1.attribute("att3", Attribute.Type.STRING);
         streamDefinition1.attribute("att4", Attribute.Type.DOUBLE);
         streamDefinition1.attribute("att5", Attribute.Type.BOOL);
-        TCPEventPublisher tcpEventPublisher = new TCPEventPublisher("localhost:7612", false);
+        TCPEventPublisher tcpEventPublisher = new TCPEventPublisher("localhost:7612", false, null);
         tcpEventPublisher.addStreamDefinition(streamDefinition);
         tcpEventPublisher.addStreamDefinition(streamDefinition1);
 
@@ -101,8 +101,6 @@ public class TCPEventTestClient {
 //            } catch (InterruptedException e) {
 //                e.printStackTrace();
                 }
-
-//
             }
         }
     }

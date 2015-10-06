@@ -20,6 +20,7 @@ public class EventReceiverConfigurationDto {
     private String eventReceiverName;
 
     private String toStreamNameWithVersion;
+    private String fromStreamNameWithVersion;
 
     private InputAdapterConfigurationDto fromAdapterConfigurationDto;
 
@@ -47,6 +48,14 @@ public class EventReceiverConfigurationDto {
 
     public void setToStreamNameWithVersion(String toStreamNameWithVersion) {
         this.toStreamNameWithVersion = toStreamNameWithVersion;
+    }
+
+    public String getFromStreamNameWithVersion() {
+        return fromStreamNameWithVersion;
+    }
+
+    public void setFromStreamNameWithVersion(String fromStreamNameWithVersion) {
+        this.fromStreamNameWithVersion = fromStreamNameWithVersion;
     }
 
     public InputAdapterConfigurationDto getFromAdapterConfigurationDto() {

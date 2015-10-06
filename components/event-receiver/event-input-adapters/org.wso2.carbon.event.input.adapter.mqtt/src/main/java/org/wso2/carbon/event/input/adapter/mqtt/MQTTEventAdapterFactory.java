@@ -22,6 +22,9 @@ import org.wso2.carbon.event.input.adapter.mqtt.internal.util.MQTTEventAdapterCo
 
 import java.util.*;
 
+/**
+ * The mqtt event adapter factory class to create a mqtt input adapter
+ */
 public class MQTTEventAdapterFactory extends InputEventAdapterFactory {
 
     private ResourceBundle resourceBundle = ResourceBundle.getBundle
@@ -78,6 +81,7 @@ public class MQTTEventAdapterFactory extends InputEventAdapterFactory {
         Property password = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD);
         password.setDisplayName(
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD));
+        password.setSecured(true);
         password.setRequired(false);
         password.setHint(
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD_HINT));

@@ -22,11 +22,13 @@ import org.wso2.carbon.event.output.adapter.core.*;
 import org.wso2.carbon.event.output.adapter.websocket.local.internal.util.WebsocketLocalEventAdapterConstants;
 import org.wso2.carbon.utils.CarbonUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * The websocket-local event adapter factory class to create a websocket-local output adapter
+ */
 public class WebsocketLocalEventAdapterFactory extends OutputEventAdapterFactory {
+    private ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.websocket.local.i18n.Resources", Locale.getDefault());
     private int httpPort;
     private int httpsPort;
     private int portOffset;
@@ -63,7 +65,9 @@ public class WebsocketLocalEventAdapterFactory extends OutputEventAdapterFactory
 
     @Override
     public String getUsageTips() {
-        return WebsocketLocalEventAdapterConstants.ADAPTOR_USAGE_TIPS_PREFIX + httpPort + WebsocketLocalEventAdapterConstants.ADAPTER_USAGE_TIPS_MID + httpsPort + WebsocketLocalEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX;
+        return resourceBundle.getString(WebsocketLocalEventAdapterConstants.ADAPTOR_USAGE_TIPS_PREFIX) + httpPort +
+                resourceBundle.getString(WebsocketLocalEventAdapterConstants.ADAPTER_USAGE_TIPS_MID) + httpsPort +
+                resourceBundle.getString(WebsocketLocalEventAdapterConstants.ADAPTER_USAGE_TIPS_POSTFIX);
     }
 
     @Override

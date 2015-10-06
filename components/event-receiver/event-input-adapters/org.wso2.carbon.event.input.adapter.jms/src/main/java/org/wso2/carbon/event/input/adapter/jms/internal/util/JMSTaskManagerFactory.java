@@ -35,9 +35,10 @@ public class JMSTaskManagerFactory {
     /**
      * Create a ServiceTaskManager for the service passed in and its corresponding JMSConnectionFactory
      *
-     * @param jcf
-     * @param name
-     * @param workerPool
+     * @param jcf           JMS Connection factory definition
+     * @param name          Event adapter name
+     * @param workerPool    Shared thread pool from the Listener
+     * @param svc           JNDI context properties and other general properties
      * @return
      */
     public static JMSTaskManager createTaskManagerForService(JMSConnectionFactory jcf,
@@ -163,6 +164,13 @@ public class JMSTaskManagerFactory {
         return map;
     }
 
+
+    /**
+     * @param key       JMS property
+     * @param svcMap    JNDI context properties and other general property map
+     * @param cfMap     properties defined on the JMS CF
+     * @return JMS property value
+     */
     private static String getRqdStringProperty(String key, Map<String, String> svcMap,
                                                Map<String, String> cfMap) {
 
@@ -176,6 +184,12 @@ public class JMSTaskManagerFactory {
         return value;
     }
 
+    /**
+     * @param key       JMS property
+     * @param svcMap    JNDI context properties and other general property map
+     * @param cfMap     properties defined on the JMS CF
+     * @return JMS property value
+     */
     private static String getOptionalStringProperty(String key, Map<String, String> svcMap,
                                                     Map<String, String> cfMap) {
 
@@ -186,6 +200,12 @@ public class JMSTaskManagerFactory {
         return value;
     }
 
+    /**
+     * @param key       JMS property
+     * @param svcMap    JNDI context properties and other general property map
+     * @param cfMap     properties defined on the JMS CF
+     * @return JMS property value
+     */
     private static Boolean getOptionalBooleanProperty(String key, Map<String, String> svcMap,
                                                       Map<String, String> cfMap) {
 
@@ -200,6 +220,12 @@ public class JMSTaskManagerFactory {
         }
     }
 
+    /**
+     * @param key       JMS property
+     * @param svcMap    JNDI context properties and other general property map
+     * @param cfMap     properties defined on the JMS CF
+     * @return JMS property value
+     */
     private static Integer getOptionalIntProperty(String key, Map<String, String> svcMap,
                                                   Map<String, String> cfMap) {
 
@@ -217,6 +243,12 @@ public class JMSTaskManagerFactory {
         return null;
     }
 
+    /**
+     * @param key       JMS property
+     * @param svcMap    JNDI context properties and other general property map
+     * @param cfMap     properties defined on the JMS CF
+     * @return JMS property value
+     */
     private static Double getOptionalDoubleProperty(String key, Map<String, String> svcMap,
                                                     Map<String, String> cfMap) {
 
@@ -234,6 +266,11 @@ public class JMSTaskManagerFactory {
         return null;
     }
 
+    /**
+     * @param svcMap    JNDI context properties and other general property map
+     * @param cfMap     properties defined on the JMS CF
+     * @return value for the specific transactionality type
+     */
     private static int getTransactionality(Map<String, String> svcMap, Map<String, String> cfMap) {
 
         String key = BaseConstants.PARAM_TRANSACTIONALITY;
@@ -257,6 +294,12 @@ public class JMSTaskManagerFactory {
         }
     }
 
+    /**
+     * Get the destination type
+     * @param svcMap    JNDI context properties and other general property map
+     * @param cfMap     properties defined on the JMS CF
+     * @return int- 1 for queue type and 2 for topic type
+     */
     private static int getDestinationType(Map<String, String> svcMap, Map<String, String> cfMap) {
 
         String key = JMSConstants.PARAM_DEST_TYPE;
@@ -271,6 +314,12 @@ public class JMSTaskManagerFactory {
         return JMSConstants.QUEUE;
     }
 
+    /**
+     * Get the session acknowledge type
+     * @param svcMap    JNDI context properties and other general property map
+     * @param cfMap     properties defined on the JMS CF
+     * @return value for the specific acknowledge type
+     */
     private static int getSessionAck(Map<String, String> svcMap, Map<String, String> cfMap) {
 
         String key = JMSConstants.PARAM_SESSION_ACK;
@@ -296,6 +345,12 @@ public class JMSTaskManagerFactory {
         }
     }
 
+    /**
+     * Get the cache level
+     * @param svcMap    JNDI context properties and other general property map
+     * @param cfMap     properties defined on the JMS CF
+     * @return cache level
+     */
     private static int getCacheLevel(Map<String, String> svcMap, Map<String, String> cfMap) {
 
         String key = JMSConstants.PARAM_CACHE_LEVEL;
@@ -318,6 +373,12 @@ public class JMSTaskManagerFactory {
         return JMSConstants.CACHE_AUTO;
     }
 
+    /**
+     * Get the jms spec version
+     * @param svcMap    JNDI context properties and other general property map
+     * @param cfMap     properties defined on the JMS CF
+     * @return false only if the version if different than 1.1
+     */
     private static boolean getJMSSpecVersion(Map<String, String> svcMap,
                                              Map<String, String> cfMap) {
 

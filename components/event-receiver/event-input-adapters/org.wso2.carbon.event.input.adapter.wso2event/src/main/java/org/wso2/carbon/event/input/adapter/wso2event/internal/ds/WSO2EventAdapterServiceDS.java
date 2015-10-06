@@ -85,7 +85,6 @@ public class WSO2EventAdapterServiceDS {
                         PrivilegedCarbonContext.startTenantFlow();
                         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(credentials.getTenantId());
                         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(credentials.getDomainName());
-
                         for (Event event : events) {
                             ConcurrentHashMap<String, WSO2EventAdapter> adapters = WSO2EventAdapterServiceValueHolder.getAdapterService(credentials.getDomainName(), event.getStreamId());
                             if (adapters != null) {
@@ -100,7 +99,6 @@ public class WSO2EventAdapterServiceDS {
                     } finally {
                         PrivilegedCarbonContext.endTenantFlow();
                     }
-
                 }
             });
         }
