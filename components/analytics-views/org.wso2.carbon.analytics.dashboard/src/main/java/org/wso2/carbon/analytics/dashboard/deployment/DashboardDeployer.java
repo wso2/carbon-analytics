@@ -85,10 +85,6 @@ public class DashboardDeployer implements AppDeploymentHandler {
                 if(!gadgetDir.exists()) {
                     gadgetDir.mkdir();
                 }
-                File layoutDir = new File(path + File.separator + "layout");
-                if(!layoutDir.exists()) {
-                    layoutDir.mkdir();
-                }
                 File widgetDir = new File(path + File.separator + "widget");
                 if(!widgetDir.exists()) {
                     widgetDir.mkdir();
