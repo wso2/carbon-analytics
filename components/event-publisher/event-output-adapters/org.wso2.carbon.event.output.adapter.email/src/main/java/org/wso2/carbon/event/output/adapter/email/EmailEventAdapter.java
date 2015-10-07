@@ -201,18 +201,16 @@ public class EmailEventAdapter implements OutputEventAdapter {
 
 
             //initializing SMTP server to create session object.
-            if (smtpUsername != null && smtpPassword != null) {
-                if (!smtpUsername.isEmpty() && !smtpPassword.isEmpty()) {
-                    session = Session.getInstance(props, new Authenticator() {
-                        public PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication(smtpUsername, smtpPassword);
-                        }
-                    });
-                } else {
-                    session = Session.getInstance(props);
-                }
+            if (smtpUsername != null && smtpPassword != null && !smtpUsername.isEmpty() && !smtpPassword.isEmpty()) {
+                session = Session.getInstance(props, new Authenticator() {
+                    public PasswordAuthentication
+                    getPasswordAuthentication() {
+                        return new PasswordAuthentication(smtpUsername, smtpPassword);
+                    }
+                });
             } else {
                 session = Session.getInstance(props);
+                log.info("Connecting without user authentication");
             }
         }
     }
