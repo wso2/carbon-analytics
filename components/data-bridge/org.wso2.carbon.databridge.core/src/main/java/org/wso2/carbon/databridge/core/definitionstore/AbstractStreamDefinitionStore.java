@@ -15,6 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.databridge.core.definitionstore;
 
 import org.apache.commons.logging.Log;
@@ -86,12 +87,6 @@ public abstract class AbstractStreamDefinitionStore implements StreamDefinitionS
         return false;
     }
 
-    public void invalidateStreamDefinition(String streamName, String streamVersion, int tenantId) {
-        for (StreamAddRemoveListener streamAddRemoveListener : streamAddRemoveListenerList) {
-            streamAddRemoveListener.streamRemoved(tenantId, streamName + ":" + streamVersion);
-        }
-    }
-
     @Override
     public void subscribe(StreamAddRemoveListener streamAddRemoveListener) {
         if (streamAddRemoveListener != null) {
@@ -106,6 +101,11 @@ public abstract class AbstractStreamDefinitionStore implements StreamDefinitionS
         }
     }
 
+    public void invalidateStreamDefinition(String streamName, String streamVersion, int tenantId) {
+        for (StreamAddRemoveListener streamAddRemoveListener : streamAddRemoveListenerList) {
+            streamAddRemoveListener.streamRemoved(tenantId, streamName + ":" + streamVersion);
+        }
+    }
 
     public abstract StreamDefinition getStreamDefinitionFromStore(String name, String version, int tenantId)
             throws StreamDefinitionStoreException;

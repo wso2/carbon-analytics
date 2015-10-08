@@ -42,8 +42,6 @@ public interface StreamDefinitionStore {
 
     public boolean deleteStreamDefinition(String streamName, String streamVersion, int tenantId);
 
-    public void invalidateStreamDefinition(String streamName, String streamVersion, int tenantId);
-
     public void subscribe(StreamAddRemoveListener streamAddRemoveListener);
 
     public void unsubscribe(StreamAddRemoveListener streamAddRemoveListener);

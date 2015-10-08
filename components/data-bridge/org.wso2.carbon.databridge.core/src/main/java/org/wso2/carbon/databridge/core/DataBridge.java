@@ -444,11 +444,6 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         return streamDefinitionStore.deleteStreamDefinition(streamName, streamVersion, tenantId);
     }
 
-    @Override
-    public void invalidateStreamDefinition(String streamName, String streamVersion, int tenantId) {
-        streamDefinitionStore.invalidateStreamDefinition(streamName, streamVersion, tenantId);
-    }
-
     public List<AgentCallback> getSubscribers() {
         return eventDispatcher.getSubscribers();
     }
