@@ -30,22 +30,16 @@
         <property key="questionMark">?</property>
         <property key="equal">=</property>
         <property key="and">AND</property>
-        <property key="selectAllColumnsDataTypeInTable">SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_NAME = '$TABLE_NAME'
-        </property>
+        <property key="selectAllColumnsDataTypeInTable">SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '$TABLE_NAME'</property>
         <property key="selectFromTable">SELECT $COLUMNS FROM $TABLE_NAME</property>
         <property key="oracle.string">varchar2(255)</property>
         <property key="oracle.long">CLOB</property>
         <property key="oracle.double">BINARY_DOUBLE</property>
         <property key="oracle.isTableExist">SELECT * FROM $TABLE_NAME WHERE ROWNUM = 1</property>
-        <property key="oracle.selectAllColumnsDataTypeInTable">SELECT COLUMN_NAME, DATA_TYPE FROM USER_TAB_COLS WHERE
-            TABLE_NAME = '$TABLE_NAME'
-        </property>
+        <property key="oracle.selectAllColumnsDataTypeInTable">SELECT COLUMN_NAME, DATA_TYPE FROM USER_TAB_COLS WHERE TABLE_NAME = '$TABLE_NAME'</property>
         <property key="mssql.string">varchar2(255)</property>
         <property key="mssql.isTableExist">SELECT TOP 1 * FROM $TABLE_NAME</property>
-        <property key="mssql.selectAllColumnsDataTypeInTable">SELECT COLUMN_NAME, DATA_TYPE FROM
-            INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '$TABLE_NAME'
-        </property>
+        <property key="mssql.selectAllColumnsDataTypeInTable">SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '$TABLE_NAME'</property>
         <property key="h2.integer">varchar2(255)</property>
         <property key="h2.long">REAL</property>
         <property key="h2.selectAllColumnsDataTypeInTable">SHOW COLUMNS FROM $TABLE_NAME</property>
@@ -88,9 +82,9 @@
     </adapterConfig>
 
     <adapterConfig type="email">
-        <property key="mail.smtp.from">abcd@gmail.com</property>
         <!-- Comment mail.smtp.user and mail.smtp.password properties to support connecting SMTP servers which use trust
         based authentication rather username/password authentication -->
+        <property key="mail.smtp.from">abcd@gmail.com</property>
         <property key="mail.smtp.user">abcd</property>
         <property key="mail.smtp.password">xxxx</property>
         <property key="mail.smtp.host">smtp.gmail.com</property>
