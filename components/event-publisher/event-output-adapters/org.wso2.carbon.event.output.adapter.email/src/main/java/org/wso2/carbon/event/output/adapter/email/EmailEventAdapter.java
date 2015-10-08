@@ -210,7 +210,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
                 });
             } else {
                 session = Session.getInstance(props);
-                log.info("Connecting without user authentication");
+                log.info("Connecting adapter " + eventAdapterConfiguration.getName() + "without user authentication for tenant " + tenantId);
             }
         }
     }
