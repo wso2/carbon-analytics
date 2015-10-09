@@ -81,10 +81,11 @@ object JDBCRDDCarbonUtils extends Logging {
       }
     } catch {
       case e: SQLException => throw new
-          AnalyticsExecutionException("Error while connecting to datasource " + dataSource , e)
+          AnalyticsExecutionException("Error while connecting to datasource "
+                                      + dataSource + " : " + e.getMessage, e)
       case e: Exception => throw new
           AnalyticsExecutionException("Error while resolving the table " + table +
-                                      " in datasource " + dataSource, e)
+                                      " in datasource " + dataSource + " : " + e.getMessage, e)
     }
 
     throw new RuntimeException("This line is unreachable.")
@@ -205,10 +206,11 @@ object JDBCRDDCarbonUtils extends Logging {
         new Properties)
     } catch {
       case e: SQLException => throw new
-          AnalyticsExecutionException("Error while connecting to datasource " + dataSource , e)
+          AnalyticsExecutionException("Error while connecting to datasource "
+                                      + dataSource + " : " + e.getMessage , e)
       case e: Exception => throw new
           AnalyticsExecutionException("Error while scanning the table " + fqTable +
-                                      " in datasource " + dataSource, e)
+                                      " in datasource " + dataSource + " : " + e.getMessage , e)
     }
     finally {
       conn.close()

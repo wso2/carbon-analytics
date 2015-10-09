@@ -112,7 +112,8 @@ package object carbon {
       }
       catch {
         case e: Exception =>
-          throw new AnalyticsExecutionException ("Error while saving data to the table " + tableName, e)
+          throw new AnalyticsExecutionException ("Error while saving data to the table "
+                                                 + tableName + " : " + e.getMessage , e)
       }
     }
 
