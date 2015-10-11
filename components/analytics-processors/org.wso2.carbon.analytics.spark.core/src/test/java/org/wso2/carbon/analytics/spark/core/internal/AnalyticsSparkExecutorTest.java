@@ -79,22 +79,22 @@ public class AnalyticsSparkExecutorTest {
     public void testCreateTableQuery() throws AnalyticsException {
         System.out.println(testString("start : create temp table test"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
-        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
-        this.service.deleteTable(1, "Log");
-        this.service.createTable(1, "Log");
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log1", 0, 10, -1, -1);
+        this.service.deleteTable(1, "Log1");
+        this.service.createTable(1, "Log1");
         this.service.put(records);
-        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log1 USING CarbonAnalytics " +
                            "OPTIONS" +
-                           "(tableName \"Log\"," +
+                           "(tableName \"Log1\"," +
                            "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, summary STRING\"" +
                            ")");
-        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT ip FROM Log");
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT ip FROM Log1");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
-        result = ex.executeQuery(1, "SELECT * FROM Log");
+        result = ex.executeQuery(1, "SELECT * FROM Log1");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
-        this.service.deleteTable(1, "Log");
+        this.service.deleteTable(1, "Log1");
         System.out.println(testString("end : create temp table test"));
     }
 
@@ -163,7 +163,7 @@ public class AnalyticsSparkExecutorTest {
     public void testMultiTenantQueryExecution() throws AnalyticsException {
         System.out.println(testString("start : multi tenancy test "));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
-        String commonTableName = "log";
+        String commonTableName = "log4";
         List<Record> records1 = AnalyticsRecordStoreTest.generateRecords(-1234, commonTableName, 0, 10, -1, -1);
         List<Record> records2 = AnalyticsRecordStoreTest.generateRecords(2, commonTableName, 0, 2000, -1, -1);
 
@@ -175,52 +175,52 @@ public class AnalyticsSparkExecutorTest {
         this.service.put(records2);
 
         //test supertenant queries
-        ex.executeQuery(-1234, "CREATE TEMPORARY TABLE log USING CarbonAnalytics " +
+        ex.executeQuery(-1234, "CREATE TEMPORARY TABLE log4 USING CarbonAnalytics " +
                                "OPTIONS" +
-                               "(tableName \"log\"," +
-                               "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
+                               "(tableName \"log4\"," +
+                               "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log4 STRING\"" +
                                ")");
-        AnalyticsQueryResult result = ex.executeQuery(-1234, "SELECT * FROM log");
+        AnalyticsQueryResult result = ex.executeQuery(-1234, "SELECT * FROM log4");
         Assert.assertEquals(result.getRows().size(), 10);
 
         //test tenant queries
-        ex.executeQuery(2, "CREATE TEMPORARY TABLE log USING CarbonAnalytics " +
+        ex.executeQuery(2, "CREATE TEMPORARY TABLE log4 USING CarbonAnalytics " +
                            "OPTIONS" +
-                           "(tableName \"log\"," +
-                           "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
+                           "(tableName \"log4\"," +
+                           "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log4 STRING\"" +
                            ")");
-        result = ex.executeQuery(2, "SELECT * FROM log");
+        result = ex.executeQuery(2, "SELECT * FROM log4");
         Assert.assertEquals(result.getRows().size(), 2000);
 
         //test <table>.<column name> queries
-        ex.executeQuery(-1234, "CREATE TEMPORARY TABLE log2 USING CarbonAnalytics " +
+        ex.executeQuery(-1234, "CREATE TEMPORARY TABLE log44 USING CarbonAnalytics " +
                                "OPTIONS" +
-                               "(tableName \"log\"," +
-                               "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
+                               "(tableName \"log4\"," +
+                               "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log4 STRING\"" +
                                ")");
-        result = ex.executeQuery(-1234, "SELECT log.ip FROM log UNION SELECT log2.ip FROM log2");
+        result = ex.executeQuery(-1234, "SELECT log4.ip FROM log4 UNION SELECT log44.ip FROM log44");
         Assert.assertEquals(result.getRows().size(), 1);
 
         //test single letter table queries ex; table name = "t"
         ex.executeQuery(-1234, "CREATE TEMPORARY TABLE t USING CarbonAnalytics " +
                                "OPTIONS" +
-                               "(tableName \"log\"," +
-                               "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
+                               "(tableName \"log4\"," +
+                               "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log4 STRING\"" +
                                ")");
         result = ex.executeQuery(-1234, "SELECT t.ip FROM t");
         Assert.assertEquals(result.getRows().size(), 10);
 
         //test queries with table names and tables alias
-        result = ex.executeQuery(-1234, "select * from ( select * from log ) t1 full outer join " +
-                                        "( select * from log2 ) t2 on t1.ip = t2.ip");
+        result = ex.executeQuery(-1234, "select * from ( select * from log4 ) t1 full outer join " +
+                                        "( select * from log44 ) t2 on t1.ip = t2.ip");
         Assert.assertEquals(result.getRows().size(), 10 * 10);
 
-        this.service.deleteTable(-1234, "log");
-        this.service.deleteTable(-1234, "log2");
+        this.service.deleteTable(-1234, "log4");
+        this.service.deleteTable(-1234, "log44");
         this.service.deleteTable(-1234, "t");
         this.service.deleteTable(-1234, "t1");
         this.service.deleteTable(-1234, "t2");
-        this.service.deleteTable(2, "log");
+        this.service.deleteTable(2, "log4");
         System.out.println(testString("end : multi tenancy test "));
     }
 
@@ -239,25 +239,25 @@ public class AnalyticsSparkExecutorTest {
     public void testCreateTableWithColumnOptions() throws AnalyticsException {
         System.out.println(testString("start : create temp table with column options test"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
-        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
-        this.service.deleteTable(1, "Log");
-        this.service.createTable(1, "Log");
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log5", 0, 10, -1, -1);
+        this.service.deleteTable(1, "Log5");
+        this.service.createTable(1, "Log5");
         this.service.put(records);
-        String query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+        String query = "CREATE TEMPORARY TABLE Log5 USING CarbonAnalytics " +
                        "OPTIONS" +
-                       "(tableName \"Log\"," +
+                       "(tableName \"Log5\"," +
                        "schema \"server_name STRING, ip STRING -i, tenant INTEGER -sp, sequence LONG -i, summary STRING\", " +
                        "primaryKeys \"ip, log\"" +
                        ")";
         ex.executeQuery(1, query);
-        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT ip FROM Log");
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT ip FROM Log5");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
 
 
-        query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+        query = "CREATE TEMPORARY TABLE Log5 USING CarbonAnalytics " +
                 "OPTIONS" +
-                "(tableName \"Log\"," +
+                "(tableName \"Log5\"," +
                 "schema \"server_name STRING -sp, ip STRING, tenant INTEGER, sequence LONG, summary STRING\", " +
                 "primaryKeys \"ip, log\"" +
                 ")";
@@ -270,9 +270,9 @@ public class AnalyticsSparkExecutorTest {
         }
         Assert.assertTrue(success, "Query did not fail!");
 
-        query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+        query = "CREATE TEMPORARY TABLE Log5 USING CarbonAnalytics " +
                 "OPTIONS" +
-                "(tableName \"Log\"," +
+                "(tableName \"Log5\"," +
                 "schema \"server_name STRING -XX, ip STRING, tenant INTEGER, sequence LONG, summary STRING\", " +
                 "primaryKeys \"ip, log\"" +
                 ")";
@@ -285,9 +285,9 @@ public class AnalyticsSparkExecutorTest {
         }
         Assert.assertTrue(success, "Query did not fail!");
 
-        query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+        query = "CREATE TEMPORARY TABLE Log5 USING CarbonAnalytics " +
                 "OPTIONS" +
-                "(tableName \"Log\"," +
+                "(tableName \"Log5\"," +
                 "schema \"server_name STRING -xx xx, ip STRING, tenant INTEGER, sequence LONG, summary STRING\", " +
                 "primaryKeys \"ip, log\"" +
                 ")";
@@ -300,7 +300,7 @@ public class AnalyticsSparkExecutorTest {
         }
         Assert.assertTrue(success, "Query did not fail!");
 
-        this.service.deleteTable(1, "Log");
+        this.service.deleteTable(1, "Log5");
         System.out.println(testString("end : create temp table with column options test"));
     }
 
@@ -308,40 +308,40 @@ public class AnalyticsSparkExecutorTest {
     public void testCreateTableWithMultipleRecordStores() throws AnalyticsException {
         System.out.println(testString("start : create temp table with multiple record stores test"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
-        this.cleanupTable(1, "Log");
+        this.cleanupTable(1, "Log6");
 
         List<String> recordStoreNames = this.service.listRecordStoreNames();
         Assert.assertTrue(recordStoreNames.size() > 1, "Only single data store is available");
 
-        String query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+        String query = "CREATE TEMPORARY TABLE Log6 USING CarbonAnalytics " +
                        "OPTIONS" +
-                       "(tableName \"Log\"," +
+                       "(tableName \"Log6\"," +
                        "schema \"server_name STRING, ip STRING -i, tenant INTEGER -sp, sequence LONG -i, summary STRING\", " +
                        "primaryKeys \"ip, log\"" +
                        ")";
         ex.executeQuery(1, query);
 
-        Assert.assertEquals(this.service.getRecordStoreNameByTable(1, "Log"), "PROCESSED_DATA_STORE",
+        Assert.assertEquals(this.service.getRecordStoreNameByTable(1, "Log6"), "PROCESSED_DATA_STORE",
                             "Table is not created in PROCESSED_DATA_STORE by default");
-        this.cleanupTable(1, "Log");
+        this.cleanupTable(1, "Log6");
 
 
-        query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+        query = "CREATE TEMPORARY TABLE Log6 USING CarbonAnalytics " +
                 "OPTIONS" +
-                "(tableName \"Log\"," +
+                "(tableName \"Log6\"," +
                 "schema \"server_name STRING, ip STRING -i, tenant INTEGER -sp, sequence LONG -i, summary STRING\", " +
                 "recordStore \"EVENT_STORE\", " +
                 "primaryKeys \"ip, log\"" +
                 ")";
         ex.executeQuery(1, query);
 
-        Assert.assertEquals(this.service.getRecordStoreNameByTable(1, "Log"), "EVENT_STORE",
+        Assert.assertEquals(this.service.getRecordStoreNameByTable(1, "Log6"), "EVENT_STORE",
                             "Table is not created in EVENT_STORE");
-        this.cleanupTable(1, "Log");
+        this.cleanupTable(1, "Log6");
 
-        query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+        query = "CREATE TEMPORARY TABLE Log6 USING CarbonAnalytics " +
                 "OPTIONS" +
-                "(tableName \"Log\"," +
+                "(tableName \"Log6\"," +
                 "schema \"server_name STRING, ip STRING -i, tenant INTEGER -sp, sequence LONG -i, summary STRING\", " +
                 "recordStore \"XXX\", " +
                 "primaryKeys \"ip, log\"" +
@@ -354,7 +354,7 @@ public class AnalyticsSparkExecutorTest {
             success = true;
         }
         Assert.assertTrue(success, "Query did not fail!");
-        this.cleanupTable(1, "Log");
+        this.cleanupTable(1, "Log6");
 
         System.out.println(testString("end : create temp table with multiple record stores test"));
     }
@@ -364,12 +364,12 @@ public class AnalyticsSparkExecutorTest {
     public void testTimestampRetrivability() throws AnalyticsException, InterruptedException {
         System.out.println(testString("start : Test Time stamp retrievability"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
-        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
-        this.service.deleteTable(1, "Log");
-        this.service.deleteTable(1, "Log1");
-        this.service.deleteTable(1, "Log2");
-        this.service.deleteTable(1, "Log3");
-        this.service.createTable(1, "Log");
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log7", 0, 10, -1, -1);
+        this.service.deleteTable(1, "Log7");
+        this.service.deleteTable(1, "Log77");
+        this.service.deleteTable(1, "Log777");
+        this.service.deleteTable(1, "Log7777");
+        this.service.createTable(1, "Log7");
         this.service.put(records);
         List<ColumnDefinition> colDefs = new ArrayList<>();
         colDefs.add(new ColumnDefinition("server_name", AnalyticsSchema.ColumnType.STRING));
@@ -378,79 +378,79 @@ public class AnalyticsSparkExecutorTest {
         colDefs.add(new ColumnDefinition("sequence", AnalyticsSchema.ColumnType.LONG));
         colDefs.add(new ColumnDefinition("summary", AnalyticsSchema.ColumnType.STRING));
         AnalyticsSchema schema = new AnalyticsSchema(colDefs, Collections.<String>emptyList());
-        this.service.setTableSchema(1, "Log", schema);
+        this.service.setTableSchema(1, "Log7", schema);
 
-        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log7 USING CarbonAnalytics " +
                            "OPTIONS" +
-                           "(tableName \"Log\"" +
+                           "(tableName \"Log7\"" +
                            ")");
-        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM Log");
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM Log7");
         Assert.assertEquals(result.getRows().size(), 10);
         Assert.assertEquals(result.getColumns().length, 5);
         Assert.assertEquals(Arrays.asList(result.getColumns()).contains("_timestamp"), false);
         System.out.println(result);
 
-        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log7 USING CarbonAnalytics " +
                            "OPTIONS" +
-                           "(tableName \"Log\"," +
+                           "(tableName \"Log7\"," +
                            "schema \"_timestamp LONG, server_name STRING, ip STRING, tenant INTEGER, sequence LONG, summary STRING\"" +
                            ")");
-        result = ex.executeQuery(1, "SELECT _timestamp FROM Log");
+        result = ex.executeQuery(1, "SELECT _timestamp FROM Log7");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
-        result = ex.executeQuery(1, "SELECT * FROM Log");
+        result = ex.executeQuery(1, "SELECT * FROM Log7");
         Assert.assertEquals(result.getRows().size(), 10);
         Assert.assertEquals(result.getColumns().length, 6);
         System.out.println(result);
 
-        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log7 USING CarbonAnalytics " +
                            "OPTIONS" +
-                           "(tableName \"Log\"," +
+                           "(tableName \"Log7\"," +
                            "schema \"server_name STRING, ip STRING, _timestamp LONG, tenant INTEGER, sequence LONG, summary STRING\"" +
                            ")");
-        result = ex.executeQuery(1, "SELECT _timestamp, ip FROM Log");
+        result = ex.executeQuery(1, "SELECT _timestamp, ip FROM Log7");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
-        result = ex.executeQuery(1, "SELECT * FROM Log");
+        result = ex.executeQuery(1, "SELECT * FROM Log7");
         Assert.assertEquals(result.getRows().size(), 10);
         Assert.assertEquals(Arrays.asList(result.getColumns()).contains("_timestamp"), true);
         System.out.println(result);
 
 
-        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log1 USING CarbonAnalytics " +
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log77 USING CarbonAnalytics " +
                            "OPTIONS" +
-                           "(tableName \"Log1\"," +
+                           "(tableName \"Log77\"," +
                            "schema \"server_name STRING, ip STRING\"" +
                            ")");
-        ex.executeQuery(1, "insert into table Log1 SELECT server_name, ip FROM Log limit 5");
-        result = ex.executeQuery(1, "SELECT server_name, ip FROM Log1");
+        ex.executeQuery(1, "insert into table Log77 SELECT server_name, ip FROM Log7 limit 5");
+        result = ex.executeQuery(1, "SELECT server_name, ip FROM Log77");
         Assert.assertEquals(result.getRows().size(), 5);
         System.out.println(result);
 
         Thread.sleep(2000);
-        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log2 USING CarbonAnalytics " +
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log777 USING CarbonAnalytics " +
                            "OPTIONS" +
-                           "(tableName \"Log2\"," +
+                           "(tableName \"Log777\"," +
                            "schema \"ip STRING, _timestamp LONG\"" +
                            ")");
-        ex.executeQuery(1, "insert into table Log2 SELECT ip, _timestamp FROM Log limit 5");
-        result = ex.executeQuery(1, "SELECT ip, _timestamp FROM Log2");
+        ex.executeQuery(1, "insert into table Log777 SELECT ip, _timestamp FROM Log7 limit 5");
+        result = ex.executeQuery(1, "SELECT ip, _timestamp FROM Log777");
         Assert.assertEquals(result.getRows().size(), 5);
         System.out.println(result);
-        Assert.assertEquals(this.service.getTableSchema(1, "Log2").getColumns().size(), 1,
+        Assert.assertEquals(this.service.getTableSchema(1, "Log777").getColumns().size(), 1,
                             "wrong number of columns");
-        System.out.println(this.service.getTableSchema(1, "Log2").getColumns().toString());
+        System.out.println(this.service.getTableSchema(1, "Log777").getColumns().toString());
 
         Thread.sleep(2000);
-        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log3 USING CarbonAnalytics " +
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log7777 USING CarbonAnalytics " +
                            "OPTIONS" +
-                           "(tableName \"Log3\"," +
+                           "(tableName \"Log7777\"," +
                            "schema \"server_name STRING, ip STRING\"" +
                            ")");
-        ex.executeQuery(1, "insert into table Log3 SELECT server_name, ip  FROM Log limit 5");
+        ex.executeQuery(1, "insert into table Log7777 SELECT server_name, ip  FROM Log7 limit 5");
         ex.executeQuery(1, "CREATE TEMPORARY TABLE Log33 USING CarbonAnalytics " +
                            "OPTIONS" +
-                           "(tableName \"Log3\"," +
+                           "(tableName \"Log7777\"," +
                            "schema \"_timestamp LONG, server_name STRING, ip STRING\"" +
                            ")");
         result = ex.executeQuery(1, "SELECT _timestamp FROM Log33");
@@ -460,19 +460,19 @@ public class AnalyticsSparkExecutorTest {
         // create a time difference between the records and the current time
         Thread.sleep(2000);
         String currentTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        result = ex.executeQuery(1, "SELECT * FROM Log where _timestamp < timestamp(\"" + currentTimeString + "\")");
+        result = ex.executeQuery(1, "SELECT * FROM Log7 where _timestamp < timestamp(\"" + currentTimeString + "\")");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
 
         currentTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz").format(new Date());
-        result = ex.executeQuery(1, "SELECT * FROM Log where _timestamp < timestamp('" + currentTimeString + "')");
+        result = ex.executeQuery(1, "SELECT * FROM Log7 where _timestamp < timestamp('" + currentTimeString + "')");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
 
-        this.service.deleteTable(1, "Log");
-        this.service.deleteTable(1, "Log1");
-        this.service.deleteTable(1, "Log2");
-        this.service.deleteTable(1, "Log3");
+        this.service.deleteTable(1, "Log7");
+        this.service.deleteTable(1, "Log77");
+        this.service.deleteTable(1, "Log777");
+        this.service.deleteTable(1, "Log7777");
         System.out.println(testString("end : test Time stamp retrievability"));
     }
 
@@ -480,21 +480,21 @@ public class AnalyticsSparkExecutorTest {
     public void testFaultyTimestampUDFException() throws AnalyticsException, InterruptedException {
         System.out.println(testString("start : Faulty Timestamp exception test"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
-        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
-        this.service.deleteTable(1, "Log");
-        this.service.createTable(1, "Log");
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log8", 0, 10, -1, -1);
+        this.service.deleteTable(1, "Log8");
+        this.service.createTable(1, "Log8");
         this.service.put(records);
-        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log8 USING CarbonAnalytics " +
                            "OPTIONS" +
-                           "(tableName \"Log\"," +
+                           "(tableName \"Log8\"," +
                            "schema \"_timestamp LONG, server_name STRING, ip STRING, tenant INTEGER, sequence LONG, summary STRING\"" +
                            ")");
 
         String faultyTimeStamp = "falseTimestamp";
-        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM Log where _timestamp < timestamp('" + faultyTimeStamp + "')");
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM Log8 where _timestamp < timestamp('" + faultyTimeStamp + "')");
         System.out.println(result);
 
-        this.service.deleteTable(1, "Log");
+        this.service.deleteTable(1, "Log8");
         System.out.println(testString("end : Faulty Timestamp exception test"));
     }
 
@@ -532,31 +532,15 @@ public class AnalyticsSparkExecutorTest {
     public void testCreateTableWithNoSchema() throws AnalyticsException {
         System.out.println(testString("start : create temp table with no schema test"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
-        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
-        this.service.deleteTable(1, "Log");
-        this.service.createTable(1, "Log");
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log9", 0, 10, -1, -1);
+        this.service.deleteTable(1, "Log9");
+        this.service.createTable(1, "Log9");
         this.service.put(records);
         String query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
                        "OPTIONS" +
-                       "(tableName \"Log\"" +
+                       "(tableName \"Log9\"" +
                        ")";
-        ex.executeQuery(1, query);
         boolean success = false;
-        try {
-            ex.executeQuery(1, "SELECT ip FROM Log");
-        } catch (Exception e){
-            System.out.println("Query failed with : " + e.getMessage());
-            success = true;
-        }
-        Assert.assertTrue(success, "Query did not fail!");
-
-        query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
-                "OPTIONS" +
-                "(tableName \"Log\"," +
-                "schema \"server_name STRING -sp, ip STRING, tenant INTEGER, sequence LONG, summary STRING\", " +
-                "primaryKeys \"ip, log\"" +
-                ")";
-        success = false;
         try {
             ex.executeQuery(1, query);
         } catch (Exception e) {
@@ -567,17 +551,62 @@ public class AnalyticsSparkExecutorTest {
 
         success = false;
         try {
-            ex.executeQuery(1,"insert into table Log select 1");
+            ex.executeQuery(1, "SELECT ip FROM Log9");
         } catch (Exception e) {
             System.out.println("Query failed with : " + e.getMessage());
             success = true;
         }
         Assert.assertTrue(success, "Query did not fail!");
 
-        this.service.deleteTable(1, "Log");
+        success = false;
+        try {
+            ex.executeQuery(1, "insert into table Log9 select 1");
+        } catch (Exception e) {
+            System.out.println("Query failed with : " + e.getMessage());
+            success = true;
+        }
+        Assert.assertTrue(success, "Query did not fail!");
+
+        this.cleanupTable(1, "Log9");
         System.out.println(testString("end : create temp table with column options test"));
     }
 
+    @Test
+    public void testMergeTableSchema() throws AnalyticsException {
+        System.out.println(testString("start : merge table schema test"));
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log10", 0, 10, -1, -1);
+        this.service.deleteTable(1, "Log10");
+        this.service.createTable(1, "Log10");
+        this.service.put(records);
+
+        List<ColumnDefinition> cols = new ArrayList<>();
+        cols.add(new ColumnDefinition("server_name", AnalyticsSchema.ColumnType.STRING));
+        cols.add(new ColumnDefinition("ip", AnalyticsSchema.ColumnType.STRING));
+        cols.add(new ColumnDefinition("tenant", AnalyticsSchema.ColumnType.INTEGER));
+        cols.add(new ColumnDefinition("sequence", AnalyticsSchema.ColumnType.LONG));
+        cols.add(new ColumnDefinition("summary", AnalyticsSchema.ColumnType.LONG));
+        this.service.setTableSchema(1, "Log10", new AnalyticsSchema(cols, Collections.<String>emptyList()));
+
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log10 USING CarbonAnalytics " +
+                           "OPTIONS" +
+                           "(tableName \"Log10\"," +
+                           "schema \"ip1 int\"" +
+                           ")");
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT ip FROM Log10");
+        Assert.assertEquals(result.getRows().size(), 10);
+        System.out.println(result);
+        result = ex.executeQuery(1, "SELECT * FROM Log10");
+        Assert.assertEquals(result.getRows().size(), 10);
+        System.out.println(result);
+
+        result = ex.executeQuery(1, "SELECT ip1 FROM Log10");
+        Assert.assertEquals(result.getRows().size(), 10);
+        System.out.println(result);
+
+        this.cleanupTable(1, "Log10");
+        System.out.println(testString("end : merge table schema test"));
+    }
 
 
     @BeforeClass

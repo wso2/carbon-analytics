@@ -69,6 +69,7 @@ public class FacetSparkTest extends SparkTestBase {
 		Assert.assertEquals(result.getRows().size(), INFO_MESSAGES);
 
 		this.service.deleteTable(1, "Log");
+		this.service.deleteTable(1, "facetTest");
 
 		System.out.println(testString("END: Facet Persistence tester"));
 

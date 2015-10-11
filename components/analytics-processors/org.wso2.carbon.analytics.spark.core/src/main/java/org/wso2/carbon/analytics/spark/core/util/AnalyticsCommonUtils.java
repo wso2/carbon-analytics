@@ -24,10 +24,14 @@ import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
+import scala.collection.Iterator;
 
 import javax.lang.model.type.NullType;
 import java.lang.reflect.ParameterizedType;
@@ -37,6 +41,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -201,5 +206,59 @@ public class AnalyticsCommonUtils {
         return !(colType.name().equalsIgnoreCase(AnalyticsConstants.STRING_TYPE)
                  || colType.name().equalsIgnoreCase(AnalyticsConstants.BINARY_TYPE)
                  || colType.name().equalsIgnoreCase(AnalyticsConstants.FACET_TYPE));
+    }
+
+    public static boolean isEmptyAnalyticsSchema(AnalyticsSchema analyticsSchema) {
+        return analyticsSchema == null || analyticsSchema.getColumns() == null;
+    }
+
+    public static boolean isEmptySchema(StructType schema) {
+        return schema == null || schema.fieldNames() == null;
+    }
+
+    public static StructField[] extractFieldsFromColumns(Map<String, ColumnDefinition> columns) {
+        StructField[] resFields = new StructField[columns.size()];
+
+        int i = 0;
+        for (Map.Entry<String, ColumnDefinition> entry : columns.entrySet()) {
+            String type = entry.getValue().getType().name();
+            resFields[i] = new StructField(entry.getKey(), AnalyticsCommonUtils.stringToDataType(type),
+                                           true, Metadata.empty());
+            i++;
+        }
+        return resFields;
+    }
+
+    public static StructField[] extractFieldsFromString(String schemaString) {
+        String[] strFields = schemaString.split(",");
+        StructField[] resFields = new StructField[(strFields.length)];
+        String name, type;
+        String[] strFieldTokens;
+        for (int i = 0; i < strFields.length; i++) {
+            strFieldTokens = strFields[i].trim().split(" ");
+            name = strFieldTokens[0].trim();
+            type = strFieldTokens[1].trim().toLowerCase();
+            StructField field = new StructField(name, AnalyticsCommonUtils.stringToDataType(type),
+                                                true, Metadata.empty());
+            resFields[i] = field;
+        }
+        return resFields;
+    }
+
+    public static AnalyticsSchema analyticsSchemaFromStructType(StructType schema) {
+        List<ColumnDefinition> colDefs = new ArrayList<>();
+        Iterator<StructField> fieldIter = schema.iterator();
+        while (fieldIter.hasNext()) {
+            StructField field = fieldIter.next();
+            String name = field.name();
+            AnalyticsSchema.ColumnType type = AnalyticsCommonUtils.stringToColumnType(field.dataType().typeName());
+            colDefs.add(new ColumnDefinition(name, type));
+        }
+
+        return new AnalyticsSchema(colDefs, Collections.<String>emptyList());
+    }
+
+    public static StructType structTypeFromAnalyticsSchema(AnalyticsSchema analyticsSchema){
+        return new StructType(extractFieldsFromColumns(analyticsSchema.getColumns()));
     }
 }
