@@ -116,9 +116,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -167,6 +169,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private static final String EMPTY_FACET_VALUE = "EMPTY_FACET_VALUE!";
 
     private static final String DEFAULT_SCORE = "1";
+    public static final String PATH_SEPARATOR = "___####___";
+    public static final int TAXONOMYWORKER_TIMEOUT = 60;
 
     private Map<String, Directory> indexDirs = new HashMap<>();
 
@@ -1593,51 +1597,81 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     public AnalyticsIterator<Record> searchWithAggregates(int tenantId, AggregateRequest aggregateRequest)
             throws AnalyticsException {
-        List<SubCategories> subCategories = getUniqueGroupings(tenantId, aggregateRequest);
-        AnalyticsIterator<Record> iterator = new AggregateRecordIterator(tenantId, subCategories, aggregateRequest, this);
-        return iterator;
+        try {
+            List<String[]> subCategories = getUniqueGroupings(tenantId, aggregateRequest);
+            AnalyticsIterator<Record> iterator = new AggregateRecordIterator(tenantId, subCategories, aggregateRequest, this);
+            return iterator;
+        } catch (IOException e) {
+            log.error("Error occured while performing aggregation, " + e.getMessage(), e);
+            throw new AnalyticsException("Error occured while performing aggregation, " + e.getMessage(), e);
+
+        }
     }
 
-    private List<SubCategories> getUniqueGroupings(int tenantId,
-                                                               AggregateRequest aggregateRequest)
-            throws AnalyticsIndexException {
-        CategoryDrillDownRequest categoryDrillDownRequest = createCategoryDrilldownRequest(aggregateRequest);
-        if (aggregateRequest.getAggregateLevel() == 0) {
-            List<SubCategories> groupings = new ArrayList<>();
-            SubCategories subCategories =  this.drilldownCategories(tenantId, categoryDrillDownRequest);
-            groupings.add(subCategories);
-            return groupings;
-        } else if (aggregateRequest.getAggregateLevel() > 0) {
-            return getSubCategoriesWithBFS(tenantId, aggregateRequest, categoryDrillDownRequest);
+    private List<String[]> getUniqueGroupings(int tenantId, AggregateRequest aggregateRequest)
+            throws AnalyticsIndexException, IOException {
+        if (aggregateRequest.getAggregateLevel() >= 0) {
+            List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds(TAXONOMY_INDEX_DATA_FS_BASE_PATH,
+                                                                                tenantId, aggregateRequest.getTableName());
+            ExecutorService pool = Executors.newFixedThreadPool(taxonomyShardIds.size());
+            Set<Future<Set<String>>> perShardUniqueCategories = new HashSet<>();
+            Set<String> finalUniqueCategories = new HashSet<>();
+            for (int i = 0; i < taxonomyShardIds.size(); i++) {
+                String shardedTableId = this.generateShardedTableId(tenantId, aggregateRequest.getTableName(),
+                                                                    taxonomyShardIds.get(i));
+                Directory taxonomyDir = this.lookupTaxonomyIndexDir(shardedTableId);
+                TaxonomyReader reader = new DirectoryTaxonomyReader(taxonomyDir);
+                Callable<Set<String>> callable = new TaxonomyWorker(reader, aggregateRequest);
+                Future<Set<String>> result = pool.submit(callable);
+                perShardUniqueCategories.add(result);
+            }
+            try {
+                for (Future<Set<String>> result : perShardUniqueCategories) {
+                    finalUniqueCategories.addAll(result.get());
+                }
+                return getUniqueSubCategories(aggregateRequest, finalUniqueCategories);
+            } catch (Exception e) {
+                log.error("Error while generating Unique categories for aggregation, " + e.getMessage(), e);
+                throw new AnalyticsIndexException("Error while generating Unique categories for aggregation, " +
+                                                  e.getMessage(), e);
+            } finally {
+                shutdownTaxonomyWorkerThreadPool(pool);
+            }
         } else {
             throw new AnalyticsIndexException("Aggregate level cannot be less than zero");
         }
     }
 
-    private List<SubCategories> getSubCategoriesWithBFS(int tenantId,
-                                                        AggregateRequest aggregateRequest,
-                                                        CategoryDrillDownRequest categoryDrillDownRequest)
+    private void shutdownTaxonomyWorkerThreadPool(ExecutorService pool)
             throws AnalyticsIndexException {
-        List<SubCategories> groupings = new ArrayList<>();
-        groupings.add(this.drilldownCategories(tenantId, categoryDrillDownRequest));
+        if (pool != null) {
+            pool.shutdown();
+        }
         try {
-            int totalAggregateLevel = getTotalAggregateLevel(aggregateRequest);
-            SubCategories subCategories;
-            do {
-                subCategories = groupings.remove(0);
-                List<CategorySearchResultEntry> categoryResults = subCategories.getCategories();
-                for (CategorySearchResultEntry category : categoryResults) {
-                    categoryDrillDownRequest.setPath(addCategoryToArray(subCategories.getPath(),
-                                                                        category.getCategoryValue()));
-                    groupings.add(this.drilldownCategories(tenantId, categoryDrillDownRequest));
-                }
-                if (!groupings.isEmpty()) {
-                    subCategories = groupings.get(0);
-                } else {
-                    subCategories = null;
+            if(!pool.awaitTermination(TAXONOMYWORKER_TIMEOUT, TimeUnit.SECONDS)) {
+                pool.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            log.error("Error while shutting down the Taxonomyworker threadpool , " + e.getMessage(), e);
+            throw new AnalyticsIndexException("Error while shutting down the Taxonomyworker threadpool , " +
+                                              e.getMessage(), e);
+        } finally {
+            pool = null;
+        }
+    }
+
+    private List<String[]> getUniqueSubCategories(AggregateRequest aggregateRequest,
+                                                  Set<String> uniqueCategories)
+            throws AnalyticsIndexException {
+        List<String[]> groupings = new ArrayList<>();
+        try {
+            int totalAggregateLevel = aggregateRequest.getAggregateLevel() + 1;
+            for (String category : uniqueCategories) {
+                String[] path = category.split(PATH_SEPARATOR);
+                if (path.length == totalAggregateLevel) {
+                    groupings.add(path);
                 }
             }
-            while (subCategories != null && subCategories.getPath().length < totalAggregateLevel);
             return groupings;
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new AnalyticsIndexException("The field: " + aggregateRequest.getGroupByField() +
@@ -1646,69 +1680,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    private int getTotalAggregateLevel(AggregateRequest aggregateRequest) {
-        int totalAggregateLevel = 0;
-        if (aggregateRequest.getParentPath() != null) {
-            totalAggregateLevel = aggregateRequest.getParentPath().size();
-        }
-        totalAggregateLevel += aggregateRequest.getAggregateLevel();
-        return totalAggregateLevel;
-    }
-
-    private CategoryDrillDownRequest createCategoryDrilldownRequest(
-            AggregateRequest aggregateRequest) {
-        CategoryDrillDownRequest categoryDrillDownRequest = new CategoryDrillDownRequest();
-        categoryDrillDownRequest.setFieldName(aggregateRequest.getGroupByField());
-        if (aggregateRequest.getParentPath() != null && !aggregateRequest.getParentPath().isEmpty()) {
-            List<String> parentPath = aggregateRequest.getParentPath();
-            categoryDrillDownRequest.setPath(parentPath.toArray(new String[parentPath.size()]));
-        } else {
-            categoryDrillDownRequest.setPath(new String[]{});
-        }
-        categoryDrillDownRequest.setQuery(aggregateRequest.getQuery());
-        categoryDrillDownRequest.setTableName(aggregateRequest.getTableName());
-        return categoryDrillDownRequest;
-    }
-
-    private String[] addCategoryToArray(String[] path, String categoryValue) {
-        String[] newArray = Arrays.copyOf(path, path.length + 1);
-        newArray[path.length] = categoryValue;
-        return newArray;
-    }
-
-    /*@SuppressWarnings("unchecked")
-    private Record aggregatePerGrouping(int tenantId, CategorySearchResultEntry facetValue, String[] path, AggregateRequest aggregateRequest)
-            throws AnalyticsException {
-        Map<String,  Object> optionalParams = new HashMap<>();
-        optionalParams.put(Constants.AggregateOptionalParams.COUNT, facetValue.getScore());
-        Map<String, Object> aggregatedValues = new HashMap<>();
-        for (AggregateField field : aggregateRequest.getFields()) {
-            Iterator<Record> iterator = IteratorUtils.chainedIterator(this.getRecordIterators(tenantId, facetValue, path, aggregateRequest));
-            AggregateFunction function = this.getAggregates().get(field.getAggregateFunction());
-            if (function == null) {
-                throw new AnalyticsException("Unknown aggregate function!");
-            } else if (field.getFieldName() == null || field.getFieldName().isEmpty()) {
-                throw new AnalyticsException("One of the aggregating fields is not provided");
-            } else if (field.getAlias() == null || field.getAlias().isEmpty()) {
-                throw new AnalyticsException("One of the aggregating field alias is not provided");
-            }
-            Object aggregatedValue = function.process(iterator, field.getFieldName(), optionalParams);
-            aggregatedValues.put(field.getAlias(), aggregatedValue);
-        }
-        aggregatedValues.put(aggregateRequest.getGroupByField(), facetValue.getCategoryValue());
-        return new Record(tenantId, aggregateRequest.getTableName(), aggregatedValues);
-    }*/
-
     @SuppressWarnings("unchecked")
-    private Record aggregatePerGrouping(int tenantId, CategorySearchResultEntry facetValue, String[] path,
+    private Record aggregatePerGrouping(int tenantId, String[] path,
                                          AggregateRequest aggregateRequest)
             throws AnalyticsException {
         Map<String,  Number> optionalParams = new HashMap<>();
-        optionalParams.put(Constants.AggregateOptionalParams.COUNT, facetValue.getScore());
         Map<String, AggregateFunction> perAliasAggregateFunction = initPerAliasAggregateFunctions(aggregateRequest,
                                                                                                   optionalParams);
-        Iterator<Record> iterator = IteratorUtils.chainedIterator(this.getRecordIterators(tenantId,
-                                                                                          facetValue, path, aggregateRequest));
+        Iterator<Record> iterator = IteratorUtils.chainedIterator(this.getRecordIterators(tenantId, path, aggregateRequest));
         while (iterator.hasNext()) {
             Record record = iterator.next();
             for (AggregateField field : aggregateRequest.getFields()) {
@@ -1717,13 +1696,12 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 function.process(value);
             }
         }
-        Map<String, Object> aggregatedValues = generateAggregateRecordValues(facetValue, path,
+        Map<String, Object> aggregatedValues = generateAggregateRecordValues(path,
                                                                              aggregateRequest, perAliasAggregateFunction);
         return new Record(tenantId, aggregateRequest.getTableName(), aggregatedValues);
     }
 
-    private Map<String, Object> generateAggregateRecordValues(CategorySearchResultEntry facetValue,
-                                                              String[] path,
+    private Map<String, Object> generateAggregateRecordValues(String[] path,
                                                               AggregateRequest aggregateRequest,
                                                               Map<String, AggregateFunction> perAliasAggregateFunction)
             throws AnalyticsException {
@@ -1734,7 +1712,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             aggregatedValues.put(alias, result);
         }
         aggregatedValues.put(aggregateRequest.getGroupByField(),
-                             addCategoryToArray(path, facetValue.getCategoryValue()));
+                             path);
         return aggregatedValues;
     }
 
@@ -1756,11 +1734,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return perAliasAggregateFunction;
     }
 
-    private List<Iterator<Record>> getRecordIterators(int tenantId,
-                                                      CategorySearchResultEntry facetValue, String[] path,
+    private List<Iterator<Record>> getRecordIterators(int tenantId, String[] path,
                                                       AggregateRequest aggregateRequest)
             throws AnalyticsException {
-        List<SearchResultEntry> searchResultEntries = getRecordSearchEntries(tenantId, facetValue, path,  aggregateRequest);
+        List<SearchResultEntry> searchResultEntries = getRecordSearchEntries(tenantId, path,  aggregateRequest);
         List<String> recordIds = getRecordIds(searchResultEntries);
         AnalyticsDataResponse analyticsDataResponse = this.analyticsDataService.get(tenantId, aggregateRequest.getTableName(),
                                                                                     1, null, recordIds);
@@ -1772,8 +1749,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return iterators;
     }
 
-    private List<SearchResultEntry> getRecordSearchEntries(int tenantId,
-                                                           CategorySearchResultEntry facetValue, String[] path,
+    private List<SearchResultEntry> getRecordSearchEntries(int tenantId, String[] path,
                                                            AggregateRequest aggregateRequest)
             throws AnalyticsIndexException {
         AnalyticsDrillDownRequest analyticsDrillDownRequest = new AnalyticsDrillDownRequest();
@@ -1784,7 +1760,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         Map<String, List<String>> groupByCategory = new HashMap<>();
         List<String> groupByValue = new ArrayList<>();
         groupByValue.addAll(Arrays.asList(path));
-        groupByValue.add(facetValue.getCategoryValue());
         groupByCategory.put(aggregateRequest.getGroupByField(), groupByValue);
         analyticsDrillDownRequest.setCategoryPaths(groupByCategory);
         return this.getDrillDownRecords(tenantId, analyticsDrillDownRequest, null, null);
@@ -1802,14 +1777,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
         private static Log logger = LogFactory.getLog(AggregateRecordIterator.class);
         private AggregateRequest request;
-        private List<SubCategories> groupings;
+        private List<String[]> groupings;
         private int tenantId;
-        private SubCategories currentSubCategories;
-        private List<CategorySearchResultEntry> currentResultEntries;
-        private CategorySearchResultEntry resultEntry;
-        private String[] parentPath;
+        private String[] currentGrouping;
         private AnalyticsDataIndexer indexer;
-        public AggregateRecordIterator(int tenantId, List<SubCategories> uniqueGroupings,
+        public AggregateRecordIterator(int tenantId, List<String[]> uniqueGroupings,
                                        AggregateRequest request, AnalyticsDataIndexer indexer) {
             this.request = request;
             this.tenantId = tenantId;
@@ -1820,10 +1792,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         @Override
         public void close() throws IOException {
             request = null;
-            resultEntry = null;
-            currentResultEntries = null;
-            parentPath = null;
-            currentSubCategories = null;
+            currentGrouping = null;
             groupings = null;
 
         }
@@ -1831,24 +1800,15 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         @Override
         public synchronized boolean hasNext() {
             if (groupings!= null && !groupings.isEmpty()) {
-                currentSubCategories = groupings.get(0);
-                if (currentSubCategories != null && currentSubCategories.getCategories() != null
-                    && !currentSubCategories.getCategories().isEmpty()) {
-                    parentPath = currentSubCategories.getPath();
-                    currentResultEntries = currentSubCategories.getCategories();
-                    resultEntry = currentResultEntries.get(0);
-                    if (resultEntry.getCategoryValue() != null && !resultEntry.getCategoryValue().isEmpty()) {
-                        return true;
-                    } else {
-                        currentResultEntries.remove(resultEntry);
-                        this.hasNext();
-                    }
+                currentGrouping = groupings.get(0);
+                if (currentGrouping != null && currentGrouping.length > 0) {
+                    return true;
                 } else {
-                    groupings.remove(currentSubCategories);
-                    return this.hasNext();
+                    groupings.remove(currentGrouping);
+                    this.hasNext();
                 }
             } else {
-                return false;
+                    return false;
             }
             return false;
         }
@@ -1857,12 +1817,12 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         public synchronized Record next() {
             if (hasNext()) {
                 try {
-                    return indexer.aggregatePerGrouping(tenantId, resultEntry, parentPath, request);
+                    return indexer.aggregatePerGrouping(tenantId, currentGrouping, request);
                 } catch (AnalyticsException e) {
                     logger.error("Failed to create aggregated record: " + e.getMessage(), e);
                     throw new RuntimeException("Error while iterating aggregate records: " + e.getMessage(), e);
                 } finally {
-                    currentResultEntries.remove(resultEntry);
+                    groupings.remove(currentGrouping);
                 }
             }
             return null;
@@ -2030,6 +1990,50 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 } catch (InterruptedException e) {
                     break;
                 }
+            }
+        }
+    }
+
+    private class TaxonomyWorker implements Callable {
+
+        private TaxonomyReader reader;
+        private AggregateRequest request;
+
+        public TaxonomyWorker() {
+
+        }
+
+        public TaxonomyWorker(TaxonomyReader reader, AggregateRequest request) {
+            this.reader = reader;
+            this.request = request;
+        }
+
+        @Override
+        public Set<String> call() throws Exception {
+            List<String> parentPath = request.getParentPath();
+            if (parentPath == null) {
+                parentPath = new ArrayList<>();
+            }
+            Set<String> perShardCategorySet = new TreeSet<>();
+            String[] path = parentPath.toArray(new String[parentPath.size()]);
+            int ordinal = reader.getOrdinal(request.getGroupByField(), path);
+            this.addAllCategoriesToSet(reader, ordinal, null, 1, perShardCategorySet);
+            return perShardCategorySet;
+        }
+
+        private void addAllCategoriesToSet(TaxonomyReader r, int ord, String parent, int depth,
+                                           Set<String> uniqueGroups) throws IOException {
+            TaxonomyReader.ChildrenIterator it = r.getChildren(ord);
+            int child;
+            while ((child = it.next()) != TaxonomyReader.INVALID_ORDINAL) {
+                String newParent;
+                if (parent != null) {
+                    newParent = parent + PATH_SEPARATOR + r.getPath(child).components[depth];
+                } else {
+                    newParent = r.getPath(child).components[depth];
+                }
+                uniqueGroups.add(newParent);
+                addAllCategoriesToSet(r, child, newParent, depth + 1, uniqueGroups);
             }
         }
     }

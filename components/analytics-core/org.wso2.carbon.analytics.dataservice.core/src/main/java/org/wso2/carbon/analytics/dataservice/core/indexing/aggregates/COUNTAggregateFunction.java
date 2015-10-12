@@ -28,18 +28,18 @@ import java.util.Map;
  */
 public class COUNTAggregateFunction implements AggregateFunction {
 
-    private Number count;
+    private long count;
 
     public COUNTAggregateFunction(Map<String, Number> optionalParams) {
-        count = optionalParams.get(Constants.AggregateOptionalParams.COUNT);
-        if (count == null) {
-            count = 0;
-        }
+        count = optionalParams.get(Constants.AggregateOptionalParams.COUNT).longValue();
     }
 
     @Override
     public void process(Number value)
             throws AnalyticsException {
+        if (count == 0) {
+            count++;
+        }
         //no specific processing
     }
 
