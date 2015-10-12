@@ -114,8 +114,10 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     @Override
     public RDD<Row> buildScan() {
         if (isEmptySchema(this.schema)) {
-            throw new RuntimeException("Unable to scan through the table as the schema " +
-                                       "is unavailable for " + this.tableName);
+            String msg = "Unable to scan through the table as the schema " +
+                         "is unavailable for " + this.tableName;
+            log.error(msg);
+            throw new RuntimeException(msg);
         }
         return new AnalyticsRDD(this.tenantId, this.tableName,
                                 new ArrayList<>(Arrays.asList(this.schema.fieldNames())),

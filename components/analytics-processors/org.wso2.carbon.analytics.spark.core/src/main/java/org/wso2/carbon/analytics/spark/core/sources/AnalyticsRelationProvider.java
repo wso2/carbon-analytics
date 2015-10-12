@@ -86,15 +86,17 @@ public class AnalyticsRelationProvider implements RelationProvider,
         try {
             createTableIfNotExist();
         } catch (AnalyticsExecutionException e) {
-            throw new RuntimeException("Error while creating the table : " + this.tableName + " : "
-                                       + e.getMessage(), e);
+            String msg = "Error while creating the table : " + this.tableName + " : " + e.getMessage();
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
         }
         if (isSchemaProvided()) {
             try {
                 setSchemaIfProvided();
             } catch (AnalyticsExecutionException e) {
-                throw new RuntimeException("Error while merging the schema for the table : " +
-                                           this.tableName + " : " + e.getMessage(), e);
+                String msg = "Error while merging the schema for the table : " + this.tableName + " : " + e.getMessage();
+                log.error(msg, e);
+                throw new RuntimeException(msg, e);
             }
             return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext
                     , this.schemaStruct);
@@ -124,9 +126,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
                     this.dataService.createTable(this.tenantId, this.recordStore, this.tableName);
                 }
             } catch (AnalyticsException e) {
-                String msg = "Error while accessing table " + this.tableName + " : " + e.getMessage();
-                log.error(msg, e);
-                throw new AnalyticsExecutionException(msg, e);
+                throw new AnalyticsExecutionException("Error while accessing table " + this.tableName + " : " + e.getMessage(), e);
             }
         } else if (!this.streamName.isEmpty()) {
             try {
@@ -138,9 +138,8 @@ public class AnalyticsRelationProvider implements RelationProvider,
                     this.dataService.createTable(this.tenantId, this.recordStore, this.tableName);
                 }
             } catch (AnalyticsException e) {
-                String msg = "Error while accessing table " + this.tableName + " : " + e.getMessage();
-                log.error(msg, e);
-                throw new AnalyticsExecutionException(msg, e);
+                throw new AnalyticsExecutionException("Error while accessing table " + this.tableName
+                                                      + " : " + e.getMessage(), e);
             }
         } else {
             throw new AnalyticsExecutionException("Empty " + AnalyticsConstants.TABLE_NAME + " OR "
@@ -170,17 +169,13 @@ public class AnalyticsRelationProvider implements RelationProvider,
                             (existingSchema, pKeyList, colList, Collections.<String>emptyList());
                 }
             } catch (AnalyticsException e) {
-                String msg = "Error while reading " + this.tableName + " table schema: " + e.getMessage();
-                log.error(msg, e);
-                throw new AnalyticsExecutionException(msg, e);
+                throw new AnalyticsExecutionException("Error while reading " + this.tableName + " table schema: " + e.getMessage(), e);
             }
 
             try {
                 this.dataService.setTableSchema(this.tenantId, this.tableName, finalSchema);
             } catch (AnalyticsException e) {
-                String msg = "Error while setting " + this.tableName + " table schema: " + e.getMessage();
-                log.error(msg, e);
-                throw new AnalyticsExecutionException(msg, e);
+                throw new AnalyticsExecutionException("Error while setting " + this.tableName + " table schema: " + e.getMessage(), e);
             }
 
             StructType tempStruct = structTypeFromAnalyticsSchema(finalSchema);
@@ -296,25 +291,30 @@ public class AnalyticsRelationProvider implements RelationProvider,
         try {
             createTableIfNotExist();
         } catch (AnalyticsExecutionException e) {
-            throw new RuntimeException("Error while creating the table : " + this.tableName + " : "
-                                       + e.getMessage(), e);
+            String msg = "Error while creating the table : " + this.tableName + " : " + e.getMessage();
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
         }
         try {
             setSchemaIfProvided();
         } catch (AnalyticsExecutionException e) {
-            throw new RuntimeException("Error while merging the schema for the table : " +
-                                       this.tableName + " : " + e.getMessage(), e);
+            String msg = "Error while merging the schema for the table : " + this.tableName + " : " + e.getMessage();
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
         }
 
         try {
             AnalyticsSchema schemaFromDS;
             schemaFromDS = dataService.getTableSchema(this.tenantId, this.tableName);
             if (!AnalyticsCommonUtils.validateSchemaColumns(schema, schemaFromDS)) {
-                throw new RuntimeException("Incompatible schemas for the tables");
+                String msg = "Incompatible schemas for the table " + this.tableName;
+                log.error(msg);
+                throw new RuntimeException(msg);
             }
         } catch (AnalyticsException e) {
-            log.error("Failed to load the schema for table " + tableName + ": " + e.getMessage(), e);
-            throw new RuntimeException("Failed to load the schema for table " + tableName + ": " + e.getMessage(), e);
+            String msg = "Failed to load the schema for table " + tableName + ": " + e.getMessage();
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
         }
 
         return new AnalyticsRelation(this.tenantId, this.tableName, this.recordStore, sqlContext,
