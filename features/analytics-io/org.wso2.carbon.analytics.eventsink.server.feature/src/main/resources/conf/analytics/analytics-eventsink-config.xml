@@ -28,7 +28,7 @@
     <QueueSize>8192</QueueSize>
 
     <!--Maximum total size of events that can live within the queue in MB-->
-    <maxQueueCapacity>50</maxQueueCapacity>
+    <maxQueueCapacity>10</maxQueueCapacity>
 
     <!--The events will be collected as bundles with maximum size of events in KB during the high traffic.-->
     <maxBatchSize>10</maxBatchSize>
