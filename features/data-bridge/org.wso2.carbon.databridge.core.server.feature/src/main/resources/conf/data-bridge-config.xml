@@ -19,7 +19,7 @@
     <workerThreads>10</workerThreads>
 
     <!--Maximum amount of messages that can be queued internally in MB-->
-    <maxEventBufferCapacity>50</maxEventBufferCapacity>
+    <maxEventBufferCapacity>10</maxEventBufferCapacity>
 
     <!-- Queue size; the maximum number of events that can be stored in the queue -->
     <eventBufferSize>2000</eventBufferSize>
