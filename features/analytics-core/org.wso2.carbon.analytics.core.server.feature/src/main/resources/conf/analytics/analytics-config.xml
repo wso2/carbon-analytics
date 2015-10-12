@@ -62,6 +62,9 @@
    <!-- The number of index shards, should be equal or higher to the number of indexing nodes that is going to be working,
         ideal count being 'number of indexing nodes * [CPU cores used for indexing per node]' -->
    <shardCount>6</shardCount>
+   <!-- The number of batch index records, the indexing node will process per each indexing thread. A batch index record basically
+        encapsulates a batch of records retrieved from the receiver to be indexed -->
+   <shardIndexRecordBatchSize>100</shardIndexRecordBatchSize>
    <!-- Data purging related configuration -->
    <analytics-data-purging>
       <!-- Below entry will indicate purging is enable or not. If user wants to enable data purging for cluster then this property

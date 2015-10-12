@@ -91,6 +91,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private static final int FLOW_CONTROL_RECEIVE_LOW_DEFAULT = 5000;
 
     private static final int FLOW_CONTROL_RECEIVE_HIGH_DEFAULT = 10000;
+    
+    private static final int DEFAULT_SHARD_INDEX_RECORD_BATCH_SIZE = 100;
 
     private static final Log logger = LogFactory.getLog(AnalyticsDataServiceImpl.class);
 
@@ -153,6 +155,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         this.initIndexedTableStore();
         this.indexer = new AnalyticsDataIndexer(this.getIndexStagingRecordStore(), this.analyticsFileSystem, this,
                                                 this.indexedTableStore, config.getShardCount(), 
+                                                this.extractShardIndexRecordBatchSize(config),
                                                 this.calculateIndexingThreadCount(config), luceneAnalyzer,
                                                 this.createFlowController(config.getAnalyticsReceiverIndexingFlowControlConfiguration()));
         AnalyticsServiceHolder.setAnalyticsDataService(this);
@@ -162,6 +165,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         } 
         this.indexer.init();
         this.initDataPurging(config);
+    }
+    
+    private int extractShardIndexRecordBatchSize(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
+    	int value = config.getShardIndexRecordBatchSize();
+    	if (value <= 0) {
+    		value = DEFAULT_SHARD_INDEX_RECORD_BATCH_SIZE;
+    	}
+    	return value;
     }
     
     private AnalyticsReceiverIndexingFlowController createFlowController(

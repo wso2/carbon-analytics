@@ -45,6 +45,8 @@ public class AnalyticsDataServiceConfiguration {
     
     private int shardCount;
     
+    private int shardIndexRecordBatchSize;
+    
     private int indexingThreadCount;
     
     private int recordsBatchSize = Constants.RECORDS_BATCH_SIZE;
@@ -109,6 +111,15 @@ public class AnalyticsDataServiceConfiguration {
     
     public void setShardCount(int shardCount) {
         this.shardCount = shardCount;
+    }
+    
+    @XmlElement (name = "shardIndexRecordBatchSize", defaultValue = "100")
+    public int getShardIndexRecordBatchSize() {
+        return shardIndexRecordBatchSize;
+    }
+    
+    public void setShardIndexRecordBatchSize(int shardIndexRecordBatchSize) {
+        this.shardIndexRecordBatchSize = shardIndexRecordBatchSize;
     }
     
     @XmlElement (name = "indexingThreadCount", defaultValue = "-1")
