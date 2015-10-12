@@ -17,6 +17,7 @@ package org.wso2.carbon.analytics.dashboard.deployment;
 
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dashboard.DashboardConstants;
@@ -86,8 +87,14 @@ public class DashboardDeployer implements AppDeploymentHandler {
                     gadgetDir.mkdir();
                 }
                 File layoutDir = new File(path + File.separator + "layout");
-                if(!layoutDir.exists()) {
-                    layoutDir.mkdir();
+                if (!layoutDir.exists()) {
+                    String carbonLayoutDir= new StringBuilder(carbonRepository)
+                            .append("jaggeryapps").append(File.separator)
+                            .append(DashboardConstants.APP_NAME).append(File.separator)
+                            .append("store").append(File.separator)
+                            .append("carbon.super").append(File.separator)
+                            .append("layout").toString();
+                    FileUtils.copyDirectory(new File(carbonLayoutDir),new File(path));
                 }
                 File widgetDir = new File(path + File.separator + "widget");
                 if(!widgetDir.exists()) {
