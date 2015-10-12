@@ -178,10 +178,12 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                             }
                         } catch (AnalyticsTableNotAvailableException ex) {
                             for (AnalyticsTableRecord analyticsTableRecord : analyticsTable.getAnalyticsTableRecords()) {
-                                ColumnDefinition columnDefinition = getColumnDefinition(analyticsTableRecord);
-                                columnDefinitions.add(columnDefinition);
-                                if (analyticsTableRecord.isPrimaryKey()) {
-                                    primaryKeys.add(analyticsTableRecord.getColumnName());
+                                if (analyticsTableRecord.isPersist()) {
+                                    ColumnDefinition columnDefinition = getColumnDefinition(analyticsTableRecord);
+                                    columnDefinitions.add(columnDefinition);
+                                    if (analyticsTableRecord.isPrimaryKey()) {
+                                        primaryKeys.add(analyticsTableRecord.getColumnName());
+                                    }
                                 }
                             }
                         }
