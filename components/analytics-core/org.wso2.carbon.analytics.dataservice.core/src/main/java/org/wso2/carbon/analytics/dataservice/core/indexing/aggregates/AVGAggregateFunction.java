@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.analytics.dataservice.core.indexing.aggregates;
 
-import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 import java.util.Map;
@@ -31,20 +30,26 @@ public class AVGAggregateFunction implements AggregateFunction {
     private double sum;
     private double count;
 
+
     public AVGAggregateFunction(Map<String, Number> optionalParams) {
         //No optional params are passed in initializing
         sum = 0;
-        count = optionalParams.get(Constants.AggregateOptionalParams.COUNT).doubleValue();
+        count = 0;
     }
 
     @Override
     public void process(Number value)
             throws AnalyticsException {
         sum += value.doubleValue();
+        count++;
     }
 
     @Override
     public Number finish() throws AnalyticsException {
-        return sum / count;
+        if (count != 0) {
+            return sum / count;
+        } else {
+            throw new AnalyticsException("Cannot compute average, count is zero (Division by Zero!");
+        }
     }
 }
