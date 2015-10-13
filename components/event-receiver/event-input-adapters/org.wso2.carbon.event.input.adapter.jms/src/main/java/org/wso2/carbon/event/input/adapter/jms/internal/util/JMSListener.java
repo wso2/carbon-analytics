@@ -1,20 +1,20 @@
 /*
-*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.event.input.adapter.jms.internal.util;
 
 import org.apache.commons.logging.Log;
@@ -123,6 +123,7 @@ public class JMSListener implements Runnable {
     private boolean checkJMSConnection(JMSTaskManager stm) {
 
         Connection connection = null;
+        boolean connectionEstablished = false;
         Hashtable<String, String> jmsProperties = stm.getJmsProperties();
         try {
             ConnectionFactory jmsConFactory = null;
@@ -139,10 +140,20 @@ public class JMSListener implements Runnable {
                     jmsProperties.get(JMSConstants.PARAM_JMS_USERNAME),
                     jmsProperties.get(JMSConstants.PARAM_JMS_PASSWORD),
                     stm.isJmsSpec11(), stm.isQueue(), stm.isSubscriptionDurable(), stm.getDurableSubscriberClientId());
+            connectionEstablished = connection != null;
         } catch (JMSException ignore) {
-        }   // we silently ignore this as a JMSException can be expected when connection is not available
+            // we silently ignore this as a JMSException can be expected when connection is not available
+        } finally {
+            if (connectionEstablished) {
+                try {
+                    connection.close();
+                } catch (JMSException e) {
+                    log.debug("Error while closing established Test JMS connection: " + e.getMessage(), e);
+                }
+            }
+        }
 
-        return (connection != null);
+        return connectionEstablished;
     }
 
     /**
