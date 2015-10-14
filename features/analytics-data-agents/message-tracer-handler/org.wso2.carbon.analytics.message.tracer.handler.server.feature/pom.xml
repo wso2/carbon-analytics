@@ -76,7 +76,7 @@
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}
                                 </importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.event.stream.core:${carbon.analytics.common.version}
+                                <importFeatureDef>org.wso2.carbon.event.stream:${carbon.analytics.common.version}
                                 </importFeatureDef>
                             </importFeatures>
                         </configuration>
