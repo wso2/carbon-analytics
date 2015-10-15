@@ -62,6 +62,9 @@ public class AnalyticsEventTableUtils {
     public static Map<String, Object> streamEventToRecordValues(int tenantId, String tableName, List<Attribute> attrs,
             ComplexEvent event) {
         Object[] data = event.getOutputData();
+        if (data == null) {
+            return new HashMap<>(0);
+        }
         Map<String, Object> values = new HashMap<String, Object>();
         for (int i = 0; i < attrs.size(); i++) {
             if (data.length > i) {
@@ -128,11 +131,6 @@ public class AnalyticsEventTableUtils {
         Attribute attr;
         for (int i = 0; i < attrs.size(); i++) {
         	attr = attrs.get(i);
-        	if (attr == null) {
-        		throw new IllegalStateException("The event attribute definition at index '" + i + 
-        				"' is null, out of " + attrs.size() + " attributes, Attr List: " + 
-        				attrs + ", Record: " + record);
-        	}
             data[i] = record.getValue(attr.getName());
         }
         event.setOutputData(data);

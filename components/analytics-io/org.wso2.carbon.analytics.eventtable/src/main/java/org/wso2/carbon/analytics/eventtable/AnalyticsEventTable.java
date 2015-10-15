@@ -638,7 +638,11 @@ public class AnalyticsEventTable implements EventTable {
             } else if (this.pkMatchCompatible) {
                 Record record = AnalyticsEventTableUtils.getRecordWithEventValues(this.tenantId, this.tableName, 
                         this.attrs, matchingEvent);
-                records = Arrays.asList(record);
+                if (record == null) {
+                    records = new ArrayList<>(0);
+                } else {
+                    records = Arrays.asList(record);
+                }
             } else {
                 records = this.executeLuceneQuery(matchingEvent);
             }
