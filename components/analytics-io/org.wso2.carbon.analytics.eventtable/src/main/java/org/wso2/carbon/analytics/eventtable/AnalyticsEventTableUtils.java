@@ -125,8 +125,15 @@ public class AnalyticsEventTableUtils {
     public static StreamEvent recordToStreamEvent(List<Attribute> attrs, Record record) {
         StreamEvent event = new StreamEvent(0, 0, attrs.size());
         Object[] data = new Object[attrs.size()];
+        Attribute attr;
         for (int i = 0; i < attrs.size(); i++) {
-            data[i] = record.getValue(attrs.get(i).getName());
+        	attr = attrs.get(i);
+        	if (attr == null) {
+        		throw new IllegalStateException("The event attribute definition at index '" + i + 
+        				"' is null, out of " + attrs.size() + " attributes, Attr List: " + 
+        				attrs + ", Record: " + record);
+        	}
+            data[i] = record.getValue(attr.getName());
         }
         event.setOutputData(data);
         return event;
