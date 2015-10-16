@@ -65,6 +65,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -140,9 +141,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
         this.sparkConf = initializeSparkConf(this.portOffset, propsFile);
 
-//        this.redundantMasterCount = this.sparkConf.getInt(AnalyticsConstants.CARBON_SPARK_MASTER_COUNT, 1);
         this.sparkMaster = getStringFromSparkConf(AnalyticsConstants.CARBON_SPARK_MASTER, "local");
-        this.redundantMasterCount = this.sparkConf.getInt(AnalyticsConstants.CARBON_SPARK_MASTER_COUNT, 2);
+        this.redundantMasterCount = this.sparkConf.getInt(AnalyticsConstants.CARBON_SPARK_MASTER_COUNT, 1);
 
         this.registerShorthandStrings();
         this.registerSqlDialects();
@@ -292,7 +292,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             if (!this.clientActive) {
                 //master URL needs to be updated according to the spark masters in the cluster
                 updateMaster(this.sparkConf);
-                initializeSqlContext(new JavaSparkContext(this.sparkConf));
+                initializeSqlContext(this.initializeSparkContext(this.sparkConf));
                 this.clientActive = true;
                 log.info("Started Spark CLIENT in the cluster pointing to MASTERS " + this.sparkConf.get(AnalyticsConstants.SPARK_MASTER) +
                          " with the application name : " + this.sparkConf.get(AnalyticsConstants.SPARK_APP_NAME) +
@@ -305,9 +305,24 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
+    private JavaSparkContext initializeSparkContext(SparkConf conf) {
+        JavaSparkContext jsc = new JavaSparkContext(conf);
+        try {
+            jsc.setLocalProperty(AnalyticsConstants.SPARK_SCHEDULER_POOL,
+                                 conf.get(AnalyticsConstants.CARBON_SCHEDULER_POOL));
+        } catch (NoSuchElementException e) {
+            logDebug("No carbon.scheduler.pool present the config file. Setting the default scheduler " +
+                     "pool name : " + AnalyticsConstants.DEFAULT_CARBON_SCHEDULER_POOL_NAME);
+            jsc.setLocalProperty(AnalyticsConstants.SPARK_SCHEDULER_POOL,
+                                 AnalyticsConstants.DEFAULT_CARBON_SCHEDULER_POOL_NAME);
+        }
+
+        return jsc;
+    }
+
     private void initializeClient(Boolean local) throws AnalyticsException {
         if (ServiceHolder.isAnalyticsSparkContextEnabled()) {
-            initializeSqlContext(new JavaSparkContext(this.sparkConf));
+            initializeSqlContext(initializeSparkContext(this.sparkConf));
             if (local) {
                 log.info("Started Spark CLIENT in the LOCAL mode" +
                          " with the application name : " + this.sparkConf.get(AnalyticsConstants.SPARK_APP_NAME) +
@@ -466,7 +481,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      * @param portOffset port offset
      * @param propsFile  location of the properties file
      */
-    private SparkConf initializeSparkConf(int portOffset, String propsFile) {
+    private SparkConf initializeSparkConf(int portOffset, String propsFile)
+            throws AnalyticsException {
         // create a spark conf object without loading defaults
         SparkConf conf = new SparkConf(false);
 
@@ -478,11 +494,33 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         setAdditionalConfigs(conf);
         addSparkPropertiesPortOffset(conf, portOffset);
 
+
         return conf;
     }
 
-    private void setAdditionalConfigs(SparkConf conf) {
+    private void setAdditionalConfigs(SparkConf conf) throws AnalyticsException {
         //executor constants for spark env
+        String carbonHome = null, carbonConfDir, analyticsSparkConfDir;
+        try {
+            carbonHome = conf.get(AnalyticsConstants.CARBON_DAS_SYMBOLIC_LINK);
+            logDebug("CARBON HOME set with the symbolic link " + carbonHome);
+        } catch (NoSuchElementException e) {
+            try {
+                carbonHome = CarbonUtils.getCarbonHome();
+            } catch (Throwable ex) {
+                logDebug("CARBON HOME can not be found. Spark conf in non-carbon environment");
+            }
+        }
+        logDebug("CARBON HOME used for Spark Conf : " + carbonHome);
+
+        if (carbonHome != null) {
+            carbonConfDir = carbonHome + File.separator + "repository" + File.separator + "conf";
+        } else {
+            logDebug("CARBON HOME is NULL. Spark conf in non-carbon environment. Using the custom conf path");
+            carbonConfDir = GenericUtils.getAnalyticsConfDirectory();
+        }
+        analyticsSparkConfDir = carbonConfDir + File.separator + "analytics" + File.separator + "spark";
+
         conf.setIfMissing(AnalyticsConstants.SPARK_APP_NAME, DEFAULT_SPARK_APP_NAME);
         conf.setIfMissing(AnalyticsConstants.SPARK_DRIVER_CORES, "1");
         conf.setIfMissing(AnalyticsConstants.SPARK_DRIVER_MEMORY, "512m");
@@ -513,47 +551,45 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_WEBUI_PORT, "11500");
 
         conf.setIfMissing(AnalyticsConstants.SPARK_SCHEDULER_MODE, "FAIR");
+        conf.setIfMissing(AnalyticsConstants.SPARK_SCHEDULER_ALLOCATION_FILE,
+                          analyticsSparkConfDir + File.separator + AnalyticsConstants.FAIR_SCHEDULER_XML);
         conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE, "CUSTOM");
         conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE_FACTORY,
                           AnalyticsRecoveryModeFactory.class.getName());
 
+        conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + carbonConfDir);
+        conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + carbonConfDir);
+
+        String sparkClasspath = (System.getProperty("SPARK_CLASSPATH") == null) ?
+                                "" : System.getProperty("SPARK_CLASSPATH");
+
+        // if the master url starts with "spark", this means that the cluster would be pointed
+        // an external cluster. in an external cluster, having more than one implementations of
+        // sl4j is not possible. hence, it would be removed from the executor cp. DAS-199
+        if (carbonHome != null) {
+            try {
+                if (conf.get(AnalyticsConstants.CARBON_SPARK_MASTER).trim().toLowerCase().startsWith("spark")) {
+                    sparkClasspath = ComputeClasspath.getSparkClasspath(sparkClasspath, carbonHome, new String[]{"slf4j"});
+                } else {
+                    sparkClasspath = ComputeClasspath.getSparkClasspath(sparkClasspath, carbonHome);
+                }
+            } catch (IOException e) {
+                throw new AnalyticsExecutionException("Unable to create the extra spark classpath" + e.getMessage(), e);
+            }
+        } else {
+            logDebug("CARBON HOME is NULL. Spark conf in non-carbon environment");
+        }
+
         try {
-            String carbonHome;
-            try {
-                carbonHome = conf.get(AnalyticsConstants.CARBON_DAS_SYMBOLIC_LINK);
-            } catch (NoSuchElementException e) {
-                carbonHome = CarbonUtils.getCarbonHome();
-            }
-            String carbonConf = carbonHome + File.separator + "repository" + File.separator + "conf";
+            conf.set("spark.executor.extraClassPath", conf.get("spark.executor.extraClassPath") + ";" + sparkClasspath);
+        } catch (NoSuchElementException e) {
+            conf.set("spark.executor.extraClassPath", sparkClasspath);
+        }
 
-            conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + carbonConf);
-            conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + carbonConf);
-
-            String sparkClasspath = (System.getProperty("SPARK_CLASSPATH") == null) ?
-                                    "" : System.getProperty("SPARK_CLASSPATH");
-
-            // if the master url starts with "spark", this means that the cluster would be pointed
-            // an external cluster. in an external cluster, having more than one implementations of
-            // sl4j is not possible. hence, it would be removed from the executor cp. DAS-199
-            if (conf.get(AnalyticsConstants.CARBON_SPARK_MASTER).trim().toLowerCase().startsWith("spark")) {
-                sparkClasspath = ComputeClasspath.getSparkClasspath(sparkClasspath, carbonHome, new String[]{"slf4j"});
-            } else {
-                sparkClasspath = ComputeClasspath.getSparkClasspath(sparkClasspath, carbonHome);
-            }
-            try {
-                conf.set("spark.executor.extraClassPath", conf.get("spark.executor.extraClassPath") + ";" + sparkClasspath);
-            } catch (NoSuchElementException e) {
-                conf.set("spark.executor.extraClassPath", sparkClasspath);
-            }
-
-            try {
-                conf.set("spark.driver.extraClassPath", conf.get("spark.driver.extraClassPath") + ";" + sparkClasspath);
-            } catch (NoSuchElementException e) {
-                conf.set("spark.driver.extraClassPath", sparkClasspath);
-            }
-
-        } catch (Throwable e) {
-            logDebug("Spark conf in non-carbon environment");
+        try {
+            conf.set("spark.driver.extraClassPath", conf.get("spark.driver.extraClassPath") + ";" + sparkClasspath);
+        } catch (NoSuchElementException e) {
+            conf.set("spark.driver.extraClassPath", sparkClasspath);
         }
     }
 

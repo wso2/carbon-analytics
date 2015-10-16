@@ -65,7 +65,9 @@ public class AnalyticsConstants {
     public static final String TERM_OPTIONS = "options";
 
     public static final String SPARK_DEFAULTS_FILE = "spark-defaults.conf";
+    public static final String FAIR_SCHEDULER_XML = "fairscheduler.xml";
     public static final int SPARK_DEFAULT_PARTITION_COUNT = 6;
+    public static final String DEFAULT_CARBON_SCHEDULER_POOL_NAME = "carbon-pool";
 
     //Analytics relation strings
     public static final String TENANT_ID = "tenantId";
@@ -85,6 +87,7 @@ public class AnalyticsConstants {
     public static final String CARBON_SPARK_MASTER_COUNT = "carbon.spark.master.count";
     public static final String CARBON_SPARK_MASTER = "carbon.spark.master";
     public static final String CARBON_DAS_SYMBOLIC_LINK = "carbon.das.symbolic.link";
+    public static final String CARBON_SCHEDULER_POOL = "carbon.scheduler.pool";
 
     public static final int SPARK_PERSISTENCE_TENANT_ID = -5000;
     public static final String SPARK_MASTER_MAP = "__SPARK_MASTER_MAP__";
@@ -106,6 +109,8 @@ public class AnalyticsConstants {
     public static final String SPARK_MASTER = "spark.master";
 
     public static final String SPARK_SCHEDULER_MODE = "spark.scheduler.mode";
+    public static final String SPARK_SCHEDULER_POOL = "spark.scheduler.pool";
+    public static final String SPARK_SCHEDULER_ALLOCATION_FILE = "spark.scheduler.allocation.file";
     public static final String SPARK_SERIALIZER = "spark.serializer";
     public static final String SPARK_KRYOSERIALIZER_BUFFER_MAX = "spark.kryoserializer.buffer.max";
     public static final String SPARK_KRYOSERIALIZER_BUFFER = "spark.kryoserializer.buffer";
