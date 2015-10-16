@@ -784,11 +784,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private AnalyticsQueryResult toResult(DataFrame dataFrame)
             throws AnalyticsExecutionException {
         int resultsLimit = this.sparkConf.getInt("carbon.spark.results.limit", -1);
-        if(resultsLimit != -1){
+        if (resultsLimit != -1) {
             return new AnalyticsQueryResult(dataFrame.schema().fieldNames(),
                     convertRowsToObjects(dataFrame.limit(resultsLimit).collect()));
-        }
-        else {
+        } else {
             return new AnalyticsQueryResult(dataFrame.schema().fieldNames(),
                     convertRowsToObjects(dataFrame.collect()));
         }
