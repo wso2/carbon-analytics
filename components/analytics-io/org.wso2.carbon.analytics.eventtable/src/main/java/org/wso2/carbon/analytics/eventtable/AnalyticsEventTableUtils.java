@@ -62,6 +62,9 @@ public class AnalyticsEventTableUtils {
     public static Map<String, Object> streamEventToRecordValues(int tenantId, String tableName, List<Attribute> attrs,
             ComplexEvent event) {
         Object[] data = event.getOutputData();
+        if (data == null) {
+            return new HashMap<>(0);
+        }
         Map<String, Object> values = new HashMap<String, Object>();
         for (int i = 0; i < attrs.size(); i++) {
             if (data.length > i) {
@@ -125,8 +128,10 @@ public class AnalyticsEventTableUtils {
     public static StreamEvent recordToStreamEvent(List<Attribute> attrs, Record record) {
         StreamEvent event = new StreamEvent(0, 0, attrs.size());
         Object[] data = new Object[attrs.size()];
+        Attribute attr;
         for (int i = 0; i < attrs.size(); i++) {
-            data[i] = record.getValue(attrs.get(i).getName());
+        	attr = attrs.get(i);
+            data[i] = record.getValue(attr.getName());
         }
         event.setOutputData(data);
         return event;

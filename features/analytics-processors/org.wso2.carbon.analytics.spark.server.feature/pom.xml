@@ -262,11 +262,12 @@
                     <include>spark-defaults.conf</include>
                     <include>spark-udf-config.xml</include>
                     <include>external-spark-classpath.conf</include>
+                    <include>fairscheduler.xml</include>
                     <!-- moved to product-das DAS-110 -->
-                    <!--<include>wso2server.sh</include>-->
-                    <!--<include>wso2server.bat</include>-->
-                    <!--<include>load-spark-env-vars.sh</include>-->
-                    <!--<include>load-spark-env-vars.bat</include>-->
+                    <!--<include>wso2server.sh</include>
+                    <include>wso2server.bat</include>
+                    <include>load-spark-env-vars.sh</include>
+                    <include>load-spark-env-vars.bat</include>-->
                 </includes>
             </resource>
         </resources>

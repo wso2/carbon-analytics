@@ -172,6 +172,7 @@ public class AnalyticsPersistenceManager {
             properties.put(AnalyticsConstants.TASK_TENANT_ID_PROPERTY, String.valueOf(tenantId));
             properties.put(AnalyticsConstants.TASK_SCRIPT_NAME_PROPERTY, script.getName());
             TaskInfo.TriggerInfo triggerInfo = new TaskInfo.TriggerInfo(script.getCronExpression());
+            triggerInfo.setDisallowConcurrentExecution(true);
             TaskInfo taskInfo = new TaskInfo(script.getName(), AnalyticsTask.class.getCanonicalName(),
                     properties, triggerInfo);
             try {

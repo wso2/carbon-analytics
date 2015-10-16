@@ -91,8 +91,9 @@ public class AnalyticsWritingFunction extends AbstractFunction1<Iterator<Row>, B
             try {
                 ads.put(records);
             } catch (AnalyticsException e) {
-                log.error("Error while pushing data to the dataservice: " + e.getMessage(), e);
-                throw new RuntimeException("Error while pushing data to the dataservice: " + e.getMessage(), e);
+                String msg = "Error while pushing data to the dataservice: " + e.getMessage();
+                log.error(msg, e);
+                throw new RuntimeException(msg, e);
             }
         }
         return BoxedUnit.UNIT;
@@ -128,8 +129,8 @@ public class AnalyticsWritingFunction extends AbstractFunction1<Iterator<Row>, B
         }
     }
 
-    private void logDebug (String msg){
-        if (log.isDebugEnabled()){
+    private void logDebug(String msg) {
+        if (log.isDebugEnabled()) {
             log.debug(msg);
         }
     }

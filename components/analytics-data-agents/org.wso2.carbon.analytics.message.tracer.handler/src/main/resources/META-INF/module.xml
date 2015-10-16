@@ -15,7 +15,7 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
  -->
-<module name="wso2bammessagetracerservice"
+<module name="wso2analyticsmessagetracerservice"
         class="org.wso2.carbon.analytics.message.tracer.handler.modules.MessageTracerModule">
 
     <InFlow>

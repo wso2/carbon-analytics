@@ -334,6 +334,14 @@ for t in "$CARBON_HOME"/repository/components/plugins/*objenesis*.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done
+for t in "$CARBON_HOME"/repository/components/plugins/*hector*.jar
+do
+    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
+done
+for t in "$CARBON_HOME"/repository/components/plugins/*thrift*.jar
+do
+    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
+done
 for t in "$CARBON_HOME"/repository/components/plugins/*google*.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t

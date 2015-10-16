@@ -149,9 +149,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     public static final int INDEX_DATA_RECORD_TENANT_ID = -1000;
     
     public static final String INDEX_DATA_RECORD_TABLE_NAME = "__INDEX_DATA__";
-    
-    private static final int SHARD_INDEX_RECORD_BATCH_SIZE = 1000;
-    
+        
     private static final String ANALYTICS_INDEXING_GROUP = "__ANALYTICS_INDEXING_GROUP__";
 
     private static final String INDEX_DATA_FS_BASE_PATH = "/_data/index/";
@@ -169,7 +167,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private static final String EMPTY_FACET_VALUE = "EMPTY_FACET_VALUE!";
 
     private static final String DEFAULT_SCORE = "1";
+    
     public static final String PATH_SEPARATOR = "___####___";
+    
     public static final int TAXONOMYWORKER_TIMEOUT = 60;
 
     private Map<String, Directory> indexDirs = new HashMap<>();
@@ -188,6 +188,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     private int shardCount;
     
+    private int shardIndexRecordBatchSize;
+    
     private int indexingThreadCount;
     
     private ExecutorService shardWorkerExecutor;
@@ -204,7 +206,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         
     public AnalyticsDataIndexer(AnalyticsRecordStore analyticsRecordStore, 
             AnalyticsFileSystem analyticsFileSystem, AnalyticsDataService analyticsDataService,
-            AnalyticsIndexedTableStore indexedTableStore, int shardCount,
+            AnalyticsIndexedTableStore indexedTableStore, int shardCount, int shardIndexRecordBatchSize,
             int indexingThreadCount, Analyzer analyzer,
             AnalyticsReceiverIndexingFlowController flowController) throws AnalyticsException {
     	this.luceneAnalyzer = analyzer;
@@ -213,6 +215,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         this.analyticsDataService = analyticsDataService;
         this.indexedTableStore = indexedTableStore;
     	this.shardCount = shardCount;
+    	this.shardIndexRecordBatchSize = shardIndexRecordBatchSize;
     	this.indexingThreadCount = indexingThreadCount;
     	this.flowController = flowController;
     }
@@ -398,14 +401,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     private void processIndexOperations(int shardIdFrom, int shardRange) throws AnalyticsException {
-        int count = SHARD_INDEX_RECORD_BATCH_SIZE;
+        int count = this.shardIndexRecordBatchSize;
         int tmpCount;
         /* continue processing operations in this until there aren't any to be processed */
-        while (count >= SHARD_INDEX_RECORD_BATCH_SIZE) {
+        while (count >= this.shardIndexRecordBatchSize) {
             count = 0;
             for (IndexedTableId indexTableId : this.indexedTableStore.getAllIndexedTables()) {
                 tmpCount = this.processIndexOperations(indexTableId.getTenantId(), 
-                        indexTableId.getTableName(), shardIdFrom, shardRange, SHARD_INDEX_RECORD_BATCH_SIZE);
+                        indexTableId.getTableName(), shardIdFrom, shardRange, this.shardIndexRecordBatchSize);
                 count = Math.max(count, tmpCount);
             }
         }
@@ -1608,7 +1611,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    private List<String[]> getUniqueGroupings(int tenantId, AggregateRequest aggregateRequest)
+	private List<String[]> getUniqueGroupings(int tenantId, AggregateRequest aggregateRequest)
             throws AnalyticsIndexException, IOException {
         if (aggregateRequest.getAggregateLevel() >= 0) {
             List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds(TAXONOMY_INDEX_DATA_FS_BASE_PATH,
@@ -2008,14 +2011,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    private class TaxonomyWorker implements Callable {
+    private class TaxonomyWorker implements Callable<Set<String>> {
 
         private TaxonomyReader reader;
         private AggregateRequest request;
-
-        public TaxonomyWorker() {
-
-        }
 
         public TaxonomyWorker(TaxonomyReader reader, AggregateRequest request) {
             this.reader = reader;
