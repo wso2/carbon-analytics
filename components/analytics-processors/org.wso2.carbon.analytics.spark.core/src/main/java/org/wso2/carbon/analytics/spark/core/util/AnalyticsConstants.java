@@ -119,5 +119,4 @@ public class AnalyticsConstants {
     public static final String SPARK_RECOVERY_MODE_FACTORY = "spark.deploy.recoveryMode.factory";
 
     public static final String SPARK_RESULTS_LIMIT = "carbon.spark.results.limit";
-
 }
