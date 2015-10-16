@@ -493,8 +493,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         conf.setAll(properties);
         setAdditionalConfigs(conf);
         addSparkPropertiesPortOffset(conf, portOffset);
-
-
         return conf;
     }
 
@@ -559,6 +557,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + carbonConfDir);
         conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + carbonConfDir);
+
+        //setting the default limit for the spark query results
+        conf.setIfMissing("carbon.spark.results.limit", "1000");
 
         String sparkClasspath = (System.getProperty("SPARK_CLASSPATH") == null) ?
                                 "" : System.getProperty("SPARK_CLASSPATH");
@@ -780,13 +781,19 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    private static AnalyticsQueryResult toResult(DataFrame dataFrame)
+    private AnalyticsQueryResult toResult(DataFrame dataFrame)
             throws AnalyticsExecutionException {
-        return new AnalyticsQueryResult(dataFrame.schema().fieldNames(),
-                                        convertRowsToObjects(dataFrame.collect()));
+        int resultsLimit = this.sparkConf.getInt("carbon.spark.results.limit", -1);
+        if (resultsLimit != -1) {
+            return new AnalyticsQueryResult(dataFrame.schema().fieldNames(),
+                    convertRowsToObjects(dataFrame.limit(resultsLimit).collect()));
+        } else {
+            return new AnalyticsQueryResult(dataFrame.schema().fieldNames(),
+                    convertRowsToObjects(dataFrame.collect()));
+        }
     }
 
-    private static List<List<Object>> convertRowsToObjects(Row[] rows) {
+    private List<List<Object>> convertRowsToObjects(Row[] rows) {
         List<List<Object>> result = new ArrayList<>();
         List<Object> objects;
         for (Row row : rows) {
