@@ -1820,11 +1820,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                         logger.error("Failed to create aggregated record: " + e.getMessage(), e);
                         throw new RuntimeException("Error while iterating aggregate records: " + e.getMessage(), e);
                     }
-                    if (currentRecord != null) {
-                        return  true;
-                    } else {
+                    if (currentRecord == null) {
                         groupings.remove(currentGrouping);
-                        this.hasNext();
+                        return  this.hasNext();
+                    } else {
+                        return true;
                     }
                 } else {
                     groupings.remove(currentGrouping);
