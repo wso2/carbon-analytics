@@ -76,7 +76,7 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
                 /* Setting the initial row to start time -1 because it will soon be incremented by 1L. */
                 this.latestRow = HBaseUtils.encodeLong(timeFrom - POSTFIX);
             }
-            if (timeFrom >= Long.MAX_VALUE - 1) {
+            if (timeTo >= Long.MAX_VALUE - 1) {
                 this.noStopTime = true;
             } else {
                 this.endRow = HBaseUtils.encodeLong(timeTo);
@@ -179,18 +179,24 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
         ResultScanner resultScanner;
         try {
             resultScanner = this.indexTable.getScanner(indexScan);
+            outer:
             for (Result rowResult : resultScanner) {
-                if (counter == this.batchSize || this.globalCounter == this.recordsCount) {
-                    /* Snap out of further processing, because either the batch end or the client limit has been reached. */
-                    break;
-                }
                 Cell[] cells = rowResult.rawCells();
                 for (Cell cell : cells) {
+                    if ((this.globalCounter == this.recordsCount)) {
+                        this.fullyFetched = true;
+                        break outer;
+                    }
                     currentBatch.add(Bytes.toString(CellUtil.cloneValue(cell)));
+                    counter++;
+                    this.globalCounter++;
+                }
+                if (counter >= this.batchSize) {
+                    /* Snap out of further processing, because either the batch end or the client limit has been reached. */
+                    this.latestRow = rowResult.getRow();
+                    break;
                 }
                 this.latestRow = rowResult.getRow();
-                counter++;
-                this.globalCounter++;
             }
             resultScanner.close();
             indexTable.close();
