@@ -24,9 +24,6 @@
     String enableMsgBodyDump = request.getParameter("enableMsgBodyDump");
     String enableLogging = request.getParameter("enableLogging");
     String enablePublishToBAM = request.getParameter("enablePublishToBAM");
-    String url = request.getParameter("url");
-    String userName = request.getParameter("user_name");
-    String password = request.getParameter("password");
 
     String backendServerURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
     ConfigurationContext configContext =
@@ -58,15 +55,6 @@
             eventingConfigData.setPublishToBAMEnable(true);
         } else {
             eventingConfigData.setPublishToBAMEnable(false);
-        }
-        if (url != null) {
-            eventingConfigData.setUrl(url);
-        }
-        if (userName != null) {
-            eventingConfigData.setUserName(userName);
-        }
-        if (password != null) {
-            eventingConfigData.setPassword(password);
         }
         try {
             client.setEventingConfigData(eventingConfigData);
@@ -111,16 +99,6 @@
     boolean isMsgDumpingEnable = eventingConfigData.getDumpBodyEnable();
     boolean isLoggingEnable = eventingConfigData.getLoggingEnable();
     boolean isPublishToBAMEnable = eventingConfigData.getPublishToBAMEnable();
-
-    if (url == null) {
-        url = eventingConfigData.getUrl();
-    }
-    if (userName == null) {
-        userName = eventingConfigData.getUserName();
-    }
-    if (password == null) {
-        password = eventingConfigData.getPassword();
-    }
 %>
 
 <script id="source" type="text/javascript">
@@ -137,32 +115,7 @@
 
     var rowNum = 1;
 
-    function testServer(){
 
-        var serverUrl = document.getElementById('url').value;
-        var serverIp = serverUrl.split("://")[1].split(":")[0];
-        var authPort = serverUrl.split("://")[1].split(":")[1];
-
-        if(serverIp == null || authPort == null || serverIp == "" || authPort == ""){
-            CARBON.showInfoDialog("Please enter the URL correctly.");
-        } else {
-            jQuery.ajax({
-                            type:"GET",
-                            url:"../bampubsvcstat/test_server_ajaxprocessor.jsp",
-                            data:{action:"testServer", ip:serverIp, port:authPort},
-                            success:function(data){
-                                if(data != null && data != ""){
-                                    var result = data.replace(/\n+/g, '');
-                                    if(result == "true"){
-                                        CARBON.showInfoDialog("Successfully connected to BAM Server");
-                                    } else if(result == "false"){
-                                        CARBON.showErrorDialog("BAM Server cannot be connected!")
-                                    }
-                                }
-                            }
-                        });
-        }
-    }
 
     function enableActivityStreamFieldsForBAM() {
         if ($(".activityConfigurationCheckBox").is(":checked") && $('#enablePublishToBAM').is(":checked")) {
@@ -244,21 +197,6 @@
                         <% } %>
                         <fmt:message key="enable.bam.event.publishing"/>
                     </td>
-                </tr>
-                <tr class="activityConfigurationInput" style="display:none">
-                    <td><fmt:message key="bam.url"/></td>
-                    <td>
-                        <input type="text"  id="url" name="url" value="<%=url%>"/>
-                        <input type="button" value="Test Server" onclick="testServer()"/>
-                    </td>
-                </tr>
-                <tr class="activityConfigurationInput" style="display:none">
-                    <td><fmt:message key="username"/></td>
-                    <td><input type="text"  name="user_name" value="<%=userName%>"/></td>
-                </tr>
-                <tr class="activityConfigurationInput" style="display:none">
-                    <td><fmt:message key="password"/></td>
-                    <td><input type="password"  name="password" value="<%=password%>"/></td>
                 </tr>
                 <tr>
                     <td colspan="4" class="buttonRow">
