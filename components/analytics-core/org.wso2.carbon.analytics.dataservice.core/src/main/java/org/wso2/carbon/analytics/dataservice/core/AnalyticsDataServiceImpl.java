@@ -859,16 +859,26 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
         AnalyticsRecordStore ars = this.getAnalyticsRecordStore(arsName);
-        Iterator<Record> recordIterator = GenericUtils.recordGroupsToIterator(ars, this.get(tenantId, tableName, 
-                1, null, timeFrom, timeTo, 0, -1).getRecordGroups());
-        while (recordIterator.hasNext()) {
-            this.delete(tenantId, tableName, this.getRecordIdsBatch(recordIterator));
-        }
+        /* This delete must delete both data in the record store an the index. If the table is
+         * not indexed, directly the record store data can be deleted with a range delete, but
+         * if the data is indexed, since the indexer doesn't have a range delete, the record ids
+         * need to be read chunk by chunk, this can be possibly optimized in the future by adding
+         * a range delete to indexer, where a range delete operation needs to be done for all the 
+         * index shards */
+        if (this.isTableIndexed(this.lookupTableInfo(tenantId, tableName))) {
+            Iterator<Record> recordIterator = GenericUtils.recordGroupsToIterator(ars, this.get(tenantId, tableName, 
+                    1, null, timeFrom, timeTo, 0, -1).getRecordGroups());
+            while (recordIterator.hasNext()) {
+                this.delete(tenantId, tableName, this.getRecordIdsBatch(recordIterator));
+            }
+        } else {
+            ars.delete(tenantId, tableName, timeFrom, timeTo);
+        }        
     }
     
     private List<String> getRecordIdsBatch(Iterator<Record> recordIterator) throws AnalyticsException {
         List<String> result = new ArrayList<>(DELETE_BATCH_SIZE);
-        for (int i = 0; i < DELETE_BATCH_SIZE & recordIterator.hasNext(); i++) {
+        for (int i = 0; i < DELETE_BATCH_SIZE && recordIterator.hasNext(); i++) {
             result.add(recordIterator.next().getId());
         }
         return result;
