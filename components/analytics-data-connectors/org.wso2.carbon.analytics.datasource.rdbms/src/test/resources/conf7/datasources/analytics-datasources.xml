@@ -17,9 +17,10 @@
                     <maxActive>80</maxActive>
                     <maxWait>360000</maxWait>
                     <minIdle>5</minIdle>
-                    <testOnBorrow>true</testOnBorrow>
                     <validationQuery>SELECT 1</validationQuery>
-                    <validationInterval>30000</validationInterval>
+                    <initialSize>0</initialSize>
+                    <testWhileIdle>true</testWhileIdle>
+                    <minEvictableIdleTimeMillis>4000</minEvictableIdleTimeMillis>
                 </configuration>
             </definition>
         </datasource>
@@ -38,7 +39,9 @@
                     <minIdle>5</minIdle>
                     <testOnBorrow>true</testOnBorrow>
                     <validationQuery>SELECT 1</validationQuery>
-                    <validationInterval>30000</validationInterval>
+                    <initialSize>0</initialSize>
+                    <testWhileIdle>true</testWhileIdle>
+                    <minEvictableIdleTimeMillis>4000</minEvictableIdleTimeMillis>
                 </configuration>
             </definition>
         </datasource>

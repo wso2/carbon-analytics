@@ -82,6 +82,9 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         this.groups.put(groupId, groupEventListener);
         List<Member> groupMembers = this.getGroupMembers(groupId);
         Member myself = this.hz.getCluster().getLocalMember();
+        if (groupMembers.contains(myself)) {
+            groupMembers.remove(myself);
+        }
         groupMembers.add(myself);
         if (this.checkLeader(myself, groupId)) {
             this.leaders.put(groupId, myself);
@@ -185,10 +188,16 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         List<Member> groupMembers = this.getGroupMembers(groupId);
         Set<Member> existingMembers = this.hz.getCluster().getMembers();
         Iterator<Member> memberItr = groupMembers.iterator();
+        List<Member> removeList = new ArrayList<>();
+        Member currentMember;
         while (memberItr.hasNext()) {
-            if (!existingMembers.contains(memberItr.next())) {
-                memberItr.remove();
+            currentMember = memberItr.next();
+            if (!existingMembers.contains(currentMember)) {
+                removeList.add(currentMember);
             }
+        }
+        for (Member member : removeList) {
+            groupMembers.remove(member);
         }
         if (this.getGroupMembers(groupId).size() == 0) {
             this.resetLeaderInitDoneFlag(groupId);
