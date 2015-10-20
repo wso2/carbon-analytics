@@ -332,7 +332,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                                 + " for tenant" + tenantId);
                     }
                     /* Sentence */
-                    this.deleteIndexEntries(tenantId, tableName, criminals);
+                    this.deleteRows(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.INDEX, criminals);
                 }
             } catch (IOException e) {
                 throw new AnalyticsException("Error while pruning obsolete entries from table " + tableName
@@ -514,7 +514,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             dataTable = this.conn.getTable(TableName.valueOf(dataTableName));
             dataTable.delete(dataDeletes);
             log.debug("Processed deletion of " + dataDeletes.size() + " records from table " + tableName + "for tenant " + tenantId);
-            this.deleteIndexEntries(tenantId, tableName, timestamps);
+            this.deleteRows(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.INDEX, timestamps);
         } catch (IOException e) {
             throw new AnalyticsException("Error deleting records from " + tableName + " for tenant " + tenantId + " : "
                     + e.getMessage(), e);
@@ -530,22 +530,6 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             log.debug("Closed HBase connection transients successfully.");
         } catch (IOException ignore) {
                 /* do nothing, the connection is dead anyway */
-        }
-    }
-
-    private void deleteIndexEntries(int tenantId, String tableName, List<byte[]> timestamps) throws IOException {
-        Table indexTable = null;
-        List<Delete> indexDeletes = new ArrayList<>();
-        String indexTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.INDEX);
-        for (byte[] timestamp : timestamps) {
-            Delete delete = new Delete(timestamp);
-            indexDeletes.add(delete);
-        }
-        try {
-            indexTable = this.conn.getTable(TableName.valueOf(indexTableName));
-            indexTable.delete(indexDeletes);
-        } finally {
-            GenericUtils.closeQuietly(indexTable);
         }
     }
 
