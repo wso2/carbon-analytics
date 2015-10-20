@@ -234,6 +234,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (this.checkIndexThrottlingDisabledExplicitely()) {
             this.flowController.getConfig().setEnabled(false);
         }
+        this.getAnalyticsRecordStore().createTable(INDEX_DATA_RECORD_TENANT_ID, INDEX_DATA_RECORD_TABLE_NAME);
         if (this.checkIfIndexingNode()) {
             this.initializeIndexingSchedules();
         }
@@ -250,7 +251,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     private void initializeIndexingSchedules() throws AnalyticsException {
-        this.getAnalyticsRecordStore().createTable(INDEX_DATA_RECORD_TENANT_ID, INDEX_DATA_RECORD_TABLE_NAME);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
             log.info("Analytics Indexing Mode: CLUSTERED");

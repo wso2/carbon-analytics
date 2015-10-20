@@ -859,21 +859,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
         AnalyticsRecordStore ars = this.getAnalyticsRecordStore(arsName);
-        /* This delete must delete both data in the record store an the index. If the table is
-         * not indexed, directly the record store data can be deleted with a range delete, but
-         * if the data is indexed, since the indexer doesn't have a range delete, the record ids
-         * need to be read chunk by chunk, this can be possibly optimized in the future by adding
-         * a range delete to indexer, where a range delete operation needs to be done for all the 
-         * index shards */
-        if (this.isTableIndexed(this.lookupTableInfo(tenantId, tableName))) {
-            Iterator<Record> recordIterator = GenericUtils.recordGroupsToIterator(ars, this.get(tenantId, tableName, 
-                    1, null, timeFrom, timeTo, 0, -1).getRecordGroups());
-            while (recordIterator.hasNext()) {
-                this.delete(tenantId, tableName, this.getRecordIdsBatch(recordIterator));
-            }
-        } else {
-            ars.delete(tenantId, tableName, timeFrom, timeTo);
-        }        
+        /* this is done to make sure, raw record data as well as the index data are also deleted,
+         * even if the table is not indexed now, it could have been indexed earlier, so delete operation
+         * must be done in the indexer as well */
+        Iterator<Record> recordIterator = GenericUtils.recordGroupsToIterator(ars, this.get(tenantId, tableName, 
+                1, null, timeFrom, timeTo, 0, -1).getRecordGroups());
+        while (recordIterator.hasNext()) {
+            this.delete(tenantId, tableName, this.getRecordIdsBatch(recordIterator));
+        }       
     }
     
     private List<String> getRecordIdsBatch(Iterator<Record> recordIterator) throws AnalyticsException {
