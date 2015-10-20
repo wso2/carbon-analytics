@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.spark.core.internal;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
+import com.hazelcast.core.Member;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.SparkConf;
@@ -72,6 +73,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -197,10 +199,16 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    private void runClusteredSetupLogic() throws AnalyticsClusterException {
+    private void cleanupMasterMap(Set<Member> members, Map<String, Object> masterMap) {
+        Iterator<Map.Entry<String, Object>> itr = masterMap.entrySet().iterator();
+        while (itr.hasNext()) {
+            if (!members.contains(itr.next().getValue())) {
+                itr.remove();
+            }
+        }
+    }
 
-        acm.joinGroup(CLUSTER_GROUP_NAME, this);
-        log.info("Member joined the cluster");
+    private void runClusteredSetupLogic() throws AnalyticsClusterException {
 
         //port offsetted master name
         String thisMasterUrl = "spark://" + this.myHost + ":" + this.sparkConf.
@@ -208,6 +216,12 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         HazelcastInstance hz = AnalyticsServiceHolder.getHazelcastInstance();
         Map<String, Object> masterMap = hz.getMap(AnalyticsConstants.SPARK_MASTER_MAP);
+
+        this.cleanupMasterMap(hz.getCluster().getMembers(), masterMap);
+
+        acm.joinGroup(CLUSTER_GROUP_NAME, this);
+        log.info("Member joined the cluster");
+
         Set<String> masterUrls = masterMap.keySet();
 
         //start master logic
