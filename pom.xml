@@ -952,6 +952,11 @@
                 <artifactId>xercesImpl</artifactId>
                 <version>${xerces.xercesImpl.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.smslib</groupId>
+                <artifactId>smslib</artifactId>
+                <version>${org.smslib.version}</version>
+            </dependency>
 
             <!--carbon-deployment features start-->
             <!--<dependency>-->
@@ -1157,6 +1162,17 @@
             <url>http://repo.marketcetera.org/maven/</url>
         </repository>
 
+        <repository>
+            <id>smslib.releases</id>
+            <name>smslib Repository</name>
+            <url>http://smslib.org/maven2/v3/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+        </repository>
+
     </repositories>
 
     <properties>
@@ -1262,6 +1278,7 @@
         <!-- Spark dependency versions end-->
 
         <wsdl4j.wso2.version>1.6.2.wso2v2</wsdl4j.wso2.version>
+        <org.smslib.version>3.4.5</org.smslib.version>
     </properties>
 
 </project>
