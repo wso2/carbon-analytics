@@ -199,12 +199,18 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    private void cleanupMasterMap(Set<Member> members, Map<String, Object> masterMap) {
+    private void cleanupMasterMap(Member myself, Set<Member> members, Map<String, Object> masterMap) {
         Iterator<Map.Entry<String, Object>> itr = masterMap.entrySet().iterator();
+        Map.Entry<String, Object> currentEntry;
+        List<String> removeIds = new ArrayList<>();
         while (itr.hasNext()) {
-            if (!members.contains(itr.next().getValue())) {
-                itr.remove();
+            currentEntry = itr.next();
+            if (!members.contains(currentEntry.getValue()) || (currentEntry.getValue().equals(myself))) {
+                removeIds.add(currentEntry.getKey());
             }
+        }
+        for (String key : removeIds) {
+            masterMap.remove(key);
         }
     }
 
@@ -217,7 +223,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         HazelcastInstance hz = AnalyticsServiceHolder.getHazelcastInstance();
         Map<String, Object> masterMap = hz.getMap(AnalyticsConstants.SPARK_MASTER_MAP);
 
-        this.cleanupMasterMap(hz.getCluster().getMembers(), masterMap);
+        this.cleanupMasterMap(hz.getCluster().getLocalMember(), hz.getCluster().getMembers(), masterMap);
 
         acm.joinGroup(CLUSTER_GROUP_NAME, this);
         log.info("Member joined the cluster");
