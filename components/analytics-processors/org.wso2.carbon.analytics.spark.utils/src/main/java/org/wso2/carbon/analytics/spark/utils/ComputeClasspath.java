@@ -236,7 +236,7 @@ public class ComputeClasspath {
     public static String getSparkClasspath(String sparkClasspath, String carbonHome, String[] excludeJars)
             throws IOException {
         String cp = createInitialSparkClasspath(sparkClasspath, carbonHome, REQUIRED_JARS, SEP, excludeJars);
-        return cp + addJarsFromLib("", carbonHome, SEP) + addJarsFromConfig("", carbonHome, SEP);
+        return cp + addJarsFromLib("", carbonHome, SEP) + addJarsFromDropins("", carbonHome, SEP) + addJarsFromConfig("", carbonHome, SEP);
     }
 
     public static String[] getSparkClasspathJarsArray(String sparkClasspath, String carbonHome)
@@ -256,6 +256,16 @@ public class ComputeClasspath {
     private static String addJarsFromLib(String scp, String carbonHome, String separator) {
         File libDir = new File(carbonHome + File.separator + "repository" + File.separator
                                + "components" + File.separator + "lib");
+        File[] libJars = listJars(libDir);
+        for (File jar : libJars) {
+            scp = scp + separator + jar.getAbsolutePath();
+        }
+        return scp;
+    }
+
+    private static String addJarsFromDropins(String scp, String carbonHome, String separator) {
+        File libDir = new File(carbonHome + File.separator + "repository" + File.separator
+                + "components" + File.separator + "dropins");
         File[] libJars = listJars(libDir);
         for (File jar : libJars) {
             scp = scp + separator + jar.getAbsolutePath();
