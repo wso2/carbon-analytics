@@ -266,7 +266,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return GenericUtils.splitNumberRange(this.getShardCount(), numWorkers);
     }
     
-    private void scheduleWorkers(Integer[] shardInfo) throws AnalyticsException {
+    private synchronized void scheduleWorkers(Integer[] shardInfo) throws AnalyticsException {
         int shardIndexFrom = shardInfo[0];
         int shardRange = shardInfo[1];
         this.stopAndCleanupIndexProcessing();
@@ -1556,7 +1556,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             try {
                 acm.executeAll(ANALYTICS_INDEXING_GROUP, new IndexingStopMessage());
                 List<Object> members = acm.getMembers(ANALYTICS_INDEXING_GROUP);
-                List<Integer[]> schedulePlan = this.generateIndexWorkerSchedulePlan(members.size());
+                int memberCount = members.size();
+                if (memberCount == 0) {
+                    throw new AnalyticsException("No indexing nodes found in the cluster for index operation scheduling.");
+                }
+                List<Integer[]> schedulePlan = this.generateIndexWorkerSchedulePlan(memberCount);
                 for (int i = 0; i < members.size(); i++) {
                     acm.executeOne(ANALYTICS_INDEXING_GROUP, members.get(i), 
                             new IndexingScheduleMessage(schedulePlan.get(i)));
