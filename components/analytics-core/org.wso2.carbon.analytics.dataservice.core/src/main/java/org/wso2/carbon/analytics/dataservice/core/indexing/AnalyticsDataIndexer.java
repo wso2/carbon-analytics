@@ -1497,7 +1497,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
     
-    public void stopAndCleanupIndexProcessing() {
+    public synchronized void stopAndCleanupIndexProcessing() {
         this.getFlowController().stop();
         if (this.shardWorkerExecutor != null) {
             this.shardWorkerExecutor.shutdown();
