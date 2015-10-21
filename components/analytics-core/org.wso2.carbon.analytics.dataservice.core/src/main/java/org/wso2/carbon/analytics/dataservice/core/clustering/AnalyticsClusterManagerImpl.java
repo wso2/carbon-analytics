@@ -26,6 +26,7 @@ import com.hazelcast.core.MembershipListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -82,8 +83,8 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         this.groups.put(groupId, groupEventListener);
         List<Member> groupMembers = this.getGroupMembers(groupId);
         Member myself = this.hz.getCluster().getLocalMember();
-        if (groupMembers.contains(myself)) {
-            groupMembers.remove(myself);
+        if (GenericUtils.hzContains(groupMembers, myself)) { //groupMembers.contains(myself)
+            GenericUtils.hzRemove(groupMembers, myself); //groupMembers.remove(myself)
         }
         groupMembers.add(myself);
         if (this.checkLeader(myself, groupId)) {
@@ -192,12 +193,12 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         Member currentMember;
         while (memberItr.hasNext()) {
             currentMember = memberItr.next();
-            if (!existingMembers.contains(currentMember)) {
+            if (!existingMembers.contains(currentMember)) { //
                 removeList.add(currentMember);
             }
         }
         for (Member member : removeList) {
-            groupMembers.remove(member);
+            GenericUtils.hzRemove(groupMembers, member); //groupMembers.remove(member)
         }
         if (this.getGroupMembers(groupId).size() == 0) {
             this.resetLeaderInitDoneFlag(groupId);
@@ -279,8 +280,8 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     private void checkGroupMemberRemoval(String groupId, Member member)
             throws AnalyticsClusterException {
         List<Member> groupMembers = this.getGroupMembers(groupId);
-        if (groupMembers.contains(member)) {
-            groupMembers.remove(member);
+        if (GenericUtils.hzContains(groupMembers, member)) { // groupMembers.contains(member)
+            GenericUtils.hzRemove(groupMembers, member); //groupMembers.remove(member);
         }
         if (this.isLeader(groupId)) {
             /* if I'm already the leader, notify of the membership change */

@@ -199,7 +199,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    private void cleanupMasterMap(Member myself, Set<Member> members, Map<String, Object> masterMap) {
+    private void cleanupMasterMap(Member myself, Set<Member> members,
+                                  Map<String, Object> masterMap) {
         Iterator<Map.Entry<String, Object>> itr = masterMap.entrySet().iterator();
         Map.Entry<String, Object> currentEntry;
         List<String> removeIds = new ArrayList<>();
@@ -219,29 +220,39 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         //port offsetted master name
         String thisMasterUrl = "spark://" + this.myHost + ":" + this.sparkConf.
                 get(AnalyticsConstants.SPARK_MASTER_PORT);
+        logDebug("Spark master URL for this node : " + thisMasterUrl);
 
         HazelcastInstance hz = AnalyticsServiceHolder.getHazelcastInstance();
         Map<String, Object> masterMap = hz.getMap(AnalyticsConstants.SPARK_MASTER_MAP);
 
-        this.cleanupMasterMap(hz.getCluster().getLocalMember(), hz.getCluster().getMembers(), masterMap);
-
-        acm.joinGroup(CLUSTER_GROUP_NAME, this);
-        log.info("Member joined the cluster");
-
+        Object localMember = acm.getLocalMember();
+        log.info("Local member : " + localMember);
         Set<String> masterUrls = masterMap.keySet();
+        logDebug("Master URLs : " + Arrays.toString(masterUrls.toArray()));
 
         //start master logic
+        log.info("Current Spark Master map size : " + masterMap.size());
         if (masterUrls.contains(thisMasterUrl) || masterMap.size() < this.redundantMasterCount) {
             log.info("Masters available are less than the redundant master count or " +
                      "This is/ has been a member of the MasterMap");
 
-            masterMap.put(thisMasterUrl, acm.getLocalMember());
+            if (!masterUrls.contains(thisMasterUrl)) {
+                log.info("Adding member to the Spark Master map : " + localMember);
+                masterMap.put(thisMasterUrl, localMember);
+            }
+
             log.info("Starting SPARK MASTER...");
             this.startMaster();
         }
 
+        acm.joinGroup(CLUSTER_GROUP_NAME, this);
+        log.info("Member joined the Carbon Analytics Execution cluster : " + localMember);
+
+        this.processLeaderElectable();
+
         // start worker and client logic
-        if (masterMap.size() >= this.redundantMasterCount) { //
+        log.info("Spark Master map size after starting masters : " + masterMap.size());
+        if (masterMap.size() >= this.redundantMasterCount) {
             log.info("Redundant master count reached. Starting workers in all members...");
             this.acm.executeAll(CLUSTER_GROUP_NAME, new StartWorkerExecutionCall());
 
@@ -403,7 +414,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         } else {
             logDebug("Master is already active in this node, therefore ignoring Master startup");
         }
-        processLeaderElectable();
+//        processLeaderElectable();
     }
 
     /**
@@ -412,11 +423,17 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      */
     private void processLeaderElectable() throws AnalyticsClusterException {
         if (!isElectedLeaderAvailable()) {
+            log.info("No elected leader is available. Hence electing this member as the leader");
             this.electAsLeader();
         }
     }
 
     private boolean isElectedLeaderAvailable() throws AnalyticsClusterException {
+        if (acm.getMembers(CLUSTER_GROUP_NAME).isEmpty()){
+            log.info("Cluster is empty. Hence no elected leader available");
+            return false;
+        }
+
         List<Boolean> clusterElectedLeaders = acm.executeAll(CLUSTER_GROUP_NAME,
                                                              new CheckElectedLeaderExecutionCall());
         return clusterElectedLeaders.contains(true);
@@ -806,10 +823,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         int resultsLimit = this.sparkConf.getInt("carbon.spark.results.limit", -1);
         if (resultsLimit != -1) {
             return new AnalyticsQueryResult(dataFrame.schema().fieldNames(),
-                    convertRowsToObjects(dataFrame.limit(resultsLimit).collect()));
+                                            convertRowsToObjects(dataFrame.limit(resultsLimit).collect()));
         } else {
             return new AnalyticsQueryResult(dataFrame.schema().fieldNames(),
-                    convertRowsToObjects(dataFrame.collect()));
+                                            convertRowsToObjects(dataFrame.collect()));
         }
     }
 
@@ -845,10 +862,13 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 // masterMap empty means that there haven't been any masters in the cluster
                 // so, no electable leader is available.
                 // therefore this node is put to the map as a possible leader
-                String masterUrl = "spark://" + this.myHost + ":" + this.sparkConf.getInt(AnalyticsConstants.SPARK_MASTER_PORT, 7077 + this.portOffset);
+                logDebug("Spark master map is empty...");
+                String masterUrl = "spark://" + this.myHost + ":" + this.sparkConf.getInt(
+                        AnalyticsConstants.SPARK_MASTER_PORT, 7077 + this.portOffset);
                 masterMap.put(masterUrl, acm.getLocalMember());
                 logDebug("Added " + masterUrl + " to the MasterMap");
-            } else {
+            } else if (masterMap.size() >= this.redundantMasterCount) {
+                log.info("Redundant master count fulfilled : " + masterMap.size());
                 // when becoming leader, this checks if there is an elected spark leader available in the cluster.
                 // if there is, then the cluster is already in a workable state.
                 // else, a suitable leader needs to be elected.
@@ -857,15 +877,17 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     try {
                         electSuitableLeader();
                     } catch (AnalyticsClusterException e) {
-                        String msg = "Unable to elect a suitable leader" + e.getMessage();
+                        String msg = "Unable to elect a suitable leader : " + e.getMessage();
                         log.error(msg, e);
                         throw new RuntimeException(msg, e);
                     }
                 }
 
                 // new spark client app will be created, pointing to the spark masters
-                log.info("Initializing new spark client app");
+                log.info("Initializing new spark client app...");
                 this.initializeAnalyticsClient();
+            } else {
+                    log.info("Master map size is less than the redundant master count");
             }
         } catch (AnalyticsException e) {
             String msg = "Error in processing on becoming leader cluster message: " + e.getMessage();
@@ -896,7 +918,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 //this means that this master is active in the cluster
                 acm.executeOne(CLUSTER_GROUP_NAME, masterMember, new ElectLeaderExecutionCall());
                 foundSuitableMaster = true;
-                log.info("Suitable leader elected");
+                log.info("Suitable leader elected : " + masterMember);
                 break;
             }
         }
@@ -936,6 +958,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      */
     @Override
     public void onMembersChangeForLeader(boolean removedMember) {
+        log.info("Member change, remove: " + removedMember);
         try {
             this.workerCount = AnalyticsServiceHolder.getAnalyticsClusterManager().getMembers(CLUSTER_GROUP_NAME).size();
             log.info("Analytics worker updated, total count: " + this.getWorkerCount());
@@ -945,6 +968,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     //this means that the elected spark master has been removed
                     log.info("Removed member was the Spark elected leader. Electing a suitable leader...");
                     electSuitableLeader();
+                } else {
+                    log.info("Elected leader already available.");
                 }
             }
         } catch (AnalyticsClusterException e) {

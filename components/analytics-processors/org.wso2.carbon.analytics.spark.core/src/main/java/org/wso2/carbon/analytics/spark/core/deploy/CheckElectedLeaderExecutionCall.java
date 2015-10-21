@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.analytics.spark.core.deploy;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 
 import java.io.Serializable;
@@ -30,8 +32,12 @@ public class CheckElectedLeaderExecutionCall implements Callable<Boolean>, Seria
 
     private static final long serialVersionUID = -155083315280606063L;
 
+    private static Log log = LogFactory.getLog(CheckElectedLeaderExecutionCall.class);
+
     @Override
     public Boolean call() throws Exception {
-        return ServiceHolder.getAnalyticskExecutor().isElectedLeader();
+        boolean result = ServiceHolder.getAnalyticskExecutor().isElectedLeader();
+        log.info("Check Elected Leader Request: " + result);
+        return result;
     }
 }
