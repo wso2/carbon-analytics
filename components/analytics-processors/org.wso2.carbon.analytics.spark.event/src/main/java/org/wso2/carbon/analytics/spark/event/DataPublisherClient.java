@@ -44,11 +44,11 @@ public class DataPublisherClient {
 
     public void publish(List<Event> events) throws DataEndpointException {
         for (Event event : events) {
-            dataPublisher.tryPublish(event);
+            dataPublisher.publish(event);
         }
     }
 
     public void publish(Event event) throws DataEndpointException {
-        dataPublisher.tryPublish(event);
+        dataPublisher.publish(event);
     }
 }
