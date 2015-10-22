@@ -96,8 +96,8 @@ public class ChunkedDataOutput extends OutputStream {
         if (chunkPosition > 0) {
             activeChunk = this.dataChunks.get(this.dataChunks.size() - 1);
         }
-        this.getStream().setLength(this.position);
         this.getStream().writeChunks(this.dataChunks);
+        this.getStream().setLength(this.position);        
         this.dataChunks.clear();
         if (activeChunk != null) {
             this.dataChunks.add(activeChunk);

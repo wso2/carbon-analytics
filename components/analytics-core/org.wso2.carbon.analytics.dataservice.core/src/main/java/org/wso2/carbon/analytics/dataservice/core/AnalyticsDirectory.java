@@ -113,6 +113,11 @@ public class AnalyticsDirectory extends Directory {
     public void renameFile(String s, String s1) throws IOException {
         this.getFileSystem().renameFileInDirectory(getPath(), s, s1);
     }
+    
+    @Override
+    public String toString() {
+        return this.getPath();
+    }
 
     /**
      * Lucene {@link IndexInput} adaptor implementation using Carbon analytics {@link DataInput}.

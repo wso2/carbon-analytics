@@ -53,6 +53,7 @@ import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyReader;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.DocValuesType;
+import org.apache.lucene.index.IndexNotFoundException;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -832,14 +833,21 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         List<String> shardIds = this.lookupGloballyExistingShardIds(INDEX_DATA_FS_BASE_PATH,
                 tenantId, tableName);
         List<IndexReader> indexReaders = new ArrayList<>();
-
         for (String shardId : shardIds) {
             String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
-            IndexReader reader = DirectoryReader.open(this.lookupIndexDir(shardedTableId));
-            indexReaders.add(reader);
+            try {
+                IndexReader reader = DirectoryReader.open(this.lookupIndexDir(shardedTableId));
+                indexReaders.add(reader);
+            } catch (IndexNotFoundException ignore) {
+                /* this can happen if a user just started to index records in a table,
+                 * but it didn't yet do the first commit, so it does not have segment* files.
+                 * The execution comes to this place, because the shards are identified, since
+                 * there is some other intermediate files written to the index directory. 
+                 * So in this situation, if we are in the middle of the initial commit, we ignore
+                 * this partially indexed data for now */
+            }
         }
         return new MultiReader(indexReaders.toArray(new IndexReader[indexReaders.size()]));
-
     }
 
     public SubCategories drilldownCategories(int tenantId, CategoryDrillDownRequest drillDownRequest)
@@ -874,11 +882,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private List<SearchResultEntry> drillDownRecords(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
                                                      Directory indexDir, Directory taxonomyIndexDir,
-                                                     String rangeField,AnalyticsDrillDownRange range)
+                                                     String rangeField, AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
         IndexReader indexReader = null;
         TaxonomyReader taxonomyReader = null;
-        List<SearchResultEntry> searchResults =new ArrayList<>();
+        List<SearchResultEntry> searchResults = new ArrayList<>();
         try {
             indexReader = DirectoryReader.open(indexDir);
             taxonomyReader = new DirectoryTaxonomyReader(taxonomyIndexDir);
@@ -898,6 +906,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 searchResults.add(new SearchResultEntry(document.get(INDEX_ID_INTERNAL_FIELD), scoreDoc.score));
             }
             return searchResults;
+        } catch (IndexNotFoundException ignore) {
+            return new ArrayList<>();
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error while performing drilldownRecords: " + e.getMessage(), e);
         } finally {
@@ -944,6 +954,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 }
             }
             return searchResults;
+        } catch (IndexNotFoundException ignore) {
+            return new ArrayList<>();
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error while performing drilldownCategories: " + e.getMessage(), e);
         } catch (org.apache.lucene.queryparser.classic.ParseException e) {
@@ -955,9 +967,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private double getDrillDownRecordCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
                                                      Directory indexDir, Directory taxonomyIndexDir,
-                                                     String rangeField,AnalyticsDrillDownRange range)
+                                                     String rangeField, AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
-
         IndexReader indexReader = null;
         TaxonomyReader taxonomyReader = null;
         try {
@@ -987,6 +998,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 }
             }
             return count;
+        } catch (IndexNotFoundException ignore) {
+            return 0;
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error while getting drilldownCount: " + e.getMessage(), e);
         } finally {
