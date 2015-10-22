@@ -592,8 +592,17 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE_FACTORY,
                           AnalyticsRecoveryModeFactory.class.getName());
 
-        conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + carbonConfDir);
-        conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + carbonConfDir);
+        String agentConfPath = carbonHome + File.separator + "repository" + File.separator +
+                "conf"  + File.separator + "data-bridge" + File.separator + "data-agent-config.xml";
+        conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + carbonConfDir
+                + " -Djavax.net.ssl.trustStore=" + System.getProperty("javax.net.ssl.trustStore")
+                + " -Djavax.net.ssl.trustStorePassword=" + System.getProperty("javax.net.ssl.trustStorePassword")
+                + " -DAgent.Config.Path=" + agentConfPath);
+
+        conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + carbonConfDir
+                + " -Djavax.net.ssl.trustStore=" + System.getProperty("javax.net.ssl.trustStore")
+                + " -Djavax.net.ssl.trustStorePassword=" + System.getProperty("javax.net.ssl.trustStorePassword")
+                + " -DAgent.Config.Path=" + agentConfPath);
 
         //setting the default limit for the spark query results
         conf.setIfMissing("carbon.spark.results.limit", "1000");

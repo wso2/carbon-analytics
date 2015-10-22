@@ -51,6 +51,10 @@ public class EventStreamProvider implements RelationProvider, Serializable {
     private String description;
     private String nickname;
     private String payload;
+    private String receiverURLSet;
+    private String authURLSet;
+    private String username;
+    private String password;
 
     public EventStreamProvider() {
     }
@@ -60,7 +64,8 @@ public class EventStreamProvider implements RelationProvider, Serializable {
         setParameters(parameters);
         defineStreamIfNotExists();
 
-        return new StreamRelation(tenantId, sqlContext, getStreamId(streamName, version), payload);
+        return new StreamRelation(tenantId, sqlContext, getStreamId(streamName, version), payload,
+                receiverURLSet, authURLSet, username, password);
     }
 
     private void setParameters(Map<String, String> parameters) {
@@ -70,6 +75,10 @@ public class EventStreamProvider implements RelationProvider, Serializable {
         this.description = extractValuesFromMap(EventingConstants.DESCRIPTION, parameters, "");
         this.nickname = extractValuesFromMap(EventingConstants.NICKNAME, parameters, "");
         this.payload = extractValuesFromMap(EventingConstants.PAYLOAD, parameters, "");
+        this.receiverURLSet = extractValuesFromMap(EventingConstants.receiverURLSet, parameters, "");
+        this.authURLSet = extractValuesFromMap(EventingConstants.authURLSet, parameters, null);
+        this.username = extractValuesFromMap(EventingConstants.username, parameters, "");
+        this.password = extractValuesFromMap(EventingConstants.password, parameters, "");
     }
 
     private void defineStreamIfNotExists() {
@@ -83,8 +92,8 @@ public class EventStreamProvider implements RelationProvider, Serializable {
                     String[] fields = payload.split(",");
                     String name, type;
                     String[] tokens;
-                    for (int i = 0; i < fields.length; i++) {
-                        tokens = fields[i].trim().split(" ");
+                    for (String field : fields) {
+                        tokens = field.trim().split(" ");
                         name = tokens[0].trim();
                         type = tokens[1].trim().toUpperCase();
                         streamDefinition.addPayloadData(name, AttributeType.valueOf(type));
