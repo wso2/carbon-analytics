@@ -21,8 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructType;
-import org.wso2.carbon.analytics.spark.event.internal.ServiceHolder;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.commons.Event;
 import scala.collection.Iterator;
 import scala.runtime.AbstractFunction1;
@@ -49,12 +48,7 @@ public class EventIteratorFunction extends AbstractFunction1<Iterator<Row>, Boxe
     private String authURLSet;
     private String username;
     private String password;
-
-    public EventIteratorFunction(int tenantId,String streamId, StructType schema) {
-        this.tenantId = tenantId;
-        this.streamId = streamId;
-        this.schema = schema;
-    }
+    private DataPublisher dataPublisher;
 
     public EventIteratorFunction(int tenantId,String streamId, StructType schema,
                                  String receiverURLSet, String authURLSet, String username, String password) {
@@ -67,31 +61,39 @@ public class EventIteratorFunction extends AbstractFunction1<Iterator<Row>, Boxe
         this.password = password;
     }
 
+    //note : this method is invoked by apply() method instead of constructor due to some kryo serialization issues
+    private void initDataPublisherClient() {
+        String key = receiverURLSet + "_" +  authURLSet + "_" + username  + "_" + password;
+        dataPublisher = DataPublisherHolder.getInstance().getDataPublisher(key);
+        if (dataPublisher == null) {
+            try {
+                dataPublisher = new DataPublisher(EventingConstants.THRIFT_AGENT_TYPE, receiverURLSet, authURLSet, username, password);
+                DataPublisherHolder.getInstance().addDataPublisher(key, dataPublisher);
+            } catch (Exception e) {
+                log.warn("Failed to create data publisher for publishing events to streamId: " + this.streamId, e);
+            }
+        }
+    }
+
     @Override
     public BoxedUnit apply(Iterator<Row> iterator) {
-        try {
-            //todo: get data publishers from a map rather than creating each time
-            DataPublisherClient dataPublisherClient = new DataPublisherClient(receiverURLSet, authURLSet, username, password);
-            while (iterator.hasNext()) {
-                Row row = iterator.next();
-                List<Object> result = new ArrayList<Object>();
-                for (int i = 0; i < row.length(); i++) {
-                    result.add(row.get(i));
-                }
-                dataPublisherClient.publish(buildEvent(result));
+        initDataPublisherClient();
+        while (iterator.hasNext()) {
+            Row row = iterator.next();
+            List<Object> result = new ArrayList<Object>();
+            for (int i = 0; i < row.length(); i++) {
+                result.add(row.get(i));
+            }
+            if (dataPublisher != null) {
+                dataPublisher.publish(buildEvent(result));
+            } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("Published event to streamId: " + this.streamId);
+                    log.debug("Publisher is not initialized properly. Couldn't publish events to streamId: " + this.streamId);
                 }
             }
-            //todo : fix shutdown method properly without having random sleeps
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                log.error(e);
+            if (log.isDebugEnabled()) {
+                log.debug("Published event to streamId: " + this.streamId);
             }
-            dataPublisherClient.shutdown();
-        } catch (Exception e) {
-            log.warn("Failed to publish events to streamId: " + this.streamId, e);
         }
         return BoxedUnit.UNIT;
     }

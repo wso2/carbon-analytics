@@ -28,4 +28,5 @@ public class EventingConstants {
     public static final String authURLSet = "authURL";
     public static final String username = "username";
     public static final String password = "password";
+    public static final String THRIFT_AGENT_TYPE = "Thrift";
 }
