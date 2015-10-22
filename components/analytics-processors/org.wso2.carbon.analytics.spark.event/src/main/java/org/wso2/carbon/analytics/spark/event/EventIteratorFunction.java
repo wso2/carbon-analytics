@@ -45,6 +45,10 @@ public class EventIteratorFunction extends AbstractFunction1<Iterator<Row>, Boxe
     private int tenantId;
     private StructType schema;
     private String streamId;
+    private String receiverURLSet;
+    private String authURLSet;
+    private String username;
+    private String password;
 
     public EventIteratorFunction(int tenantId,String streamId, StructType schema) {
         this.tenantId = tenantId;
@@ -52,19 +56,42 @@ public class EventIteratorFunction extends AbstractFunction1<Iterator<Row>, Boxe
         this.schema = schema;
     }
 
+    public EventIteratorFunction(int tenantId,String streamId, StructType schema,
+                                 String receiverURLSet, String authURLSet, String username, String password) {
+        this.tenantId = tenantId;
+        this.streamId = streamId;
+        this.schema = schema;
+        this.receiverURLSet = receiverURLSet;
+        this.authURLSet = authURLSet;
+        this.username = username;
+        this.password = password;
+    }
+
     @Override
     public BoxedUnit apply(Iterator<Row> iterator) {
-        while (iterator.hasNext()) {
-            Row row = iterator.next();
-            List<Object> result = new ArrayList<Object>();
-            for (int i = 0; i < row.length(); i++) {
-                result.add(row.get(i));
+        try {
+            //todo: get data publishers from a map rather than creating each time
+            DataPublisherClient dataPublisherClient = new DataPublisherClient(receiverURLSet, authURLSet, username, password);
+            while (iterator.hasNext()) {
+                Row row = iterator.next();
+                List<Object> result = new ArrayList<Object>();
+                for (int i = 0; i < row.length(); i++) {
+                    result.add(row.get(i));
+                }
+                dataPublisherClient.publish(buildEvent(result));
+                if (log.isDebugEnabled()) {
+                    log.debug("Published event to streamId: " + this.streamId);
+                }
             }
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(this.tenantId);
-            ServiceHolder.getEventStreamService().publish(buildEvent(result));
-            if (log.isDebugEnabled()) {
-                log.debug("Published event to streamId: " + this.streamId);
+            //todo : fix shutdown method properly without having random sleeps
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                log.error(e);
             }
+            dataPublisherClient.shutdown();
+        } catch (Exception e) {
+            log.warn("Failed to publish events to streamId: " + this.streamId, e);
         }
         return BoxedUnit.UNIT;
     }

@@ -24,4 +24,8 @@ public class EventingConstants {
     public static final String DESCRIPTION = "description";
     public static final String NICKNAME = "nickname";
     public static final String PAYLOAD = "payload";
+    public static final String receiverURLSet = "receiverURL";
+    public static final String authURLSet = "authURL";
+    public static final String username = "username";
+    public static final String password = "password";
 }
