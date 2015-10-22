@@ -71,12 +71,12 @@ public class WSO2EventInputMapper implements InputMapper {
             }
         }
         this.exportedStreamDefinition = exportedStreamDefinition;
-        boolean candidateForArbitaryMaps = isCandidateForArbitaryAttributes(eventReceiverConfiguration.getInputMapping(), importedStreamDefinition);
-        if (!candidateForArbitaryMaps) {
+        boolean candidateForArbitraryMaps = isCandidateForArbitraryAttributes(eventReceiverConfiguration.getInputMapping(), importedStreamDefinition);
+        if (!candidateForArbitraryMaps) {
             validateInputStreamAttributes();
         }
 
-        if (importedStreamDefinition != null && eventReceiverConfiguration.getInputMapping().isCustomMappingEnabled() && !candidateForArbitaryMaps) {
+        if (importedStreamDefinition != null && eventReceiverConfiguration.getInputMapping().isCustomMappingEnabled() && !candidateForArbitraryMaps) {
             this.inputDataTypeSpecificPositionMap = new HashMap<InputDataType, int[]>();
             Map<Integer, Integer> payloadDataMap = new TreeMap<Integer, Integer>();
             Map<Integer, Integer> metaDataMap = new TreeMap<Integer, Integer>();
@@ -158,12 +158,12 @@ public class WSO2EventInputMapper implements InputMapper {
             if (importedStreamDefinition.getPayloadData() != null ? !importedStreamDefinition.getPayloadData().equals(exportedStreamDefinition.getPayloadData()) : exportedStreamDefinition.getPayloadData() != null) {
                 throw new EventReceiverStreamValidationException("Input stream definition : " + importedStreamDefinition + " not matching with output stream definition : " + exportedStreamDefinition + " to create pass-through link ", importedStreamDefinition.getStreamId());
             }
-        } else {
+        } else if (!candidateForArbitraryMaps) {
             throw new EventReceiverStreamValidationException("Error while retrieving stream definition : " + fromStreamName + ":" + fromStreamVersion);
         }
     }
 
-    private boolean isCandidateForArbitaryAttributes(InputMapping inputMapping, StreamDefinition importedStreamDefinition) {
+    private boolean isCandidateForArbitraryAttributes(InputMapping inputMapping, StreamDefinition importedStreamDefinition) {
         for (InputMappingAttribute inputMappingAttribute : inputMapping.getInputMappingAttributes()) {
             if (EventReceiverConstants.META_DATA_VAL.equals(inputMappingAttribute.getFromElementType()) &&
                     !importedStreamDefinition.getMetaData().contains(new Attribute(inputMappingAttribute.getFromElementKey(),
