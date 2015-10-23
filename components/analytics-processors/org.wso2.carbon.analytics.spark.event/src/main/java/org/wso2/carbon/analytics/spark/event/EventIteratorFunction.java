@@ -61,23 +61,9 @@ public class EventIteratorFunction extends AbstractFunction1<Iterator<Row>, Boxe
         this.password = password;
     }
 
-    //note : this method is invoked by apply() method instead of constructor due to some kryo serialization issues
-    private void initDataPublisherClient() {
-        String key = receiverURLSet + "_" +  authURLSet + "_" + username  + "_" + password;
-        dataPublisher = DataPublisherHolder.getInstance().getDataPublisher(key);
-        if (dataPublisher == null) {
-            try {
-                dataPublisher = new DataPublisher(EventingConstants.THRIFT_AGENT_TYPE, receiverURLSet, authURLSet, username, password);
-                DataPublisherHolder.getInstance().addDataPublisher(key, dataPublisher);
-            } catch (Exception e) {
-                log.warn("Failed to create data publisher for publishing events to streamId: " + this.streamId, e);
-            }
-        }
-    }
-
     @Override
     public BoxedUnit apply(Iterator<Row> iterator) {
-        initDataPublisherClient();
+        dataPublisher = DataPublisherHolder.getInstance().getDataPublisher(receiverURLSet, authURLSet, username, password);
         while (iterator.hasNext()) {
             Row row = iterator.next();
             List<Object> result = new ArrayList<Object>();

@@ -19,6 +19,8 @@
 
 package org.wso2.carbon.analytics.spark.event;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 
@@ -28,6 +30,7 @@ import java.util.Map;
 
 public class DataPublisherHolder implements Serializable {
     private static final long serialVersionUID = 1704808211183828268L;
+    private static final Log log = LogFactory.getLog(DataPublisherHolder.class);
     private static volatile DataPublisherHolder instance;
     private Map<String, DataPublisher> dataPublisherMap;
 
@@ -47,11 +50,22 @@ public class DataPublisherHolder implements Serializable {
         return instance;
     }
 
-    public DataPublisher getDataPublisher(String key) {
-        return dataPublisherMap.get(key);
-    }
-
-    public void addDataPublisher(String key, DataPublisher dataPublisher) {
-        dataPublisherMap.put(key, dataPublisher);
+    public DataPublisher getDataPublisher(String receiverURLSet, String authURLSet, String username, String password) {
+        String dataPublisherKey = receiverURLSet + "_" +  authURLSet + "_" + username  + "_" + password;
+        if(!dataPublisherMap.containsKey(dataPublisherKey)) {
+            try {
+                DataPublisher dataPublisher = new DataPublisher(EventingConstants.THRIFT_AGENT_TYPE, receiverURLSet,
+                        authURLSet, username, password);
+                dataPublisherMap.put(dataPublisherKey, dataPublisher);
+                if (log.isDebugEnabled()) {
+                    log.debug("New publisher is add publish events to to : " + receiverURLSet +
+                            " , Current publisher count : " + dataPublisherMap.size());
+                }
+                return dataPublisher;
+            } catch (Exception e) {
+                log.warn("Failed to create data publisher for publishing events to : " + receiverURLSet, e);
+            }
+        }
+        return dataPublisherMap.get(dataPublisherKey);
     }
 }
