@@ -76,10 +76,19 @@ public class AnalyticsEventTableUtils {
         return values;
     }
     
+    private static void mergeMapsWithNoNulls(Map<String, Object> source, Map<String, Object> target) {
+        for (Map.Entry<String, Object> entry : source.entrySet()) {
+            if (target.get(entry.getKey()) == null) {
+                target.put(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+    
     public static Record getRecordWithEventValues(int tenantId, String tableName, List<Attribute> attrs,
-            ComplexEvent event) {
+            ComplexEvent event, Map<String, Object> constantRHSValues) {
         try {
             Map<String, Object> values = streamEventToRecordValues(tenantId, tableName, attrs, event);
+            mergeMapsWithNoNulls(constantRHSValues, values);
             List<Map<String, Object>> valuesBatch = new ArrayList<Map<String,Object>>();
             valuesBatch.add(values);
             AnalyticsDataResponse resp = ServiceHolder.getAnalyticsDataService().getWithKeyValues(

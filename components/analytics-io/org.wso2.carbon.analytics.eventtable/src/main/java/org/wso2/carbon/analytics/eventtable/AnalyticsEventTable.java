@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.eventtable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -143,8 +144,12 @@ public class AnalyticsEventTable implements EventTable {
     private void checkAndProcessPostInit() {
         if (!this.postInit) {
             try {
-                this.postInit = true;
-                this.processTableSchema();
+                synchronized (this) {
+                    if (!this.postInit) {
+                        this.processTableSchema();
+                        this.postInit = true;
+                    }
+                }
             } catch (AnalyticsException e) {
                 throw new IllegalStateException("Error in processing analytics event table schema: " + 
                         e.getMessage(), e);
@@ -305,6 +310,8 @@ public class AnalyticsEventTable implements EventTable {
         
         private Set<String> primaryKeySet;
         
+        private Set<String> candidatePrimaryKeySet;
+        
         private Set<String> indexedKeySet;
         
         private Set<String> mentionedFields;
@@ -321,6 +328,8 @@ public class AnalyticsEventTable implements EventTable {
         
         private boolean operatorInit;
         
+        private Map<String, Object> constantRHSValues;
+        
         public AnalyticsTableOperator(int tenantId, String tableName, List<Attribute> attrs, Expression expression, 
                 MetaComplexEvent metaComplexEvent, ExecutionPlanContext executionPlanContext, 
                 List<VariableExpressionExecutor> variableExpressionExecutors, 
@@ -336,8 +345,10 @@ public class AnalyticsEventTable implements EventTable {
             this.matchingStreamIndex = matchingStreamIndex;
             this.withinTime = withinTime;
             this.primaryKeySet = new HashSet<String>();
+            this.candidatePrimaryKeySet = new HashSet<>();
             this.indexedKeySet = new HashSet<String>();
             this.mentionedFields = new HashSet<String>();
+            this.constantRHSValues = new HashMap<>();
             this.initMetaStateEvent();
             /* first parse for evaluating the query, since expression evaluation cannot be
              * done in a lazy manner */
@@ -348,28 +359,33 @@ public class AnalyticsEventTable implements EventTable {
             if (this.operatorInit) {
                 return;
             }
-            this.operatorInit = true;
-            checkAndProcessPostInit();
-            try {
-                AnalyticsSchema schema = ServiceHolder.getAnalyticsDataService().getTableSchema(this.tenantId, this.tableName);
-                List<String> primaryKeys = schema.getPrimaryKeys();
-                if (primaryKeys != null) {
-                    this.primaryKeySet.addAll(primaryKeys);
+            synchronized (this) {
+                if (this.operatorInit) {
+                    return;
                 }
-                Set<String> indices = schema.getIndexedColumns().keySet();
-                if (indices != null) {
-                    this.indexedKeySet.addAll(indices);
+                checkAndProcessPostInit();
+                try {
+                    AnalyticsSchema schema = ServiceHolder.getAnalyticsDataService().getTableSchema(this.tenantId, this.tableName);
+                    List<String> primaryKeys = schema.getPrimaryKeys();
+                    if (primaryKeys != null) {
+                        this.primaryKeySet.addAll(primaryKeys);
+                    }
+                    Set<String> indices = schema.getIndexedColumns().keySet();
+                    if (indices != null) {
+                        this.indexedKeySet.addAll(indices);
+                    }
+                } catch (AnalyticsException e) {
+                    throw new IllegalStateException("Unable to lookup table schema: " + e.getMessage(), e);
                 }
-            } catch (AnalyticsException e) {
-                throw new IllegalStateException("Unable to lookup table schema: " + e.getMessage(), e);
-            }
-            this.luceneQuery = this.luceneQueryFromExpression(this.expression, false).toString();
-            Set<String> nonIndixedFields = new HashSet<String>(this.mentionedFields);
-            nonIndixedFields.removeAll(this.indexedKeySet);
-            if (!this.pkMatchCompatible && nonIndixedFields.size() > 0) {
-                throw new IllegalStateException("The table [" + this.tenantId + ", " + this.tableName + 
-                        "] requires the field(s): " + nonIndixedFields + 
-                        " to be indexed for the given analytics event table based query to execute.");
+                this.luceneQuery = this.luceneQueryFromExpression(this.expression, false).toString();
+                Set<String> nonIndixedFields = new HashSet<String>(this.mentionedFields);
+                nonIndixedFields.removeAll(this.indexedKeySet);
+                if (!this.pkMatchCompatible && nonIndixedFields.size() > 0) {
+                    throw new IllegalStateException("The table [" + this.tenantId + ", " + this.tableName + 
+                            "] requires the field(s): " + nonIndixedFields + 
+                            " to be indexed for the given analytics event table based query to execute.");
+                }
+                this.operatorInit = true;
             }
         }
         
@@ -415,10 +431,8 @@ public class AnalyticsEventTable implements EventTable {
             }            
         }
         
-        private void checkPrimaryKeyUsage(String field) {
-            if (!this.primaryKeySet.contains(field)) {
-                this.pkMatchCompatible = false;
-            }
+        private boolean checkPrimaryKeyCompatibleWithCandidates() {
+            return this.primaryKeySet.equals(this.candidatePrimaryKeySet);
         }
         
         private ColumnType getFieldType(String field, boolean firstPass) {
@@ -487,9 +501,10 @@ public class AnalyticsEventTable implements EventTable {
                     return "(" + field + ": " + this.toLuceneQueryRHSValue(rhs) + ")";
                 case EQUAL:
                     if (!firstPass) {
-                        this.checkPrimaryKeyUsage(field);
+                        this.candidatePrimaryKeySet.add(field);
                     }
                     this.mentionedFields.add(field);
+                    this.constantRHSValues.put(field, rhs);
                     return "(" + (this.getFieldType(field, firstPass).equals(ColumnType.STRING) ? 
                             Constants.NON_TOKENIZED_FIELD_PREFIX : "") + 
                             field + ": " + this.toLuceneQueryRHSValue(rhs) + ")";                
@@ -633,11 +648,15 @@ public class AnalyticsEventTable implements EventTable {
         private List<Record> findRecords(ComplexEvent matchingEvent, Object candidateEvents, 
                 StreamEventCloner streamEventCloner) {
             List<Record> records;
+            if (this.pkMatchCompatible) {
+                /* if no one else complained, check with primary key candidates */
+                this.pkMatchCompatible = this.checkPrimaryKeyCompatibleWithCandidates();
+            }
             if (this.returnAllRecords) {
                 records = AnalyticsEventTableUtils.getAllRecords(this.tenantId, this.tableName);
             } else if (this.pkMatchCompatible) {
                 Record record = AnalyticsEventTableUtils.getRecordWithEventValues(this.tenantId, this.tableName, 
-                        this.attrs, matchingEvent);
+                        this.attrs, matchingEvent, this.constantRHSValues);
                 if (record == null) {
                     records = new ArrayList<>(0);
                 } else {
