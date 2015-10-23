@@ -580,13 +580,13 @@ public class AnalyticsEventTable implements EventTable {
                 if (max) {
                     return Double.toString(Double.MAX_VALUE);
                 } else {
-                    return Double.toString(Double.MIN_VALUE);
+                    return Double.toString(-Double.MAX_VALUE);
                 }
             case FLOAT:
                 if (max) {
                     return Float.toString(Float.MAX_VALUE);
                 } else {
-                    return Float.toString(Float.MIN_VALUE);
+                    return Float.toString(-Float.MAX_VALUE);
                 }
             case INTEGER:
                 if (max) {
