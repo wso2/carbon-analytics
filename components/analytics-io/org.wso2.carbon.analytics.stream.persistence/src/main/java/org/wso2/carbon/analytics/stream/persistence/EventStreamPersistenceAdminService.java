@@ -25,7 +25,6 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventStore;
-import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
 import org.wso2.carbon.analytics.stream.persistence.dto.AnalyticsTable;
 import org.wso2.carbon.analytics.stream.persistence.dto.AnalyticsTableRecord;
 import org.wso2.carbon.analytics.stream.persistence.exception.EventStreamPersistenceAdminServiceException;
@@ -107,12 +106,14 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                                                                                                          tableName));
                     }
                 } else {
-                    log.warn("Analytics table does not exist for stream[" + streamName + "]");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Analytics table does not exist for stream[" + streamName + "]");
+                    }
                 }
             }
-            if (!streamAlreadyExist) {
-                log.warn("Stream[" + streamName + "] not existing in file system. Retuning empty AnalyticsTable " +
-                         "object.");
+            if (!streamAlreadyExist && log.isDebugEnabled()) {
+                log.debug("Stream[" + streamName + "] not existing in file system. Retuning empty AnalyticsTable " +
+                          "object.");
             }
         } catch (Exception e) {
             log.error("Unable to get analytics schema[" + streamName + "]: " + e.getMessage(), e);
@@ -204,10 +205,13 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
     private void removeExistingEventSink(AnalyticsTable analyticsTable)
             throws EventStreamPersistenceAdminServiceException {
         try {
-            ServiceHolder.getAnalyticsEventSinkService().removeEventSink(getTenantId(),
-                                                                         analyticsTable.getTableName(),
-                                                                         analyticsTable.getStreamVersion());
-        } catch (AnalyticsEventStoreException e) {
+            AnalyticsEventStore eventStore = ServiceHolder.getAnalyticsEventSinkService().getEventStore(getTenantId(), analyticsTable.getTableName());
+            if (eventStore != null && eventStore.getEventSource() != null) {
+                ServiceHolder.getAnalyticsEventSinkService().removeEventSink(getTenantId(),
+                                                                             analyticsTable.getTableName(),
+                                                                             analyticsTable.getStreamVersion());
+            }
+        } catch (Exception e) {
             log.error("Unable to save analytics schema[" + analyticsTable.getTableName() + "]: " + e.getMessage(), e);
             throw new EventStreamPersistenceAdminServiceException("Unable to save analytics schema", e);
         }

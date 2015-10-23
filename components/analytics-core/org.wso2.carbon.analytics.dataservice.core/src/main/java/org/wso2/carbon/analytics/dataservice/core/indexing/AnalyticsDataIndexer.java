@@ -53,6 +53,7 @@ import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyReader;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.DocValuesType;
+import org.apache.lucene.index.IndexNotFoundException;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -234,6 +235,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (this.checkIndexThrottlingDisabledExplicitely()) {
             this.flowController.getConfig().setEnabled(false);
         }
+        this.getAnalyticsRecordStore().createTable(INDEX_DATA_RECORD_TENANT_ID, INDEX_DATA_RECORD_TABLE_NAME);
         if (this.checkIfIndexingNode()) {
             this.initializeIndexingSchedules();
         }
@@ -250,7 +252,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     private void initializeIndexingSchedules() throws AnalyticsException {
-        this.getAnalyticsRecordStore().createTable(INDEX_DATA_RECORD_TENANT_ID, INDEX_DATA_RECORD_TABLE_NAME);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
             log.info("Analytics Indexing Mode: CLUSTERED");
@@ -266,7 +267,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return GenericUtils.splitNumberRange(this.getShardCount(), numWorkers);
     }
     
-    private void scheduleWorkers(Integer[] shardInfo) throws AnalyticsException {
+    private synchronized void scheduleWorkers(Integer[] shardInfo) throws AnalyticsException {
         int shardIndexFrom = shardInfo[0];
         int shardRange = shardInfo[1];
         this.stopAndCleanupIndexProcessing();
@@ -832,14 +833,21 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         List<String> shardIds = this.lookupGloballyExistingShardIds(INDEX_DATA_FS_BASE_PATH,
                 tenantId, tableName);
         List<IndexReader> indexReaders = new ArrayList<>();
-
         for (String shardId : shardIds) {
             String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
-            IndexReader reader = DirectoryReader.open(this.lookupIndexDir(shardedTableId));
-            indexReaders.add(reader);
+            try {
+                IndexReader reader = DirectoryReader.open(this.lookupIndexDir(shardedTableId));
+                indexReaders.add(reader);
+            } catch (IndexNotFoundException ignore) {
+                /* this can happen if a user just started to index records in a table,
+                 * but it didn't yet do the first commit, so it does not have segment* files.
+                 * The execution comes to this place, because the shards are identified, since
+                 * there is some other intermediate files written to the index directory. 
+                 * So in this situation, if we are in the middle of the initial commit, we ignore
+                 * this partially indexed data for now */
+            }
         }
         return new MultiReader(indexReaders.toArray(new IndexReader[indexReaders.size()]));
-
     }
 
     public SubCategories drilldownCategories(int tenantId, CategoryDrillDownRequest drillDownRequest)
@@ -874,11 +882,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private List<SearchResultEntry> drillDownRecords(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
                                                      Directory indexDir, Directory taxonomyIndexDir,
-                                                     String rangeField,AnalyticsDrillDownRange range)
+                                                     String rangeField, AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
         IndexReader indexReader = null;
         TaxonomyReader taxonomyReader = null;
-        List<SearchResultEntry> searchResults =new ArrayList<>();
+        List<SearchResultEntry> searchResults = new ArrayList<>();
         try {
             indexReader = DirectoryReader.open(indexDir);
             taxonomyReader = new DirectoryTaxonomyReader(taxonomyIndexDir);
@@ -898,6 +906,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 searchResults.add(new SearchResultEntry(document.get(INDEX_ID_INTERNAL_FIELD), scoreDoc.score));
             }
             return searchResults;
+        } catch (IndexNotFoundException ignore) {
+            return new ArrayList<>();
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error while performing drilldownRecords: " + e.getMessage(), e);
         } finally {
@@ -944,6 +954,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 }
             }
             return searchResults;
+        } catch (IndexNotFoundException ignore) {
+            return new ArrayList<>();
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error while performing drilldownCategories: " + e.getMessage(), e);
         } catch (org.apache.lucene.queryparser.classic.ParseException e) {
@@ -955,9 +967,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private double getDrillDownRecordCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
                                                      Directory indexDir, Directory taxonomyIndexDir,
-                                                     String rangeField,AnalyticsDrillDownRange range)
+                                                     String rangeField, AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
-
         IndexReader indexReader = null;
         TaxonomyReader taxonomyReader = null;
         try {
@@ -987,6 +998,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 }
             }
             return count;
+        } catch (IndexNotFoundException ignore) {
+            return 0;
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error while getting drilldownCount: " + e.getMessage(), e);
         } finally {
@@ -1497,7 +1510,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
     
-    public void stopAndCleanupIndexProcessing() {
+    public synchronized void stopAndCleanupIndexProcessing() {
         this.getFlowController().stop();
         if (this.shardWorkerExecutor != null) {
             this.shardWorkerExecutor.shutdown();
@@ -1556,7 +1569,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             try {
                 acm.executeAll(ANALYTICS_INDEXING_GROUP, new IndexingStopMessage());
                 List<Object> members = acm.getMembers(ANALYTICS_INDEXING_GROUP);
-                List<Integer[]> schedulePlan = this.generateIndexWorkerSchedulePlan(members.size());
+                int memberCount = members.size();
+                if (memberCount == 0) {
+                    throw new AnalyticsException("No indexing nodes found in the cluster for index operation scheduling.");
+                }
+                List<Integer[]> schedulePlan = this.generateIndexWorkerSchedulePlan(memberCount);
                 for (int i = 0; i < members.size(); i++) {
                     acm.executeOne(ANALYTICS_INDEXING_GROUP, members.get(i), 
                             new IndexingScheduleMessage(schedulePlan.get(i)));

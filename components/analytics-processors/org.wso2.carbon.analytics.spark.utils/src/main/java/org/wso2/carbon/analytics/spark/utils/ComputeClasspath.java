@@ -107,27 +107,26 @@ public class ComputeClasspath {
             "org.wso2.carbon.analytics.eventtable",
             "org.wso2.carbon.analytics.io.commons",
             "org.wso2.carbon.analytics.spark.core",
+            "org.wso2.carbon.analytics.spark.event",
             "org.wso2.carbon.analytics.stream.persistence",
             "org.wso2.carbon.base",
             "org.wso2.carbon.cluster.mgt.core",
+            "org.wso2.carbon.identity.user.store.configuration",
+            "org.wso2.carbon.identity.user.store.configuration.deployer",
+            "org.wso2.carbon.user.api",
+            "org.wso2.carbon.user.core",
+            "org.wso2.carbon.user.mgt",
+            "org.wso2.carbon.user.mgt.common",
             "org.wso2.carbon.core",
             "org.wso2.carbon.core.common",
             "org.wso2.carbon.core.services",
             "org.wso2.carbon.databridge.agent",
-            "org.wso2.carbon.databridge.agent",
-            "org.wso2.carbon.databridge.commons",
             "org.wso2.carbon.databridge.commons",
             "org.wso2.carbon.databridge.commons.binary",
-            "org.wso2.carbon.databridge.commons.binary",
-            "org.wso2.carbon.databridge.commons.thrift",
             "org.wso2.carbon.databridge.commons.thrift",
             "org.wso2.carbon.databridge.core",
-            "org.wso2.carbon.databridge.core",
-            "org.wso2.carbon.databridge.receiver.binary",
             "org.wso2.carbon.databridge.receiver.binary",
             "org.wso2.carbon.databridge.receiver.thrift",
-            "org.wso2.carbon.databridge.receiver.thrift",
-            "org.wso2.carbon.databridge.streamdefn.filesystem",
             "org.wso2.carbon.databridge.streamdefn.filesystem",
             "org.wso2.carbon.datasource.reader.cassandra",
             "org.wso2.carbon.datasource.reader.hadoop",
@@ -212,7 +211,10 @@ public class ComputeClasspath {
             "uncommons-maths",
             "wss4j",
             "xmlbeans",
-            "XmlSchema"
+            "XmlSchema",
+            "commons-pool",
+            "disruptor",
+            "org.eclipse.osgi"
     };
 
     private static String SEP = System.getProperty("os.name").toLowerCase().contains("win") ? ";" : ":";
@@ -236,7 +238,8 @@ public class ComputeClasspath {
     public static String getSparkClasspath(String sparkClasspath, String carbonHome, String[] excludeJars)
             throws IOException {
         String cp = createInitialSparkClasspath(sparkClasspath, carbonHome, REQUIRED_JARS, SEP, excludeJars);
-        return cp + addJarsFromLib("", carbonHome, SEP) + addJarsFromConfig("", carbonHome, SEP);
+        return cp + addJarsFromDropins("", carbonHome, SEP) + addJarsFromLib("", carbonHome, SEP) +
+                addJarsFromEndorsedLib("", carbonHome, SEP) + addJarsFromConfig("", carbonHome, SEP);
     }
 
     public static String[] getSparkClasspathJarsArray(String sparkClasspath, String carbonHome)
@@ -256,6 +259,25 @@ public class ComputeClasspath {
     private static String addJarsFromLib(String scp, String carbonHome, String separator) {
         File libDir = new File(carbonHome + File.separator + "repository" + File.separator
                                + "components" + File.separator + "lib");
+        File[] libJars = listJars(libDir);
+        for (File jar : libJars) {
+            scp = scp + separator + jar.getAbsolutePath();
+        }
+        return scp;
+    }
+
+    private static String addJarsFromDropins(String scp, String carbonHome, String separator) {
+        File libDir = new File(carbonHome + File.separator + "repository" + File.separator
+                + "components" + File.separator + "dropins");
+        File[] libJars = listJars(libDir);
+        for (File jar : libJars) {
+            scp = scp + separator + jar.getAbsolutePath();
+        }
+        return scp;
+    }
+
+    private static String addJarsFromEndorsedLib(String scp, String carbonHome, String separator) {
+        File libDir = new File(carbonHome + File.separator + "lib" + File.separator + "endorsed");
         File[] libJars = listJars(libDir);
         for (File jar : libJars) {
             scp = scp + separator + jar.getAbsolutePath();

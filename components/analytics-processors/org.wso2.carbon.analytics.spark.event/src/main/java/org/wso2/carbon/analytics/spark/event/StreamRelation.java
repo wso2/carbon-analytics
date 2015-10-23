@@ -27,6 +27,8 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
+import org.wso2.carbon.analytics.spark.core.util.CarbonScalaUtils;
+import scala.reflect.ClassTag$;
 
 import java.io.Serializable;
 
@@ -41,6 +43,10 @@ public class StreamRelation extends BaseRelation implements InsertableRelation, 
     private StructType schema;
     private String streamId;
     private int tenantId;
+    private String receiverURLSet;
+    private String authURLSet;
+    private String username;
+    private String password;
 
     public StreamRelation(int tenantId,SQLContext sqlContext, String streamId,String payloadString) {
         this.tenantId = tenantId;
@@ -49,9 +55,27 @@ public class StreamRelation extends BaseRelation implements InsertableRelation, 
         this.schema = new StructType(extractFieldsFromString(payloadString));
     }
 
+    public StreamRelation(int tenantId, SQLContext sqlContext, String streamId, String payloadString,
+                          String receiverURLSet, String authURLSet, String username, String password) {
+        this.tenantId = tenantId;
+        this.sqlContext = sqlContext;
+        this.streamId = streamId;
+        this.schema = new StructType(extractFieldsFromString(payloadString));
+        this.receiverURLSet = receiverURLSet;
+        this.authURLSet = authURLSet;
+        this.username = username;
+        this.password = password;
+    }
+
     @Override
     public void insert(DataFrame data, boolean b) {
-        data.foreachPartition(new EventIteratorFunction(this.tenantId,this.streamId,data.schema()));
+        for (int i = 0; i < data.rdd().partitions().length; i++) {
+            data.sqlContext().sparkContext().runJob(data.rdd(),
+                    new EventIteratorFunction(this.tenantId, this.streamId, data.schema(),
+                            receiverURLSet, authURLSet, username, password),
+                    CarbonScalaUtils.getNumberSeq(i, i + 1), false,
+                    ClassTag$.MODULE$.Unit());
+        }
     }
 
     @Override

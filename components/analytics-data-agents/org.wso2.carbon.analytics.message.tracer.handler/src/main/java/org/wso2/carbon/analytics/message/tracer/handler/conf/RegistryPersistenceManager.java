@@ -40,9 +40,6 @@ public class RegistryPersistenceManager {
         EventingConfigData eventingConfigData = new EventingConfigData();
         // First set it to defaults, but do not persist
         eventingConfigData.setMessageTracingEnable(false);
-        eventingConfigData.setUrl(MessageTracerConstants.EMPTY_STRING);
-        eventingConfigData.setPassword(MessageTracerConstants.EMPTY_STRING);
-        eventingConfigData.setUserName(MessageTracerConstants.EMPTY_STRING);
         eventingConfigData.setDumpBodyEnable(false);
         eventingConfigData.setLoggingEnable(false);
         eventingConfigData.setPublishToBAMEnable(false);
@@ -50,9 +47,6 @@ public class RegistryPersistenceManager {
         try {
             String enableTrace = getConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_TRACE);
             String enablePublishToBAM  = getConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_PUBLISH_TO_BAM);
-            String bamUrl = getConfigurationProperty(tenantId, MessageTracerConstants.BAM_URL);
-            String bamUserName = getConfigurationProperty(tenantId, MessageTracerConstants.BAM_USER_NAME);
-            String bamPassword = getConfigurationProperty(tenantId, MessageTracerConstants.BAM_PASSWORD);
             String dumpBody = getConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_DUMP_MESSAGE_BODY);
             String enableLogging = getConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_LOGGING);
             if (enableTrace != null) {
@@ -63,11 +57,8 @@ public class RegistryPersistenceManager {
                 if (enableLogging != null) {
                     eventingConfigData.setLoggingEnable(Boolean.valueOf(enableLogging));
                 }
-                if (enablePublishToBAM != null && bamUrl != null && bamUserName != null && bamPassword != null ) {
+                if (enablePublishToBAM != null) {
                     eventingConfigData.setPublishToBAMEnable(Boolean.valueOf(enablePublishToBAM));
-                    eventingConfigData.setUrl(bamUrl);
-                    eventingConfigData.setUserName(bamUserName);
-                    eventingConfigData.setPassword(bamPassword);
                 }
                 Map<Integer, EventingConfigData> tenantEventConfigData = TenantEventConfigData.getTenantSpecificEventingConfigData();
                 tenantEventConfigData.put(tenantId, eventingConfigData);
@@ -118,12 +109,6 @@ public class RegistryPersistenceManager {
         tenantEventConfigData.put(tenantId, eventingConfigData);
         updateConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_TRACE,
                                     eventingConfigData.isMessageTracingEnable());
-        updateConfigurationProperty(tenantId, MessageTracerConstants.BAM_URL,
-                                    eventingConfigData.getUrl());
-        updateConfigurationProperty(tenantId, MessageTracerConstants.BAM_USER_NAME,
-                                    eventingConfigData.getUserName());
-        updateConfigurationProperty(tenantId, MessageTracerConstants.BAM_PASSWORD,
-                                    eventingConfigData.getPassword());
         updateConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_DUMP_MESSAGE_BODY,
                                     eventingConfigData.isDumpBodyEnable());
         updateConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_LOGGING,

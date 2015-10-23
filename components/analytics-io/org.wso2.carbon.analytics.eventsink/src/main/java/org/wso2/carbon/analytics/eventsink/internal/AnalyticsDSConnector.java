@@ -160,8 +160,7 @@ public class AnalyticsDSConnector {
                         try {
                             return StringUtils.join(gson.fromJson(fieldStrValue, List.class), ',');
                         } catch (Exception e) {
-                            throw new AnalyticsException("Error while parsing FACET field: " + fieldName +
-                                    ", Expected a JSON array without double quotations", e );
+                            return fieldStrValue;
                         }
                     case STRING:
                         return fieldStrValue;

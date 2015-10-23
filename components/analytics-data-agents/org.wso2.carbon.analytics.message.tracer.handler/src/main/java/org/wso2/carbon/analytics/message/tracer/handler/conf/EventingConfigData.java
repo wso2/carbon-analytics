@@ -19,9 +19,6 @@ package org.wso2.carbon.analytics.message.tracer.handler.conf;
 public class EventingConfigData {
 
     private boolean messageTracingEnable;
-    private String url;
-    private String userName;
-    private String password;
     private boolean dumpBodyEnable;
     private boolean loggingEnable;
     private boolean publishToBAMEnable;
@@ -32,30 +29,6 @@ public class EventingConfigData {
 
     public boolean isMessageTracingEnable() {
         return messageTracingEnable;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public boolean isDumpBodyEnable() {

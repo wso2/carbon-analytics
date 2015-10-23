@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.analytics.spark.core.deploy;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 
 import java.io.Serializable;
@@ -30,9 +32,12 @@ public class ElectLeaderExecutionCall implements Callable<Integer>, Serializable
 
     private static final long serialVersionUID = -155083315280606063L;
 
+    private static Log log = LogFactory.getLog(ElectLeaderExecutionCall.class);
+
     @Override
     public Integer call() throws Exception {
         ServiceHolder.getAnalyticskExecutor().electAsLeader();
+        log.info("Current node elected as Spark leader.");
         return 0;
     }
 }

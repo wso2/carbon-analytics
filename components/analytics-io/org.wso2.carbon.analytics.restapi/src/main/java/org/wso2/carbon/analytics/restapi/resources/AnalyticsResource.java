@@ -895,7 +895,7 @@ public class AnalyticsResource extends AbstractResource {
      * @return the {@link Response} response
      * @throws AnalyticsException
      */
-    /*@POST
+    @POST
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
     @Path("tables/{tableName}/schema")
@@ -916,7 +916,7 @@ public class AnalyticsResource extends AbstractResource {
         } else {
             throw new AnalyticsException("Table schema is not provided");
         }
-    }*/
+    }
 
     /**
      * Gets the analytics schema of a table

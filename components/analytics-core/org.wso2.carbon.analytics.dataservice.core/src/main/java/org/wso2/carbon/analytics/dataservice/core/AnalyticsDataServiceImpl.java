@@ -859,16 +859,19 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
         AnalyticsRecordStore ars = this.getAnalyticsRecordStore(arsName);
+        /* this is done to make sure, raw record data as well as the index data are also deleted,
+         * even if the table is not indexed now, it could have been indexed earlier, so delete operation
+         * must be done in the indexer as well */
         Iterator<Record> recordIterator = GenericUtils.recordGroupsToIterator(ars, this.get(tenantId, tableName, 
                 1, null, timeFrom, timeTo, 0, -1).getRecordGroups());
         while (recordIterator.hasNext()) {
             this.delete(tenantId, tableName, this.getRecordIdsBatch(recordIterator));
-        }
+        }       
     }
     
     private List<String> getRecordIdsBatch(Iterator<Record> recordIterator) throws AnalyticsException {
         List<String> result = new ArrayList<>(DELETE_BATCH_SIZE);
-        for (int i = 0; i < DELETE_BATCH_SIZE & recordIterator.hasNext(); i++) {
+        for (int i = 0; i < DELETE_BATCH_SIZE && recordIterator.hasNext(); i++) {
             result.add(recordIterator.next().getId());
         }
         return result;
