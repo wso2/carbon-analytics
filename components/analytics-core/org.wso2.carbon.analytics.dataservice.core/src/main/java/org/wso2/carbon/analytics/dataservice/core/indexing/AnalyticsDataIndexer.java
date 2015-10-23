@@ -1815,7 +1815,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 currentGrouping = groupings.get(0);
                 if (currentGrouping != null && currentGrouping.length > 0) {
                     try {
-                        currentRecord = indexer.aggregatePerGrouping(tenantId, currentGrouping, request);
+                        if (currentRecord != null) {
+                            return true;
+                        } else {
+                            currentRecord = indexer.aggregatePerGrouping(tenantId, currentGrouping, request);
+                        }
                     } catch (AnalyticsException e) {
                         logger.error("Failed to create aggregated record: " + e.getMessage(), e);
                         throw new RuntimeException("Error while iterating aggregate records: " + e.getMessage(), e);
@@ -1840,7 +1844,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         public synchronized Record next() {
             if (hasNext()) {
                 groupings.remove(currentGrouping);
-                return currentRecord;
+                Record tempRecord = currentRecord;
+                currentRecord = null;
+                return tempRecord;
             }
             return null;
         }
