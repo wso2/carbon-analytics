@@ -327,6 +327,12 @@ public class EmailEventAdapter implements InputEventAdapter {
     private void processMessage(Message msg, String expectedSubject) {
         try {
             String mailSubject = msg.getSubject();
+            if (mailSubject == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Skipping message because the subject field is null. Expected subject : " + expectedSubject);
+                }
+                return;
+            }
             if (mailSubject.equalsIgnoreCase(expectedSubject)) {
                 String contentType = msg.getContentType();
                 if (contentType != null && contentType.toLowerCase().startsWith("text/plain")) {
@@ -374,17 +380,17 @@ public class EmailEventAdapter implements InputEventAdapter {
 
         //validate poll interval
         String pollIntervalProperty = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_POLL_INTERVAL);
-        try{
+        try {
             Integer.parseInt(pollIntervalProperty);
-        } catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             throw new InputEventAdapterException("Invalid value set for property 'Poll Interval': " + pollIntervalProperty, e);
         }
 
         //validate port
         String portProperty = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PROTOCOL_PORT);
-        try{
+        try {
             Integer.parseInt(portProperty);
-        } catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             throw new InputEventAdapterException("Invalid value set for property 'Mail Protocol Port': " + portProperty, e);
         }
     }
