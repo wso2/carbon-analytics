@@ -716,7 +716,11 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             }
         }
     }
-    
+
+    /*
+    the users should ensure that the order of the primary key list is independent of the order:
+    check DAS-289
+     */
     private String generateRecordIdFromPrimaryKeyValues(Map<String, Object> values, List<String> primaryKeys) {
         StringBuilder builder = new StringBuilder();
         Object obj;
