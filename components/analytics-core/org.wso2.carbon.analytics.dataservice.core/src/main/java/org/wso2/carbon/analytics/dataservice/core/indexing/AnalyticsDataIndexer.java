@@ -163,7 +163,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private static final String INDEX_INTERNAL_SCORE_FIELD = "_score";
 
-    private static final String NULL_INDEX_VALUE = "";
+    public static final String NULL_INDEX_VALUE = "";
 
     private static final String EMPTY_FACET_VALUE = "EMPTY_FACET_VALUE!";
 

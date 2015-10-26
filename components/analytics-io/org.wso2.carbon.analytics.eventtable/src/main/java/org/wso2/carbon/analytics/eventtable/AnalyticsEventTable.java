@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
+import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -562,6 +563,9 @@ public class AnalyticsEventTable implements EventTable {
         }
         
         private String toLuceneQueryRHSValue(Object value) {
+            if (value == null) {
+                value = AnalyticsDataIndexer.NULL_INDEX_VALUE;
+            }
             if (value instanceof String && !value.toString().startsWith(LUCENE_QUERY_PARAM)) {
                 return "\"" + value + "\"";
             }
