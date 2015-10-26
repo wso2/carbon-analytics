@@ -241,80 +241,15 @@ for t in "$CARBON_HOME"/lib/commons-lang*.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done
-
-for t in "$CARBON_HOME"/repository/components/plugins/*analytics*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/*commons*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/*datasource*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/*hazelcast*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/*logging*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/*registry*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/*axis2*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/*carbon.core*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/*util*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/*base*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/*pool*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/lucene_5.2.1.wso2v1.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/*analyzer*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/*axiom*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/*ntask*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
 for t in "$CARBON_HOME"/repository/components/lib/*.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done
-for t in "$CARBON_HOME"/repository/components/plugins/*kryo*.jar
+for t in "$CARBON_HOME"/repository/components/plugins/*.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done
-for t in "$CARBON_HOME"/repository/components/plugins/*objenesis*.jar
-do
-    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
-done
-for t in "$CARBON_HOME"/repository/components/plugins/*google*.jar
+for t in "$CARBON_HOME"/lib/endorsed/*.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done
