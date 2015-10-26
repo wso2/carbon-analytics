@@ -29,19 +29,22 @@ import java.util.Map;
  * This class represents a schema for the analytics tables.
  */
 public class AnalyticsSchema implements Serializable {
-    
+
     private static final long serialVersionUID = -4696693702436657326L;
 
     private Map<String, ColumnDefinition> columns;
 
     private transient Map<String, ColumnDefinition> indexedColumns = null;
-    
-    /** primary keys are set separately rather than having in {@link ColumnDefinition} 
-     * to optimize the lookup of just the primary keys when required */
+
+    /**
+     * primary keys are set separately rather than having in {@link ColumnDefinition}
+     * to optimize the lookup of just the primary keys when required
+     */
     private List<String> primaryKeys;
-    
-    public AnalyticsSchema() { }
-    
+
+    public AnalyticsSchema() {
+    }
+
     public AnalyticsSchema(List<ColumnDefinition> columns, List<String> primaryKeys) {
         if (columns != null) {
             this.columns = new LinkedHashMap<>(columns.size());
@@ -53,13 +56,15 @@ public class AnalyticsSchema implements Serializable {
         /* we should always have the same primary key order, or order to
          * not to depend on the order of the primary key list in generating
          * the hashcode */
-        Collections.sort(this.primaryKeys);
-     }
-    
+        if (this.primaryKeys != null) {
+            Collections.sort(this.primaryKeys);
+        }
+    }
+
     public Map<String, ColumnDefinition> getColumns() {
         return columns;
     }
-    
+
     public List<String> getPrimaryKeys() {
         return primaryKeys;
     }
@@ -92,7 +97,7 @@ public class AnalyticsSchema implements Serializable {
         BINARY,
         FACET
     }
-    
+
     @Override
     public int hashCode() {
         int hash1 = 0, hash2 = 0;
@@ -104,7 +109,7 @@ public class AnalyticsSchema implements Serializable {
         }
         return hash1 * hash2;
     }
-    
+
     @Override
     public boolean equals(Object rhs) {
         if (!(rhs instanceof AnalyticsSchema)) {
