@@ -240,7 +240,7 @@ public class Utils {
      * @return Table schema bean
      */
     public static AnalyticsSchemaBean createTableSchemaBean(AnalyticsSchema analyticsSchema) {
-        Map<String, ColumnDefinitionBean> columnDefinitions = new HashMap<>();
+        Map<String, ColumnDefinitionBean> columnDefinitions = new LinkedHashMap<>();
         List<String> primaryKeys = new ArrayList<>();
         if (analyticsSchema.getColumns() != null) {
             for (Map.Entry<String, ColumnDefinition> columns :
