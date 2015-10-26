@@ -70,6 +70,7 @@ FOR %%C in ("%CARBON_HOME%\bin\*.jar") DO set CARBON_CLASSPATH=!CARBON_CLASSPATH
 set CARBON_CLASSPATH="%JAVA_HOME%\lib\tools.jar";%CARBON_CLASSPATH%;
 
 set CARBON_CLASSPATH="%CARBON_HOME%\repository\components\plugins\*";%CARBON_CLASSPATH%;
+set CARBON_CLASSPATH="%CARBON_HOME%\lib\endorsed\*";%CARBON_CLASSPATH%;
 
 FOR %%D in ("%CARBON_HOME%\lib\commons-lang*.jar") DO set CARBON_CLASSPATH=!CARBON_CLASSPATH!;".\lib\%%~nD%%~xD"
 rem ----- Process the input command -------------------------------------------
