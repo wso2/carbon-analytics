@@ -232,15 +232,15 @@ public class ComputeClasspath {
 
     public static String getSparkClasspath(String sparkClasspath, String carbonHome)
             throws IOException {
-        if (!fileExists(carbonHome)) throw new IOException(
-                "CarbonHome specified, does not exists :" + carbonHome);
+//        if (!fileExists(carbonHome)) throw new IOException(
+//                "CarbonHome specified, does not exists :" + carbonHome);
         return  getSparkClasspath(sparkClasspath, carbonHome, new String[0]);
     }
 
     public static String getSparkClasspath(String sparkClasspath, String carbonHome, String[] excludeJars)
             throws IOException {
-        if (!fileExists(carbonHome)) throw new IOException(
-                "CarbonHome specified, does not exists :" + carbonHome);
+//        if (!fileExists(carbonHome)) throw new IOException(
+//                "CarbonHome specified, does not exists :" + carbonHome);
         String cp = createInitialSparkClasspath(sparkClasspath, carbonHome, REQUIRED_JARS, SEP, excludeJars);
         return cp + addJarsFromDropins("", carbonHome, SEP) + addJarsFromLib("", carbonHome, SEP) +
                 addJarsFromEndorsedLib("", carbonHome, SEP) + addJarsFromConfig("", carbonHome, SEP);
