@@ -172,7 +172,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     public static final String PATH_SEPARATOR = "___####___";
     
     public static final int TAXONOMYWORKER_TIMEOUT = 60;
-
+    
     private Map<String, Directory> indexDirs = new HashMap<>();
 
     private Map<String, Directory> indexTaxonomyDirs = new HashMap<>();
@@ -652,11 +652,16 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
     
-    public List<SearchResultEntry> search(int tenantId, String tableName, String query,
-            int start, int count) throws AnalyticsIndexException {
-        List<SearchResultEntry> result = new ArrayList<>(count);
-        result.addAll(this.doSearch(tenantId, tableName, query, start, count));
-        return result;
+    public List<SearchResultEntry> search(final int tenantId, final String tableName, final String query,
+            final int start, final int count) throws AnalyticsIndexException {
+        return new IndexSearchOpExecutor<List<SearchResultEntry>>() {            
+            @Override
+            public List<SearchResultEntry> run() throws AnalyticsIndexException {
+                List<SearchResultEntry> result = new ArrayList<>(count);
+                result.addAll(doSearch(tenantId, tableName, query, start, count));
+                return result;
+            }
+        }.execute();
     }
 
     private List<SearchResultEntry> doSearch(int tenantId, String tableName, String query, int start, int count)
@@ -721,7 +726,17 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return perFieldAnalyzerWrapper;
     }
 
-    public int searchCount(int tenantId, String tableName, String query) throws AnalyticsIndexException {
+    public int searchCount(final int tenantId, final String tableName, final String query) throws AnalyticsIndexException {
+        return new IndexSearchOpExecutor<Integer>() {            
+            @Override
+            public Integer run() throws AnalyticsIndexException {
+                return doSearchCount(tenantId, tableName, query);
+
+            }
+        }.execute();
+    }
+    
+    private int doSearchCount(int tenantId, String tableName, String query) throws AnalyticsIndexException {
         IndexReader reader = null;
         try {
             reader = this.getCombinedIndexReader(tenantId, tableName);
@@ -753,34 +768,39 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    public List<AnalyticsDrillDownRange> drillDownRangeCount(int tenantId,
-            AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
+    public List<AnalyticsDrillDownRange> drillDownRangeCount(final int tenantId,
+            final AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
         if (drillDownRequest.getRangeField() == null) {
             throw new AnalyticsIndexException("Rangefield is not set");
         }
         if (drillDownRequest.getRanges() == null) {
             throw new AnalyticsIndexException("Ranges are not set");
         }
-        IndexReader indexReader= null;
-        try {
-            indexReader = this.getCombinedIndexReader(tenantId, drillDownRequest.getTableName());
-            return getAnalyticsDrillDownRanges(tenantId, drillDownRequest, indexReader);
-        } catch (org.apache.lucene.queryparser.classic.ParseException e) {
-            throw new AnalyticsIndexException("Error while parsing the lucene query: " +
-                                              e.getMessage(), e);
-        } catch (IOException e) {
-            throw new AnalyticsIndexException("Error while reading sharded indices: " +
-                                              e.getMessage(), e);
-        } finally {
-            if (indexReader != null) {
+        return new IndexSearchOpExecutor<List<AnalyticsDrillDownRange>>() {            
+            @Override
+            public List<AnalyticsDrillDownRange> run() throws AnalyticsIndexException {
+                IndexReader indexReader = null;
                 try {
-                    indexReader.close();
-                } catch (IOException e) {
-                    log.error("Error in closing the index reader: " +
+                    indexReader = getCombinedIndexReader(tenantId, drillDownRequest.getTableName());
+                    return getAnalyticsDrillDownRanges(tenantId, drillDownRequest, indexReader);
+                } catch (org.apache.lucene.queryparser.classic.ParseException e) {
+                    throw new AnalyticsIndexException("Error while parsing the lucene query: " +
                                                       e.getMessage(), e);
+                } catch (IOException e) {
+                    throw new AnalyticsIndexException("Error while reading sharded indices: " +
+                                                      e.getMessage(), e);
+                } finally {
+                    if (indexReader != null) {
+                        try {
+                            indexReader.close();
+                        } catch (IOException e) {
+                            log.error("Error in closing the index reader: " +
+                                                              e.getMessage(), e);
+                        }
+                    }
                 }
             }
-        }
+        }.execute();        
     }
 
     private List<AnalyticsDrillDownRange> getAnalyticsDrillDownRanges(int tenantId,
@@ -1179,40 +1199,55 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return totalCount;
     }
 
-    private List<SearchResultEntry> drillDownRecordsPerShard(int tenantId,
-                                                             String shardId,
-                                                             AnalyticsDrillDownRequest drillDownRequest,
-                                                             String rangeField,
-                                                             AnalyticsDrillDownRange range)
+    private List<SearchResultEntry> drillDownRecordsPerShard(
+            final int tenantId,
+            final String shardId,
+            final AnalyticsDrillDownRequest drillDownRequest,
+            final String rangeField,
+            final AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
         String tableName = drillDownRequest.getTableName();
         String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
-        Directory indexDir = this.lookupIndexDir(shardedTableId);
-        Directory taxonomyDir = this.lookupTaxonomyIndexDir(shardedTableId);
-        return this.drillDownRecords(tenantId, drillDownRequest, indexDir, taxonomyDir, rangeField, range);
+        final Directory indexDir = this.lookupIndexDir(shardedTableId);
+        final Directory taxonomyDir = this.lookupTaxonomyIndexDir(shardedTableId);
+        return new IndexSearchOpExecutor<List<SearchResultEntry>>() {            
+            @Override
+            public List<SearchResultEntry> run() throws AnalyticsIndexException {
+                return drillDownRecords(tenantId, drillDownRequest, indexDir, taxonomyDir, rangeField, range);
+            }
+        }.execute();
     }
 
-    private List<CategorySearchResultEntry> drillDownCategoriesPerShard(int tenantId,String shardId,
-                                                             CategoryDrillDownRequest drillDownRequest)
+    private List<CategorySearchResultEntry> drillDownCategoriesPerShard(final int tenantId, final String shardId,
+                                                             final CategoryDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        String shardedTableId = this.generateShardedTableId(tenantId, drillDownRequest.getTableName(), shardId);
-        Directory indexDir = this.lookupIndexDir(shardedTableId);
-        Directory taxonomyDir = this.lookupTaxonomyIndexDir(shardedTableId);
-        return this.drilldowncategories(tenantId, indexDir, taxonomyDir, drillDownRequest);
+        return new IndexSearchOpExecutor<List<CategorySearchResultEntry>>() {            
+            @Override
+            public List<CategorySearchResultEntry> run() throws AnalyticsIndexException {
+                String shardedTableId = generateShardedTableId(tenantId, drillDownRequest.getTableName(), shardId);
+                Directory indexDir = lookupIndexDir(shardedTableId);
+                Directory taxonomyDir = lookupTaxonomyIndexDir(shardedTableId);
+                return drilldowncategories(tenantId, indexDir, taxonomyDir, drillDownRequest);
+            }
+        }.execute();        
     }
 
-    private double getDrillDownRecordCountPerShard(int tenantId,
-                                                             String shardId,
-                                                             AnalyticsDrillDownRequest drillDownRequest,
-                                                             String rangeField,
-                                                             AnalyticsDrillDownRange range)
+    private double getDrillDownRecordCountPerShard(final int tenantId,
+                                                   final String shardId,
+                                                   final AnalyticsDrillDownRequest drillDownRequest,
+                                                   final String rangeField,
+                                                   final AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
-
-        String tableName = drillDownRequest.getTableName();
-        String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
-        Directory indexDir = this.lookupIndexDir(shardedTableId);
-        Directory taxonomyDir = this.lookupTaxonomyIndexDir(shardedTableId);
-        return this.getDrillDownRecordCount(tenantId, drillDownRequest, indexDir, taxonomyDir, rangeField, range);
+        return new IndexSearchOpExecutor<Double>() {            
+            @Override
+            public Double run() throws AnalyticsIndexException {
+                String tableName = drillDownRequest.getTableName();
+                String shardedTableId = generateShardedTableId(tenantId, tableName, shardId);
+                Directory indexDir = lookupIndexDir(shardedTableId);
+                Directory taxonomyDir = lookupTaxonomyIndexDir(shardedTableId);
+                return getDrillDownRecordCount(tenantId, drillDownRequest, indexDir, taxonomyDir, rangeField, range);
+            }
+        }.execute();        
     }
 
     /**
@@ -1615,17 +1650,23 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    public AnalyticsIterator<Record> searchWithAggregates(int tenantId, AggregateRequest aggregateRequest)
+    public AnalyticsIterator<Record> searchWithAggregates(final int tenantId, 
+            final AggregateRequest aggregateRequest)
             throws AnalyticsException {
-        try {
-            List<String[]> subCategories = getUniqueGroupings(tenantId, aggregateRequest);
-            AnalyticsIterator<Record> iterator = new AggregateRecordIterator(tenantId, subCategories, aggregateRequest, this);
-            return iterator;
-        } catch (IOException e) {
-            log.error("Error occured while performing aggregation, " + e.getMessage(), e);
-            throw new AnalyticsException("Error occured while performing aggregation, " + e.getMessage(), e);
-
-        }
+        final AnalyticsDataIndexer indexer = this;
+        return new IndexSearchOpExecutor<AnalyticsIterator<Record>>() {            
+            @Override
+            public AnalyticsIterator<Record> run() throws AnalyticsIndexException {
+                try {
+                    List<String[]> subCategories = getUniqueGroupings(tenantId, aggregateRequest);
+                    AnalyticsIterator<Record> iterator = new AggregateRecordIterator(tenantId, subCategories, aggregateRequest, indexer);
+                    return iterator;
+                } catch (IOException e) {
+                    log.error("Error occured while performing aggregation, " + e.getMessage(), e);
+                    throw new AnalyticsIndexException("Error occured while performing aggregation, " + e.getMessage(), e);
+                }
+            }
+        }.execute();        
     }
 
 	private List<String[]> getUniqueGroupings(int tenantId, AggregateRequest aggregateRequest)
@@ -2072,6 +2113,34 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 addAllCategoriesToSet(r, child, newParent, depth + 1, uniqueGroups);
             }
         }
+    }
+    
+    /**
+     * This class represents index search operation retry logic.
+     */
+    private abstract static class IndexSearchOpExecutor<E> {
+        
+        private static final int[] RETRY_WAIT_TIMES = new int[] { 100, 1000 };
+        
+        public abstract E run() throws AnalyticsIndexException;
+        
+        public E execute() throws AnalyticsIndexException {
+            for (int i = 0; i <= RETRY_WAIT_TIMES.length; i++) {
+                try {
+                    return this.run();
+                } catch (AnalyticsIndexException e) {
+                    if (i >= RETRY_WAIT_TIMES.length) {
+                        throw e;
+                    }
+                    try {
+                        log.warn("Retrying index search operation: " + i);
+                        Thread.sleep(RETRY_WAIT_TIMES[i]);
+                    } catch (InterruptedException ignore) { }
+                }
+            }
+            throw new AnalyticsIndexException("IndexSearchOpExecutor: this should never happen.");
+        }
+        
     }
     
 }
