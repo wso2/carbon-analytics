@@ -232,33 +232,33 @@ public class ComputeClasspath {
 
     public static String getSparkClasspath(String sparkClasspath, String carbonHome)
             throws IOException {
-//        if (!fileExists(carbonHome)) throw new IOException(
-//                "CarbonHome specified, does not exists :" + carbonHome);
+        if (!isDirectory(carbonHome)) throw new IOException(
+                "CarbonHome specified, does not exists :" + carbonHome);
         return  getSparkClasspath(sparkClasspath, carbonHome, new String[0]);
     }
 
     public static String getSparkClasspath(String sparkClasspath, String carbonHome, String[] excludeJars)
             throws IOException {
-//        if (!fileExists(carbonHome)) throw new IOException(
-//                "CarbonHome specified, does not exists :" + carbonHome);
+        if (!isDirectory(carbonHome)) throw new IOException(
+                "CarbonHome specified, does not exists :" + carbonHome);
         String cp = createInitialSparkClasspath(sparkClasspath, carbonHome, REQUIRED_JARS, SEP, excludeJars);
         return cp + addJarsFromDropins("", carbonHome, SEP) + addJarsFromLib("", carbonHome, SEP) +
                 addJarsFromEndorsedLib("", carbonHome, SEP) + addJarsFromConfig("", carbonHome, SEP);
     }
 
-    public static String[] getSparkClasspathJarsArray(String sparkClasspath, String carbonHome)
-            throws IOException {
-        return getSparkClasspath(sparkClasspath, carbonHome).split(SEP);
-    }
-
-    public static String getSparkClasspathAbsolute(String sparkClasspath, String carbonHome)
-            throws IOException {
-        if (carbonHome.endsWith(File.separator)) {
-            return getSparkClasspath(sparkClasspath, carbonHome).replace(carbonHome, "." + File.separator);
-        } else {
-            return getSparkClasspath(sparkClasspath, carbonHome).replace(carbonHome, ".");
-        }
-    }
+//    public static String[] getSparkClasspathJarsArray(String sparkClasspath, String carbonHome)
+//            throws IOException {
+//        return getSparkClasspath(sparkClasspath, carbonHome).split(SEP);
+//    }
+//
+//    public static String getSparkClasspathAbsolute(String sparkClasspath, String carbonHome)
+//            throws IOException {
+//        if (carbonHome.endsWith(File.separator)) {
+//            return getSparkClasspath(sparkClasspath, carbonHome).replace(carbonHome, "." + File.separator);
+//        } else {
+//            return getSparkClasspath(sparkClasspath, carbonHome).replace(carbonHome, ".");
+//        }
+//    }
 
     private static String addJarsFromLib(String scp, String carbonHome, String separator) {
         File libDir = new File(carbonHome + File.separator + "repository" + File.separator
@@ -334,6 +334,11 @@ public class ComputeClasspath {
     private static boolean fileExists(String path) {
         File tempFile = new File(path);
         return tempFile.exists() && !tempFile.isDirectory();
+    }
+
+    private static boolean isDirectory(String path) {
+        File tempFile = new File(path);
+        return tempFile.exists() && tempFile.isDirectory();
     }
 
     private static File[] listJars(File dir) {
