@@ -329,7 +329,7 @@ public class EmailEventAdapter implements InputEventAdapter {
             String mailSubject = msg.getSubject();
             if (mailSubject == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Skipping message because the subject field is null. Message : " + msg.toString());
+                    log.debug("Skipping message because the subject field is null. Expected subject : " + expectedSubject);
                 }
                 return;
             }
