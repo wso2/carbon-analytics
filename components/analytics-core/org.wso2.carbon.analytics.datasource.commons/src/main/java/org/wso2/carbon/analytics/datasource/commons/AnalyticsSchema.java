@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.datasource.commons;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,7 +50,11 @@ public class AnalyticsSchema implements Serializable {
             }
         }
         this.primaryKeys = primaryKeys;
-    }
+        /* we should always have the same primary key order, or order to
+         * not to depend on the order of the primary key list in generating
+         * the hashcode */
+        Collections.sort(this.primaryKeys);
+     }
     
     public Map<String, ColumnDefinition> getColumns() {
         return columns;
