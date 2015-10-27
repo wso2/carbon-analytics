@@ -17,6 +17,8 @@
 */
 package org.wso2.carbon.analytics.spark.core.internal;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.core.AnalyticsTask;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
@@ -49,6 +51,7 @@ import java.util.Map;
  * the analytics scripts.
  */
 public class AnalyticsPersistenceManager {
+    private static final Log log = LogFactory.getLog(AnalyticsPersistenceManager.class);
     private static AnalyticsPersistenceManager instance = new AnalyticsPersistenceManager();
 
     private AnalyticsPersistenceManager() {
@@ -220,8 +223,8 @@ public class AnalyticsPersistenceManager {
                 userRegistry.delete(scriptLocation);
                 scheduleTask(tenantId, new AnalyticsScript(scriptName));
             } else {
-                throw new AnalyticsPersistenceException("Script wasn't existing in :" + scriptLocation +
-                        ". Cannot delete non existing script : " + scriptName + " for tenantId : " + tenantId + ". ");
+                log.info("Cannot delete non existing script : " + scriptName + " for tenantId : " + tenantId + ". " +
+                        "It might have been deleted already." );
             }
         } catch (RegistryException e) {
             throw new AnalyticsPersistenceException("Error while loading the registry for tenant : " + tenantId, e);
