@@ -1187,7 +1187,7 @@
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
         <!--CEP versions-->
-        <siddhi.version>3.0.3</siddhi.version>
+        <siddhi.version>3.0.4-SNAPSHOT</siddhi.version>
 
         <orbit.version.json>1.0.0.wso2v1</orbit.version.json>
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
