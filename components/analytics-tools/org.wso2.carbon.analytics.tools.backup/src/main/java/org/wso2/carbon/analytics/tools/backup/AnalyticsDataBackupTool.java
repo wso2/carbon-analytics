@@ -181,7 +181,7 @@ public class AnalyticsDataBackupTool {
             } else if (line.hasOption(BACKUP_FILE_SYSTEM)) {
                 backupFileSystem(analyticsFileSystem, tenantId, baseDir);
             } else if (line.hasOption(RESTORE_RECORD_STORE)) {
-                restoreRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables,disableStaging);
+                restoreRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables, disableStaging);
             } else if (line.hasOption(RESTORE_FILE_SYSTEM)) {
                 restoreFileSystem(analyticsFileSystem, baseDir);
             } else if (line.hasOption(REINDEX_EVENTS)) {
@@ -525,6 +525,7 @@ public class AnalyticsDataBackupTool {
             while ((nRead = inputStream.read(buffer, 0, buffer.length)) != -1) {
                 byteArrayOutputStream.write(buffer, 0, nRead);
             }
+            return byteArrayOutputStream.toByteArray();
         } catch (FileNotFoundException e) {
             throw new IOException("Error in reading the file: " + e.getMessage(), e);
         } catch (IOException e) {
@@ -532,7 +533,6 @@ public class AnalyticsDataBackupTool {
         } finally {
             byteArrayOutputStream.flush();
         }
-        return byteArrayOutputStream.toByteArray();
     }
 
     /**
