@@ -67,8 +67,8 @@ public abstract class SparkTestBase {
 
     /**
      * Provides a way to format the test messages
-     * @param str
-     * @return formattedString
+     * @param str the message to print
+     * @return formattedString which would be printed
      */
     protected String testString(String str) {
         return "\n************** " + str.toUpperCase() + " **************\n";
@@ -78,22 +78,21 @@ public abstract class SparkTestBase {
      * Generates a given number of dummy log records
      * @param tenantId
      * @param tableName
-     * @param time
-     * @param timeOffset
+     * @param time timestamp of the event
      * @param errorMessages => number of error messages required
      * @param infoMessages  => number of info messages required
      * @return
      */
-    protected List<Record> generateRecords(int tenantId, String tableName, long time, int timeOffset,int errorMessages,int infoMessages) {
+    protected List<Record> generateRecords(int tenantId, String tableName, long time, int errorMessages, int infoMessages) {
         List<Record> result = new ArrayList<Record>();
 
         for (int i = 0; i < errorMessages; i++) {
             result.add(generateRecord(tenantId, tableName, "ERROR", "[ERROR] /get failed for tenant:" + tenantId,
-                    time, timeOffset, true));
+                    time, true));
         }
         for (int i = 0; i < infoMessages; i++) {
             result.add(generateRecord(tenantId, tableName, "INFO", "[INFO] the request success for tenant:" + tenantId,
-                    time, timeOffset, true));
+                    time, true));
         }
         return result;
     }
@@ -102,22 +101,21 @@ public abstract class SparkTestBase {
      * Generates a given number of dummy log records with facets
      * @param tenantId
      * @param tableName
-     * @param time
-     * @param timeOffset
+     * @param time timestamp of the event
      * @param errorMessages => number of error messages required
      * @param infoMessages  => number of info messages required
      * @return
      */
-    protected List<Record> generateRecordsWithFacets(int tenantId, String tableName, long time, int timeOffset,int errorMessages,int infoMessages) {
+    protected List<Record> generateRecordsWithFacets(int tenantId, String tableName, long time, int errorMessages, int infoMessages) {
         List<Record> result = new ArrayList<Record>();
 
         for (int i = 0; i < errorMessages; i++) {
             result.add(generateRecordWithFacets(tenantId, tableName, "ERROR", "[ERROR] /get failed for tenant:" + tenantId,
-                    time, timeOffset, true));
+                    time, true));
         }
         for (int i = 0; i < infoMessages; i++) {
             result.add(generateRecordWithFacets(tenantId, tableName, "INFO", "[INFO] the request success for tenant:" + tenantId,
-                    time, timeOffset, true));
+                    time, true));
         }
         return result;
     }
@@ -126,15 +124,14 @@ public abstract class SparkTestBase {
      *
      * @param tenantId
      * @param tableName
-     * @param logLevel
-     * @param message
-     * @param time
-     * @param timeOffset
-     * @param generateRecordIds
+     * @param logLevel of the log ( INFO, ERROR, WARN)
+     * @param message log message
+     * @param time timestamp of the message
+     * @param generateRecordIds should the record ID get generated or not
      * @return
      */
     protected Record generateRecord(int tenantId, String tableName, String logLevel, String message,
-                                  long time, int timeOffset, boolean generateRecordIds) {
+                                  long time, boolean generateRecordIds) {
 
         Map<String, Object> values = new HashMap<String, Object>();
         values.put("log_level", logLevel);
@@ -144,7 +141,6 @@ public abstract class SparkTestBase {
         long timeTmp;
         if (time != -1) {
             timeTmp = time;
-            time += timeOffset;
         } else {
             timeTmp = System.currentTimeMillis();
         }
@@ -157,15 +153,14 @@ public abstract class SparkTestBase {
      *
      * @param tenantId
      * @param tableName
-     * @param logLevel
-     * @param message
-     * @param time
-     * @param timeOffset
-     * @param generateRecordIds
+     * @param logLevel of the log ( INFO, ERROR, WARN)
+     * @param message log message
+     * @param time timestamp of the message
+     * @param generateRecordIds should the record ID get generated or not
      * @return
      */
     protected Record generateRecordWithFacets(int tenantId, String tableName, String logLevel, String message,
-                                    long time, int timeOffset, boolean generateRecordIds) {
+                                    long time, boolean generateRecordIds) {
 
         Map<String, Object> values = new HashMap<String, Object>();
         values.put("log_level", logLevel);
@@ -177,7 +172,6 @@ public abstract class SparkTestBase {
         long timeTmp;
         if (time != -1) {
             timeTmp = time;
-            time += timeOffset;
         } else {
             timeTmp = System.currentTimeMillis();
         }

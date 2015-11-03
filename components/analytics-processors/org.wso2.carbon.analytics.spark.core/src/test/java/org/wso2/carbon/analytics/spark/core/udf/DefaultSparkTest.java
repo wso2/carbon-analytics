@@ -41,7 +41,7 @@ public class DefaultSparkTest extends SparkTestBase {
 		final int ERROR_MESSAGES = 5;
 
 		SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
-        List<Record> records = generateRecords(1, "Log", System.currentTimeMillis(), -1, ERROR_MESSAGES, INFO_MESSAGES);
+        List<Record> records = generateRecords(1, "Log", System.currentTimeMillis(), ERROR_MESSAGES, INFO_MESSAGES);
         this.service.deleteTable(1, "Log");
 		this.service.createTable(1, "Log");
 		this.service.put(records);
@@ -68,7 +68,7 @@ public class DefaultSparkTest extends SparkTestBase {
 		final int ERROR_MESSAGES = 5;
 
 		SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
-		List<Record> records = generateRecords(1, "Log", System.currentTimeMillis(), -1, ERROR_MESSAGES, INFO_MESSAGES);
+		List<Record> records = generateRecords(1, "Log", System.currentTimeMillis(), ERROR_MESSAGES, INFO_MESSAGES);
 		this.service.deleteTable(1, "Log");
 		this.service.createTable(1, "Log");
 		this.service.put(records);

@@ -44,7 +44,7 @@ public class FacetSparkTest extends SparkTestBase {
 
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
         List<Record> records =
-                generateRecords(1, "Log", System.currentTimeMillis(), -1,
+                generateRecords(1, "Log", System.currentTimeMillis(),
                         ERROR_MESSAGES, INFO_MESSAGES);
         this.service.deleteTable(1, "Log");
         this.service.createTable(1, "Log");
@@ -89,7 +89,7 @@ public class FacetSparkTest extends SparkTestBase {
 
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
         List<Record> records =
-                generateRecords(1, "Log", System.currentTimeMillis(), -1,
+                generateRecords(1, "Log", System.currentTimeMillis(),
                         ERROR_MESSAGES, INFO_MESSAGES);
         this.service.deleteTable(1, "Log");
         this.service.createTable(1, "Log");
