@@ -111,10 +111,10 @@ public class AnalyticsDataBackupTool {
                 "specify tenant id of the tenant considered").create(TENANT_ID));
         options.addOption(OptionBuilder.withArgName("restore record batch size (default is " +
                 RECORD_BATCH_SIZE + ")").hasArg().withDescription(
-                        "specify the number of records per batch for backup").create(BATCH_SIZE));
+                "specify the number of records per batch for backup").create(BATCH_SIZE));
         return options;
     }
-    
+
     public static void main(String[] args) throws Exception {
         Options options = populateOptions();
         CommandLineParser parser = new BasicParser();
@@ -165,7 +165,7 @@ public class AnalyticsDataBackupTool {
             }
 
             File baseDir;
-            if (line.getOptionValue(DIR) != null){
+            if (line.getOptionValue(DIR) != null) {
                 baseDir = new File(line.getOptionValue(DIR));
                 if (!baseDir.exists()) {
                     baseDir.mkdirs();
@@ -201,7 +201,7 @@ public class AnalyticsDataBackupTool {
         }
         System.out.println("Done.");
     }
-    
+
     private static void checkBaseDir(File baseDir) {
         if (baseDir == null) {
             System.out.println("The basedir must be given.");
@@ -278,7 +278,7 @@ public class AnalyticsDataBackupTool {
                     continue;
                 }
                 try {
-                    List<Record> records= readRecordFromFile(file);
+                    List<Record> records = readRecordFromFile(file);
                     for (Record record : records) {
                         if (!table.equals(record.getTableName())) {
                             System.out.println("Invalid record, invalid table name in record compared to "
@@ -430,6 +430,7 @@ public class AnalyticsDataBackupTool {
 
     /**
      * Backing up the filesystem to the local recursively.
+     *
      * @param analyticsFileSystem
      * @param path
      * @param baseDir
@@ -588,6 +589,7 @@ public class AnalyticsDataBackupTool {
 
     /**
      * Returns an indexing disabled schema from the provided Analytics Schema.
+     *
      * @param schema
      * @return AnalyticsSchema in which the indexing of the columns are set to false
      */
@@ -609,20 +611,22 @@ public class AnalyticsDataBackupTool {
         }
         return indexLessSchema;
     }
+
     /**
      * Re-indexes the published events.
+     *
      * @param dataService
      * @param indexer
      * @param tenantId
      * @param tableName
      * @throws AnalyticsException
      */
-    private static void reindexData(AnalyticsDataService dataService, int tenantId,String tableName) throws AnalyticsException {
+    private static void reindexData(AnalyticsDataService dataService, int tenantId, String tableName) throws AnalyticsException {
         AnalyticsDataResponse analyticsDataResponse = dataService.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
         RecordGroup[] recordGroups = analyticsDataResponse.getRecordGroups();
         String recordStoreName = analyticsDataResponse.getRecordStoreName();
         List<Record> recordList = new ArrayList<>();
-        dataService.clearIndexData(tenantId,tableName);
+        dataService.clearIndexData(tenantId, tableName);
 
         int j = 1;
         //iterating the record groups
