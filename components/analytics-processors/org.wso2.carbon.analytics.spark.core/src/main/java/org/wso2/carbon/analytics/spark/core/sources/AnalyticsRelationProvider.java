@@ -66,6 +66,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
     private String primaryKeys;
     private AnalyticsDataService dataService;
     private String recordStore;
+    private boolean mergeFlag;
     private StructType schemaStruct;
 
     public AnalyticsRelationProvider() {
@@ -106,13 +107,16 @@ public class AnalyticsRelationProvider implements RelationProvider,
     }
 
     private void setParameters(Map<String, String> parameters) {
-        this.tenantId = Integer.parseInt(extractValuesFromMap(AnalyticsConstants.TENANT_ID, parameters, "-1234"));
+        this.tenantId = Integer.parseInt(extractValuesFromMap(AnalyticsConstants.TENANT_ID,
+                                                              parameters, "-1234"));
         this.tableName = extractValuesFromMap(AnalyticsConstants.TABLE_NAME, parameters, "");
         this.schemaString = extractValuesFromMap(AnalyticsConstants.SCHEMA_STRING, parameters, "");
         this.streamName = extractValuesFromMap(AnalyticsConstants.STREAM_NAME, parameters, "");
         this.primaryKeys = extractValuesFromMap(AnalyticsConstants.PRIMARY_KEYS, parameters, "");
         this.recordStore = extractValuesFromMap(AnalyticsConstants.RECORD_STORE, parameters,
                                                 AnalyticsConstants.DEFAULT_PROCESSED_DATA_STORE_NAME);
+        this.mergeFlag = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.MERGE_SCHEMA,
+                                                                   parameters, "true"));
     }
 
     private void createTableIfNotExist() throws AnalyticsExecutionException {
@@ -161,15 +165,20 @@ public class AnalyticsRelationProvider implements RelationProvider,
             }
 
             AnalyticsSchema finalSchema = new AnalyticsSchema(colList, pKeyList);
-            try {
-                AnalyticsSchema existingSchema = this.dataService.getTableSchema(this.tenantId, this.tableName);
-                if (!isEmptyAnalyticsSchema(existingSchema)) {
-                    logDebug("There is an existing schema already present. Hence, merging the schemas");
-                    finalSchema = AnalyticsDataServiceUtils.createMergedSchema
-                            (existingSchema, pKeyList, colList, Collections.<String>emptyList());
+            if (this.mergeFlag) {
+                logDebug("MergeSchema flag is set. Hence merging the schema with the existing schema");
+                try {
+                    AnalyticsSchema existingSchema = this.dataService.getTableSchema(this.tenantId, this.tableName);
+                    if (!isEmptyAnalyticsSchema(existingSchema)) {
+                        logDebug("There is an existing schema already present. Hence, merging the schemas");
+                        finalSchema = AnalyticsDataServiceUtils.createMergedSchema
+                                (existingSchema, pKeyList, colList, Collections.<String>emptyList());
+                    }
+                } catch (AnalyticsException e) {
+                    throw new AnalyticsExecutionException("Error while reading " + this.tableName + " table schema: " + e.getMessage(), e);
                 }
-            } catch (AnalyticsException e) {
-                throw new AnalyticsExecutionException("Error while reading " + this.tableName + " table schema: " + e.getMessage(), e);
+            } else {
+                logDebug("MergeSchema flag is not set. Hence using the given schema");
             }
 
             try {

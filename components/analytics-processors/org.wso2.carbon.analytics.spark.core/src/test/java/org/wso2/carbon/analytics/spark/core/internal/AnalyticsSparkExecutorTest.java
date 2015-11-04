@@ -593,6 +593,10 @@ public class AnalyticsSparkExecutorTest {
                            "(tableName \"Log10\"," +
                            "schema \"ip1 int\"" +
                            ")");
+
+        AnalyticsSchema schema = this.service.getTableSchema(1, "Log10");
+        Assert.assertEquals(schema.getColumns().size(), 6, "Merged schema columns do not match" );
+
         AnalyticsQueryResult result = ex.executeQuery(1, "SELECT ip FROM Log10");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
@@ -605,6 +609,46 @@ public class AnalyticsSparkExecutorTest {
         System.out.println(result);
 
         this.cleanupTable(1, "Log10");
+
+        records = AnalyticsRecordStoreTest.generateRecords(1, "Log11", 0, 10, -1, -1);
+        this.service.createTable(1, "Log11");
+        this.service.put(records);
+
+        cols = new ArrayList<>();
+        cols.add(new ColumnDefinition("server_name", AnalyticsSchema.ColumnType.STRING));
+        cols.add(new ColumnDefinition("ip", AnalyticsSchema.ColumnType.STRING));
+        cols.add(new ColumnDefinition("tenant", AnalyticsSchema.ColumnType.INTEGER));
+        cols.add(new ColumnDefinition("sequence", AnalyticsSchema.ColumnType.LONG));
+        cols.add(new ColumnDefinition("summary", AnalyticsSchema.ColumnType.LONG));
+        this.service.setTableSchema(1, "Log11", new AnalyticsSchema(cols, Collections.<String>emptyList()));
+
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log11 USING CarbonAnalytics " +
+                           "OPTIONS" +
+                           "(tableName \"Log11\"," +
+                           "schema \"ip1 int\"," +
+                           "mergeSchema \"false\""+
+                           ")");
+
+        schema = this.service.getTableSchema(1, "Log11");
+        Assert.assertEquals(schema.getColumns().size(), 1, "Merged schema columns do not match" );
+
+
+        boolean success = false;
+        try {
+            ex.executeQuery(1, "SELECT ip FROM Log11");
+        } catch (Exception e) {
+            System.out.println("Query failed with : " + e.getMessage());
+            success = true;
+        }
+        Assert.assertTrue(success, "Query did not fail!");
+
+        result = ex.executeQuery(1, "SELECT ip1 FROM Log11");
+        Assert.assertEquals(result.getRows().size(), 10);
+        System.out.println(result);
+
+        this.cleanupTable(1, "Log11");
+        
+        
         System.out.println(testString("end : merge table schema test"));
     }
 
