@@ -152,7 +152,6 @@ public class AnalyticsDataMigrationTool {
         KeyspaceDefinition keyspaceDefinition = cluster.describeKeyspace(CASSANDRA_KEYSPACE);
         List<ColumnFamilyDefinition> cfDefs = keyspaceDefinition.getCfDefs();
         ColumnFamilyDefinition columnFamilyDefinition = null;
-
         //getting the column family definition
         for (ColumnFamilyDefinition cfDef : cfDefs) {
             if (cfDef.getName().equals(columnFamily)) {
