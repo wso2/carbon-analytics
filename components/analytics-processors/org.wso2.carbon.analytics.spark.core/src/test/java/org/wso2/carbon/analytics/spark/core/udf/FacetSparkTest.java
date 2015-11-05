@@ -34,14 +34,13 @@ public class FacetSparkTest extends SparkTestBase {
     /**
      * Tests the persistence of facets in the record store.
      *
-     * @throws AnalyticsException
+     * @throws AnalyticsException thrown when service fails to perform operations of Analytics Service.
      */
     @Test
     public void testFacetPersistence() throws AnalyticsException {
         System.out.println(testString("START : Facet Persistence tester"));
         final int INFO_MESSAGES = 10;
         final int ERROR_MESSAGES = 0;
-
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
         List<Record> records =
                 generateRecords(1, "Log", System.currentTimeMillis(),
@@ -69,24 +68,21 @@ public class FacetSparkTest extends SparkTestBase {
         // testing the facet persistence
         AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * from facetTest where composite = '1,INFO'");
         Assert.assertEquals(result.getRows().size(), INFO_MESSAGES);
-
         this.service.deleteTable(1, "Log");
         this.service.deleteTable(1, "facetTest");
-
         System.out.println(testString("END: Facet Persistence tester"));
     }
 
     /**
      * tests if the Facet UDFs fails if given the wrong number of parameters.
      *
-     * @throws AnalyticsException
+     * @throws AnalyticsException thrown when service fails to perform operations of Analytics Service.
      */
     @Test (expectedExceptions = ClassCastException.class)
     public void testFacetUDFWrongNumberOfParameters() throws AnalyticsException {
         System.out.println(testString("START : Facet UDF fail tester"));
         final int INFO_MESSAGES = 10;
         final int ERROR_MESSAGES = 0;
-
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
         List<Record> records =
                 generateRecords(1, "Log", System.currentTimeMillis(),
@@ -103,9 +99,7 @@ public class FacetSparkTest extends SparkTestBase {
 
         // for a single facet
         ex.executeQuery(1, "SELECT facet3(tenant,log_level) from Log");
-
         this.service.deleteTable(1, "Log");
-
         System.out.println(testString("END: Facet UDF fail tester"));
 
     }
