@@ -79,6 +79,7 @@ public class AnalyticsDataBackupTool {
     private static final String BACKUP_RECORD_STORE = "backupRecordStore";
     private static final String TABLE_SCHEMA_FILE_NAME = "__TABLE_SCHEMA__";
     private static final String ANALYTICS_DS_CONFIG_FILE = "analytics-config.xml";
+    private static final String ENABLE_INDEXING = "enableIndexing";
     private static final int INDEX_PROCESS_WAIT_TIME = -1;
     private static final String RECORD_BATCH_SIZE = "1000";
     private static int batchSize = 0;
@@ -86,8 +87,7 @@ public class AnalyticsDataBackupTool {
     private static final int READ_BUFFER_SIZE = 10240;
     private static final int RECORD_INDEX_CHUNK_SIZE = 1000;
 
-    @SuppressWarnings("static-access")
-    private static Options populateOptions() {
+    @SuppressWarnings("static-access") private static Options populateOptions() {
         Options options = new Options();
         options.addOption(new Option(BACKUP_RECORD_STORE, false, "backup analytics data"));
         options.addOption(new Option(BACKUP_FILE_SYSTEM, false, "backup filesystem data"));
@@ -97,21 +97,21 @@ public class AnalyticsDataBackupTool {
 
         options.addOption(new Option(REINDEX_EVENTS, false, "re-indexes records in the given table data"));
 
-        options.addOption(new Option("enableIndexing", false, "enables indexing while restoring"));
+        options.addOption(new Option(ENABLE_INDEXING, false, "enables indexing while restoring"));
         options.addOption(new Option(DISABLE_STAGING, false, "disables staging while restoring"));
-        options.addOption(OptionBuilder.withArgName("directory").hasArg().withDescription(
-                "source/target directory").create(DIR));
-        options.addOption(OptionBuilder.withArgName("table list").hasArg().withDescription(
-                "analytics tables (comma separated) to backup/restore").create(TABLES));
-        options.addOption(OptionBuilder.withArgName(TIME_PATTERN).hasArg().withDescription(
-                "consider records from this time (inclusive)").create(TIMEFROM));
-        options.addOption(OptionBuilder.withArgName(TIME_PATTERN).hasArg().withDescription(
-                "consider records to this time (non-inclusive)").create(TIMETO));
-        options.addOption(OptionBuilder.withArgName("tenant id (default is super tenant)").hasArg().withDescription(
-                "specify tenant id of the tenant considered").create(TENANT_ID));
+        options.addOption(
+                OptionBuilder.withArgName("directory").hasArg().withDescription("source/target directory").create(DIR));
+        options.addOption(OptionBuilder.withArgName("table list").hasArg()
+                .withDescription("analytics tables (comma separated) to backup/restore").create(TABLES));
+        options.addOption(OptionBuilder.withArgName(TIME_PATTERN).hasArg()
+                .withDescription("consider records from this time (inclusive)").create(TIMEFROM));
+        options.addOption(OptionBuilder.withArgName(TIME_PATTERN).hasArg()
+                .withDescription("consider records to this time (non-inclusive)").create(TIMETO));
+        options.addOption(OptionBuilder.withArgName("tenant id (default is super tenant)").hasArg()
+                .withDescription("specify tenant id of the tenant considered").create(TENANT_ID));
         options.addOption(OptionBuilder.withArgName("restore record batch size (default is " +
-                RECORD_BATCH_SIZE + ")").hasArg().withDescription(
-                "specify the number of records per batch for backup").create(BATCH_SIZE));
+                RECORD_BATCH_SIZE + ")").hasArg().withDescription("specify the number of records per batch for backup")
+                .create(BATCH_SIZE));
         return options;
     }
 
@@ -124,7 +124,7 @@ public class AnalyticsDataBackupTool {
             System.exit(1);
         }
         if (line.hasOption(RESTORE_RECORD_STORE)) {
-            if (line.hasOption("enableIndexing")) {
+            if (line.hasOption(ENABLE_INDEXING)) {
                 System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
                 forceIndexing = true;
             } else {
@@ -174,8 +174,11 @@ public class AnalyticsDataBackupTool {
                 baseDir = null;
             }
 
-            System.out.println("Intializing [tenant=" + tenantId + "] [timefrom='" + tfStr + "'] [timeto='" + ttStr + "'] [dir='" + baseDir + "']" +
-                    (specificTables != null ? (" [table=" + Arrays.toString(specificTables) + "]") : "") + "...");
+            System.out.println(
+                    "Intializing [tenant=" + tenantId + "] [timefrom='" + tfStr + "'] [timeto='" + ttStr + "'] [dir='"
+                            + baseDir + "']" +
+                            (specificTables != null ? (" [table=" + Arrays.toString(specificTables) + "]") : "")
+                            + "...");
             if (line.hasOption(BACKUP_RECORD_STORE)) {
                 backupRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
             } else if (line.hasOption(BACKUP_FILE_SYSTEM)) {
@@ -209,9 +212,8 @@ public class AnalyticsDataBackupTool {
         }
     }
 
-    private static void backupRecordStore(AnalyticsDataService service, int tenantId, File baseDir,
-                                          long timeFrom, long timeTo, String[] specificTables)
-            throws AnalyticsException {
+    private static void backupRecordStore(AnalyticsDataService service, int tenantId, File baseDir, long timeFrom,
+            long timeTo, String[] specificTables) throws AnalyticsException {
         checkBaseDir(baseDir);
         if (specificTables != null) {
             for (String specificTable : specificTables) {
@@ -226,9 +228,8 @@ public class AnalyticsDataBackupTool {
         }
     }
 
-    private static void restoreRecordStore(AnalyticsDataService service, int tenantId, File baseDir,
-                                           long timeFrom, long timeTo, String[] specificTables, boolean disableStaging)
-            throws IOException {
+    private static void restoreRecordStore(AnalyticsDataService service, int tenantId, File baseDir, long timeFrom,
+            long timeTo, String[] specificTables, boolean disableStaging) throws IOException {
         checkBaseDir(baseDir);
         if (specificTables != null) {
             for (String specificTable : specificTables) {
@@ -244,7 +245,7 @@ public class AnalyticsDataBackupTool {
     }
 
     private static void restoreTable(AnalyticsDataService service, int tenantId, String table, File baseDir,
-                                     long timeFrom, long timeTo, boolean disableStaging) {
+            long timeFrom, long timeTo, boolean disableStaging) {
         try {
             checkBaseDir(baseDir);
             System.out.print("Restoring table '" + table + "'..");
@@ -274,29 +275,30 @@ public class AnalyticsDataBackupTool {
                     System.out.print(".");
                 }
                 if (file.isDirectory()) {
-                    System.out.println(file.getAbsolutePath() + "is a directory, which cannot contain record data, skipping.");
+                    System.out.println(
+                            file.getAbsolutePath() + "is a directory, which cannot contain record data, skipping.");
                     continue;
                 }
                 try {
                     List<Record> records = readRecordFromFile(file);
                     for (Record record : records) {
                         if (!table.equals(record.getTableName())) {
-                            System.out.println("Invalid record, invalid table name in record compared to "
-                                    + "current directory: " + record.getTableName());
+                            System.out.println(
+                                    "Invalid record, invalid table name in record compared to " + "current directory: "
+                                            + record.getTableName());
                         }
                     /* check timestamp range */
                         if (!(record.getTimestamp() >= timeFrom && record.getTimestamp() < timeTo)) {
                             records.remove(record);
                         }
                     }
-
                     service.put(records);
                     if (forceIndexing) {
                         service.waitForIndexing(INDEX_PROCESS_WAIT_TIME);
                     }
-
                 } catch (IOException e) {
-                    System.out.println("Error in reading record data from file: " + file.getAbsoluteFile() + ", skipping.");
+                    System.out.println(
+                            "Error in reading record data from file: " + file.getAbsoluteFile() + ", skipping.");
                 }
                 count++;
             }
@@ -308,7 +310,7 @@ public class AnalyticsDataBackupTool {
     }
 
     private static void backupTable(AnalyticsDataService service, int tenantId, String table, File basedir,
-                                    long timeFrom, long timeTo) {
+            long timeFrom, long timeTo) {
         try {
             checkBaseDir(basedir);
             System.out.print("Backing up table '" + table + "'..");
@@ -385,8 +387,7 @@ public class AnalyticsDataBackupTool {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static List<Record> readRecordFromFile(File file) throws IOException {
+    @SuppressWarnings("unchecked") private static List<Record> readRecordFromFile(File file) throws IOException {
         FileInputStream fileIn = null;
         try {
             fileIn = new FileInputStream(file);
@@ -417,13 +418,13 @@ public class AnalyticsDataBackupTool {
     /**
      * Backs up the file system to Local.
      *
-     * @param analyticsFileSystem
-     * @param tenantId
-     * @param baseDir
-     * @throws IOException
+     * @param analyticsFileSystem analyticsFileSystem object.
+     * @param tenantId            tenant ID of the tenant.
+     * @param baseDir             where the FileSystem should be backed upto.
+     * @throws IOException if the data cannot be written to the files.
      */
-    private static void backupFileSystem(AnalyticsFileSystem analyticsFileSystem, int tenantId,
-                                         File targetBaseDir) throws IOException {
+    private static void backupFileSystem(AnalyticsFileSystem analyticsFileSystem, int tenantId, File targetBaseDir)
+            throws IOException {
         System.out.println("Backing up the filesystem to: " + targetBaseDir);
         backupFileSystemToLocal(analyticsFileSystem, "/", targetBaseDir.getAbsolutePath());
     }
@@ -431,13 +432,13 @@ public class AnalyticsDataBackupTool {
     /**
      * Backing up the filesystem to the local recursively.
      *
-     * @param analyticsFileSystem
-     * @param path
-     * @param baseDir
-     * @throws IOException
+     * @param analyticsFileSystem analyticsFileSystem object.
+     * @param tenantId            tenant ID of the tenant.
+     * @param baseDir             where the FileSystem should be backed upto.
+     * @throws IOException if the data cannot be written to the files.
      */
-    private static void backupFileSystemToLocal(AnalyticsFileSystem analyticsFileSystem,
-                                                String path, String targetBaseDir) throws IOException {
+    private static void backupFileSystemToLocal(AnalyticsFileSystem analyticsFileSystem, String path,
+            String targetBaseDir) throws IOException {
         targetBaseDir = GenericUtils.normalizePath(targetBaseDir);
         List<String> nodeList = analyticsFileSystem.list(path);
         String parentPath = (path.equals("/")) ? path : path + "/";
@@ -471,12 +472,11 @@ public class AnalyticsDataBackupTool {
     /**
      * Restores the a local filesystem to the DAS filesystem.
      *
-     * @param analyticsFileSystem
-     * @param baseDir
-     * @throws IOException
+     * @param analyticsFileSystem analyticsFileSystem object.
+     * @param baseDir             from where the data would be restored from.
+     * @throws IOException if the data cannot be written to the data layer.
      */
-    private static void restoreFileSystem(AnalyticsFileSystem analyticsFileSystem, File baseDir)
-            throws IOException {
+    private static void restoreFileSystem(AnalyticsFileSystem analyticsFileSystem, File baseDir) throws IOException {
         System.out.println("Restoring the file system with the Directory: " + baseDir);
         restoreFileStructure(analyticsFileSystem, baseDir, baseDir);
     }
@@ -484,15 +484,15 @@ public class AnalyticsDataBackupTool {
     /**
      * Recursively travels through the filestructure and restores them.
      *
-     * @param analyticsFileSystem
-     * @param node
-     * @param baseDir
-     * @throws IOException
+     * @param analyticsFileSystem analyticsFileSystem object.
+     * @param node                where to start reading the files in the structure.
+     * @param baseDir             from where the data would be restored from.
+     * @throws IOException if the data cannot be written to the data layer.
      */
-    private static void restoreFileStructure(AnalyticsFileSystem analyticsFileSystem, File node, File baseDir) throws IOException {
+    private static void restoreFileStructure(AnalyticsFileSystem analyticsFileSystem, File node, File baseDir)
+            throws IOException {
         //get the relative path
         final String relativePath = node.getAbsolutePath().substring(baseDir.getParent().length());
-
         if (node.isDirectory()) {
             analyticsFileSystem.mkdir(relativePath);
             String[] subNodes = node.list();
@@ -514,9 +514,9 @@ public class AnalyticsDataBackupTool {
     /**
      * Read the file into a byte array.
      *
-     * @param file
-     * @return
-     * @throws IOException
+     * @param file from which to read from.
+     * @return byte array of the file content.
+     * @throws IOException if the file cannot be read.
      */
     private static byte[] readFile(File file) throws IOException {
         byte[] buffer = new byte[READ_BUFFER_SIZE];
@@ -539,8 +539,8 @@ public class AnalyticsDataBackupTool {
     /**
      * returning a map of properties read from the config.
      *
-     * @param props
-     * @return
+     * @param props properties to be added to the map.
+     * @return a map of property nam and values.
      */
     private static Map<String, String> convertToMap(AnalyticsDataServiceConfigProperty[] props) {
         Map<String, String> result = new HashMap<>();
@@ -550,34 +550,30 @@ public class AnalyticsDataBackupTool {
         return result;
     }
 
-    private static AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig()
-            throws AnalyticsException {
+    private static AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
         try {
-            File confFile =
-                    new File(GenericUtils.getAnalyticsConfDirectory() + File.separator +
-                            AnalyticsDataSourceConstants.ANALYTICS_CONF_DIR +
-                            File.separator + ANALYTICS_DS_CONFIG_FILE);
+            File confFile = new File(GenericUtils.getAnalyticsConfDirectory() + File.separator +
+                    AnalyticsDataSourceConstants.ANALYTICS_CONF_DIR +
+                    File.separator + ANALYTICS_DS_CONFIG_FILE);
             if (!confFile.exists()) {
-                throw new AnalyticsException(
-                        "Cannot initalize analytics data service, " +
-                                "the analytics data service configuration file cannot be found at: " +
-                                confFile.getPath());
+                throw new AnalyticsException("Cannot initalize analytics data service, " +
+                        "the analytics data service configuration file cannot be found at: " +
+                        confFile.getPath());
             }
             System.out.println("conf: " + confFile.getAbsolutePath());
             JAXBContext ctx = JAXBContext.newInstance(AnalyticsDataServiceConfiguration.class);
             Unmarshaller unmarshaller = ctx.createUnmarshaller();
             return (AnalyticsDataServiceConfiguration) unmarshaller.unmarshal(confFile);
         } catch (JAXBException e) {
-            throw new AnalyticsException(
-                    "Error in processing analytics data service configuration: " +
-                            e.getMessage(), e);
+            throw new AnalyticsException("Error in processing analytics data service configuration: " + e.getMessage(),
+                    e);
         }
     }
 
     /**
      * Creates a directory in the local file system for the given path.
      *
-     * @param path
+     * @param path the path of the directory to be created.
      */
     private static void createDirectoryInLocalSystem(String path) {
         File dir = new File(path);
@@ -590,8 +586,8 @@ public class AnalyticsDataBackupTool {
     /**
      * Returns an indexing disabled schema from the provided Analytics Schema.
      *
-     * @param schema
-     * @return AnalyticsSchema in which the indexing of the columns are set to false
+     * @param schema schema of the table.
+     * @return analyticsSchema in which the indexing of the columns are set to false.
      */
     private static AnalyticsSchema removeIndexingFromSchema(AnalyticsSchema schema) {
         AnalyticsSchema indexLessSchema = null;
@@ -615,14 +611,15 @@ public class AnalyticsDataBackupTool {
     /**
      * Re-indexes the published events.
      *
-     * @param dataService
-     * @param indexer
-     * @param tenantId
-     * @param tableName
+     * @param dataService the dataservice object.
+     * @param tenantId    id of the tenant,
+     * @param tableName   name of the table in which the data should be reindexed.
      * @throws AnalyticsException
      */
-    private static void reindexData(AnalyticsDataService dataService, int tenantId, String tableName) throws AnalyticsException {
-        AnalyticsDataResponse analyticsDataResponse = dataService.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
+    private static void reindexData(AnalyticsDataService dataService, int tenantId, String tableName)
+            throws AnalyticsException {
+        AnalyticsDataResponse analyticsDataResponse = dataService
+                .get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
         RecordGroup[] recordGroups = analyticsDataResponse.getRecordGroups();
         String recordStoreName = analyticsDataResponse.getRecordStoreName();
         List<Record> recordList = new ArrayList<>();
@@ -631,7 +628,8 @@ public class AnalyticsDataBackupTool {
         int j = 1;
         //iterating the record groups
         for (int i = 0; i < recordGroups.length; i++) {
-            AnalyticsIterator<Record> recordAnalyticsIterator = dataService.readRecords(recordStoreName, recordGroups[i]);
+            AnalyticsIterator<Record> recordAnalyticsIterator = dataService
+                    .readRecords(recordStoreName, recordGroups[i]);
 
             //iterating each record in the record group
             while (recordAnalyticsIterator.hasNext()) {

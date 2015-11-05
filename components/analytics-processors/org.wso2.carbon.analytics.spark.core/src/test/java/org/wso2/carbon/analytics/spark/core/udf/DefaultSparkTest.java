@@ -30,7 +30,7 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import java.util.List;
 
 /**
- * This class tests the default UDFs added to the spark SQL
+ * This class tests the default UDFs added to the spark SQL.
  */
 public class DefaultSparkTest extends SparkTestBase {
 

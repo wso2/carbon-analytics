@@ -25,10 +25,11 @@ package org.wso2.carbon.analytics.spark.core.udf.defaults;
 public class StringConcatenator {
 
     /**
-     * This UDF returns the concatenation of two strings
-     * @param firstString first String for the concatenation
-     * @param secondString second String for the concatenation
-     * @return the concatenation of the two Strings ( firstString + secondString)
+     * This UDF returns the concatenation of two strings.
+     *
+     * @param firstString first String for the concatenation.
+     * @param secondString second String for the concatenation.
+     * @return the concatenation of the two Strings ( firstString + secondString).
      */
     public String concat(String firstString, String secondString) {
         return firstString + secondString;

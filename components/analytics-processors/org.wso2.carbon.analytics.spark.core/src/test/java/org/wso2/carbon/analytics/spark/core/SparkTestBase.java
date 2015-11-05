@@ -64,8 +64,8 @@ public abstract class SparkTestBase {
     /**
      * Provides a way to format the test messages.
      *
-     * @param str the message to print
-     * @return formattedString which would be printed
+     * @param str the message to print.
+     * @return formattedString which would be printed.
      */
     protected String testString(String str) {
         return "\n************** " + str.toUpperCase() + " **************\n";
@@ -74,12 +74,12 @@ public abstract class SparkTestBase {
     /**
      * Generates a given number of dummy log records.
      *
-     * @param tenantId      tenant ID for the records
-     * @param tableName     table Name for the records
-     * @param time          timestamp of the event
-     * @param errorMessages number of error messages required
-     * @param infoMessages  number of info messages required
-     * @return a list of Records with the specified details
+     * @param tenantId      tenant ID for the records.
+     * @param tableName     table Name for the records.
+     * @param time          timestamp of the event.
+     * @param errorMessages number of error messages required.
+     * @param infoMessages  number of info messages required.
+     * @return a list of Records with the specified details.
      */
     protected List<Record> generateRecords(int tenantId, String tableName, long time, int errorMessages,
             int infoMessages) {
@@ -99,12 +99,12 @@ public abstract class SparkTestBase {
     /**
      * Generates a given number of dummy log records with facets.
      *
-     * @param tenantId      tenant ID for the records
-     * @param tableName     table Name for the records
-     * @param time          timestamp of the event
-     * @param errorMessages number of error messages required
-     * @param infoMessages  number of info messages required
-     * @return a list of Records with the specified details
+     * @param tenantId      tenant ID for the records.
+     * @param tableName     table Name for the records.
+     * @param time          timestamp of the event.
+     * @param errorMessages number of error messages required.
+     * @param infoMessages  number of info messages required.
+     * @return a list of Records with the specified details.
      */
     protected List<Record> generateRecordsWithFacets(int tenantId, String tableName, long time, int errorMessages,
             int infoMessages) {
@@ -125,13 +125,13 @@ public abstract class SparkTestBase {
     /**
      * generates an random record.
      *
-     * @param tenantId          tenant ID for the records
-     * @param tableName         table Name for the records
-     * @param logLevel          of the log ( INFO, ERROR, WARN)
-     * @param message           log message
-     * @param time              timestamp of the message
-     * @param generateRecordIds should the record ID get generated or not
-     * @return a Record with the specified details
+     * @param tenantId          tenant ID for the records.
+     * @param tableName         table Name for the records.
+     * @param logLevel          of the log ( INFO, ERROR, WARN).
+     * @param message           log message.
+     * @param time              timestamp of the message.
+     * @param generateRecordIds should the record ID get generated or not.
+     * @return a Record with the specified details.
      */
     protected Record generateRecord(int tenantId, String tableName, String logLevel, String message, long time,
             boolean generateRecordIds) {
@@ -156,11 +156,11 @@ public abstract class SparkTestBase {
      *
      * @param tenantId
      * @param tableName
-     * @param logLevel          of the log ( INFO, ERROR, WARN)
-     * @param message           log message
-     * @param time              timestamp of the message
-     * @param generateRecordIds should the record ID get generated or not
-     * @return a Record with the specified details
+     * @param logLevel          of the log ( INFO, ERROR, WARN).
+     * @param message           log message.
+     * @param time              timestamp of the message.
+     * @param generateRecordIds should the record ID get generated or not.
+     * @return a Record with the specified details.
      */
     protected Record generateRecordWithFacets(int tenantId, String tableName, String logLevel, String message,
             long time, boolean generateRecordIds) {
