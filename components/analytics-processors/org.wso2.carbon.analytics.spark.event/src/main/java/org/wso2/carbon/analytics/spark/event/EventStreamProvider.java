@@ -62,7 +62,7 @@ public class EventStreamProvider implements RelationProvider, Serializable {
     @Override
     public StreamRelation createRelation(SQLContext sqlContext, Map<String, String> parameters) {
         setParameters(parameters);
-        defineStreamIfNotExists();
+//        defineStreamIfNotExists();
 
         return new StreamRelation(tenantId, sqlContext, getStreamId(streamName, version), payload,
                 receiverURLSet, authURLSet, username, password);
