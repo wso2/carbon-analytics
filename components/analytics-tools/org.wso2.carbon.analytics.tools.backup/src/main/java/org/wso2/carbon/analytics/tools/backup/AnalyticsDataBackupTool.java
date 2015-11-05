@@ -51,6 +51,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,12 +92,9 @@ public class AnalyticsDataBackupTool {
         Options options = new Options();
         options.addOption(new Option(BACKUP_RECORD_STORE, false, "backup analytics data"));
         options.addOption(new Option(BACKUP_FILE_SYSTEM, false, "backup filesystem data"));
-
         options.addOption(new Option(RESTORE_RECORD_STORE, false, "restores analytics data"));
         options.addOption(new Option(RESTORE_FILE_SYSTEM, false, "restores filesystem data"));
-
         options.addOption(new Option(REINDEX_EVENTS, false, "re-indexes records in the given table data"));
-
         options.addOption(new Option(ENABLE_INDEXING, false, "enables indexing while restoring"));
         options.addOption(new Option(DISABLE_STAGING, false, "disables staging while restoring"));
         options.addOption(
@@ -123,41 +121,19 @@ public class AnalyticsDataBackupTool {
             new HelpFormatter().printHelp("analytics-backup.sh|cmd", options);
             System.exit(1);
         }
-        if (line.hasOption(RESTORE_RECORD_STORE)) {
-            if (line.hasOption(ENABLE_INDEXING)) {
-                System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
-                forceIndexing = true;
-            } else {
-                System.setProperty(AnalyticsDataIndexer.DISABLE_INDEX_THROTTLING_ENV_PROP, Boolean.TRUE.toString());
-            }
-        }
-        if (line.hasOption(BACKUP_RECORD_STORE)) {
-            batchSize = Integer.parseInt(line.getOptionValue(BATCH_SIZE, RECORD_BATCH_SIZE));
-        }
         AnalyticsDataService service = null;
         AnalyticsFileSystem analyticsFileSystem = null;
         try {
-            AnalyticsDataServiceConfiguration config = loadAnalyticsDataServiceConfig();
-            String afsClass = config.getAnalyticsFileSystemConfiguration().getImplementation();
-            analyticsFileSystem = (AnalyticsFileSystem) Class.forName(afsClass).newInstance();
-            analyticsFileSystem.init(convertToMap(config.getAnalyticsFileSystemConfiguration().getProperties()));
+            analyticsFileSystem = getAnalyticsFileSystem();
             service = AnalyticsServiceHolder.getAnalyticsDataService();
-
-            // this flag is used to control the staging for the records
-            boolean disableStaging = line.hasOption(DISABLE_STAGING);
             int tenantId = Integer.parseInt(line.getOptionValue(TENANT_ID, "" + MultitenantConstants.SUPER_TENANT_ID));
-            SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
-            long timeFrom = Long.MIN_VALUE;
-            String tfStr = "-~";
-            if (line.hasOption(TIMEFROM)) {
-                tfStr = line.getOptionValue(TIMEFROM);
-                timeFrom = dateFormat.parse(tfStr).getTime();
+            Long timeTo = getTime(line, TIMETO);
+            if (timeTo == null) {
+                timeTo = Long.MAX_VALUE;
             }
-            long timeTo = Long.MAX_VALUE;
-            String ttStr = "+~";
-            if (line.hasOption(TIMETO)) {
-                ttStr = line.getOptionValue(TIMETO);
-                timeTo = dateFormat.parse(ttStr).getTime();
+            Long timeFrom = getTime(line, TIMEFROM);
+            if (timeFrom == null) {
+                timeFrom = Long.MIN_VALUE;
             }
             String[] specificTables = null;
             if (line.hasOption(TABLES)) {
@@ -173,26 +149,10 @@ public class AnalyticsDataBackupTool {
             } else {
                 baseDir = null;
             }
-
-            System.out.println(
-                    "Intializing [tenant=" + tenantId + "] [timefrom='" + tfStr + "'] [timeto='" + ttStr + "'] [dir='"
-                            + baseDir + "']" +
-                            (specificTables != null ? (" [table=" + Arrays.toString(specificTables) + "]") : "")
-                            + "...");
-            if (line.hasOption(BACKUP_RECORD_STORE)) {
-                backupRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
-            } else if (line.hasOption(BACKUP_FILE_SYSTEM)) {
-                backupFileSystem(analyticsFileSystem, tenantId, baseDir);
-            } else if (line.hasOption(RESTORE_RECORD_STORE)) {
-                restoreRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables, disableStaging);
-            } else if (line.hasOption(RESTORE_FILE_SYSTEM)) {
-                restoreFileSystem(analyticsFileSystem, baseDir);
-            } else if (line.hasOption(REINDEX_EVENTS)) {
-                for (int i = 0; i < specificTables.length; i++) {
-                    System.out.printf("Reindexing data for the table: " + specificTables[i]);
-                    reindexData(service, tenantId, specificTables[i]);
-                }
-            }
+            System.out.println("Intializing [tenant=" + tenantId + "] [timefrom='" + timeFrom + "'] [timeto='" + timeTo
+                    + "'] [dir='" + baseDir + "']" +
+                    (specificTables != null ? (" [table=" + Arrays.toString(specificTables) + "]") : "") + "...");
+            performAction(line, service, analyticsFileSystem, tenantId, timeTo, timeFrom, specificTables, baseDir);
         } finally {
             if (service != null) {
                 service.destroy();
@@ -203,6 +163,56 @@ public class AnalyticsDataBackupTool {
             Thread.sleep(2000);
         }
         System.out.println("Done.");
+    }
+
+    private static void performAction(CommandLine line, AnalyticsDataService service,
+            AnalyticsFileSystem analyticsFileSystem, int tenantId, Long timeTo, Long timeFrom, String[] specificTables,
+            File baseDir) throws AnalyticsException, IOException {
+        // this flag is used to control the staging for the records
+        boolean disableStaging = line.hasOption(DISABLE_STAGING);
+        if (line.hasOption(RESTORE_RECORD_STORE)) {
+            if (line.hasOption(ENABLE_INDEXING)) {
+                System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
+                forceIndexing = true;
+            } else {
+                System.setProperty(AnalyticsDataIndexer.DISABLE_INDEX_THROTTLING_ENV_PROP, Boolean.TRUE.toString());
+            }
+        }
+        if (line.hasOption(BACKUP_RECORD_STORE)) {
+            batchSize = Integer.parseInt(line.getOptionValue(BATCH_SIZE, RECORD_BATCH_SIZE));
+        }
+        if (line.hasOption(BACKUP_RECORD_STORE)) {
+            backupRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
+        } else if (line.hasOption(BACKUP_FILE_SYSTEM)) {
+            backupFileSystem(analyticsFileSystem, tenantId, baseDir);
+        } else if (line.hasOption(RESTORE_RECORD_STORE)) {
+            restoreRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables, disableStaging);
+        } else if (line.hasOption(RESTORE_FILE_SYSTEM)) {
+            restoreFileSystem(analyticsFileSystem, baseDir);
+        } else if (line.hasOption(REINDEX_EVENTS)) {
+            for (int i = 0; i < specificTables.length; i++) {
+                System.out.printf("Reindexing data for the table: " + specificTables[i]);
+                reindexData(service, tenantId, specificTables[i]);
+            }
+        }
+    }
+
+    private static AnalyticsFileSystem getAnalyticsFileSystem()
+            throws AnalyticsException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+        AnalyticsDataServiceConfiguration config = loadAnalyticsDataServiceConfig();
+        String afsClass = config.getAnalyticsFileSystemConfiguration().getImplementation();
+        AnalyticsFileSystem analyticsFileSystem = (AnalyticsFileSystem) Class.forName(afsClass).newInstance();
+        analyticsFileSystem.init(convertToMap(config.getAnalyticsFileSystemConfiguration().getProperties()));
+        return analyticsFileSystem;
+    }
+
+    private static Long getTime(CommandLine line, String option) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
+        if (line.hasOption(option)) {
+            String tfStr = line.getOptionValue(option);
+            return dateFormat.parse(tfStr).getTime();
+        }
+        return null;
     }
 
     private static void checkBaseDir(File baseDir) {
@@ -444,7 +454,6 @@ public class AnalyticsDataBackupTool {
         String parentPath = (path.equals("/")) ? path : path + "/";
         String nodePath;            // dependent on the DAS filesystem
         String fileSystemNodePath; // dependent on the file system
-
         for (String node : nodeList) {
             nodePath = parentPath + node;
             //convert the filesystem target path to match the filesystem path settings
@@ -565,8 +574,8 @@ public class AnalyticsDataBackupTool {
             Unmarshaller unmarshaller = ctx.createUnmarshaller();
             return (AnalyticsDataServiceConfiguration) unmarshaller.unmarshal(confFile);
         } catch (JAXBException e) {
-            throw new AnalyticsException("Error in processing analytics data service configuration: " + e.getMessage(),
-                    e);
+            throw new AnalyticsException("Error in processing analytics data service configuration: " +
+                    e.getMessage(), e);
         }
     }
 
@@ -624,17 +633,14 @@ public class AnalyticsDataBackupTool {
         String recordStoreName = analyticsDataResponse.getRecordStoreName();
         List<Record> recordList = new ArrayList<>();
         dataService.clearIndexData(tenantId, tableName);
-
         int j = 1;
         //iterating the record groups
         for (int i = 0; i < recordGroups.length; i++) {
             AnalyticsIterator<Record> recordAnalyticsIterator = dataService
                     .readRecords(recordStoreName, recordGroups[i]);
-
             //iterating each record in the record group
             while (recordAnalyticsIterator.hasNext()) {
                 recordList.add(recordAnalyticsIterator.next());
-
                 // index the data as chuncks
                 if (j % RECORD_INDEX_CHUNK_SIZE == 0) {
                     dataService.put(recordList);
