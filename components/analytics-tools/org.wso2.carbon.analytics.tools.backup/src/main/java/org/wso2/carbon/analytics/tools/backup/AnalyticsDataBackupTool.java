@@ -139,7 +139,6 @@ public class AnalyticsDataBackupTool {
             if (line.hasOption(TABLES)) {
                 specificTables = line.getOptionValue(TABLES).split(",");
             }
-
             File baseDir;
             if (line.getOptionValue(DIR) != null) {
                 baseDir = new File(line.getOptionValue(DIR));
@@ -265,58 +264,67 @@ public class AnalyticsDataBackupTool {
                 System.out.println(myDir.getAbsolutePath() + " is not a directory to contain table data, skipping.");
                 return;
             }
-
-            // enabling/disabling the staging for the table
-            AnalyticsSchema currentSchema = readTableSchema(baseDir.getAbsolutePath() + File.separator + table);
-            AnalyticsSchema schema;
-            if (disableStaging)
-                schema = removeIndexingFromSchema(currentSchema);
-            else
-                schema = currentSchema;
-
-            service.setTableSchema(tenantId, table, schema);
-            File[] files = myDir.listFiles();
-            int count = 0;
-            for (File file : files) {
-                if (file.getName().equalsIgnoreCase(TABLE_SCHEMA_FILE_NAME)) {
-                    continue;
-                }
-                if (count % 5000 == 0) {
-                    System.out.print(".");
-                }
-                if (file.isDirectory()) {
-                    System.out.println(
-                            file.getAbsolutePath() + "is a directory, which cannot contain record data, skipping.");
-                    continue;
-                }
-                try {
-                    List<Record> records = readRecordFromFile(file);
-                    for (Record record : records) {
-                        if (!table.equals(record.getTableName())) {
-                            System.out.println(
-                                    "Invalid record, invalid table name in record compared to " + "current directory: "
-                                            + record.getTableName());
-                        }
-                    /* check timestamp range */
-                        if (!(record.getTimestamp() >= timeFrom && record.getTimestamp() < timeTo)) {
-                            records.remove(record);
-                        }
-                    }
-                    service.put(records);
-                    if (forceIndexing) {
-                        service.waitForIndexing(INDEX_PROCESS_WAIT_TIME);
-                    }
-                } catch (IOException e) {
-                    System.out.println(
-                            "Error in reading record data from file: " + file.getAbsoluteFile() + ", skipping.");
-                }
-                count++;
-            }
+            setTableSchema(service, tenantId, table, baseDir, disableStaging);
+            restoreTableFromFiles(service, table, timeFrom, timeTo, myDir);
             System.out.println();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Error in restoring table: " + table + " - " + e.getMessage());
         }
+    }
+
+    private static void restoreTableFromFiles(AnalyticsDataService service, String table, long timeFrom, long timeTo,
+            File myDir) throws AnalyticsException {
+        File[] files = myDir.listFiles();
+        int count = 0;
+        for (File file : files) {
+            if (file.getName().equalsIgnoreCase(TABLE_SCHEMA_FILE_NAME)) {
+                continue;
+            }
+            if (count % 5000 == 0) {
+                System.out.print(".");
+            }
+            if (file.isDirectory()) {
+                System.out.println(
+                        file.getAbsolutePath() + "is a directory, which cannot contain record data, skipping.");
+                continue;
+            }
+            try {
+                List<Record> records = readRecordFromFile(file);
+                for (Record record : records) {
+                    if (!table.equals(record.getTableName())) {
+                        System.out.println(
+                                "Invalid record, invalid table name in record compared to " + "current directory: "
+                                        + record.getTableName());
+                    }
+                /* check timestamp range */
+                    if (!(record.getTimestamp() >= timeFrom && record.getTimestamp() < timeTo)) {
+                        records.remove(record);
+                    }
+                }
+                service.put(records);
+                if (forceIndexing) {
+                    service.waitForIndexing(INDEX_PROCESS_WAIT_TIME);
+                }
+            } catch (IOException e) {
+                System.out.println(
+                        "Error in reading record data from file: " + file.getAbsoluteFile() + ", skipping.");
+            }
+            count++;
+        }
+    }
+
+    private static void setTableSchema(AnalyticsDataService service, int tenantId, String table, File baseDir,
+            boolean disableStaging) throws IOException, AnalyticsException {
+        // enabling/disabling the staging for the table
+        AnalyticsSchema currentSchema = readTableSchema(baseDir.getAbsolutePath() + File.separator + table);
+        AnalyticsSchema schema;
+        if (disableStaging) {
+            schema = removeIndexingFromSchema(currentSchema);
+        } else {
+            schema = currentSchema;
+        }
+        service.setTableSchema(tenantId, table, schema);
     }
 
     private static void backupTable(AnalyticsDataService service, int tenantId, String table, File basedir,
