@@ -190,9 +190,8 @@ public class AnalyticsDataMigrationTool {
             Map<String, String> credentials = new HashMap<>();
             credentials.put("username", cassandraUser);
             credentials.put("password", cassandraPassword);
-            cluster = HFactory
-                    .getOrCreateCluster(clusterName, new CassandraHostConfigurator(cassandraUrl + ":" + cassandraPort),
-                            credentials);
+            cluster = HFactory.getOrCreateCluster(clusterName,
+                    new CassandraHostConfigurator(cassandraUrl + ":" + cassandraPort), credentials);
         } else {
             throw new Exception("Username and Password is not provided!");
         }
