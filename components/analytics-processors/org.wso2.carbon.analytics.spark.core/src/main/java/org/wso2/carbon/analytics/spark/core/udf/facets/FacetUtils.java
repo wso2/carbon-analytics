@@ -28,9 +28,10 @@ import java.util.List;
  */
 public class FacetUtils {
     /**
-     * Converts the objects list to String value arrays
-     * @param objects
-     * @return An array of String values
+     * Converts the objects list to String value arrays.
+     *
+     * @param objects array of objects to be concatenated in to the String array.
+     * @return An array of String values.
      */
     public static String getFacetString(Object... objects) {
         List<String> valueList = new ArrayList<>();

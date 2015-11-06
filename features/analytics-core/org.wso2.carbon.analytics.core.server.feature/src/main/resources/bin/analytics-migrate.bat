@@ -1,19 +1,20 @@
 @echo off
 
-REM ---------------------------------------------------------------------------
-REM        Copyright 2005-2009 WSO2, Inc. http://www.wso2.org
-REM
-REM  Licensed under the Apache License, Version 2.0 (the "License");
-REM  you may not use this file except in compliance with the License.
-REM  You may obtain a copy of the License at
-REM
-REM      http://www.apache.org/licenses/LICENSE-2.0
-REM
-REM  Unless required by applicable law or agreed to in writing, software
-REM  distributed under the License is distributed on an "AS IS" BASIS,
-REM  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-REM  See the License for the specific language governing permissions and
-REM  limitations under the License.
+rem  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+rem
+rem  WSO2 Inc. licenses this file to you under the Apache License,
+rem  Version 2.0 (the "License"); you may not use this file except
+rem  in compliance with the License.
+rem  You may obtain a copy of the License at
+rem
+rem  http://www.apache.org/licenses/LICENSE-2.0
+rem
+rem  Unless required by applicable law or agreed to in writing,
+rem  software distributed under the License is distributed on an
+rem  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+rem  KIND, either express or implied.  See the License for the
+rem  specific language governing permissions and limitations
+rem  under the License.
 
 rem ---------------------------------------------------------------------------
 rem Main Script for WSO2 Carbon
@@ -52,7 +53,6 @@ rem find CARBON_HOME if it does not exist due to either an invalid value passed
 rem by the user or the %0 problem on Windows 9x
 if not exist "%CARBON_HOME%\bin\version.txt" goto noServerHome
 
-set AXIS2_HOME=%CARBON_HOME%
 goto updateClasspath
 
 :noServerHome
@@ -77,54 +77,6 @@ rem ----- Process the input command -------------------------------------------
 
 rem Slurp the command line arguments. This loop allows for an unlimited number
 rem of arguments (up to the command line limit, anyway).
-
-
-:setupArgs
-if ""%1""=="""" goto doneStart
-
-if ""%1""==""-run""     goto commandLifecycle
-if ""%1""==""--run""    goto commandLifecycle
-if ""%1""==""run""      goto commandLifecycle
-
-if ""%1""==""-restart""  goto commandLifecycle
-if ""%1""==""--restart"" goto commandLifecycle
-if ""%1""==""restart""   goto commandLifecycle
-
-if ""%1""==""debug""    goto commandDebug
-if ""%1""==""-debug""   goto commandDebug
-if ""%1""==""--debug""  goto commandDebug
-
-if ""%1""==""version""   goto commandVersion
-if ""%1""==""-version""  goto commandVersion
-if ""%1""==""--version"" goto commandVersion
-
-shift
-goto setupArgs
-
-rem ----- commandVersion -------------------------------------------------------
-:commandVersion
-shift
-type "%CARBON_HOME%\bin\version.txt"
-type "%CARBON_HOME%\bin\wso2carbon-version.txt"
-goto end
-
-rem ----- commandDebug ---------------------------------------------------------
-:commandDebug
-shift
-set DEBUG_PORT=%1
-if "%DEBUG_PORT%"=="" goto noDebugPort
-if not "%JAVA_OPTS%"=="" echo Warning !!!. User specified JAVA_OPTS will be ignored, once you give the --debug option.
-set JAVA_OPTS=-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%DEBUG_PORT%
-echo Please start the remote debugging client to continue...
-goto findJdk
-
-:noDebugPort
-echo Please specify the debug port after the --debug option
-goto end
-
-rem ----- commandLifecycle -----------------------------------------------------
-:commandLifecycle
-goto findJdk
 
 :doneStart
 if "%OS%"=="Windows_NT" @setlocal

@@ -20,15 +20,16 @@
 package org.wso2.carbon.analytics.spark.core.udf.defaults;
 
 /**
- * This is an UDF class supporting string concatenation for spark SQL
+ * This is an UDF class supporting string concatenation for spark SQL.
  */
 public class StringConcatenator {
 
     /**
-     * This UDF returns the concatenation of two strings
-     * @param firstString
-     * @param secondString
-     * @return fistString + secondString
+     * This UDF returns the concatenation of two strings.
+     *
+     * @param firstString first String for the concatenation.
+     * @param secondString second String for the concatenation.
+     * @return the concatenation of the two Strings ( firstString + secondString).
      */
     public String concat(String firstString, String secondString) {
         return firstString + secondString;

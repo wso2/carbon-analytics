@@ -37,19 +37,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This is the test base for testing
- * Custom UDFs supported by DAS
+ * This is the test base for testing custom UDFs supported by DAS.
  */
 
 public abstract class SparkTestBase {
 
     protected AnalyticsDataService service;
 
-    @BeforeClass
-    public void setup() throws NamingException, AnalyticsException, IOException {
+    @BeforeClass public void setup() throws NamingException, AnalyticsException, IOException {
         GenericUtils.clearGlobalCustomDataSourceRepo();
-        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP,
-                "src/test/resources/conf1");
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
@@ -58,83 +55,86 @@ public abstract class SparkTestBase {
         ServiceHolder.getAnalyticskExecutor().initializeSparkServer();
     }
 
-    @AfterClass
-    public void done() throws NamingException, AnalyticsException, IOException {
+    @AfterClass public void done() throws NamingException, AnalyticsException, IOException {
         ServiceHolder.getAnalyticskExecutor().stop();
         this.service.destroy();
         System.clearProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP);
     }
 
     /**
-     * Provides a way to format the test messages
-     * @param str
-     * @return formattedString
+     * Provides a way to format the test messages.
+     *
+     * @param str the message to print.
+     * @return formattedString which would be printed.
      */
     protected String testString(String str) {
         return "\n************** " + str.toUpperCase() + " **************\n";
     }
 
     /**
-     * Generates a given number of dummy log records
-     * @param tenantId
-     * @param tableName
-     * @param time
-     * @param timeOffset
-     * @param errorMessages => number of error messages required
-     * @param infoMessages  => number of info messages required
-     * @return
+     * Generates a given number of dummy log records.
+     *
+     * @param tenantId      tenant ID for the records.
+     * @param tableName     table Name for the records.
+     * @param time          timestamp of the event.
+     * @param errorMessages number of error messages required.
+     * @param infoMessages  number of info messages required.
+     * @return a list of Records with the specified details.
      */
-    protected List<Record> generateRecords(int tenantId, String tableName, long time, int timeOffset,int errorMessages,int infoMessages) {
+    protected List<Record> generateRecords(int tenantId, String tableName, long time, int errorMessages,
+            int infoMessages) {
         List<Record> result = new ArrayList<Record>();
 
         for (int i = 0; i < errorMessages; i++) {
-            result.add(generateRecord(tenantId, tableName, "ERROR", "[ERROR] /get failed for tenant:" + tenantId,
-                    time, timeOffset, true));
+            result.add(generateRecord(tenantId, tableName, "ERROR", "[ERROR] /get failed for tenant:" + tenantId, time,
+                    true));
         }
         for (int i = 0; i < infoMessages; i++) {
             result.add(generateRecord(tenantId, tableName, "INFO", "[INFO] the request success for tenant:" + tenantId,
-                    time, timeOffset, true));
+                    time, true));
         }
         return result;
     }
 
     /**
-     * Generates a given number of dummy log records with facets
-     * @param tenantId
-     * @param tableName
-     * @param time
-     * @param timeOffset
-     * @param errorMessages => number of error messages required
-     * @param infoMessages  => number of info messages required
-     * @return
+     * Generates a given number of dummy log records with facets.
+     *
+     * @param tenantId      tenant ID for the records.
+     * @param tableName     table Name for the records.
+     * @param time          timestamp of the event.
+     * @param errorMessages number of error messages required.
+     * @param infoMessages  number of info messages required.
+     * @return a list of Records with the specified details.
      */
-    protected List<Record> generateRecordsWithFacets(int tenantId, String tableName, long time, int timeOffset,int errorMessages,int infoMessages) {
+    protected List<Record> generateRecordsWithFacets(int tenantId, String tableName, long time, int errorMessages,
+            int infoMessages) {
         List<Record> result = new ArrayList<Record>();
 
         for (int i = 0; i < errorMessages; i++) {
-            result.add(generateRecordWithFacets(tenantId, tableName, "ERROR", "[ERROR] /get failed for tenant:" + tenantId,
-                    time, timeOffset, true));
+            result.add(
+                    generateRecordWithFacets(tenantId, tableName, "ERROR", "[ERROR] /get failed for tenant:" + tenantId,
+                            time, true));
         }
         for (int i = 0; i < infoMessages; i++) {
-            result.add(generateRecordWithFacets(tenantId, tableName, "INFO", "[INFO] the request success for tenant:" + tenantId,
-                    time, timeOffset, true));
+            result.add(generateRecordWithFacets(tenantId, tableName, "INFO",
+                    "[INFO] the request success for tenant:" + tenantId, time, true));
         }
         return result;
     }
+
     /**
-     * generates an random record
+     * generates an random record.
      *
-     * @param tenantId
-     * @param tableName
-     * @param logLevel
-     * @param message
-     * @param time
-     * @param timeOffset
-     * @param generateRecordIds
-     * @return
+     * @param tenantId          tenant ID for the records.
+     * @param tableName         table Name for the records.
+     * @param logLevel          of the log ( INFO, ERROR, WARN).
+     * @param message           log message.
+     * @param time              timestamp of the message.
+     * @param generateRecordIds should the record ID get generated or not.
+     * @return a Record with the specified details.
      */
-    protected Record generateRecord(int tenantId, String tableName, String logLevel, String message,
-                                  long time, int timeOffset, boolean generateRecordIds) {
+    protected Record generateRecord(int tenantId, String tableName, String logLevel, String message, long time,
+            boolean generateRecordIds) {
 
         Map<String, Object> values = new HashMap<String, Object>();
         values.put("log_level", logLevel);
@@ -144,45 +144,42 @@ public abstract class SparkTestBase {
         long timeTmp;
         if (time != -1) {
             timeTmp = time;
-            time += timeOffset;
         } else {
             timeTmp = System.currentTimeMillis();
         }
-        return new Record(generateRecordIds ? GenericUtils.generateRecordID() : null, tenantId,
-                tableName, values, timeTmp);
+        return new Record(generateRecordIds ? GenericUtils.generateRecordID() : null, tenantId, tableName, values,
+                timeTmp);
     }
 
     /**
-     * generates an random record with facets
+     * generates an random record with facets.
      *
      * @param tenantId
      * @param tableName
-     * @param logLevel
-     * @param message
-     * @param time
-     * @param timeOffset
-     * @param generateRecordIds
-     * @return
+     * @param logLevel          of the log ( INFO, ERROR, WARN).
+     * @param message           log message.
+     * @param time              timestamp of the message.
+     * @param generateRecordIds should the record ID get generated or not.
+     * @return a Record with the specified details.
      */
     protected Record generateRecordWithFacets(int tenantId, String tableName, String logLevel, String message,
-                                    long time, int timeOffset, boolean generateRecordIds) {
+            long time, boolean generateRecordIds) {
 
         Map<String, Object> values = new HashMap<String, Object>();
         values.put("log_level", logLevel);
         values.put("tenant", tenantId);
         values.put("message", "Important syslog with tenant ID: " + tenantId + "and message:" +
                 message);
-        values.put("composite","["+logLevel+","+tenantId+"]");
+        values.put("composite", "[" + logLevel + "," + tenantId + "]");
 
         long timeTmp;
         if (time != -1) {
             timeTmp = time;
-            time += timeOffset;
         } else {
             timeTmp = System.currentTimeMillis();
         }
-        return new Record(generateRecordIds ? GenericUtils.generateRecordID() : null, tenantId,
-                tableName, values, timeTmp);
+        return new Record(generateRecordIds ? GenericUtils.generateRecordID() : null, tenantId, tableName, values,
+                timeTmp);
     }
 
 }

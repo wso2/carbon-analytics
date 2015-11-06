@@ -43,6 +43,7 @@ import org.apache.commons.cli.*;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 /**
@@ -51,7 +52,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 public class AnalyticsDataMigrationTool {
 
     private static final String DEFAULT_CASSANDRA_PORT = "9160";
-    private static final String DEFAULT_CASSANDRA_SERVER_URL = "localhost" ;
+    private static final String DEFAULT_CASSANDRA_SERVER_URL = "localhost";
     private static final String CASSANDRA_URL = "cassandraUrl";
     private static final String CASSANDRA_PORT = "cassandraPort";
     private static final String COLUMN_FAMILY = "columnFamily";
@@ -89,10 +90,161 @@ public class AnalyticsDataMigrationTool {
 
     public static void main(String[] args) throws Exception {
         System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
+        Options options = getOptions();
+        CommandLineParser parser = new BasicParser();
+        CommandLine line = parser.parse(options, args);
+        if (args.length < 4) {
+            new HelpFormatter().printHelp("analytics-migrate.sh|cmd", options);
+            System.exit(1);
+        }
+        AnalyticsDataService service = null;
+        try {
+            service = AnalyticsServiceHolder.getAnalyticsDataService();
+            int batchSize = Integer.parseInt(line.getOptionValue(BATCH_SIZE, RECORD_BATCH_SIZE));
+            int tenantId = Integer.parseInt(line.getOptionValue(TENANT_ID, "" + MultitenantConstants.SUPER_TENANT_ID));
+            String analyticTable;
+            String columnFamily;
+            if (line.hasOption(COLUMN_FAMILY)) {
+                columnFamily = line.getOptionValue(COLUMN_FAMILY);
+            } else {
+                throw new Exception("Column Family Name is not provided!");
+            }
+            if (line.hasOption(ANALYTIC_TABLE)) {
+                analyticTable = line.getOptionValue(ANALYTIC_TABLE);
+            } else {
+                throw new Exception("Analytic Table is not provided!");
+            }
+            System.out.println("Migrating data...");
+            if (!service.tableExists(tenantId, analyticTable)) {
+                service.createTable(tenantId, analyticTable);
+                System.out.println("Creating the analytics table: " + analyticTable);
+            } else {
+                System.out.println("Analytics table: " + analyticTable + " already exists. ");
+            }
+            System.out.println(
+                    "Inserting records to Analytic Table: " + analyticTable + " from column family: " + columnFamily);
+            migrate(service, batchSize, tenantId, analyticTable, columnFamily, line);
+            System.out.println("Successfully migrated!.");
+            System.exit(0);
+        } catch (Exception e) {
+            System.out.println("Error while migrating: " + e.getMessage());
+        } finally {
+            if (service != null) {
+                service.destroy();
+            }
+        }
+    }
+
+    private static void migrate(AnalyticsDataService service, int batchSize, int tenantId, String analyticTable,
+            String columnFamily, CommandLine line) throws Exception {
+        Cluster cluster = getCluster(line);
+        Keyspace keyspace = HFactory.createKeyspace(CASSANDRA_KEYSPACE, cluster);
+        Map<String, ColumnDefinition> columnDefinitionMap = getStringColumnDefinitionMap(cluster, columnFamily);
+        RangeSlicesQuery<String, String, byte[]> rangeQuery = getStringStringRangeSlicesQuery(columnFamily,
+                batchSize, keyspace);
+        long totalRecordCount = 0;
+        migrateRecords(service, analyticTable, tenantId, batchSize, columnDefinitionMap, rangeQuery,
+                totalRecordCount);
+    }
+
+    private static Map<String, ColumnDefinition> getStringColumnDefinitionMap(Cluster cluster, String columnFamily) {
+        //getting the column definitions
+        KeyspaceDefinition keyspaceDefinition = cluster.describeKeyspace(CASSANDRA_KEYSPACE);
+        List<ColumnFamilyDefinition> cfDefs = keyspaceDefinition.getCfDefs();
+        ColumnFamilyDefinition columnFamilyDefinition = null;
+        //getting the column family definition
+        for (ColumnFamilyDefinition cfDef : cfDefs) {
+            if (cfDef.getName().equals(columnFamily)) {
+                columnFamilyDefinition = cfDef;
+                break;
+            }
+        }
+        //adding the column definitions into a map <columnName,columnDefinition>
+        Map<String, ColumnDefinition> columnDefinitionMap = new HashMap<>();
+        for (ColumnDefinition columnDefinition : columnFamilyDefinition.getColumnMetadata()) {
+            columnDefinitionMap
+                    .put(Charset.defaultCharset().decode(columnDefinition.getName()).toString(), columnDefinition);
+        }
+        if (columnDefinitionMap == null) {
+            System.out.println("The column Family could not be found in the keyspace...");
+            System.exit(0);
+        }
+        return columnDefinitionMap;
+    }
+
+    private static Cluster getCluster(CommandLine line) throws Exception {
+        String cassandraUrl;
+        String cassandraUser = null, cassandraPassword = null, clusterName = null;
+        //if no cassandra URL is provided use the server URL
+        cassandraUrl = line.getOptionValue(CASSANDRA_URL, DEFAULT_CASSANDRA_SERVER_URL);
+        clusterName = line.getOptionValue(CLUSTER_NAME, DEFAULT_CLUSTER_NAME);
+        int cassandraPort = Integer.parseInt(line.getOptionValue(CASSANDRA_PORT, DEFAULT_CASSANDRA_PORT));
+        if (line.hasOption(CASSANDRA_USERNAME)) {
+            cassandraUser = line.getOptionValue(CASSANDRA_USERNAME);
+        }
+        if (line.hasOption(CASSANDRA_PASSWORD)) {
+            cassandraPassword = line.getOptionValue(CASSANDRA_PASSWORD);
+        }
+        Cluster cluster;//configuring the cassandra cluster and the keyspace
+        if (cassandraUser != null && cassandraPassword != null) {
+            Map<String, String> credentials = new HashMap<>();
+            credentials.put("username", cassandraUser);
+            credentials.put("password", cassandraPassword);
+            cluster = HFactory.getOrCreateCluster(clusterName,
+                    new CassandraHostConfigurator(cassandraUrl + ":" + cassandraPort), credentials);
+        } else {
+            throw new Exception("Username and Password is not provided!");
+        }
+        return cluster;
+    }
+
+    private static void migrateRecords(AnalyticsDataService service, String analyticTable, int tenantId, int batchSize,
+            Map<String, ColumnDefinition> columnDefinitionMap, RangeSlicesQuery<String, String, byte[]> rangeQuery,
+            long totalRecordCount) throws AnalyticsException {
+        QueryResult<OrderedRows<String, String, byte[]>> result;
+        OrderedRows<String, String, byte[]> orderedRows;
+        Record record;
+        String lastKey;//exectuting the query batch by batch ( using the specified batch size) and publishing to the server
+        List<Record> records = new ArrayList<Record>();
+        while (true) {
+            result = rangeQuery.execute();
+            orderedRows = result.get();
+            for (Row<String, String, byte[]> row : orderedRows) {
+                Map<String, Object> values = getRowValues(row, columnDefinitionMap);
+                record = new Record(tenantId, analyticTable, values);
+                records.add(record);
+            }
+            //setting the next set of records to be fetched
+            lastKey = orderedRows.peekLast().getKey();
+            rangeQuery.setKeys(lastKey, "");
+            //putting the records to the Data Analtycs Server
+            totalRecordCount += records.size();
+            service.put(records);
+            records.clear();
+            System.out.println("Number of records migrated: " + totalRecordCount);
+            // check if all rows are read
+            if (orderedRows.getCount() != batchSize)
+                break;
+        }
+    }
+
+    private static RangeSlicesQuery<String, String, byte[]> getStringStringRangeSlicesQuery(String columnFamily,
+            int batchSize, Keyspace keyspace) {
+        //setting up the query
+        RangeSlicesQuery<String, String, byte[]> rangeQuery = HFactory
+                .createRangeSlicesQuery(keyspace, StringSerializer.get(), StringSerializer.get(),
+                        BytesArraySerializer.get());
+        rangeQuery.setColumnFamily(columnFamily);
+        rangeQuery.setRange(null, null, false, Integer.MAX_VALUE);
+        rangeQuery.setKeys(null, null);
+        rangeQuery.setRowCount(batchSize);
+        return rangeQuery;
+    }
+
+    private static Options getOptions() {
         Options options = new Options();
         options.addOption(OptionBuilder.withArgName(CASSANDRA_URL_ARG).hasArg()
-                .withDescription("Cassandra server url '<default value: localhost>'")
-                .create(CASSANDRA_URL));
+                .withDescription("Cassandra server url '<default value: localhost>'").create(CASSANDRA_URL));
         options.addOption(OptionBuilder.withArgName(COLUMN_FAMILY_NAME_ARG).hasArg()
                 .withDescription("Name of the columnFamily to be migrated").create(COLUMN_FAMILY));
         options.addOption(OptionBuilder.withArgName(ANALYTIC_TABLE_NAME_ARG).hasArg()
@@ -105,162 +257,21 @@ public class AnalyticsDataMigrationTool {
                 .withDescription("specify tenant id of the tenant considered '<default value: super tenant>'")
                 .create(TENANT_ID));
         options.addOption(OptionBuilder.withArgName(CASSANDRA_USERNAME_ARG).hasArg()
-                .withDescription("specify the cassandra username")
-                .create(CASSANDRA_USERNAME));
+                .withDescription("specify the cassandra username").create(CASSANDRA_USERNAME));
         options.addOption(OptionBuilder.withArgName(CASSANDRA_PASSWORD_ARG).hasArg()
-                .withDescription("specify the cassandra username")
-                .create(CASSANDRA_PASSWORD));
-        options.addOption(OptionBuilder.withArgName(CASSANDRA_PORT_ARG).hasArg()
-                .withDescription("specify the cassandra port")
-                .create(CASSANDRA_PORT_ARG));
-        options.addOption(OptionBuilder.withArgName(CLUSTER_NAME_ARG).hasArg()
-                .withDescription("specify the cassandra cluster")
-                .create(CLUSTER_NAME));
-        CommandLineParser parser = new BasicParser();
-        CommandLine line = parser.parse(options, args);
-        if (args.length < 4 ) {
-            new HelpFormatter().printHelp("analytics-migrate.sh|cmd", options);
-            System.exit(1);
-        }
-
-        AnalyticsDataService service = null;
-        Cluster cluster = null;
-        try {
-            service = AnalyticsServiceHolder.getAnalyticsDataService();
-            String cassandraUrl;
-            String columnFamily;
-            String analyticTable;
-            String cassandraUser = null, cassandraPassword = null, clusterName = null;
-            int tenantId = Integer.parseInt(line.getOptionValue(TENANT_ID, "" + MultitenantConstants.SUPER_TENANT_ID));
-            //if no cassandra URL is provided use the server URL
-            cassandraUrl = line.getOptionValue(CASSANDRA_URL, DEFAULT_CASSANDRA_SERVER_URL);
-            clusterName = line.getOptionValue(CLUSTER_NAME, DEFAULT_CLUSTER_NAME);
-            int cassandraPort = Integer.parseInt(line.getOptionValue(CASSANDRA_PORT, DEFAULT_CASSANDRA_PORT));
-            int batchSize = Integer.parseInt(line.getOptionValue(BATCH_SIZE, RECORD_BATCH_SIZE));
-            if (line.hasOption(COLUMN_FAMILY)) {
-                columnFamily = line.getOptionValue(COLUMN_FAMILY);
-            } else {
-                throw new Exception("Column Family Name is not provided!");
-            }
-            if (line.hasOption(ANALYTIC_TABLE)) {
-                analyticTable = line.getOptionValue(ANALYTIC_TABLE);
-            } else {
-                throw new Exception("Analytic Table is not provided!");
-            }
-            if (line.hasOption(CASSANDRA_USERNAME)) {
-                cassandraUser = line.getOptionValue(CASSANDRA_USERNAME);
-            }
-            if (line.hasOption(CASSANDRA_PASSWORD)) {
-                cassandraPassword = line.getOptionValue(CASSANDRA_PASSWORD);
-            }
-            System.out.println("Intializing [tenant=" + tenantId + "] [Cassandra Server='" + cassandraUrl + "'] " +
-                    "[port='" + cassandraPort + "'] [columnFamily='" + columnFamily + "'] " +
-                    "[analyticTable='" + analyticTable + "']...");
-
-            //configuring the cassandra cluster and the keyspace
-            if (cassandraUser != null && cassandraPassword != null) {
-                Map<String, String> credentials = new HashMap<>();
-                credentials.put("username", cassandraUser);
-                credentials.put("password", cassandraPassword);
-                cluster = HFactory.getOrCreateCluster(clusterName,new CassandraHostConfigurator(cassandraUrl+":"+cassandraPort),credentials);
-            } else {
-                throw new Exception("Username and Password is not provided!");
-            }
-            Keyspace keyspace = HFactory.createKeyspace(CASSANDRA_KEYSPACE, cluster);
-
-            //getting the column definitions
-            KeyspaceDefinition keyspaceDefinition = cluster.describeKeyspace(CASSANDRA_KEYSPACE);
-            List<ColumnFamilyDefinition> cfDefs = keyspaceDefinition.getCfDefs();
-            ColumnFamilyDefinition columnFamilyDefinition = null;
-
-            //getting the column family definition
-            for (ColumnFamilyDefinition cfDef : cfDefs) {
-                if (cfDef.getName().equals(columnFamily)) {
-                    columnFamilyDefinition = cfDef;
-                    break;
-                }
-            }
-
-            //adding the column definitions into a map <columnName,columnDefinition>
-            Map<String, ColumnDefinition> columnDefinitionMap = new HashMap<>();
-            for (ColumnDefinition columnDefinition : columnFamilyDefinition.getColumnMetadata()) {
-                columnDefinitionMap.put(Charset.defaultCharset().decode(columnDefinition.getName()).toString(), columnDefinition);
-            }
-
-            if (columnDefinitionMap == null) {
-                System.out.println("The column Family could not be found in the keyspace...");
-                System.exit(0);
-            }
-
-            System.out.println("Migrating data...");
-            if (!service.tableExists(tenantId, analyticTable)) {
-                service.createTable(tenantId, analyticTable);
-                System.out.println("Creating the analytics table: " + analyticTable);
-            } else {
-                System.out.println("Analytics table: " + analyticTable + " already exists. ");
-            }
-            System.out.println("Inserting records to Analytic Table: " + analyticTable + " from column family: " + columnFamily);
-
-            //setting up the query
-            RangeSlicesQuery<String, String, byte[]> rangeQuery = HFactory.createRangeSlicesQuery(keyspace, StringSerializer.get(),
-                    StringSerializer.get(), BytesArraySerializer.get());
-            rangeQuery.setColumnFamily(columnFamily);
-            rangeQuery.setRange(null, null, false, Integer.MAX_VALUE);
-            rangeQuery.setKeys(null, null);
-            rangeQuery.setRowCount(batchSize);
-
-            QueryResult<OrderedRows<String, String, byte[]>> result;
-            OrderedRows<String, String, byte[]> orderedRows;
-            Record record;
-            String lastKey;
-
-            long totalRecordCount = 0;
-            //exectuting the query batch by batch ( using the specified batch size) and publishing to the server
-            List<Record> records = new ArrayList<Record>();
-            while (true) {
-                result = rangeQuery.execute();
-                orderedRows = result.get();
-                for (Row<String, String, byte[]> row : orderedRows) {
-                    Map<String, Object> values = getRowValues(row,columnDefinitionMap);
-                    record = new Record(tenantId, analyticTable, values);
-                    records.add(record);
-                }
-
-                //setting the next set of records to be fetched
-                lastKey = orderedRows.peekLast().getKey();
-                rangeQuery.setKeys(lastKey, "");
-
-                //putting the records to the Data Analtycs Server
-                totalRecordCount += records.size();
-                service.put(records);
-                records.clear();
-                System.out.println("Number of records migrated: " + totalRecordCount);
-
-                // check if all rows are read
-                if (orderedRows.getCount() != batchSize)
-                    break;
-            }
-
-            System.out.println("Successfully migrated!.");
-            System.exit(0);
-        }catch(Exception e) {
-            System.out.println("Error while migrating: " + e.getMessage());
-        } finally {
-            if (service != null) {
-                service.destroy();
-            }
-        }
+                .withDescription("specify the cassandra username").create(CASSANDRA_PASSWORD));
+        options.addOption(
+                OptionBuilder.withArgName(CASSANDRA_PORT_ARG).hasArg().withDescription("specify the cassandra port")
+                        .create(CASSANDRA_PORT_ARG));
+        options.addOption(
+                OptionBuilder.withArgName(CLUSTER_NAME_ARG).hasArg().withDescription("specify the cassandra cluster")
+                        .create(CLUSTER_NAME));
+        return options;
     }
 
-    /**
-     * Provides the columns and values for the record
-     * @param row
-     * @param columnDefinitionMap
-     * @return a map of columns and the corresponding values.
-     */
-    private static Map<String, Object> getRowValues(Row row,Map<String,ColumnDefinition> columnDefinitionMap) {
+    private static Map<String, Object> getRowValues(Row row, Map<String, ColumnDefinition> columnDefinitionMap) {
         Map<String, Object> valuesMap = new HashMap<>();
-        List<HColumn<String,byte[]>> columns = row.getColumnSlice().getColumns();
+        List<HColumn<String, byte[]>> columns = row.getColumnSlice().getColumns();
         String columnName;
 
         for (HColumn column : columns) {
@@ -280,32 +291,26 @@ public class AnalyticsDataMigrationTool {
         return valuesMap;
     }
 
-    /**
-     * Un-marshal the cassandra returned byte array into Object.
-     * @param marshalType
-     * @param bytes
-     * @return an Object of the corresponding type of the validation class.
-     */
     private static Object unMarshalValues(String marshalType, ByteBuffer bytes) {
         switch (marshalType) {
-            case UTF8_TYPE:
-                return StringSerializer.get().fromByteBuffer(bytes);
-            case LONG_TYPE:
-                return LongSerializer.get().fromByteBuffer(bytes);
-            case INTEGER_TYPE:
-                return IntegerSerializer.get().fromByteBuffer(bytes);
-            case ASCII_TYPE:
-                return AsciiSerializer.get().fromByteBuffer(bytes);
-            case BYTE_TYPE:
-                return ByteBufferSerializer.get().fromByteBuffer(bytes);
-            case BOOLEAN_TYPE:
-                return BooleanSerializer.get().fromByteBuffer(bytes);
-            case FLOAT_TYPE:
-                return FloatSerializer.get().fromByteBuffer(bytes);
-            case DOUBLE_TYPE:
-                return DoubleSerializer.get().fromByteBuffer(bytes);
-            default:
-                return "";
+        case UTF8_TYPE:
+            return StringSerializer.get().fromByteBuffer(bytes);
+        case LONG_TYPE:
+            return LongSerializer.get().fromByteBuffer(bytes);
+        case INTEGER_TYPE:
+            return IntegerSerializer.get().fromByteBuffer(bytes);
+        case ASCII_TYPE:
+            return AsciiSerializer.get().fromByteBuffer(bytes);
+        case BYTE_TYPE:
+            return ByteBufferSerializer.get().fromByteBuffer(bytes);
+        case BOOLEAN_TYPE:
+            return BooleanSerializer.get().fromByteBuffer(bytes);
+        case FLOAT_TYPE:
+            return FloatSerializer.get().fromByteBuffer(bytes);
+        case DOUBLE_TYPE:
+            return DoubleSerializer.get().fromByteBuffer(bytes);
+        default:
+            return "";
         }
     }
 }
