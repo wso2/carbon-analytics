@@ -53,7 +53,6 @@ rem find CARBON_HOME if it does not exist due to either an invalid value passed
 rem by the user or the %0 problem on Windows 9x
 if not exist "%CARBON_HOME%\bin\version.txt" goto noServerHome
 
-set AXIS2_HOME=%CARBON_HOME%
 goto updateClasspath
 
 :noServerHome
@@ -78,54 +77,6 @@ rem ----- Process the input command -------------------------------------------
 
 rem Slurp the command line arguments. This loop allows for an unlimited number
 rem of arguments (up to the command line limit, anyway).
-
-
-:setupArgs
-if ""%1""=="""" goto doneStart
-
-if ""%1""==""-run""     goto commandLifecycle
-if ""%1""==""--run""    goto commandLifecycle
-if ""%1""==""run""      goto commandLifecycle
-
-if ""%1""==""-restart""  goto commandLifecycle
-if ""%1""==""--restart"" goto commandLifecycle
-if ""%1""==""restart""   goto commandLifecycle
-
-if ""%1""==""debug""    goto commandDebug
-if ""%1""==""-debug""   goto commandDebug
-if ""%1""==""--debug""  goto commandDebug
-
-if ""%1""==""version""   goto commandVersion
-if ""%1""==""-version""  goto commandVersion
-if ""%1""==""--version"" goto commandVersion
-
-shift
-goto setupArgs
-
-rem ----- commandVersion -------------------------------------------------------
-:commandVersion
-shift
-type "%CARBON_HOME%\bin\version.txt"
-type "%CARBON_HOME%\bin\wso2carbon-version.txt"
-goto end
-
-rem ----- commandDebug ---------------------------------------------------------
-:commandDebug
-shift
-set DEBUG_PORT=%1
-if "%DEBUG_PORT%"=="" goto noDebugPort
-if not "%JAVA_OPTS%"=="" echo Warning !!!. User specified JAVA_OPTS will be ignored, once you give the --debug option.
-set JAVA_OPTS=-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%DEBUG_PORT%
-echo Please start the remote debugging client to continue...
-goto findJdk
-
-:noDebugPort
-echo Please specify the debug port after the --debug option
-goto end
-
-rem ----- commandLifecycle -----------------------------------------------------
-:commandLifecycle
-goto findJdk
 
 :doneStart
 if "%OS%"=="Windows_NT" @setlocal
