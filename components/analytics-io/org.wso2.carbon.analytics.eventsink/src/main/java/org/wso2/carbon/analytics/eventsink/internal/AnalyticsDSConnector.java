@@ -18,6 +18,7 @@
 package org.wso2.carbon.analytics.eventsink.internal;
 
 import com.google.gson.Gson;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,11 +36,13 @@ import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
+import org.wso2.carbon.utils.CarbonUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Analytics data service connector which actually makes the interacts with DS.
@@ -49,8 +52,20 @@ public class AnalyticsDSConnector {
 
     private Gson gson;
 
+    private AtomicInteger recordsPersisted;
+    private AtomicInteger totalRecordCounter;
+    private long startTime;
+    private boolean isProfilePersistence;
+
     public AnalyticsDSConnector() {
         gson = new Gson();
+        String profileReceiver = System.getProperty("profilePersistence");
+        if (profileReceiver != null && profileReceiver.equalsIgnoreCase("true")) {
+            isProfilePersistence = true;
+            recordsPersisted = new AtomicInteger();
+            totalRecordCounter = new AtomicInteger();
+            startTime = 0;
+        }
     }
 
     public void insertEvents(int tenantId, List<Event> events) throws StreamDefinitionStoreException,
@@ -58,10 +73,65 @@ public class AnalyticsDSConnector {
         if (!ServiceHolder.getEventPublisherManagementService().isDrop()) {
             //In CEP HA setup the same event will be sent along the cluster, and hence only the leader
             // will need to store the event to avoid the duplicate events stored..
-            ServiceHolder.getAnalyticsDataAPI().put(convertEventsToRecord(tenantId, events));
+            List<Record> records = this.convertEventsToRecord(tenantId, events);
+            startTimeMeasurement();
+            ServiceHolder.getAnalyticsDataAPI().put(records);
+            endTimeMeasurement(records.size());
         }
     }
 
+    private void endTimeMeasurement(int recordCount) {
+        if (isProfilePersistence) {
+            recordsPersisted.addAndGet(recordCount);
+            if (recordsPersisted.get() > 100000) {
+                synchronized (this) {
+                    if (recordsPersisted.get() > 100000) {
+                        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                        Date date = new Date();
+
+                        long endTime = System.currentTimeMillis();
+                        int currentBatchSize = recordsPersisted.getAndSet(0);
+                        totalRecordCounter.addAndGet(currentBatchSize);
+
+                        String line = "[" + dateFormat.format(date) + "] # of records : " + currentBatchSize +
+                                " start timestamp : " + startTime +
+                                " end time stamp : " + endTime + " Throughput is (records / sec) : " +
+                                (currentBatchSize * 1000) / (endTime - startTime) + " Total Record Count : " +
+                                totalRecordCounter + " \n";
+                        File file = new File(CarbonUtils.getCarbonHome() + File.separator + "persistence-perf.txt");
+                        if (!file.exists()) {
+                            log.info("Creating the performance measurement file at : " + file.getAbsolutePath());
+                        }
+                        try {
+                            appendToFile(IOUtils.toInputStream(line), file);
+                        } catch (IOException e) {
+                            log.error(e.getMessage(), e);
+                        }
+                        startTime = 0;
+                    }
+                }
+            }
+        }
+
+    }
+
+    public void appendToFile(final InputStream in, final File f) throws IOException {
+        OutputStream stream = null;
+        try {
+            stream = new BufferedOutputStream(new FileOutputStream(f, true));
+            IOUtils.copy(in, stream);
+        } finally {
+            IOUtils.closeQuietly(stream);
+        }
+    }
+
+    private void startTimeMeasurement() {
+        if (isProfilePersistence) {
+            if (startTime == 0) {
+                startTime = System.currentTimeMillis();
+            }
+        }
+    }
 
     private List<Record> convertEventsToRecord(int tenantId, List<Event> events)
             throws StreamDefinitionStoreException, AnalyticsException {
@@ -119,7 +189,7 @@ public class AnalyticsDSConnector {
     }
 
     private void populateTypedAttributes(AnalyticsSchema schema, String type, List<Attribute> attributes, Object[] values,
-                                         Map<String, Object> eventAttribute) throws AnalyticsException{
+                                         Map<String, Object> eventAttribute) throws AnalyticsException {
         if (attributes == null) {
             return;
         }
