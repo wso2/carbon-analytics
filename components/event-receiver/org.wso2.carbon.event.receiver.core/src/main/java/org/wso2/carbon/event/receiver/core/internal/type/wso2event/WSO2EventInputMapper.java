@@ -290,9 +290,22 @@ public class WSO2EventInputMapper implements InputMapper {
     //TODO This method needs to be optimized for performance
     private Object[] processArbitraryMap(Event inEvent) {
         Map<String, String> arbitraryMap = inEvent.getArbitraryDataMap();
-        Object[] metaData = new Object[exportedStreamDefinition.getMetaData().size()];
-        Object[] correlationData = new Object[exportedStreamDefinition.getCorrelationData().size()];
-        Object[] payloadData = new Object[exportedStreamDefinition.getPayloadData().size()];
+        Object[] metaData, correlationData, payloadData;
+        if (exportedStreamDefinition.getMetaData() != null) {
+            metaData = new Object[exportedStreamDefinition.getMetaData().size()];
+        } else {
+            metaData = new Object[0];
+        }
+        if (exportedStreamDefinition.getCorrelationData() != null) {
+            correlationData = new Object[exportedStreamDefinition.getCorrelationData().size()];
+        } else {
+            correlationData = new Object[0];
+        }
+        if (exportedStreamDefinition.getPayloadData() != null) {
+            payloadData = new Object[exportedStreamDefinition.getPayloadData().size()];
+        } else {
+            payloadData = new Object[0];
+        }
         for (int i = 0; i < metaData.length; i++) {
             Attribute metaAttribute = exportedStreamDefinition.getMetaData().get(i);
             String value = arbitraryMap.get(EventReceiverUtil.getMappedInputStreamAttributeName(
