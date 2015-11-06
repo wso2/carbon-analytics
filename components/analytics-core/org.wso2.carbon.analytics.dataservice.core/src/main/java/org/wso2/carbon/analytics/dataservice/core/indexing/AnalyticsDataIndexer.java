@@ -1673,7 +1673,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             throws AnalyticsIndexException, IOException {
         if (aggregateRequest.getAggregateLevel() >= 0) {
             List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds(TAXONOMY_INDEX_DATA_FS_BASE_PATH,
-                                                                                tenantId, aggregateRequest.getTableName());
+                    tenantId, aggregateRequest.getTableName());
+            if (taxonomyShardIds.size() == 0) {
+                return new ArrayList<>();
+            }
             ExecutorService pool = Executors.newFixedThreadPool(taxonomyShardIds.size());
             Set<Future<Set<String>>> perShardUniqueCategories = new HashSet<>();
             Set<String> finalUniqueCategories = new HashSet<>();
