@@ -220,6 +220,13 @@ public class CarbonAnalyticsProcessorService implements AnalyticsProcessorServic
         return ServiceHolder.isAnalyticsExecutionEnabled();
     }
 
+    /**
+     * Checks whether the analytics scheduled task for analytics script is running in background.
+     *
+     * @param scriptName
+     * @return
+     * @throws AnalyticsExecutionException
+     */
     @Override
     public boolean isAnalyticsTaskExecuting(String scriptName) throws AnalyticsExecutionException {
         if (null != scriptName && !scriptName.trim().isEmpty()) {

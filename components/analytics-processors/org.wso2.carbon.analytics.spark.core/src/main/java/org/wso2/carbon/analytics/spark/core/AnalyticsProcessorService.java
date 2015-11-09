@@ -125,6 +125,11 @@ public interface AnalyticsProcessorService {
      */
     boolean isAnalyticsExecutionEnabled();
 
-    boolean isAnalyticsTaskExecuting(String scriptName) throws AnalyticsExecutionException;
 
+    /**
+     * Checks whether the analytics scheduled task for analytics script is running in background.
+     *
+     * @return
+     */
+    boolean isAnalyticsTaskExecuting(String scriptName) throws AnalyticsExecutionException;
 }
