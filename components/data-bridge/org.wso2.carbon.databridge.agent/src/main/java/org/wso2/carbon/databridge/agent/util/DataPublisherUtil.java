@@ -19,7 +19,7 @@ package org.wso2.carbon.databridge.agent.util;
 
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
-
+import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,8 +45,8 @@ public class DataPublisherUtil {
      */
     public static ArrayList<Object[]> getEndpointGroups(String urlSet)
             throws DataEndpointConfigurationException {
-        ArrayList<String> urlGroups = new ArrayList<>();
-        ArrayList<Object[]> endPointGroups = new ArrayList<>();
+        ArrayList<String> urlGroups = new ArrayList<String>();
+        ArrayList<Object[]> endPointGroups = new ArrayList<Object[]>();
         Pattern regex = Pattern.compile("\\{.*?\\}");
         Matcher regexMatcher = regex.matcher(urlSet);
         while (regexMatcher.find()) {
