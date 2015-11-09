@@ -124,4 +124,7 @@ public interface AnalyticsProcessorService {
      * @return
      */
     boolean isAnalyticsExecutionEnabled();
+
+    boolean isAnalyticsTaskExecuting(String scriptName) throws AnalyticsExecutionException;
+
 }

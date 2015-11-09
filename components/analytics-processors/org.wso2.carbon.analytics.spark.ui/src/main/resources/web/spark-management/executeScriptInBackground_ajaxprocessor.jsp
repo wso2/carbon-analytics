@@ -37,28 +37,46 @@
     try {
         AnalyticsExecutionClient client = new AnalyticsExecutionClient(cookie, serverURL, configContext);
         if (null != scriptName && !scriptName.trim().isEmpty()) {
-            client.executeScriptInBackground(scriptName);
+            if (client.isAnalyticsTaskExecuting(scriptName)) {
+        %>
+            <div id="returnedResults">
+                <span class="errorView"> <b>WARNING: </b> Scheduled task for the script : <%=scriptName%> is already running.
+                    Please try again after the scheduled task is completed.</span>
+            </div>
+        <%
+            } else if (client.isAnalyticsScriptExecuting(scriptName)) {
+        %>
+            <div id="returnedResults">
+                <span class="errorView"> <b>WARNING: </b> Script : <%=scriptName%> is already running in background.
+                    Please try again after the background execution is completed.</span>
+            </div>
+        <%
+            } else {
+                client.executeScriptInBackground(scriptName);
+        %>
+            <div id="returnedResults">
+                <br/>
+                <span class="queryInfo">Script execution started in background. Refer tables for results.</span>
+                <br/>
+            </div>
+        <%
+            }
         } else if (null != scriptContent && !scriptContent.trim().isEmpty()) {
             client.executeScriptContentInBackground(scriptContent);
+        %>
+            <div id="returnedResults">
+                <br/>
+                <span class="queryInfo">Script execution started in background. Refer tables for results.</span>
+                <br/>
+            </div>
+        <%
         }
-%>
-<div id="returnedResults">
-        <br/>
-        <span class="queryInfo">Script execution started in background. Refer tables for results.</span>
-        <br/>
+    } catch (Exception e) {
+        e.printStackTrace();
+    %>
+    <div id="returnedResults">
+        <span class="errorView"> <b>ERROR: </b><%=e.getMessage()%> </span>
+    </div>
 
-</div>
-<%--<div id="returnedResults">--%>
-<%--<span class="errorView"> <b>WARNING: </b> Scheduled task for the script : <%=scriptName%> is already running.--%>
-<%--Please try again after the scheduled task is completed.</span>--%>
-<%--</div>--%>
-<% //}
-} catch (Exception e) {
-    e.printStackTrace();
-%>
-<div id="returnedResults">
-    <span class="errorView"> <b>ERROR: </b><%=e.getMessage()%> </span>
-</div>
-
-<% }
-%>
+    <% }
+    %>

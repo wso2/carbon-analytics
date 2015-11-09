@@ -172,4 +172,8 @@ public class AnalyticsExecutionClient {
     public boolean isAnalyticsScriptExecuting(String scriptName) throws RemoteException {
         return stub.isAnalyticsScriptExecuting(scriptName);
     }
+
+    public boolean isAnalyticsTaskExecuting(String scriptName) throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+        return stub.isAnalyticsTaskExecuting(scriptName);
+    }
 }

@@ -25,6 +25,8 @@ import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
+import org.wso2.carbon.ntask.common.TaskException;
+import org.wso2.carbon.ntask.core.TaskManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -216,5 +218,24 @@ public class CarbonAnalyticsProcessorService implements AnalyticsProcessorServic
     @Override
     public boolean isAnalyticsExecutionEnabled() {
         return ServiceHolder.isAnalyticsExecutionEnabled();
+    }
+
+    @Override
+    public boolean isAnalyticsTaskExecuting(String scriptName) throws AnalyticsExecutionException {
+        if (null != scriptName && !scriptName.trim().isEmpty()) {
+            try {
+                TaskManager.TaskState state = ServiceHolder.getTaskManager().getTaskState(scriptName);
+                return null != state && state == TaskManager.TaskState.BLOCKED;
+            } catch (TaskException e) {
+                if (e.getCode().equals(TaskException.Code.NO_TASK_EXISTS)){
+                    return false;
+                } else {
+                    log.error("Error while retrieving the status of the task:" + scriptName, e);
+                    throw new AnalyticsExecutionException("Error while retrieving the status of the task:" + scriptName, e);
+                }
+            }
+        } else {
+            return false;
+        }
     }
 }

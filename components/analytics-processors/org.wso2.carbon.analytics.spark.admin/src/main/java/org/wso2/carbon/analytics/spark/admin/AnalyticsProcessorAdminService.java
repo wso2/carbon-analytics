@@ -392,4 +392,17 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
     public boolean isAnalyticsScriptExecuting(String scriptName) {
         return AnalyticsProcessorUtils.getRunningScriptsMap().containsKey(scriptName);
     }
+
+    /**
+     * Checks and returns whether scheduled analytics task executing already
+     *
+     * @return
+     */
+    public boolean isAnalyticsTaskExecuting(String scriptName) throws AnalyticsProcessorAdminException {
+        try {
+            return ServiceHolder.getAnalyticsProcessorService().isAnalyticsTaskExecuting(scriptName);
+        } catch (AnalyticsExecutionException e) {
+            throw new AnalyticsProcessorAdminException("Error while retrieving the status of the task : " + scriptName, e);
+        }
+    }
 }

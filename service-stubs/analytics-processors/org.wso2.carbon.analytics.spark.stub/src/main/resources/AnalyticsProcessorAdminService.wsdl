@@ -41,11 +41,26 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="deleteScript">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="saveScript">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="cronExpression" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateScriptTask">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="cronExpression" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
@@ -58,35 +73,12 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="updateScriptContent">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="updateScriptTask">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="cronExpression" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="updateScript">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="cronExpression" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteScript">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -99,6 +91,14 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax221:AnalyticsScriptDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateScriptContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -150,6 +150,20 @@
                 </xs:complexType>
             </xs:element>
             <xs:element name="isAnalyticsScriptExecutingResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isAnalyticsTaskExecuting">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isAnalyticsTaskExecutingResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
@@ -263,6 +277,12 @@
     <wsdl:message name="getAllScriptsResponse">
         <wsdl:part name="parameters" element="ns:getAllScriptsResponse"/>
     </wsdl:message>
+    <wsdl:message name="isAnalyticsTaskExecutingRequest">
+        <wsdl:part name="parameters" element="ns:isAnalyticsTaskExecuting"/>
+    </wsdl:message>
+    <wsdl:message name="isAnalyticsTaskExecutingResponse">
+        <wsdl:part name="parameters" element="ns:isAnalyticsTaskExecutingResponse"/>
+    </wsdl:message>
     <wsdl:message name="deleteScriptRequest">
         <wsdl:part name="parameters" element="ns:deleteScript"/>
     </wsdl:message>
@@ -326,6 +346,11 @@
             <wsdl:input message="ns:getAllScriptsRequest" wsaw:Action="urn:getAllScripts"/>
             <wsdl:output message="ns:getAllScriptsResponse" wsaw:Action="urn:getAllScriptsResponse"/>
             <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:getAllScriptsAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsTaskExecuting">
+            <wsdl:input message="ns:isAnalyticsTaskExecutingRequest" wsaw:Action="urn:isAnalyticsTaskExecuting"/>
+            <wsdl:output message="ns:isAnalyticsTaskExecutingResponse" wsaw:Action="urn:isAnalyticsTaskExecutingResponse"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:isAnalyticsTaskExecutingAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
         </wsdl:operation>
         <wsdl:operation name="deleteScript">
             <wsdl:input message="ns:deleteScriptRequest" wsaw:Action="urn:deleteScript"/>
@@ -460,6 +485,18 @@
         </wsdl:operation>
         <wsdl:operation name="getAllScripts">
             <soap:operation soapAction="urn:getAllScripts" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsTaskExecuting">
+            <soap:operation soapAction="urn:isAnalyticsTaskExecuting" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -623,6 +660,18 @@
                 <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="isAnalyticsTaskExecuting">
+            <soap12:operation soapAction="urn:isAnalyticsTaskExecuting" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="deleteScript">
             <soap12:operation soapAction="urn:deleteScript" style="document"/>
             <wsdl:input>
@@ -736,6 +785,15 @@
         </wsdl:operation>
         <wsdl:operation name="getAllScripts">
             <http:operation location="getAllScripts"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsTaskExecuting">
+            <http:operation location="isAnalyticsTaskExecuting"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>

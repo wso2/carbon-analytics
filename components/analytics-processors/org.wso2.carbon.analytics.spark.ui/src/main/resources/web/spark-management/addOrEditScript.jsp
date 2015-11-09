@@ -79,6 +79,7 @@
 
         function executeQuery() {
             var scriptContent = editAreaLoader.getValue("allcommands");
+            var scriptName = '<%=scriptName%>';
             if (scriptContent == null || scriptContent == '') {
                 CARBON.showErrorDialog("No queries entered in the window! Please enter some queries and try again!");
             } else {
@@ -86,7 +87,7 @@
                 openProgressBar();
                 new Ajax.Request('executeScript_ajaxprocessor.jsp', {
                     method: 'post',
-                    parameters: {scriptContent: scriptContent},
+                    parameters: {scriptName: scriptName, scriptContent: scriptContent},
                     onSuccess: function (transport) {
                         closeProgrsssBar();
                         document.getElementById('middle').style.cursor = '';
@@ -110,6 +111,7 @@
 
         function executeQueryInBackground() {
             var scriptContent = editAreaLoader.getValue("allcommands");
+            var scriptName = '<%=scriptName%>';
             if (scriptContent == null || scriptContent == '') {
                 CARBON.showErrorDialog("No queries entered in the window! Please enter some queries and try again!");
             } else {
@@ -117,7 +119,7 @@
                 openProgressBar();
                 new Ajax.Request('executeScriptInBackground_ajaxprocessor.jsp', {
                     method: 'post',
-                    parameters: {scriptContent: scriptContent},
+                    parameters: {scriptName: scriptName, scriptContent: scriptContent},
                     onSuccess: function (transport) {
                         closeProgrsssBar();
                         document.getElementById('middle').style.cursor = '';
@@ -129,7 +131,6 @@
                         var endIndex = allPage.indexOf(closeDivText, temp);
                         var queryResults = allPage.substring(startIndex, endIndex);
                         document.getElementById('analyticsResult').innerHTML = queryResults;
-                        CARBON.showInfoDialog("Successfully started executing the script in background.");
                     },
                     onFailure: function (transport) {
                         closeProgrsssBar();

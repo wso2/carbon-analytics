@@ -36,8 +36,39 @@
         AnalyticsExecutionClient client = new AnalyticsExecutionClient(cookie, serverURL, configContext);
         String scriptName = request.getParameter("scriptName");
         try {
-            client.executeScriptInBackground(scriptName);
-        } catch (AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException e) {
+            if(client.isAnalyticsTaskExecuting(scriptName)) {
+    %>
+            <script type="text/javascript">
+                CARBON.showWarningDialog('Scheduled task for the script : <%=scriptName%> is already running. Please try again after the scheduled task is completed.', function () {
+                    location.href = "listScripts.jsp";
+                }, function () {
+                    location.href = "listScripts.jsp";
+                });
+            </script>
+    <%
+            } else if (client.isAnalyticsScriptExecuting(scriptName)) {
+    %>
+                <script type="text/javascript">
+                    CARBON.showWarningDialog('Script : <%=scriptName%> is already running in background. Please try again after the background execution is completed.', function () {
+                        location.href = "listScripts.jsp";
+                    }, function () {
+                        location.href = "listScripts.jsp";
+                    });
+                </script>
+    <%
+            } else {
+                client.executeScriptInBackground(scriptName);
+    %>
+                <script type="text/javascript">
+                    CARBON.showInfoDialog('Successfully started executing the script: <%=scriptName%> in background.', function () {
+                        location.href = "listScripts.jsp";
+                    }, function () {
+                        location.href = "listScripts.jsp";
+                    });
+                </script>
+    <%
+            }
+        } catch (Exception e) {
     %>
     <script type="text/javascript">
         location.href = "listScripts.jsp";
@@ -47,11 +78,4 @@
     <%
         }
     %>
-    <script type="text/javascript">
-        CARBON.showInfoDialog('Successfully started executing the script: <%=scriptName%> in background.', function () {
-            location.href = "listScripts.jsp";
-        }, function () {
-            location.href = "listScripts.jsp";
-        });
-    </script>
 </fmt:bundle>
