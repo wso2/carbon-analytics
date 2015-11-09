@@ -286,10 +286,6 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         return recordBatches;
     }
 
-    private String inferRecordIdentity(Record record) {
-        return HBaseUtils.generateGenericTableName(record.getTenantId(), record.getTableName());
-    }
-
     private void policeIncomingRecords(Map<String, List<Record>> recordBatches) throws AnalyticsException {
         int tenantId;
         String tableName;
@@ -312,7 +308,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                     suspects.add(get);
                 }
                 /* Arrest */
-                List<byte[]> criminals = new ArrayList<>();
+                List<Delete> criminals = new ArrayList<>();
                 Result[] results = recordTable.get(suspects);
                 for (Result currentResult : results) {
                     if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
@@ -321,7 +317,8 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                                 HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
                         byte[] data = CellUtil.cloneValue(dataCell);
                         if (data.length > 0) {
-                            criminals.add(data);
+                            criminals.add(new Delete(data).addColumn(
+                                    HBaseAnalyticsDSConstants.ANALYTICS_INDEX_COLUMN_FAMILY_NAME, currentResult.getRow()));
                         }
                     }
                 }
@@ -332,7 +329,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                                 + " for tenant" + tenantId);
                     }
                     /* Sentence */
-                    this.deleteRows(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.INDEX, criminals);
+                    this.deleteColumns(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.INDEX, criminals);
                 }
             } catch (IOException e) {
                 throw new AnalyticsException("Error while pruning obsolete entries from table " + tableName
@@ -341,6 +338,10 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                 GenericUtils.closeQuietly(recordTable);
             }
         }
+    }
+
+    private String inferRecordIdentity(Record record) {
+        return HBaseUtils.generateGenericTableName(record.getTenantId(), record.getTableName());
     }
 
     @Override
@@ -483,6 +484,78 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
 
+    @Override
+    public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
+        Table dataTable = null;
+        List<Delete> dataDeletes = new ArrayList<>();
+        String dataTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA);
+        List<Delete> timestampDeletes = this.lookupIndexDeletes(dataTableName, ids, tenantId, tableName);
+        for (String recordId : ids) {
+            dataDeletes.add(new Delete(recordId.getBytes(StandardCharsets.UTF_8)));
+        }
+        try {
+            dataTable = this.conn.getTable(TableName.valueOf(dataTableName));
+            dataTable.delete(dataDeletes);
+            log.debug("Processed deletion of " + dataDeletes.size() + " records from table " + tableName + "for tenant " + tenantId);
+            this.deleteColumns(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.INDEX, timestampDeletes);
+        } catch (IOException e) {
+            throw new AnalyticsException("Error deleting records from " + tableName + " for tenant " + tenantId + " : "
+                    + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(dataTable);
+        }
+    }
+
+    private List<Delete> lookupIndexDeletes(String dataTableName, List<String> rowIds, int tenantId, String tableName)
+            throws AnalyticsException {
+        List<Delete> indexDeletes = new ArrayList<>();
+        List<Get> gets = new ArrayList<>();
+        Table dataTable = null;
+        for (String rowId : rowIds) {
+            if (!rowId.isEmpty()) {
+                gets.add(new Get(rowId.getBytes(StandardCharsets.UTF_8)).addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                        HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME));
+            }
+        }
+        try {
+            dataTable = this.conn.getTable(TableName.valueOf(dataTableName));
+            Result[] results = dataTable.get(gets);
+            for (Result res : results) {
+                if (res.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                        HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME)) {
+                    Cell dataCell = res.getColumnLatestCell(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
+                    byte[] data = CellUtil.cloneValue(dataCell);
+                    if (data.length > 0) {
+                        indexDeletes.add(new Delete(data).addColumn(
+                                HBaseAnalyticsDSConstants.ANALYTICS_INDEX_COLUMN_FAMILY_NAME, res.getRow()));
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            throw new AnalyticsException("The secondary index for table " + tableName + " for tenant " + tenantId +
+                    " could not be initialized for deletion of rows: " + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(dataTable);
+        }
+        return indexDeletes;
+    }
+
+    private void deleteColumns(int tenantId, String tableName, HBaseAnalyticsDSConstants.TableType type, List<Delete> deletes) throws AnalyticsException {
+        Table table = null;
+        String dataTableName = HBaseUtils.generateTableName(tenantId, tableName, type);
+        try {
+            table = this.conn.getTable(TableName.valueOf(dataTableName));
+            table.delete(deletes);
+        } catch (IOException e) {
+            throw new AnalyticsException("Error deleting columns from " + tableName + " of type " + type + " for tenant " + tenantId + " : "
+                    + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(table);
+        }
+    }
+
     private void deleteRows(int tenantId, String tableName, HBaseAnalyticsDSConstants.TableType type, List<byte[]> rows) throws AnalyticsException {
         Table table = null;
         List<Delete> deletes = new ArrayList<>();
@@ -502,28 +575,6 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     @Override
-    public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
-        Table dataTable = null;
-        List<Delete> dataDeletes = new ArrayList<>();
-        String dataTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA);
-        List<byte[]> timestamps = this.lookupTimestamps(dataTableName, ids, tenantId, tableName);
-        for (String recordId : ids) {
-            dataDeletes.add(new Delete(recordId.getBytes(StandardCharsets.UTF_8)));
-        }
-        try {
-            dataTable = this.conn.getTable(TableName.valueOf(dataTableName));
-            dataTable.delete(dataDeletes);
-            log.debug("Processed deletion of " + dataDeletes.size() + " records from table " + tableName + "for tenant " + tenantId);
-            this.deleteRows(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.INDEX, timestamps);
-        } catch (IOException e) {
-            throw new AnalyticsException("Error deleting records from " + tableName + " for tenant " + tenantId + " : "
-                    + e.getMessage(), e);
-        } finally {
-            GenericUtils.closeQuietly(dataTable);
-        }
-    }
-
-    @Override
     public void destroy() throws AnalyticsException {
         try {
             this.conn.close();
@@ -531,41 +582,6 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         } catch (IOException ignore) {
                 /* do nothing, the connection is dead anyway */
         }
-    }
-
-    private List<byte[]> lookupTimestamps(String dataTableName, List<String> rowIds, int tenantId, String tableName)
-            throws AnalyticsException {
-        List<byte[]> timestamps = new ArrayList<>();
-        List<Get> gets = new ArrayList<>();
-        Table dataTable = null;
-        for (String rowId : rowIds) {
-            if (!rowId.isEmpty()) {
-                gets.add(new Get(rowId.getBytes(StandardCharsets.UTF_8)).addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                        HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME));
-            }
-        }
-        try {
-            dataTable = this.conn.getTable(TableName.valueOf(dataTableName));
-            Result[] results = dataTable.get(gets);
-            for (Result res : results) {
-                if (res.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                        HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME)) {
-                    Cell dataCell = res.getColumnLatestCell(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                    byte[] data = CellUtil.cloneValue(dataCell);
-                    if (data.length > 0) {
-                        timestamps.add(data);
-                    }
-                }
-            }
-
-        } catch (IOException e) {
-            throw new AnalyticsException("The table " + tableName + " for tenant " + tenantId +
-                    " could not be initialized for deletion of rows: " + e.getMessage(), e);
-        } finally {
-            GenericUtils.closeQuietly(dataTable);
-        }
-        return timestamps;
     }
 
     public static class HBaseUnsupportedOperationException extends AnalyticsException {
