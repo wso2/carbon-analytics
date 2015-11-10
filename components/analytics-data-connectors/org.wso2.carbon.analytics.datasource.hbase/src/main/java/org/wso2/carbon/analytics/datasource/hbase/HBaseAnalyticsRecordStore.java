@@ -39,7 +39,6 @@ import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 import org.wso2.carbon.ndatasource.common.DataSourceException;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -201,8 +200,6 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         }
         Map<String, List<Record>> recordBatches = this.generateRecordBatches(records);
         try {
-            /* Check incoming records to eliminate any residual entries on the index table */
-            this.policeIncomingRecords(recordBatches);
             /* iterating over record batches */
             for (Map.Entry<String, List<Record>> entry : recordBatches.entrySet()) {
                 tenantId = HBaseUtils.inferTenantId(entry.getKey());
@@ -249,7 +246,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             } else {
                 data = GenericUtils.encodeRecordValues(columns);
             }
-            Put put = new Put(recordId.getBytes(StandardCharsets.UTF_8));
+            Put put = new Put(Bytes.toBytes(recordId));
             put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
                     HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME, data);
             put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
@@ -267,8 +264,8 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         Put indexPut = new Put(HBaseUtils.encodeLong(record.getTimestamp()));
         /* Setting the column qualifier the same as the column value to enable multiple columns per row with
         * unique qualifiers, since we will anyway not use the qualifier during index read */
-        indexPut.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_INDEX_COLUMN_FAMILY_NAME, record.getId().getBytes(StandardCharsets.UTF_8),
-                record.getId().getBytes(StandardCharsets.UTF_8));
+        indexPut.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_INDEX_COLUMN_FAMILY_NAME, Bytes.toBytes(record.getId()),
+                Bytes.toBytes(record.getId()));
         return indexPut;
     }
 
@@ -284,60 +281,6 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             recordBatch.add(record);
         }
         return recordBatches;
-    }
-
-    private void policeIncomingRecords(Map<String, List<Record>> recordBatches) throws AnalyticsException {
-        int tenantId;
-        String tableName;
-        Table recordTable = null;
-        for (Map.Entry<String, List<Record>> entry : recordBatches.entrySet()) {
-            tenantId = HBaseUtils.inferTenantId(entry.getKey());
-            tableName = HBaseUtils.inferTableName(entry.getKey());
-            if (!this.tableExists(tenantId, tableName)) {
-                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
-            }
-            try {
-                /* Surveil */
-                recordTable = this.conn.getTable(TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName,
-                        HBaseAnalyticsDSConstants.TableType.DATA)));
-                List<Get> suspects = new ArrayList<>();
-                for (Record record : recordBatches.get(entry.getKey())) {
-                    Get get = new Get(Bytes.toBytes(record.getId()));
-                    get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                    suspects.add(get);
-                }
-                /* Arrest */
-                List<Delete> criminals = new ArrayList<>();
-                Result[] results = recordTable.get(suspects);
-                for (Result currentResult : results) {
-                    if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME)) {
-                        Cell dataCell = currentResult.getColumnLatestCell(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                                HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                        byte[] data = CellUtil.cloneValue(dataCell);
-                        if (data.length > 0) {
-                            criminals.add(new Delete(data).addColumn(
-                                    HBaseAnalyticsDSConstants.ANALYTICS_INDEX_COLUMN_FAMILY_NAME, currentResult.getRow()));
-                        }
-                    }
-                }
-                if (criminals.size() > 0) {
-                    /* Produce before courts */
-                    if (log.isDebugEnabled()) {
-                        log.debug("Found " + criminals.size() + " obsolete entries on the index table for " + tableName
-                                + " for tenant" + tenantId);
-                    }
-                    /* Sentence */
-                    this.deleteColumns(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.INDEX, criminals);
-                }
-            } catch (IOException e) {
-                throw new AnalyticsException("Error while pruning obsolete entries from table " + tableName
-                        + " for tenant: " + tenantId + " : " + e.getMessage(), e);
-            } finally {
-                GenericUtils.closeQuietly(recordTable);
-            }
-        }
     }
 
     private String inferRecordIdentity(Record record) {
@@ -491,7 +434,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         String dataTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA);
         List<Delete> timestampDeletes = this.lookupIndexDeletes(dataTableName, ids, tenantId, tableName);
         for (String recordId : ids) {
-            dataDeletes.add(new Delete(recordId.getBytes(StandardCharsets.UTF_8)));
+            dataDeletes.add(new Delete(Bytes.toBytes(recordId)));
         }
         try {
             dataTable = this.conn.getTable(TableName.valueOf(dataTableName));
@@ -513,7 +456,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         Table dataTable = null;
         for (String rowId : rowIds) {
             if (!rowId.isEmpty()) {
-                gets.add(new Get(rowId.getBytes(StandardCharsets.UTF_8)).addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                gets.add(new Get(Bytes.toBytes(rowId)).addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
                         HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME));
             }
         }
