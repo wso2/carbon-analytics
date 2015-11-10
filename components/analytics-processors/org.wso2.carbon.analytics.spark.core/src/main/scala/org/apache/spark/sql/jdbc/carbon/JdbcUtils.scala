@@ -64,7 +64,11 @@ object JdbcUtils {
 
   private def getQueryConfigEntry(conn: Connection): RDBMSQueryConfigurationEntry = {
     val qConf = RDBMSUtils.loadQueryConfiguration()
-    val dbType = conn.getMetaData.getDatabaseProductName
+    var dbType = conn.getMetaData.getDatabaseProductName
+
+    if(dbType.startsWith("DB2")) {
+      dbType = "DB2.*"
+    }
 
     qConf.getDatabases.find(entry => entry.getDatabaseName.equalsIgnoreCase(dbType)).get
   }
