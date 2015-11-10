@@ -330,7 +330,6 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                         log.warn("Data Endpoint with receiver URL:" + dataEndpoint.getDataEndpointConfiguration().getReceiverURL()
                                 + " could not be deactivated", exception);
                     }
-
                 }
                 if (dataEndpoint.isConnected()) {
                     isOneReceiverConnected = true;
