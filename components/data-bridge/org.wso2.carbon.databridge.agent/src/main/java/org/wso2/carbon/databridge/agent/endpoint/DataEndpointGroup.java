@@ -23,6 +23,7 @@ import com.lmax.disruptor.dsl.Disruptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.agent.DataEndpointAgent;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.EventQueueFullException;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.databridge.agent.util.DataPublisherUtil;
@@ -319,10 +320,15 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                         dataEndpoint.deactivate();
                     }
                 } else {
-                    String[] urlElements = DataPublisherUtil.getProtocolHostPort(
-                            dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
-                    if (!isServerExists(urlElements[1], Integer.parseInt(urlElements[2]))) {
-                        dataEndpoint.deactivate();
+                    try {
+                        String[] urlElements = DataPublisherUtil.getProtocolHostPort(
+                                dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
+                        if (!isServerExists(urlElements[1], Integer.parseInt(urlElements[2]))) {
+                            dataEndpoint.deactivate();
+                        }
+                    } catch (DataEndpointConfigurationException exception) {
+                        log.warn("Data Endpoint with receiver URL:" + dataEndpoint.getDataEndpointConfiguration().getReceiverURL()
+                                + " could not be deactivated", exception);
                     }
                 }
                 if (dataEndpoint.isConnected()) {

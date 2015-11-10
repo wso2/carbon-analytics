@@ -143,7 +143,8 @@ public class DataPublisher {
             boolean failOver = (Boolean) receiverGroup[0];
 
             DataEndpointGroup endpointGroup;
-            if (failOver) endpointGroup = new DataEndpointGroup(DataEndpointGroup.HAType.FAILOVER, dataEndpointAgent);
+            if (failOver)
+                endpointGroup = new DataEndpointGroup(DataEndpointGroup.HAType.FAILOVER, dataEndpointAgent);
             else endpointGroup = new DataEndpointGroup(DataEndpointGroup.HAType.LOADBALANCE,
                     dataEndpointAgent);
             /**
