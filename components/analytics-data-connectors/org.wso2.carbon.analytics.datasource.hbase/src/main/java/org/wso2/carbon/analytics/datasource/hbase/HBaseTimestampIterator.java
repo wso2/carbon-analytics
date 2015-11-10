@@ -17,6 +17,8 @@
 */
 package org.wso2.carbon.analytics.datasource.hbase;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.Cell;
@@ -58,6 +60,8 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
     private String tableName;
     private Table table, indexTable;
     private Iterator<Record> subIterator = Collections.emptyIterator();
+
+    private Connection connection;
 
     private static final Log log = LogFactory.getLog(HBaseTimestampIterator.class);
 
@@ -117,15 +121,15 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
         if (this.fullyFetched) {
             return;
         }
-        List<String> currentBatch = this.populateNextRecordBatch();
-        if (currentBatch.size() == 0) {
+        ListMultimap<String, Long> batchedResults = this.populateNextRecordBatch();
+        if (batchedResults.size() == 0) {
             return;
         }
         Set<String> colSet = null;
         List<Record> fetchedRecords = new ArrayList<>();
         List<Get> gets = new ArrayList<>();
 
-        for (String currentId : currentBatch) {
+        for (String currentId : batchedResults.keySet()) {
             Get get = new Get(Bytes.toBytes(currentId));
             get.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME);
             gets.add(get);
@@ -142,9 +146,30 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
                 if (!currentResult.isEmpty()) {
                     Record record = HBaseUtils.constructRecord(currentResult, tenantId, tableName, colSet);
                     if (record != null) {
-                        fetchedRecords.add(record);
+                        byte[] currentRecordId = currentResult.getRow();
+                        List<Long> indexEntries = batchedResults.get(Bytes.toString(currentRecordId));
+                        long originalTimestamp = record.getTimestamp();
+                        if (indexEntries.contains(originalTimestamp)) {
+                            fetchedRecords.add(record);
+                            indexEntries.remove(originalTimestamp);
+                        }
+                        List<Delete> obsoleteEntries = new ArrayList<>();
+                        for (Long timestamp : indexEntries) {
+                            obsoleteEntries.add(new Delete(Bytes.toBytes(timestamp)).addColumn(
+                                    HBaseAnalyticsDSConstants.ANALYTICS_INDEX_COLUMN_FAMILY_NAME, currentResult.getRow()));
+                        }
+                        this.deleteObsoleteEntries(obsoleteEntries);
                     }
-                }
+                } /*else {
+                    byte[] currentRecordId = currentResult.getRow();    //this is null :(
+                    List<Long> indexEntries = batchedResults.get(Bytes.toString(currentRecordId));
+                    List<Delete> obsoleteEntries = new ArrayList<>();
+                    for (Long timestamp : indexEntries) {
+                        obsoleteEntries.add(new Delete(Bytes.toBytes(timestamp)).addColumn(
+                                HBaseAnalyticsDSConstants.ANALYTICS_INDEX_COLUMN_FAMILY_NAME, currentResult.getRow()));
+                    }
+                    this.deleteObsoleteEntries(obsoleteEntries);
+                }*/
             }
             this.subIterator = fetchedRecords.iterator();
         } catch (Exception e) {
@@ -157,8 +182,8 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
         }
     }
 
-    private List<String> populateNextRecordBatch() {
-        List<String> currentBatch = new ArrayList<>();
+    private ListMultimap<String, Long> populateNextRecordBatch() {
+        ListMultimap<String, Long> currentBatch = ArrayListMultimap.create();
         if (this.recordsCount > 0) {
             if (this.globalCounter >= this.recordsCount) {
                 this.fullyFetched = true;
@@ -187,7 +212,9 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
                         this.fullyFetched = true;
                         break outer;
                     }
-                    currentBatch.add(Bytes.toString(CellUtil.cloneValue(cell)));
+                    byte[] recordId = CellUtil.cloneValue(cell);
+                    byte[] currentIndexEntry = rowResult.getRow();
+                    currentBatch.put(Bytes.toString(recordId), Bytes.toLong(currentIndexEntry));
                     counter++;
                     this.globalCounter++;
                 }
@@ -219,6 +246,7 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
 
     private void init(Connection conn, int tenantId, String tableName, List<String> columns, int recordsCount,
                       int batchSize) throws AnalyticsException {
+        this.connection = conn;
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.columns = columns;
@@ -233,6 +261,20 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
         } catch (IOException e) {
             throw new AnalyticsException("The table " + tableName + " for tenant " + tenantId +
                     " could not be initialized for reading: " + e.getMessage(), e);
+        }
+    }
+
+    private void deleteObsoleteEntries(List<Delete> obsoleteEntries) throws AnalyticsException {
+        Table table = null;
+        String dataTableName = HBaseUtils.generateTableName(this.tenantId, this.tableName, HBaseAnalyticsDSConstants.TableType.INDEX);
+        try {
+            table = this.connection.getTable(TableName.valueOf(dataTableName));
+            table.delete(obsoleteEntries);
+        } catch (IOException e) {
+            throw new AnalyticsException("Error pruning obsolete entries from the secondary index of table " + tableName + " for tenant " + tenantId + " : "
+                    + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(table);
         }
     }
 
