@@ -32,7 +32,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -121,7 +120,7 @@ public class HBaseUtils {
                         HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
                 byte[] timestamp = CellUtil.cloneValue(tsCell);
                 if (timestamp.length > 0) {
-                    return new Record(new String(rowId, StandardCharsets.UTF_8), tenantId, tableName, values, Bytes.toLong(timestamp));
+                    return new Record(Bytes.toString(rowId), tenantId, tableName, values, Bytes.toLong(timestamp));
                 }
             }
         }

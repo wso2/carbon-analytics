@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.datasource.hbase;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.filter.PageFilter;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -30,7 +31,6 @@ import org.wso2.carbon.analytics.datasource.hbase.util.HBaseRuntimeException;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -107,7 +107,7 @@ public class HBaseRegionSplitIterator implements AnalyticsIterator<Record> {
             if (record != null) {
                 return record;
             } else {
-                throw new HBaseRuntimeException("Invalid data found on row " + new String(rowId, StandardCharsets.UTF_8));
+                throw new HBaseRuntimeException("Invalid data found on row " + Bytes.toString(rowId));
             }
         } catch (AnalyticsException e) {
             this.cleanup();

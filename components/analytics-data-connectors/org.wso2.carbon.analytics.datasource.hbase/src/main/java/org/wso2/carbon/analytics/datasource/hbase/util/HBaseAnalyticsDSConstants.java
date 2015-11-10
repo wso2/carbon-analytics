@@ -17,7 +17,7 @@
 */
 package org.wso2.carbon.analytics.datasource.hbase.util;
 
-import java.nio.charset.StandardCharsets;
+import org.apache.hadoop.hbase.util.Bytes;
 
 /**
  * Class for holding constants required for the HBase Analytics Datasource
@@ -34,11 +34,11 @@ public class HBaseAnalyticsDSConstants {
         INDEX
     }
 
-    public static final byte[] ANALYTICS_DATA_COLUMN_FAMILY_NAME = "carbon-analytics-data".getBytes(StandardCharsets.UTF_8);
-    public static final byte[] ANALYTICS_INDEX_COLUMN_FAMILY_NAME = "carbon-analytics-index".getBytes(StandardCharsets.UTF_8);
+    public static final byte[] ANALYTICS_DATA_COLUMN_FAMILY_NAME = Bytes.toBytes("carbon-analytics-data");
+    public static final byte[] ANALYTICS_INDEX_COLUMN_FAMILY_NAME = Bytes.toBytes("carbon-analytics-index");
 
-    public static final byte[] ANALYTICS_ROWDATA_QUALIFIER_NAME = "row-values".getBytes(StandardCharsets.UTF_8);
-    public static final byte[] ANALYTICS_TS_QUALIFIER_NAME = "timestamp".getBytes(StandardCharsets.UTF_8);
+    public static final byte[] ANALYTICS_ROWDATA_QUALIFIER_NAME = Bytes.toBytes("row-values");
+    public static final byte[] ANALYTICS_TS_QUALIFIER_NAME = Bytes.toBytes("timestamp");
 
     public static final int DEFAULT_QUERY_BATCH_SIZE = 7000;
     public static final String HBASE_ANALYTICS_CONFIG_FILE = "hbase-analytics-config.xml";
