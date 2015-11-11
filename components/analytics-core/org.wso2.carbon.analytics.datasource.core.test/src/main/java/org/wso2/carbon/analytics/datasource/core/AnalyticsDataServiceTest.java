@@ -965,7 +965,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             count += this.service.drillDownSearchCount(tenantId, drillDownRequest);
         }
         end = System.currentTimeMillis();
-        Assert.assertEquals(n * batch * nThreads, (int) count);
+        Assert.assertEquals((int) count, n * batch * nThreads);
         System.out.println("* DrilldownSearchCount Result: " + count + " Time: " + (end - start) + " ms.");
         for (String tableName: tableNames) {
             this.cleanupTable(tenantId, tableName);
