@@ -19,6 +19,8 @@
 package org.wso2.carbon.analytics.datasource.cassandra;
 
 import com.datastax.driver.core.*;
+
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import java.nio.ByteBuffer;
@@ -29,8 +31,6 @@ import java.util.Map;
  * This class contains utility methods related to the Cassandra data connector.
  */
 public class CassandraUtils {
-
-    public static final String DATASOURCE_NAME = "datasource";
 
     public static String[] splitParentChild(String path) {
         if (path.equals("/")) {
@@ -60,6 +60,62 @@ public class CassandraUtils {
         System.out.println(rs.iterator().next().getMap(2, String.class, ByteBuffer.class));
         session.close();        
         cluster.close();
+    }
+    
+    public static String generateCreateKeyspaceQuery(String ks, 
+            Map<String, String> properties) throws AnalyticsException {
+        String className = extractClass(properties);
+        int replicationFactor = extractReplicationFactor(properties);
+        return "CREATE KEYSPACE IF NOT EXISTS " + ks + " WITH REPLICATION = {'class':'" + className + 
+                "', 'replication_factor':" + replicationFactor + "}";
+    }
+    
+    public static String extractDataSourceName(Map<String, String> properties) throws AnalyticsException {
+        String dsName = properties.get(CassandraConstants.DATASOURCE_NAME);
+        if (dsName == null) {
+            throw new AnalyticsException("The Cassandra connector property '" + CassandraConstants.DATASOURCE_NAME +
+                    "' is mandatory");
+        }
+        return dsName;
+    }
+    
+    public static String extractAFSKSName(Map<String, String> properties) {
+        String ks = properties.get(CassandraConstants.KEYSPACE);
+        if (ks == null) {
+            ks = CassandraConstants.DEFAULT_AFS_KS_NAME;
+        }
+        return ks;
+    }
+    
+    public static String extractARSKSName(Map<String, String> properties) {
+        String ks = properties.get(CassandraConstants.KEYSPACE);
+        if (ks == null) {
+            ks = CassandraConstants.DEFAULT_ARS_KS_NAME;
+        }
+        return ks;
+    }
+    
+    public static String extractClass(Map<String, String> properties) {
+        String className = properties.get(CassandraConstants.CLASS);
+        if (className == null) {
+            className = CassandraConstants.DEFAULT_CLASS;
+        }
+        return className;
+    }
+    
+    public static int extractReplicationFactor(Map<String, String> properties) throws AnalyticsException {
+        String rfStr = properties.get(CassandraConstants.REPLICATION_FACTOR);
+        int rf;
+        if (rfStr == null) {
+            rf = CassandraConstants.DEFAULT_REPLICATION_FACTOR;
+        } else {
+            try {
+                rf = Integer.parseInt(rfStr);
+            } catch (NumberFormatException e) {
+                throw new AnalyticsException("Invalid " + CassandraConstants.REPLICATION_FACTOR + ": " + rfStr);
+            }
+        }
+        return rf;
     }
     
 }

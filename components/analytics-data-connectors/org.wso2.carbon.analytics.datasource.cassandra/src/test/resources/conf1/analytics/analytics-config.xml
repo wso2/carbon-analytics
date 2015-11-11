@@ -6,6 +6,7 @@
         <implementation>org.wso2.carbon.analytics.datasource.cassandra.CassandraAnalyticsFileSystem</implementation>
         <properties>
             <property name="datasource">WSO2_ANALYTICS_DS_CASSANDRA</property>
+            <property name="keyspace">AFS_TEST</property>
         </properties>
     </analytics-file-system>
     <!-- Analytics Record Store - properties related to record storage implementation -->
@@ -13,6 +14,7 @@
         <implementation>org.wso2.carbon.analytics.datasource.cassandra.CassandraAnalyticsRecordStore</implementation>
         <properties>
             <property name="datasource">WSO2_ANALYTICS_DS_CASSANDRA</property>
+            <property name="keyspace">ARS_TEST</property>
         </properties>
     </analytics-record-store>
     <!-- The data indexing analyzer implementation -->

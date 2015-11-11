@@ -44,14 +44,14 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
     private PreparedStatement fsDataInsertStmt;
     
     private PreparedStatement fsDataSelectStmt;
+    
+    private String ksName;
 
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
-        String dsName = properties.get(CassandraUtils.DATASOURCE_NAME);
-        if (dsName == null) {
-            throw new AnalyticsException("The Cassandra connector property '" + CassandraUtils.DATASOURCE_NAME +
-                    "' is mandatory");
-        }
+        String dsName = CassandraUtils.extractDataSourceName(properties);
+        this.ksName = CassandraUtils.extractAFSKSName(properties);
+        String ksCreateQuery = CassandraUtils.generateCreateKeyspaceQuery(this.ksName, properties);
         try {
             Cluster cluster = (Cluster) GenericUtils.loadGlobalDataSource(dsName);
             if (cluster == null) {
@@ -62,11 +62,13 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
                 throw new AnalyticsException("Error establishing connection to Cassandra instance: Failed to initialize " +
                         "client from Datasource");
             }
-            this.session.execute("CREATE KEYSPACE IF NOT EXISTS AFS WITH REPLICATION = {'class':'SimpleStrategy', 'replication_factor':3};");
-            this.session.execute("CREATE TABLE IF NOT EXISTS AFS.PATH (path VARCHAR, child VARCHAR, length BIGINT, PRIMARY KEY (path, child))");
-            this.session.execute("CREATE TABLE IF NOT EXISTS AFS.DATA (path VARCHAR, sequence BIGINT, data BLOB, PRIMARY KEY (path, sequence))");
-            this.fsDataInsertStmt = this.session.prepare("INSERT INTO AFS.DATA (path, sequence, data) VALUES (?, ?, ?)");
-            this.fsDataSelectStmt = this.session.prepare("SELECT data FROM AFS.DATA WHERE path = ? and sequence = ?");
+            this.session.execute(ksCreateQuery);
+            this.session.execute("CREATE TABLE IF NOT EXISTS " + this.ksName + 
+                    ".PATH (path VARCHAR, child VARCHAR, length BIGINT, PRIMARY KEY (path, child))");
+            this.session.execute("CREATE TABLE IF NOT EXISTS " + this.ksName + 
+                    ".DATA (path VARCHAR, sequence BIGINT, data BLOB, PRIMARY KEY (path, sequence))");
+            this.fsDataInsertStmt = this.session.prepare("INSERT INTO " + this.ksName + ".DATA (path, sequence, data) VALUES (?, ?, ?)");
+            this.fsDataSelectStmt = this.session.prepare("SELECT data FROM " + this.ksName + ".DATA WHERE path = ? and sequence = ?");
         } catch (DataSourceException e) {
             throw new AnalyticsException("Error establishing connection to Cassandra instance for Analytics File System:" + e.getMessage(), e);
         }
@@ -93,7 +95,7 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
         for (String child : children) {
             this.delete(path + "/" + child);
         }
-        this.session.execute("DELETE FROM AFS.PATH WHERE path = ? and child = ?", 
+        this.session.execute("DELETE FROM " + this.ksName + ".PATH WHERE path = ? and child = ?", 
                 (Object[]) CassandraUtils.splitParentChild(path));
     }
 
@@ -107,7 +109,7 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
     @Override
     public boolean exists(String path) throws IOException {
         path = GenericUtils.normalizePath(path);
-        ResultSet rs = this.session.execute("SELECT child from AFS.PATH WHERE path = ? and child = ?",
+        ResultSet rs = this.session.execute("SELECT child from " + this.ksName + ".PATH WHERE path = ? and child = ?",
                 (Object[]) CassandraUtils.splitParentChild(path));
         return rs.iterator().hasNext();
     }
@@ -115,7 +117,7 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
     @Override
     public long length(String path) throws IOException {
         path = GenericUtils.normalizePath(path);
-        ResultSet rs = this.session.execute("SELECT length from AFS.PATH WHERE path = ? and child = ?",
+        ResultSet rs = this.session.execute("SELECT length from " + this.ksName + ".PATH WHERE path = ? and child = ?",
                 (Object[]) CassandraUtils.splitParentChild(path));
         Row row = rs.one();
         if (row == null) {
@@ -128,14 +130,14 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
     public void setLength(String path, long length) throws IOException {
         path = GenericUtils.normalizePath(path);
         String[] parentChild = CassandraUtils.splitParentChild(path);
-        this.session.execute("UPDATE AFS.PATH SET length = ? WHERE path = ? and child = ?",
+        this.session.execute("UPDATE " + this.ksName + ".PATH SET length = ? WHERE path = ? and child = ?",
                 length, parentChild[0], parentChild[1]);
     }
 
     @Override
     public List<String> list(String path) throws IOException {
         path = GenericUtils.normalizePath(path);
-        ResultSet rs = this.session.execute("SELECT child from AFS.PATH WHERE path = ?", path);
+        ResultSet rs = this.session.execute("SELECT child from " + this.ksName + ".PATH WHERE path = ?", path);
         List<String> result = new ArrayList<String>();
         for (Row row : rs.all()) {
             result.add(row.getString(0));
@@ -154,18 +156,18 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
         if (parentPath != null && !this.exists(parentPath)) {
             this.createFile(parentPath);
         }
-        this.session.execute("INSERT INTO AFS.PATH (path, child) VALUES (?, ?)", 
+        this.session.execute("INSERT INTO " + this.ksName + ".PATH (path, child) VALUES (?, ?)", 
                 (Object[]) CassandraUtils.splitParentChild(path));
     }
 
     @Override
     public void renameFileInDirectory(String dirPath, String nameFrom, String nameTo) throws IOException {
         dirPath = GenericUtils.normalizePath(dirPath);
-        this.session.execute("INSERT INTO AFS.PATH (path, child, length) VALUES (?, ?, ?)", 
+        this.session.execute("INSERT INTO " + this.ksName + ".PATH (path, child, length) VALUES (?, ?, ?)", 
                 dirPath, nameTo, this.length(dirPath + "/" + nameFrom));
-        this.session.execute("DELETE FROM AFS.PATH WHERE path = ? and child = ?",
+        this.session.execute("DELETE FROM " + this.ksName + ".PATH WHERE path = ? and child = ?",
                 dirPath, nameFrom);
-        ResultSet rs = this.session.execute("SELECT sequence, data FROM AFS.DATA WHERE path = ?", 
+        ResultSet rs = this.session.execute("SELECT sequence, data FROM " + this.ksName + ".DATA WHERE path = ?", 
                 dirPath + "/" + nameFrom);
         Iterator<Row> itr = rs.iterator();
         Row row;
@@ -175,7 +177,7 @@ public class CassandraAnalyticsFileSystem implements AnalyticsFileSystem {
             stmt.add(this.fsDataInsertStmt.bind(dirPath + "/" + nameTo, row.getLong(0), row.getBytes(1)));
         }
         session.execute(stmt);
-        this.session.execute("DELETE FROM AFS.DATA WHERE path = ?", dirPath + "/" + nameFrom);
+        this.session.execute("DELETE FROM " + this.ksName + ".DATA WHERE path = ?", dirPath + "/" + nameFrom);
     }
 
     @Override

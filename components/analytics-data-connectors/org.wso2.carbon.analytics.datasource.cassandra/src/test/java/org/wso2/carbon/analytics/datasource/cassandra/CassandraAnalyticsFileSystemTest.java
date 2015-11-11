@@ -42,6 +42,7 @@ public class CassandraAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
         AnalyticsFileSystem afs = new CassandraAnalyticsFileSystem();
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "WSO2_ANALYTICS_DS_CASSANDRA");
+        props.put("keyspace", "AFS_TEST");
         afs.init(props);
         this.init("CassandraAnalyticsDataSource", afs);
     }

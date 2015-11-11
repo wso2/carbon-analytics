@@ -42,6 +42,7 @@ public class CassandraAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest 
         AnalyticsRecordStore ars = new CassandraAnalyticsRecordStore();
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "WSO2_ANALYTICS_DS_CASSANDRA");
+        props.put("keyspace", "ARS_TEST");
         ars.init(props);
         this.init("CassandraAnalyticsDataSource", ars);
     }

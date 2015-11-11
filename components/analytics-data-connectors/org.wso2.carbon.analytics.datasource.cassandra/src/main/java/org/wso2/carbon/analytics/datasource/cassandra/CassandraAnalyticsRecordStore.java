@@ -56,12 +56,6 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
-    private static final int STREAMING_BATCH_SIZE = 1000;
-    
-    private static final int RECORD_INSERT_STATEMENTS_CACHE_SIZE = 5000;
-
-    private static final int TS_MULTIPLIER = (int) Math.pow(2, 30);
-
     private Session session;
     
     private PreparedStatement tableExistsStmt;
@@ -70,16 +64,16 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     
     private PreparedStatement timestampRecordAddStmt;
     
+    private String ksName;
+    
     private ConcurrentMap<Object, Object> recordInsertStmtMap = CacheBuilder.newBuilder().maximumSize(
-            RECORD_INSERT_STATEMENTS_CACHE_SIZE).build().asMap();
+            CassandraConstants.RECORD_INSERT_STATEMENTS_CACHE_SIZE).build().asMap();
 
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
-        String dsName = properties.get(CassandraUtils.DATASOURCE_NAME);
-        if (dsName == null) {
-            throw new AnalyticsException("The property '" + CassandraUtils.DATASOURCE_NAME +
-                    "' is required");
-        }
+        String dsName = CassandraUtils.extractDataSourceName(properties);
+        this.ksName = CassandraUtils.extractARSKSName(properties);
+        String ksCreateQuery = CassandraUtils.generateCreateKeyspaceQuery(this.ksName, properties);
         try {
             Cluster cluster = (Cluster) GenericUtils.loadGlobalDataSource(dsName);
             if (cluster == null) {
@@ -90,9 +84,8 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
                 throw new AnalyticsException("Error establishing connection to Cassandra instance: Failed to initialize " +
                         "client from Datasource");
             }
-            this.session.execute("CREATE KEYSPACE IF NOT EXISTS ARS WITH REPLICATION = "
-                    + "{'class':'SimpleStrategy', 'replication_factor':3};");
-            this.session.execute("CREATE TABLE IF NOT EXISTS ARS.TS (tenantId INT, "
+            this.session.execute(ksCreateQuery);
+            this.session.execute("CREATE TABLE IF NOT EXISTS " + this.ksName + ".TS (tenantId INT, "
                     + "tableName VARCHAR, timestamp VARINT, id VARCHAR, PRIMARY KEY ((tenantId, tableName), timestamp))");
             this.initCommonPreparedStatements();
         } catch (DataSourceException e) {
@@ -103,8 +96,10 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     private void initCommonPreparedStatements() {
         this.tableExistsStmt = this.session.prepare("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE "
                 + "keyspace_name = ? and columnfamily_name = ?");
-        this.timestampRecordDeleteStmt = session.prepare("DELETE FROM ARS.TS WHERE tenantId = ? AND tableName = ? and timestamp = ?");
-        this.timestampRecordAddStmt = session.prepare("INSERT INTO ARS.TS (tenantId, tableName, timestamp, id) VALUES (?, ?, ?, ?)");
+        this.timestampRecordDeleteStmt = session.prepare("DELETE FROM " + 
+                this.ksName + ".TS WHERE tenantId = ? AND tableName = ? and timestamp = ?");
+        this.timestampRecordAddStmt = session.prepare(
+                "INSERT INTO " + this.ksName + ".TS (tenantId, tableName, timestamp, id) VALUES (?, ?, ?, ?)");
     }
     
     private PreparedStatement retrieveRecordInsertStmt(String dataTable) {
@@ -113,7 +108,8 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             synchronized (this.recordInsertStmtMap) {
                 stmt = (PreparedStatement) this.recordInsertStmtMap.get(dataTable);
                 if (stmt == null) {
-                    stmt = session.prepare("INSERT INTO ARS." + dataTable + " (id, timestamp, data) VALUES (?, ?, ?)");
+                    stmt = session.prepare("INSERT INTO " + this.ksName + "." + dataTable + 
+                            " (id, timestamp, data) VALUES (?, ?, ?)");
                     this.recordInsertStmtMap.put(dataTable, stmt);
                 }
             }            
@@ -148,7 +144,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     private List<TokenRangeRecordGroup> calculateTokenRangeGroupForHost(int tenantId, String tableName, 
             List<String> columns, Metadata md, Host host, int partitionsPerHost, int count) {
         String ip = host.getAddress().getHostAddress();
-        List<CassandraTokenRange> trs = this.unwrapTRAndConvertToLocalTR(md.getTokenRanges("ARS", host));
+        List<CassandraTokenRange> trs = this.unwrapTRAndConvertToLocalTR(md.getTokenRanges(this.ksName, host));
         int delta = (int) Math.ceil(trs.size() / (double) partitionsPerHost);
         List<TokenRangeRecordGroup> result = new ArrayList<TokenRangeRecordGroup>(
                 partitionsPerHost);
@@ -170,16 +166,17 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     @Override
     public synchronized void createTable(int tenantId, String tableName) throws AnalyticsException {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
-        this.session.execute("CREATE TABLE IF NOT EXISTS ARS." + dataTable +
+        this.session.execute("CREATE TABLE IF NOT EXISTS " + this.ksName + "." + dataTable +
                 " (id VARCHAR, timestamp BIGINT, data MAP<VARCHAR, BLOB>, PRIMARY KEY (id))");
     }
 
     @Override
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        ResultSet rs = this.session.execute("SELECT id, timestamp FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
-                tenantId, tableName, BigInteger.valueOf(timeFrom).multiply(BigInteger.valueOf(TS_MULTIPLIER)), 
-                BigInteger.valueOf(timeTo).multiply(BigInteger.valueOf(TS_MULTIPLIER)));
+        ResultSet rs = this.session.execute("SELECT id, timestamp FROM " + this.ksName + 
+                ".TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
+                tenantId, tableName, BigInteger.valueOf(timeFrom).multiply(BigInteger.valueOf(CassandraConstants.TS_MULTIPLIER)), 
+                BigInteger.valueOf(timeTo).multiply(BigInteger.valueOf(CassandraConstants.TS_MULTIPLIER)));
         Iterator<Row> tsItr = rs.iterator();
         while (tsItr.hasNext()) {
             this.deleteWithTSItrBatch(tenantId, tableName, tsItr);
@@ -202,13 +199,13 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         List<String> ids = new ArrayList<String>();
         BatchStatement stmt = new BatchStatement();
         Row row;
-        for (int i = 0; i < STREAMING_BATCH_SIZE && itr.hasNext(); i++) {
+        for (int i = 0; i < CassandraConstants.STREAMING_BATCH_SIZE && itr.hasNext(); i++) {
             row = itr.next();
             stmt.add(this.timestampRecordDeleteStmt.bind(tenantId, tableName, row.getVarint(1)));
             ids.add(row.getString(0));
         }
         this.session.execute(stmt);
-        this.session.execute("DELETE FROM ARS." + dataTable + " WHERE id IN ?", ids);
+        this.session.execute("DELETE FROM " + this.ksName + "." + dataTable + " WHERE id IN ?", ids);
     }
     
     @Override
@@ -216,11 +213,12 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             throws AnalyticsException, AnalyticsTableNotAvailableException {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
         this.deleteTSEntries(tenantId, tableName, dataTable, ids);
-        this.session.execute("DELETE FROM ARS." + dataTable + " WHERE id IN ?", ids);
+        this.session.execute("DELETE FROM " + this.ksName + "." + dataTable + " WHERE id IN ?", ids);
     }
     
     private void deleteTSEntries(int tenantId, String tableName, String dataTable, List<String> recordIds) {
-        ResultSet rs = this.session.execute("SELECT id, timestamp FROM ARS." + dataTable + " WHERE id IN ?", recordIds);
+        ResultSet rs = this.session.execute("SELECT id, timestamp FROM " + this.ksName + "." + dataTable + 
+                " WHERE id IN ?", recordIds);
         List<BigInteger> tsTableTimestamps = this.extractTSTableTimestampList(rs);        
         BatchStatement stmt = new BatchStatement();
         for (BigInteger ts : tsTableTimestamps) {
@@ -232,8 +230,8 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     @Override
     public synchronized void deleteTable(int tenantId, String tableName) throws AnalyticsException {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
-        this.session.execute("DELETE FROM ARS.TS WHERE tenantId = ? AND tableName = ?", tenantId, tableName);
-        this.session.execute("DROP TABLE IF EXISTS ARS." + dataTable);
+        this.session.execute("DELETE FROM " + this.ksName + ".TS WHERE tenantId = ? AND tableName = ?", tenantId, tableName);
+        this.session.execute("DROP TABLE IF EXISTS " + this.ksName + "." + dataTable);
     }
 
     @Override
@@ -301,23 +299,23 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         int count = recordGroup.getCount();
         if (recordGroup.getTimeFrom() == Long.MIN_VALUE && recordGroup.getTimeTo() == Long.MAX_VALUE) {
             if (count == -1) {
-                query = "SELECT id, timestamp, data FROM ARS." + dataTable;
+                query = "SELECT id, timestamp, data FROM " + this.ksName + "." + dataTable;
             } else {
-                query = "SELECT id, timestamp, data FROM ARS." + dataTable + " LIMIT " + count;
+                query = "SELECT id, timestamp, data FROM " + this.ksName + "." + dataTable + " LIMIT " + count;
             }
             rs = this.session.execute(query);
             return this.lookupRecordsByDirectRS(tenantId, tableName, rs, columns);
         } else {
             if (count == -1) {
-                query = "SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? "
+                query = "SELECT id FROM " + this.ksName + ".TS WHERE tenantId = ? AND tableName = ? "
                         + "AND timestamp >= ? AND timestamp < ?";
             } else {
-                query = "SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? "
+                query = "SELECT id FROM " + this.ksName + ".TS WHERE tenantId = ? AND tableName = ? "
                         + "AND timestamp >= ? AND timestamp < ? LIMIT " + count;
             }
             ResultSet tsrs = this.session.execute(query, tenantId, tableName,
-                    BigInteger.valueOf(recordGroup.getTimeFrom()).multiply(BigInteger.valueOf(TS_MULTIPLIER)),
-                    BigInteger.valueOf(recordGroup.getTimeTo()).multiply(BigInteger.valueOf(TS_MULTIPLIER)));
+                    BigInteger.valueOf(recordGroup.getTimeFrom()).multiply(BigInteger.valueOf(CassandraConstants.TS_MULTIPLIER)),
+                    BigInteger.valueOf(recordGroup.getTimeTo()).multiply(BigInteger.valueOf(CassandraConstants.TS_MULTIPLIER)));
             return new CassandraRecordIDDataIterator(tenantId, tableName, tsrs.iterator(), columns);
         }
     }
@@ -329,7 +327,8 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     
     private AnalyticsIterator<Record> lookupRecordsByIds(int tenantId, String tableName, List<String> ids, List<String> columns) {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
-        ResultSet rs = this.session.execute("SELECT id, timestamp, data FROM ARS." + dataTable + " WHERE id IN ?", ids);
+        ResultSet rs = this.session.execute("SELECT id, timestamp, data FROM " + this.ksName + 
+                "." + dataTable + " WHERE id IN ?", ids);
         return this.lookupRecordsByDirectRS(tenantId, tableName, rs, columns);
     }
     
@@ -375,8 +374,8 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     private BigInteger toTSTableTimestamp(long timestamp, String id) {
-        return (BigInteger.valueOf(timestamp).multiply(BigInteger.valueOf(TS_MULTIPLIER))).add(
-                BigInteger.valueOf(Math.abs(id.hashCode() % TS_MULTIPLIER)));
+        return (BigInteger.valueOf(timestamp).multiply(BigInteger.valueOf(CassandraConstants.TS_MULTIPLIER))).add(
+                BigInteger.valueOf(Math.abs(id.hashCode() % CassandraConstants.TS_MULTIPLIER)));
     }
     
     private List<String> extractRecordIds(List<Record> batch) {
@@ -425,7 +424,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
     private boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);  
-        Statement stmt = this.tableExistsStmt.bind("ars", dataTable.toLowerCase());
+        Statement stmt = this.tableExistsStmt.bind(this.ksName.toLowerCase(), dataTable.toLowerCase());
         ResultSet rs = this.session.execute(stmt);
         return rs.iterator().hasNext();
     }
@@ -464,10 +463,10 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             CassandraTokenRange tokenRange = this.tokenRangesItr.next();
             String query;
             if (this.count == -1) {
-                query = "SELECT id, timestamp, data FROM ARS." + dataTable + 
+                query = "SELECT id, timestamp, data FROM " + ksName + "." + dataTable + 
                         " WHERE token(id) > ? and token(id) <= ?";
             } else {
-                query = "SELECT id, timestamp, data FROM ARS." + dataTable + 
+                query = "SELECT id, timestamp, data FROM " + ksName + "." + dataTable + 
                         " WHERE token(id) > ? and token(id) <= ? LIMIT " + this.count;
             }
             ResultSet rs = session.execute(query, tokenRange.getStart(), tokenRange.getEnd());
@@ -540,14 +539,14 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         }
         
         private void populateBatch() {
-            List<String> ids = new ArrayList<String>(STREAMING_BATCH_SIZE);
+            List<String> ids = new ArrayList<String>(CassandraConstants.STREAMING_BATCH_SIZE);
             Row row;
-            for (int i = 0; i < STREAMING_BATCH_SIZE && this.resultSetItr.hasNext(); i++) {
+            for (int i = 0; i < CassandraConstants.STREAMING_BATCH_SIZE && this.resultSetItr.hasNext(); i++) {
                 row = this.resultSetItr.next();
                 ids.add(row.getString(0));
             }
             String dataTable = generateTargetDataTableName(this.tenantId, this.tableName);
-            ResultSet rs = session.execute("SELECT id, timestamp, data FROM ARS." + dataTable + " WHERE id IN ?", ids);
+            ResultSet rs = session.execute("SELECT id, timestamp, data FROM " + ksName + "." + dataTable + " WHERE id IN ?", ids);
             this.dataItr = new CassandraDirectDataIterator(this.tenantId, this.tableName, rs.iterator(), this.columns);
         }
         

@@ -945,7 +945,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             drillDownRequest.setRecordCount(75);
             drillDownRequest.setQuery("log:exception");
             drillDownRequest.setScoreFunction("_weight");
-            List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
+            List<String> path = Arrays.asList(new String[] { "SomeLocation", "SomeInnerLocation" });
             drillDownRequest.addCategoryPath("location", path);
             results.addAll(this.service.drillDownSearch(tenantId, drillDownRequest));
         }
@@ -960,12 +960,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             drillDownRequest.setRecordStartIndex(0);
             drillDownRequest.setRecordCount(75);
             drillDownRequest.setQuery("log:exception");
-            List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
+            List<String> path = Arrays.asList(new String[] { "SomeLocation", "SomeInnerLocation" });
             drillDownRequest.addCategoryPath("location", path);
             count += this.service.drillDownSearchCount(tenantId, drillDownRequest);
         }
         end = System.currentTimeMillis();
-        Assert.assertTrue(count == n * batch * nThreads);
+        Assert.assertEquals(n * batch * nThreads, (int) count);
         System.out.println("* DrilldownSearchCount Result: " + count + " Time: " + (end - start) + " ms.");
         for (String tableName: tableNames) {
             this.cleanupTable(tenantId, tableName);
