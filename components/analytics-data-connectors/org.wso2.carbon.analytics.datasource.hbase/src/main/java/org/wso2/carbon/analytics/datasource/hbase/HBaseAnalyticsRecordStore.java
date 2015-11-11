@@ -17,6 +17,8 @@
 */
 package org.wso2.carbon.analytics.datasource.hbase;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -385,11 +387,10 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException {
         int batchSize = this.queryConfig.getBatchSize();
         int batchCounter = 0;
-        List<byte[]> recordIds = new ArrayList<>();
+        ListMultimap<String, Long> recordsWithRef = ArrayListMultimap.create();
         List<byte[]> timestamps = new ArrayList<>();
         String formattedTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.INDEX);
         Table indexTable = null;
-        Cell[] cells;
         Scan indexScan = new Scan();
         if (timeFrom >= 0L) {
             indexScan.setStartRow(HBaseUtils.encodeLong(timeFrom));
@@ -403,21 +404,31 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             indexTable = this.conn.getTable(TableName.valueOf(formattedTableName));
             resultScanner = indexTable.getScanner(indexScan);
             for (Result rowResult : resultScanner) {
-                cells = rowResult.rawCells();
+                /* Using Result.rawCells() because the descriptors in the secondary index are never known in advance */
+                Cell[] cells = rowResult.rawCells();
                 for (Cell cell : cells) {
-                    recordIds.add(CellUtil.cloneValue(cell));
-                    batchCounter++;
+                    if (cell != null) {
+                        /* recordId -> the record ID which corresponds to the index lookup */
+                        String recordId = Bytes.toString(CellUtil.cloneValue(cell));
+                        /* timeStampRef -> what actual index entry was used to retrieve this particular record ID */
+                        Long timeStampRef = Bytes.toLong(rowResult.getRow());
+                        recordsWithRef.put(recordId, timeStampRef);
+                        batchCounter++;
+                    }
                 }
                 timestamps.add(rowResult.getRow());
                 if (batchCounter >= batchSize) {
                     batchCounter = 0;
-                    this.deleteRows(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA, recordIds);
+                    /* Delete only the records which actually have their timestamp matching the retrieved
+                    secondary index entries */
+                    this.deleteDataRows(tenantId, tableName, recordsWithRef);
+                    /* Delete ALL retrieved secondary index entries, whether backed by actual records or not */
                     this.deleteRows(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.INDEX, timestamps);
-                    recordIds.clear();
+                    recordsWithRef.clear();
                     timestamps.clear();
                 }
             }
-            this.deleteRows(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA, recordIds);
+            this.deleteDataRows(tenantId, tableName, recordsWithRef);
             this.deleteRows(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.INDEX, timestamps);
         } catch (IOException e) {
             throw new AnalyticsException("Index for table " + tableName + " could not be read for deletion: " + e.getMessage(), e);
@@ -514,6 +525,45 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                     + e.getMessage(), e);
         } finally {
             GenericUtils.closeQuietly(table);
+        }
+    }
+
+    private void deleteDataRows(int tenantId, String tableName, ListMultimap<String, Long> recordsWithRef) throws AnalyticsException {
+        Table dataTable = null;
+        List<Get> gets = new ArrayList<>();
+        List<Delete> deletes = new ArrayList<>();
+        String dataTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA);
+        try {
+            dataTable = this.conn.getTable(TableName.valueOf(dataTableName));
+            /* For all records set for termination, check if they really do have their timestamps within the given range
+             through a GET operation (i.e. kick down doors and check if any of them are really Sarah Connor) */
+            for (String recordId : recordsWithRef.keySet()) {
+                gets.add(new Get(Bytes.toBytes(recordId)).addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                        HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME));
+            }
+
+            Result[] results = dataTable.get(gets);
+            for (Result res : results) {
+                if (res.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                        HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME)) {
+                    Cell dataCell = res.getColumnLatestCell(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
+                    byte[] originalTimestamp = CellUtil.cloneValue(dataCell);
+                    if (originalTimestamp.length > 0) {
+                        List<Long> candidateIndexEntries = recordsWithRef.get(Bytes.toString(res.getRow()));
+                        if (candidateIndexEntries.contains(Bytes.toLong(originalTimestamp))) {
+                            deletes.add(new Delete(res.getRow()));
+                        }
+                    }
+                }
+            }
+            /* Cyberdyne Systems Model 101 Series 800 is GO */
+            dataTable.delete(deletes);
+        } catch (IOException e) {
+            throw new AnalyticsException("Error deleting records from " + tableName + " for tenant " + tenantId + " : "
+                    + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(dataTable);
         }
     }
 
