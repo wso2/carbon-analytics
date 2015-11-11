@@ -50,7 +50,6 @@ public class DashboardDeployer implements AppDeploymentHandler {
     @Override
     public void deployArtifacts(CarbonApplication carbonApp, AxisConfiguration axisConfig)
             throws DeploymentException {
-
         checkForTenantDirectory();
         ApplicationConfiguration appConfig = carbonApp.getAppConfig();
         List<Artifact.Dependency> deps = appConfig.getApplicationArtifact().getDependencies();
@@ -65,39 +64,34 @@ public class DashboardDeployer implements AppDeploymentHandler {
 
     /**
      *  If tenant domain is foo.com, this method checks for a directory named foo.com inside /portal/store directory.
-     *  If not found, this will create foo.com, foo.com/gadget, foo.com/layout and foo.com/widget directories too
+     *  If not found, this will create foo.com, foo.com/gadget, foo.com/layout and foo.com/widget directories too.
      */
-    private void checkForTenantDirectory() throws DeploymentException{
+    private void checkForTenantDirectory() throws DeploymentException {
         String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         String carbonRepository = CarbonUtils.getCarbonRepository();
-        String path = new StringBuilder(carbonRepository)
-                .append("jaggeryapps").append(File.separator)
-                .append(DashboardConstants.APP_NAME).append(File.separator)
-                .append("store").append(File.separator)
+        String path = new StringBuilder(carbonRepository).append("jaggeryapps").append(File.separator)
+                .append(DashboardConstants.APP_NAME).append(File.separator).append("store").append(File.separator)
                 .append(tenantDomain).toString();
-
         File tenantDir = new File(path.toString());
-        if(!tenantDir.exists()) {
+        if (!tenantDir.exists()) {
             log.info("Creating directory " + tenantDomain + " for tenant related dashboard artifacts");
             try {
                 tenantDir.mkdir();
-                //create gadgte, layout and widget directories for this tenant
+                //create gadget, layout and widget directories for this tenant
                 File gadgetDir = new File(path + File.separator + "gadget");
-                if(!gadgetDir.exists()) {
+                if (!gadgetDir.exists()) {
                     gadgetDir.mkdir();
                 }
                 File layoutDir = new File(path + File.separator + "layout");
                 if (!layoutDir.exists()) {
-                    String carbonLayoutDir= new StringBuilder(carbonRepository)
-                            .append("jaggeryapps").append(File.separator)
-                            .append(DashboardConstants.APP_NAME).append(File.separator)
-                            .append("store").append(File.separator)
-                            .append("carbon.super").append(File.separator)
+                    String carbonLayoutDir = new StringBuilder(carbonRepository).append("jaggeryapps")
+                            .append(File.separator).append(DashboardConstants.APP_NAME).append(File.separator)
+                            .append("store").append(File.separator).append("carbon.super").append(File.separator)
                             .append("layout").toString();
-                    FileUtils.copyDirectory(new File(carbonLayoutDir),new File(path));
+                    FileUtils.copyDirectory(new File(carbonLayoutDir), new File(path));
                 }
                 File widgetDir = new File(path + File.separator + "widget");
-                if(!widgetDir.exists()) {
+                if (!widgetDir.exists()) {
                     widgetDir.mkdir();
                 }
                 log.info("Created gadget,layout and widget directories for tenant [" + tenantDomain + "]");
@@ -121,11 +115,11 @@ public class DashboardDeployer implements AppDeploymentHandler {
                     try {
                         if (fileName.endsWith(DashboardConstants.DASHBOARD_EXTENSION)) {
                             String dashboardDefn = DeploymentUtil.readFile(file);
-                            String resourceName = fileName.substring(0,
-                                    fileName.lastIndexOf(DashboardConstants.DASHBOARD_EXTENSION));
-                            DeploymentUtil.createRegistryResource(DashboardConstants.DASHBOARDS_RESOURCE_PATH
-                                            + resourceName,
-                                    dashboardDefn);
+                            String resourceName = fileName
+                                    .substring(0, fileName.lastIndexOf(DashboardConstants.DASHBOARD_EXTENSION));
+                            DeploymentUtil
+                                    .createRegistryResource(DashboardConstants.DASHBOARDS_RESOURCE_PATH + resourceName,
+                                            dashboardDefn);
                             log.info("Dashboard definition [" + resourceName + "] has been created.");
                         }
                     } catch (IOException e) {
@@ -143,8 +137,8 @@ public class DashboardDeployer implements AppDeploymentHandler {
                             String storePath = getArtifactPath("gadget");
                             File destination = new File(storePath + file.getName());
                             DeploymentUtil.copyFolder(file, destination);
-                            log.info("Gadget directory [" + file.getName() + "] has been copied to path "
-                                    + destination.getAbsolutePath());
+                            log.info("Gadget directory [" + file.getName() + "] has been copied to path " + destination
+                                    .getAbsolutePath());
                         }
                     } catch (IOException e) {
                         String errorMsg = "Error while reading from the file : " + file.getAbsolutePath();
@@ -157,8 +151,8 @@ public class DashboardDeployer implements AppDeploymentHandler {
                             String storePath = getArtifactPath("layout");
                             File destination = new File(storePath + file.getName());
                             DeploymentUtil.copyFolder(file, destination);
-                            log.info("Layout directory [" + file.getName() + "] has been copied to path "
-                                    + destination.getAbsolutePath());
+                            log.info("Layout directory [" + file.getName() + "] has been copied to path " + destination
+                                    .getAbsolutePath());
                         }
                     } catch (IOException e) {
                         String errorMsg = "Error while reading from the file : " + file.getAbsolutePath();
@@ -166,7 +160,6 @@ public class DashboardDeployer implements AppDeploymentHandler {
                         throw new DashboardDeploymentException(errorMsg, e);
                     }
                 }
-
             }
         }
     }
@@ -174,8 +167,7 @@ public class DashboardDeployer implements AppDeploymentHandler {
     @Override
     public void undeployArtifacts(CarbonApplication carbonApplication, AxisConfiguration axisConfiguration)
             throws DeploymentException {
-        List<Artifact.Dependency> deps = carbonApplication.getAppConfig().getApplicationArtifact()
-                .getDependencies();
+        List<Artifact.Dependency> deps = carbonApplication.getAppConfig().getApplicationArtifact().getDependencies();
         List<Artifact> artifacts = new ArrayList<Artifact>();
         for (Artifact.Dependency dep : deps) {
             Artifact artifact = dep.getArtifact();
@@ -195,8 +187,8 @@ public class DashboardDeployer implements AppDeploymentHandler {
             if (DashboardConstants.DASHBOARD_ARTIFACT_TYPE.equals(artifact.getType())) {
                 try {
                     if (fileName.endsWith(DashboardConstants.DASHBOARD_EXTENSION)) {
-                        String resourcePath = DashboardConstants.DASHBOARDS_RESOURCE_PATH
-                                + fileName.substring(0, fileName.lastIndexOf(DashboardConstants.DASHBOARD_EXTENSION));
+                        String resourcePath = DashboardConstants.DASHBOARDS_RESOURCE_PATH + fileName
+                                .substring(0, fileName.lastIndexOf(DashboardConstants.DASHBOARD_EXTENSION));
                         try {
                             DeploymentUtil.removeRegistryResource(resourcePath);
                         } catch (RegistryException e) {
@@ -209,29 +201,45 @@ public class DashboardDeployer implements AppDeploymentHandler {
                     log.error("Error occurred while trying to undeploy : " + artifact.getName());
                 }
             } else if (DashboardConstants.GADGET_ARTIFACT_TYPE.equals(artifact.getType())) {
-                file.delete();
+                deleteFile(file);
                 log.info("Artifact [" + file.getName() + "] has been deleted from gadgets directory.");
             } else if (DashboardConstants.LAYOUT_ARTIFACT_TYPE.equals(artifact.getType())) {
-                file.delete();
+                deleteFile(file);
                 log.info("Artifact [" + file.getName() + "] has been deleted from layouts directory.");
             }
         }
     }
-
     /**
      * Returns the absolute path for the artifact store location.
      *
-     * @param artifactName
-     * @return
+     * @param artifactName name of the artifact.
+     * @return  path of the artifact
      */
     protected String getArtifactPath(String artifactName) {
         String carbonRepository = CarbonUtils.getCarbonRepository();
         StringBuilder sb = new StringBuilder(carbonRepository);
-        sb.append("jaggeryapps").append(File.separator)
-                .append(DashboardConstants.APP_NAME).append(File.separator)
+        sb.append("jaggeryapps").append(File.separator).append(DashboardConstants.APP_NAME).append(File.separator)
                 .append("store").append(File.separator)
                 .append(CarbonContext.getThreadLocalCarbonContext().getTenantDomain()).append(File.separator)
                 .append(artifactName).append(File.separator);
         return sb.toString();
+    }
+
+    private void deleteFile(File file) {
+        if (file.isDirectory() && file.exists()) {
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (int i = 0; i < files.length; i++) {
+                    if (files[i].isDirectory()) {
+                        deleteFile(files[i]);
+                    } else {
+                        files[i].delete();
+                    }
+                }
+            }
+        }
+        if (file.exists()) {
+            file.delete();
+        }
     }
 }
