@@ -29,6 +29,8 @@ import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.TokenRange;
 import com.google.common.cache.CacheBuilder;
 
+import org.apache.commons.collections.MultiHashMap;
+import org.apache.commons.collections.MultiMap;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -54,6 +56,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * This class represents the Cassandra implementation of {@link AnalyticsRecordStore}.
  */
+@SuppressWarnings("deprecation")
 public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
     private Session session;
@@ -212,14 +215,18 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     public void delete(int tenantId, String tableName, List<String> ids) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
-        this.deleteTSEntries(tenantId, tableName, dataTable, ids);
+        this.deleteTSEntriesOfRecords(tenantId, tableName, dataTable, ids);
         this.session.execute("DELETE FROM " + this.ksName + "." + dataTable + " WHERE id IN ?", ids);
     }
     
-    private void deleteTSEntries(int tenantId, String tableName, String dataTable, List<String> recordIds) {
+    private void deleteTSEntriesOfRecords(int tenantId, String tableName, String dataTable, List<String> recordIds) {
         ResultSet rs = this.session.execute("SELECT id, timestamp FROM " + this.ksName + "." + dataTable + 
                 " WHERE id IN ?", recordIds);
         List<BigInteger> tsTableTimestamps = this.extractTSTableTimestampList(rs);        
+        this.deleteTSEntries(tenantId, tableName, tsTableTimestamps);
+    }
+    
+    private void deleteTSEntries(int tenantId, String tableName, Collection<BigInteger> tsTableTimestamps) {
         BatchStatement stmt = new BatchStatement();
         for (BigInteger ts : tsTableTimestamps) {
             stmt.add(this.timestampRecordDeleteStmt.bind(tenantId, tableName, ts));
@@ -307,16 +314,16 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             return this.lookupRecordsByDirectRS(tenantId, tableName, rs, columns);
         } else {
             if (count == -1) {
-                query = "SELECT id FROM " + this.ksName + ".TS WHERE tenantId = ? AND tableName = ? "
+                query = "SELECT id, timestamp FROM " + this.ksName + ".TS WHERE tenantId = ? AND tableName = ? "
                         + "AND timestamp >= ? AND timestamp < ?";
             } else {
-                query = "SELECT id FROM " + this.ksName + ".TS WHERE tenantId = ? AND tableName = ? "
+                query = "SELECT id, timestamp FROM " + this.ksName + ".TS WHERE tenantId = ? AND tableName = ? "
                         + "AND timestamp >= ? AND timestamp < ? LIMIT " + count;
             }
             ResultSet tsrs = this.session.execute(query, tenantId, tableName,
                     BigInteger.valueOf(recordGroup.getTimeFrom()).multiply(BigInteger.valueOf(CassandraConstants.TS_MULTIPLIER)),
                     BigInteger.valueOf(recordGroup.getTimeTo()).multiply(BigInteger.valueOf(CassandraConstants.TS_MULTIPLIER)));
-            return new CassandraRecordIDDataIterator(tenantId, tableName, tsrs.iterator(), columns);
+            return new CassandraRecordTSBasedIDDataIterator(tenantId, tableName, tsrs.iterator(), columns);
         }
     }
     
@@ -378,21 +385,13 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
                 BigInteger.valueOf(Math.abs(id.hashCode() % CassandraConstants.TS_MULTIPLIER)));
     }
     
-    private List<String> extractRecordIds(List<Record> batch) {
-        List<String> result = new ArrayList<String>(batch.size());
-        for (Record record : batch) {
-            result.add(record.getId());
-        }
-        return result;
-    }
-    
     private void addBatch(List<Record> batch) throws AnalyticsException, AnalyticsTableNotAvailableException {
         Record firstRecord = batch.get(0);
         int tenantId = firstRecord.getTenantId();
         String tableName = firstRecord.getTableName();
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
         try {
-            this.deleteTSEntries(tenantId, tableName, dataTable, this.extractRecordIds(batch));
+            //this.deleteTSEntries(tenantId, tableName, dataTable, this.extractRecordIds(batch));
             this.addRawRecordBatch(dataTable, batch);
             this.addTSRecordBatch(tenantId, tableName, batch);
         } catch (Exception e) {
@@ -521,15 +520,15 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
      */
     public class CassandraRecordIDDataIterator implements AnalyticsIterator<Record> {
 
-        private int tenantId;
+        protected int tenantId;
         
-        private String tableName;
+        protected String tableName;
                 
-        private List<String> columns;
+        protected List<String> columns;
         
-        private Iterator<Row> resultSetItr;
+        protected Iterator<Row> resultSetItr;
         
-        private AnalyticsIterator<Record> dataItr;
+        protected AnalyticsIterator<Record> dataItr;
         
         public CassandraRecordIDDataIterator(int tenantId, String tableName, Iterator<Row> resultSetItr, List<String> columns) {
             this.tenantId = tenantId;
@@ -538,7 +537,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             this.resultSetItr = resultSetItr;
         }
         
-        private void populateBatch() {
+        protected void populateBatch() {
             List<String> ids = new ArrayList<String>(CassandraConstants.STREAMING_BATCH_SIZE);
             Row row;
             for (int i = 0; i < CassandraConstants.STREAMING_BATCH_SIZE && this.resultSetItr.hasNext(); i++) {
@@ -589,14 +588,40 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     /**
+     * {@link CassandraRecordIDDataIterator} based variant for considering indexed timestamp values
+     * also for doing read-repair for duplicated timestamps in the index.
+     */
+    public class CassandraRecordTSBasedIDDataIterator extends CassandraRecordIDDataIterator {
+        
+        public CassandraRecordTSBasedIDDataIterator(int tenantId, String tableName, 
+                Iterator<Row> resultSetItr, List<String> columns) {
+            super(tenantId, tableName, resultSetItr, columns);
+        }
+        
+        @Override
+        protected void populateBatch() {
+            MultiMap tsIds = new MultiHashMap(CassandraConstants.STREAMING_BATCH_SIZE);
+            Row row;
+            for (int i = 0; i < CassandraConstants.STREAMING_BATCH_SIZE && this.resultSetItr.hasNext(); i++) {
+                row = this.resultSetItr.next();
+                tsIds.put(row.getString(0), row.getVarint(1));
+            }
+            String dataTable = generateTargetDataTableName(this.tenantId, this.tableName);
+            ResultSet rs = session.execute("SELECT id, timestamp, data FROM " + ksName + "." + dataTable + " WHERE id IN ?", tsIds.keySet());
+            this.dataItr = new CassandraTSValidatingDirectDataIterator(this.tenantId, this.tableName, rs.iterator(), this.columns, tsIds);
+        }
+        
+    }
+    
+    /**
      * Cassandra data {@link AnalyticsIterator} implementation for streaming, which reads data
      * directly from the data table.
      */
     public class CassandraDirectDataIterator implements AnalyticsIterator<Record> {
 
-        private int tenantId;
+        protected int tenantId;
         
-        private String tableName;
+        protected String tableName;
         
         private Set<String> columns;
         
@@ -651,6 +676,68 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         @Override
         public void close() throws IOException {
             /** nothing to do **/
+        }
+        
+    }
+    
+    /**
+     * {@link CassandraDirectDataIterator} based iterator which does timestamp based
+     * read-repair operations for data records lookups.
+     */
+    public class CassandraTSValidatingDirectDataIterator extends CassandraDirectDataIterator {
+        
+        private MultiMap tsIds;
+        
+        private Record current;
+        
+        public CassandraTSValidatingDirectDataIterator(int tenantId, String tableName, Iterator<Row> resultSetItr, 
+                List<String> columns, MultiMap tsIds) {
+            super (tenantId, tableName, resultSetItr, columns);
+            this.tsIds = tsIds;
+        }
+        
+        @Override
+        public boolean hasNext() {
+            if (this.current != null) {
+                return true;
+            }
+            while (super.hasNext()) {
+                this.current = this.next();
+                if (this.current != null) {
+                    break;
+                }
+            }
+            return this.current != null;
+        }
+        
+        @Override
+        public Record next() {
+            if (this.current != null) {
+                Record result = this.current;
+                this.current = null;
+                return result;
+            } else {
+                return this.validateRecordAndReturn(super.next());
+            }
+        }
+        
+        private Record validateRecordAndReturn(Record record) {
+            BigInteger targetTS = toTSTableTimestamp(record.getTimestamp(), record.getId());
+            @SuppressWarnings("unchecked")
+            Collection<BigInteger> tss = (Collection<BigInteger>) tsIds.get(record.getId());
+            boolean removed = tss.remove(targetTS);
+            if (!tss.isEmpty()) {
+                this.removeTSEntries(tss);
+            }
+            if (removed) {
+                return record;
+            } else {
+                return null;
+            }
+        }
+        
+        private void removeTSEntries(Collection<BigInteger> tss) {
+            deleteTSEntries(this.tenantId, this.tableName, tss);
         }
         
     }
