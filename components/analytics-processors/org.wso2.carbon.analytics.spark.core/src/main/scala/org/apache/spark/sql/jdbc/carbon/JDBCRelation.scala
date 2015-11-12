@@ -165,6 +165,7 @@ case class JDBCRelation(
   override def insert(data: DataFrame, overwrite: Boolean): Unit = {
     try {
       val conn = GenericUtils.loadGlobalDataSource(dataSource).asInstanceOf[DataSource].getConnection
+      conn.setAutoCommit(false)
 
       try {
         var tableExists = JdbcUtils.tableExists(conn, tableName)
