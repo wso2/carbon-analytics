@@ -208,8 +208,11 @@ public class DataPublisherUtil {
             for (int j = 1; j < receiverGroup.length; j++) {
                 authURLSet += DataPublisherUtil.getDefaultAuthUrl(receiverGroup[j].toString());
                 if (j != receiverGroup.length - 1) {
-                    if (failOver) authURLSet += DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR;
-                    else authURLSet += DataEndpointConstants.LB_URL_GROUP_SEPARATOR;
+                    if (failOver) {
+                        authURLSet += DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR;
+                    } else {
+                        authURLSet += DataEndpointConstants.LB_URL_GROUP_SEPARATOR;
+                    }
                 }
             }
             authURLSet += "}";
