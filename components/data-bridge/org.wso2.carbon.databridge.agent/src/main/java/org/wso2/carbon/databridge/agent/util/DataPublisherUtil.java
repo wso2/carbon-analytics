@@ -20,6 +20,7 @@ package org.wso2.carbon.databridge.agent.util;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
+
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -151,8 +152,11 @@ public class DataPublisherUtil {
         for (int i = 1; i < urlGroup.length; i++) {
             urlSet += urlGroup[i];
             if (i != urlGroup.length - 1) {
-                if (isFailOver) urlSet += DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR;
-                else urlSet += DataEndpointConstants.LB_URL_GROUP_SEPARATOR;
+                if (isFailOver) {
+                    urlSet += DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR;
+                } else {
+                    urlSet += DataEndpointConstants.LB_URL_GROUP_SEPARATOR;
+                }
             }
         }
         return urlSet;
