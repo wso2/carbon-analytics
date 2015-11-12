@@ -151,8 +151,11 @@ public class DataPublisherUtil {
         for (int i = 1; i < urlGroup.length; i++) {
             urlSet += urlGroup[i];
             if (i != urlGroup.length - 1) {
-                if (isFailOver) urlSet += DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR;
-                else urlSet += DataEndpointConstants.LB_URL_GROUP_SEPARATOR;
+                if (isFailOver) {
+                    urlSet += DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR;
+                } else {
+                    urlSet += DataEndpointConstants.LB_URL_GROUP_SEPARATOR;
+                }
             }
         }
         return urlSet;
@@ -204,8 +207,11 @@ public class DataPublisherUtil {
             for (int j = 1; j < receiverGroup.length; j++) {
                 authURLSet += DataPublisherUtil.getDefaultAuthUrl(receiverGroup[j].toString());
                 if (j != receiverGroup.length - 1) {
-                    if (failOver) authURLSet += DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR;
-                    else authURLSet += DataEndpointConstants.LB_URL_GROUP_SEPARATOR;
+                    if (failOver) {
+                        authURLSet += DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR;
+                    } else {
+                        authURLSet += DataEndpointConstants.LB_URL_GROUP_SEPARATOR;
+                    }
                 }
             }
             authURLSet += "}";
