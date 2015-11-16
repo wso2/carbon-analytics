@@ -618,7 +618,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         
         long start = System.currentTimeMillis();
         this.writeIndexRecords(tenantId, tableName, n, batch);
-        this.service.waitForIndexing(-1);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         long end = System.currentTimeMillis();
         System.out.println("* Records: " + (n * batch));
         System.out.println("* Write Time: " + (end - start) + " ms.");
