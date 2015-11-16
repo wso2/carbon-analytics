@@ -27,7 +27,6 @@
     EventReceiverAdminServiceStub stub = EventReceiverUIUtils.getEventReceiverAdminService(config, session, request);
     String eventReceiverName = request.getParameter("eventReceiverName");
     String msg = null;
-
     EventReceiverConfigurationInfoDto[] eventReceiverConfigurationInfoDtoArray = null;
     if (stub != null) {
         try {
@@ -40,7 +39,6 @@
             return;
         }
     }
-
     if (eventReceiverConfigurationInfoDtoArray != null) {
         for (EventReceiverConfigurationInfoDto eventReceiverConfiguration : eventReceiverConfigurationInfoDtoArray) {
             if (eventReceiverConfiguration.getEventReceiverName().equals(eventReceiverName)) {
@@ -49,7 +47,6 @@
             }
         }
     }
-
     if (stub != null) {
         try {
             if (msg == null) {
@@ -60,10 +57,8 @@
                 String eventAdapterInfo = request.getParameter("eventAdapterInfo");
                 // property set contains a set of properties, eg; userName$myName|url$http://wso2.org|
                 String propertySet = request.getParameter("propertySet");
-
                 String fromStreamNameWithVersion = "";
                 BasicInputAdapterPropertyDto[] basicInputAdapterPropertyDtos = null;
-
                 if (propertySet != null) {
                     String[] properties = propertySet.split("\\|=");
                     if (properties != null && !propertySet.equals("")) {
@@ -74,7 +69,6 @@
                             String[] propertyNameAndValue = property.split("\\$=");
                             if (propertyNameAndValue != null) {
                                 basicInputAdapterPropertyDtos[index] = new BasicInputAdapterPropertyDto();
-
                                 basicInputAdapterPropertyDtos[index].setKey(propertyNameAndValue[0].trim());
                                 basicInputAdapterPropertyDtos[index].setValue(propertyNameAndValue[1].trim());
                                 index++;
@@ -82,19 +76,14 @@
                         }
                     }
                 }
-
                 if (inputMappingType.equals("wso2event")) {
                     EventMappingPropertyDto[] metaEbProperties = null;
                     EventMappingPropertyDto[] correlationEbProperties = null;
                     EventMappingPropertyDto[] payloadEbProperties = null;
                     String customMapping = request.getParameter("customMappingValue");
-
                     if (customMapping.equalsIgnoreCase(EventReceiverUIConstants.STRING_LITERAL_ENABLE)) {
-
                         fromStreamNameWithVersion = request.getParameter("fromStreamName") + EventReceiverUIConstants.STREAM_VERSION_DELIMITER + request.getParameter("fromStreamVersion");
-
                         String metaPropertySet = request.getParameter("metaData");
-
                         if (metaPropertySet != null && !metaPropertySet.isEmpty()) {
                             String[] properties = metaPropertySet.split("\\$=");
                             if (properties != null) {
@@ -112,10 +101,8 @@
                                     }
                                 }
                             }
-
                         }
                         String correlationPropertySet = request.getParameter("correlationData");
-
                         if (correlationPropertySet != null && !correlationPropertySet.isEmpty()) {
                             String[] properties = correlationPropertySet.split("\\$=");
                             if (properties != null) {
@@ -133,10 +120,8 @@
                                     }
                                 }
                             }
-
                         }
                         String payloadPropertySet = request.getParameter("payloadData");
-
                         if (payloadPropertySet != null && !payloadPropertySet.isEmpty()) {
                             String[] properties = payloadPropertySet.split("\\$=");
                             if (properties != null) {
@@ -154,18 +139,15 @@
                                     }
                                 }
                             }
-
                         }
                     }
                     stub.deployWso2EventReceiverConfiguration(eventReceiverName, streamNameWithVersion, eventAdapterInfo, metaEbProperties, correlationEbProperties, payloadEbProperties,
                             basicInputAdapterPropertyDtos, EventReceiverUIConstants.STRING_LITERAL_ENABLE.equalsIgnoreCase(customMapping), fromStreamNameWithVersion);
                 } else if (inputMappingType.equals("xml")) {
-
                     String prefixPropertySet = request.getParameter("prefixData");
                     String parentSelectorXpath = request.getParameter("parentSelectorXpath");
                     EventMappingPropertyDto[] namespaceProperties = null;
                     EventMappingPropertyDto[] xpathProperties = null;
-
                     String customMapping = request.getParameter("customMappingValue");
                     if (customMapping.equalsIgnoreCase("enable")) {
                         if (prefixPropertySet != null && !prefixPropertySet.isEmpty()) {
@@ -206,10 +188,8 @@
                                     }
                                 }
                             }
-
                         }
                     }
-
                     stub.deployXmlEventReceiverConfiguration(eventReceiverName, streamNameWithVersion, eventAdapterInfo,
                             parentSelectorXpath, namespaceProperties, xpathProperties, basicInputAdapterPropertyDtos,
                             EventReceiverUIConstants.STRING_LITERAL_ENABLE.equalsIgnoreCase(customMapping));
@@ -230,20 +210,18 @@
                                     mapEbProperties[index].setName(propertyNameValueAndType[0].trim());
                                     mapEbProperties[index].setValueOf(propertyNameValueAndType[1].trim());
                                     mapEbProperties[index].setType(propertyNameValueAndType[2].trim());
+                                    mapEbProperties[index].setDefaultValue(propertyNameValueAndType[3].trim());
                                     index++;
                                 }
                             }
                         }
-
                     }
-
                     stub.deployMapEventReceiverConfiguration(eventReceiverName, streamNameWithVersion, eventAdapterInfo,
                             mapEbProperties, basicInputAdapterPropertyDtos,
                             EventReceiverUIConstants.STRING_LITERAL_ENABLE.equalsIgnoreCase(customMapping));
                 } else if (inputMappingType.equals("text")) {
                     String textPropertySet = request.getParameter("textData");
                     EventMappingPropertyDto[] textEbProperties = null;
-
                     String customMapping = request.getParameter("customMappingValue");
                     if (textPropertySet != null && !textPropertySet.isEmpty()) {
                         String[] properties = textPropertySet.split("\\$=");
@@ -265,7 +243,6 @@
                                 }
                             }
                         }
-
                     }
                     stub.deployTextEventReceiverConfiguration(eventReceiverName, streamNameWithVersion, eventAdapterInfo,
                             textEbProperties, basicInputAdapterPropertyDtos,
@@ -294,13 +271,11 @@
                                 }
                             }
                         }
-
                     }
                     stub.deployJsonEventReceiverConfiguration(eventReceiverName, streamNameWithVersion, eventAdapterInfo,
                             jsonEbProperties, basicInputAdapterPropertyDtos,
                             EventReceiverUIConstants.STRING_LITERAL_ENABLE.equalsIgnoreCase(customMapping));
                 }
-
                 msg = "true";
             }
         } catch (Throwable t) {

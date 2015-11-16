@@ -39,6 +39,7 @@ public class MapInputMapper implements InputMapper {
     private int noPayloadData;
     private StreamDefinition streamDefinition;
     private Object[] attributePositionKeyMap = null;
+    private Object[] attributeDefaultValueKeyMap = null;
     private EventReceiverConfiguration eventReceiverConfiguration = null;
 
     public MapInputMapper(EventReceiverConfiguration eventReceiverConfiguration,
@@ -52,16 +53,20 @@ public class MapInputMapper implements InputMapper {
             if (mapInputMapping.isCustomMappingEnabled()) {
 
                 Map<Integer, Object> positionKeyMap = new HashMap<Integer, Object>();
+                Map<Integer, Object> defaultValueMap = new HashMap<Integer, Object>();
                 for (InputMappingAttribute inputMappingAttribute : mapInputMapping.getInputMappingAttributes()) {
                     positionKeyMap.put(inputMappingAttribute.getToStreamPosition(), inputMappingAttribute.getFromElementKey());
+                    defaultValueMap.put(inputMappingAttribute.getToStreamPosition(), inputMappingAttribute.getDefaultValue());
                     if (positionKeyMap.get(inputMappingAttribute.getToStreamPosition()) == null) {
                         this.attributePositionKeyMap = null;
                         throw new EventReceiverStreamValidationException("Error creating map mapping. '" + inputMappingAttribute.getToElementKey() + "' position not found.", streamDefinition.getStreamId());
                     }
                 }
                 this.attributePositionKeyMap = new Object[positionKeyMap.size()];
+                this.attributeDefaultValueKeyMap = new Object[positionKeyMap.size()];
                 for (int i = 0; i < attributePositionKeyMap.length; i++) {
                     attributePositionKeyMap[i] = positionKeyMap.get(i);
+                    attributeDefaultValueKeyMap[i] = defaultValueMap.get(i);
                 }
             } else {
                 this.noMetaData = streamDefinition.getMetaData() != null ? streamDefinition.getMetaData().size() : 0;
@@ -82,7 +87,11 @@ public class MapInputMapper implements InputMapper {
             Map eventMap = (Map) obj;
             List<Object> outObjList = new ArrayList<Object>();
             for (int i = 0; i < this.attributePositionKeyMap.length; i++) {
-                outObjList.add(eventMap.get(this.attributePositionKeyMap[i]));
+                if (eventMap.get(this.attributePositionKeyMap[i])==null) {
+                    outObjList.add(this.attributeDefaultValueKeyMap[i]);
+                } else {
+                    outObjList.add(eventMap.get(this.attributePositionKeyMap[i]));
+                }
             }
             outObjArray = outObjList.toArray();
         } else {
