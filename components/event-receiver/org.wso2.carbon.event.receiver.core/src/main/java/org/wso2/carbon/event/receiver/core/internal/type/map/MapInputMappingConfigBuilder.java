@@ -69,7 +69,7 @@ public class MapInputMappingConfigBuilder {
                         throw new EventReceiverConfigurationException("An attribute mapping must provide a valid 'to' element");
                     }
                     if (propertyToElement.getAttribute(new QName(EventReceiverConstants.ER_ATTR_NAME)) == null ||
-                        propertyToElement.getAttribute(new QName(EventReceiverConstants.ER_ATTR_TYPE)) == null) {
+                            propertyToElement.getAttribute(new QName(EventReceiverConstants.ER_ATTR_TYPE)) == null) {
                         throw new EventReceiverConfigurationException("An attribute mapping must provide name and type for its 'to' element.");
                     }
                 }
@@ -95,6 +95,9 @@ public class MapInputMappingConfigBuilder {
         toElement.addAttribute(EventReceiverConstants.ER_ATTR_NAME, inputMappingAttribute.getToElementKey(), null);
         toElement.addAttribute(EventReceiverConstants.ER_ATTR_TYPE, EventReceiverConfigurationBuilder.getAttributeType(inputMappingAttribute.getToElementType()), null);
 
+        if (inputMappingAttribute.getDefaultValue() != null && !inputMappingAttribute.getDefaultValue().isEmpty()) {
+            toElement.addAttribute(EventReceiverConstants.ER_ATTR_DEFAULT_VALUE, inputMappingAttribute.getDefaultValue(), null);
+        }
         propertyOMElement.addChild(fromElement);
         propertyOMElement.addChild(toElement);
 
@@ -118,7 +121,7 @@ public class MapInputMappingConfigBuilder {
                 inputMappingAttribute.setToStreamPosition(positionCount++);
                 mapInputMapping.addInputMappingAttribute(inputMappingAttribute);
             }
-        }else {
+        } else {
             mapInputMapping.setCustomMappingEnabled(false);
         }
 
@@ -158,18 +161,17 @@ public class MapInputMappingConfigBuilder {
         String name = propertyFromElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_NAME));
         String valueOf = propertyToElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_NAME));
         String attributeType = propertyToElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_TYPE));
+        String defaultVal = propertyToElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_DEFAULT_VALUE));
         AttributeType type = EventReceiverConstants.STRING_ATTRIBUTE_TYPE_MAP.get(attributeType.toLowerCase());
 
         if (valueOf == null) {
             valueOf = name;
         }
 
-        return new InputMappingAttribute(name, valueOf, type);
+        InputMappingAttribute mappingAttribute = new InputMappingAttribute(name, valueOf, type);
+        mappingAttribute.setDefaultValue(defaultVal);
+        return mappingAttribute;
     }
 
 
 }
-
-
-
-
