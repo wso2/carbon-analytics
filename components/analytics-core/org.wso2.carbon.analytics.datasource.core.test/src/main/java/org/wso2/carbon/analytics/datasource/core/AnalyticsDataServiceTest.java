@@ -124,14 +124,11 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.createTable(250035, "TABLE1");
         List<String> tables = this.service.listTables(250035);
         Assert.assertEquals(tables.size(), 1);
-        Assert.assertTrue(new HashSet<String>(tables).contains("TABLE1"));
+        Assert.assertTrue(new HashSet<>(tables).contains("TABLE1"));
         Assert.assertTrue(this.service.tableExists(250035, "table1"));
         Assert.assertTrue(this.service.tableExists(250035, "TABLE1"));
         /* this should not throw an exception */
         this.service.createTable(250035, "Table1");
-        Record record = this.createRecord(250035, "TABLE2", "S1", "10.0.0.1", 1, "LOG");
-        List<Record> records = new ArrayList<Record>();
-        records.add(record);
         this.service.deleteTable(250035, "TABLE2");
         this.service.deleteTable(250035, "TABLE1");
         this.service.deleteTable(8830, "TABLEX");
@@ -162,7 +159,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.add(cd5);
         ColumnDefinition cd6 = new ColumnDefinition("something3", AnalyticsSchema.ColumnType.LONG);
         columns.add(cd6);
-        List<String> primaryKeys = new ArrayList<String>();
+        List<String> primaryKeys = new ArrayList<>();
         primaryKeys.add("name");
         primaryKeys.add("age");
         schema = new AnalyticsSchema(columns, primaryKeys);
@@ -173,7 +170,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     }
 
     @Test (expectedExceptions = AnalyticsTableNotAvailableException.class, dependsOnMethods = "testTableSetGetSchema")
-    public void testTableGetNoSchema() throws AnalyticsTableNotAvailableException, AnalyticsException {
+    public void testTableGetNoSchema() throws AnalyticsException {
         this.service.deleteTable(105, "T1");
         this.service.getTableSchema(105, "T1");
     }
@@ -185,21 +182,18 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.createTable(-1234, "TABLE1");
         List<String> tables = this.service.listTables(-1234);
         Assert.assertEquals(tables.size(), 1);
-        Assert.assertTrue(new HashSet<String>(tables).contains("TABLE1"));
+        Assert.assertTrue(new HashSet<>(tables).contains("TABLE1"));
         Assert.assertTrue(this.service.tableExists(-1234, "table1"));
         Assert.assertTrue(this.service.tableExists(-1234, "TABLE1"));
         /* this should not throw an exception */
         this.service.createTable(-1234, "Table1");
-        Record record = this.createRecord(-1234, "TABLE2", "S1", "10.0.0.1", 1, "LOG");
-        List<Record> records = new ArrayList<Record>();
-        records.add(record);
         this.service.deleteTable(-1234, "TABLE2");
         this.service.deleteTable(-1234, "TABLE1");
         Assert.assertEquals(this.service.listTables(-1234).size(), 0);
     }
     
     private Record createRecord(int tenantId, String tableName, String serverName, String ip, int tenant, String log) {
-        Map<String, Object> values = new HashMap<String, Object>();
+        Map<String, Object> values = new HashMap<>();
         values.put("server_name", serverName);
         values.put("ip", ip);
         values.put("tenant", tenant);
@@ -217,11 +211,11 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     }
     
     private List<Record> generateIndexRecords(int tenantId, String tableName, int n, long startTimestamp) {
-        Map<String, Object> values = new HashMap<String, Object>();
+        Map<String, Object> values;
         Record record;
-        List<Record> result = new ArrayList<Record>();
+        List<Record> result = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            values = new HashMap<String, Object>();
+            values = new HashMap<>();
             values.put("INT1", i);
             values.put("STR1", "STRING" + i);
             values.put("str2", "string" + i);
@@ -229,7 +223,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             values.put("LN1", 1435000L + i);
             values.put("DB1", 54.535 + i);
             values.put("FL1", 3.14 + i);
-            values.put("BL1", i % 2 == 0 ? true : false);
+            values.put("BL1", i % 2 == 0);
             record = new Record(tenantId, tableName, values, startTimestamp + i * 10);
             result.add(record);
         }        
@@ -330,15 +324,15 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<ColumnDefinition> columns = new ArrayList<>();
         columns.add(new ColumnDefinition("STR1", ColumnType.STRING, true, false));
         columns.add(new ColumnDefinition("STR2", ColumnType.STRING, true, false));
-        Map<String, Object> values = new HashMap<String, Object>();
+        Map<String, Object> values = new HashMap<>();
         values.put("STR1", "Sri Lanka is known for tea");
         values.put("STR2", "Cricket is most famous");
-        Map<String, Object> values2 = new HashMap<String, Object>();
+        Map<String, Object> values2 = new HashMap<>();
         values2.put("STR1", "Canada is known for Ice Hockey");
         values2.put("STR2", "It is very cold");
         Record record = new Record(tenantId, tableName, values);
         Record record2 = new Record(tenantId, tableName, values2);
-        List<Record> records = new ArrayList<Record>();
+        List<Record> records = new ArrayList<>();
         records.add(record);
         records.add(record2);
         this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
@@ -353,11 +347,11 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         result = this.service.search(tenantId, tableName, "STR2:cricket", 0, 10);
         Assert.assertEquals(result.size(), 1);
         Assert.assertEquals(result.get(0).getId(), id);
-        values = new HashMap<String, Object>();
+        values = new HashMap<>();
         values.put("STR1", "South Africa is know for diamonds");
         values.put("STR2", "NBA has the best basketball action");
         record = new Record(id, tenantId, tableName, values);
-        records = new ArrayList<Record>();
+        records = new ArrayList<>();
         records.add(record);
         /* update */
         this.service.put(records);
@@ -391,7 +385,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(this.service.search(tenantId, tableName, "STR1:S*", 0, 150).size(), 0);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, 98, 0);
         this.service.put(records);
-        List<String> ids = new ArrayList<String>();
+        List<String> ids = new ArrayList<>();
         ids.add(records.get(0).getId());
         ids.add(records.get(5).getId());
         ids.add(records.get(50).getId());
@@ -475,7 +469,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<ColumnDefinition> columns = new ArrayList<>();
         columns.add(new ColumnDefinition("tenant", ColumnType.INTEGER, false, false));
         columns.add(new ColumnDefinition("log", ColumnType.STRING, false, false));
-        List<String> primaryKeys = new ArrayList<String>();
+        List<String> primaryKeys = new ArrayList<>();
         primaryKeys.add("tenant");
         primaryKeys.add("log");
         AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
@@ -484,7 +478,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.put(records);
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
-        Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
+        Assert.assertEquals(new HashSet<>(recordsIn), new HashSet<>(records));
         records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, 1, 74, -1, -1, false);
         this.service.put(records);
         recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
@@ -495,7 +489,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 77);
-        Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
+        Assert.assertEquals(new HashSet<>(recordsIn), new HashSet<>(records));
         primaryKeys.clear();
         schema = new AnalyticsSchema(columns, primaryKeys);
         this.service.setTableSchema(tenantId, tableName, schema);
@@ -515,7 +509,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     }
     
     @Test (dependsOnMethods = "testMultipleDataRecordAddRetrieveWithKeys")
-    public void testRecordAddRetreiveWithKeyValues() throws AnalyticsException {
+    public void testRecordAddRetrieveWithKeyValues() throws AnalyticsException {
         int tenantId = 1;
         String tableName = "MyT1";
         this.cleanupTable(tenantId, tableName);
@@ -523,25 +517,25 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<ColumnDefinition> columns = new ArrayList<>();
         columns.add(new ColumnDefinition("tenant", ColumnType.INTEGER, false, false));
         columns.add(new ColumnDefinition("log", ColumnType.STRING, false, false));
-        List<String> primaryKeys = new ArrayList<String>();
+        List<String> primaryKeys = new ArrayList<>();
         primaryKeys.add("tenant");
         primaryKeys.add("log");
         AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
         this.service.setTableSchema(tenantId, tableName, schema);
-        List<Record> records = new ArrayList<Record>();
-        Map<String, Object> values = new HashMap<String, Object>();
+        List<Record> records = new ArrayList<>();
+        Map<String, Object> values = new HashMap<>();
         values.put("tenant", "1");
         values.put("log", "log statement 1");
         Record record1 = new Record(tenantId, tableName, values);
-        values = new HashMap<String, Object>();
+        values = new HashMap<>();
         values.put("tenant", "1");
         values.put("log", "log statement 2");
         Record record2 = new Record(tenantId, tableName, values);
-        values = new HashMap<String, Object>();
+        values = new HashMap<>();
         values.put("tenant", "2");
         values.put("log", "log statement 1");
         Record record3 = new Record(tenantId, tableName, values);
-        values = new HashMap<String, Object>();
+        values = new HashMap<>();
         values.put("tenant", "2");
         values.put("log", "log statement 2");
         Record record4 = new Record(tenantId, tableName, values);
@@ -550,27 +544,27 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         records.add(record3);
         records.add(record4);
         this.service.put(records);
-        List<Map<String, Object>> valuesBatch = new ArrayList<Map<String,Object>>();
-        values = new HashMap<String, Object>();
+        List<Map<String, Object>> valuesBatch = new ArrayList<>();
+        values = new HashMap<>();
         values.put("tenant", "1");
         values.put("log", "log statement 1");
         valuesBatch.add(values);
-        values = new HashMap<String, Object>();
+        values = new HashMap<>();
         values.put("tenant", "2");
         values.put("log", "log statement 2");
         values.put("some_other_field", "xxxxxxxx zzzzzz");
         valuesBatch.add(values);
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.getWithKeyValues(tenantId, tableName, 1, null, valuesBatch));
-        Set<Record> matchRecords = new HashSet<Record>();
+        Set<Record> matchRecords = new HashSet<>();
         matchRecords.add(record1);
         matchRecords.add(record4);
         Assert.assertEquals(recordsIn.size(), 2);
-        Assert.assertEquals(new HashSet<Record>(recordsIn), matchRecords);
+        Assert.assertEquals(new HashSet<>(recordsIn), matchRecords);
         this.cleanupTable(tenantId, tableName);
     }
     
-    @Test (dependsOnMethods = "testRecordAddRetreiveWithKeyValues")
+    @Test (dependsOnMethods = "testRecordAddRetrieveWithKeyValues")
     public void testDataRecordAddReadPerformanceNonIndex() throws AnalyticsException {
         int tenantId = 51;
         String tableName = "TableX";
@@ -624,7 +618,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         
         long start = System.currentTimeMillis();
         this.writeIndexRecords(tenantId, tableName, n, batch);
-        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
+        this.service.waitForIndexing(-1);
         long end = System.currentTimeMillis();
         System.out.println("* Records: " + (n * batch));
         System.out.println("* Write Time: " + (end - start) + " ms.");
@@ -682,7 +676,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         drillDownRequest.setRecordStartIndex(0);
         drillDownRequest.setRecordCount(75);
         drillDownRequest.setQuery("log: exception");
-        List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
+        List<String> path = Arrays.asList("SomeLocation", "SomeInnerLocation");
         drillDownRequest.addCategoryPath("location", path);
         List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
         end = System.currentTimeMillis();
@@ -736,7 +730,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             drillDownRequest.setRecordStartIndex(0);
             drillDownRequest.setRecordCount(75);
             drillDownRequest.setQuery("log: exception");
-            List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
+            List<String> path = Arrays.asList("SomeLocation", "SomeInnerLocation");
             drillDownRequest.addCategoryPath("location", path);
             results.addAll(this.service.drillDownSearch(tenantId, drillDownRequest));
         }
@@ -751,7 +745,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             drillDownRequest.setRecordStartIndex(0);
             drillDownRequest.setRecordCount(75);
             drillDownRequest.setQuery("log:exception");
-            List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
+            List<String> path = Arrays.asList("SomeLocation", "SomeInnerLocation");
             drillDownRequest.addCategoryPath("location", path);
             count += this.service.drillDownSearchCount(tenantId, drillDownRequest);
         }
@@ -885,7 +879,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         drillDownRequest.setRecordStartIndex(0);
         drillDownRequest.setRecordCount(75);
         drillDownRequest.setQuery("log:exception");
-        List<String> path = Arrays.asList(new String[] {"SomeLocation", "SomeInnerLocation"});
+        List<String> path = Arrays.asList("SomeLocation", "SomeInnerLocation");
         drillDownRequest.addCategoryPath("location", path);
         List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
         end = System.currentTimeMillis();
@@ -945,7 +939,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             drillDownRequest.setRecordCount(75);
             drillDownRequest.setQuery("log:exception");
             drillDownRequest.setScoreFunction("_weight");
-            List<String> path = Arrays.asList(new String[] { "SomeLocation", "SomeInnerLocation" });
+            List<String> path = Arrays.asList("SomeLocation", "SomeInnerLocation");
             drillDownRequest.addCategoryPath("location", path);
             results.addAll(this.service.drillDownSearch(tenantId, drillDownRequest));
         }
@@ -960,7 +954,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             drillDownRequest.setRecordStartIndex(0);
             drillDownRequest.setRecordCount(75);
             drillDownRequest.setQuery("log:exception");
-            List<String> path = Arrays.asList(new String[] { "SomeLocation", "SomeInnerLocation" });
+            List<String> path = Arrays.asList("SomeLocation", "SomeInnerLocation");
             drillDownRequest.addCategoryPath("location", path);
             count += this.service.drillDownSearchCount(tenantId, drillDownRequest);
         }
