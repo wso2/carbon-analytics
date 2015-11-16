@@ -55,7 +55,7 @@ public class AnalyticsRecordStoreTest {
     }
 
     private Record createRecord(int tenantId, String tableName, String serverName, String ip, int tenant, String log) {
-        Map<String, Object> values = new HashMap<String, Object>();
+        Map<String, Object> values = new HashMap<>();
         values.put("server_name", serverName);
         values.put("ip", ip);
         values.put("tenant", tenant);
@@ -194,7 +194,7 @@ public class AnalyticsRecordStoreTest {
         this.analyticsRS.deleteTable(tenantId, tableName);
         this.analyticsRS.createTable(tenantId, tableName);
         Record record = this.createRecord(tenantId, tableName, "S1", "192.168.1.1", 55, "LOG1");
-        List<Record> records = new ArrayList<Record>();
+        List<Record> records = new ArrayList<>();
         records.add(record);
         this.analyticsRS.put(records);
         List<Record> recordsIn = GenericUtils.listRecords(this.analyticsRS,

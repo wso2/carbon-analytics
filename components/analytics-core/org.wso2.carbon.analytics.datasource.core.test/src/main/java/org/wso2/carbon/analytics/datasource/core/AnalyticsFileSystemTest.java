@@ -18,14 +18,6 @@
  */
 package org.wso2.carbon.analytics.datasource.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
@@ -33,6 +25,14 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem.DataInput;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * This class contains tests related to {@link AnalyticsFileSystem}.
@@ -84,13 +84,13 @@ public class AnalyticsFileSystemTest {
         /* the path must be normalized, can end with "/" or not */
         files = this.analyticsFileSystem.list("/d1/d2/");
         Assert.assertEquals(files.size(), 2);
-        Assert.assertEquals(new HashSet<String>(Arrays.asList(new String[] { "d3", "d5" })), 
-                new HashSet<String>(files));
+        Assert.assertEquals(new HashSet<>(Arrays.asList(new String[] { "d3", "d5" })),
+                new HashSet<>(files));
         this.addFilesToDir("/d1/d2", "f1", "f2", "f3");
         files = this.analyticsFileSystem.list("/d1/d2");
         Assert.assertEquals(files.size(), 5);
-        Assert.assertEquals(new HashSet<String>(Arrays.asList(new String[] { "d3", "d5", "f1", "f2", "f3" })), 
-                new HashSet<String>(files));
+        Assert.assertEquals(new HashSet<>(Arrays.asList(new String[] { "d3", "d5", "f1", "f2", "f3" })),
+                new HashSet<>(files));
         this.analyticsFileSystem.delete("/d1");
         Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2/d3"));
         Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2/d5"));
