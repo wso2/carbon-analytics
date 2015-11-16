@@ -87,7 +87,7 @@ public class MapInputMapper implements InputMapper {
             Map eventMap = (Map) obj;
             List<Object> outObjList = new ArrayList<Object>();
             for (int i = 0; i < this.attributePositionKeyMap.length; i++) {
-                if (eventMap.get(this.attributePositionKeyMap[i])==null) {
+                if (eventMap.get(this.attributePositionKeyMap[i]) == null) {
                     outObjList.add(this.attributeDefaultValueKeyMap[i]);
                 } else {
                     outObjList.add(eventMap.get(this.attributePositionKeyMap[i]));

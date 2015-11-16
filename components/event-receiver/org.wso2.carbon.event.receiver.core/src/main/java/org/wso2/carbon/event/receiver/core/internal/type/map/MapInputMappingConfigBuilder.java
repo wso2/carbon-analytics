@@ -121,7 +121,7 @@ public class MapInputMappingConfigBuilder {
                 inputMappingAttribute.setToStreamPosition(positionCount++);
                 mapInputMapping.addInputMappingAttribute(inputMappingAttribute);
             }
-        }else {
+        } else {
             mapInputMapping.setCustomMappingEnabled(false);
         }
 
