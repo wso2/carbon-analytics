@@ -54,9 +54,9 @@ public class TCPEventSendingTestCase {
     @Test
     public void testEventSendingToServer() throws InterruptedException, IOException {
         String hostname = "0.0.0.0";
-        int port = 7612;
+        int port = 7652;
 
-        StreamDefinition streamDefinition = new StreamDefinition().id("TestStream")
+        StreamDefinition streamDefinition = StreamDefinition.id("TestStream")
                 .attribute("att1", Attribute.Type.INT)
                 .attribute("att2", Attribute.Type.FLOAT)
                 .attribute("att3", Attribute.Type.STRING)
@@ -64,22 +64,25 @@ public class TCPEventSendingTestCase {
 
         TestStreamCallback streamCallback = new TestStreamCallback();
         TCPEventServer tcpEventServer = new TCPEventServer(new TCPEventServerConfig(hostname, port), streamCallback, null);
-        tcpEventServer.addStreamDefinition(streamDefinition);
-        tcpEventServer.start();
-        Thread.sleep(1000);
-        threadPool.submit(new ClientThread(hostname, port, streamDefinition, new SimpleDataProvider(), 100, false, 0));
-        Thread.sleep(5000);
-        Assert.assertEquals(100, streamCallback.getEventCount());
-        log.info("Shutting down server...");
-        tcpEventServer.shutdown();
+        try {
+            tcpEventServer.addStreamDefinition(streamDefinition);
+            tcpEventServer.start();
+            Thread.sleep(1000);
+            threadPool.submit(new ClientThread(hostname, port, streamDefinition, new SimpleDataProvider(), 100, false, 0));
+            Thread.sleep(5000);
+            Assert.assertEquals(100, streamCallback.getEventCount());
+        } finally {
+            log.info("Shutting down server...");
+            tcpEventServer.shutdown();
+        }
     }
 
     @Test
     public void testHighLoadEventSendingToServer() throws IOException, InterruptedException {
         String hostname = "0.0.0.0";
-        int port = 7613;
+        int port = 7653;
 
-        StreamDefinition streamDefinition = new StreamDefinition().id("analyticsStats")
+        StreamDefinition streamDefinition = StreamDefinition.id("analyticsStats")
                 .attribute("meta_ipAdd", Attribute.Type.STRING)
                 .attribute("meta_index", Attribute.Type.LONG)
                 .attribute("meta_timestamp", Attribute.Type.LONG)
@@ -89,27 +92,30 @@ public class TCPEventSendingTestCase {
 
         TestStreamCallback streamCallback = new TestStreamCallback();
         TCPEventServer tcpEventServer = new TCPEventServer(new TCPEventServerConfig(hostname, port), streamCallback, null);
-        tcpEventServer.addStreamDefinition(streamDefinition);
-        tcpEventServer.start();
-        Thread.sleep(1000);
-        for (int i = 0; i < TOTAL_CLIENTS; i++) {
-            threadPool.submit(new ClientThread(hostname, port, streamDefinition, new AnalyticStatDataProvider(), EVENTS_PER_CLIENT, false, 0));
+        try {
+            tcpEventServer.addStreamDefinition(streamDefinition);
+            tcpEventServer.start();
+            Thread.sleep(1000);
+            for (int i = 0; i < TOTAL_CLIENTS; i++) {
+                threadPool.submit(new ClientThread(hostname, port, streamDefinition, new AnalyticStatDataProvider(), EVENTS_PER_CLIENT, false, 0));
+            }
+            while (streamCallback.getEventCount() < TOTAL_CLIENTS * EVENTS_PER_CLIENT) {
+                Thread.sleep(5000);
+            }
+            Assert.assertEquals(TOTAL_CLIENTS * EVENTS_PER_CLIENT, streamCallback.getEventCount());
+        } finally {
+            log.info("Shutting down server...");
+            tcpEventServer.shutdown();
         }
-        while (streamCallback.getEventCount() < TOTAL_CLIENTS * EVENTS_PER_CLIENT) {
-            Thread.sleep(5000);
-        }
-        Assert.assertEquals(TOTAL_CLIENTS * EVENTS_PER_CLIENT, streamCallback.getEventCount());
-        log.info("Shutting down server...");
-        tcpEventServer.shutdown();
     }
 
 
     @Test
     public void testEventSendingOnServerFailure() throws IOException, InterruptedException {
         String hostname = "0.0.0.0";
-        int port = 7614;
+        int port = 7654;
 
-        StreamDefinition streamDefinition = new StreamDefinition().id("TestStream")
+        StreamDefinition streamDefinition = StreamDefinition.id("TestStream")
                 .attribute("att1", Attribute.Type.INT)
                 .attribute("att2", Attribute.Type.FLOAT)
                 .attribute("att3", Attribute.Type.STRING)
@@ -117,23 +123,26 @@ public class TCPEventSendingTestCase {
 
         TestStreamCallback streamCallback = new TestStreamCallback();
         TCPEventServer tcpEventServer = new TCPEventServer(new TCPEventServerConfig(hostname, port), streamCallback, null);
-        threadPool.submit(new ClientThread(hostname, port, streamDefinition, new SimpleDataProvider(), 100, false, 1000));
-        Thread.sleep(10000);
-        tcpEventServer.addStreamDefinition(streamDefinition);
-        tcpEventServer.start();
-        Thread.sleep(5000);
-        Assert.assertTrue(streamCallback.getEventCount() > 0);
-        log.info("Shutting down server...");
-        tcpEventServer.shutdown();
+        try {
+            threadPool.submit(new ClientThread(hostname, port, streamDefinition, new SimpleDataProvider(), 100, false, 1000));
+            Thread.sleep(10000);
+            tcpEventServer.addStreamDefinition(streamDefinition);
+            tcpEventServer.start();
+            Thread.sleep(5000);
+            Assert.assertTrue(streamCallback.getEventCount() > 0);
+        } finally {
+            log.info("Shutting down server...");
+            tcpEventServer.shutdown();
+        }
     }
 
 
     @Test
     public void testAddressAlreadyExisted() throws Exception {
         String hostname = "0.0.0.0";
-        int port = 7615;
+        int port = 7655;
 
-        StreamDefinition streamDefinition = new StreamDefinition().id("TestStream")
+        StreamDefinition streamDefinition = StreamDefinition.id("TestStream")
                 .attribute("att1", Attribute.Type.INT)
                 .attribute("att2", Attribute.Type.FLOAT)
                 .attribute("att3", Attribute.Type.STRING)
@@ -217,9 +226,9 @@ public class TCPEventSendingTestCase {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("IOException occurred:" + e.getMessage(), e);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("Thread interrupted while sleeping." + e.getMessage(), e);
             } finally {
                 if (tcpEventPublisher != null) {
                     tcpEventPublisher.shutdown();
