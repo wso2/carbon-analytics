@@ -188,7 +188,7 @@ public class AnalyticsDataBackupTool {
             batchSize = Integer.parseInt(line.getOptionValue(BATCH_SIZE, RECORD_BATCH_SIZE));
         }
        if (line.hasOption(PURGE_DATA)) {
-           tableName = line.getOptionValue(BATCH_SIZE, RECORD_BATCH_SIZE);
+           tableName = line.getOptionValue(PURGETABLE, null);
            if (tableName != null) {
                 purgeDataWithRange(service, tenantId, timeFrom, timeTo, tableName);
             } else {
