@@ -65,12 +65,13 @@ import java.util.Map;
  */
 public class AnalyticsDataBackupTool {
 
-    private static final String TIME_PATTERN = "yy-mm-dd hh:mm:ss";
+    private static final String TIME_PATTERN = "yy-mm-dd-hh:mm:ss";
     private static final String DIR = "dir";
     private static final String TABLES = "tables";
     private static final String TIMETO = "timeTo";
     private static final String TIMEFROM = "timeFrom";
     private static final String TENANT_ID = "tenantId";
+    private static final String PURGETABLE = "table";
     private static final String BATCH_SIZE = "batchSize";
     private static final String REINDEX_EVENTS = "reindexEvents";
     private static final String DISABLE_STAGING = "disableStaging";
@@ -81,6 +82,7 @@ public class AnalyticsDataBackupTool {
     private static final String TABLE_SCHEMA_FILE_NAME = "__TABLE_SCHEMA__";
     private static final String ANALYTICS_DS_CONFIG_FILE = "analytics-config.xml";
     private static final String ENABLE_INDEXING = "enableIndexing";
+    private static final String PURGE_DATA = "purge";
     private static final int INDEX_PROCESS_WAIT_TIME = -1;
     private static final String RECORD_BATCH_SIZE = "1000";
     private static int batchSize = 0;
@@ -88,7 +90,8 @@ public class AnalyticsDataBackupTool {
     private static final int READ_BUFFER_SIZE = 10240;
     private static final int RECORD_INDEX_CHUNK_SIZE = 1000;
 
-    @SuppressWarnings("static-access") private static Options populateOptions() {
+    @SuppressWarnings("static-access")
+    private static Options populateOptions() {
         Options options = new Options();
         options.addOption(new Option(BACKUP_RECORD_STORE, false, "backup analytics data"));
         options.addOption(new Option(BACKUP_FILE_SYSTEM, false, "backup filesystem data"));
@@ -97,6 +100,7 @@ public class AnalyticsDataBackupTool {
         options.addOption(new Option(REINDEX_EVENTS, false, "re-indexes records in the given table data"));
         options.addOption(new Option(ENABLE_INDEXING, false, "enables indexing while restoring"));
         options.addOption(new Option(DISABLE_STAGING, false, "disables staging while restoring"));
+        options.addOption(new Option(PURGE_DATA, false, "Purges Data for a given time range"));
         options.addOption(
                 OptionBuilder.withArgName("directory").hasArg().withDescription("source/target directory").create(DIR));
         options.addOption(OptionBuilder.withArgName("table list").hasArg()
@@ -107,6 +111,8 @@ public class AnalyticsDataBackupTool {
                 .withDescription("consider records to this time (non-inclusive)").create(TIMETO));
         options.addOption(OptionBuilder.withArgName("tenant id (default is super tenant)").hasArg()
                 .withDescription("specify tenant id of the tenant considered").create(TENANT_ID));
+        options.addOption(OptionBuilder.withArgName("purge table name").hasArg()
+                .withDescription("specify table name of which the data would be purged").create(PURGETABLE));
         options.addOption(OptionBuilder.withArgName("restore record batch size (default is " +
                 RECORD_BATCH_SIZE + ")").hasArg().withDescription("specify the number of records per batch for backup")
                 .create(BATCH_SIZE));
@@ -169,6 +175,7 @@ public class AnalyticsDataBackupTool {
             File baseDir) throws AnalyticsException, IOException {
         // this flag is used to control the staging for the records
         boolean disableStaging = line.hasOption(DISABLE_STAGING);
+        String tableName = null;
         if (line.hasOption(RESTORE_RECORD_STORE)) {
             if (line.hasOption(ENABLE_INDEXING)) {
                 System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
@@ -180,7 +187,14 @@ public class AnalyticsDataBackupTool {
         if (line.hasOption(BACKUP_RECORD_STORE)) {
             batchSize = Integer.parseInt(line.getOptionValue(BATCH_SIZE, RECORD_BATCH_SIZE));
         }
-        if (line.hasOption(BACKUP_RECORD_STORE)) {
+       if (line.hasOption(PURGE_DATA)) {
+           tableName = line.getOptionValue(BATCH_SIZE, RECORD_BATCH_SIZE);
+           if (tableName != null) {
+                purgeDataWithRange(service, tenantId, timeFrom, timeTo, tableName);
+            } else {
+                System.out.println("Please specify the table name for data purging!");
+            }
+        } else if (line.hasOption(BACKUP_RECORD_STORE)) {
             backupRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
         } else if (line.hasOption(BACKUP_FILE_SYSTEM)) {
             backupFileSystem(analyticsFileSystem, tenantId, baseDir);
@@ -405,7 +419,8 @@ public class AnalyticsDataBackupTool {
         }
     }
 
-    @SuppressWarnings("unchecked") private static List<Record> readRecordFromFile(File file) throws IOException {
+    @SuppressWarnings("unchecked")
+    private static List<Record> readRecordFromFile(File file) throws IOException {
         FileInputStream fileIn = null;
         try {
             fileIn = new FileInputStream(file);
@@ -660,5 +675,22 @@ public class AnalyticsDataBackupTool {
         //write the remaining records in the records list
         if (!recordList.isEmpty())
             dataService.put(recordList);
+    }
+
+    /**
+     * Deletes data from the table for a given time range.
+     *
+     * @param service   Analytics Data Service.
+     * @param tenantId  Tenant ID.
+     * @param timeFrom  Start time of the records for the purging.
+     * @param timeTo    Stop time of the records for the purging.
+     * @param tableName Name of the table of which the data will be purged.
+     * @throws AnalyticsException Thrown when unable to access the Analytics Service.
+     */
+    private static void purgeDataWithRange(AnalyticsDataService service, int tenantId, long timeFrom,
+            long timeTo, String tableName) throws AnalyticsException {
+        if (service.tableExists(tenantId, tableName)) {
+            service.delete(tenantId, tableName, timeFrom, timeTo);
+        }
     }
 }
