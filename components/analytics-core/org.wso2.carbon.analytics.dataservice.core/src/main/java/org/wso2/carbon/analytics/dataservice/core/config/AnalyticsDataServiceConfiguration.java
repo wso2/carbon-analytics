@@ -108,11 +108,16 @@ public class AnalyticsDataServiceConfiguration {
     public int getShardCount() {
         return shardCount;
     }
-    
+
     public void setShardCount(int shardCount) {
         this.shardCount = shardCount;
     }
-    
+
+    @XmlElement (name = "maxAggregateIteratorsSize", defaultValue = "10")
+    public int getmaxAggregateIteratorsSize() {
+        return shardCount;
+    }
+
     @XmlElement (name = "shardIndexRecordBatchSize", defaultValue = "100")
     public int getShardIndexRecordBatchSize() {
         return shardIndexRecordBatchSize;
