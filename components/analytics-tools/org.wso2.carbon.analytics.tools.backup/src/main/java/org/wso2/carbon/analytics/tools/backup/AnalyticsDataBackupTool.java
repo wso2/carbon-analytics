@@ -31,7 +31,11 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataServiceConfigProperty;
 import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsDataIndexer;
-import org.wso2.carbon.analytics.datasource.commons.*;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
@@ -41,7 +45,6 @@ import org.wso2.carbon.base.MultitenantConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -523,7 +526,9 @@ public class AnalyticsDataBackupTool {
                 out.flush();
                 System.out.println(node.getAbsoluteFile() + " -> " + relativePath);
             } catch (IOException e) {
-                throw new IOException("Error in restoring the file to the filesystem: " + e.getMessage(), e);
+                String message = "Error in restoring the file to the filesystem";
+                System.out.println(message);
+                throw new IOException(message + e.getMessage(), e);
             }
         }
     }
@@ -545,9 +550,13 @@ public class AnalyticsDataBackupTool {
             }
             return byteArrayOutputStream.toByteArray();
         } catch (FileNotFoundException e) {
-            throw new IOException("Error in reading the file: " + e.getMessage(), e);
+            String message = "File: " + file.getName() + " not found!";
+            System.out.println(message);
+            throw new IOException(message + "\n" + e.getMessage(), e);
         } catch (IOException e) {
-            throw new IOException("Error in reading the file: " + e.getMessage(), e);
+            String message = "Error reading the file: " + file.getName();
+            System.out.println(message);
+            throw new IOException(message + "\n" + e.getMessage(), e);
         } finally {
             byteArrayOutputStream.flush();
         }
