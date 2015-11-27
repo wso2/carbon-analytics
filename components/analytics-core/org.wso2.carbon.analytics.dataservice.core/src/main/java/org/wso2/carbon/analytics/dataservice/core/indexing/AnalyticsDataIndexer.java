@@ -192,6 +192,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private int shardIndexRecordBatchSize;
 
+    private int maxIteratorPoolSize;
+
     private int indexingThreadCount;
 
     private ExecutorService shardWorkerExecutor;
@@ -209,7 +211,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     public AnalyticsDataIndexer(AnalyticsRecordStore analyticsRecordStore,
             AnalyticsFileSystem analyticsFileSystem, AnalyticsDataService analyticsDataService,
             AnalyticsIndexedTableStore indexedTableStore, int shardCount, int shardIndexRecordBatchSize,
-            int indexingThreadCount, Analyzer analyzer,
+            int indexingThreadCount, int maxIteratorPoolSize, Analyzer analyzer,
             AnalyticsReceiverIndexingFlowController flowController) throws AnalyticsException {
     	this.luceneAnalyzer = analyzer;
         this.analyticsRecordStore = analyticsRecordStore;
@@ -220,6 +222,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     	this.shardIndexRecordBatchSize = shardIndexRecordBatchSize;
     	this.indexingThreadCount = indexingThreadCount;
     	this.flowController = flowController;
+        this.maxIteratorPoolSize = maxIteratorPoolSize;
     }
 
     /**
@@ -1752,7 +1755,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                                          AggregateRequest aggregateRequest)
             throws AnalyticsException {
         AnalyticsDataServiceConfiguration config = new AnalyticsDataServiceConfiguration();
-        int iteratorsSize = config.getmaxAggregateIteratorsSize();
         Map<String, Number> optionalParams = new HashMap<>();
         Map<String, AggregateFunction> perAliasAggregateFunction = initPerAliasAggregateFunctions(aggregateRequest,
                 optionalParams);
@@ -1761,15 +1763,15 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         List<SearchResultEntry> searchResultEntries = getRecordSearchEntries(tenantId, path, aggregateRequest);
         if (!searchResultEntries.isEmpty()) {
             List<String> recordIds = getRecordIds(searchResultEntries);     //FIXME : recordIds variable can go OOM
-            AnalyticsDataResponse analyticsDataResponse = this.analyticsDataService
-                    .get(tenantId, aggregateRequest.getTableName(), 1, null, recordIds);
+            AnalyticsDataResponse analyticsDataResponse = this.analyticsDataService.get(tenantId,
+                    aggregateRequest.getTableName(), 1, null, recordIds);
             String recordStoreName = analyticsDataResponse.getRecordStoreName();
             RecordGroup[] recordGroupsArray = analyticsDataResponse.getRecordGroups();
             List<RecordGroup> recordGroupList = new ArrayList<>();
             int recordsGroupLength = recordGroupsArray.length;
             for (int i = 0; i < recordsGroupLength; i++) {
                 recordGroupList.add(recordGroupsArray[i]);
-                if (i % iteratorsSize == 0 || i == recordsGroupLength - 1) {
+                if (i % maxIteratorPoolSize == 0 || i == recordsGroupLength - 1) {
                     List<Iterator<Record>> iterators = this.getRecordIterators(recordGroupList, recordStoreName);
                     if (!iterators.isEmpty()) {
                         Iterator<Record> iterator = IteratorUtils.chainedIterator(iterators);
