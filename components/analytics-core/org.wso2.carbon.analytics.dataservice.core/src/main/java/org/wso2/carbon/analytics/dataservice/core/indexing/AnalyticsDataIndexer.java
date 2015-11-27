@@ -1762,7 +1762,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         //get the search results from lucene
         List<SearchResultEntry> searchResultEntries = getRecordSearchEntries(tenantId, path, aggregateRequest);
         if (!searchResultEntries.isEmpty()) {
-            List<String> recordIds = getRecordIds(searchResultEntries);     //FIXME : recordIds variable can go OOM
+            List<String> recordIds = getRecordIds(searchResultEntries);
             AnalyticsDataResponse analyticsDataResponse = this.analyticsDataService.get(tenantId,
                     aggregateRequest.getTableName(), 1, null, recordIds);
             String recordStoreName = analyticsDataResponse.getRecordStoreName();
@@ -1853,7 +1853,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return this.getDrillDownRecords(tenantId, analyticsDrillDownRequest, null, null);
     }
 
-    private static List<String> getRecordIds(List<SearchResultEntry> searchResults) {
+    private List<String> getRecordIds(List<SearchResultEntry> searchResults) {
         List<String> ids = new ArrayList<>();
         for (SearchResultEntry searchResult : searchResults) {
             ids.add(searchResult.getId());
