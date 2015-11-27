@@ -90,7 +90,6 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsQueryParser;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
-import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsIndexedTableStore.IndexedTableId;
 import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunction;
 import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunctionFactory;
@@ -1754,7 +1753,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private Record aggregatePerGrouping(int tenantId, String[] path,
                                          AggregateRequest aggregateRequest)
             throws AnalyticsException {
-        AnalyticsDataServiceConfiguration config = new AnalyticsDataServiceConfiguration();
         Map<String, Number> optionalParams = new HashMap<>();
         Map<String, AggregateFunction> perAliasAggregateFunction = initPerAliasAggregateFunctions(aggregateRequest,
                 optionalParams);
