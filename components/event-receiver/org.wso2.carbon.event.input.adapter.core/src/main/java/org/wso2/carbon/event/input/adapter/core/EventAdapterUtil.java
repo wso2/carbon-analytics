@@ -21,8 +21,12 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
+import org.wso2.carbon.event.input.adapter.core.internal.config.AdapterConfig;
+import org.wso2.carbon.event.input.adapter.core.internal.config.AdapterConfigs;
 import org.wso2.carbon.event.input.adapter.core.internal.ds.InputEventAdapterServiceValueHolder;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+
+import java.util.Map;
 
 public class EventAdapterUtil {
 
@@ -41,5 +45,17 @@ public class EventAdapterUtil {
             }
         }
         return axisConfiguration;
+    }
+
+
+    public static Map<String, String> getGlobalProperties(String type) {
+        AdapterConfigs adapterConfigs = InputEventAdapterServiceValueHolder.getGlobalAdapterConfigs();
+        if (adapterConfigs != null) {
+            AdapterConfig adapterConfig = adapterConfigs.getAdapterConfig(type);
+            if (adapterConfig != null) {
+                return adapterConfig.getGlobalPropertiesAsMap();
+            }
+        }
+        return null;
     }
 }
