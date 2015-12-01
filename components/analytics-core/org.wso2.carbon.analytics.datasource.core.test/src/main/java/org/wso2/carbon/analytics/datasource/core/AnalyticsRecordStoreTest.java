@@ -586,6 +586,12 @@ public class AnalyticsRecordStoreTest {
         this.cleanupT1();
     }
 
+    /**
+     * Test if the GET operations work as intended when the same record is sent and queried at different time ranges.
+     * This test is required in particular for connectors which depend on timestamp-based secondary indices
+     * (i.e. HBase, Cassandra).
+     * @throws AnalyticsException
+     */
     @Test public void testDuplicateRecordSearch() throws AnalyticsException {
         this.cleanupT1();
         this.analyticsRS.createTable(7, "T1");
@@ -606,6 +612,29 @@ public class AnalyticsRecordStoreTest {
         Assert.assertEquals(
                 GenericUtils.listRecords(this.analyticsRS, this.analyticsRS.get(7, "T1", 1, null, 9000, 11000, 0, -1))
                         .size(), 0);
+        this.cleanupT1();
+    }
+
+    /**
+     * This test checks whether only the records which strictly fall within the prescribed time ranges are deleted.
+     * This test is required in particular for connectors which depend on timestamp-based secondary indices
+     * (i.e. HBase, Cassandra).
+     * @throws AnalyticsException
+     */
+    @Test public void testDuplicateRecordDelete() throws AnalyticsException {
+        this.cleanupT1();
+        this.analyticsRS.createTable(7, "T1");
+        List<Record> putList = new ArrayList<>();
+        putList.add(new Record("MyRecord", 7, "T1", new HashMap<String, Object>(), 10000));
+        putList.add(new Record("MyRecord", 7, "T1", new HashMap<String, Object>(), 20000));
+        this.analyticsRS.put(putList);
+        Assert.assertEquals(
+                GenericUtils.listRecords(this.analyticsRS, this.analyticsRS.get(7, "T1", 1, null, Long.MIN_VALUE,
+                        Long.MAX_VALUE - 1L, 0, -1)).size(), 1);
+        this.analyticsRS.delete(7,"T1",9000, 11000);
+        Assert.assertEquals(
+                GenericUtils.listRecords(this.analyticsRS, this.analyticsRS.get(7, "T1", 1, null, Long.MIN_VALUE,
+                        Long.MAX_VALUE - 1L, 0, -1)).size(), 1);
         this.cleanupT1();
     }
 
