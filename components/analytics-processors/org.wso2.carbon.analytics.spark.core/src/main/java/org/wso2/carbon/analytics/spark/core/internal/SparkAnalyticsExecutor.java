@@ -707,6 +707,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         long start = System.currentTimeMillis();
         try {
+            if (this.sqlCtx == null){
+                throw new AnalyticsExecutionException("Spark SQL Context is not available. " +
+                                                      "Check if the cluster has instantiated properly.");
+            }
             DataFrame result = this.sqlCtx.sql(query);
             return toResult(result);
         } finally {
