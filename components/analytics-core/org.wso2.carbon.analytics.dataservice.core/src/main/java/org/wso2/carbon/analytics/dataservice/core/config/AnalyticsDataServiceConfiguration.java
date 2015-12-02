@@ -44,7 +44,9 @@ public class AnalyticsDataServiceConfiguration {
     private String indexStagingRecordStore;
     
     private int shardCount;
-    
+
+    private int maxAggregateIteratorsSize;
+
     private int shardIndexRecordBatchSize;
     
     private int indexingThreadCount;
@@ -108,11 +110,20 @@ public class AnalyticsDataServiceConfiguration {
     public int getShardCount() {
         return shardCount;
     }
-    
+
     public void setShardCount(int shardCount) {
         this.shardCount = shardCount;
     }
-    
+
+    @XmlElement (name = "maxAggregateIteratorsSize", defaultValue = "10")
+    public int getMaxAggregateIteratorsSize() {
+        return maxAggregateIteratorsSize;
+    }
+
+    public void setMaxAggregateIteratorsSize(int maxAggregateIteratorsSize) {
+        this.maxAggregateIteratorsSize = maxAggregateIteratorsSize;
+    }
+
     @XmlElement (name = "shardIndexRecordBatchSize", defaultValue = "100")
     public int getShardIndexRecordBatchSize() {
         return shardIndexRecordBatchSize;

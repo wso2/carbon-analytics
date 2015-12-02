@@ -156,7 +156,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         this.indexer = new AnalyticsDataIndexer(this.getIndexStagingRecordStore(), this.analyticsFileSystem, this,
                                                 this.indexedTableStore, config.getShardCount(), 
                                                 this.extractShardIndexRecordBatchSize(config),
-                                                this.calculateIndexingThreadCount(config), luceneAnalyzer,
+                                                this.calculateIndexingThreadCount(config),
+                                                config.getMaxAggregateIteratorsSize(), luceneAnalyzer,
                                                 this.createFlowController(config.getAnalyticsReceiverIndexingFlowControlConfiguration()));
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();

@@ -140,17 +140,17 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private static final int INDEXING_SCHEDULE_PLAN_RETRY_COUNT = 3;
 
     public static final String DISABLE_INDEXING_ENV_PROP = "disableIndexing";
-    
+
     public static final String DISABLE_INDEX_THROTTLING_ENV_PROP = "disableIndexThrottling";
-    
+
     private static final int WAIT_INDEX_TIME_INTERVAL = 1000;
 
     private static final String INDEX_OP_DATA_ATTRIBUTE = "__INDEX_OP_DATA__";
-    
+
     public static final int INDEX_DATA_RECORD_TENANT_ID = -1000;
-    
+
     public static final String INDEX_DATA_RECORD_TABLE_NAME = "__INDEX_DATA__";
-        
+
     private static final String ANALYTICS_INDEXING_GROUP = "__ANALYTICS_INDEXING_GROUP__";
 
     private static final String INDEX_DATA_FS_BASE_PATH = "/_data/index/";
@@ -168,50 +168,52 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private static final String EMPTY_FACET_VALUE = "EMPTY_FACET_VALUE!";
 
     private static final String DEFAULT_SCORE = "1";
-    
+
     public static final String PATH_SEPARATOR = "___####___";
-    
+
     public static final int TAXONOMYWORKER_TIMEOUT = 60;
-    
+
     private Map<String, Directory> indexDirs = new HashMap<>();
 
     private Map<String, Directory> indexTaxonomyDirs = new HashMap<>();
 
     private AggregateFunctionFactory aggregateFunctionFactory;
-    
+
     private Analyzer luceneAnalyzer;
-    
+
     private AnalyticsFileSystem analyticsFileSystem;
-    
+
     private AnalyticsRecordStore analyticsRecordStore;
 
     private AnalyticsDataService analyticsDataService;
-    
+
     private int shardCount;
-    
+
     private int shardIndexRecordBatchSize;
-    
+
+    private int maxIteratorPoolSize;
+
     private int indexingThreadCount;
-    
+
     private ExecutorService shardWorkerExecutor;
-    
+
     private List<IndexWorker> workers;
-    
+
     private AnalyticsIndexedTableStore indexedTableStore;
-    
+
     private boolean indexingStatsEnabled;
-    
+
     private AnalyticsDataIndexingStatsCollector statsCollector;
-    
+
     private AnalyticsReceiverIndexingFlowController flowController;
-        
-    public AnalyticsDataIndexer(AnalyticsRecordStore analyticsRecordStore, 
+
+    public AnalyticsDataIndexer(AnalyticsRecordStore analyticsRecordStore,
             AnalyticsFileSystem analyticsFileSystem, AnalyticsDataService analyticsDataService,
             AnalyticsIndexedTableStore indexedTableStore, int shardCount, int shardIndexRecordBatchSize,
-            int indexingThreadCount, Analyzer analyzer,
+            int indexingThreadCount, int maxIteratorPoolSize, Analyzer analyzer,
             AnalyticsReceiverIndexingFlowController flowController) throws AnalyticsException {
     	this.luceneAnalyzer = analyzer;
-        this.analyticsRecordStore = analyticsRecordStore;    	
+        this.analyticsRecordStore = analyticsRecordStore;
     	this.analyticsFileSystem = analyticsFileSystem;
         this.analyticsDataService = analyticsDataService;
         this.indexedTableStore = indexedTableStore;
@@ -219,8 +221,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     	this.shardIndexRecordBatchSize = shardIndexRecordBatchSize;
     	this.indexingThreadCount = indexingThreadCount;
     	this.flowController = flowController;
+        this.maxIteratorPoolSize = maxIteratorPoolSize;
     }
-    
+
     /**
      * This method initializes the indexer, and must be called before any other operation in this class is called.
      * @throws AnalyticsException
@@ -245,28 +248,28 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         String indexDisableProp =  System.getProperty(DISABLE_INDEXING_ENV_PROP);
         return !(indexDisableProp != null && Boolean.parseBoolean(indexDisableProp));
     }
-    
+
     private boolean checkIndexThrottlingDisabledExplicitely() {
         String indexDisableProp =  System.getProperty(DISABLE_INDEX_THROTTLING_ENV_PROP);
         return !(indexDisableProp != null && Boolean.parseBoolean(indexDisableProp));
     }
-    
+
     private void initializeIndexingSchedules() throws AnalyticsException {
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
             log.info("Analytics Indexing Mode: CLUSTERED");
-            acm.joinGroup(ANALYTICS_INDEXING_GROUP, this);            
+            acm.joinGroup(ANALYTICS_INDEXING_GROUP, this);
         } else {
             log.info("Analytics Indexing Mode: STANDALONE");
             List<Integer[]> indexingSchedule = this.generateIndexWorkerSchedulePlan(1);
             this.scheduleWorkers(indexingSchedule.get(0));
         }
     }
-    
+
     private List<Integer[]> generateIndexWorkerSchedulePlan(int numWorkers) {
         return GenericUtils.splitNumberRange(this.getShardCount(), numWorkers);
     }
-    
+
     private synchronized void scheduleWorkers(Integer[] shardInfo) throws AnalyticsException {
         int shardIndexFrom = shardInfo[0];
         int shardRange = shardInfo[1];
@@ -283,7 +286,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         for (int i = 0; i < threadCount; i++) {
             if (i + 1 >= threadCount) {
                 tmpRange = shardIndexFrom + shardRange - current;
-                worker = new IndexWorker(current, tmpRange);                
+                worker = new IndexWorker(current, tmpRange);
             } else {
                 tmpRange = current + range > shardIndexFrom + shardRange ? shardIndexFrom + shardRange - current : range;
                 worker = new IndexWorker(current, tmpRange);
@@ -295,59 +298,59 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         log.info("Processing Analytics Indexing Shards " + shardDetails);
     }
-    
+
     public AnalyticsReceiverIndexingFlowController getFlowController() {
         return flowController;
     }
-    
+
     public boolean isIndexingStatsEnabled() {
         return indexingStatsEnabled;
     }
-    
+
     private int getIndexingThreadCount() {
         return indexingThreadCount;
     }
-    
+
     public AnalyticsFileSystem getFileSystem() {
         return analyticsFileSystem;
     }
-    
+
     public AnalyticsRecordStore getAnalyticsRecordStore() {
         return analyticsRecordStore;
     }
-    
+
     public int getShardCount() {
         return shardCount;
     }
-    
+
     private long createIndexProcessId(Record record) {
         return this.createIndexProcessId(record.getTenantId(), record.getTableName(), record.getId());
     }
-    
+
     private long createIndexProcessId(int tenantId, String tableName, String id) {
         int shardId = this.calculateShardId(id);
         return this.createIndexProcessId(tenantId, tableName, shardId);
     }
-    
+
     private long createIndexProcessId(int tenantId, String tableName, int shardId) {
         String tableId = GenericUtils.calculateTableIdentity(tenantId, tableName);
         return Math.abs(tableId.hashCode()) + shardId;
     }
-    
+
     private Record createIndexProcessDataUpdateRecord(long processId, List<Record> records) {
         Map<String, Object> values = new HashMap<String, Object>(1);
         values.put(INDEX_OP_DATA_ATTRIBUTE, records);
-        return new Record(GenericUtils.generateRecordID(), INDEX_DATA_RECORD_TENANT_ID, INDEX_DATA_RECORD_TABLE_NAME, 
+        return new Record(GenericUtils.generateRecordID(), INDEX_DATA_RECORD_TENANT_ID, INDEX_DATA_RECORD_TABLE_NAME,
                 values, processId);
     }
-    
+
     private Record createIndexProcessDataDeleteRecord(long processId, DeleteIndexEntry[] ids) {
         Map<String, Object> values = new HashMap<String, Object>(1);
         values.put(INDEX_OP_DATA_ATTRIBUTE, ids);
-        return new Record(GenericUtils.generateRecordID(), INDEX_DATA_RECORD_TENANT_ID, INDEX_DATA_RECORD_TABLE_NAME, 
+        return new Record(GenericUtils.generateRecordID(), INDEX_DATA_RECORD_TENANT_ID, INDEX_DATA_RECORD_TABLE_NAME,
                 values, processId);
     }
-    
+
     private List<Record> createIndexUpdateRecords(List<Record> records) {
         Map<Long, List<Record>> data = new HashMap<Long, List<Record>>();
         long processId;
@@ -367,7 +370,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         return result;
     }
-    
+
     private List<Record> createIndexDeleteRecords(int tenantId, String tableName, List<String> ids) {
         Map<Long, List<DeleteIndexEntry>> data = new HashMap<Long, List<DeleteIndexEntry>>();
         long processId;
@@ -383,24 +386,24 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         List<Record> result = new ArrayList<Record>(data.size());
         for (Map.Entry<Long, List<DeleteIndexEntry>> entry : data.entrySet()) {
-            result.add(this.createIndexProcessDataDeleteRecord(entry.getKey(), 
+            result.add(this.createIndexProcessDataDeleteRecord(entry.getKey(),
                     entry.getValue().toArray(new DeleteIndexEntry[0])));
         }
         return result;
     }
-    
+
     private void scheduleIndexUpdate(List<Record> records) throws AnalyticsException {
         List<Record> indexRecords = this.createIndexUpdateRecords(records);
         this.getAnalyticsRecordStore().put(indexRecords);
         this.getFlowController().receive(indexRecords.size());
     }
-    
+
     private void scheduleIndexDelete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
         List<Record> indexRecords = this.createIndexDeleteRecords(tenantId, tableName, ids);
         this.getAnalyticsRecordStore().put(indexRecords);
         this.getFlowController().receive(indexRecords.size());
     }
-    
+
     private void processIndexOperations(int shardIdFrom, int shardRange) throws AnalyticsException {
         int count = this.shardIndexRecordBatchSize;
         int tmpCount;
@@ -408,13 +411,13 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         while (count >= this.shardIndexRecordBatchSize) {
             count = 0;
             for (IndexedTableId indexTableId : this.indexedTableStore.getAllIndexedTables()) {
-                tmpCount = this.processIndexOperations(indexTableId.getTenantId(), 
-                        indexTableId.getTableName(), shardIdFrom, shardRange, this.shardIndexRecordBatchSize);
+                tmpCount = this.processIndexOperations(indexTableId.getTenantId(), indexTableId.getTableName(),
+                        shardIdFrom, shardRange, this.shardIndexRecordBatchSize);
                 count = Math.max(count, tmpCount);
             }
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     private int processIndexOperations(int tenantId, String tableName, int shardIdFrom, int shardRange,
             int count) throws AnalyticsException {
@@ -422,8 +425,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (indexRecords.size() == 0) {
             return 0;
         }
-        Object[] result = this.checkAndExtractInsertDeleteIndexOperationBatches(tenantId, tableName, 
-                shardIdFrom, shardRange, indexRecords);
+        Object[] result = this.checkAndExtractInsertDeleteIndexOperationBatches(tenantId, tableName, shardIdFrom,
+                shardRange, indexRecords);
         List<Object> indexObjs = this.entriesListToIndexObjects((List<Object>) result[0]);
         List<String> processedIds = (List<String>) result[1];
         Map<Integer, List<Record>> shardRecordMap;
@@ -438,7 +441,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 shardRecordMap = this.groupByShards((List<Record>) indexObj);
                 for (Map.Entry<Integer, List<Record>> entry : shardRecordMap.entrySet()) {
                     this.updateIndex(entry.getKey(), entry.getValue(), this.lookupIndices(tenantId, tableName));
-                }                
+                }
             }
         }
         try {
@@ -452,7 +455,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             this.getFlowController().processed(processedIds.size());
         }
     }
-    
+
     private Map<Integer, List<Record>> groupByShards(List<Record> records) {
         Map<Integer, List<Record>> result = new HashMap<Integer, List<Record>>();
         int shardId;
@@ -468,7 +471,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         return result;
     }
-    
+
     private Map<Integer, List<String>> groupByShards(String[] ids) {
         Map<Integer, List<String>> result = new HashMap<Integer, List<String>>();
         int shardId;
@@ -484,7 +487,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         return result;
     }
-    
+
     private List<Object> entriesListToIndexObjects(List<Object> entriesList) {
         List<Record> updateRecords = new ArrayList<Record>();
         List<String> deleteRecords = new ArrayList<String>();
@@ -512,7 +515,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         return result;
     }
-    
+
     /* The logic in this method that is used to again group the records by table identity is important,
      * where the earlier query using process ids does not guarantee unique table/tenant-id combination,
      * because there can be collisions when generating the process ids, if collisions are found, the 
@@ -553,7 +556,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 for (DeleteIndexEntry deleteEntry : (DeleteIndexEntry[]) value) {
                     if (this.checkRecordDeleteProcessEntitlement(deleteEntry, tenantId, tableName, shardIdFrom, shardRange)) {
                         processed = true;
-                        entriesList.add(deleteEntry.getId());                    
+                        entriesList.add(deleteEntry.getId());
                     } else {
                         foreignDeleteEntries.add(deleteEntry);
                     }
@@ -561,12 +564,13 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 if (processed) {
                     processedIds.add(indexRecord.getId());
                     if (!foreignDeleteEntries.isEmpty()) {
-                        foreignEntries.add(foreignDeleteEntries.toArray(new DeleteIndexEntry[foreignDeleteEntries.size()]));
+                        foreignEntries.add(
+                                foreignDeleteEntries.toArray(new DeleteIndexEntry[foreignDeleteEntries.size()]));
                         foreignDeleteEntries = new ArrayList<AnalyticsDataIndexer.DeleteIndexEntry>();
                     }
                 }
             } else {
-                log.error("Corrupted index operation from index record, deleting index record with table name: " + 
+                log.error("Corrupted index operation from index record, deleting index record with table name: " +
                         indexRecord.getTableName() + " id: " + indexRecord.getId());
                 this.deleteIndexRecords(Arrays.asList(indexRecord.getId()));
             }
@@ -574,7 +578,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         this.handleForeignIndexEntries(foreignEntries);
         return new Object[] { entriesList, processedIds };
     }
-    
+
     @SuppressWarnings("unchecked")
     private void handleForeignIndexEntries(List<Object> foreignEntries) throws AnalyticsException {
         for (Object obj : foreignEntries) {
@@ -592,50 +596,50 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
         }
     }
-    
-    private boolean checkRecordUpdateProcessEntitlement(Record record, int tenantId, String tableName, 
+
+    private boolean checkRecordUpdateProcessEntitlement(Record record, int tenantId, String tableName,
             int shardIdFrom, int shardRange) {
         for (int i = shardIdFrom; i < shardIdFrom + shardRange; i++) {
-            if (tenantId == record.getTenantId() && tableName.equals(record.getTableName()) && 
+            if (tenantId == record.getTenantId() && tableName.equals(record.getTableName()) &&
                     this.calculateShardId(record.getId()) == i) {
                 return true;
             }
         }
         return false;
     }
-    
-    private boolean checkRecordDeleteProcessEntitlement(DeleteIndexEntry deleteEntry, int tenantId, String tableName, 
+
+    private boolean checkRecordDeleteProcessEntitlement(DeleteIndexEntry deleteEntry, int tenantId, String tableName,
             int shardIdFrom, int shardRange) {
         for (int i = shardIdFrom; i < shardIdFrom + shardRange; i++) {
-            if (tenantId == deleteEntry.getTenantId() && tableName.equals(deleteEntry.getTableName()) && 
+            if (tenantId == deleteEntry.getTenantId() && tableName.equals(deleteEntry.getTableName()) &&
                     this.calculateShardId(deleteEntry.getId()) == i) {
                 return true;
             }
         }
         return false;
     }
-    
+
     private void deleteIndexRecords(List<String> processedIds) throws AnalyticsException {
         this.getAnalyticsRecordStore().delete(INDEX_DATA_RECORD_TENANT_ID, INDEX_DATA_RECORD_TABLE_NAME, processedIds);
     }
-    
+
     private List<Record> loadIndexOperationRecords(int tenantId, String tableName, int shardIdFrom, int shardRange,
             int count) throws AnalyticsException {
         long processIdStart = this.createIndexProcessId(tenantId, tableName, shardIdFrom);
         long processIdEnd = this.createIndexProcessId(tenantId, tableName, shardIdFrom + shardRange);
         return GenericUtils.listRecords(this.getAnalyticsRecordStore(), this.getAnalyticsRecordStore().get(
-                INDEX_DATA_RECORD_TENANT_ID, INDEX_DATA_RECORD_TABLE_NAME, 1, 
-                null, processIdStart, processIdEnd, 0, count));
+                INDEX_DATA_RECORD_TENANT_ID, INDEX_DATA_RECORD_TABLE_NAME, 1, null, processIdStart, processIdEnd, 0,
+                count));
     }
-    
+
     private int calculateShardId(String id) {
         return Math.abs(id.hashCode()) % this.getShardCount();
     }
-    
+
     private String generateGlobalPath(String basepath, int tenantId, String tableName) {
         return this.generateDirPath(basepath, this.generateTableId(tenantId, tableName));
     }
-    
+
     private List<String> lookupGloballyExistingShardIds(String basepath, int tenantId, String tableName)
             throws AnalyticsIndexException {
         String globalPath = this.generateGlobalPath(basepath, tenantId, tableName);
@@ -647,14 +651,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
             return result;
         } catch (IOException e) {
-            throw new AnalyticsIndexException("Error in looking up index shard directories for tenant: " + 
+            throw new AnalyticsIndexException("Error in looking up index shard directories for tenant: " +
                     tenantId + " table: " + tableName);
         }
     }
-    
+
     public List<SearchResultEntry> search(final int tenantId, final String tableName, final String query,
             final int start, final int count) throws AnalyticsIndexException {
-        return new IndexSearchOpExecutor<List<SearchResultEntry>>() {            
+        return new IndexSearchOpExecutor<List<SearchResultEntry>>() {
             @Override
             public List<SearchResultEntry> run() throws AnalyticsIndexException {
                 List<SearchResultEntry> result = new ArrayList<>(count);
@@ -727,7 +731,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
 
     public int searchCount(final int tenantId, final String tableName, final String query) throws AnalyticsIndexException {
-        return new IndexSearchOpExecutor<Integer>() {            
+        return new IndexSearchOpExecutor<Integer>() {
             @Override
             public Integer run() throws AnalyticsIndexException {
                 return doSearchCount(tenantId, tableName, query);
@@ -735,7 +739,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
         }.execute();
     }
-    
+
     private int doSearchCount(int tenantId, String tableName, String query) throws AnalyticsIndexException {
         IndexReader reader = null;
         try {
@@ -776,7 +780,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (drillDownRequest.getRanges() == null) {
             throw new AnalyticsIndexException("Ranges are not set");
         }
-        return new IndexSearchOpExecutor<List<AnalyticsDrillDownRange>>() {            
+        return new IndexSearchOpExecutor<List<AnalyticsDrillDownRange>>() {
             @Override
             public List<AnalyticsDrillDownRange> run() throws AnalyticsIndexException {
                 IndexReader indexReader = null;
@@ -800,7 +804,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                     }
                 }
             }
-        }.execute();        
+        }.execute();
     }
 
     private List<AnalyticsDrillDownRange> getAnalyticsDrillDownRanges(int tenantId,
@@ -916,8 +920,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                                                                 drillDownRequest.getTableName());
             FacetsConfig config = this.getFacetsConfigurations(indices);
             DrillSideways drillSideways = new DrillSideways(indexSearcher, config, taxonomyReader);
-            DrillDownQuery drillDownQuery = this.createDrillDownQuery(drillDownRequest,
-                                              indices, config,rangeField, range);
+            DrillDownQuery drillDownQuery = this.createDrillDownQuery(drillDownRequest, indices, config, rangeField,
+                    range);
             drillSideways.search(drillDownQuery, facetsCollector);
             int topResultCount = drillDownRequest.getRecordStartIndex() + drillDownRequest.getRecordCount();
             TopDocs topDocs = FacetsCollector.search(indexSearcher, drillDownQuery, topResultCount, facetsCollector);
@@ -998,8 +1002,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId,
                                                                 drillDownRequest.getTableName());
             FacetsConfig config = this.getFacetsConfigurations(indices);
-            DrillDownQuery drillDownQuery = this.createDrillDownQuery(drillDownRequest,
-                                                                      indices, config,rangeField, range);
+            DrillDownQuery drillDownQuery = this.createDrillDownQuery(drillDownRequest, indices, config, rangeField,
+                    range);
             ValueSource scoreFunction = this.getCompiledScoreFunction(drillDownRequest.getScoreFunction(), indices);
             FacetsCollector facetsCollector = new FacetsCollector(true);
             Map<String, List<String>> categoryPaths = drillDownRequest.getCategoryPaths();
@@ -1159,11 +1163,12 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         int endIndex = startIndex + drillDownRequest.getRecordCount();
         if (endIndex <= startIndex) throw new AnalyticsIndexException("Record Count should be greater than 0");
         String tableName = drillDownRequest.getTableName();
-        List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds(TAXONOMY_INDEX_DATA_FS_BASE_PATH,
-                                                                            tenantId, tableName);
+        List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds(TAXONOMY_INDEX_DATA_FS_BASE_PATH, tenantId,
+                tableName);
         List<SearchResultEntry> resultFacetList = new ArrayList<>();
         for (String shardId : taxonomyShardIds) {
-            resultFacetList.addAll(this.drillDownRecordsPerShard(tenantId, shardId, drillDownRequest, rangeField, range));
+            resultFacetList.addAll(
+                    this.drillDownRecordsPerShard(tenantId, shardId, drillDownRequest, rangeField, range));
         }
         Collections.sort(resultFacetList);
         if (resultFacetList.size() < startIndex) {
@@ -1190,8 +1195,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                                          String rangeField, AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
         String tableName = drillDownRequest.getTableName();
-        List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds(TAXONOMY_INDEX_DATA_FS_BASE_PATH,
-                tenantId, tableName);
+        List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds(TAXONOMY_INDEX_DATA_FS_BASE_PATH, tenantId,
+                tableName);
         double totalCount = 0;
         for (String shardId : taxonomyShardIds) {
             totalCount += this.getDrillDownRecordCountPerShard(tenantId, shardId, drillDownRequest, rangeField, range);
@@ -1210,7 +1215,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
         final Directory indexDir = this.lookupIndexDir(shardedTableId);
         final Directory taxonomyDir = this.lookupTaxonomyIndexDir(shardedTableId);
-        return new IndexSearchOpExecutor<List<SearchResultEntry>>() {            
+        return new IndexSearchOpExecutor<List<SearchResultEntry>>() {
             @Override
             public List<SearchResultEntry> run() throws AnalyticsIndexException {
                 return drillDownRecords(tenantId, drillDownRequest, indexDir, taxonomyDir, rangeField, range);
@@ -1221,7 +1226,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private List<CategorySearchResultEntry> drillDownCategoriesPerShard(final int tenantId, final String shardId,
                                                              final CategoryDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        return new IndexSearchOpExecutor<List<CategorySearchResultEntry>>() {            
+        return new IndexSearchOpExecutor<List<CategorySearchResultEntry>>() {
             @Override
             public List<CategorySearchResultEntry> run() throws AnalyticsIndexException {
                 String shardedTableId = generateShardedTableId(tenantId, drillDownRequest.getTableName(), shardId);
@@ -1229,7 +1234,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 Directory taxonomyDir = lookupTaxonomyIndexDir(shardedTableId);
                 return drilldowncategories(tenantId, indexDir, taxonomyDir, drillDownRequest);
             }
-        }.execute();        
+        }.execute();
     }
 
     private double getDrillDownRecordCountPerShard(final int tenantId,
@@ -1238,7 +1243,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                                                    final String rangeField,
                                                    final AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
-        return new IndexSearchOpExecutor<Double>() {            
+        return new IndexSearchOpExecutor<Double>() {
             @Override
             public Double run() throws AnalyticsIndexException {
                 String tableName = drillDownRequest.getTableName();
@@ -1247,7 +1252,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 Directory taxonomyDir = lookupTaxonomyIndexDir(shardedTableId);
                 return getDrillDownRecordCount(tenantId, drillDownRequest, indexDir, taxonomyDir, rangeField, range);
             }
-        }.execute();        
+        }.execute();
     }
 
     /**
@@ -1258,7 +1263,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     public void put(List<Record> records) throws AnalyticsException {
         this.scheduleIndexUpdate(records);
     }
-    
+
     /**
     * Deletes the given records in the index.
     * @param tenantId The tenant id
@@ -1269,7 +1274,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
         this.scheduleIndexDelete(tenantId, tableName, ids);
     }
-    
+
     private void deleteInIndex(int tenantId, String tableName, int shardIndex, List<String> ids) throws AnalyticsException {
         String tableId = this.generateShardedTableId(tenantId, tableName, Integer.toString(shardIndex));
         IndexWriter indexWriter = this.createIndexWriter(tableId);
@@ -1293,8 +1298,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
         }
     }
-    
-    private void updateIndex(int shardIndex, List<Record> recordBatch, 
+
+    private void updateIndex(int shardIndex, List<Record> recordBatch,
             Map<String, ColumnDefinition> columns) throws AnalyticsIndexException {
         Record firstRecord = recordBatch.get(0);
         int tenantId = firstRecord.getTenantId();
@@ -1321,7 +1326,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
         }
     }
-    
+
     private String trimNonTokenizedIndexStringField(String value) {
         if (value.length() > MAX_NON_TOKENIZED_INDEX_STRING_SIZE) {
             return value.substring(0, MAX_NON_TOKENIZED_INDEX_STRING_SIZE);
@@ -1329,7 +1334,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             return value;
         }
     }
-    
+
     private void checkAndAddDocEntry(Document doc, AnalyticsSchema.ColumnType type, String name, Object obj)
             throws AnalyticsIndexException {
         FieldType fieldType = new FieldType();
@@ -1345,7 +1350,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         switch (type) {
         case STRING:
             doc.add(new TextField(name, obj.toString(), Store.NO));
-            doc.add(new StringField(Constants.NON_TOKENIZED_FIELD_PREFIX + name, 
+            doc.add(new StringField(Constants.NON_TOKENIZED_FIELD_PREFIX + name,
                     this.trimNonTokenizedIndexStringField(obj.toString()), Store.NO));
             break;
         case INTEGER:
@@ -1448,7 +1453,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private Directory createDirectory(String tableId) throws AnalyticsIndexException {
         return this.createDirectory(INDEX_DATA_FS_BASE_PATH, tableId);
     }
-    
+
     private Directory createDirectory(String basePath, String tableId) throws AnalyticsIndexException {
         String path = this.generateDirPath(basePath, tableId);
         try {
@@ -1457,7 +1462,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             throw new AnalyticsIndexException("Error in creating directory: " + e.getMessage(), e);
         }
     }
-    
+
     private Directory lookupIndexDir(String tableId) throws AnalyticsIndexException {
         Directory indexDir = this.indexDirs.get(tableId);
         if (indexDir == null) {
@@ -1485,7 +1490,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         return indexTaxonomyDir;
     }
-    
+
     private IndexWriter createIndexWriter(String tableId) throws AnalyticsIndexException {
         Directory indexDir = this.lookupIndexDir(tableId);
         IndexWriterConfig conf = new IndexWriterConfig(this.luceneAnalyzer);
@@ -1504,7 +1509,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             throw new AnalyticsIndexException("Error in creating index writer: " + e.getMessage(), e);
         }
     }
-    
+
     public void clearIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
         /* delete all global index data, not only local ones */
         String globalFacetPath = this.generateGlobalPath(TAXONOMY_INDEX_DATA_FS_BASE_PATH, tenantId, tableName);
@@ -1513,21 +1518,21 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             this.getFileSystem().delete(globalFacetPath);
             this.getFileSystem().delete(globalIndexPath);
         } catch (IOException e) {
-            throw new AnalyticsIndexException("Error in clearing index data for tenant: " + 
+            throw new AnalyticsIndexException("Error in clearing index data for tenant: " +
                     tenantId + " table: " + tableName + " : " + e.getMessage(), e);
         }
     }
-    
+
     private String generateShardedTableId(int tenantId, String tableName, String shardId) {
         /* the table names are not case-sensitive */
         return this.generateTableId(tenantId, tableName) + "/" + shardId;
     }
-    
+
     private String generateTableId(int tenantId, String tableName) {
         /* the table names are not case-sensitive */
         return tenantId + "_" + tableName.toLowerCase();
     }
-    
+
     private void closeAndRemoveIndexDir(String tableId) throws AnalyticsIndexException {
         Directory indexDir = this.indexDirs.remove(tableId);
         try {
@@ -1538,13 +1543,13 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             throw new AnalyticsIndexException("Error in closing index directory: " + e.getMessage(), e);
         }
     }
-    
+
     private void closeAndRemoveIndexDirs(Set<String> tableIds) throws AnalyticsIndexException {
         for (String tableId : tableIds) {
             this.closeAndRemoveIndexDir(tableId);
         }
     }
-    
+
     public synchronized void stopAndCleanupIndexProcessing() {
         this.getFlowController().stop();
         if (this.shardWorkerExecutor != null) {
@@ -1568,14 +1573,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         this.stopAndCleanupIndexProcessing();
         this.closeAndRemoveIndexDirs(new HashSet<String>(this.indexDirs.keySet()));
     }
-        
+
     public void waitForIndexing(long maxWait) throws AnalyticsException, AnalyticsTimeoutException {
         for (IndexedTableId indexedTableId : this.indexedTableStore.getAllIndexedTables()) {
             this.waitForIndexing(indexedTableId.getTenantId(), indexedTableId.getTableName(), maxWait);
         }
     }
-    
-    public void waitForIndexing(int tenantId, String tableName, long maxWait) 
+
+    public void waitForIndexing(int tenantId, String tableName, long maxWait)
             throws AnalyticsException {
         if (maxWait < 0) {
             maxWait = Long.MAX_VALUE;
@@ -1596,7 +1601,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
         }
     }
-    
+
     private void planIndexingWorkersInCluster() throws AnalyticsException {
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         int retryCount = 0;
@@ -1610,14 +1615,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 }
                 List<Integer[]> schedulePlan = this.generateIndexWorkerSchedulePlan(memberCount);
                 for (int i = 0; i < members.size(); i++) {
-                    acm.executeOne(ANALYTICS_INDEXING_GROUP, members.get(i), 
+                    acm.executeOne(ANALYTICS_INDEXING_GROUP, members.get(i),
                             new IndexingScheduleMessage(schedulePlan.get(i)));
                 }
                 break;
             } catch (AnalyticsException e) {
                 retryCount++;
                 if (retryCount < INDEXING_SCHEDULE_PLAN_RETRY_COUNT) {
-                    log.warn("Retrying index schedule planning: " + 
+                    log.warn("Retrying index schedule planning: " +
                             e.getMessage() + ": attempt " + (retryCount + 1) + "...", e);
                 } else {
                     log.error("Giving up index schedule planning: " + e.getMessage(), e);
@@ -1626,7 +1631,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
         }
     }
-    
+
     @Override
     public void onBecomingLeader() {
         try {
@@ -1650,11 +1655,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    public AnalyticsIterator<Record> searchWithAggregates(final int tenantId, 
+    public AnalyticsIterator<Record> searchWithAggregates(final int tenantId,
             final AggregateRequest aggregateRequest)
             throws AnalyticsException {
         final AnalyticsDataIndexer indexer = this;
-        return new IndexSearchOpExecutor<AnalyticsIterator<Record>>() {            
+        return new IndexSearchOpExecutor<AnalyticsIterator<Record>>() {
             @Override
             public AnalyticsIterator<Record> run() throws AnalyticsIndexException {
                 try {
@@ -1666,7 +1671,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                     throw new AnalyticsIndexException("Error occured while performing aggregation, " + e.getMessage(), e);
                 }
             }
-        }.execute();        
+        }.execute();
     }
 
 	private List<String[]> getUniqueGroupings(int tenantId, AggregateRequest aggregateRequest)
@@ -1682,7 +1687,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             Set<String> finalUniqueCategories = new HashSet<>();
             for (int i = 0; i < taxonomyShardIds.size(); i++) {
                 String shardedTableId = this.generateShardedTableId(tenantId, aggregateRequest.getTableName(),
-                                                                    taxonomyShardIds.get(i));
+                        taxonomyShardIds.get(i));
                 Directory taxonomyDir = this.lookupTaxonomyIndexDir(shardedTableId);
                 TaxonomyReader reader = new DirectoryTaxonomyReader(taxonomyDir);
                 Callable<Set<String>> callable = new TaxonomyWorker(reader, aggregateRequest);
@@ -1748,23 +1753,40 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private Record aggregatePerGrouping(int tenantId, String[] path,
                                          AggregateRequest aggregateRequest)
             throws AnalyticsException {
-        Map<String,  Number> optionalParams = new HashMap<>();
+        Map<String, Number> optionalParams = new HashMap<>();
         Map<String, AggregateFunction> perAliasAggregateFunction = initPerAliasAggregateFunctions(aggregateRequest,
-                                                                                                  optionalParams);
-        List<Iterator<Record>> iterators = this.getRecordIterators(tenantId, path, aggregateRequest);
+                optionalParams);
         Record aggregatedRecord = null;
-        if (!iterators.isEmpty()) {
-            Iterator<Record> iterator = IteratorUtils.chainedIterator(iterators);
-            while (iterator.hasNext()) {
-                Record record = iterator.next();
-                for (AggregateField field : aggregateRequest.getFields()) {
-                    Number value = (Number) record.getValue(field.getFieldName());
-                    AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
-                    function.process(value);
+        //get the search results from lucene
+        List<SearchResultEntry> searchResultEntries = getRecordSearchEntries(tenantId, path, aggregateRequest);
+        if (!searchResultEntries.isEmpty()) {
+            List<String> recordIds = getRecordIds(searchResultEntries);
+            AnalyticsDataResponse analyticsDataResponse = this.analyticsDataService.get(tenantId,
+                    aggregateRequest.getTableName(), 1, null, recordIds);
+            String recordStoreName = analyticsDataResponse.getRecordStoreName();
+            RecordGroup[] recordGroupsArray = analyticsDataResponse.getRecordGroups();
+            List<RecordGroup> recordGroupList = new ArrayList<>();
+            int recordsGroupLength = recordGroupsArray.length;
+            for (int i = 0; i < recordsGroupLength; i++) {
+                recordGroupList.add(recordGroupsArray[i]);
+                if (i % maxIteratorPoolSize == 0 || i == recordsGroupLength - 1) {
+                    List<Iterator<Record>> iterators = this.getRecordIterators(recordGroupList, recordStoreName);
+                    if (!iterators.isEmpty()) {
+                        Iterator<Record> iterator = IteratorUtils.chainedIterator(iterators);
+                        while (iterator.hasNext()) {
+                            Record record = iterator.next();
+                            for (AggregateField field : aggregateRequest.getFields()) {
+                                Number value = (Number) record.getValue(field.getFieldName());
+                                AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
+                                function.process(value);
+                            }
+                        }
+                    }
+                    recordGroupList.clear();
                 }
             }
-            Map<String, Object> aggregatedValues = generateAggregateRecordValues(path,
-                                                                                 aggregateRequest, perAliasAggregateFunction);
+            Map<String, Object> aggregatedValues = generateAggregateRecordValues(path, aggregateRequest,
+                    perAliasAggregateFunction);
             aggregatedRecord = new Record(tenantId, aggregateRequest.getTableName(), aggregatedValues);
         }
         return aggregatedRecord;
@@ -1790,7 +1812,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             throws AnalyticsException {
         Map<String, AggregateFunction> perAliasAggregateFunction = new HashMap<>();
         for (AggregateField field : aggregateRequest.getFields()) {
-            AggregateFunction function = getAggregateFunctionFactory().create(field.getAggregateFunction(), optionalParams);
+            AggregateFunction function = getAggregateFunctionFactory().create(field.getAggregateFunction(),
+                    optionalParams);
             if (function == null) {
                 throw new AnalyticsException("Unknown aggregate function!");
             } else if (field.getFieldName() == null || field.getFieldName().isEmpty()) {
@@ -1803,20 +1826,12 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return perAliasAggregateFunction;
     }
 
-    private List<Iterator<Record>> getRecordIterators(int tenantId, String[] path,
-                                                      AggregateRequest aggregateRequest)
+    private List<Iterator<Record>> getRecordIterators(List<RecordGroup> recordGroups, String recordStoreName)
             throws AnalyticsException {
         List<Iterator<Record>> iterators = new ArrayList<>();
-        List<SearchResultEntry> searchResultEntries = getRecordSearchEntries(tenantId, path,  aggregateRequest);
-        if (!searchResultEntries.isEmpty()) {
-            List<String> recordIds = getRecordIds(searchResultEntries);
-            AnalyticsDataResponse analyticsDataResponse = this.analyticsDataService.get(tenantId, aggregateRequest.getTableName(),
-                                                                                        1, null, recordIds);
-            RecordGroup[] recordGroups = analyticsDataResponse.getRecordGroups();
             for (RecordGroup recordGroup : recordGroups) {
-                iterators.add(this.analyticsDataService.readRecords(analyticsDataResponse.getRecordStoreName(), recordGroup));
+                iterators.add(this.analyticsDataService.readRecords(recordStoreName, recordGroup));
             }
-        }
         return iterators;
     }
 
@@ -1836,7 +1851,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return this.getDrillDownRecords(tenantId, analyticsDrillDownRequest, null, null);
     }
 
-    private static List<String> getRecordIds(List<SearchResultEntry> searchResults) {
+    private List<String> getRecordIds(List<SearchResultEntry> searchResults) {
         List<String> ids = new ArrayList<>();
         for (SearchResultEntry searchResult : searchResults) {
             ids.add(searchResult.getId());
@@ -1944,11 +1959,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
      * This is executed to start indexing operations in the current node.
      */
     public static class IndexingScheduleMessage implements Callable<String>, Serializable {
-        
+
         private static final long serialVersionUID = 7912933193977147465L;
-        
+
         private Integer[] shardInfo;
-        
+
         public IndexingScheduleMessage(Integer[] shardInfo) {
             this.shardInfo = shardInfo;
         }
@@ -1966,32 +1981,32 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             return "OK";
         }
     }
-    
+
     /**
      * This class represents a index delete entry.
      */
     public static class DeleteIndexEntry implements Serializable {
-        
+
         private static final long serialVersionUID = -3118546252869493269L;
 
         private int tenantId;
-        
+
         private String tableName;
-        
+
         private String id;
-        
+
         public DeleteIndexEntry() { }
-        
+
         public DeleteIndexEntry(int tenantId, String tableName, String id) {
             this.tenantId = tenantId;
             this.tableName = tableName;
             this.id = id;
         }
-        
+
         public int getTenantId() {
             return tenantId;
         }
-        
+
         public String getTableName() {
             return tableName;
         }
@@ -1999,37 +2014,37 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         public String getId() {
             return id;
         }
-        
+
     }
-    
+
     /**
      * This class represents an indexing operation for a record.
      */
     public static class IndexOperation implements Serializable {
-        
+
         private static final long serialVersionUID = -5071679492708482851L;
-        
+
         private Record record;
-        
+
         private boolean delete;
-        
+
         public IndexOperation() { }
-        
+
         public IndexOperation(Record record, boolean delete) {
             this.record = record;
             this.delete = delete;
         }
-        
+
         public Record getRecord() {
             return record;
         }
-        
+
         public boolean isDelete() {
             return delete;
         }
-        
+
     }
-    
+
     /**
      * This represents an indexing worker, who does index operations in the background.
      */
@@ -2038,28 +2053,28 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         private static final int INDEX_WORKER_SLEEP_TIME = 1500;
 
         private int shardIdFrom;
-        
+
         private int shardRange;
-        
+
         private boolean stop;
-        
+
         public IndexWorker(int shardIdFrom, int shardRange) {
             this.shardIdFrom = shardIdFrom;
             this.shardRange = shardRange;
         }
-        
+
         public int getShardIdFrom() {
             return shardIdFrom;
         }
-        
+
         public int getShardRange() {
             return shardRange;
         }
-        
+
         public void stop() {
             this.stop = true;
         }
-        
+
         @Override
         public void run() {
             while (!this.stop) {
@@ -2117,16 +2132,16 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
         }
     }
-    
+
     /**
      * This class represents index search operation retry logic.
      */
     private abstract static class IndexSearchOpExecutor<E> {
-        
+
         private static final int[] RETRY_WAIT_TIMES = new int[] { 100, 1000 };
-        
+
         public abstract E run() throws AnalyticsIndexException;
-        
+
         public E execute() throws AnalyticsIndexException {
             for (int i = 0; i <= RETRY_WAIT_TIMES.length; i++) {
                 try {
@@ -2143,7 +2158,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
             throw new AnalyticsIndexException("IndexSearchOpExecutor: this should never happen.");
         }
-        
+
     }
-    
+
 }
