@@ -135,25 +135,19 @@ public class AnalyticsDSConnector {
 
     private List<Record> convertEventsToRecord(int tenantId, List<Event> events)
             throws StreamDefinitionStoreException, AnalyticsException {
-        List<Record> records = new ArrayList<>();
+        List<Record> records = new ArrayList<>(events.size());
+        long timestamp;
+        String tableName;
+        StreamDefinition streamDefinition;
+        AnalyticsSchema analyticsSchema;
+        AbstractStreamDefinitionStore streamDefinitionStore = ServiceHolder.getStreamDefinitionStoreService();
+        if (streamDefinitionStore == null) {
+            throw new AnalyticsException("Stream Definition store is not available. dropping Event");
+        }
         for (Event event : events) {
-            long timestamp;
-            String tableName;
-            StreamDefinition streamDefinition;
-            AnalyticsSchema analyticsSchema;
-            AbstractStreamDefinitionStore streamDefinitionStore = ServiceHolder.getStreamDefinitionStoreService();
-            AnalyticsDataAPI analyticsDataAPI = ServiceHolder.getAnalyticsDataAPI();
-            if (streamDefinitionStore != null) {
-                streamDefinition = streamDefinitionStore.getStreamDefinition(event.getStreamId(), tenantId);
-                tableName = AnalyticsEventSinkUtil.generateAnalyticsTableName(streamDefinition.getName());
-            } else {
-                throw new AnalyticsException("Stream Definition store is not available. dropping Event");
-            }
-            if (analyticsDataAPI != null) {
-                analyticsSchema = ServiceHolder.getAnalyticsDataAPI().getTableSchema(tenantId, tableName);
-            } else {
-                throw new AnalyticsException("Analytics Data API is not available. dropping events");
-            }
+            streamDefinition = streamDefinitionStore.getStreamDefinition(event.getStreamId(), tenantId);
+            tableName = AnalyticsEventSinkUtil.generateAnalyticsTableName(streamDefinition.getName());
+            analyticsSchema = ServiceHolder.getAnalyticsDataAPI().getTableSchema(tenantId, tableName);
             Map<String, Object> eventAttributes = new HashMap<>();
             populateCommonAttributes(streamDefinition, analyticsSchema, eventAttributes);
             populateTypedAttributes(analyticsSchema, AnalyticsEventSinkConstants.EVENT_META_DATA_TYPE,
