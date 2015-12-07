@@ -29,4 +29,14 @@
    <!-- The number of index shards, should be equal or higher to the number of indexing nodes that is going to be working,
         ideal count being 'number of indexing nodes * CPU cores' -->
    <shardCount>6</shardCount>
+    <!-- The number of batch index records, the indexing node will process per each indexing thread. A batch index record basically
+     encapsulates a batch of records retrieved from the receiver to be indexed -->
+    <shardIndexRecordBatchSize>100</shardIndexRecordBatchSize>
+    <!-- Receiver/Indexing flow-control configuration -->
+    <analytics-receiver-indexing-flow-control enabled = "true">
+        <!-- maximum number of records that can be in index staging area before receiving is throttled -->
+        <recordReceivingHighThreshold>6000</recordReceivingHighThreshold>
+        <!-- the limit on number of records to be lower than, to reduce throttling -->
+        <recordReceivingLowThreshold>3000</recordReceivingLowThreshold>
+    </analytics-receiver-indexing-flow-control>
 </analytics-dataservice-configuration>
