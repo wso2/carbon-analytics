@@ -79,6 +79,7 @@ public class AnalyticsDataBackupTool {
     private static final String REINDEX_EVENTS = "reindexEvents";
     private static final String DISABLE_STAGING = "disableStaging";
     private static final String PURGE_DATA = "purge";
+    private static final String DELETE_TABLE = "deleteTables";
     private static final String RESTORE_FILE_SYSTEM = "restoreFileSystem";
     private static final String RESTORE_RECORD_STORE = "restoreRecordStore";
     private static final String BACKUP_FILE_SYSTEM = "backupFileSystem";
@@ -104,6 +105,7 @@ public class AnalyticsDataBackupTool {
         options.addOption(new Option(ENABLE_INDEXING, false, "enables indexing while restoring"));
         options.addOption(new Option(DISABLE_STAGING, false, "disables staging while restoring"));
         options.addOption(new Option(PURGE_DATA, false, "Purges Data for a given time range"));
+        options.addOption(new Option(DELETE_TABLE, false, "Deletes given tables"));
         options.addOption(
                 OptionBuilder.withArgName("directory").hasArg().withDescription("source/target directory").create(DIR));
         options.addOption(OptionBuilder.withArgName("table list").hasArg()
@@ -197,6 +199,8 @@ public class AnalyticsDataBackupTool {
             } else {
                 System.out.println("Please specify the table name for data purging!");
             }
+        } else if (line.hasOption(DELETE_TABLE)) {
+            deleteTables(service, tenantId, specificTables);
         } else if (line.hasOption(BACKUP_RECORD_STORE)) {
             backupRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
         } else if (line.hasOption(BACKUP_FILE_SYSTEM)) {
@@ -700,6 +704,20 @@ public class AnalyticsDataBackupTool {
             long timeTo, String tableName) throws AnalyticsException {
         if (service.tableExists(tenantId, tableName)) {
             service.delete(tenantId, tableName, timeFrom, timeTo);
+        }
+    }
+
+    /**
+     * Deletes a specified set of tables.
+     *
+     * @param service   Analytics Data Service.
+     * @param tenantId  Tenant ID
+     * @param tableList List of tables to be deleted.
+     */
+    private static void deleteTables(AnalyticsDataService service, int tenantId, String[] tableList)
+            throws AnalyticsException {
+        for (String tableName : tableList) {
+            service.deleteTable(tenantId,tableName);
         }
     }
 }
