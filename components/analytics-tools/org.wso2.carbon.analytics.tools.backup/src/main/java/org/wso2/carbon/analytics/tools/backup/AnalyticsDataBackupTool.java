@@ -105,7 +105,7 @@ public class AnalyticsDataBackupTool {
         options.addOption(new Option(ENABLE_INDEXING, false, "enables indexing while restoring"));
         options.addOption(new Option(DISABLE_STAGING, false, "disables staging while restoring"));
         options.addOption(new Option(PURGE_DATA, false, "Purges Data for a given time range"));
-        options.addOption(new Option(DELETE_TABLE, false, "Deletes a given table"));
+        options.addOption(new Option(DELETE_TABLE, false, "Deletes a given tables"));
         options.addOption(
                 OptionBuilder.withArgName("directory").hasArg().withDescription("source/target directory").create(DIR));
         options.addOption(OptionBuilder.withArgName("table list").hasArg()
