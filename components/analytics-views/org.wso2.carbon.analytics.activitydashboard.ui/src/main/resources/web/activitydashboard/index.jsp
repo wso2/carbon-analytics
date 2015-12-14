@@ -240,7 +240,7 @@
                     loadSearchResultPage();
                 },
                 error: function (data) {
-                    CARBON.showErrorDialog(data);
+                    CARBON.showErrorDialog("Activity search could not be completed due to an error. Please check your input fields and try again.");
                 }
             });
         }
