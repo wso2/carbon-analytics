@@ -23,9 +23,11 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreDeploymentException;
+import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
 import org.wso2.carbon.analytics.eventsink.internal.AnalyticsEventSinkServerStartupObserver;
 import org.wso2.carbon.analytics.eventsink.internal.AnalyticsEventStoreManager;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
@@ -107,7 +109,7 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
                             eventStore.getName());
                 }
                 ServiceHolder.getAnalyticsDataAPI().setTableSchema(tenantId, eventStore.getName(),
-                        AnalyticsEventSinkUtil.getAnalyticsSchema(eventStore.getAnalyticsTableSchema()));
+                        this.resolveAndMergeSchemata(tenantId, eventStore));
                 for (String streamId : eventStore.getEventSource().getStreamIds()) {
                     if (ServiceHolder.getStreamDefinitionStoreService().getStreamDefinition(streamId, tenantId) != null) {
                         ServiceHolder.getAnalyticsEventStreamListener().subscribeForStream(tenantId, streamId);
@@ -126,6 +128,17 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
             log.error(errorMsg, e);
             throw new AnalyticsEventStoreException(errorMsg, e);
         }
+    }
+
+    private AnalyticsSchema resolveAndMergeSchemata(int tenantId, AnalyticsEventStore eventStoreConfig) throws AnalyticsException {
+        AnalyticsSchema incomingSchema = AnalyticsEventSinkUtil.getAnalyticsSchema(eventStoreConfig.getAnalyticsTableSchema());
+        if (!eventStoreConfig.isMergeSchema()) {
+            return incomingSchema;
+        }
+        AnalyticsSchema liveSchema = ServiceHolder.getAnalyticsDataAPI().getTableSchema(tenantId, eventStoreConfig.getName());
+        return AnalyticsDataServiceUtils.createMergedSchema(liveSchema, incomingSchema.getPrimaryKeys(),
+                new ArrayList<>(incomingSchema.getColumns().values()),
+                new ArrayList<>(incomingSchema.getIndexedColumns().keySet()));
     }
 
     public void undeploy(String fileName) throws DeploymentException {

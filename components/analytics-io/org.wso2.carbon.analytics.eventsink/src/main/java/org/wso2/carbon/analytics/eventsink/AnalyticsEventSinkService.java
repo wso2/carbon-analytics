@@ -28,6 +28,9 @@ public interface AnalyticsEventSinkService {
     void putEventSink(int tenantId, String streamName, String version, AnalyticsSchema analyticsSchema,
                       String recordStoreName) throws AnalyticsEventStoreException;
 
+    void putEventSinkWithSchemaMergeInfo(int tenantId, String streamName, String version, AnalyticsSchema analyticsSchema,
+                      String recordStoreName, boolean isMergeSchema) throws AnalyticsEventStoreException;
+
     void putEventStore(int tenantId, AnalyticsEventStore eventStore) throws AnalyticsEventStoreException;
 
     void removeEventSink(int tenantId, String streamName, String version) throws AnalyticsEventStoreException;

@@ -97,6 +97,7 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                         AnalyticsEventStore eventStore = ServiceHolder.getAnalyticsEventSinkService().
                                 getEventStore(getTenantId(), streamName);
                         if (eventStore != null && eventStore.getEventSource() != null) {
+                            analyticsTable.setMergeSchema(eventStore.isMergeSchema());
                             List<String> streamIds = eventStore.getEventSource().getStreamIds();
                             if (streamIds != null && streamIds.contains(streamName + ":" + version)) {
                                 analyticsTable.setPersist(true);
@@ -157,7 +158,7 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                         List<String> primaryKeys = new ArrayList<>();
                         try {
                             AnalyticsSchema tableSchema = analyticsDataService.getTableSchema(getTenantId(), tableName);
-                            if (isStreamExist(analyticsTable.getTableName()) && tableSchema != null) {
+                            if ((isStreamExist(analyticsTable.getTableName()) || analyticsTable.isMergeSchema()) && tableSchema != null) {
                                 Map<String, ColumnDefinition> columns = tableSchema.getColumns();
                                 removeArbitraryField(columns);
                                 AnalyticsTableRecord[] analyticsTableRecords = analyticsTable.getAnalyticsTableRecords();
@@ -189,8 +190,9 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                             }
                         }
                         AnalyticsSchema schema = new AnalyticsSchema(columnDefinitions, primaryKeys);
-                        ServiceHolder.getAnalyticsEventSinkService().putEventSink(getTenantId(), analyticsTable
-                                .getTableName(), analyticsTable.getStreamVersion(), schema, analyticsTable.getRecordStoreName());
+                        ServiceHolder.getAnalyticsEventSinkService().putEventSinkWithSchemaMergeInfo(getTenantId(), analyticsTable
+                                        .getTableName(), analyticsTable.getStreamVersion(), schema,
+                                analyticsTable.getRecordStoreName(), analyticsTable.isMergeSchema());
                     } catch (Exception e) {
                         log.error("Unable to save analytics schema[" + analyticsTable.getTableName() + "]: " + e.getMessage(), e);
                         throw new EventStreamPersistenceAdminServiceException("Unable to save analytics schema", e);

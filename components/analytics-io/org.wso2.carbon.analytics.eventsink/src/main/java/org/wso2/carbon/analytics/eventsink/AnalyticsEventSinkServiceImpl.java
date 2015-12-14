@@ -31,9 +31,15 @@ public class AnalyticsEventSinkServiceImpl implements AnalyticsEventSinkService 
     @Override
     public void putEventSink(int tenantId, String streamName, String version, AnalyticsSchema analyticsSchema,
                              String recordStoreName) throws AnalyticsEventStoreException {
+        putEventSinkWithSchemaMergeInfo(tenantId, streamName, version, analyticsSchema, recordStoreName, false);
+    }
+
+    public void putEventSinkWithSchemaMergeInfo(int tenantId, String streamName, String version, AnalyticsSchema analyticsSchema,
+                                                String recordStoreName, boolean isMergeSchema) throws AnalyticsEventStoreException {
         String streamId = DataBridgeCommonsUtils.generateStreamId(streamName, version);
         AnalyticsEventStore analyticsEventStore = AnalyticsEventSinkUtil.
                 getAnalyticsEventStore(streamName, version, analyticsSchema, recordStoreName);
+        analyticsEventStore.setMergeSchema(isMergeSchema);
         AnalyticsEventStore existingEventStore = AnalyticsEventStoreManager.
                 getInstance().getAnalyticsEventStore(tenantId,
                 analyticsEventStore.getName());
@@ -50,11 +56,11 @@ public class AnalyticsEventSinkServiceImpl implements AnalyticsEventSinkService 
                             + analyticsEventStore.getRecordStore() + "," +
                             " therefore unable to proceed with new event sink for stream :" + streamName + " , version : "
                             + version + " , with primary record store.");
-                }else if (!analyticsEventStore.getRecordStore().equals(existingEventStore.getRecordStore())){
+                } else if (!analyticsEventStore.getRecordStore().equals(existingEventStore.getRecordStore())) {
                     throw new AnalyticsEventStoreException("Already event store is configured with record store name : "
                             + analyticsEventStore.getRecordStore() + "," +
                             " therefore unable to proceed with new event sink for stream :" + streamName + " , version : "
-                            + version + " , with record store :" + analyticsEventStore.getRecordStore()+".");
+                            + version + " , with record store :" + analyticsEventStore.getRecordStore() + ".");
                 }
             }
             for (String aStream : existingEventStore.getEventSource().getStreamIds()) {
