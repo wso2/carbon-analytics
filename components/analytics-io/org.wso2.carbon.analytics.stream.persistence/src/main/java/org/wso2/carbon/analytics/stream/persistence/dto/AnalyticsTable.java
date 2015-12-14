@@ -30,6 +30,7 @@ public class AnalyticsTable implements Serializable {
     private String streamVersion;
     private String recordStoreName;
     private boolean persist;
+    private boolean mergeSchema;
     private AnalyticsTableRecord[] analyticsTableRecords;
 
     public AnalyticsTable() {
@@ -73,5 +74,13 @@ public class AnalyticsTable implements Serializable {
 
     public void setAnalyticsTableRecords(AnalyticsTableRecord[] analyticsTableRecords) {
         this.analyticsTableRecords = analyticsTableRecords;
+    }
+
+    public boolean isMergeSchema() {
+        return mergeSchema;
+    }
+
+    public void setMergeSchema(boolean isMergeSchema) {
+        this.mergeSchema = isMergeSchema;
     }
 }

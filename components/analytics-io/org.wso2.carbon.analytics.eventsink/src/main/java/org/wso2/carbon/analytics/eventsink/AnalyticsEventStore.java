@@ -34,6 +34,7 @@ public class AnalyticsEventStore {
     private String name;
     private String recordStore;
     private EventSource eventSource;
+    private boolean mergeSchema;
     private AnalyticsTableSchema analyticsTableSchema;
 
     @XmlElement(name = "Source")
@@ -95,6 +96,15 @@ public class AnalyticsEventStore {
             tableName = streamName.replace('.', '_');
         }
         return tableName;
+    }
+
+    @XmlElement(name = "MergeSchema")
+    public boolean isMergeSchema() {
+        return mergeSchema;
+    }
+
+    public void setMergeSchema(boolean isMergeSchema) {
+        this.mergeSchema = isMergeSchema;
     }
 
     public static class EventSource {
