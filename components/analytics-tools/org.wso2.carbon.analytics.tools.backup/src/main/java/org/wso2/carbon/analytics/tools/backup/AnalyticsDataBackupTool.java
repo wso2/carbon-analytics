@@ -38,22 +38,17 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
-import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -80,9 +75,7 @@ public class AnalyticsDataBackupTool {
     private static final String DISABLE_STAGING = "disableStaging";
     private static final String PURGE_DATA = "purge";
     private static final String DELETE_TABLE = "deleteTables";
-    private static final String RESTORE_FILE_SYSTEM = "restoreFileSystem";
     private static final String RESTORE_RECORD_STORE = "restoreRecordStore";
-    private static final String BACKUP_FILE_SYSTEM = "backupFileSystem";
     private static final String BACKUP_RECORD_STORE = "backupRecordStore";
     private static final String TABLE_SCHEMA_FILE_NAME = "__TABLE_SCHEMA__";
     private static final String ANALYTICS_DS_CONFIG_FILE = "analytics-config.xml";
@@ -98,9 +91,7 @@ public class AnalyticsDataBackupTool {
     private static Options populateOptions() {
         Options options = new Options();
         options.addOption(new Option(BACKUP_RECORD_STORE, false, "backup analytics data"));
-        options.addOption(new Option(BACKUP_FILE_SYSTEM, false, "backup filesystem data"));
         options.addOption(new Option(RESTORE_RECORD_STORE, false, "restores analytics data"));
-        options.addOption(new Option(RESTORE_FILE_SYSTEM, false, "restores filesystem data"));
         options.addOption(new Option(REINDEX_EVENTS, false, "re-indexes records in the given table data"));
         options.addOption(new Option(ENABLE_INDEXING, false, "enables indexing while restoring"));
         options.addOption(new Option(DISABLE_STAGING, false, "disables staging while restoring"));
@@ -133,9 +124,7 @@ public class AnalyticsDataBackupTool {
             System.exit(1);
         }
         AnalyticsDataService service = null;
-        AnalyticsFileSystem analyticsFileSystem = null;
         try {
-            analyticsFileSystem = getAnalyticsFileSystem();
             service = AnalyticsServiceHolder.getAnalyticsDataService();
             int tenantId = Integer.parseInt(line.getOptionValue(TENANT_ID, "" + MultitenantConstants.SUPER_TENANT_ID));
             Long timeTo = getTime(line, TIMETO);
@@ -162,22 +151,18 @@ public class AnalyticsDataBackupTool {
             System.out.println("Intializing [tenant=" + tenantId + "] [timefrom='" + timeFrom + "'] [timeto='" + timeTo
                     + "'] [dir='" + baseDir + "']" +
                     (specificTables != null ? (" [table=" + Arrays.toString(specificTables) + "]") : "") + "...");
-            performAction(line, service, analyticsFileSystem, tenantId, timeTo, timeFrom, specificTables, baseDir);
+            performAction(line, service, tenantId, timeTo, timeFrom, specificTables, baseDir);
         } finally {
             if (service != null) {
                 service.destroy();
-            }
-            if (analyticsFileSystem != null) {
-                analyticsFileSystem.destroy();
             }
             Thread.sleep(2000);
         }
         System.out.println("Done.");
     }
 
-    private static void performAction(CommandLine line, AnalyticsDataService service,
-            AnalyticsFileSystem analyticsFileSystem, int tenantId, Long timeTo, Long timeFrom, String[] specificTables,
-            File baseDir) throws AnalyticsException, IOException {
+    private static void performAction(CommandLine line, AnalyticsDataService service, int tenantId, Long timeTo,
+            Long timeFrom, String[] specificTables, File baseDir) throws AnalyticsException, IOException {
         // this flag is used to control the staging for the records
         boolean disableStaging = line.hasOption(DISABLE_STAGING);
         String tableName = null;
@@ -203,27 +188,14 @@ public class AnalyticsDataBackupTool {
             deleteTables(service, tenantId, specificTables);
         } else if (line.hasOption(BACKUP_RECORD_STORE)) {
             backupRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
-        } else if (line.hasOption(BACKUP_FILE_SYSTEM)) {
-            backupFileSystem(analyticsFileSystem, tenantId, baseDir);
         } else if (line.hasOption(RESTORE_RECORD_STORE)) {
             restoreRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables, disableStaging);
-        } else if (line.hasOption(RESTORE_FILE_SYSTEM)) {
-            restoreFileSystem(analyticsFileSystem, baseDir);
         } else if (line.hasOption(REINDEX_EVENTS)) {
             for (int i = 0; i < specificTables.length; i++) {
                 System.out.printf("Reindexing data for the table: " + specificTables[i]);
                 reindexData(service, tenantId, specificTables[i]);
             }
         }
-    }
-
-    private static AnalyticsFileSystem getAnalyticsFileSystem()
-            throws AnalyticsException, InstantiationException, IllegalAccessException, ClassNotFoundException {
-        AnalyticsDataServiceConfiguration config = loadAnalyticsDataServiceConfig();
-        String afsClass = config.getAnalyticsFileSystemConfiguration().getImplementation();
-        AnalyticsFileSystem analyticsFileSystem = (AnalyticsFileSystem) Class.forName(afsClass).newInstance();
-        analyticsFileSystem.init(convertToMap(config.getAnalyticsFileSystemConfiguration().getProperties()));
-        return analyticsFileSystem;
     }
 
     private static Long getTime(CommandLine line, String option) throws ParseException {
@@ -456,132 +428,6 @@ public class AnalyticsDataBackupTool {
     }
 
     /**
-     * Backs up the file system to Local.
-     *
-     * @param analyticsFileSystem analyticsFileSystem object.
-     * @param tenantId            tenant ID of the tenant.
-     * @param baseDir             where the FileSystem should be backed upto.
-     * @throws IOException if the data cannot be written to the files.
-     */
-    private static void backupFileSystem(AnalyticsFileSystem analyticsFileSystem, int tenantId, File targetBaseDir)
-            throws IOException {
-        System.out.println("Backing up the filesystem to: " + targetBaseDir);
-        backupFileSystemToLocal(analyticsFileSystem, "/", targetBaseDir.getAbsolutePath());
-    }
-
-    /**
-     * Backing up the filesystem to the local recursively.
-     *
-     * @param analyticsFileSystem analyticsFileSystem object.
-     * @param tenantId            tenant ID of the tenant.
-     * @param baseDir             where the FileSystem should be backed upto.
-     * @throws IOException if the data cannot be written to the files.
-     */
-    private static void backupFileSystemToLocal(AnalyticsFileSystem analyticsFileSystem, String path,
-            String targetBaseDir) throws IOException {
-        targetBaseDir = GenericUtils.normalizePath(targetBaseDir);
-        List<String> nodeList = analyticsFileSystem.list(path);
-        String parentPath = (path.equals("/")) ? path : path + "/";
-        String nodePath;            // dependent on the DAS filesystem
-        String fileSystemNodePath; // dependent on the file system
-        for (String node : nodeList) {
-            nodePath = parentPath + node;
-            //convert the filesystem target path to match the filesystem path settings
-            fileSystemNodePath = targetBaseDir + nodePath;
-            fileSystemNodePath = fileSystemNodePath.replace("/", File.separator);
-            if (analyticsFileSystem.length(nodePath) == 0) { // the node is a directory
-                createDirectoryInLocalSystem(fileSystemNodePath);
-                backupFileSystemToLocal(analyticsFileSystem, nodePath, targetBaseDir);
-            } else {                                          // the node is a file
-                AnalyticsFileSystem.DataInput input = analyticsFileSystem.createInput(nodePath);
-                byte[] dataInBuffer = new byte[READ_BUFFER_SIZE];
-                int len;
-                try (FileOutputStream out = new FileOutputStream(fileSystemNodePath)) {
-                    while ((len = input.read(dataInBuffer, 0, dataInBuffer.length)) > 0) {
-                        out.write(dataInBuffer, 0, len);
-                    }
-                } catch (IOException e) {
-                    throw new IOException("Could not write to the output file: " + e.getMessage(), e);
-                }
-                System.out.println(nodePath + " -> " + fileSystemNodePath);
-            }
-        }
-    }
-
-    /**
-     * Restores the a local filesystem to the DAS filesystem.
-     *
-     * @param analyticsFileSystem analyticsFileSystem object.
-     * @param baseDir             from where the data would be restored from.
-     * @throws IOException if the data cannot be written to the data layer.
-     */
-    private static void restoreFileSystem(AnalyticsFileSystem analyticsFileSystem, File baseDir) throws IOException {
-        System.out.println("Restoring the file system with the Directory: " + baseDir);
-        restoreFileStructure(analyticsFileSystem, baseDir, baseDir);
-    }
-
-    /**
-     * Recursively travels through the filestructure and restores them.
-     *
-     * @param analyticsFileSystem analyticsFileSystem object.
-     * @param node                where to start reading the files in the structure.
-     * @param baseDir             from where the data would be restored from.
-     * @throws IOException if the data cannot be written to the data layer.
-     */
-    private static void restoreFileStructure(AnalyticsFileSystem analyticsFileSystem, File node, File baseDir)
-            throws IOException {
-        //get the relative path
-        final String relativePath = node.getAbsolutePath().substring(baseDir.getParent().length());
-        if (node.isDirectory()) {
-            analyticsFileSystem.mkdir(relativePath);
-            String[] subNodes = node.list();
-            for (String filename : subNodes) {
-                restoreFileStructure(analyticsFileSystem, new File(node, filename), baseDir);
-            }
-        } else if (node.isFile()) {
-            byte[] data = readFile(node);
-            try (OutputStream out = analyticsFileSystem.createOutput(relativePath)) {
-                out.write(data, 0, data.length);
-                out.flush();
-                System.out.println(node.getAbsoluteFile() + " -> " + relativePath);
-            } catch (IOException e) {
-                String message = "Error in restoring the file to the filesystem";
-                System.out.println(message);
-                throw new IOException(message + e.getMessage(), e);
-            }
-        }
-    }
-
-    /**
-     * Read the file into a byte array.
-     *
-     * @param file from which to read from.
-     * @return byte array of the file content.
-     * @throws IOException if the file cannot be read.
-     */
-    private static byte[] readFile(File file) throws IOException {
-        byte[] buffer = new byte[READ_BUFFER_SIZE];
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        try (InputStream inputStream = new FileInputStream(file)) {
-            int nRead;
-            while ((nRead = inputStream.read(buffer, 0, buffer.length)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, nRead);
-            }
-            return byteArrayOutputStream.toByteArray();
-        } catch (FileNotFoundException e) {
-            String message = "File: " + file.getName() + " not found!";
-            System.out.println(message);
-            throw new IOException(message + "\n" + e.getMessage(), e);
-        } catch (IOException e) {
-            String message = "Error reading the file: " + file.getName();
-            System.out.println(message);
-            throw new IOException(message + "\n" + e.getMessage(), e);
-        } finally {
-            byteArrayOutputStream.flush();
-        }
-    }
-
-    /**
      * returning a map of properties read from the config.
      *
      * @param props properties to be added to the map.
@@ -612,19 +458,6 @@ public class AnalyticsDataBackupTool {
         } catch (JAXBException e) {
             throw new AnalyticsException("Error in processing analytics data service configuration: " +
                     e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Creates a directory in the local file system for the given path.
-     *
-     * @param path the path of the directory to be created.
-     */
-    private static void createDirectoryInLocalSystem(String path) {
-        File dir = new File(path);
-        // if the directory does not exist, create it.
-        if (!dir.exists()) {
-            dir.mkdir();
         }
     }
 
