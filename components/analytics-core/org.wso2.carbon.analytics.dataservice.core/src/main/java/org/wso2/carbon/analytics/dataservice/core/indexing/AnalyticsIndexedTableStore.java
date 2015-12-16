@@ -32,12 +32,12 @@ public class AnalyticsIndexedTableStore {
     
     private IndexedTableId[] indexedTableIdsArray = new IndexedTableId[0];
         
-    public void addIndexedTable(int tenantId, String tableName) {
+    public synchronized void addIndexedTable(int tenantId, String tableName) {
         this.indexedTableIds.add(new IndexedTableId(tenantId, tableName));
         this.refreshIndexedTableArray();
     }
     
-    public void removeIndexedTable(int tenantId, String tableName) {
+    public synchronized void removeIndexedTable(int tenantId, String tableName) {
         this.indexedTableIds.remove(new IndexedTableId(tenantId, tableName));
         this.refreshIndexedTableArray();
     }
