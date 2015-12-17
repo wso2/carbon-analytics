@@ -76,7 +76,7 @@ public class MBeanRegistrar {
         if (jmxAgentName == null || "".equals(jmxAgentName)) {
             jmxAgentName = "org.wso2.carbon.event";
         }
-        //When this id parameter is an event stream ID, it contains the colon character which is an invalid one for an MBean object name.
+        //When this id parameter is an event stream ID, it contains the colon character which is an invalid one to be included in an MBean object name.
         //Therefore, it will be replaced with an underscore.
         return jmxAgentName + ":Type=" + category + ",Name=" + id.replace(':','_');
     }
