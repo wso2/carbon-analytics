@@ -72,7 +72,7 @@ public class EventStatisticsDS {
 
         EventStatisticsServiceHolder.getInstance().setEventStatisticsManager(new EventStatisticsManager());
 
-        //JMX-based event-stat monitoring is supported only for super tenant because other tenants cannot it to monitor event-stats.
+        //JMX-based event-stat monitoring is supported only for super tenant because other tenants cannot use it to monitor event-stats.
         reporterThread = new StatisticsReporterThread(MultitenantConstants.SUPER_TENANT_ID);
 
         // Set a custom interval value if required
