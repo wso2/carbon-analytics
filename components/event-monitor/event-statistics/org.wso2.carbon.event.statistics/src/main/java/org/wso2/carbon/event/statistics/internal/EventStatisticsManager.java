@@ -83,7 +83,7 @@ public class EventStatisticsManager {
 
     public synchronized EventStatisticsMonitor getEventStatisticMonitor(int tenantId, String category, String deployment, String element) {
 
-        String key=String.valueOf(tenantId) + category + deployment + element;
+        String key = String.valueOf(tenantId) + category + deployment + element;
         EventStatisticsMonitor statisticsMonitor = statisticsMonitorMap.get(key);
         if (statisticsMonitor == null) {
             synchronized (this) {

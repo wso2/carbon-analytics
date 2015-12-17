@@ -89,18 +89,21 @@ public class StatisticsReporterThread extends Thread {
 
         if (tenantCounter.getChildCounters().size() > 0) {
             CollectionDTO[] categoryCollectionDTOs = new CollectionDTO[tenantCounter.getChildCounters().size()];
+            tenantCollectionDTO.setChildCollectionDTOs(categoryCollectionDTOs);
             int categoryCount = 0;
             for (StatsCounter categoryCounter : tenantCounter.getChildCounters().values()) {
                 categoryCollectionDTOs[categoryCount] = new CollectionDTO();
                 categoryCollectionDTOs[categoryCount].setStatsDTO(EventStatsHelper.constructStatsDTO(categoryCounter));
                 if (categoryCounter.getChildCounters().size() > 0) {
                     CollectionDTO[] deploymentCollectionDTOs = new CollectionDTO[categoryCounter.getChildCounters().size()];
+                    categoryCollectionDTOs[categoryCount].setChildCollectionDTOs(deploymentCollectionDTOs);
                     int deploymentCount = 0;
                     for (StatsCounter deploymentCounter : categoryCounter.getChildCounters().values()) {
                         deploymentCollectionDTOs[deploymentCount] = new CollectionDTO();
                         deploymentCollectionDTOs[deploymentCount].setStatsDTO(EventStatsHelper.constructStatsDTO(deploymentCounter));
                         if (deploymentCounter.getChildCounters().size() > 0) {
                             CollectionDTO[] elementCollectionDTOs = new CollectionDTO[deploymentCounter.getChildCounters().size()];
+                            deploymentCollectionDTOs[deploymentCount].setChildCollectionDTOs(elementCollectionDTOs);
                             int elementCount = 0;
                             for (StatsCounter elementCounter : deploymentCounter.getChildCounters().values()) {
                                 elementCollectionDTOs[elementCount] = new CollectionDTO();
