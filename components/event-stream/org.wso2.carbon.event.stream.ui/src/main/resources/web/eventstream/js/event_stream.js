@@ -90,6 +90,7 @@ function addEventStream(form, option, eventStreamId) {
                         payloadIndex: payloadIndex,
                         arbitraryIndex: arbitraryIndex,
                         eventPersist: document.getElementById("eventPersistCheckbox").checked,
+                        mergeSchema: document.getElementById("schemaReplaceCheckbox").checked,
                         eventStreamDescription: eventStreamDescription,
                         eventStreamNickName: eventStreamNickName,
                         recordStream: document.getElementById("recordStoreSelect").value
@@ -122,6 +123,7 @@ function addEventStream(form, option, eventStreamId) {
                             payloadIndex: payloadIndex,
                             arbitraryIndex: arbitraryIndex,
                             eventPersist: document.getElementById("eventPersistCheckbox").checked,
+                            mergeSchema: document.getElementById("schemaReplaceCheckbox").checked,
                             eventStreamDescription: eventStreamDescription,
                             eventStreamNickName: eventStreamNickName,
                             recordStream: document.getElementById("recordStoreSelect").value

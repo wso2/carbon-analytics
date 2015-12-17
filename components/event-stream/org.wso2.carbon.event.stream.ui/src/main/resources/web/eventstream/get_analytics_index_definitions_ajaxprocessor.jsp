@@ -50,6 +50,7 @@
                 }
                 table.setPersist(schema.getPersist());
                 table.setRecordStoreName(schema.getRecordStoreName());
+                table.setMergeSchema(schema.getMergeSchema());
                 responseText = new Gson().toJson(table);
             }
         } catch (Exception e) {
