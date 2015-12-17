@@ -45,6 +45,7 @@ import org.wso2.carbon.analytics.api.RemoteRecordIterator;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceAuthenticationException;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceRemoteException;
+import org.wso2.carbon.analytics.api.exception.AnalyticsServiceUnauthorizedException;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
@@ -158,7 +159,7 @@ public class AnalyticsAPIHttpClient {
         return instance;
     }
 
-    public void authenticate(String username, String password) throws AnalyticsServiceException {
+    public synchronized void authenticate(String username, String password) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(this.protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.MANAGEMENT_SERVICE_URI)
                 .setParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.LOGIN_OPERATION);
@@ -213,7 +214,7 @@ public class AnalyticsAPIHttpClient {
                     if (numberOfRetry == AnalyticsDataConstants.MAXIMUM_NUMBER_OF_RETRY - 1) {
                         log.error("Unable to connect to remote service, have retried "
                                 + AnalyticsDataConstants.MAXIMUM_NUMBER_OF_RETRY + " times, but unable to reach. ", ex);
-                    }else {
+                    } else {
                         try {
                             Thread.sleep(2000);
                         } catch (InterruptedException ignored) {
@@ -249,7 +250,12 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public void createTable(int tenantId, String username, String recordStoreName, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
+    public synchronized void invalidateSessionAndAuthenticate(String userName, String password) {
+        sessionId = null;
+        validateAndAuthenticate(userName, password);
+    }
+
+    public void createTable(int tenantId, String username, String recordStoreName, String tableName, boolean securityEnabled) throws AnalyticsServiceException, AnalyticsServiceUnauthorizedException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
                 .TABLE_PROCESSOR_SERVICE_URI);
@@ -271,7 +277,11 @@ public class AnalyticsAPIHttpClient {
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to create the table - " + tableName + " for tenant id : "
+                        + tenantId + ". " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to create the table - " + tableName + " for tenant id : "
                         + tenantId + ". " + response);
@@ -304,7 +314,11 @@ public class AnalyticsAPIHttpClient {
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(schema)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to set the schema for the table - " + tableName
+                        + ", schema - " + gson.toJson(schema) + " for tenant id : " + tenantId + ". " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to set the schema for the table - " + tableName
                         + ", schema - " + gson.toJson(schema) + " for tenant id : " + tenantId + ". " + response);
@@ -334,7 +348,11 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to get the schema for the table - " + tableName
+                        + " for tenant id : " + tenantId + ". " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to get the schema for the table - " + tableName
                         + " for tenant id : " + tenantId + ". " + response);
@@ -373,7 +391,10 @@ public class AnalyticsAPIHttpClient {
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             String response = getResponseString(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                throw new AnalyticsServiceUnauthorizedException("Unable to check the existence for the table - " + tableName
+                        + " for tenant id : " + tenantId + ". " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to check the existence for the table - " + tableName
                         + " for tenant id : " + tenantId + ". " + response);
             } else {
@@ -414,7 +435,11 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to get the list of tables for tenant id : "
+                        + tenantId + ". " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to get the list of tables for tenant id : "
                         + tenantId + ". " + response);
@@ -452,7 +477,11 @@ public class AnalyticsAPIHttpClient {
             HttpDelete deleteMethod = new HttpDelete(builder.build().toString());
             deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(deleteMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to create the table - " + tableName +
+                        " for tenant id : " + tenantId + ". " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to create the table - " + tableName + " for tenant id : " + tenantId + ". " + response);
             } else {
@@ -483,7 +512,11 @@ public class AnalyticsAPIHttpClient {
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             String response = getResponseString(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                throw new AnalyticsServiceUnauthorizedException("Unable to get the record count for the table - " + tableName
+                        + ", time from : " + timeFrom + " , timeTo : " + timeTo
+                        + " for tenant id : " + tenantId + ". " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to get the record count for the table - " + tableName
                         + ", time from : " + timeFrom + " , timeTo : " + timeTo
                         + " for tenant id : " + tenantId + ". " + response);
@@ -522,7 +555,10 @@ public class AnalyticsAPIHttpClient {
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(records)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to put the records. " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to put the records. " + response);
             } else {
@@ -565,7 +601,11 @@ public class AnalyticsAPIHttpClient {
             deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(deleteMethod);
             String response = getResponseString(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                throw new AnalyticsServiceUnauthorizedException("Unable to delete the record count for the table - " + tableName
+                        + ", time from : " + timeFrom + " , timeTo : " + timeTo
+                        + " for tenant id : " + tenantId + ". " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to delete the record count for the table - " + tableName
                         + ", time from : " + timeFrom + " , timeTo : " + timeTo
                         + " for tenant id : " + tenantId + ". " + response);
@@ -594,7 +634,11 @@ public class AnalyticsAPIHttpClient {
             deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(deleteMethod);
             String response = getResponseString(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                throw new AnalyticsServiceUnauthorizedException("Unable to delete the record count for the table - " + tableName
+                        + ", records - " + recordIds
+                        + " for tenant id : " + tenantId + ". " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to delete the record count for the table - " + tableName
                         + ", records - " + recordIds
                         + " for tenant id : " + tenantId + ". " + response);
@@ -640,7 +684,11 @@ public class AnalyticsAPIHttpClient {
             HttpDelete deleteMethod = new HttpDelete(builder.build().toString());
             deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(deleteMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to get the index for table - " + tableName
+                        + " for tenant id : " + tenantId + ". " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to get the index for table - " + tableName
                         + " for tenant id : " + tenantId + ". " + response);
@@ -674,7 +722,12 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to search the table - " + tableName
+                        + " for tenant id : " + tenantId + " with query : " + query + ". "
+                        + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to search the table - " + tableName
                         + " for tenant id : " + tenantId + " with query : " + query + ". "
@@ -714,7 +767,11 @@ public class AnalyticsAPIHttpClient {
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             String response = getResponseString(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                throw new AnalyticsServiceUnauthorizedException("Unable to search the table - " + tableName
+                        + " for tenant id : " + tenantId + " with query : " + query + ". "
+                        + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to search the table - " + tableName
                         + " for tenant id : " + tenantId + " with query : " + query + ". "
                         + response);
@@ -756,9 +813,12 @@ public class AnalyticsAPIHttpClient {
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             String response = getResponseString(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                throw new AnalyticsServiceUnauthorizedException("Unable to configure max wait: " + maxWait + " for indexing. "
+                        + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to configure max wait: " + maxWait + " for indexing. "
-                                                    + response);
+                        + response);
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
@@ -778,7 +838,10 @@ public class AnalyticsAPIHttpClient {
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             String response = getResponseString(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                throw new AnalyticsServiceUnauthorizedException("Unable to destroy the process . "
+                        + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to destroy the process . "
                         + response);
             }
@@ -812,7 +875,11 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to destroy the process . "
+                        + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to destroy the process . "
                         + response);
@@ -860,7 +927,11 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to get with key values . "
+                        + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to get with key values . "
                         + response);
@@ -905,7 +976,10 @@ public class AnalyticsAPIHttpClient {
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             String response = getResponseString(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                throw new AnalyticsServiceUnauthorizedException("Unable to get the record store for the table : " + tableName + " ." +
+                        response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to get the record store for the table : " + tableName + " ." +
                         response);
             } else {
@@ -939,7 +1013,11 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to list the record stores." +
+                        response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to list the record stores." +
                         response);
@@ -981,7 +1059,11 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceException("Unable to destroy the process . "
+                        + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to destroy the process . "
                         + response);
@@ -1020,7 +1102,11 @@ public class AnalyticsAPIHttpClient {
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(recordGroup)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to read the record group. "
+                        + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to read the record group. "
                         + response);
@@ -1043,7 +1129,9 @@ public class AnalyticsAPIHttpClient {
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             String response = getResponseString(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                throw new AnalyticsServiceUnauthorizedException("Error while checking the pagination support. " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Error while checking the pagination support. " + response);
             }
             if (response.startsWith(AnalyticsAPIConstants.PAGINATION_SUPPORT)) {
@@ -1066,7 +1154,7 @@ public class AnalyticsAPIHttpClient {
                     + e.getMessage(), e);
         }
     }
-    
+
     public boolean isRecordCountSupported(String recordStoreName) {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(this.protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.MANAGEMENT_SERVICE_URI)
@@ -1077,7 +1165,9 @@ public class AnalyticsAPIHttpClient {
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             String response = getResponseString(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                throw new AnalyticsServiceUnauthorizedException("Error while checking the record count support. " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Error while checking the record count support. " + response);
             }
             if (response.startsWith(AnalyticsAPIConstants.RECORD_COUNT_SUPPORT)) {
@@ -1119,7 +1209,10 @@ public class AnalyticsAPIHttpClient {
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(drillDownRequest)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to process the DrillDown Request. " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to process the DrillDown Request. " + response);
             } else {
@@ -1157,7 +1250,11 @@ public class AnalyticsAPIHttpClient {
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(drillDownRequest)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to process the drillDown request. "
+                        + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to process the drillDown request. "
                         + response);
@@ -1195,7 +1292,11 @@ public class AnalyticsAPIHttpClient {
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(drillDownRequest)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to read the Category drilldown object. "
+                        + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to read the Category drilldown object. "
                         + response);
@@ -1235,7 +1336,11 @@ public class AnalyticsAPIHttpClient {
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(drillDownRequest)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceUnauthorizedException("Unable to read the Analytics drilldown object. "
+                        + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to read the Analytics drilldown object. "
                         + response);
@@ -1257,8 +1362,8 @@ public class AnalyticsAPIHttpClient {
     }
 
     public AnalyticsIterator<Record> searchWithAggregates(int tenantId, String username,
-                                                             AggregateRequest aggregateRequest,
-                                                             boolean securityEnabled) {
+                                                          AggregateRequest aggregateRequest,
+                                                          boolean securityEnabled) {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SEARCH_WITH_AGGREGATES_OPERATION)
@@ -1279,7 +1384,9 @@ public class AnalyticsAPIHttpClient {
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             String response = getResponseString(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                throw new AnalyticsServiceUnauthorizedException("Error while searching with aggregates. " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Error while searching with aggregates. " + response);
             } else {
                 return new RemoteRecordIterator(httpResponse.getEntity().getContent());
