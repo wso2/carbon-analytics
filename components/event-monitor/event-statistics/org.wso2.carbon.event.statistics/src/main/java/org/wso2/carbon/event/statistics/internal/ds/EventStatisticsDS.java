@@ -21,12 +21,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.base.ServerConfiguration;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.statistics.EventStatisticsObserver;
 import org.wso2.carbon.event.statistics.EventStatisticsService;
 import org.wso2.carbon.event.statistics.internal.Constants;
 import org.wso2.carbon.event.statistics.internal.EventStatisticsManager;
 import org.wso2.carbon.event.statistics.internal.StatisticsReporterThread;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 
 /**
@@ -72,7 +72,8 @@ public class EventStatisticsDS {
 
         EventStatisticsServiceHolder.getInstance().setEventStatisticsManager(new EventStatisticsManager());
 
-        reporterThread = new StatisticsReporterThread(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+        //JMX-based event-stat monitoring is supported only for super tenant because other tenants cannot use it to monitor event-stats.
+        reporterThread = new StatisticsReporterThread(MultitenantConstants.SUPER_TENANT_ID);
 
         // Set a custom interval value if required
         ServerConfiguration serverConf = ServerConfiguration.getInstance();

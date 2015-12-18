@@ -172,18 +172,25 @@ public class TCPEventPublisher {
                     buf.putDouble((Double) eventData[i]);
                     continue;
                 case STRING:
-                    int length = ((String) eventData[i]).getBytes(defaultCharset).length;
-                    buf.putInt(length);
+                    if (eventData[i] == null) {
+                        buf.putInt(-1);
+                    } else {
+                        int length = ((String) eventData[i]).getBytes(defaultCharset).length;
+                        buf.putInt(length);
+                        stringSize += length;
+                    }
                     stringDataIndex[stringIndex] = i;
                     stringIndex++;
-                    stringSize += length;
             }
         }
         arrayOutputStream.write(buf.array());
 
         buf = ByteBuffer.allocate(stringSize);
         for (int aStringIndex : stringDataIndex) {
-            buf.put(((String) eventData[aStringIndex]).getBytes(defaultCharset));
+            Object data = eventData[aStringIndex];
+            if (data != null) {
+                buf.put(((String) eventData[aStringIndex]).getBytes(defaultCharset));
+            }
         }
         arrayOutputStream.write(buf.array());
 

@@ -195,9 +195,14 @@ public class TCPEventServer {
                         for (int i = 0; i < attributeTypes.length; i++) {
                             Attribute.Type type = attributeTypes[i];
                             if (Attribute.Type.STRING == type) {
-                                byte[] stringData = loadData(in, new byte[stringValueSizes.get(stringSizePosition)]);
+                                int size = stringValueSizes.get(stringSizePosition);
+                                if (size == -1) {
+                                    eventData[i] = null;
+                                } else {
+                                    byte[] stringData = loadData(in, new byte[size]);
+                                    eventData[i] = new String(stringData, 0, stringData.length);
+                                }
                                 stringSizePosition++;
-                                eventData[i] = new String(stringData, 0, stringData.length);
                             }
                         }
                         streamCallback.receive(streamId, timestamp, eventData);
