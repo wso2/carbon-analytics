@@ -52,7 +52,9 @@ public class AnalyticsTask implements Task {
     public void execute() {
         if (ServiceHolder.isAnalyticsExecutionEnabled()) {
             try {
-                log.info("Executing the schedule task for: " + scriptName + " for tenant id: " + tenantId);
+                if (log.isDebugEnabled()){
+                    log.debug("Executing the schedule task for: " + scriptName + " for tenant id: " + tenantId);
+                }
                 if (ServiceHolder.getAnalyticsProcessorService() != null) {
                     ServiceHolder.getAnalyticsProcessorService().executeScript(tenantId, this.scriptName);
                 } else {
