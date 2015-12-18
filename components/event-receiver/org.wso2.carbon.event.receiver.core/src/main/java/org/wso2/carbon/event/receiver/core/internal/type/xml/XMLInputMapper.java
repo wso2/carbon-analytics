@@ -242,8 +242,12 @@ public class XMLInputMapper implements InputMapper {
                     Class<?> beanClass = Class.forName(type);
                     Object returnedObj = null;
                     if (omElementResult != null) {
-                        returnedObj = BeanUtil.deserialize(beanClass,
-                                omElementResult, reflectionBasedObjectSupplier, null);
+                        if(omElementResult.getFirstElement() != null){
+                            returnedObj = omElementResult.toString();
+                        }else {
+                            returnedObj = BeanUtil.deserialize(beanClass,
+                                    omElementResult, reflectionBasedObjectSupplier, null);
+                        }
                     }
 
                     if (omElementResult == null || returnedObj == null) {

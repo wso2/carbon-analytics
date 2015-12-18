@@ -285,7 +285,7 @@ public class JSONInputMapper implements InputMapper {
         } else if (AttributeType.LONG.equals(attributeType)) {
             return Long.parseLong(propertyValue.toString());
         } else {
-            return propertyValue;
+            return propertyValue.toString();
         }
 
     }
