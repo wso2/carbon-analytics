@@ -34,11 +34,10 @@ import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataPurgingCon
 import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataPurgingIncludeTable;
 import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataServiceConfigProperty;
 import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataServiceConfiguration;
-import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsReceiverIndexingFlowControlConfiguration;
 import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsRecordStoreConfiguration;
 import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsIndexedTableStore;
-import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsReceiverIndexingFlowController;
+import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsIndexerInfo;
 import org.wso2.carbon.analytics.dataservice.core.tasks.AnalyticsGlobalDataPurgingTask;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -80,20 +79,6 @@ import java.util.concurrent.Callable;
  */
 public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
-    private static final int FLOW_CONTROL_RECEIVE_HIGH_LOWEST = 20;
-
-    private static final int FLOW_CONTROL_RECEIVE_DEFAULT_MARGIN = 1000;
-    
-    private static final int FLOW_CONTROL_RECEIVE_LOWEST_MARGIN = 5;
-
-    private static final int FLOW_CONTROL_RECEIVE_LOW_LOWEST = 10;
-
-    private static final int FLOW_CONTROL_RECEIVE_LOW_DEFAULT = 5000;
-
-    private static final int FLOW_CONTROL_RECEIVE_HIGH_DEFAULT = 10000;
-    
-    private static final int DEFAULT_SHARD_INDEX_RECORD_BATCH_SIZE = 100;
-
     private static final Log logger = LogFactory.getLog(AnalyticsDataServiceImpl.class);
 
     private static final String ANALYTICS_DATASERVICE_GROUP = "__ANALYTICS_DATASERVICE_GROUP__";
@@ -133,9 +118,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private Map<String, AnalyticsTableInfo> tableInfoMap = new HashMap<String, AnalyticsTableInfo>();
     
     private String primaryARSName;
-    
-    private String indexStagingARSName;
-    
+        
     private AnalyticsIndexedTableStore indexedTableStore;
     
     public AnalyticsDataServiceImpl() throws AnalyticsException {
@@ -153,11 +136,16 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
                     e.getMessage(), e);
         }
         this.initIndexedTableStore();
-        this.indexer = new AnalyticsDataIndexer(this.getIndexStagingRecordStore(), this.analyticsFileSystem, this,
-                                                this.indexedTableStore, config.getShardCount(), 
-                                                this.extractShardIndexRecordBatchSize(config),
-                                                this.calculateIndexingThreadCount(config), luceneAnalyzer,
-                                                this.createFlowController(config.getAnalyticsReceiverIndexingFlowControlConfiguration()));
+        AnalyticsIndexerInfo indexerInfo = new AnalyticsIndexerInfo();
+        indexerInfo.setAnalyticsRecordStore(this.getPrimaryAnalyticsRecordStore());
+        indexerInfo.setAnalyticsFileSystem(this.analyticsFileSystem);
+        indexerInfo.setAnalyticsDataService(this);
+        indexerInfo.setIndexedTableStore(this.indexedTableStore);
+        indexerInfo.setShardCount(config.getShardCount());
+        indexerInfo.setShardIndexRecordBatchSize(this.extractShardIndexRecordBatchSize(config));
+        indexerInfo.setLuceneAnalyzer(luceneAnalyzer);
+        indexerInfo.setIndexStoreLocation(GenericUtils.resolveLocation(Constants.DEFAULT_INDEX_STORE_LOCATION));
+        this.indexer = new AnalyticsDataIndexer(indexerInfo);
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
@@ -170,55 +158,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private int extractShardIndexRecordBatchSize(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
     	int value = config.getShardIndexRecordBatchSize();
     	if (value <= 0) {
-    		value = DEFAULT_SHARD_INDEX_RECORD_BATCH_SIZE;
+    		value = Constants.DEFAULT_SHARD_INDEX_RECORD_BATCH_SIZE;
     	}
     	return value;
-    }
-    
-    private AnalyticsReceiverIndexingFlowController createFlowController(
-            AnalyticsReceiverIndexingFlowControlConfiguration config) throws AnalyticsException {
-        if (config == null) {
-            config = new AnalyticsReceiverIndexingFlowControlConfiguration();
-            config.setEnabled(true);
-        }
-        if (config.getRecordReceivingHighThreshold() == 0 && config.getRecordReceivingLowThreshold() == 0) {
-            config.setRecordReceivingHighThreshold(FLOW_CONTROL_RECEIVE_HIGH_DEFAULT);
-            config.setRecordReceivingLowThreshold(FLOW_CONTROL_RECEIVE_LOW_DEFAULT);
-        } else if (config.getRecordReceivingHighThreshold() == 0) {
-            if (config.getRecordReceivingLowThreshold() < FLOW_CONTROL_RECEIVE_LOW_LOWEST) {
-                throw new AnalyticsException("The receiver indexing flow control low value cannot be smaller than " + 
-                        FLOW_CONTROL_RECEIVE_LOW_LOWEST);
-            }
-            config.setRecordReceivingHighThreshold(config.getRecordReceivingLowThreshold() + FLOW_CONTROL_RECEIVE_DEFAULT_MARGIN);
-        } else if (config.getRecordReceivingLowThreshold() == 0) {
-            if (config.getRecordReceivingHighThreshold() < FLOW_CONTROL_RECEIVE_HIGH_LOWEST) {
-                throw new AnalyticsException("The receiver indexing flow control high value cannot be smaller than " + 
-                        FLOW_CONTROL_RECEIVE_HIGH_LOWEST);
-            }
-            config.setRecordReceivingLowThreshold(config.getRecordReceivingHighThreshold() - FLOW_CONTROL_RECEIVE_DEFAULT_MARGIN);
-        } else {
-            if (config.getRecordReceivingHighThreshold() - config.getRecordReceivingLowThreshold() < 
-                    FLOW_CONTROL_RECEIVE_LOWEST_MARGIN) {
-                throw new AnalyticsException("The receiver indexing flow control high / value margin must be bigger than " + 
-                        FLOW_CONTROL_RECEIVE_LOWEST_MARGIN);
-            }
-            if (config.getRecordReceivingLowThreshold() < FLOW_CONTROL_RECEIVE_LOW_LOWEST) {
-                throw new AnalyticsException("The receiver indexing flow control low value cannot be smaller than " + 
-                        FLOW_CONTROL_RECEIVE_LOW_LOWEST);
-            }
-        }
-        return new AnalyticsReceiverIndexingFlowController(config);
-    }
-    
-    private int calculateIndexingThreadCount(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
-        int indexingThreadCount = config.getIndexingThreadCount();
-        if (indexingThreadCount == -1 || indexingThreadCount == 0) {
-            indexingThreadCount = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
-        } else if (indexingThreadCount < 0 || indexingThreadCount > 100) {
-            throw new AnalyticsException("The 'indexingThreadCount' property value must be either -1 "
-                    + "for auto detect or between 1 and 100");
-        }
-        return indexingThreadCount;
     }
     
     private void initIndexedTableStore() throws AnalyticsException {
@@ -303,10 +245,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (this.primaryARSName.length() == 0) {
             throw new AnalyticsException("Primary record store name cannot be empty.");
         }
-        this.indexStagingARSName = config.getIndexStagingRecordStore();
-        if (this.indexStagingARSName != null) {
-            this.indexStagingARSName = this.indexStagingARSName.trim();
-        }
         this.analyticsRecordStores = new HashMap<String, AnalyticsRecordStore>();
         for (AnalyticsRecordStoreConfiguration arsConfig : config.getAnalyticsRecordStoreConfigurations()) {
             String name = arsConfig.getName().trim();
@@ -325,19 +263,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             throw new AnalyticsException("The primary record store with name '" + this.primaryARSName + "' cannot be found.");
         }
         this.recordsBatchSize = config.getRecordsBatchSize();
-    }
-    
-    private AnalyticsRecordStore getIndexStagingRecordStore() throws AnalyticsException {
-        if (this.indexStagingARSName != null) {
-            AnalyticsRecordStore ars = this.analyticsRecordStores.get(this.indexStagingARSName);
-            if (ars == null) {
-                throw new AnalyticsException("The analytics indexing staging record store '" + 
-                        this.indexStagingARSName + "' does not exist.");
-            }
-            return ars;
-        } else {
-            return this.getPrimaryAnalyticsRecordStore();
-        }
     }
     
     private AnalyticsRecordStore getPrimaryAnalyticsRecordStore() {
@@ -480,7 +405,11 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void clearIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
         tableName = GenericUtils.normalizeTableName(tableName);
-        this.getIndexer().clearIndexData(tenantId, tableName);
+        try {
+            this.getIndexer().clearIndexData(tenantId, tableName);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsIndexException("Error in clearing index data: " + e.getMessage(), e);
+        }
     }
     
     @Override

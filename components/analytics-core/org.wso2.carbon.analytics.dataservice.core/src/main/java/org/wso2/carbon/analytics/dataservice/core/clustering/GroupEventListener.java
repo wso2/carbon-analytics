@@ -44,4 +44,9 @@ public interface GroupEventListener {
      */
     void onMembersChangeForLeader(boolean removed);
     
+    /**
+     * Called when any member has left the group.
+     */
+    void onMemberRemoved();
+    
 }

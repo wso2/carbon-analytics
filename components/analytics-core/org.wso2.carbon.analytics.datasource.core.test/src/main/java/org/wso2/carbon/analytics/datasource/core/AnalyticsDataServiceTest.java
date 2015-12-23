@@ -34,7 +34,6 @@ import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import java.io.Serializable;
@@ -190,17 +189,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.deleteTable(-1234, "TABLE2");
         this.service.deleteTable(-1234, "TABLE1");
         Assert.assertEquals(this.service.listTables(-1234).size(), 0);
-    }
-    
-    private Record createRecord(int tenantId, String tableName, String serverName, String ip, int tenant, String log) {
-        Map<String, Object> values = new HashMap<>();
-        values.put("server_name", serverName);
-        values.put("ip", ip);
-        values.put("tenant", tenant);
-        values.put("log", log);
-        values.put("sequence", null);
-        values.put("summary2", null);
-        return new Record(GenericUtils.generateRecordID(), tenantId, tableName, values, System.currentTimeMillis());
     }
     
     private void cleanupTable(int tenantId, String tableName) throws AnalyticsException {
@@ -635,6 +623,11 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         end = System.currentTimeMillis();
         Assert.assertEquals(results.size(), 75);
         System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
+        start = System.currentTimeMillis();
+        int count = this.service.searchCount(tenantId, tableName, "*:*");
+        end = System.currentTimeMillis();
+        System.out.println("* Search Index Full Count: " + count + " Time: " + (end - start) + " ms.");
+        Assert.assertEquals(count, n * batch);
         
         this.cleanupTable(tenantId, tableName);
         System.out.println("\n************** END ANALYTICS DS (WITH INDEXING) PERF TEST **************");
@@ -1012,6 +1005,11 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
 
     @Override
     public void onMembersChangeForLeader(boolean removed) {
+        /* nothing to do */
+    }
+    
+    @Override
+    public void onMemberRemoved() {
         /* nothing to do */
     }
     

@@ -29,6 +29,7 @@ import org.w3c.dom.Document;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -765,6 +766,18 @@ public class GenericUtils {
             }
         }
         return false;
+    }
+    
+    public static String resolveLocation(String path) {
+        String carbonHome = null;
+        try {
+            carbonHome = CarbonUtils.getCarbonHome();
+        } catch (Throwable ignore) { }
+        if (carbonHome == null) {
+            carbonHome = "./target";
+        }
+        path = path.replace(AnalyticsDataSourceConstants.CARBON_HOME_VAR, carbonHome);
+        return path;
     }
 
 }

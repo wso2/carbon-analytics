@@ -17,6 +17,10 @@
 */
 package org.wso2.carbon.analytics.dataservice.core;
 
+import java.io.File;
+
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
+
 /**
  * This class hold constants that required for data service
  */
@@ -41,5 +45,26 @@ public class Constants {
     public static final String TABLE = "table";
     public static final String TENANT_ID = "tenantId";
     public static final String CRON_STRING = "cronString";
+
+    public static final int INDEX_WORKER_STOP_WAIT_TIME = 60000;
+    public static final int META_INFO_TENANT_ID = -1000;
+    public static final String GLOBAL_SHARD_ALLOCATION_CONFIG_TABLE = "__GLOBAL_SHARD_ALLOCATION_CONFIG__";
+    public static final String GLOBAL_SHARD_ALLOCATION_CONFIG_COLUMN = "VALUE";
+    public static final String INDEX_STAGING_DATA_TABLE = "__INDEX_STAGING_DATA__";
+    public static final String INDEX_STAGING_DATA_COLUMN = "VALUE";
+
+    public static final int DEFAULT_SHARD_INDEX_RECORD_BATCH_SIZE = 100;
+    public static final String DISABLE_INDEXING_ENV_PROP = "disableIndexing";
+    public static final String ANALYTICS_INDEXING_GROUP = "__ANALYTICS_INDEXING_GROUP__";
+    
+    public static final String DEFAULT_INDEX_STORE_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator + "repository"
+            + File.separator + "data" + File.separator + "index_data" + File.separator;
+    public static final String INDEX_STORE_DIR_PREFIX = "shard";    
+    public static final String LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator + "repository"
+            + File.separator + "conf" + File.separator + "analytics" + File.separator + "local-shard-allocation-config.conf";    
+    public static final String MY_NODEID_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator + "repository"
+            + File.separator + "conf" + File.separator + "analytics" + File.separator + "my-node-id.dat";
+    public static final String DEFAULT_LOCAL_INDEX_STAGING_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator + "repository"
+            + File.separator + "data" + File.separator + "index_staging_queues" + File.separator;
     
 }

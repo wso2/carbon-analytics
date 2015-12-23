@@ -36,19 +36,13 @@ public class AnalyticsDataServiceConfiguration {
     private AnalyticsLuceneAnalyzerConfiguration luceneAnalyzerConfiguration;
 
     private AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration;
-    
-    private AnalyticsReceiverIndexingFlowControlConfiguration receiverIndexingFlowControlConfiguration;
-    
+        
     private String primaryRecordStore;
-    
-    private String indexStagingRecordStore;
-    
+        
     private int shardCount;
     
     private int shardIndexRecordBatchSize;
-    
-    private int indexingThreadCount;
-    
+        
     private int recordsBatchSize = Constants.RECORDS_BATCH_SIZE;
     
     @XmlElement (name = "analytics-record-store", nillable = false)
@@ -95,15 +89,6 @@ public class AnalyticsDataServiceConfiguration {
         this.primaryRecordStore = primaryRecordStore;
     }
     
-    @XmlElement
-    public String getIndexStagingRecordStore() {
-        return indexStagingRecordStore;
-    }
-
-    public void setIndexStagingRecordStore(String indexStagingRecordStore) {
-        this.indexStagingRecordStore = indexStagingRecordStore;
-    }
-    
     @XmlElement (name = "shardCount", defaultValue = "6")
     public int getShardCount() {
         return shardCount;
@@ -120,15 +105,6 @@ public class AnalyticsDataServiceConfiguration {
     
     public void setShardIndexRecordBatchSize(int shardIndexRecordBatchSize) {
         this.shardIndexRecordBatchSize = shardIndexRecordBatchSize;
-    }
-    
-    @XmlElement (name = "indexingThreadCount", defaultValue = "-1")
-    public int getIndexingThreadCount() {
-        return indexingThreadCount;
-    }
-    
-    public void setIndexingThreadCount(int indexingThreadCount) {
-        this.indexingThreadCount = indexingThreadCount;
     }
 
     @XmlElement (name = "recordsBatchSize", defaultValue = "1000")
@@ -148,16 +124,6 @@ public class AnalyticsDataServiceConfiguration {
     public void setAnalyticsDataPurgingConfiguration(
             AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration) {
         this.analyticsDataPurgingConfiguration = analyticsDataPurgingConfiguration;
-    }
-    
-    @XmlElement(name = "analytics-receiver-indexing-flow-control")
-    public AnalyticsReceiverIndexingFlowControlConfiguration getAnalyticsReceiverIndexingFlowControlConfiguration() {
-        return receiverIndexingFlowControlConfiguration;
-    }
-
-    public void setAnalyticsReceiverIndexingFlowControlConfiguration(
-            AnalyticsReceiverIndexingFlowControlConfiguration receiverIndexingFlowControlConfiguration) {
-        this.receiverIndexingFlowControlConfiguration = receiverIndexingFlowControlConfiguration;
     }
     
 }

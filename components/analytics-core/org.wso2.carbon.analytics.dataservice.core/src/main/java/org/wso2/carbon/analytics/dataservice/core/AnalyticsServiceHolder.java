@@ -21,7 +21,6 @@ package org.wso2.carbon.analytics.dataservice.core;
 import com.hazelcast.core.HazelcastInstance;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManagerImpl;
-import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -69,7 +68,7 @@ public class AnalyticsServiceHolder {
     private static void checkAndPopulateCustomAnalyticsDS() {
         try {
             if (System.getProperty(FORCE_INDEXING_ENV_PROP) == null) {
-                System.setProperty(AnalyticsDataIndexer.DISABLE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
+                System.setProperty(Constants.DISABLE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
             }
             analyticsClusterManager = new AnalyticsClusterManagerImpl();
             analyticsDataService = new AnalyticsDataServiceImpl();

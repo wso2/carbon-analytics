@@ -1009,5 +1009,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
+    @Override
+    public void onMemberRemoved() {
+        /* nothing to do */
+    }
+
 
 }

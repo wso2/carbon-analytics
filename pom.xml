@@ -494,6 +494,11 @@
                 <version>${orbit.version.disruptor}</version>
             </dependency>
             <dependency>
+                <groupId>org.wso2.orbit.com.leansoft</groupId>
+                <artifactId>bigqueue</artifactId>
+                <version>${orbit.version.bigqueue}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.restapi</artifactId>
                 <version>${carbon.analytics.version}</version>
@@ -1230,6 +1235,7 @@
         <orbit.version.xmlschema>1.4.7.wso2v2</orbit.version.xmlschema>
         <orbit.version.commons.lang>2.6.0.wso2v1</orbit.version.commons.lang>
         <orbit.version.disruptor>3.3.2.wso2v2</orbit.version.disruptor>
+        <orbit.version.bigqueue>0.7.0.wso2v1</orbit.version.bigqueue>
         <asm.orbit.version>3.1.wso2v1</asm.orbit.version>
         <commons.codec.orbit.version>1.4.0.wso2v1</commons.codec.orbit.version>
         <commons.configuration.orbit.version>1.6.0.wso2v1</commons.configuration.orbit.version>
@@ -1328,6 +1334,15 @@
         <version.noggit>0.6.wso2v1</version.noggit>
         <hector.version>1.0-5</hector.version>
     </properties>
+
+    <repositories>
+
+<repository>
+  <id>github.release.repo</id>
+  <url>https://raw.github.com/bulldog2011/bulldog-repo/master/repo/releases/</url>
+</repository>
+
+    </repositories>
 
     <pluginRepositories>
         <pluginRepository>

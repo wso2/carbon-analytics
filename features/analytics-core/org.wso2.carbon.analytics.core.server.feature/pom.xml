@@ -93,6 +93,10 @@
             <groupId>org.wso2.noggit</groupId>
             <artifactId>noggit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.leansoft</groupId>
+            <artifactId>bigqueue</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -141,6 +145,7 @@
                                 <!--TODO Temporary added noggit bundle to resolve server shutdown issue. This need for registry indexing that comes with
                                jaggery server feature-->
                                 <bundleDef>org.wso2.noggit:noggit</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.leansoft:bigqueue</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>

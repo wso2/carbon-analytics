@@ -282,17 +282,21 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         List<Member> groupMembers = this.getGroupMembers(groupId);
         if (GenericUtils.hzContains(groupMembers, member)) { // groupMembers.contains(member)
             GenericUtils.hzRemove(groupMembers, member); //groupMembers.remove(member);
-        }
-        if (this.isLeader(groupId)) {
-            /* if I'm already the leader, notify of the membership change */
+            if (this.isLeader(groupId)) {
+                /* if I'm already the leader, notify of the membership change */
+                GroupEventListener listener = this.groups.get(groupId);
+                if (listener != null) {
+                    listener.onMembersChangeForLeader(true);
+                }
+            } else if (this.checkLeader(this.hz.getCluster().getLocalMember(), groupId)) {
+                /* check if I'm already not the leader, and if I just became the leader */
+                this.executeMyselfBecomingLeader(groupId);
+            }
             GroupEventListener listener = this.groups.get(groupId);
             if (listener != null) {
-                listener.onMembersChangeForLeader(true);
+                listener.onMemberRemoved();
             }
-        } else if (this.checkLeader(this.hz.getCluster().getLocalMember(), groupId)) {
-            /* check if I'm already not the leader, and if I just became the leader */
-            this.executeMyselfBecomingLeader(groupId);
-        }
+        }        
     }
 
     private void leaderUpdateNotificationReceived(String groupId) {

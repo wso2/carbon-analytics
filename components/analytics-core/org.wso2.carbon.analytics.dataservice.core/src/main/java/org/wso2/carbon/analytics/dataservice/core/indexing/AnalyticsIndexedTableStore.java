@@ -88,6 +88,11 @@ public class AnalyticsIndexedTableStore {
                     
         }
         
+        @Override
+        public String toString() {
+            return "[" + this.getTenantId() + "," + this.getTableName() + "]";
+        }
+        
     }
     
 }

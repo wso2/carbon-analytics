@@ -47,7 +47,7 @@ import org.wso2.siddhi.core.util.EventPrinter;
  */
 public class AnalyticsEventTableTest {
 
-    private static final int DEFAULT_WAIT_TIME = 6000;
+    private static final int DEFAULT_WAIT_TIME = 3000;
 
 	private AnalyticsDataService service;
     
