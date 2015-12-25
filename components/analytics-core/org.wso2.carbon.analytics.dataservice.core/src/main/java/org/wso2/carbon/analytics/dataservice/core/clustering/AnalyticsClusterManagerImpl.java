@@ -215,13 +215,19 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     @Override
     public <T> T executeOne(String groupId, Object member, Callable<T> callable)
             throws AnalyticsClusterException {
-        Future<T> result = this.hz.getExecutorService(
-                this.generateGroupExecutorId(groupId)).submitToMember(callable, (Member) member);
+        Future<T> result = this.executeOneFuture(groupId, member, callable);
         try {
             return result.get();
         } catch (InterruptedException | ExecutionException e) {
             throw new AnalyticsClusterException("Error in cluster execute one: " + e.getMessage(), e);
         }
+    }
+    
+    @Override
+    public <T> Future<T> executeOneFuture(String groupId, Object member, Callable<T> callable)
+            throws AnalyticsClusterException {
+        return this.hz.getExecutorService(this.generateGroupExecutorId(groupId)).submitToMember(
+                callable, (Member) member);
     }
 
     @Override
@@ -236,25 +242,6 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
                 result.add(entry.getValue().get());
             } catch (InterruptedException | ExecutionException e) {
                 throw new AnalyticsClusterException("Error in cluster execute all: " + e.getMessage(), e);
-            }
-        }
-        return result;
-    }
-    
-    @Override
-    public <T> List<T> execute(String groupId, Callable<T> callable, List<Object> members) throws AnalyticsClusterException {
-        List<T> result = new ArrayList<T>();
-        List<Member> memberList = new ArrayList<>(members.size());
-        for (Object member : members) {
-            memberList.add((Member) member);
-        }
-        Map<Member, Future<T>> executionResult = this.hz.getExecutorService(
-                this.generateGroupExecutorId(groupId)).submitToMembers(callable, memberList);
-        for (Map.Entry<Member, Future<T>> entry : executionResult.entrySet()) {
-            try {
-                result.add(entry.getValue().get());
-            } catch (InterruptedException | ExecutionException e) {
-                throw new AnalyticsClusterException("Error in cluster execute: " + e.getMessage(), e);
             }
         }
         return result;

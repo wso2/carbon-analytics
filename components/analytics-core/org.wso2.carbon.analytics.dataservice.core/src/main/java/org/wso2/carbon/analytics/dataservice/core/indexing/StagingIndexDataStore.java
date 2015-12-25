@@ -48,7 +48,7 @@ public class StagingIndexDataStore {
         this.indexer = indexer;
     }
     
-    public void put(List<Record> records) throws AnalyticsException {
+    public void put(String nodeId, List<Record> records) throws AnalyticsException {
         Map<Integer, List<Record>> shardedRecords = this.indexer.extractShardedRecords(records);
         for (Map.Entry<Integer, List<Record>> entry : shardedRecords.entrySet()) {
             Collection<List<Record>> recordBatches = GenericUtils.generateRecordBatches(entry.getValue());
@@ -60,7 +60,7 @@ public class StagingIndexDataStore {
                     ids.add(record.getId());
                 }
                 StagingIndexDataEntry indexEntry = new StagingIndexDataEntry(tenantId, tableName, ids);
-                this.addEntryToShard(entry.getKey(), indexEntry);
+                this.addEntryToShard(nodeId, entry.getKey(), indexEntry);
             }
         }
         if (log.isDebugEnabled()) {
@@ -68,19 +68,19 @@ public class StagingIndexDataStore {
         }
     }
     
-    public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
+    public void delete(String nodeId, int tenantId, String tableName, List<String> ids) throws AnalyticsException {
         Map<Integer, List<String>> shardedIds = this.indexer.extractShardedIds(ids);
         for (Map.Entry<Integer, List<String>> entry : shardedIds.entrySet()) {
             StagingIndexDataEntry indexEntry = new StagingIndexDataEntry(tenantId, tableName, ids);
-            this.addEntryToShard(entry.getKey(), indexEntry);
+            this.addEntryToShard(nodeId, entry.getKey(), indexEntry);
         }
         if (log.isDebugEnabled()) {
             log.debug("Staging index data delete: " + ids.size());
         }
     }
     
-    private void addEntryToShard(int shardIndex, StagingIndexDataEntry entry) throws AnalyticsException {
-        String tableName = this.generateTableName(shardIndex);
+    private void addEntryToShard(String nodeId, int shardIndex, StagingIndexDataEntry entry) throws AnalyticsException {
+        String tableName = this.generateTableName(nodeId, shardIndex);
         int tenantId = Constants.META_INFO_TENANT_ID;
         Map<String, Object> values = new HashMap<>(1);
         values.put(Constants.INDEX_STAGING_DATA_COLUMN, entry);
@@ -95,15 +95,15 @@ public class StagingIndexDataStore {
         }
     }
     
-    private String generateTableName(int shardIndex) {
-        return Constants.INDEX_STAGING_DATA_TABLE + shardIndex;
+    private String generateTableName(String nodeId, int shardIndex) {
+        return Constants.INDEX_STAGING_DATA_TABLE + shardIndex + "_" + nodeId;
     }
     
-    public List<StagingIndexDataEntry> loadEntries(int shardIndex) throws AnalyticsException {
+    public List<StagingIndexDataEntry> loadEntries(String nodeId, int shardIndex) throws AnalyticsException {
         AnalyticsRecordStore rs = this.indexer.getAnalyticsRecordStore();
         try {
             List<Record> records = GenericUtils.listRecords(rs, rs.get(Constants.META_INFO_TENANT_ID, 
-                    this.generateTableName(shardIndex), 1, null, 
+                    this.generateTableName(nodeId, shardIndex), 1, null, 
                     Long.MIN_VALUE, Long.MAX_VALUE, 0, Constants.RECORDS_BATCH_SIZE));
             List<StagingIndexDataEntry> result = new ArrayList<>(records.size());
             for (Record record : records) {
@@ -115,9 +115,9 @@ public class StagingIndexDataStore {
         }
     }
     
-    public void removeEntries(int shardIndex, List<String> ids) throws AnalyticsException {
+    public void removeEntries(String nodeId, int shardIndex, List<String> ids) throws AnalyticsException {
         AnalyticsRecordStore rs = this.indexer.getAnalyticsRecordStore();
-        rs.delete(Constants.META_INFO_TENANT_ID, this.generateTableName(shardIndex), ids);
+        rs.delete(Constants.META_INFO_TENANT_ID, this.generateTableName(nodeId, shardIndex), ids);
     }
     
     public static class StagingIndexDataEntry implements Serializable {

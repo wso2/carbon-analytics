@@ -41,6 +41,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
@@ -78,7 +79,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
     
     private String myNodeId;
     
-    private Map<Integer, Object> shardMemberMap;
+    private GlobalShardMemberMapping shardMemberMap;
     
     private Set<Integer> suppressWarnMessagesInactiveMembers = new HashSet<>();
     
@@ -92,7 +93,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.indexer = indexer;
         this.localShardAllocationConfig = new LocalShardAllocationConfig();
         this.globalShardAllocationConfig = new GlobalShardAllocationConfig(this.indexer.getAnalyticsRecordStore());
-        this.shardMemberMap = new HashMap<>();
+        this.shardMemberMap = new GlobalShardMemberMapping(this.indexer.getShardCount(), 
+                this.globalShardAllocationConfig);
         this.stagingIndexDataStore = new StagingIndexDataStore(this.indexer);
     }
     
@@ -115,7 +117,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
     private List<Integer> calculateLocalGlobalShardDiff() throws AnalyticsException {
         List<Integer> result = new ArrayList<>();
         for (int shardIndex : this.localShardAllocationConfig.getShardIndices()) {
-            if (!this.myNodeId.equals(this.globalShardAllocationConfig.getNodeIdForShard(shardIndex))) {
+            if (!this.globalShardAllocationConfig.getNodeIdsForShard(shardIndex).contains(this.myNodeId)) {
                 result.add(shardIndex);
             }
         }
@@ -148,7 +150,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
             }
             for (int shardIndex : this.localShardAllocationConfig.getShardIndices()) {
                 if (this.localShardAllocationConfig.getShardStatus(shardIndex).equals(ShardStatus.RESTORE)) {
-                    this.globalShardAllocationConfig.setNodeIdForShard(shardIndex, this.myNodeId);
+                    this.globalShardAllocationConfig.addNodeIdForShard(shardIndex, this.myNodeId);
                 }
             }
             List<Integer> localShardDiff = this.calculateLocalGlobalShardDiff();
@@ -169,7 +171,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.processLocalShards();
     }
     
-    public Map<Integer, Object> getShardMemberMap() {
+    public GlobalShardMemberMapping getShardMemberMap() {
         return shardMemberMap;
     }
     
@@ -233,27 +235,29 @@ public class IndexNodeCoordinator implements GroupEventListener {
     public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
         Map<Integer, List<String>> shardedIds = this.indexer.extractShardedIds(ids);
         List<String> localIds = new ArrayList<>();
-        Map<Object, List<String>> remoteIdsMap = new HashMap<>();
-        Object memberNode;
+        Map<String, List<String>> remoteIdsMap = new HashMap<>();
         for (Map.Entry<Integer, List<String>> entry : shardedIds.entrySet()) {
-            if (this.shardMemberMap.containsKey(entry.getKey())) {
-                memberNode = this.shardMemberMap.get(entry.getKey());
-                if (memberNode == null) { // Local node
+            Set<String> nodeIds = this.shardMemberMap.getNodeIdsForShard(entry.getKey());
+            for (String nodeId : nodeIds) {
+                if (this.myNodeId.equals(nodeId)) {
                     localIds.addAll(entry.getValue());
                 } else {
-                    List<String> remoteIds = remoteIdsMap.get(memberNode);
-                    if (remoteIds == null) {
-                        remoteIds = new ArrayList<>();
-                        remoteIdsMap.put(memberNode, remoteIds);
+                    Object memberNode = this.shardMemberMap.getMemberFromNodeId(nodeId);
+                    if (memberNode == null) {
+                        this.addToStaging(nodeId, tenantId, tableName, entry.getValue());
+                    } else {
+                        List<String> remoteIds = remoteIdsMap.get(nodeId);
+                        if (remoteIds == null) {
+                            remoteIds = new ArrayList<>();
+                            remoteIdsMap.put(nodeId, remoteIds);
+                        }
+                        remoteIds.addAll(entry.getValue());
                     }
-                    remoteIds.addAll(entry.getValue());
                 }
-            } else {
-                this.addToStaging(tenantId, tableName, entry.getValue());
             }
         }
         this.indexer.deleteLocal(tenantId, tableName, localIds);
-        for (Map.Entry<Object, List<String>> entry : remoteIdsMap.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : remoteIdsMap.entrySet()) {
             this.processRemoteRecordDelete(entry.getKey(), tenantId, tableName, entry.getValue());
         }
     }
@@ -261,34 +265,41 @@ public class IndexNodeCoordinator implements GroupEventListener {
     public void put(List<Record> records) throws AnalyticsException {
         Map<Integer, List<Record>> shardedRecords = this.indexer.extractShardedRecords(records);
         List<Record> localRecords = new ArrayList<>();
-        Map<Object, List<Record>> remoteRecordsMap = new HashMap<>();
-        Object memberNode;
+        Map<String, List<Record>> remoteRecordsMap = new HashMap<>();
         for (Map.Entry<Integer, List<Record>> entry : shardedRecords.entrySet()) {
-            if (this.shardMemberMap.containsKey(entry.getKey())) {
-                memberNode = this.shardMemberMap.get(entry.getKey());
-                if (memberNode == null) { // Local node
+            Set<String> nodeIds = this.shardMemberMap.getNodeIdsForShard(entry.getKey());
+            for (String nodeId : nodeIds) {
+                if (this.myNodeId.equals(nodeId)) {
                     localRecords.addAll(entry.getValue());
                 } else {
-                    List<Record> remoteRecords = remoteRecordsMap.get(memberNode);
-                    if (remoteRecords == null) {
-                        remoteRecords = new ArrayList<>();
-                        remoteRecordsMap.put(memberNode, remoteRecords);
+                    Object memberNode = this.shardMemberMap.getMemberFromNodeId(nodeId);
+                    if (memberNode == null) {
+                        this.addToStaging(nodeId, localRecords);
+                    } else {
+                        List<Record> remoteRecords = remoteRecordsMap.get(nodeId);
+                        if (remoteRecords == null) {
+                            remoteRecords = new ArrayList<>();
+                            remoteRecordsMap.put(nodeId, remoteRecords);
+                        }
+                        remoteRecords.addAll(entry.getValue());
                     }
-                    remoteRecords.addAll(entry.getValue());
                 }
-            } else {
-                this.addToStaging(entry.getValue());
             }
         }
         this.indexer.putLocal(localRecords);
-        for (Map.Entry<Object, List<Record>> entry : remoteRecordsMap.entrySet()) {
+        for (Map.Entry<String, List<Record>> entry : remoteRecordsMap.entrySet()) {
             this.processRemoteRecordPut(entry.getKey(), entry.getValue());
         }
     }
     
-    private void processRemoteRecordPut(Object member, List<Record> records) throws AnalyticsException {
+    private void processRemoteRecordPut(String nodeId, List<Record> records) throws AnalyticsException {
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        Object member = null;
         try {
+            member = this.shardMemberMap.getMemberFromNodeId(nodeId);
+            if (member == null) {
+                this.addToStaging(nodeId, records);
+            }
             acm.executeOne(Constants.ANALYTICS_INDEXING_GROUP, member, new IndexDataPutCall(records));
         } catch (Throwable e) {
             if (!this.suppressWarnMessagesInactiveMembers.contains(member.hashCode())) {
@@ -296,27 +307,32 @@ public class IndexNodeCoordinator implements GroupEventListener {
                         " -> adding to staging area for later pickup..");
             }
             this.suppressWarnMessagesInactiveMembers.add(member.hashCode());
-            this.addToStaging(records);
+            this.addToStaging(nodeId, records);
         }
     }
     
-    private void processRemoteRecordDelete(Object member, int tenantId, String tableName, List<String> ids) throws AnalyticsException {
+    private void processRemoteRecordDelete(String nodeId, int tenantId, String tableName, List<String> ids) throws AnalyticsException {
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        Object member = null;
         try {
+            member = this.shardMemberMap.getMemberFromNodeId(nodeId);
+            if (member == null) {
+                this.addToStaging(nodeId, tenantId, tableName, ids);
+            }
             acm.executeOne(Constants.ANALYTICS_INDEXING_GROUP, member, new IndexDataDeleteCall(tenantId, tableName, ids));
         } catch (AnalyticsClusterException e) {
             log.warn("Error in sending remote record batch delete to member: " + member + ": " + e.getMessage() + 
                     " -> adding to staging area for later pickup..");
-            this.addToStaging(tenantId, tableName, ids);
+            this.addToStaging(nodeId, tenantId, tableName, ids);
         }
     }
     
-    private void addToStaging(List<Record> records) throws AnalyticsException {
-        this.stagingIndexDataStore.put(records);
+    private void addToStaging(String nodeId, List<Record> records) throws AnalyticsException {
+        this.stagingIndexDataStore.put(nodeId, records);
     }
     
-    private void addToStaging(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
-        this.stagingIndexDataStore.delete(tenantId, tableName, ids);
+    private void addToStaging(String nodeId, int tenantId, String tableName, List<String> ids) throws AnalyticsException {
+        this.stagingIndexDataStore.delete(nodeId, tenantId, tableName, ids);
     }
     
     private void readAndIndexTable(IndexedTableId tableId, Object[] initShardObjs) throws AnalyticsException {
@@ -351,55 +367,79 @@ public class IndexNodeCoordinator implements GroupEventListener {
     private Map<String, List<Integer>> loadGlobalShards() throws AnalyticsException {
         int shardCount = this.indexer.getShardCount();
         Map<String, List<Integer>> result = new HashMap<String, List<Integer>>();
-        String nodeId;
+        Set<String> nodeIds;
         List<Integer> shards;
         for (int i = 0; i < shardCount; i++) {
-            nodeId = this.globalShardAllocationConfig.getNodeIdForShard(i);
-            shards = result.get(nodeId);
-            if (shards == null) {
-                shards = new ArrayList<>();
-                result.put(nodeId, shards);
+            nodeIds = this.globalShardAllocationConfig.getNodeIdsForShard(i);
+            for (String nodeId : nodeIds) {
+                shards = result.get(nodeId);
+                if (shards == null) {
+                    shards = new ArrayList<>();
+                    result.put(nodeId, shards);
+                }
+                shards.add(i);
             }
-            shards.add(i);
         }
         return result;
     }
     
-    private List<Integer> allocateLocalShards() throws AnalyticsException {
-        Map<String, List<Integer>> globalShards = this.loadGlobalShards();
-        List<Integer> result = new ArrayList<>();
+    private Set<Integer> allocateLocalShards() throws AnalyticsException {
+        Set<Integer> result = new HashSet<>();
+        int shardCopyCount = this.indexer.getReplicationFactor() + 1;
+        for (int i = 0; i < this.indexer.getShardCount(); i++) {
+            if (this.globalShardAllocationConfig.getNodeIdsForShard(i).size() < shardCopyCount) {
+                result.add(i);
+            }
+        }
+        Map<String, List<Integer>> globalShards = this.loadGlobalShards();        
         boolean resume = true;
         while (resume) {
             resume = false;
             for (Map.Entry<String, List<Integer>> entry : globalShards.entrySet()) {
-                if (entry.getValue().size() > result.size() || 
-                        (entry.getKey() == null && entry.getValue().size() > 0)) {
-                    result.add(entry.getValue().remove(0));
-                    resume = true;
+                if (entry.getValue().size() > result.size()) {
+                    Iterator<Integer> itr = entry.getValue().iterator();
+                    int val;
+                    while (itr.hasNext()) {
+                        val = itr.next();
+                        if (!result.contains(val)) {
+                            itr.remove();
+                            this.globalShardAllocationConfig.removeNodeIdFromShard(val, entry.getKey());
+                            result.add(val);
+                            resume = true;
+                            break;
+                        }
+                    }
                 }
             }
         }
         return result;
     }
     
+    private void cleanupLocalNodeShardsFromGlobal() throws AnalyticsException {
+        for (int i = 0; i < this.indexer.getShardCount(); i++) {
+            if (this.globalShardAllocationConfig.getNodeIdsForShard(i).contains(this.myNodeId)) {
+                this.globalShardAllocationConfig.removeNodeIdFromShard(i, this.myNodeId);
+            }
+        }
+    }
+    
     private void allocateLocalShardsFromGlobal() throws AnalyticsException {
-        List<Integer> myShards = this.extractExistingLocalShardsFromGlobal();
+        Set<Integer> myShards = this.extractExistingLocalShardsFromGlobal();
         if (myShards.isEmpty()) {
+            this.cleanupLocalNodeShardsFromGlobal();
             myShards = this.allocateLocalShards();
         }
         for (Integer shardIndex : myShards) {
             this.localShardAllocationConfig.setShardStatus(shardIndex, ShardStatus.INIT);
-            this.globalShardAllocationConfig.setNodeIdForShard(shardIndex, this.myNodeId);
+            this.globalShardAllocationConfig.addNodeIdForShard(shardIndex, this.myNodeId);
         }
     }
     
-    private List<Integer> extractExistingLocalShardsFromGlobal() throws AnalyticsException {
+    private Set<Integer> extractExistingLocalShardsFromGlobal() throws AnalyticsException {
         int shardCount = this.indexer.getShardCount();
-        String nodeId;
-        List<Integer> myShards = new ArrayList<>();
+        Set<Integer> myShards = new HashSet<>();
         for (int i = 0; i < shardCount; i++) {
-            nodeId = this.globalShardAllocationConfig.getNodeIdForShard(i);
-            if (this.myNodeId.equals(nodeId)) {
+            if (this.globalShardAllocationConfig.getNodeIdsForShard(i).contains(this.myNodeId)) {
                 myShards.add(i);
             }
         }
@@ -466,18 +506,22 @@ public class IndexNodeCoordinator implements GroupEventListener {
             AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
             localMember = acm.getLocalMember();
         }
-        return new LocalShardAddressInfo(localMember, this.localShardAllocationConfig.getShardIndices());
+        return new LocalShardAddressInfo(this.myNodeId, localMember);
     }
     
     private void queryAndRefreshClusterShardOwnerAddresses() throws AnalyticsException {
-        this.shardMemberMap.clear();
+        this.shardMemberMap.reset();
         this.suppressWarnMessagesInactiveMembers.clear();
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         List<LocalShardAddressInfo> result = acm.executeAll(Constants.ANALYTICS_INDEXING_GROUP, 
                 new QueryLocalShardsAndAddressCall());
         for (LocalShardAddressInfo entry : result) {
-            this.updateShardMemberMap(entry);
+            this.shardMemberMap.updateMemberMapping(entry);
         }
+    }
+    
+    public Map<Object, Set<Integer>> generateMemberShardMappingForIndexLookup() throws AnalyticsIndexException {
+        return this.shardMemberMap.generateMemberShardMappingForIndexLookup();
     }
     
     private void stopAndCleanupStagingWorkers() {
@@ -502,6 +546,9 @@ public class IndexNodeCoordinator implements GroupEventListener {
     private void refreshStagingWorkers() {
         this.stopAndCleanupStagingWorkers();
         Integer[] localShardIndices = this.localShardAllocationConfig.getShardIndices();;
+        if (localShardIndices.length == 0) {
+            return;
+        }
         this.stagingWorkerExecutor = Executors.newFixedThreadPool(localShardIndices.length);
         this.stagingIndexWorkers = new ArrayList<>(localShardIndices.length);
         for (int shardIndex : localShardIndices) {
@@ -518,19 +565,12 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.stopAndCleanupStagingWorkers();
     }
     
-    private void updateShardMemberMap(LocalShardAddressInfo shardInfo) {
-        Object member = shardInfo.getMember();
-        for (int shardIndex : shardInfo.getShards()) {
-            this.shardMemberMap.put(shardIndex, member);
-        }
-    }
-    
     public void refreshIndexShardInfo() throws AnalyticsException {
         if (this.isClusteringEnabled()) {
             this.queryAndRefreshClusterShardOwnerAddresses();
         } else {
-            this.shardMemberMap.clear();
-            this.updateShardMemberMap(this.generateLocalShardMemberInfo());
+            this.shardMemberMap.reset();
+            this.shardMemberMap.updateMemberMapping(this.generateLocalShardMemberInfo());
         }
         this.indexer.refreshLocalIndexShards(new HashSet<>(Arrays.asList(
                 this.localShardAllocationConfig.getShardIndices())));
@@ -660,35 +700,35 @@ public class IndexNodeCoordinator implements GroupEventListener {
     
     public static class LocalShardAddressInfo implements DataSerializable {
    
+        private String nodeId;
+        
         private Object member;
-        
-        private Integer[] shards;
-        
+                
         public LocalShardAddressInfo() { }
         
-        public LocalShardAddressInfo(Object member, Integer[] shards) {
+        public LocalShardAddressInfo(String nodeId, Object member) {
+            this.nodeId = nodeId;
             this.member = member;
-            this.shards = shards;
+        }
+        
+        public String getNodeId() {
+            return nodeId;
         }
         
         public Object getMember() {
             return member;
         }
 
-        public Integer[] getShards() {
-            return shards;
-        }
-
         @Override
         public void readData(ObjectDataInput input) throws IOException {
+            this.nodeId = input.readObject();
             this.member = input.readObject();
-            this.shards = input.readObject();
         }
 
         @Override
         public void writeData(ObjectDataOutput output) throws IOException {
+            output.writeObject(this.nodeId);
             output.writeObject(this.member);
-            output.writeObject(this.shards);
         }
         
     }
@@ -761,7 +801,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         } catch (Throwable e) {
             log.error("Error in processing index staging entry (deleting entry..): " + e.getMessage(), e);
         }
-        this.stagingIndexDataStore.removeEntries(shardIndex, Arrays.asList(entry.getRecordId()));
+        this.stagingIndexDataStore.removeEntries(this.myNodeId, shardIndex, Arrays.asList(entry.getRecordId()));
     }
     
     private Set<String> extractIds(List<Record> records) {
@@ -788,7 +828,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         public void run() {
             while (!this.stop) {
                 try {
-                    List<StagingIndexDataEntry> entries = stagingIndexDataStore.loadEntries(this.shardIndex);
+                    List<StagingIndexDataEntry> entries = stagingIndexDataStore.loadEntries(myNodeId, this.shardIndex);
                     if (!entries.isEmpty()) {
                         for (StagingIndexDataEntry entry : entries) {
                             processStagingEntry(this.shardIndex, entry);

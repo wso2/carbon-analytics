@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.dataservice.core.clustering;
 import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 /**
  * This interface represents the analytics clustering related operations.
@@ -70,16 +71,6 @@ public interface AnalyticsClusterManager {
     <T> List<T> executeAll(String groupId, Callable<T> callable) throws AnalyticsClusterException;
     
     /**
-     * Executes the given {@link Callable} in the given members in the group.
-     * @param groupId The group id of the group
-     * @param callable The implementation to be executed
-     * @param members The target members, must be retrieved from a call such as 'getMembers' 
-     * @return The aggregation of results from all the nodes
-     * @throws AnalyticsClusterException
-     */
-    <T> List<T> execute(String groupId, Callable<T> callable, List<Object> members) throws AnalyticsClusterException;
-    
-    /**
      * Executes the given {@link Callable} in the given member.
      * @param groupId The group id of the group 
      * @param member The target member, must be retrieved from a call such as 'getMembers'
@@ -88,6 +79,16 @@ public interface AnalyticsClusterManager {
      * @throws AnalyticsClusterException
      */
     <T> T executeOne(String groupId, Object member, Callable<T> callable) throws AnalyticsClusterException;
+    
+    /**
+     * Executes the given {@link Callable} in the given member asynchronously.
+     * @param groupId The group id of the group 
+     * @param member The target member, must be retrieved from a call such as 'getMembers'
+     * @param callable The implementation to be executed
+     * @return The result from the target member as a {@link Future} object
+     * @throws AnalyticsClusterException
+     */
+    <T> Future<T> executeOneFuture(String groupId, Object member, Callable<T> callable) throws AnalyticsClusterException;
 
     /**
      * Sets a property local to the given group.

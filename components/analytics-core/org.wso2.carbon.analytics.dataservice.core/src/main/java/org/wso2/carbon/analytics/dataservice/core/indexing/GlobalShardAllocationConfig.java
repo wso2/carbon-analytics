@@ -20,8 +20,10 @@ package org.wso2.carbon.analytics.dataservice.core.indexing;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -33,26 +35,42 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
  * This class contains node/shard mapping information for all the nodes.
  */
 public class GlobalShardAllocationConfig {
-    
+        
     private AnalyticsRecordStore recordStore;
     
     public GlobalShardAllocationConfig(AnalyticsRecordStore recordStore) {
         this.recordStore = recordStore;
     }
     
-    public String getNodeIdForShard(int shardIndex) throws AnalyticsException {
+    public Set<String> getNodeIdsForShard(int shardIndex) throws AnalyticsException {
         List<Record> records = GenericUtils.listRecords(this.recordStore, this.recordStore.get(Constants.META_INFO_TENANT_ID, 
                 Constants.GLOBAL_SHARD_ALLOCATION_CONFIG_TABLE, 1, null, Arrays.asList(String.valueOf(shardIndex))));
         if (records.size() > 0) {
-            return records.get(0).getValue(Constants.GLOBAL_SHARD_ALLOCATION_CONFIG_COLUMN).toString();
+            return records.get(0).getValues().keySet();
         } else {
-            return null;
+            return new HashSet<>(0);
         }
     }
     
-    public void setNodeIdForShard(int shardIndex, String nodeId) throws AnalyticsException {
-        Map<String, Object> values = new HashMap<>(1);
-        values.put(Constants.GLOBAL_SHARD_ALLOCATION_CONFIG_COLUMN, nodeId);
+    public void removeNodeIdFromShard(int shardIndex, String nodeId) throws AnalyticsException {
+        Set<String> nodeIds = this.getNodeIdsForShard(shardIndex);
+        Map<String, Object> values = new HashMap<>(nodeIds.size());
+        for (String entry : nodeIds) {
+            values.put(entry, entry);
+        }
+        values.remove(nodeId);
+        Record record = new Record(String.valueOf(shardIndex), Constants.META_INFO_TENANT_ID, 
+                Constants.GLOBAL_SHARD_ALLOCATION_CONFIG_TABLE, values);
+        this.recordStore.put(Arrays.asList(record));
+    }
+    
+    public void addNodeIdForShard(int shardIndex, String nodeId) throws AnalyticsException {
+        Set<String> nodeIds = this.getNodeIdsForShard(shardIndex);
+        Map<String, Object> values = new HashMap<>(nodeIds.size() + 1);
+        for (String entry : nodeIds) {
+            values.put(entry, entry);
+        }
+        values.put(nodeId, nodeId);
         Record record = new Record(String.valueOf(shardIndex), Constants.META_INFO_TENANT_ID, 
                 Constants.GLOBAL_SHARD_ALLOCATION_CONFIG_TABLE, values);
         this.recordStore.put(Arrays.asList(record));

@@ -49,7 +49,6 @@ public class Constants {
     public static final int INDEX_WORKER_STOP_WAIT_TIME = 60000;
     public static final int META_INFO_TENANT_ID = -1000;
     public static final String GLOBAL_SHARD_ALLOCATION_CONFIG_TABLE = "__GLOBAL_SHARD_ALLOCATION_CONFIG__";
-    public static final String GLOBAL_SHARD_ALLOCATION_CONFIG_COLUMN = "VALUE";
     public static final String INDEX_STAGING_DATA_TABLE = "__INDEX_STAGING_DATA__";
     public static final String INDEX_STAGING_DATA_COLUMN = "VALUE";
 

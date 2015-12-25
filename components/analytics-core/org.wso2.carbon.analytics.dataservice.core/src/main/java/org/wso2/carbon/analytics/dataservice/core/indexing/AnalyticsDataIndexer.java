@@ -122,6 +122,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -178,6 +179,8 @@ public class AnalyticsDataIndexer {
     
     private Set<Integer> localShards = new HashSet<>();
     
+    private int replicationFactor = 1;
+    
     public AnalyticsDataIndexer(AnalyticsIndexerInfo indexerInfo) throws AnalyticsException {
     	this.indexerInfo = indexerInfo;
     }
@@ -192,6 +195,10 @@ public class AnalyticsDataIndexer {
         this.localIndexDataStore = new LocalIndexDataStore(this);
         this.indexNodeCoordinator = new IndexNodeCoordinator(this);
         this.indexNodeCoordinator.init();
+    }
+    
+    public int getReplicationFactor() {
+        return replicationFactor;
     }
     
     public IndexNodeCoordinator getIndexNodeCoordinator() {
@@ -346,6 +353,9 @@ public class AnalyticsDataIndexer {
     private void reschuduleWorkers() throws AnalyticsException {
         this.stopAndCleanupIndexProcessing();
         this.workers = new ArrayList<>(this.localShards.size());
+        if (this.localShards.size() == 0) {
+            return;
+        }
         this.shardWorkerExecutor = Executors.newFixedThreadPool(this.localShards.size());
         for (int shardIndex : this.localShards) {
             IndexWorker worker = new IndexWorker(shardIndex);
@@ -358,11 +368,11 @@ public class AnalyticsDataIndexer {
         return Math.abs(id.hashCode()) % this.getShardCount();
     }
     
-    private List<String> lookupGloballyExistingShardIds()
+    private List<Integer> lookupGloballyExistingShardIds()
             throws AnalyticsIndexException {
-        List<String> result = new ArrayList<>(this.localShards.size());
+        List<Integer> result = new ArrayList<>(this.localShards.size());
         for (int shardIndex : this.localShards) {
-            result.add(String.valueOf(shardIndex));
+            result.add(shardIndex);
         }
         return result;
     }
@@ -371,10 +381,7 @@ public class AnalyticsDataIndexer {
             final int start, final int count) throws AnalyticsException {
         List<SearchResultEntry> result;
         if (this.isClusteringEnabled()) {
-            AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
-            List<List<SearchResultEntry>> entries = acm.execute(org.wso2.carbon.analytics.dataservice.core.Constants.
-                    ANALYTICS_INDEXING_GROUP, new SearchCall(tenantId, tableName, query, start, count),
-                    this.getMembersForAllShards());
+            List<List<SearchResultEntry>> entries = this.executeIndexLookup(new SearchCall(tenantId, tableName, query, start, count));
             result = new ArrayList<>();
             for (List<SearchResultEntry> entry : entries) {
                 result.addAll(entry);
@@ -391,7 +398,7 @@ public class AnalyticsDataIndexer {
                 result = new ArrayList<>(0);
             }
         } else {
-            result = this.doSearch(tenantId, tableName, query, start, count);
+            result = this.doSearch(this.localShards, tenantId, tableName, query, start, count);
         }
         if (log.isDebugEnabled()) {
             log.debug("Search [" + query + "]: " + result.size());
@@ -399,13 +406,13 @@ public class AnalyticsDataIndexer {
         return result;
     }
 
-    private List<SearchResultEntry> doSearch(int tenantId, String tableName, String query, int start, int count)
+    private List<SearchResultEntry> doSearch(Set<Integer> shardIndices, int tenantId, String tableName, String query, int start, int count)
             throws AnalyticsIndexException {
         List<SearchResultEntry> result = new ArrayList<>();
         IndexReader reader = null;
         ExecutorService searchExecutor = Executors.newCachedThreadPool();
         try {
-            reader = this.getCombinedIndexReader(tenantId, tableName);
+            reader = this.getCombinedIndexReader(shardIndices, tenantId, tableName);
             IndexSearcher searcher = new IndexSearcher(reader, searchExecutor);
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, tableName);
             Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
@@ -469,34 +476,43 @@ public class AnalyticsDataIndexer {
         return AnalyticsServiceHolder.getAnalyticsClusterManager().isClusteringEnabled();
     }
     
-    private List<Object> getMembersForAllShards() throws AnalyticsIndexException {
+    private Map<Object, Set<Integer>> generateMemberShardMappingForIndexLookup() throws AnalyticsIndexException {
+        return this.indexNodeCoordinator.generateMemberShardMappingForIndexLookup();
+    }
+    
+    private <T> List<T> executeIndexLookup(IndexLookupOperationCall<T> call) throws AnalyticsIndexException {
+        Map<Object, Set<Integer>> target = this.generateMemberShardMappingForIndexLookup();
+        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        List<T> result = new ArrayList<>();
+        List<Future<T>> futures = new ArrayList<>();
         try {
-            return AnalyticsServiceHolder.getAnalyticsClusterManager().getMembers(
-                    org.wso2.carbon.analytics.dataservice.core.Constants.ANALYTICS_INDEXING_GROUP);
-        } catch (AnalyticsClusterException e) {
-            throw new AnalyticsIndexException("Error in getting members for all shards: " + e.getMessage(), e);
+            IndexLookupOperationCall<T> copyCall;
+            for (Map.Entry<Object, Set<Integer>> entry : target.entrySet()) {
+                copyCall = (IndexLookupOperationCall<T>) call.copy();
+                copyCall.setShardIndices(entry.getValue());
+                futures.add(acm.executeOneFuture(org.wso2.carbon.analytics.dataservice.core.Constants.
+                        ANALYTICS_INDEXING_GROUP, entry.getKey(), copyCall));
+            }
+            for (Future<T> future : futures) {
+                result.add(future.get());
+            }
+        } catch (AnalyticsClusterException | ExecutionException | InterruptedException e) {
+            throw new AnalyticsIndexException("Error in executing cluster index lookup: " + e.getMessage(), e);
         }
+        return result;
     }
 
     public int searchCount(final int tenantId, final String tableName, final String query) 
             throws AnalyticsIndexException {
         int result;
         if (this.isClusteringEnabled()) {
-            AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
-            List<Integer> counts;
-            try {
-                counts = acm.execute(org.wso2.carbon.analytics.dataservice.core.Constants.
-                        ANALYTICS_INDEXING_GROUP, new SearchCountCall(tenantId, tableName, query),
-                        this.getMembersForAllShards());
-            } catch (AnalyticsClusterException e) {
-                throw new AnalyticsIndexException("Error in doing cluster search count: " + e.getMessage(), e);
-            }
+            List<Integer> counts = this.executeIndexLookup(new SearchCountCall(tenantId, tableName, query));
             result = 0;
             for (int count : counts) {
                 result += count;
             }
         } else {
-            result = doSearchCount(tenantId, tableName, query);
+            result = doSearchCount(this.localShards, tenantId, tableName, query);
         }
         if (log.isDebugEnabled()) {
             log.debug("Search Count: " + result);
@@ -504,10 +520,11 @@ public class AnalyticsDataIndexer {
         return result;
     }
     
-    private int doSearchCount(int tenantId, String tableName, String query) throws AnalyticsIndexException {
+    private int doSearchCount(Set<Integer> shardIds, int tenantId, String tableName,
+            String query) throws AnalyticsIndexException {
         IndexReader reader = null;
         try {
-            reader = this.getCombinedIndexReader(tenantId, tableName);
+            reader = this.getCombinedIndexReader(shardIds, tenantId, tableName);
             IndexSearcher searcher = new IndexSearcher(reader);
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, tableName);
             Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
@@ -550,7 +567,7 @@ public class AnalyticsDataIndexer {
         }
         IndexReader indexReader = null;
         try {
-            indexReader = getCombinedIndexReader(tenantId, drillDownRequest.getTableName());
+            indexReader = getCombinedIndexReader(this.localShards, tenantId, drillDownRequest.getTableName());
             return getAnalyticsDrillDownRanges(tenantId, drillDownRequest, indexReader);
         } catch (org.apache.lucene.queryparser.classic.ParseException e) {
             throw new AnalyticsIndexException("Error while parsing the lucene query: " +
@@ -615,11 +632,10 @@ public class AnalyticsDataIndexer {
         return buckets.toArray(new DoubleRange[buckets.size()]);
     }
 
-    private MultiReader getCombinedIndexReader(int tenantId, String tableName)
+    private MultiReader getCombinedIndexReader(Set<Integer> shardIds, int tenantId, String tableName)
             throws IOException, AnalyticsIndexException {
-        List<String> shardIds = this.lookupGloballyExistingShardIds();
         List<IndexReader> indexReaders = new ArrayList<>();
-        for (String shardId : shardIds) {
+        for (int shardId : shardIds) {
             String tableId = this.generateTableId(tenantId, tableName);
             try {
                 IndexReader reader = DirectoryReader.open(this.lookupIndexDir(shardId, tableId));
@@ -924,9 +940,9 @@ public class AnalyticsDataIndexer {
         if (startIndex < 0 ) throw new AnalyticsIndexException("Start index should be greater than 0");
         int endIndex = startIndex + drillDownRequest.getRecordCount();
         if (endIndex <= startIndex) throw new AnalyticsIndexException("Record Count should be greater than 0");
-        List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds();
+        List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
         List<SearchResultEntry> resultFacetList = new ArrayList<>();
-        for (String shardId : taxonomyShardIds) {
+        for (int shardId : taxonomyShardIds) {
             resultFacetList.addAll(this.drillDownRecordsPerShard(tenantId, shardId, drillDownRequest, rangeField, range));
         }
         Collections.sort(resultFacetList);
@@ -941,9 +957,9 @@ public class AnalyticsDataIndexer {
 
     private List<CategorySearchResultEntry> getDrillDownCategories(int tenantId,
                    CategoryDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
-        List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds();
+        List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
         List<CategorySearchResultEntry> categoriesPerShard = new ArrayList<>();
-        for (String shardId : taxonomyShardIds) {
+        for (int shardId : taxonomyShardIds) {
             categoriesPerShard.addAll(this.drillDownCategoriesPerShard(tenantId, shardId, drillDownRequest));
         }
         return categoriesPerShard;
@@ -952,9 +968,9 @@ public class AnalyticsDataIndexer {
     public double getDrillDownRecordCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
                                          String rangeField, AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
-        List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds();
+        List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
         double totalCount = 0;
-        for (String shardId : taxonomyShardIds) {
+        for (int shardId : taxonomyShardIds) {
             totalCount += this.getDrillDownRecordCountPerShard(tenantId, shardId, drillDownRequest, rangeField, range);
         }
         return totalCount;
@@ -962,7 +978,7 @@ public class AnalyticsDataIndexer {
 
     private List<SearchResultEntry> drillDownRecordsPerShard(
             final int tenantId,
-            final String shardId,
+            final int shardId,
             final AnalyticsDrillDownRequest drillDownRequest,
             final String rangeField,
             final AnalyticsDrillDownRange range)
@@ -974,7 +990,7 @@ public class AnalyticsDataIndexer {
         return drillDownRecords(tenantId, drillDownRequest, indexDir, taxonomyDir, rangeField, range);
     }
 
-    private List<CategorySearchResultEntry> drillDownCategoriesPerShard(final int tenantId, final String shardId,
+    private List<CategorySearchResultEntry> drillDownCategoriesPerShard(final int tenantId, final int shardId,
                                                              final CategoryDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
         String tableId = generateTableId(tenantId, drillDownRequest.getTableName());
@@ -984,7 +1000,7 @@ public class AnalyticsDataIndexer {
     }
 
     private double getDrillDownRecordCountPerShard(final int tenantId,
-                                                   final String shardId,
+                                                   final int shardId,
                                                    final AnalyticsDrillDownRequest drillDownRequest,
                                                    final String rangeField,
                                                    final AnalyticsDrillDownRange range)
@@ -1029,7 +1045,7 @@ public class AnalyticsDataIndexer {
             log.debug("Deleting data in local index [" + shardIndex + "]: " + ids.size());
         }
         String tableId = this.generateTableId(tenantId, tableName);
-        IndexWriter indexWriter = this.createIndexWriter(String.valueOf(shardIndex), tableId);
+        IndexWriter indexWriter = this.createIndexWriter(shardIndex, tableId);
         List<Term> terms = new ArrayList<Term>(ids.size());
         for (String id : ids) {
             terms.add(new Term(INDEX_ID_INTERNAL_FIELD, id));
@@ -1089,8 +1105,8 @@ public class AnalyticsDataIndexer {
         int tenantId = firstRecord.getTenantId();
         String tableName = firstRecord.getTableName();
         String tableId = this.generateTableId(tenantId, tableName);
-        IndexWriter indexWriter = this.createIndexWriter(String.valueOf(shardIndex), tableId);
-        TaxonomyWriter taxonomyWriter = this.createTaxonomyIndexWriter(String.valueOf(shardIndex), tableId);
+        IndexWriter indexWriter = this.createIndexWriter(shardIndex, tableId);
+        TaxonomyWriter taxonomyWriter = this.createTaxonomyIndexWriter(shardIndex, tableId);
         try {
             for (Record record : recordBatch) {
                 indexWriter.updateDocument(new Term(INDEX_ID_INTERNAL_FIELD, record.getId()),
@@ -1227,7 +1243,7 @@ public class AnalyticsDataIndexer {
         return indices;
     }
 
-    private String generateDirPath(String shardId, String basePath, String tableId) {
+    private String generateDirPath(int shardId, String basePath, String tableId) {
         String indexStoreLoc = this.indexerInfo.getIndexStoreLocation();
         if (!indexStoreLoc.endsWith(File.separator)) {
             indexStoreLoc += File.separator;
@@ -1235,11 +1251,11 @@ public class AnalyticsDataIndexer {
         return indexStoreLoc + shardId + basePath + tableId;
     }
 
-    private Directory createDirectory(String shardId, String tableId) throws AnalyticsIndexException {
+    private Directory createDirectory(int shardId, String tableId) throws AnalyticsIndexException {
         return this.createDirectory(shardId, INDEX_DATA_FS_BASE_PATH, tableId);
     }
     
-    private Directory createDirectory(String shardId, String basePath, String tableId) throws AnalyticsIndexException {
+    private Directory createDirectory(int shardId, String basePath, String tableId) throws AnalyticsIndexException {
         String path = this.generateDirPath(shardId, basePath, tableId);
         try {
             return new NIOFSDirectory(Paths.get(path));
@@ -1248,11 +1264,11 @@ public class AnalyticsDataIndexer {
         }
     }
     
-    private String generateShardedTableId(String shardId, String tableId) {
+    private String generateShardedTableId(int shardId, String tableId) {
         return shardId + "_" + tableId;
     }
     
-    private Directory lookupIndexDir(String shardId, String tableId) throws AnalyticsIndexException {
+    private Directory lookupIndexDir(int shardId, String tableId) throws AnalyticsIndexException {
         String shardedTableId = this.generateShardedTableId(shardId, tableId);
         Directory indexDir = this.indexDirs.get(shardedTableId);
         if (indexDir == null) {
@@ -1267,7 +1283,7 @@ public class AnalyticsDataIndexer {
         return indexDir;
     }
 
-    private Directory lookupTaxonomyIndexDir(String shardId, String tableId) throws AnalyticsIndexException {
+    private Directory lookupTaxonomyIndexDir(int shardId, String tableId) throws AnalyticsIndexException {
         String shardedTableId = this.generateShardedTableId(shardId, tableId);
         Directory indexTaxonomyDir = this.indexTaxonomyDirs.get(shardedTableId);
         if (indexTaxonomyDir == null) {
@@ -1282,7 +1298,7 @@ public class AnalyticsDataIndexer {
         return indexTaxonomyDir;
     }
     
-    private IndexWriter createIndexWriter(String shardId, String tableId) throws AnalyticsIndexException {
+    private IndexWriter createIndexWriter(int shardId, String tableId) throws AnalyticsIndexException {
         Directory indexDir = this.lookupIndexDir(shardId, tableId);
         IndexWriterConfig conf = new IndexWriterConfig(this.indexerInfo.getLuceneAnalyzer());
         try {
@@ -1292,7 +1308,7 @@ public class AnalyticsDataIndexer {
         }
     }
 
-    private TaxonomyWriter createTaxonomyIndexWriter(String shardId, String tableId) throws AnalyticsIndexException {
+    private TaxonomyWriter createTaxonomyIndexWriter(int shardId, String tableId) throws AnalyticsIndexException {
         Directory indexDir = this.lookupTaxonomyIndexDir(shardId, tableId);
         try {
             return new DirectoryTaxonomyWriter(indexDir, IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
@@ -1309,20 +1325,20 @@ public class AnalyticsDataIndexer {
         String tableId = this.generateTableId(tenantId, tableName);
         for (int shardIndex : this.localShards) {
             try {
-                Directory dir = this.indexDirs.remove(this.generateShardedTableId(String.valueOf(shardIndex), tableId));
+                Directory dir = this.indexDirs.remove(this.generateShardedTableId(shardIndex, tableId));
                 if (dir != null) {
                     dir.close();
                 }
-                dir = this.indexTaxonomyDirs.remove(this.generateShardedTableId(String.valueOf(shardIndex), tableId));
+                dir = this.indexTaxonomyDirs.remove(this.generateShardedTableId(shardIndex, tableId));
                 if (dir != null) {
                     dir.close();
                 }
                 try {
-                    FileUtils.deleteDirectory(new File(this.generateDirPath(String.valueOf(shardIndex), 
+                    FileUtils.deleteDirectory(new File(this.generateDirPath(shardIndex, 
                             TAXONOMY_INDEX_DATA_FS_BASE_PATH, tableId)));
                 } catch (FileNotFoundException ignore) { }
                 try {
-                    FileUtils.deleteDirectory(new File(this.generateDirPath(String.valueOf(shardIndex), 
+                    FileUtils.deleteDirectory(new File(this.generateDirPath(shardIndex, 
                             INDEX_DATA_FS_BASE_PATH, tableId)));
                 } catch (FileNotFoundException ignore) { }                
             } catch (IOException e) {
@@ -1426,7 +1442,7 @@ public class AnalyticsDataIndexer {
 	private List<String[]> getUniqueGroupings(int tenantId, AggregateRequest aggregateRequest)
             throws AnalyticsIndexException, IOException {
         if (aggregateRequest.getAggregateLevel() >= 0) {
-            List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds();
+            List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
             if (taxonomyShardIds.size() == 0) {
                 return new ArrayList<>();
             }
@@ -1742,7 +1758,24 @@ public class AnalyticsDataIndexer {
         
     }
     
-    public static class SearchCountCall implements Callable<Integer>, Serializable {
+    /**
+     * Base class for all index operation lookup calls;
+     */
+    public abstract static class IndexLookupOperationCall<T> implements Callable<T>, Serializable {
+
+        private static final long serialVersionUID = -3795911382229854410L;
+        
+        protected Set<Integer> shardIndices;
+        
+        public void setShardIndices(Set<Integer> shardIndices) {
+            this.shardIndices = shardIndices;
+        }
+        
+        public abstract IndexLookupOperationCall<T> copy();
+        
+    }
+    
+    public static class SearchCountCall extends IndexLookupOperationCall<Integer> {
 
         private static final long serialVersionUID = -6551068087138398124L;
 
@@ -1766,14 +1799,19 @@ public class AnalyticsDataIndexer {
             }
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
-                return adsImpl.getIndexer().doSearchCount(this.tenantId, this.tableName, this.query);
+                return adsImpl.getIndexer().doSearchCount(this.shardIndices, this.tenantId, this.tableName, this.query);
             }
             return 0;
+        }
+
+        @Override
+        public IndexLookupOperationCall<Integer> copy() {
+            return new SearchCountCall(this.tenantId, this.tableName, this.query);
         }
         
     }
     
-    public static class SearchCall implements Callable<List<SearchResultEntry>>, Serializable {
+    public static class SearchCall extends IndexLookupOperationCall<List<SearchResultEntry>> {
 
         private static final long serialVersionUID = -6551068087138398124L;
 
@@ -1803,9 +1841,14 @@ public class AnalyticsDataIndexer {
             }
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
-                return adsImpl.getIndexer().doSearch(this.tenantId, this.tableName, this.query, this.start, this.count);
+                return adsImpl.getIndexer().doSearch(this.shardIndices, this.tenantId, this.tableName, this.query, this.start, this.count);
             }
             return new ArrayList<>();
+        }
+
+        @Override
+        public IndexLookupOperationCall<List<SearchResultEntry>> copy() {
+            return new SearchCall(this.tenantId, this.tableName, this.query, this.start, this.count);
         }
         
     }
