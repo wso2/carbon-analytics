@@ -372,8 +372,9 @@ public class AnalyticsDataIndexer {
         List<SearchResultEntry> result;
         if (this.isClusteringEnabled()) {
             AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
-            List<List<SearchResultEntry>> entries = acm.executeAll(org.wso2.carbon.analytics.dataservice.core.Constants.
-                    ANALYTICS_INDEXING_GROUP, new SearchCall(tenantId, tableName, query, start, count));
+            List<List<SearchResultEntry>> entries = acm.execute(org.wso2.carbon.analytics.dataservice.core.Constants.
+                    ANALYTICS_INDEXING_GROUP, new SearchCall(tenantId, tableName, query, start, count),
+                    this.getMembersForAllShards());
             result = new ArrayList<>();
             for (List<SearchResultEntry> entry : entries) {
                 result.addAll(entry);
@@ -467,6 +468,15 @@ public class AnalyticsDataIndexer {
     private boolean isClusteringEnabled() {
         return AnalyticsServiceHolder.getAnalyticsClusterManager().isClusteringEnabled();
     }
+    
+    private List<Object> getMembersForAllShards() throws AnalyticsIndexException {
+        try {
+            return AnalyticsServiceHolder.getAnalyticsClusterManager().getMembers(
+                    org.wso2.carbon.analytics.dataservice.core.Constants.ANALYTICS_INDEXING_GROUP);
+        } catch (AnalyticsClusterException e) {
+            throw new AnalyticsIndexException("Error in getting members for all shards: " + e.getMessage(), e);
+        }
+    }
 
     public int searchCount(final int tenantId, final String tableName, final String query) 
             throws AnalyticsIndexException {
@@ -475,8 +485,9 @@ public class AnalyticsDataIndexer {
             AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
             List<Integer> counts;
             try {
-                counts = acm.executeAll(org.wso2.carbon.analytics.dataservice.core.Constants.
-                        ANALYTICS_INDEXING_GROUP, new SearchCountCall(tenantId, tableName, query));
+                counts = acm.execute(org.wso2.carbon.analytics.dataservice.core.Constants.
+                        ANALYTICS_INDEXING_GROUP, new SearchCountCall(tenantId, tableName, query),
+                        this.getMembersForAllShards());
             } catch (AnalyticsClusterException e) {
                 throw new AnalyticsIndexException("Error in doing cluster search count: " + e.getMessage(), e);
             }

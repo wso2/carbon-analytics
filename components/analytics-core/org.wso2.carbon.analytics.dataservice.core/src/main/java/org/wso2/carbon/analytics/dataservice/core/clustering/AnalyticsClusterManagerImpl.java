@@ -227,10 +227,6 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     @Override
     public <T> List<T> executeAll(String groupId, Callable<T> callable)
             throws AnalyticsClusterException {
-        if (!this.groups.containsKey(groupId)) {
-            throw new AnalyticsClusterException("The node is required to join the group (" +
-                                                groupId + ") before sending cluster messages");
-        }
         List<Member> members = this.getGroupMembers(groupId);
         List<T> result = new ArrayList<T>();
         Map<Member, Future<T>> executionResult = this.hz.getExecutorService(
@@ -240,6 +236,25 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
                 result.add(entry.getValue().get());
             } catch (InterruptedException | ExecutionException e) {
                 throw new AnalyticsClusterException("Error in cluster execute all: " + e.getMessage(), e);
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public <T> List<T> execute(String groupId, Callable<T> callable, List<Object> members) throws AnalyticsClusterException {
+        List<T> result = new ArrayList<T>();
+        List<Member> memberList = new ArrayList<>(members.size());
+        for (Object member : members) {
+            memberList.add((Member) member);
+        }
+        Map<Member, Future<T>> executionResult = this.hz.getExecutorService(
+                this.generateGroupExecutorId(groupId)).submitToMembers(callable, memberList);
+        for (Map.Entry<Member, Future<T>> entry : executionResult.entrySet()) {
+            try {
+                result.add(entry.getValue().get());
+            } catch (InterruptedException | ExecutionException e) {
+                throw new AnalyticsClusterException("Error in cluster execute: " + e.getMessage(), e);
             }
         }
         return result;

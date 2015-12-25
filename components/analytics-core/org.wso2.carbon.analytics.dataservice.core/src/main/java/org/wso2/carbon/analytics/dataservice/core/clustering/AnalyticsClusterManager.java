@@ -70,6 +70,16 @@ public interface AnalyticsClusterManager {
     <T> List<T> executeAll(String groupId, Callable<T> callable) throws AnalyticsClusterException;
     
     /**
+     * Executes the given {@link Callable} in the given members in the group.
+     * @param groupId The group id of the group
+     * @param callable The implementation to be executed
+     * @param members The target members, must be retrieved from a call such as 'getMembers' 
+     * @return The aggregation of results from all the nodes
+     * @throws AnalyticsClusterException
+     */
+    <T> List<T> execute(String groupId, Callable<T> callable, List<Object> members) throws AnalyticsClusterException;
+    
+    /**
      * Executes the given {@link Callable} in the given member.
      * @param groupId The group id of the group 
      * @param member The target member, must be retrieved from a call such as 'getMembers'
