@@ -104,6 +104,8 @@ import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
+import com.hazelcast.spi.exception.TargetNotMemberException;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -481,6 +483,20 @@ public class AnalyticsDataIndexer {
     }
     
     private <T> List<T> executeIndexLookup(IndexLookupOperationCall<T> call) throws AnalyticsIndexException {
+        try {
+            return this.executeIndexLookupDirect(call);
+        } catch (TargetNotMemberException e) {
+            log.warn("Target member not available for index lookup, refreshing index shard info...");
+            try {
+                this.indexNodeCoordinator.refreshIndexShardInfo();
+            } catch (AnalyticsException ex) {
+                log.warn("Error in refreshing shard info in execute index lookup: " + ex.getMessage(), ex);
+            }
+            return this.executeIndexLookupDirect(call);
+        }
+    }
+    
+    private <T> List<T> executeIndexLookupDirect(IndexLookupOperationCall<T> call) throws AnalyticsIndexException {
         Map<Object, Set<Integer>> target = this.generateMemberShardMappingForIndexLookup();
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         List<T> result = new ArrayList<>();

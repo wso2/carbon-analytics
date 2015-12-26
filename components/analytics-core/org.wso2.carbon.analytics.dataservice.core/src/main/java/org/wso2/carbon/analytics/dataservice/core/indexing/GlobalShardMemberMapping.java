@@ -81,6 +81,9 @@ public class GlobalShardMemberMapping {
                 members.add(member);
             }
         }
+        if (members.isEmpty()) {
+            return null;
+        }
         return members.get((int) (members.size() * Math.random()));
     }
     

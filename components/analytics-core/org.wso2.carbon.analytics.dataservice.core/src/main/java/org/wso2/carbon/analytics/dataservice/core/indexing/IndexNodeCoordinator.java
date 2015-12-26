@@ -47,7 +47,6 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.Constants;
-import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsIndexedTableStore.IndexedTableId;
@@ -67,6 +66,8 @@ import com.hazelcast.nio.serialization.DataSerializable;
  */
 public class IndexNodeCoordinator implements GroupEventListener {
     
+    private static final int FAIL_INDEX_OPERATION_REFRESH_THRESHOLD = 100;
+
     private static final String GSA_LOCK = "__GLOBAL_SHARD_ALLOCATION_LOCK__";
 
     private static Log log = LogFactory.getLog(IndexNodeCoordinator.class);
@@ -88,6 +89,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
     private ExecutorService stagingWorkerExecutor;
     
     private List<StagingDataIndexWorker> stagingIndexWorkers;
+    
+    private int failedIndexOperationCount;
     
     public IndexNodeCoordinator(AnalyticsDataIndexer indexer) throws AnalyticsException {
         this.indexer = indexer;
@@ -274,7 +277,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
                 } else {
                     Object memberNode = this.shardMemberMap.getMemberFromNodeId(nodeId);
                     if (memberNode == null) {
-                        this.addToStaging(nodeId, localRecords);
+                        this.addToStaging(nodeId, entry.getValue());
                     } else {
                         List<Record> remoteRecords = remoteRecordsMap.get(nodeId);
                         if (remoteRecords == null) {
@@ -307,7 +310,16 @@ public class IndexNodeCoordinator implements GroupEventListener {
                         " -> adding to staging area for later pickup..");
             }
             this.suppressWarnMessagesInactiveMembers.add(member.hashCode());
+            this.checkFailedOperationCountRefresh();
             this.addToStaging(nodeId, records);
+        }
+    }
+    
+    private void checkFailedOperationCountRefresh() throws AnalyticsException {
+        this.failedIndexOperationCount++;
+        if (this.failedIndexOperationCount > FAIL_INDEX_OPERATION_REFRESH_THRESHOLD) {
+            this.failedIndexOperationCount = 0;
+            this.refreshIndexShardInfo();
         }
     }
     
@@ -320,9 +332,13 @@ public class IndexNodeCoordinator implements GroupEventListener {
                 this.addToStaging(nodeId, tenantId, tableName, ids);
             }
             acm.executeOne(Constants.ANALYTICS_INDEXING_GROUP, member, new IndexDataDeleteCall(tenantId, tableName, ids));
-        } catch (AnalyticsClusterException e) {
-            log.warn("Error in sending remote record batch delete to member: " + member + ": " + e.getMessage() + 
-                    " -> adding to staging area for later pickup..");
+        } catch (Throwable e) {
+            if (!this.suppressWarnMessagesInactiveMembers.contains(member.hashCode())) {
+                log.warn("Error in sending remote record batch delete to member: " + member + ": " + e.getMessage() + 
+                        " -> adding to staging area for later pickup..");
+            }
+            this.suppressWarnMessagesInactiveMembers.add(member.hashCode());
+            this.checkFailedOperationCountRefresh();
             this.addToStaging(nodeId, tenantId, tableName, ids);
         }
     }

@@ -23,6 +23,8 @@ import com.hazelcast.core.Member;
 import com.hazelcast.core.MemberAttributeEvent;
 import com.hazelcast.core.MembershipEvent;
 import com.hazelcast.core.MembershipListener;
+import com.hazelcast.spi.exception.TargetNotMemberException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
@@ -237,12 +239,20 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         List<T> result = new ArrayList<T>();
         Map<Member, Future<T>> executionResult = this.hz.getExecutorService(
                 this.generateGroupExecutorId(groupId)).submitToMembers(callable, members);
+        List<Member> invalidMembers = new ArrayList<>();
         for (Map.Entry<Member, Future<T>> entry : executionResult.entrySet()) {
             try {
                 result.add(entry.getValue().get());
+            } catch (TargetNotMemberException e) {
+                invalidMembers.add(entry.getKey());
+                log.warn("Invalid target member: " + entry.getKey() + " removed from group: " + groupId);
             } catch (InterruptedException | ExecutionException e) {
                 throw new AnalyticsClusterException("Error in cluster execute all: " + e.getMessage(), e);
             }
+        }
+        /* process invalid members */
+        if (!invalidMembers.isEmpty()) {
+            members.removeAll(invalidMembers);
         }
         return result;
     }
