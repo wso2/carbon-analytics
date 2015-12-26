@@ -39,6 +39,8 @@ public class AnalyticsIndexerInfo {
     private AnalyticsIndexedTableStore indexedTableStore;
 
     private int shardCount;
+    
+    private int indexReplicationFactor;
 
     private int shardIndexRecordBatchSize;
     
@@ -90,6 +92,14 @@ public class AnalyticsIndexerInfo {
 
     public void setShardCount(int shardCount) {
         this.shardCount = shardCount;
+    }
+    
+    public int getIndexReplicationFactor() {
+        return indexReplicationFactor;
+    }
+
+    public void setIndexReplicationFactor(int indexReplicationFactor) {
+        this.indexReplicationFactor = indexReplicationFactor;
     }
 
     public int getShardIndexRecordBatchSize() {

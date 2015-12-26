@@ -41,6 +41,8 @@ public class AnalyticsDataServiceConfiguration {
         
     private int shardCount;
     
+    private int indexReplicationFactor = Constants.DEFAULT_INDEX_REPLICATION_FACTOR;
+    
     private int shardIndexRecordBatchSize;
         
     private int recordsBatchSize = Constants.RECORDS_BATCH_SIZE;
@@ -98,6 +100,15 @@ public class AnalyticsDataServiceConfiguration {
         this.shardCount = shardCount;
     }
     
+    @XmlElement (name = "indexReplicationFactor", defaultValue = "" + Constants.DEFAULT_INDEX_REPLICATION_FACTOR)
+    public int getIndexReplicationFactor() {
+        return indexReplicationFactor;
+    }
+    
+    public void setIndexReplicationFactor(int indexReplicationFactor) {
+        this.indexReplicationFactor = indexReplicationFactor;
+    }
+    
     @XmlElement (name = "shardIndexRecordBatchSize", defaultValue = "100")
     public int getShardIndexRecordBatchSize() {
         return shardIndexRecordBatchSize;
@@ -107,7 +118,7 @@ public class AnalyticsDataServiceConfiguration {
         this.shardIndexRecordBatchSize = shardIndexRecordBatchSize;
     }
 
-    @XmlElement (name = "recordsBatchSize", defaultValue = "1000")
+    @XmlElement (name = "recordsBatchSize", defaultValue = "" + Constants.RECORDS_BATCH_SIZE)
     public int getRecordsBatchSize() {
         return recordsBatchSize;
     }

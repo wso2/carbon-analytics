@@ -180,9 +180,7 @@ public class AnalyticsDataIndexer {
     private LocalIndexDataStore localIndexDataStore;
     
     private Set<Integer> localShards = new HashSet<>();
-    
-    private int replicationFactor = 1;
-    
+        
     public AnalyticsDataIndexer(AnalyticsIndexerInfo indexerInfo) throws AnalyticsException {
     	this.indexerInfo = indexerInfo;
     }
@@ -200,7 +198,7 @@ public class AnalyticsDataIndexer {
     }
     
     public int getReplicationFactor() {
-        return replicationFactor;
+        return this.indexerInfo.getIndexReplicationFactor();
     }
     
     public IndexNodeCoordinator getIndexNodeCoordinator() {
