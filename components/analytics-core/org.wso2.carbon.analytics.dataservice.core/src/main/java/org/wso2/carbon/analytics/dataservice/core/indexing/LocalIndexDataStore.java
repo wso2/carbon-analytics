@@ -171,23 +171,38 @@ public class LocalIndexDataStore {
         
     }
     
+    /**
+     * Local persistent queue implementation. This should be used in a single thread at a time, 
+     * due to reliability guarantees it gives with dequeue.
+     */
     public static class LocalIndexDataQueue {
         
+        private static final String PRIMARY_QUEUE_SUFFIX = "P";
+        
+        private static final String SECONDARY_QUEUE_SUFFIX = "S";
+
         private static final int QUEUE_CLEANUP_THRESHOLD = 1000;
         
-        private IBigQueue queue;
+        private IBigQueue primaryQueue;
         
+        private IBigQueue secondaryQueue;
+        
+        private long secondaryQueueInitialCount;
+        
+        private long secondaryProcessedCount;
+                
         private int removeCount = 0;
         
         public LocalIndexDataQueue(int shardIndex) throws AnalyticsException {
-            this.queue = this.createQueue(shardIndex);
+            this.primaryQueue = this.createQueue(shardIndex + PRIMARY_QUEUE_SUFFIX);
+            this.secondaryQueue = this.createQueue(shardIndex + SECONDARY_QUEUE_SUFFIX);
         }
         
-        private IBigQueue createQueue(int shardIndex) throws AnalyticsException {
+        private IBigQueue createQueue(String queueId) throws AnalyticsException {
             String path = Constants.DEFAULT_LOCAL_INDEX_STAGING_LOCATION;
             path = GenericUtils.resolveLocation(path);
             try {
-                return new BigQueueImpl(path, String.valueOf(shardIndex));
+                return new BigQueueImpl(path, queueId);
             } catch (IOException e) {
                 throw new AnalyticsException("Error in creating queue: " + e.getMessage(), e);
             }
@@ -195,36 +210,77 @@ public class LocalIndexDataStore {
         
         public void enqueue(IndexOperation indexOp) throws AnalyticsException {
             try {
-                this.queue.enqueue(indexOp.getBytes());
+                this.primaryQueue.enqueue(indexOp.getBytes());
             } catch (IOException e) {
                 throw new AnalyticsException("Error in index data enqueue: " + e.getMessage(), e);
             }
         }
         
-        public IndexOperation dequeue() throws AnalyticsException {
+        public void startDequeue() {
+            this.secondaryProcessedCount = 0;
+            this.secondaryQueueInitialCount = this.secondaryQueue.size();
+        }
+        
+        private void queueDrain(IBigQueue queue, long count) throws IOException {
+            long queueSize = queue.size();
+            if (count >= queueSize) {
+                queue.removeAll();
+            } else {
+                for (int i = 0; i < count; i++) {
+                    queue.dequeue();
+                }
+            }
+        }
+        
+        public void endDequeue() throws AnalyticsException {
             try {
-                IndexOperation indexOp = IndexOperation.fromBytes(this.queue.dequeue());
+                this.queueDrain(this.secondaryQueue, this.secondaryProcessedCount);
+            } catch (IOException e) {
+                throw new AnalyticsException("Error in end dequeue: " + e.getMessage(), e);
+            }
+        }
+        
+        public IndexOperation peekNext() throws AnalyticsException {
+            try {
+                byte[] data;
+                if (this.secondaryProcessedCount < this.secondaryQueueInitialCount) {
+                    /* the following will not end up in strict FIFO, but it's
+                     * rare that the secondary queue processing will also fail,
+                     * and even when that happens, it's unlikely you need strict
+                     * ordered retrieval of records then */
+                    data = this.secondaryQueue.peek();
+                    this.secondaryQueue.enqueue(data);
+                    this.secondaryQueue.dequeue();
+                } else {
+                    data = this.primaryQueue.peek();
+                    this.secondaryQueue.enqueue(data);
+                    this.primaryQueue.dequeue();
+                }
+                this.secondaryProcessedCount++;
+                IndexOperation indexOp = IndexOperation.fromBytes(data);
                 this.removeCount++;
                 if (this.removeCount > QUEUE_CLEANUP_THRESHOLD) {
-                    this.queue.gc();
+                    this.primaryQueue.gc();
+                    this.secondaryQueue.gc();
                     this.removeCount = 0;
                 }
                 return indexOp;
             } catch (IOException e) {
-                throw new AnalyticsException("Error in index data dequeue: " + e.getMessage(), e);
+                throw new AnalyticsException("Error in index data peekNext: " + e.getMessage(), e);
             }
         }
         
         public boolean isEmpty() {
-            return this.queue.isEmpty();
+            return this.secondaryProcessedCount >= this.secondaryQueueInitialCount && this.primaryQueue.isEmpty();
         }
         
         public long size() {
-            return this.queue.size();
+            return this.primaryQueue.size();
         }
         
         public void close() throws IOException {
-            this.queue.close();
+            this.primaryQueue.close();
+            this.secondaryQueue.close();
         }
         
     }

@@ -277,8 +277,9 @@ public class AnalyticsDataIndexer {
         String deleteTableName = null;
         IndexOperation indexOp;
         List<IndexOperation> indexOps = new ArrayList<>();
+        dataQueue.startDequeue();
         while (!dataQueue.isEmpty()) {
-            indexOp = dataQueue.dequeue();
+            indexOp = dataQueue.peekNext();
             if (log.isDebugEnabled()) {
                 log.debug("Local index entry dequeue [" + shardIndex + "]");
             }
@@ -302,6 +303,7 @@ public class AnalyticsDataIndexer {
             }
         }
         this.processIndexOperationBatch(shardIndex, indexOps);
+        dataQueue.endDequeue();
         return result;
     }
     
