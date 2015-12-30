@@ -124,6 +124,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private Map<String, String> shorthandStringsMap = new HashMap<>();
 
+    private static final int MAX_RETRIES = 30;
+
+    private static final long MAX_RETRY_WAIT_INTERVAL = 60000L;
 
     public SparkAnalyticsExecutor(String myHost, int portOffset) throws AnalyticsException {
         this.myHost = myHost;
@@ -329,15 +332,23 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                          " with the application name : " + this.sparkConf.get(AnalyticsConstants.SPARK_APP_NAME) +
                          " and UI port : " + this.sparkConf.get(AnalyticsConstants.SPARK_UI_PORT));
             } else {
-                this.logDebug("Client is already active in this node, therefore ignoring client init");
+                log.info("Client is already active in this node, therefore ignoring client init");
             }
         } else {
             this.logDebug("Analytics Spark Context is disabled in this node, therefore ignoring the client initiation.");
         }
     }
 
-    private JavaSparkContext initializeSparkContext(SparkConf conf) {
-        JavaSparkContext jsc = new JavaSparkContext(conf);
+    private JavaSparkContext initializeSparkContext(SparkConf conf) throws AnalyticsException {
+        JavaSparkContext jsc = null;
+        try {
+            jsc = new JavaSparkContext(conf);
+        } catch (Exception e) {
+            if (jsc != null) {
+                jsc.stop();
+            }
+            throw new AnalyticsException("Unable to create analytics client. " + e.getMessage(), e);
+        }
         try {
             jsc.setLocalProperty(AnalyticsConstants.SPARK_SCHEDULER_POOL,
                                  conf.get(AnalyticsConstants.CARBON_SCHEDULER_POOL));
@@ -673,9 +684,15 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    public int getNumPartitionsHint() {
+    public int getNumPartitionsHint() throws AnalyticsException {
         /* all workers will not have the same CPU count, this is just an approximation */
-        return this.getWorkerCount() * Runtime.getRuntime().availableProcessors();
+        int workerCount = this.getWorkerCount();
+
+        if(workerCount == 0) {
+            throw new AnalyticsException("Error while calculating NumPartitionsHint. Worker count is zero.");
+        }
+
+        return workerCount * Runtime.getRuntime().availableProcessors();
     }
 
     public AnalyticsQueryResult executeQuery(int tenantId, String query)
@@ -867,6 +884,22 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     @Override
     public void onBecomingLeader() {
         log.info("This node is now the CARBON CLUSTERING LEADER");
+        int retries = 0;
+        boolean isFailed = !this.executeOnBecomingLeaderFlow();
+
+        while (isFailed && (retries < MAX_RETRIES)) {
+            log.info("Retrying executing On Becoming Leader flow. Retry count = " + retries);
+            long waitTime = Math.min(getWaitTimeExp(retries), MAX_RETRY_WAIT_INTERVAL);
+            retryWait(waitTime);
+            isFailed = !this.executeOnBecomingLeaderFlow();
+            retries++;
+        }
+    }
+
+    private boolean executeOnBecomingLeaderFlow() {
+        if (log.isDebugEnabled()) {
+            log.debug("Executing On Becoming Leader Flow : ");
+        }
         try {
             HazelcastInstance hz = AnalyticsServiceHolder.getHazelcastInstance();
             IMap<String, Object> masterMap = hz.getMap(AnalyticsConstants.SPARK_MASTER_MAP);
@@ -875,11 +908,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 // masterMap empty means that there haven't been any masters in the cluster
                 // so, no electable leader is available.
                 // therefore this node is put to the map as a possible leader
-                logDebug("Spark master map is empty...");
+                log.info("Spark master map is empty...");
                 String masterUrl = "spark://" + this.myHost + ":" + this.sparkConf.getInt(
                         AnalyticsConstants.SPARK_MASTER_PORT, 7077 + this.portOffset);
                 masterMap.put(masterUrl, acm.getLocalMember());
-                logDebug("Added " + masterUrl + " to the MasterMap");
+                log.info("Added " + masterUrl + " to the MasterMap");
             } else if (masterMap.size() >= this.redundantMasterCount) {
                 log.info("Redundant master count fulfilled : " + masterMap.size());
                 // when becoming leader, this checks if there is an elected spark leader available in the cluster.
@@ -900,12 +933,13 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 log.info("Initializing new spark client app...");
                 this.initializeAnalyticsClient();
             } else {
-                    log.info("Master map size is less than the redundant master count");
+                log.info("Master map size is less than the redundant master count");
             }
-        } catch (AnalyticsException e) {
+            return true;
+        } catch (Exception e) {
             String msg = "Error in processing on becoming leader cluster message: " + e.getMessage();
-            log.error(msg, e);
-            throw new RuntimeException(msg, e);
+            log.warn(msg, e);
+            return false;
         }
     }
 
@@ -972,6 +1006,19 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     @Override
     public void onMembersChangeForLeader(boolean removedMember) {
         log.info("Member change, remove: " + removedMember);
+        int retries = 0;
+        boolean isFailed = !this.executeOnMembersChangeForLeaderFlow(removedMember);
+        while (isFailed && (retries < MAX_RETRIES)) {
+            log.info("Retrying executing On Member Change for Leader Flow. Retry count = " + retries);
+            long waitTime = Math.min(getWaitTimeExp(retries), MAX_RETRY_WAIT_INTERVAL);
+            retryWait(waitTime);
+            isFailed = !this.executeOnMembersChangeForLeaderFlow(removedMember);
+            retries++;
+        }
+    }
+
+    public boolean executeOnMembersChangeForLeaderFlow(boolean removedMember) {
+        this.logDebug("Execute On Members Change For Leader Flow");
         try {
             this.workerCount = AnalyticsServiceHolder.getAnalyticsClusterManager().getMembers(CLUSTER_GROUP_NAME).size();
             log.info("Analytics worker updated, total count: " + this.getWorkerCount());
@@ -985,10 +1032,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     log.info("Elected leader already available.");
                 }
             }
-        } catch (AnalyticsClusterException e) {
-            String msg = "Error in extracting the worker count: " + e.getMessage();
-            log.error(msg, e);
-            throw new RuntimeException(msg, e);
+            return true;
+        } catch (Exception e) {
+            String msg = "Error while executing On Members Change For Leader Flow: " + e.getMessage();
+            log.warn(msg, e);
+            return false;
         }
     }
 
@@ -1012,6 +1060,17 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     @Override
     public void onMemberRemoved() {
         /* nothing to do */
+    }
+
+    private long getWaitTimeExp(int retryCount) {
+        return ((long) Math.pow(2, retryCount) * 100L);
+    }
+
+    private void retryWait(long waitTime)  {
+        try {
+            Thread.sleep(waitTime);
+        } catch (InterruptedException ignored) {
+        }
     }
 
 

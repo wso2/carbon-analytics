@@ -36,7 +36,7 @@
     AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] results = null;
     try {
         AnalyticsExecutionClient client = new AnalyticsExecutionClient(cookie, serverURL, configContext);
-        if (null != scriptName && !scriptName.trim().isEmpty()) {
+        if (null != scriptName && !scriptName.trim().isEmpty() && !scriptName.equals("null")) {
             if (client.isAnalyticsTaskExecuting(scriptName)) {
         %>
             <div id="returnedResults">

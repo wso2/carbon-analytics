@@ -121,7 +121,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         return result;
     }
 
-    private int computePartitions() {
+    private int computePartitions() throws AnalyticsException {
         if (ServiceHolder.getAnalyticskExecutor() != null) {
             return ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint();
         }

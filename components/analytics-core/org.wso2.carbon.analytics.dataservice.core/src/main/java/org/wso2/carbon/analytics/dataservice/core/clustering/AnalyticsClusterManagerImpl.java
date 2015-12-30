@@ -58,6 +58,10 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
 
     private static final Log log = LogFactory.getLog(AnalyticsClusterManagerImpl.class);
 
+    private static final int MAX_RETRIES = 15;
+
+    private static final long MAX_RETRY_WAIT_INTERVAL = 60000L;
+
     private HazelcastInstance hz;
 
     private Map<String, GroupEventListener> groups = new HashMap<String, GroupEventListener>();
@@ -81,34 +85,64 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             throw new AnalyticsClusterException("This node has already joined the group: " + groupId);
         }
 
-        this.checkAndCleanupGroups(groupId);
-        this.groups.put(groupId, groupEventListener);
-        List<Member> groupMembers = this.getGroupMembers(groupId);
-        Member myself = this.hz.getCluster().getLocalMember();
-        if (GenericUtils.hzContains(groupMembers, myself)) { //groupMembers.contains(myself)
-            GenericUtils.hzRemove(groupMembers, myself); //groupMembers.remove(myself)
+        log.info("Local member joining the group - " + groupId);
+
+        int retries = 0;
+        boolean isFailed = !this.executeJoinGroupFlow(groupId, groupEventListener);
+        while (isFailed && (retries < MAX_RETRIES)) {
+            log.info("Retrying executing Join Group Flow for " + groupId + ". Retry count = " + retries);
+            long waitTime = Math.min(getWaitTimeExp(retries), MAX_RETRY_WAIT_INTERVAL);
+            retryWait(waitTime);
+            isFailed = !this.executeJoinGroupFlow(groupId, groupEventListener);
+            retries++;
         }
-        groupMembers.add(myself);
-        if (this.checkLeader(myself, groupId)) {
-            this.leaders.put(groupId, myself);
-            if (groupEventListener != null) {
-                groupEventListener.onBecomingLeader();
+    }
+
+    private boolean executeJoinGroupFlow(String groupId, GroupEventListener groupEventListener) {
+        try {
+            if (log.isDebugEnabled()) {
+                log.debug("Executing Join Group Flow for : " + groupId);
             }
-            this.setLeaderInitDoneFlag(groupId);
-            if (groupEventListener != null) {
-                groupEventListener.onLeaderUpdate();
+            this.checkAndCleanupGroups(groupId);
+            this.groups.put(groupId, groupEventListener);
+            List<Member> groupMembers = this.getGroupMembers(groupId);
+            Member myself = this.hz.getCluster().getLocalMember();
+            if (GenericUtils.hzContains(groupMembers, myself)) { //groupMembers.contains(myself)
+                if (log.isDebugEnabled()) {
+                    log.debug("Removing myself from HZ Group Members list : " + myself);
+                }
+                GenericUtils.hzRemove(groupMembers, myself); //groupMembers.remove(myself)
             }
-        } else {
-            this.waitForInitialLeader(groupId);
-            if (groupEventListener != null) {
-                groupEventListener.onLeaderUpdate();
+            groupMembers.add(myself);
+            if (this.checkLeader(myself, groupId)) {
+                this.leaders.put(groupId, myself);
+                if (groupEventListener != null) {
+                    groupEventListener.onBecomingLeader();
+                }
+                this.setLeaderInitDoneFlag(groupId);
+                if (groupEventListener != null) {
+                    groupEventListener.onLeaderUpdate();
+                }
+            } else {
+                this.waitForInitialLeader(groupId);
+                if (groupEventListener != null) {
+                    groupEventListener.onLeaderUpdate();
+                }
+                this.sendMemberAddedNotificationToLeader(groupId);
             }
-            this.sendMemberAddedNotificationToLeader(groupId);
+            return true;
+        } catch (Exception e) {
+            String msg = "Exception while executing the join group flow .. " + e.getMessage();
+            log.warn(msg, e);
+            return false;
         }
     }
 
     private boolean checkLeader(Member member, String groupId) {
-        return member.equals(this.getLeader(groupId));
+        Member leader = this.getLeader(groupId);
+        log.info("Checking for leader of the Group : " + groupId + ". This member = " + member
+                + " , current leader = " + leader);
+        return member.equals(leader);
     }
 
     private String generateLeaderInitDoneFlagName(String groupId) {
@@ -152,7 +186,14 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
 
     @Override
     public boolean isLeader(String groupId) {
-        return this.hz.getCluster().getLocalMember().equals(this.leaders.get(groupId));
+        Member localMember = this.hz.getCluster().getLocalMember();
+        Member groupLeader = this.leaders.get(groupId);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Checking whether local member is the leader of the Group : " + groupId + ". This member = " + localMember
+                    + " , current leader = " + groupLeader);
+        }
+        return localMember.equals(groupLeader);
     }
 
     private void executeMyselfBecomingLeader(String groupId) throws AnalyticsClusterException {
@@ -289,29 +330,49 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         /* nothing to do */
     }
 
-    private void checkGroupMemberRemoval(String groupId, Member member)
-            throws AnalyticsClusterException {
-        List<Member> groupMembers = this.getGroupMembers(groupId);
-        if (GenericUtils.hzContains(groupMembers, member)) { // groupMembers.contains(member)
-            GenericUtils.hzRemove(groupMembers, member); //groupMembers.remove(member);
+    private boolean executeCheckGroupMemberRemovalFlow(String groupId, Member member) {
+        try {
+            if (log.isDebugEnabled()) {
+                log.debug("Executing Check Group Member Removal : " + groupId + " , " + member);
+            }
+		    List<Member> groupMembers = this.getGroupMembers(groupId);
+		    if (GenericUtils.hzContains(groupMembers, member)) { // groupMembers.contains(member)
+                if (log.isDebugEnabled()) {
+                    log.debug("Removing member from HZ Group Members list : " + member);
+                }
+                GenericUtils.hzRemove(groupMembers, member); //groupMembers.remove(member);
+            }
             if (this.isLeader(groupId)) {
-                /* if I'm already the leader, notify of the membership change */
+                log.info("Local Member is already the leader of the Group : " + groupId);
+		            /* if I'm already the leader, notify of the membership change */
                 GroupEventListener listener = this.groups.get(groupId);
                 if (listener != null) {
                     listener.onMembersChangeForLeader(true);
                 }
             } else if (this.checkLeader(this.hz.getCluster().getLocalMember(), groupId)) {
-                /* check if I'm already not the leader, and if I just became the leader */
+                log.info("Local member is the new leader of the Group") ;
+		            /* check if I'm already not the leader, and if I just became the leader */
                 this.executeMyselfBecomingLeader(groupId);
+            }  else {
+                log.info("Local Member is neither current leader nor new leader.") ;
             }
             GroupEventListener listener = this.groups.get(groupId);
             if (listener != null) {
                 listener.onMemberRemoved();
             }
-        }        
+            log.info("Returning from executeCheckGroupMemberRemovalFlow.") ;
+            return true;
+        } catch (Exception e) {
+            String msg = "Exception while executing the check Group Member Removal flow .. " + e.getMessage();
+            log.warn(msg, e);
+            return false;
+        }      
     }
 
     private void leaderUpdateNotificationReceived(String groupId) {
+        if (log.isDebugEnabled()) {
+            log.debug("Leader Update Notification Received : " + groupId);
+        }
         GroupEventListener listener = this.groups.get(groupId);
         if (listener != null) {
             listener.onLeaderUpdate();
@@ -319,6 +380,9 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     }
 
     private void leaderMemberAdditionNotificationReceived(String groupId) {
+        if (log.isDebugEnabled()) {
+            log.debug("Leader Member Addition Notification Received : " + groupId);
+        }
         GroupEventListener listener = this.groups.get(groupId);
         if (listener != null) {
             listener.onMembersChangeForLeader(false);
@@ -327,13 +391,33 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
 
     @Override
     public void memberRemoved(MembershipEvent event) {
+        Member member = event.getMember();
+        log.info("Member Removed Event : " + member);
         Set<String> groupIds = this.groups.keySet();
+
+        log.info("Group IDs : " + groupIds.size() + " --> " + groupIds);
         for (String groupId : groupIds) {
-            try {
-                this.checkGroupMemberRemoval(groupId, event.getMember());
-            } catch (AnalyticsClusterException e) {
-                log.error("Error in member removal: " + e.getMessage(), e);
+            int retries = 0;
+            boolean isFailed = !this.executeCheckGroupMemberRemovalFlow(groupId, member);
+            while (isFailed && (retries < MAX_RETRIES)) {
+                log.info("Retrying executing Check Group Member Removal Flow for : " + groupId
+                        + ". Retry count : " + retries + ", Member : " + member);
+                long waitTime = Math.min(getWaitTimeExp(retries), MAX_RETRY_WAIT_INTERVAL);
+                retryWait(waitTime);
+                isFailed = !this.executeCheckGroupMemberRemovalFlow(groupId, member);
+                retries++;
             }
+        }
+    }
+
+    private long getWaitTimeExp(int retryCount) {
+        return ((long) Math.pow(2, retryCount) * 100L);
+    }
+
+    private void retryWait(long waitTime)  {
+        try {
+            Thread.sleep(waitTime);
+        } catch (InterruptedException ignored) {
         }
     }
 
@@ -392,7 +476,6 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             }
             return "OK";
         }
-
     }
 
 }

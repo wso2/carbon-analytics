@@ -72,8 +72,7 @@
     %>
     <script type="text/javascript">
         location.href = "listScripts.jsp";
-        CARBON.showErrorDialog('Error while executing the script <%=scriptName%> in background. <%=e.getFaultMessage().
-        getAnalyticsProcessorAdminException().getMessage()%>');
+        CARBON.showErrorDialog('Error while executing the script <%=scriptName%> in background. <%=e.getMessage()%>');
     </script>
     <%
         }
