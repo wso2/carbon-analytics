@@ -39,7 +39,7 @@ import com.leansoft.bigqueue.IBigQueue;
  */
 public class LocalIndexDataStore {
 
-    private Log log = LogFactory.getLog(LocalIndexDataStore.class);
+    private static Log log = LogFactory.getLog(LocalIndexDataStore.class);
     
     private AnalyticsDataIndexer indexer;
     
@@ -219,6 +219,11 @@ public class LocalIndexDataStore {
         public void startDequeue() {
             this.secondaryProcessedCount = 0;
             this.secondaryQueueInitialCount = this.secondaryQueue.size();
+            if (log.isDebugEnabled()) {
+                if (this.secondaryQueueInitialCount > 0) {
+                    log.debug("Secondary index data queue processing: " + this.secondaryQueueInitialCount);
+                }
+            }
         }
         
         private void queueDrain(IBigQueue queue, long count) throws IOException {
@@ -235,6 +240,7 @@ public class LocalIndexDataStore {
         public void endDequeue() throws AnalyticsException {
             try {
                 this.queueDrain(this.secondaryQueue, this.secondaryProcessedCount);
+                this.secondaryProcessedCount = 0;
             } catch (IOException e) {
                 throw new AnalyticsException("Error in end dequeue: " + e.getMessage(), e);
             }
@@ -263,6 +269,9 @@ public class LocalIndexDataStore {
                     this.primaryQueue.gc();
                     this.secondaryQueue.gc();
                     this.removeCount = 0;
+                    if (log.isDebugEnabled()) {
+                        log.debug("Queue GC: " + this.primaryQueue + "|" + this.secondaryQueue);
+                    }
                 }
                 return indexOp;
             } catch (IOException e) {
@@ -271,11 +280,11 @@ public class LocalIndexDataStore {
         }
         
         public boolean isEmpty() {
-            return this.secondaryProcessedCount >= this.secondaryQueueInitialCount && this.primaryQueue.isEmpty();
+            return this.size() <= 0;
         }
         
         public long size() {
-            return this.primaryQueue.size();
+            return this.primaryQueue.size() + this.secondaryQueue.size() - this.secondaryProcessedCount;
         }
         
         public void close() throws IOException {

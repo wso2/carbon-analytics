@@ -92,6 +92,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
     
     private int failedIndexOperationCount;
     
+    private RemoteMemberIndexCommunicator remoteCommunicator;
+    
     public IndexNodeCoordinator(AnalyticsDataIndexer indexer) throws AnalyticsException {
         this.indexer = indexer;
         this.localShardAllocationConfig = new LocalShardAllocationConfig();
@@ -99,6 +101,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.shardMemberMap = new GlobalShardMemberMapping(this.indexer.getShardCount(), 
                 this.globalShardAllocationConfig);
         this.stagingIndexDataStore = new StagingIndexDataStore(this.indexer);
+        this.remoteCommunicator = new RemoteMemberIndexCommunicator();
     }
     
     private boolean checkIfIndexingNode() {
@@ -296,14 +299,13 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
     
     private void processRemoteRecordPut(String nodeId, List<Record> records) throws AnalyticsException {
-        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         Object member = null;
         try {
             member = this.shardMemberMap.getMemberFromNodeId(nodeId);
             if (member == null) {
                 this.addToStaging(nodeId, records);
             }
-            acm.executeOne(Constants.ANALYTICS_INDEXING_GROUP, member, new IndexDataPutCall(records));
+            this.remoteCommunicator.put(member, records);
         } catch (Throwable e) {
             if (!this.suppressWarnMessagesInactiveMembers.contains(member.hashCode())) {
                 log.warn("Error in sending remote record batch put to member: " + member + ": " + e.getMessage() + 
@@ -324,14 +326,13 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
     
     private void processRemoteRecordDelete(String nodeId, int tenantId, String tableName, List<String> ids) throws AnalyticsException {
-        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         Object member = null;
         try {
             member = this.shardMemberMap.getMemberFromNodeId(nodeId);
             if (member == null) {
                 this.addToStaging(nodeId, tenantId, tableName, ids);
             }
-            acm.executeOne(Constants.ANALYTICS_INDEXING_GROUP, member, new IndexDataDeleteCall(tenantId, tableName, ids));
+            this.remoteCommunicator.delete(member, tenantId, tableName, ids);
         } catch (Throwable e) {
             if (!this.suppressWarnMessagesInactiveMembers.contains(member.hashCode())) {
                 log.warn("Error in sending remote record batch delete to member: " + member + ": " + e.getMessage() + 
@@ -578,6 +579,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
     
     public void close() {
+        this.remoteCommunicator.close();
         this.stopAndCleanupStagingWorkers();
     }
     
