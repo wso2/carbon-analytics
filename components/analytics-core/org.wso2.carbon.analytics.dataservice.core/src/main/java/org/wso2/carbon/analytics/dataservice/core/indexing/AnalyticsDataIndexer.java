@@ -277,34 +277,42 @@ public class AnalyticsDataIndexer {
         String deleteTableName = null;
         IndexOperation indexOp;
         List<IndexOperation> indexOps = new ArrayList<>();
-        dataQueue.startDequeue();
-        while (!dataQueue.isEmpty()) {
-            indexOp = dataQueue.peekNext();
-            if (log.isDebugEnabled()) {
-                log.debug("Local index entry dequeue [" + shardIndex + "]");
-            }
-            if (indexOp.isDelete() != delete) {
-                this.processIndexOperationBatch(shardIndex, indexOps);
-                delete = indexOp.isDelete();
-                deleteTenantId = indexOp.getDeleteTenantId();
-                deleteTableName = indexOp.getDeleteTableName();
-            } else if (delete) {
-                if (!(indexOp.getDeleteTenantId() == deleteTenantId && indexOp.getDeleteTableName().equals(deleteTableName))) {
+        try {
+            dataQueue.startDequeue();
+            while (!dataQueue.isEmpty()) {
+                indexOp = dataQueue.peekNext();
+                if (log.isDebugEnabled()) {
+                    log.debug("Local index entry dequeue [" + shardIndex + "]");
+                }
+                if (indexOp.isDelete() != delete) {
                     this.processIndexOperationBatch(shardIndex, indexOps);
                     delete = indexOp.isDelete();
                     deleteTenantId = indexOp.getDeleteTenantId();
                     deleteTableName = indexOp.getDeleteTableName();
+                } else if (delete) {
+                    if (!(indexOp.getDeleteTenantId() == deleteTenantId && indexOp.getDeleteTableName().equals(deleteTableName))) {
+                        this.processIndexOperationBatch(shardIndex, indexOps);
+                        delete = indexOp.isDelete();
+                        deleteTenantId = indexOp.getDeleteTenantId();
+                        deleteTableName = indexOp.getDeleteTableName();
+                    }
+                }
+                indexOps.add(indexOp);
+                result++;
+                if (result >= maxCount) {
+                    break;
                 }
             }
-            indexOps.add(indexOp);
-            result++;
-            if (result >= maxCount) {
-                break;
-            }
+            this.processIndexOperationBatch(shardIndex, indexOps);
+            return result;
+        } finally {
+            /* Even if there is an error, we should dequeue the peeked records, or else,
+             * for errors like a target table couldn't be found anymore, the same records
+             * in the queue will cycle forever. This setup is specifically done for server
+             * crashes, where in the middle of the earlier loop, if it exists, the peeked
+             * records will not be lost. */
+            dataQueue.endDequeue();
         }
-        this.processIndexOperationBatch(shardIndex, indexOps);
-        dataQueue.endDequeue();
-        return result;
     }
     
     private IndexOperation mergeOps(List<IndexOperation> ops) {
