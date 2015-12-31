@@ -228,12 +228,9 @@ public class LocalIndexDataStore {
         
         private void queueDrain(IBigQueue queue, long count) throws IOException {
             long queueSize = queue.size();
-            if (count >= queueSize) {
-                queue.removeAll();
-            } else {
-                for (int i = 0; i < count; i++) {
-                    queue.dequeue();
-                }
+            count = queueSize < count ? queueSize : count;
+            for (int i = 0; i < count; i++) {
+                queue.dequeue();
             }
         }
         

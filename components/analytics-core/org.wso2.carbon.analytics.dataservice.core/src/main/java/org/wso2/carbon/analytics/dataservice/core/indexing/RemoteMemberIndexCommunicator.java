@@ -80,6 +80,7 @@ public class RemoteMemberIndexCommunicator {
                             REMOTE_INDEX_COMMUNICATOR_BUFFER_SIZE, this.executor);
                     disruptor.handleEventsWith(new RecordsEventHandler(member));
                     this.disruptorMap.put(member, disruptor);
+                    disruptor.start();
                 }
             }
         }
@@ -110,7 +111,7 @@ public class RemoteMemberIndexCommunicator {
     }
     
     /**
-     * Record event creationg factory class.
+     * Record event creating factory class.
      */
     public static class RecordsEventFactory implements EventFactory<RecordsHolder> {
 

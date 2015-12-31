@@ -145,6 +145,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         indexerInfo.setShardIndexRecordBatchSize(this.extractShardIndexRecordBatchSize(config));
         indexerInfo.setLuceneAnalyzer(luceneAnalyzer);
         indexerInfo.setIndexStoreLocation(GenericUtils.resolveLocation(Constants.DEFAULT_INDEX_STORE_LOCATION));
+        indexerInfo.setIndexReplicationFactor(config.getIndexReplicationFactor());
         this.indexer = new AnalyticsDataIndexer(indexerInfo);
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();

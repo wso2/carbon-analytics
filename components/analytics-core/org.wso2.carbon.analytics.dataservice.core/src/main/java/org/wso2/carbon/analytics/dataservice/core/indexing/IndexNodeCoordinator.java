@@ -304,8 +304,9 @@ public class IndexNodeCoordinator implements GroupEventListener {
             member = this.shardMemberMap.getMemberFromNodeId(nodeId);
             if (member == null) {
                 this.addToStaging(nodeId, records);
+            } else {
+                this.remoteCommunicator.put(member, records);
             }
-            this.remoteCommunicator.put(member, records);
         } catch (Throwable e) {
             if (!this.suppressWarnMessagesInactiveMembers.contains(member.hashCode())) {
                 log.warn("Error in sending remote record batch put to member: " + member + ": " + e.getMessage() + 
@@ -331,8 +332,9 @@ public class IndexNodeCoordinator implements GroupEventListener {
             member = this.shardMemberMap.getMemberFromNodeId(nodeId);
             if (member == null) {
                 this.addToStaging(nodeId, tenantId, tableName, ids);
+            } else {
+                this.remoteCommunicator.delete(member, tenantId, tableName, ids);
             }
-            this.remoteCommunicator.delete(member, tenantId, tableName, ids);
         } catch (Throwable e) {
             if (!this.suppressWarnMessagesInactiveMembers.contains(member.hashCode())) {
                 log.warn("Error in sending remote record batch delete to member: " + member + ": " + e.getMessage() + 
@@ -403,12 +405,15 @@ public class IndexNodeCoordinator implements GroupEventListener {
     private Set<Integer> allocateLocalShards() throws AnalyticsException {
         Set<Integer> result = new HashSet<>();
         int shardCopyCount = this.indexer.getReplicationFactor() + 1;
+        if (log.isDebugEnabled()) {
+            log.debug("Replication Factor: " + this.indexer.getReplicationFactor());
+        }
         for (int i = 0; i < this.indexer.getShardCount(); i++) {
             if (this.globalShardAllocationConfig.getNodeIdsForShard(i).size() < shardCopyCount) {
                 result.add(i);
             }
         }
-        Map<String, List<Integer>> globalShards = this.loadGlobalShards();        
+        Map<String, List<Integer>> globalShards = this.loadGlobalShards();
         boolean resume = true;
         while (resume) {
             resume = false;
