@@ -48,6 +48,14 @@ public class StagingIndexDataStore {
         this.indexer = indexer;
     }
     
+    public void initStagingTables(String nodeId) throws AnalyticsException {
+        AnalyticsRecordStore rs = this.indexer.getAnalyticsRecordStore();
+        int shardCount = this.indexer.getShardCount();
+        for (int i = 0; i < shardCount; i++) {
+            rs.createTable(Constants.META_INFO_TENANT_ID, this.generateTableName(nodeId, i));
+        }
+    }
+    
     public void put(String nodeId, List<Record> records) throws AnalyticsException {
         Map<Integer, List<Record>> shardedRecords = this.indexer.extractShardedRecords(records);
         for (Map.Entry<Integer, List<Record>> entry : shardedRecords.entrySet()) {

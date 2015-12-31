@@ -490,6 +490,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
                 } catch (IOException e) {
                     throw new AnalyticsException("Error in writing my node id: " + e.getMessage(), e);
                 }
+                this.stagingIndexDataStore.initStagingTables(this.myNodeId);
             }
         }
         if (log.isDebugEnabled()) {
