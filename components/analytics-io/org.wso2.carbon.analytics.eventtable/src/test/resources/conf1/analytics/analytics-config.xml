@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <analytics-dataservice-configuration>
-   <!-- Analytics File System - properties related to index storage implementation -->
-   <analytics-file-system>
-      <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsFileSystem</implementation>
-      <properties>
-            <!-- the data source name mentioned in data sources configuration -->
-            <property name="datasource">WSO2_ANALYTICS_FS_DB</property>
-      </properties>
-   </analytics-file-system>
    <primaryRecordStore>EVENT_STORE</primaryRecordStore>
    <indexStagingRecordStore>INDEX_STAGING_DATA_STORE</indexStagingRecordStore>
    <!-- Analytics Record Store - properties related to record storage implementation -->
@@ -21,12 +13,6 @@
       <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
       <properties>
             <property name="datasource">WSO2_ANALYTICS_PROCESSED_DATA_STORE_DB</property>
-      </properties>
-   </analytics-record-store>
-   <analytics-record-store name = "INDEX_STAGING_DATA_STORE">
-      <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
-      <properties>
-            <property name="datasource">WSO2_ANALYTICS_INDEX_STAGING_DB</property>
       </properties>
    </analytics-record-store>
    <!-- The data indexing analyzer implementation -->

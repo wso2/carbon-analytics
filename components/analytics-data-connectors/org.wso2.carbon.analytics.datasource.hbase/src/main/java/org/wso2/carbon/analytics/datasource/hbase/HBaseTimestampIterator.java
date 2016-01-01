@@ -19,8 +19,6 @@ package org.wso2.carbon.analytics.datasource.hbase;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.TableName;
@@ -62,8 +60,6 @@ public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
     private Iterator<Record> subIterator = Collections.emptyIterator();
 
     private Connection connection;
-
-    private static final Log log = LogFactory.getLog(HBaseTimestampIterator.class);
 
     HBaseTimestampIterator(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, int recordsCount,
                            Connection conn, int batchSize) throws AnalyticsException, AnalyticsTableNotAvailableException {

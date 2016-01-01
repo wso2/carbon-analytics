@@ -2,32 +2,11 @@
 
     <providers>
         <provider>org.wso2.carbon.ndatasource.rdbms.RDBMSDataSourceReader</provider>
-        <!--<provider>org.wso2.carbon.datasource.reader.hadoop.HDFSDataSourceReader</provider>-->
         <!--<provider>org.wso2.carbon.datasource.reader.hadoop.HBaseDataSourceReader</provider>-->
         <!--<provider>org.wso2.carbon.datasource.reader.cassandra.CassandraDataSourceReader</provider>-->
     </providers>
 
     <datasources>
-
-        <datasource>
-            <name>WSO2_ANALYTICS_FS_DB</name>
-            <description>The datasource used for analytics file system</description>
-            <definition type="RDBMS">
-                <configuration>
-                    <url>jdbc:h2:repository/database/ANALYTICS_FS_DB;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000</url>
-                    <username>wso2carbon</username>
-                    <password>wso2carbon</password>
-                    <driverClassName>org.h2.Driver</driverClassName>
-                    <maxActive>50</maxActive>
-                    <maxWait>60000</maxWait>
-                    <validationQuery>SELECT 1</validationQuery>
-                    <defaultAutoCommit>false</defaultAutoCommit>
-                    <initialSize>0</initialSize>
-                    <testWhileIdle>true</testWhileIdle>
-                    <minEvictableIdleTimeMillis>4000</minEvictableIdleTimeMillis>
-                </configuration>
-            </definition>
-        </datasource>
 
         <datasource>
             <name>WSO2_ANALYTICS_EVENT_STORE_DB</name>
@@ -68,35 +47,6 @@
                 </configuration>
             </definition>
         </datasource>
-
-        <!-- Sample datasource implementation for HDFS Analytics FileSystem-->
-        <!--<datasource>
-            <name>WSO2_ANALYTICS_FS_DB_HDFS</name>
-            <description>The datasource used for analytics file system</description>
-            <jndiConfig>
-                <name>jdbc/WSO2HDFSDB</name>
-            </jndiConfig>
-            <definition type="HDFS">
-                <configuration>
-                    <property>
-                        <name>fs.default.name</name>
-                        <value>hdfs://localhost:9000</value>
-                    </property>
-                    <property>
-                        <name>dfs.data.dir</name>
-                        <value>/dfs/data</value>
-                    </property>
-                    <property>
-                        <name>fs.hdfs.impl</name>
-                        <value>org.apache.hadoop.hdfs.DistributedFileSystem</value>
-                    </property>
-                    <property>
-                        <name>fs.file.impl</name>
-                        <value>org.apache.hadoop.fs.LocalFileSystem</value>
-                    </property>
-                </configuration>
-            </definition>
-        </datasource>-->
 
         <!-- Sample datasource implementation for HBase Analytics RecordStore-->
         <!--<datasource>

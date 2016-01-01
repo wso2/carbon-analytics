@@ -18,8 +18,6 @@
 package org.wso2.carbon.analytics.datasource.hbase;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -44,8 +42,6 @@ public class HBaseRecordIterator implements AnalyticsIterator<Record> {
     private List<List<String>> batchedIds;
 
     private int tenantId, totalBatches, currentBatchIndex;
-
-    private static final Log log = LogFactory.getLog(HBaseRecordIterator.class);
 
     private boolean fullyFetched;
     private String tableName;

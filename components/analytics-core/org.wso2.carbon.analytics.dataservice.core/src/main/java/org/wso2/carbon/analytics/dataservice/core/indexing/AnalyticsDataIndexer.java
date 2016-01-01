@@ -100,7 +100,6 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
-import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
@@ -207,10 +206,6 @@ public class AnalyticsDataIndexer {
     
     public AnalyticsIndexerInfo getAnalyticsIndexerInfo() {
         return indexerInfo;
-    }
-    
-    public AnalyticsFileSystem getFileSystem() {
-        return this.indexerInfo.getAnalyticsFileSystem();
     }
     
     public AnalyticsDataService getAnalyticsDataService() {

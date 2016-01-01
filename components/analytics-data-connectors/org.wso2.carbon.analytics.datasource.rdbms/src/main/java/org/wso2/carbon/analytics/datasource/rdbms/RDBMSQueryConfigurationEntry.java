@@ -45,10 +45,6 @@ public class RDBMSQueryConfigurationEntry {
     
     private String recordCountQuery;
     
-    private String[] fsTableInitQueries;
-    
-    private String fsTablesCheckQuery;
-    
     private String recordMergeQuery;
     
     private String recordInsertQuery;
@@ -71,32 +67,6 @@ public class RDBMSQueryConfigurationEntry {
         
     private PaginationMode paginationMode;
     
-    private String fsPathRetrievalQuery;
-    
-    private String fsListFilesQuery;
-    
-    private String fsUpdateDataPathQuery;
-    
-    private String fsInsertPathQuery;
-    
-    private String fsFileLengthRetrievalQuery;
-    
-    private String fsSetFileLengthQuery;
-    
-    private String fsReadDataChunkQuery;
-    
-    private String fsWriteDataChunkQuery;
-    
-    private String fsUpdateDataChunkQuery;
-    
-    private String fsMergeDataChunkQuery;
-    
-    private String fsDeletePathQuery;
-    
-    private String fsDeleteDataQuery;
-    
-    private int fsDataChunkSize;
-
     private boolean blobLengthRequired;
 
     private boolean forwardOnlyReadEnabled;
@@ -167,24 +137,6 @@ public class RDBMSQueryConfigurationEntry {
         this.recordTableDeleteQueries = recordTableDeleteQueries;
     }
     
-    @XmlElementWrapper (name = "fsTableInitQueries")
-    @XmlElement (name = "query")
-    public String[] getFsTableInitQueries() {
-        return fsTableInitQueries;
-    }
-  
-    public void setFsTableInitQueries(String[] fsTableInitQueries) {
-        this.fsTableInitQueries = fsTableInitQueries;
-    }
-    
-    public String getFsTablesCheckQuery() {
-        return fsTablesCheckQuery;
-    }
-    
-    public void setFsTablesCheckQuery(String fsTablesCheckQuery) {
-        this.fsTablesCheckQuery = fsTablesCheckQuery;
-    }
-    
     public String getRecordMergeQuery() {
         return recordMergeQuery;
     }
@@ -249,110 +201,6 @@ public class RDBMSQueryConfigurationEntry {
         this.recordBatchSize = recordBatchSize;
     }
 
-    public String getFsPathRetrievalQuery() {
-        return fsPathRetrievalQuery;
-    }
-    
-    public void setFsPathRetrievalQuery(String fsPathRetrievalQuery) {
-        this.fsPathRetrievalQuery = fsPathRetrievalQuery;
-    }
-    
-    public String getFsListFilesQuery() {
-        return fsListFilesQuery;
-    }
-    
-    public void setFsListFilesQuery(String fsListFilesQuery) {
-        this.fsListFilesQuery = fsListFilesQuery;
-    }
-    
-    public String getFsInsertPathQuery() {
-        return fsInsertPathQuery;
-    }
-    
-    public void setFsInsertPathQuery(String fsInsertPathQuery) {
-        this.fsInsertPathQuery = fsInsertPathQuery;
-    }
-    
-    public String getFsFileLengthRetrievalQuery() {
-        return fsFileLengthRetrievalQuery;
-    }
-    
-    public void setFsFileLengthRetrievalQuery(String fsFileLengthRetrievalQuery) {
-        this.fsFileLengthRetrievalQuery = fsFileLengthRetrievalQuery;
-    }
-    
-    public String getFsSetFileLengthQuery() {
-        return fsSetFileLengthQuery;
-    }
-    
-    public void setFsSetFileLengthQuery(String fsSetFileLengthQuery) {
-        this.fsSetFileLengthQuery = fsSetFileLengthQuery;
-    }
-   
-    public String getFsReadDataChunkQuery() {
-        return fsReadDataChunkQuery;
-    }
-    
-    public void setFsReadDataChunkQuery(String fsReadDataChunkQuery) {
-        this.fsReadDataChunkQuery = fsReadDataChunkQuery;
-    }
-    
-    public String getFsWriteDataChunkQuery() {
-        return fsWriteDataChunkQuery;
-    }
-
-    public void setFsWriteDataChunkQuery(String fsWriteDataChunkQuery) {
-        this.fsWriteDataChunkQuery = fsWriteDataChunkQuery;
-    }
-    
-    public String getFsDeletePathQuery() {
-        return fsDeletePathQuery;
-    }
-    
-    public String getFsDeleteDataQuery() {
-        return fsDeleteDataQuery;
-    }
-    
-    public void setFsDeletePathQuery(String fsDeletePathQuery) {
-        this.fsDeletePathQuery = fsDeletePathQuery;
-    }
-    
-    public void setFsDeleteDataQuery(String fsDeleteDataQuery) {
-        this.fsDeleteDataQuery = fsDeleteDataQuery;
-    }
-    
-    public String getFsUpdateDataPathQuery() {
-        return fsUpdateDataPathQuery;
-    }
-    
-    public void setFsUpdateDataPathQuery(String fsUpdateDataPathQuery) {
-        this.fsUpdateDataPathQuery = fsUpdateDataPathQuery;
-    }
-
-    public int getFsDataChunkSize() {
-        return fsDataChunkSize;
-    }
-
-    public void setFsDataChunkSize(int fsDataChunkSize) {
-        this.fsDataChunkSize = fsDataChunkSize;
-    }
-    
-    public String getFsUpdateDataChunkQuery() {
-        return fsUpdateDataChunkQuery;
-    }
-    
-    public String getFsMergeDataChunkQuery() {
-        return fsMergeDataChunkQuery;
-    }
-    
-    public void setFsMergeDataChunkQuery(String fsMergeDataChunkQuery) {
-        this.fsMergeDataChunkQuery = fsMergeDataChunkQuery;
-    }
-
-    public void setFsUpdateDataChunkQuery(String fsUpdateDataChunkQuery) {
-        this.fsUpdateDataChunkQuery = fsUpdateDataChunkQuery;
-    }
-    
     public String getRecordCountQuery() {
         return recordCountQuery;
     }

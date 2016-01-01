@@ -28,8 +28,6 @@ import org.apache.commons.cli.Options;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataServiceConfigProperty;
-import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -37,13 +35,9 @@ import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.base.MultitenantConstants;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,7 +47,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -78,13 +71,11 @@ public class AnalyticsDataBackupTool {
     private static final String RESTORE_RECORD_STORE = "restoreRecordStore";
     private static final String BACKUP_RECORD_STORE = "backupRecordStore";
     private static final String TABLE_SCHEMA_FILE_NAME = "__TABLE_SCHEMA__";
-    private static final String ANALYTICS_DS_CONFIG_FILE = "analytics-config.xml";
     private static final String ENABLE_INDEXING = "enableIndexing";
     private static final int INDEX_PROCESS_WAIT_TIME = -1;
     private static final String RECORD_BATCH_SIZE = "1000";
     private static int batchSize = 0;
     private static boolean forceIndexing = false;
-    private static final int READ_BUFFER_SIZE = 10240;
     private static final int RECORD_INDEX_CHUNK_SIZE = 1000;
 
     @SuppressWarnings("static-access")
@@ -424,40 +415,6 @@ public class AnalyticsDataBackupTool {
             if (fileIn != null) {
                 fileIn.close();
             }
-        }
-    }
-
-    /**
-     * returning a map of properties read from the config.
-     *
-     * @param props properties to be added to the map.
-     * @return a map of property nam and values.
-     */
-    private static Map<String, String> convertToMap(AnalyticsDataServiceConfigProperty[] props) {
-        Map<String, String> result = new HashMap<>();
-        for (AnalyticsDataServiceConfigProperty prop : props) {
-            result.put(prop.getName(), prop.getValue());
-        }
-        return result;
-    }
-
-    private static AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
-        try {
-            File confFile = new File(GenericUtils.getAnalyticsConfDirectory() + File.separator +
-                    AnalyticsDataSourceConstants.ANALYTICS_CONF_DIR +
-                    File.separator + ANALYTICS_DS_CONFIG_FILE);
-            if (!confFile.exists()) {
-                throw new AnalyticsException("Cannot initalize analytics data service, " +
-                        "the analytics data service configuration file cannot be found at: " +
-                        confFile.getPath());
-            }
-            System.out.println("conf: " + confFile.getAbsolutePath());
-            JAXBContext ctx = JAXBContext.newInstance(AnalyticsDataServiceConfiguration.class);
-            Unmarshaller unmarshaller = ctx.createUnmarshaller();
-            return (AnalyticsDataServiceConfiguration) unmarshaller.unmarshal(confFile);
-        } catch (JAXBException e) {
-            throw new AnalyticsException("Error in processing analytics data service configuration: " +
-                    e.getMessage(), e);
         }
     }
 

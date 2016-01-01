@@ -30,9 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class AnalyticsDataServiceConfiguration {
     
     private AnalyticsRecordStoreConfiguration[] analyticsRecordStoreConfigurations;
-    
-    private AnalyticsFileSystemConfiguration analyticsFileSystem;
-    
+        
     private AnalyticsLuceneAnalyzerConfiguration luceneAnalyzerConfiguration;
 
     private AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration;
@@ -55,15 +53,6 @@ public class AnalyticsDataServiceConfiguration {
     public void setAnalyticsRecordStoreConfigurations(AnalyticsRecordStoreConfiguration[] analyticsRecordStoreConfigurations) {
         this.analyticsRecordStoreConfigurations = analyticsRecordStoreConfigurations;
     }
-
-    @XmlElement (name = "analytics-file-system", nillable = false)
-    public AnalyticsFileSystemConfiguration getAnalyticsFileSystemConfiguration() {
-        return analyticsFileSystem;
-    }
-
-    public void setAnalyticsFileSystemConfiguration(AnalyticsFileSystemConfiguration analyticsFileSystem) {
-        this.analyticsFileSystem = analyticsFileSystem;
-    }
     
     @XmlElement (name = "analytics-lucene-analyzer")
 	public AnalyticsLuceneAnalyzerConfiguration getLuceneAnalyzerConfiguration() {
@@ -73,14 +62,6 @@ public class AnalyticsDataServiceConfiguration {
 	public void setLuceneAnalyzerConfiguration(AnalyticsLuceneAnalyzerConfiguration luceneAnalyzerConfiguration) {
 		this.luceneAnalyzerConfiguration = luceneAnalyzerConfiguration;
 	}
-
-    public AnalyticsFileSystemConfiguration getAnalyticsFileSystem() {
-        return analyticsFileSystem;
-    }
-
-    public void setAnalyticsFileSystem(AnalyticsFileSystemConfiguration analyticsFileSystem) {
-        this.analyticsFileSystem = analyticsFileSystem;
-    }
     
     @XmlElement (nillable = false, required = true)
     public String getPrimaryRecordStore() {

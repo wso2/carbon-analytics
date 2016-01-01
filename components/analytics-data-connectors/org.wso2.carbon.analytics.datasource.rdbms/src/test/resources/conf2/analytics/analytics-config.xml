@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <analytics-dataservice-configuration>
-   <!-- Analytics File System - properties related to index storage implementation -->
-   <analytics-file-system>
-      <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsFileSystem</implementation>
-      <properties>
-            <!-- the data source name mentioned in data sources configuration -->
-            <property name="datasource">WSO2_ANALYTICS_FS_DB</property>
-      </properties>
-   </analytics-file-system>
    <primaryRecordStore>EVENT_STORE</primaryRecordStore>
    <!-- Analytics Record Store - properties related to record storage implementation -->
    <analytics-record-store name = "EVENT_STORE">

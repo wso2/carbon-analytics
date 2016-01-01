@@ -22,24 +22,6 @@
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
             <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{PARTITION_KEY}} (partition_key)</query>            
         </recordTableInitQueries>
-        <fsDataChunkSize>10240</fsDataChunkSize>
-        <fsDeletePathQuery>DELETE FROM AN_FS_PATH WHERE path = ?</fsDeletePathQuery>
-        <fsDeleteDataQuery>DELETE FROM AN_FS_DATA WHERE path = ?</fsDeleteDataQuery>
-        <fsUpdateDataPathQuery>UPDATE AN_FS_DATA SET path = ? WHERE path = ?</fsUpdateDataPathQuery>
-        <fsFileLengthRetrievalQuery>SELECT length FROM AN_FS_PATH WHERE path = ?</fsFileLengthRetrievalQuery>
-        <fsInsertPathQuery>INSERT INTO AN_FS_PATH (path,is_directory,length,parent_path) VALUES (?,?,?,?)</fsInsertPathQuery>
-        <fsListFilesQuery>SELECT path FROM AN_FS_PATH WHERE parent_path = ?</fsListFilesQuery>
-        <fsPathRetrievalQuery>SELECT * FROM AN_FS_PATH WHERE path = ?</fsPathRetrievalQuery>
-        <fsReadDataChunkQuery>SELECT data FROM AN_FS_DATA WHERE path = ? AND sequence = ?</fsReadDataChunkQuery>
-        <fsSetFileLengthQuery>UPDATE AN_FS_PATH SET length = ? WHERE path = ?</fsSetFileLengthQuery>
-        <fsTableInitQueries>
-            <query>CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BOOLEAN, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path), FOREIGN KEY (parent_path) REFERENCES AN_FS_PATH(path))</query>
-            <query>CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data BINARY, PRIMARY KEY (path,sequence), FOREIGN KEY (path) REFERENCES AN_FS_PATH(path))</query>
-            <query>CREATE INDEX index_parent_id ON AN_FS_PATH(parent_path)</query>
-        </fsTableInitQueries>
-        <fsTablesCheckQuery>SELECT path FROM AN_FS_PATH WHERE path = '/'</fsTablesCheckQuery>
-        <fsUpdateDataChunkQuery>UPDATE AN_FS_DATA SET data = ? WHERE path = ? AND sequence = ?</fsUpdateDataChunkQuery>
-        <fsWriteDataChunkQuery>INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?,?,?)</fsWriteDataChunkQuery>
     </database>
 </rdbms-configuration>
 

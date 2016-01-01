@@ -5,25 +5,6 @@
     </providers>
 
     <datasources>
-        <datasource>
-            <name>WSO2_ANALYTICS_FS_DB</name>
-            <description>The datasource used for analytics file system</description>
-            <definition type="RDBMS">
-                <configuration>
-                    <url>jdbc:db2://192.168.219.130:50000/FS_DB</url>
-                    <username>db2admin</username>
-                    <password>password</password>
-                    <driverClassName>com.ibm.db2.jcc.DB2Driver</driverClassName>
-                    <maxActive>80</maxActive>
-                    <maxWait>360000</maxWait>
-                    <minIdle>5</minIdle>
-                    <validationQuery>SELECT 1</validationQuery>
-                    <initialSize>0</initialSize>
-                    <testWhileIdle>true</testWhileIdle>
-                    <minEvictableIdleTimeMillis>4000</minEvictableIdleTimeMillis>
-                </configuration>
-            </definition>
-        </datasource>
 
         <datasource>
             <name>WSO2_ANALYTICS_RS_DB</name>

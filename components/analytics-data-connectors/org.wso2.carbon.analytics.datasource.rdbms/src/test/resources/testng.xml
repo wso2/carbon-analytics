@@ -5,27 +5,20 @@
     <parameter name="mysql.password" value="root"/>
     <test name="Analytics Core Tests">
         <classes>
-            <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.mysql.MySQLAnalyticsFileSystemTest"/>-->
             <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.mysql.MySQLAnalyticsRecordStoreTest"/>-->
             <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.mysql.MySQLAnalyticsDataServiceTest"/>-->
             <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest"/>
-            <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest"/>
             <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2MemDBAnalyticsRecordStoreTest"/>
-            <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2MemDBAnalyticsFileSystemTest"/>
             <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2AnalyticsDataServiceStandaloneTest"/>
             <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2AnalyticsDataServiceClusteredTest"/>
             <!--class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsSparkSQLTest"/-->
             <!--class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsSparkSQLUITest"/-->
-            <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.oracle.OracleAnalyticsFileSystemTest"/>-->
             <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.oracle.OracleAnalyticsRecordStoreTest"/>-->
             <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.oracle.OracleAnalyticsDataServiceTest"/>-->
-            <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.mssql.MSSQLAnalyticsFileSystemTest"/>-->
             <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.mssql.MSSQLAnalyticsRecordStoreTest"/>-->
             <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.mssql.MSSQLAnalyticsDataServiceTest"/>-->
-            <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.postgre.PostgreSQLAnalyticsFileSystemTest"/>-->
             <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.postgre.PostgreSQLAnalyticsRecordStoreTest"/>-->
             <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.postgre.PostgreSQLAnalyticsDataServiceTest"/>-->
-            <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.db2.DB2AnalyticsFileSystemTest"/>-->
             <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.db2.DB2AnalyticsRecordStoreTest"/>-->
             <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.db2.DB2AnalyticsDataServiceTest"/>-->
         </classes>

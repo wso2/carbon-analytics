@@ -48,7 +48,6 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
-import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.ntask.common.TaskException;
@@ -60,7 +59,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -110,9 +108,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private int recordsBatchSize;
 
     private Map<String, AnalyticsRecordStore> analyticsRecordStores;
-    
-    private AnalyticsFileSystem analyticsFileSystem;
-        
+            
     private AnalyticsDataIndexer indexer;
     
     private Map<String, AnalyticsTableInfo> tableInfoMap = new HashMap<String, AnalyticsTableInfo>();
@@ -126,10 +122,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         Analyzer luceneAnalyzer;
         this.initARS(config);
         try {
-            String afsClass = config.getAnalyticsFileSystemConfiguration().getImplementation();
             String analyzerClass = config.getLuceneAnalyzerConfiguration().getImplementation();
-            this.analyticsFileSystem = (AnalyticsFileSystem) Class.forName(afsClass).newInstance();
-            this.analyticsFileSystem.init(this.convertToMap(config.getAnalyticsFileSystemConfiguration().getProperties()));
             luceneAnalyzer = (Analyzer) Class.forName(analyzerClass).newInstance();
         } catch (Exception e) {
             throw new AnalyticsException("Error in creating analytics data service from configuration: " + 
@@ -138,7 +131,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         this.initIndexedTableStore();
         AnalyticsIndexerInfo indexerInfo = new AnalyticsIndexerInfo();
         indexerInfo.setAnalyticsRecordStore(this.getPrimaryAnalyticsRecordStore());
-        indexerInfo.setAnalyticsFileSystem(this.analyticsFileSystem);
         indexerInfo.setAnalyticsDataService(this);
         indexerInfo.setIndexedTableStore(this.indexedTableStore);
         indexerInfo.setShardCount(config.getShardCount());
@@ -896,11 +888,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         }
         for (AnalyticsRecordStore ars : this.analyticsRecordStores.values()) {
             ars.destroy();
-        }
-        try {
-            this.analyticsFileSystem.destroy();
-        } catch (IOException e) {
-            throw new AnalyticsException("Error in analytics data service destroy: " + e.getMessage(), e);
         }
     }
 

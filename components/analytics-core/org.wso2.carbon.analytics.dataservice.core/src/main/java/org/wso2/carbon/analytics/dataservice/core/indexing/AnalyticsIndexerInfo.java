@@ -20,7 +20,6 @@ package org.wso2.carbon.analytics.dataservice.core.indexing;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
-import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 
 /**
@@ -29,9 +28,7 @@ import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 public class AnalyticsIndexerInfo {
 
     private Analyzer luceneAnalyzer;
-    
-    private AnalyticsFileSystem analyticsFileSystem;
-    
+        
     private AnalyticsRecordStore analyticsRecordStore;
 
     private AnalyticsDataService analyticsDataService;
@@ -52,14 +49,6 @@ public class AnalyticsIndexerInfo {
 
     public void setLuceneAnalyzer(Analyzer luceneAnalyzer) {
         this.luceneAnalyzer = luceneAnalyzer;
-    }
-
-    public AnalyticsFileSystem getAnalyticsFileSystem() {
-        return analyticsFileSystem;
-    }
-
-    public void setAnalyticsFileSystem(AnalyticsFileSystem analyticsFileSystem) {
-        this.analyticsFileSystem = analyticsFileSystem;
     }
 
     public AnalyticsRecordStore getAnalyticsRecordStore() {

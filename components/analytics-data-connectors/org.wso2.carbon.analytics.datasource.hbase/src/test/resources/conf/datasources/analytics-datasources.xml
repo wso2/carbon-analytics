@@ -8,7 +8,7 @@
     <datasources>
 
         <!-- Sample datasource implementation for HDFS Analytics FileSystem-->
-        <datasource>
+        <!--datasource>
             <name>WSO2_ANALYTICS_FS_DB_HDFS</name>
             <description>The datasource used for analytics file system</description>
             <jndiConfig>
@@ -34,7 +34,7 @@
                     </property>
                 </configuration>
             </definition>
-        </datasource>
+        </datasource-->
 
         <!-- Sample datasource implementation for HBase Analytics RecordStore-->
         <datasource>
