@@ -22,6 +22,14 @@ function addEventStream(form, option, eventStreamId) {
     var eventStreamDescription = document.getElementById("eventStreamDescription").value.trim();
     var eventStreamNickName = document.getElementById("eventStreamNickName").value.trim();
 
+    if(eventStreamName.indexOf(" ") != -1){
+        CARBON.showErrorDialog("Stream name can not have spaces.");
+        return;
+    }
+    if(eventStreamNickName.indexOf(" ") != -1){
+        CARBON.showErrorDialog("Stream nick name can not have spaces.");
+        return;
+    }
     if ((eventStreamName == "") || (eventStreamVersion == "")) {
         // empty fields are encountered.
         CARBON.showErrorDialog("Empty inputs fields are not allowed.");
@@ -147,17 +155,25 @@ function addEventStreamViaPopup(form, callback) {
 
     var eventStreamName = document.getElementById("eventStreamNameId").value.trim();
     var eventStreamVersion = document.getElementById("eventStreamVersionId").value.trim();
-
     var streamId = eventStreamName + ":" + eventStreamVersion;
     var eventStreamDescription = document.getElementById("eventStreamDescription").value.trim();
     var eventStreamNickName = document.getElementById("eventStreamNickName").value.trim();
+
+    if(eventStreamName.indexOf(" ") != -1){
+        CARBON.showErrorDialog("Stream name can not have spaces.");
+        return;
+    }
+
+    if(eventStreamNickName.indexOf(" ") != -1){
+        CARBON.showErrorDialog("Stream nick name can not have spaces.");
+        return;
+    }
 
     if ((eventStreamName == "") || (eventStreamVersion == "")) {
         // empty fields are encountered.
         CARBON.showErrorDialog("Empty inputs fields are not allowed.");
         return;
     }
-
     else {
         var metaData = "";
         var correlationData = "";
@@ -450,10 +466,6 @@ function convertStringToEventStreamInfoDto() {
                 document.getElementById("eventStreamDescription").value = eventStreamDefinitionDtoJSON.message.description;
                 document.getElementById("eventStreamNickName").value = eventStreamDefinitionDtoJSON.message.nickName;
 
-                //var source =  document.getElementById("sourceWorkArea");
-                //var design =  document.getElementById("designWorkArea");
-
-
                 if (0 == eventStreamDefinitionDtoJSON.message.metaAttributes.length) {
                     var streamAttributeTable = document.getElementById("outputMetaDataTable");
 
@@ -545,10 +557,60 @@ function addStreamAttribute2(dataType, name, type) {
 
 }
 
+function validateStreamDefinition(streamDefinitionString){
+    var error = "";
+    var streamDefinitionJSON = JSON.parse(streamDefinitionString);
+    var name = streamDefinitionJSON["name"];
+    var nickName = streamDefinitionJSON["nickName"];
+    var metaData = streamDefinitionJSON["metaData"];
+    var correlationData = streamDefinitionJSON["correlationData"];
+    var payloadData = streamDefinitionJSON["payloadData"];
+
+    if(name.indexOf(" ") != -1){
+        error = "Stream name can not have spaces.\n";
+    }
+    if(nickName.indexOf(" ") != -1){
+        error = "Stream nick name can not have spaces.\n";
+    }
+
+    var meta_faultName = "";
+    for(i in metaData){
+        if(metaData[i]["name"].indexOf(" ") != -1){
+            metaData_faultName = metaData[i]["name"];
+            error = "Attrbute names can not have spaces.\n" +
+                    "Metadata attribute name : " + meta_faultName + " contains spaces";
+        }
+    }
+
+    var correlation_faultName = "";
+    for(i in correlationData){
+            if(correlationData[i]["name"].indexOf(" ") != -1){
+                correlation_faultName = correlationData[i]["name"];
+                error = "Attrbute names can not have spaces.\n" +
+                        "Correlation data attribute name : " + correlation_faultName + " contains spaces";
+            }
+     }
+
+    var payload_faultName = "";
+    for(i in payloadData){
+            if(payloadData[i]["name"].indexOf(" ") != -1){
+                payload_faultName = payloadData[i]["name"];
+                error = "Attrbute names can not have spaces.\n" +
+                        "Payload data attribute name : " + payload_faultName + " contains spaces";
+            }
+     }
+
+    return error;
+}
+
 function addEventStreamByString(form) {
     var eventStreamDefinitionString = document.getElementById("streamDefinitionText").value.trim();
+    var error = validateStreamDefinition(eventStreamDefinitionString);
 
-
+    if(error != ""){
+        CARBON.showErrorDialog(error);
+        return;
+    }
     new Ajax.Request('../eventstream/add_event_stream_by_string_ajaxprocessor.jsp', {
         method: 'POST',
         asynchronous: false,
