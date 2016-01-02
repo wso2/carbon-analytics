@@ -248,6 +248,10 @@ function addStreamAttribute(dataType) {
         error = "Attribute type field is empty. \n";
     }
 
+    if ((attributeName.value).indexOf(" ")!=-1 && (attributeName.value).indexOf(" ")!= (attributeName.value).length-1){
+        error = "Attribute name can not have spaces.\n"
+    }
+
     if (error != "") {
         CARBON.showErrorDialog(error);
         return;
