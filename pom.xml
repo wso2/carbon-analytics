@@ -280,6 +280,12 @@
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.core</artifactId>
                 <version>${carbon.kernel.version}</version>
+                <exclusions>
+                    <exclusion> 
+                        <groupId>org.compass-project.wso2</groupId>
+                        <artifactId>compass</artifactId>
+                    </exclusion>
+                </exclusions> 
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>

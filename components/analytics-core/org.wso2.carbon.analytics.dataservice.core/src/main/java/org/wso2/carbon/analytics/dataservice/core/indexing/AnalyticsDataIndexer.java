@@ -106,7 +106,6 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import com.hazelcast.spi.exception.TargetNotMemberException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Paths;
@@ -117,9 +116,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
@@ -162,9 +163,9 @@ public class AnalyticsDataIndexer {
     
     public static final int TAXONOMYWORKER_TIMEOUT = 60;
     
-    private Map<String, Directory> indexDirs = new HashMap<>();
+    private Map<String, IndexWriter> indexWriters = new HashMap<>();
 
-    private Map<String, Directory> indexTaxonomyDirs = new HashMap<>();
+    private Map<String, DirectoryTaxonomyWriter> indexTaxonomyWriters = new HashMap<>();
 
     private AggregateFunctionFactory aggregateFunctionFactory;
     
@@ -657,7 +658,7 @@ public class AnalyticsDataIndexer {
         for (int shardId : shardIds) {
             String tableId = this.generateTableId(tenantId, tableName);
             try {
-                IndexReader reader = DirectoryReader.open(this.lookupIndexDir(shardId, tableId));
+                IndexReader reader = DirectoryReader.open(this.lookupIndexWriter(shardId, tableId), true);
                 indexReaders.add(reader);
             } catch (IndexNotFoundException ignore) {
                 /* this can happen if a user just started to index records in a table,
@@ -702,15 +703,11 @@ public class AnalyticsDataIndexer {
     }
 
     private List<SearchResultEntry> drillDownRecords(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
-                                                     Directory indexDir, Directory taxonomyIndexDir,
+                                                     IndexReader indexReader, TaxonomyReader taxonomyReader,
                                                      String rangeField, AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
-        IndexReader indexReader = null;
-        TaxonomyReader taxonomyReader = null;
         List<SearchResultEntry> searchResults = new ArrayList<>();
         try {
-            indexReader = DirectoryReader.open(indexDir);
-            taxonomyReader = new DirectoryTaxonomyReader(taxonomyIndexDir);
             IndexSearcher indexSearcher = new IndexSearcher(indexReader);
             FacetsCollector facetsCollector = new FacetsCollector(true);
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId,
@@ -736,15 +733,11 @@ public class AnalyticsDataIndexer {
         }
     }
 
-    private List<CategorySearchResultEntry> drilldowncategories(int tenantId, Directory indexDir,
-                                                                Directory taxonomyIndexDir,
+    private List<CategorySearchResultEntry> drilldowncategories(int tenantId, IndexReader indexReader,
+                                                                TaxonomyReader taxonomyReader,
                                                                 CategoryDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
-        IndexReader indexReader = null;
-        TaxonomyReader taxonomyReader = null;
         List<CategorySearchResultEntry> searchResults = new ArrayList<>();
         try {
-            indexReader = DirectoryReader.open(indexDir);
-            taxonomyReader = new DirectoryTaxonomyReader(taxonomyIndexDir);
             IndexSearcher indexSearcher = new IndexSearcher(indexReader);
             FacetsCollector facetsCollector = new FacetsCollector(true);
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
@@ -787,14 +780,10 @@ public class AnalyticsDataIndexer {
     }
 
     private double getDrillDownRecordCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
-                                                     Directory indexDir, Directory taxonomyIndexDir,
+                                                     IndexReader indexReader, TaxonomyReader taxonomyReader,
                                                      String rangeField, AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
-        IndexReader indexReader = null;
-        TaxonomyReader taxonomyReader = null;
         try {
-            indexReader = DirectoryReader.open(indexDir);
-            taxonomyReader = new DirectoryTaxonomyReader(taxonomyIndexDir);
             IndexSearcher indexSearcher = new IndexSearcher(indexReader);
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId,
                                                                 drillDownRequest.getTableName());
@@ -1002,20 +991,27 @@ public class AnalyticsDataIndexer {
             final String rangeField,
             final AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
-        String tableName = drillDownRequest.getTableName();
-        String tableId = this.generateTableId(tenantId, tableName);
-        Directory indexDir = this.lookupIndexDir(shardId, tableId);
-        Directory taxonomyDir = this.lookupTaxonomyIndexDir(shardId, tableId);
-        return drillDownRecords(tenantId, drillDownRequest, indexDir, taxonomyDir, rangeField, range);
+        try {
+            String tableId = this.generateTableId(tenantId, drillDownRequest.getTableName());
+            IndexReader indexReader = DirectoryReader.open(this.lookupIndexWriter(shardId, tableId), true);
+            TaxonomyReader taxonomyReader = new DirectoryTaxonomyReader(this.lookupTaxonomyIndexWriter(shardId, tableId));
+            return drillDownRecords(tenantId, drillDownRequest, indexReader, taxonomyReader, rangeField, range);
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error in opening index readers: " + e.getMessage(), e);
+        }
     }
 
     private List<CategorySearchResultEntry> drillDownCategoriesPerShard(final int tenantId, final int shardId,
                                                              final CategoryDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        String tableId = generateTableId(tenantId, drillDownRequest.getTableName());
-        Directory indexDir = lookupIndexDir(shardId, tableId);
-        Directory taxonomyDir = lookupTaxonomyIndexDir(shardId, tableId);
-        return drilldowncategories(tenantId, indexDir, taxonomyDir, drillDownRequest); 
+        try {
+            String tableId = this.generateTableId(tenantId, drillDownRequest.getTableName());
+            IndexReader indexReader = DirectoryReader.open(this.lookupIndexWriter(shardId, tableId), true);
+            TaxonomyReader taxonomyReader = new DirectoryTaxonomyReader(this.lookupTaxonomyIndexWriter(shardId, tableId));
+            return drilldowncategories(tenantId, indexReader, taxonomyReader, drillDownRequest);
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error in opening index readers: " + e.getMessage(), e);
+        }
     }
 
     private double getDrillDownRecordCountPerShard(final int tenantId,
@@ -1024,11 +1020,14 @@ public class AnalyticsDataIndexer {
                                                    final String rangeField,
                                                    final AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
-        String tableName = drillDownRequest.getTableName();
-        String tableId = generateTableId(tenantId, tableName);
-        Directory indexDir = lookupIndexDir(shardId, tableId);
-        Directory taxonomyDir = lookupTaxonomyIndexDir(shardId, tableId);
-        return getDrillDownRecordCount(tenantId, drillDownRequest, indexDir, taxonomyDir, rangeField, range);
+        try {
+            String tableId = this.generateTableId(tenantId, drillDownRequest.getTableName());
+            IndexReader indexReader = DirectoryReader.open(this.lookupIndexWriter(shardId, tableId), true);
+            TaxonomyReader taxonomyReader = new DirectoryTaxonomyReader(this.lookupTaxonomyIndexWriter(shardId, tableId));
+            return getDrillDownRecordCount(tenantId, drillDownRequest, indexReader, taxonomyReader, rangeField, range);
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error in opening index readers: " + e.getMessage(), e);
+        }
     }
 
     /**
@@ -1064,7 +1063,7 @@ public class AnalyticsDataIndexer {
             log.debug("Deleting data in local index [" + shardIndex + "]: " + ids.size());
         }
         String tableId = this.generateTableId(tenantId, tableName);
-        IndexWriter indexWriter = this.createIndexWriter(shardIndex, tableId);
+        IndexWriter indexWriter = this.lookupIndexWriter(shardIndex, tableId);
         List<Term> terms = new ArrayList<Term>(ids.size());
         for (String id : ids) {
             terms.add(new Term(INDEX_ID_INTERNAL_FIELD, id));
@@ -1074,12 +1073,6 @@ public class AnalyticsDataIndexer {
             indexWriter.commit();
         } catch (IOException e) {
             throw new AnalyticsException("Error in deleting indices: " + e.getMessage(), e);
-        } finally {
-            try {
-                indexWriter.close();
-            } catch (IOException e) {
-                log.error("Error closing index writer: " + e.getMessage(), e);
-            }
         }
     }
     
@@ -1124,22 +1117,17 @@ public class AnalyticsDataIndexer {
         int tenantId = firstRecord.getTenantId();
         String tableName = firstRecord.getTableName();
         String tableId = this.generateTableId(tenantId, tableName);
-        IndexWriter indexWriter = this.createIndexWriter(shardIndex, tableId);
-        TaxonomyWriter taxonomyWriter = this.createTaxonomyIndexWriter(shardIndex, tableId);
+        IndexWriter indexWriter = this.lookupIndexWriter(shardIndex, tableId);
+        TaxonomyWriter taxonomyWriter = this.lookupTaxonomyIndexWriter(shardIndex, tableId);
         try {
             for (Record record : recordBatch) {
                 indexWriter.updateDocument(new Term(INDEX_ID_INTERNAL_FIELD, record.getId()),
                                            this.generateIndexDoc(record, columns, taxonomyWriter).getFields());
             }
+            indexWriter.commit();
+            taxonomyWriter.commit();
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in updating index: " + e.getMessage(), e);
-        } finally {
-            try {
-                indexWriter.close();
-                taxonomyWriter.close();
-            } catch (IOException e) {
-                log.error("Error closing index writer: " + e.getMessage(), e);
-            }
         }
     }
     
@@ -1286,80 +1274,69 @@ public class AnalyticsDataIndexer {
     private String generateShardedTableId(int shardId, String tableId) {
         return shardId + "_" + tableId;
     }
-    
-    private Directory lookupIndexDir(int shardId, String tableId) throws AnalyticsIndexException {
+
+    private IndexWriter lookupIndexWriter(int shardId, String tableId) throws AnalyticsIndexException {
         String shardedTableId = this.generateShardedTableId(shardId, tableId);
-        Directory indexDir = this.indexDirs.get(shardedTableId);
-        if (indexDir == null) {
-            synchronized (this.indexDirs) {
-                indexDir = this.indexDirs.get(shardedTableId);
-                if (indexDir == null) {
-                    indexDir = this.createDirectory(shardId, tableId);
-                    this.indexDirs.put(shardedTableId, indexDir);
+        IndexWriter indexWriter = this.indexWriters.get(shardedTableId);
+        if (indexWriter == null) {
+            synchronized (this.indexWriters) {
+                indexWriter = this.indexWriters.get(shardedTableId);
+                if (indexWriter == null) {
+                    IndexWriterConfig conf = new IndexWriterConfig(this.indexerInfo.getLuceneAnalyzer());
+                    try {
+                        indexWriter = new IndexWriter(this.createDirectory(shardId, tableId), conf);
+                        this.indexWriters.put(shardedTableId, indexWriter);
+                    } catch (IOException e) {
+                        throw new AnalyticsIndexException("Error in creating index writer: " + e.getMessage(), e);
+                    }
                 }
             }
         }
-        return indexDir;
+        return indexWriter;
     }
 
-    private Directory lookupTaxonomyIndexDir(int shardId, String tableId) throws AnalyticsIndexException {
+    private DirectoryTaxonomyWriter lookupTaxonomyIndexWriter(int shardId, String tableId) throws AnalyticsIndexException {
         String shardedTableId = this.generateShardedTableId(shardId, tableId);
-        Directory indexTaxonomyDir = this.indexTaxonomyDirs.get(shardedTableId);
-        if (indexTaxonomyDir == null) {
-            synchronized (this.indexTaxonomyDirs) {
-                indexTaxonomyDir = this.indexTaxonomyDirs.get(shardedTableId);
-                if (indexTaxonomyDir == null) {
-                    indexTaxonomyDir = this.createDirectory(shardId, TAXONOMY_INDEX_DATA_FS_BASE_PATH, tableId);
-                    this.indexTaxonomyDirs.put(shardedTableId, indexTaxonomyDir);
+        DirectoryTaxonomyWriter taxonomyWriter = this.indexTaxonomyWriters.get(shardedTableId);
+        if (taxonomyWriter == null) {
+            synchronized (this.indexTaxonomyWriters) {
+                taxonomyWriter = this.indexTaxonomyWriters.get(shardedTableId);
+                if (taxonomyWriter == null) {
+                    try {
+                        taxonomyWriter = new DirectoryTaxonomyWriter(this.createDirectory(shardId, 
+                                TAXONOMY_INDEX_DATA_FS_BASE_PATH, tableId), 
+                                IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+                        this.indexTaxonomyWriters.put(shardedTableId, taxonomyWriter);
+                    } catch (IOException e) {
+                        throw new AnalyticsIndexException("Error in creating index writer: " + e.getMessage(), e);
+                    }
                 }
             }
         }
-        return indexTaxonomyDir;
-    }
-    
-    private IndexWriter createIndexWriter(int shardId, String tableId) throws AnalyticsIndexException {
-        Directory indexDir = this.lookupIndexDir(shardId, tableId);
-        IndexWriterConfig conf = new IndexWriterConfig(this.indexerInfo.getLuceneAnalyzer());
-        try {
-            return new IndexWriter(indexDir, conf);
-        } catch (IOException e) {
-            throw new AnalyticsIndexException("Error in creating index writer: " + e.getMessage(), e);
-        }
+        return taxonomyWriter;
     }
 
-    private TaxonomyWriter createTaxonomyIndexWriter(int shardId, String tableId) throws AnalyticsIndexException {
-        Directory indexDir = this.lookupTaxonomyIndexDir(shardId, tableId);
-        try {
-            return new DirectoryTaxonomyWriter(indexDir, IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-        } catch (IOException e) {
-            throw new AnalyticsIndexException("Error in creating index writer: " + e.getMessage(), e);
-        }
-    }
-    
     public void clearIndexData(int tenantId, String tableName) throws AnalyticsException {
         this.indexNodeCoordinator.clearIndexData(tenantId, tableName);
     }
     
     public void clearIndexDataLocal(int tenantId, String tableName) throws AnalyticsIndexException {
         String tableId = this.generateTableId(tenantId, tableName);
+        IndexWriter indexWriter;
+        TaxonomyWriter taxonomyWriter;
         for (int shardIndex : this.localShards) {
             try {
-                Directory dir = this.indexDirs.remove(this.generateShardedTableId(shardIndex, tableId));
-                if (dir != null) {
-                    dir.close();
-                }
-                dir = this.indexTaxonomyDirs.remove(this.generateShardedTableId(shardIndex, tableId));
-                if (dir != null) {
-                    dir.close();
-                }
-                try {
+                indexWriter = this.lookupIndexWriter(shardIndex, tableId);
+                indexWriter.deleteAll();
+                indexWriter.commit();
+                synchronized (this.indexTaxonomyWriters) {
+                    taxonomyWriter = this.lookupTaxonomyIndexWriter(shardIndex, tableId);
+                    taxonomyWriter.commit();
+                    taxonomyWriter.close();
+                    this.indexTaxonomyWriters.remove(this.generateShardedTableId(shardIndex, tableId));
                     FileUtils.deleteDirectory(new File(this.generateDirPath(shardIndex, 
                             TAXONOMY_INDEX_DATA_FS_BASE_PATH, tableId)));
-                } catch (FileNotFoundException ignore) { }
-                try {
-                    FileUtils.deleteDirectory(new File(this.generateDirPath(shardIndex, 
-                            INDEX_DATA_FS_BASE_PATH, tableId)));
-                } catch (FileNotFoundException ignore) { }                
+                }
             } catch (IOException e) {
                 throw new AnalyticsIndexException("Error in clearing index data: " + e.getMessage(), e);
             }
@@ -1371,20 +1348,20 @@ public class AnalyticsDataIndexer {
         return tenantId + "_" + tableName.toLowerCase();
     }
     
-    private void closeAndRemoveIndexDir(String tableId) throws AnalyticsIndexException {
-        Directory indexDir = this.indexDirs.remove(tableId);
+    private void closeAndRemoveIndexWriters() throws AnalyticsIndexException {
         try {
-            if (indexDir != null) {
-                indexDir.close();
+            Iterator<Entry<String, IndexWriter>> itr1 = this.indexWriters.entrySet().iterator();
+            while (itr1.hasNext()) {
+                itr1.next().getValue().close();
+                itr1.remove();
+            }
+            Iterator<Entry<String, DirectoryTaxonomyWriter>> itr2 = this.indexTaxonomyWriters.entrySet().iterator();
+            while (itr1.hasNext()) {
+                itr2.next().getValue().close();
+                itr2.remove();
             }
         } catch (IOException e) {
-            throw new AnalyticsIndexException("Error in closing index directory: " + e.getMessage(), e);
-        }
-    }
-    
-    private void closeAndRemoveIndexDirs(Set<String> tableIds) throws AnalyticsIndexException {
-        for (String tableId : tableIds) {
-            this.closeAndRemoveIndexDir(tableId);
+            throw new AnalyticsIndexException("Error in closing index writers: " + e.getMessage(), e);
         }
     }
     
@@ -1409,7 +1386,7 @@ public class AnalyticsDataIndexer {
         this.stopAndCleanupIndexProcessing();
         this.localIndexDataStore.close();
         this.indexNodeCoordinator.close();
-        this.closeAndRemoveIndexDirs(new HashSet<String>(this.indexDirs.keySet()));
+        this.closeAndRemoveIndexWriters();
     }
         
     public void waitForIndexing(long maxWait) throws AnalyticsException, AnalyticsTimeoutException {
@@ -1469,9 +1446,8 @@ public class AnalyticsDataIndexer {
             Set<Future<Set<String>>> perShardUniqueCategories = new HashSet<>();
             Set<String> finalUniqueCategories = new HashSet<>();
             for (int i = 0; i < taxonomyShardIds.size(); i++) {
-                String shardedTableId = this.generateTableId(tenantId, aggregateRequest.getTableName());
-                Directory taxonomyDir = this.lookupTaxonomyIndexDir(taxonomyShardIds.get(i), shardedTableId);
-                TaxonomyReader reader = new DirectoryTaxonomyReader(taxonomyDir);
+                String tableId = this.generateTableId(tenantId, aggregateRequest.getTableName());
+                TaxonomyReader reader = new DirectoryTaxonomyReader(this.lookupTaxonomyIndexWriter(taxonomyShardIds.get(i), tableId));
                 Callable<Set<String>> callable = new TaxonomyWorker(reader, aggregateRequest);
                 Future<Set<String>> result = pool.submit(callable);
                 perShardUniqueCategories.add(result);
