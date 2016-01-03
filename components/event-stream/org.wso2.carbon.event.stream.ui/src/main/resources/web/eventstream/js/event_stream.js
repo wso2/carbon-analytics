@@ -560,12 +560,16 @@ function addStreamAttribute2(dataType, name, type) {
 function validateStreamDefinition(streamDefinitionString){
     var error = "";
     var streamDefinitionJSON = JSON.parse(streamDefinitionString);
+    var streamId = streamDefinitionJSON["streamId"];
     var name = streamDefinitionJSON["name"];
     var nickName = streamDefinitionJSON["nickName"];
     var metaData = streamDefinitionJSON["metaData"];
     var correlationData = streamDefinitionJSON["correlationData"];
     var payloadData = streamDefinitionJSON["payloadData"];
 
+    if(streamId.indexOf(" ") != -1){
+        error = "streamId can not have spaces.\n";
+    }
     if(name.indexOf(" ") != -1){
         error = "Stream name can not have spaces.\n";
     }
@@ -576,7 +580,7 @@ function validateStreamDefinition(streamDefinitionString){
     var meta_faultName = "";
     for(i in metaData){
         if(metaData[i]["name"].indexOf(" ") != -1){
-            metaData_faultName = metaData[i]["name"];
+            meta_faultName = metaData[i]["name"];
             error = "Attrbute names can not have spaces.\n" +
                     "Metadata attribute name : " + meta_faultName + " contains spaces";
         }
