@@ -65,7 +65,6 @@ public class AnalyticsDataBackupTool {
     private static final String PURGETABLE = "table";
     private static final String BATCH_SIZE = "batchSize";
     private static final String REINDEX_EVENTS = "reindexEvents";
-    private static final String DISABLE_STAGING = "disableStaging";
     private static final String PURGE_DATA = "purge";
     private static final String DELETE_TABLE = "deleteTables";
     private static final String RESTORE_RECORD_STORE = "restoreRecordStore";
@@ -85,7 +84,6 @@ public class AnalyticsDataBackupTool {
         options.addOption(new Option(RESTORE_RECORD_STORE, false, "restores analytics data"));
         options.addOption(new Option(REINDEX_EVENTS, false, "re-indexes records in the given table data"));
         options.addOption(new Option(ENABLE_INDEXING, false, "enables indexing while restoring"));
-        options.addOption(new Option(DISABLE_STAGING, false, "disables staging while restoring"));
         options.addOption(new Option(PURGE_DATA, false, "Purges Data for a given time range"));
         options.addOption(new Option(DELETE_TABLE, false, "Deletes given tables"));
         options.addOption(
@@ -154,8 +152,6 @@ public class AnalyticsDataBackupTool {
 
     private static void performAction(CommandLine line, AnalyticsDataService service, int tenantId, Long timeTo,
             Long timeFrom, String[] specificTables, File baseDir) throws AnalyticsException, IOException {
-        // this flag is used to control the staging for the records
-        boolean disableStaging = line.hasOption(DISABLE_STAGING);
         String tableName = null;
         if (line.hasOption(RESTORE_RECORD_STORE)) {
             if (line.hasOption(ENABLE_INDEXING)) {
@@ -180,7 +176,7 @@ public class AnalyticsDataBackupTool {
         } else if (line.hasOption(BACKUP_RECORD_STORE)) {
             backupRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
         } else if (line.hasOption(RESTORE_RECORD_STORE)) {
-            restoreRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables, disableStaging);
+            restoreRecordStore(service, tenantId, baseDir, timeFrom, timeTo, specificTables);
         } else if (line.hasOption(REINDEX_EVENTS)) {
             for (int i = 0; i < specificTables.length; i++) {
                 System.out.printf("Reindexing data for the table: " + specificTables[i]);
@@ -222,23 +218,23 @@ public class AnalyticsDataBackupTool {
     }
 
     private static void restoreRecordStore(AnalyticsDataService service, int tenantId, File baseDir, long timeFrom,
-            long timeTo, String[] specificTables, boolean disableStaging) throws IOException {
+            long timeTo, String[] specificTables) throws IOException {
         checkBaseDir(baseDir);
         if (specificTables != null) {
             for (String specificTable : specificTables) {
-                restoreTable(service, tenantId, specificTable, baseDir, timeFrom, timeTo, disableStaging);
+                restoreTable(service, tenantId, specificTable, baseDir, timeFrom, timeTo);
             }
         } else {
             String[] tables = baseDir.list();
             System.out.println(tables.length + " table(s) available.");
             for (String table : tables) {
-                restoreTable(service, tenantId, table, baseDir, timeFrom, timeTo, disableStaging);
+                restoreTable(service, tenantId, table, baseDir, timeFrom, timeTo);
             }
         }
     }
 
     private static void restoreTable(AnalyticsDataService service, int tenantId, String table, File baseDir,
-            long timeFrom, long timeTo, boolean disableStaging) {
+            long timeFrom, long timeTo) {
         try {
             checkBaseDir(baseDir);
             System.out.print("Restoring table '" + table + "'..");
@@ -248,7 +244,7 @@ public class AnalyticsDataBackupTool {
                 System.out.println(myDir.getAbsolutePath() + " is not a directory to contain table data, skipping.");
                 return;
             }
-            setTableSchema(service, tenantId, table, baseDir, disableStaging);
+            setTableSchema(service, tenantId, table, baseDir);
             restoreTableFromFiles(service, table, timeFrom, timeTo, myDir);
             System.out.println();
         } catch (Exception e) {
@@ -298,17 +294,9 @@ public class AnalyticsDataBackupTool {
         }
     }
 
-    private static void setTableSchema(AnalyticsDataService service, int tenantId, String table, File baseDir,
-            boolean disableStaging) throws IOException, AnalyticsException {
-        // enabling/disabling the staging for the table
+    private static void setTableSchema(AnalyticsDataService service, int tenantId, String table, File baseDir) throws IOException, AnalyticsException {
         AnalyticsSchema currentSchema = readTableSchema(baseDir.getAbsolutePath() + File.separator + table);
-        AnalyticsSchema schema;
-        if (disableStaging) {
-            schema = removeIndexingFromSchema(currentSchema);
-        } else {
-            schema = currentSchema;
-        }
-        service.setTableSchema(tenantId, table, schema);
+        service.setTableSchema(tenantId, table, currentSchema);
     }
 
     private static void backupTable(AnalyticsDataService service, int tenantId, String table, File basedir,
