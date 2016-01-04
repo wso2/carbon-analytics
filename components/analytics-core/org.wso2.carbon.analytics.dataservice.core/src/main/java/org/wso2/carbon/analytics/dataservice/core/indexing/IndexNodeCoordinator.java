@@ -275,7 +275,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
         for (Map.Entry<Integer, List<Record>> entry : shardedRecords.entrySet()) {
             Set<String> nodeIds = this.shardMemberMap.getNodeIdsForShard(entry.getKey());
             for (String nodeId : nodeIds) {
-                if (this.myNodeId.equals(nodeId)) {
+                /* here myNodeId can be null, if this is started as a non-indexing node */
+                if (nodeId.equals(this.myNodeId)) {
                     localRecords.addAll(entry.getValue());
                 } else {
                     Object memberNode = this.shardMemberMap.getMemberFromNodeId(nodeId);
