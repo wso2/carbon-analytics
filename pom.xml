@@ -1187,7 +1187,7 @@
         <carbon.event-processing.version>2.0.9</carbon.event-processing.version>
         <carbon.analytics.common.version>5.0.7-SNAPSHOT</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[5.0, 6.0)</carbon.analytics.common.imp.pkg.version>
-        <carbon.data.version>4.3.2</carbon.data.version>
+        <carbon.data.version>4.3.4</carbon.data.version>
         <carbon.data.import.pkg.version>[4.3, 5)</carbon.data.import.pkg.version>
 
         <!-- Axis2 Version -->
