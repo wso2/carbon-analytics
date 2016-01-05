@@ -1342,12 +1342,10 @@
     </properties>
 
     <repositories>
-
-<repository>
-  <id>github.release.repo</id>
-  <url>https://raw.github.com/bulldog2011/bulldog-repo/master/repo/releases/</url>
-</repository>
-
+        <repository>
+            <id>github.release.repo</id>
+            <url>https://raw.github.com/bulldog2011/bulldog-repo/master/repo/releases/</url>
+        </repository>
     </repositories>
 
     <pluginRepositories>

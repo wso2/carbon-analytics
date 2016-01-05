@@ -22,6 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.wso2.carbon.messageconsole.ui.beans.Column;
 import org.wso2.carbon.messageconsole.ui.beans.Record;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseResult;
@@ -60,7 +61,7 @@ public class ResponseResultSerializer implements JsonSerializer<ResponseResult> 
                 JsonObject jsonRecord = new JsonObject();
                 if (record != null) {
                     for (Column column : record.getColumns()) {
-                        jsonRecord.addProperty(column.getKey(), column.getValue());
+                        jsonRecord.addProperty(column.getKey(), StringEscapeUtils.escapeXml11(column.getValue()));
                     }
                 }
                 records.add(jsonRecord);

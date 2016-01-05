@@ -31,12 +31,8 @@ function getArbitraryFields(rowData) {
                             title: 'Name'
                         },
                         Value: {
-                            title: 'Value'
-                        },
-                        Type: {
-                            title: 'Type',
-                            options: ["STRING", "INTEGER", "LONG", "BOOLEAN", "FLOAT", "DOUBLE"],
-                            list: false
+                            title: 'Value',
+                            type: 'STRING'
                         }
                     }
                 }, function (data) { //opened handler
@@ -47,6 +43,23 @@ function getArbitraryFields(rowData) {
     return $img;
 }
 
+var entityMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+    '/': '&#x2F;',
+    '`': '&#x60;',
+    '=': '&#x3D;'
+};
+
+function escapeHtml (string) {
+    return String(string).replace(/[&<>"'`=\/]/g, function fromEntityMap (s) {
+        return entityMap[s];
+    });
+}
+
 function arbitraryFieldListActionMethod(postData, jtParams) {
     return $.Deferred(function ($dfd) {
         $.ajax({
@@ -55,6 +68,7 @@ function arbitraryFieldListActionMethod(postData, jtParams) {
                     dataType: 'json',
                     data: postData,
                     success: function (data) {
+                        console.log(escapeHtml(data));
                         $dfd.resolve(data);
                     },
                     error: function () {

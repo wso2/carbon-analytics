@@ -22,6 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.wso2.carbon.messageconsole.ui.beans.Column;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseArbitraryField;
 
@@ -56,7 +57,7 @@ public class ResponseArbitraryFieldsSerializer implements JsonSerializer<Respons
             for (Column column : responseArbitraryField.getColumns()) {
                 JsonObject jsonRecord = new JsonObject();
                 jsonRecord.addProperty(NAME, column.getKey());
-                jsonRecord.addProperty(VALUE, column.getValue());
+                jsonRecord.addProperty(VALUE, StringEscapeUtils.escapeXml11(column.getValue()));
                 jsonRecord.addProperty(TYPE, column.getType());
                 records.add(jsonRecord);
             }
