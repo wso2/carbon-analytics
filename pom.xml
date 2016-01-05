@@ -1341,13 +1341,6 @@
         <hector.version>1.0-5</hector.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>github.release.repo</id>
-            <url>https://raw.github.com/bulldog2011/bulldog-repo/master/repo/releases/</url>
-        </repository>
-    </repositories>
-
     <pluginRepositories>
         <pluginRepository>
             <id>wso2.releases</id>
