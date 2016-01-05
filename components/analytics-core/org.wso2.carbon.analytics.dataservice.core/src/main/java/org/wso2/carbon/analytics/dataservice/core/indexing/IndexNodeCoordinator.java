@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -140,16 +140,18 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
     
     private void initShardAllocation() throws AnalyticsException {
-        this.populateMyNodeId();
         Lock globalAllocationLock = null;
         try {
+            boolean initialAllocation = false;
             if (!this.localShardAllocationConfig.isInit()) {
                 if (this.isClusteringEnabled()) {
                     globalAllocationLock = AnalyticsServiceHolder.getHazelcastInstance().getLock(GSA_LOCK);
                     globalAllocationLock.lock();
                 }
-                this.allocateLocalShardsFromGlobal();
+                this.cleanupLocalNodeShardsFromGlobal();
+                initialAllocation = true;
             }
+            this.allocateLocalShardsFromGlobal(initialAllocation);
             for (int shardIndex : this.localShardAllocationConfig.getShardIndices()) {
                 if (this.localShardAllocationConfig.getShardStatus(shardIndex).equals(ShardStatus.RESTORE)) {
                     this.globalShardAllocationConfig.addNodeIdForShard(shardIndex, this.myNodeId);
@@ -166,20 +168,46 @@ public class IndexNodeCoordinator implements GroupEventListener {
         }
     }
     
+    private boolean removeMyselfFromGlobalShards() throws AnalyticsException {
+        Set<Integer> shardIndices = this.extractExistingLocalShardsFromGlobal();
+        for (int shardIndex : shardIndices) {
+            this.globalShardAllocationConfig.removeNodeIdFromShard(shardIndex, this.myNodeId);
+        }
+        return shardIndices.size() > 0;
+    }
+    
     public void init() throws AnalyticsException {
-        boolean indexingNode = checkIfIndexingNode();      
+        this.populateMyNodeId();
+        boolean indexingNode = checkIfIndexingNode();
+        boolean indexingNodeDisabling = !indexingNode && this.removeMyselfFromGlobalShards();
         this.initClustering();
         if (indexingNode) {
             this.initShardAllocation();
         }
         if (this.isClusteringEnabled()) {
             AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+            if (indexingNodeDisabling) {
+                acm.executeAll(Constants.ANALYTICS_INDEXING_GROUP, new RefreshIndexShardAllocationCall());
+            }
             acm.executeAll(Constants.ANALYTICS_INDEXING_GROUP, new IndexRefreshShardInfoCall());
         } else {
             this.refreshIndexShardInfo();
         }
         if (indexingNode) {
             this.processLocalShards();
+        }
+    }
+    
+    public void refreshIndexShardAllocation() throws AnalyticsException {
+        if (!checkIfIndexingNode()) {
+            return;
+        }
+        Lock globalAllocationLock = AnalyticsServiceHolder.getHazelcastInstance().getLock(GSA_LOCK);
+        try {
+            globalAllocationLock.lock();
+            this.allocateLocalShardsFromGlobal(false);
+        } finally {
+            globalAllocationLock.unlock();
         }
     }
     
@@ -281,7 +309,6 @@ public class IndexNodeCoordinator implements GroupEventListener {
         for (Map.Entry<Integer, List<Record>> entry : shardedRecords.entrySet()) {
             Set<String> nodeIds = this.shardMemberMap.getNodeIdsForShard(entry.getKey());
             for (String nodeId : nodeIds) {
-                /* here myNodeId can be null, if this is started as a non-indexing node */
                 if (nodeId.equals(this.myNodeId)) {
                     localRecords.addAll(entry.getValue());
                 } else {
@@ -409,7 +436,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         return result;
     }
     
-    private Set<Integer> allocateLocalShards() throws AnalyticsException {
+    private Set<Integer> allocateLocalShards(boolean initialAllocation) throws AnalyticsException {
         Set<Integer> result = new HashSet<>();
         int shardCopyCount = this.indexer.getReplicationFactor() + 1;
         if (log.isDebugEnabled()) {
@@ -420,22 +447,25 @@ public class IndexNodeCoordinator implements GroupEventListener {
                 result.add(i);
             }
         }
-        Map<String, List<Integer>> globalShards = this.loadGlobalShards();
-        boolean resume = true;
-        while (resume) {
-            resume = false;
-            for (Map.Entry<String, List<Integer>> entry : globalShards.entrySet()) {
-                if (entry.getValue().size() > result.size()) {
-                    Iterator<Integer> itr = entry.getValue().iterator();
-                    int val;
-                    while (itr.hasNext()) {
-                        val = itr.next();
-                        if (!result.contains(val)) {
-                            itr.remove();
-                            this.globalShardAllocationConfig.removeNodeIdFromShard(val, entry.getKey());
-                            result.add(val);
-                            resume = true;
-                            break;
+        if (initialAllocation) {
+            /* if initial, try to snatch shards from other nodes who has more than me */
+            Map<String, List<Integer>> globalShards = this.loadGlobalShards();
+            boolean resume = true;
+            while (resume) {
+                resume = false;
+                for (Map.Entry<String, List<Integer>> entry : globalShards.entrySet()) {
+                    if (entry.getValue().size() > result.size()) {
+                        Iterator<Integer> itr = entry.getValue().iterator();
+                        int val;
+                        while (itr.hasNext()) {
+                            val = itr.next();
+                            if (!result.contains(val)) {
+                                itr.remove();
+                                this.globalShardAllocationConfig.removeNodeIdFromShard(val, entry.getKey());
+                                result.add(val);
+                                resume = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -452,12 +482,10 @@ public class IndexNodeCoordinator implements GroupEventListener {
         }
     }
     
-    private void allocateLocalShardsFromGlobal() throws AnalyticsException {
-        Set<Integer> myShards = this.extractExistingLocalShardsFromGlobal();
-        if (myShards.isEmpty()) {
-            this.cleanupLocalNodeShardsFromGlobal();
-            myShards = this.allocateLocalShards();
-        }
+    private void allocateLocalShardsFromGlobal(boolean initialAllocation) throws AnalyticsException {
+        Set<Integer> existingShards = this.extractExistingLocalShardsFromGlobal();
+        Set<Integer> myShards = this.allocateLocalShards(initialAllocation);
+        myShards.removeAll(existingShards);
         for (Integer shardIndex : myShards) {
             this.localShardAllocationConfig.setShardStatus(shardIndex, ShardStatus.INIT);
             this.globalShardAllocationConfig.addNodeIdForShard(shardIndex, this.myNodeId);
@@ -646,6 +674,25 @@ public class IndexNodeCoordinator implements GroupEventListener {
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
                     adsImpl.getIndexer().getIndexNodeCoordinator().refreshIndexShardInfo();
+            }
+            return "OK";
+        }
+    }
+    
+    public static class RefreshIndexShardAllocationCall implements Callable<String>, Serializable {
+
+        private static final long serialVersionUID = 9184535660460958764L;
+
+        @Override
+        public String call() throws Exception {
+            AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
+            if (ads == null) {
+                throw new AnalyticsException("The analytics data service implementation is not registered");
+            }
+            /* these cluster messages are specific to AnalyticsDataServiceImpl */
+            if (ads instanceof AnalyticsDataServiceImpl) {
+                AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
+                    adsImpl.getIndexer().getIndexNodeCoordinator().refreshIndexShardAllocation();
             }
             return "OK";
         }
