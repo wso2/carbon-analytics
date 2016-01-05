@@ -248,6 +248,11 @@ public abstract class DataEndpoint {
             } catch (Exception ex) {
                 log.error("Unexpected error occurred while sending the event. ", ex);
                 handleFailedEvents();
+            } catch (Throwable t){
+                //There can be situations where runtime exceptions/class not found exceptions occur, This block help to catch those exceptions.
+                //No need to retry send events. Deactivating the state would be enough.
+                log.error("Unexpected error occurred while sending events. ", t);
+                deactivate();
             } finally {
                 //If any processing error occurred the state will be changed to unavailable,
                 // Hence the state switch should be happening only in busy state where the publishing was success.
