@@ -352,8 +352,10 @@ public class AnalyticsDataIndexer {
     
     public void refreshLocalIndexShards(Set<Integer> localShards) throws AnalyticsException {
         this.localShards = localShards;
-        this.localIndexDataStore.refreshLocalIndexShards();
-        this.reschuduleWorkers();
+        if (IndexNodeCoordinator.checkIfIndexingNode()) {
+            this.localIndexDataStore.refreshLocalIndexShards();
+            this.reschuduleWorkers();
+        }
     }
     
     private void reschuduleWorkers() throws AnalyticsException {

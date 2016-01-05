@@ -104,7 +104,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.remoteCommunicator = new RemoteMemberIndexCommunicator();
     }
     
-    private boolean checkIfIndexingNode() {
+    public static boolean checkIfIndexingNode() {
         String indexDisableProp =  System.getProperty(Constants.DISABLE_INDEXING_ENV_PROP);
         return !(indexDisableProp != null && Boolean.parseBoolean(indexDisableProp));
     }
@@ -139,12 +139,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
         }
     }
     
-    public void init() throws AnalyticsException {
-        if (!this.checkIfIndexingNode()) {
-            return;
-        }        
+    private void initShardAllocation() throws AnalyticsException {
         this.populateMyNodeId();
-        this.initClustering();
         Lock globalAllocationLock = null;
         try {
             if (!this.localShardAllocationConfig.isInit()) {
@@ -168,13 +164,23 @@ public class IndexNodeCoordinator implements GroupEventListener {
                 globalAllocationLock.unlock();
             }
         }
+    }
+    
+    public void init() throws AnalyticsException {
+        boolean indexingNode = checkIfIndexingNode();      
+        this.initClustering();
+        if (indexingNode) {
+            this.initShardAllocation();
+        }
         if (this.isClusteringEnabled()) {
             AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
             acm.executeAll(Constants.ANALYTICS_INDEXING_GROUP, new IndexRefreshShardInfoCall());
         } else {
             this.refreshIndexShardInfo();
         }
-        this.processLocalShards();
+        if (indexingNode) {
+            this.processLocalShards();
+        }
     }
     
     public GlobalShardMemberMapping getShardMemberMap() {
@@ -568,6 +574,9 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
     
     private void refreshStagingWorkers() {
+        if (!checkIfIndexingNode()) {
+            return;
+        }
         this.stopAndCleanupStagingWorkers();
         Integer[] localShardIndices = this.localShardAllocationConfig.getShardIndices();;
         if (localShardIndices.length == 0) {
@@ -600,8 +609,9 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.indexer.refreshLocalIndexShards(new HashSet<>(Arrays.asList(
                 this.localShardAllocationConfig.getShardIndices())));
         this.refreshStagingWorkers();
-        log.info("Indexing initialized: " + (this.isClusteringEnabled() ? 
-                "CLUSTERED " + this.shardMemberMap : "STANDALONE"));
+        log.info("Indexing Initialized: " + (this.isClusteringEnabled() ? 
+                "CLUSTERED " + this.shardMemberMap : "STANDALONE") + " | Current Node Indexing: " + 
+                (checkIfIndexingNode() ? "Yes" : "No"));
     }
     
     public void waitForIndexing(long maxWait) throws AnalyticsException {
