@@ -85,6 +85,7 @@ public final class ConfigurationConstants {
     public static final String ROLE_MEMBERSHIP_MAP = PREFIX + "role_membership_map";
     public static final String ACTIVEID = PREFIX + "Active";
     public static final String PASSIVEID = PREFIX + "Passive";
+    public static final String BACKUPID = PREFIX + "Backup";
     public static final String MEMBERS = PREFIX + "members";
     public static final long AXIS_TIME_INTERVAL_IN_MILLISECONDS = 10000;
     public static enum HAMode {Active, Passive, Backup}

@@ -62,6 +62,7 @@ public class HAManager {
     private String passiveId;
 
     private HAConfiguration otherMember;
+    private HAConfiguration otherMember2;
 
 
     public HAManager(HazelcastInstance hazelcastInstance, HAConfiguration haConfiguration, ScheduledExecutorService executorService) {
@@ -115,6 +116,8 @@ public class HAManager {
                 passiveLockAcquired = false;
                 passiveLock.forceUnlock();
             }
+        }else{
+            becomeBackup();
         }
     }
 
@@ -241,6 +244,52 @@ public class HAManager {
             }
         });
         log.info("Became CEP HA Passive Member");
+    }
+
+    private void becomeBackup() {
+        roleToMembershipMap.set(passiveId, haConfiguration);
+
+        final HAConfiguration activeMember = roleToMembershipMap.get(activeId);
+        otherMember = activeMember;
+
+        final HAConfiguration passiveMember = roleToMembershipMap.get(passiveId);
+        otherMember2 = passiveMember;
+
+        // Send non-duplicate events to active member
+        final CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder.getCarbonEventManagementService();
+        List<HostAndPort> receiverList = new ArrayList<HostAndPort>();
+        receiverList.add(otherMember.getTransport());
+        eventManagementService.setReceiverMembers(receiverList);
+        eventManagementService.addMember(otherMember.getTransport());
+
+        // Send non-duplicate events to passive member
+        final CarbonEventManagementService eventManagementService2 = EventManagementServiceValueHolder.getCarbonEventManagementService();
+        List<HostAndPort> receiverList2 = new ArrayList<HostAndPort>();
+        receiverList.add(otherMember2.getTransport());
+        eventManagementService2.setReceiverMembers(receiverList2);
+        eventManagementService2.addMember(otherMember2.getTransport());
+
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        log.info("CEP HA State syncing started..");
+                        syncState(activeMember, eventManagementService);
+                        syncState(passiveMember, eventManagementService2);
+                        log.info("CEP HA State successfully synced.");
+                        return;
+                    } catch (EventManagementException e) {
+                        log.error("CEP HA State syncing failed, " + e.getMessage(), e);
+                    }
+                    try {
+                        Thread.sleep(10000); //Todo move to config file
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+        });
+        log.info("Became CEP HA Backup Member");
     }
 
     private void syncState(HAConfiguration activeMember, CarbonEventManagementService eventManagementService) {
