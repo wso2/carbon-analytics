@@ -53,7 +53,7 @@ public class AnalyticsDataIndexingStatsCollector extends TimerTask {
         this.lastCount.set(currentFullCount);
         if (recordsProcessed > 0) {
             double tps = recordsProcessed / (double) INTERVAL * 1000;
-            log.info("Indexing Statistics -> TPS: " + tps);
+            log.info("Indexing Statistics TPS: " + tps + ", Full Count: " + currentFullCount);
         }        
     }
 
