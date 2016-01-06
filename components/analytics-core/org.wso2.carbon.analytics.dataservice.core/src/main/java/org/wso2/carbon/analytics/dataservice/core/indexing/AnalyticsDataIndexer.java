@@ -676,8 +676,18 @@ public class AnalyticsDataIndexer {
 
     public SubCategories drilldownCategories(int tenantId, CategoryDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        List<CategorySearchResultEntry> searchResults = this.getDrillDownCategories(tenantId, drillDownRequest);
-        List<CategorySearchResultEntry> mergedResult = this.mergePerShardCategoryResults(searchResults);
+        List<CategorySearchResultEntry> searchResults;
+        if (this.isClusteringEnabled()) {
+            searchResults = new ArrayList<>();
+            List<List<CategorySearchResultEntry>> categoriesPerNodes =
+                    this.executeIndexLookup(new DrillDownCategoriesCall(tenantId, drillDownRequest));
+            for (List<CategorySearchResultEntry> categoriesPerNode : categoriesPerNodes) {
+                searchResults.addAll(categoriesPerNode);
+            }
+        } else {
+            searchResults = this.getDrillDownCategories(tenantId, drillDownRequest);
+        }
+        List<CategorySearchResultEntry> mergedResult = this.mergeCategoryResults(searchResults);
         String[] path = drillDownRequest.getPath();
         if (path == null) {
             path = new String[] {};
@@ -685,8 +695,13 @@ public class AnalyticsDataIndexer {
         return new SubCategories(path, mergedResult);
     }
 
-    private List<CategorySearchResultEntry> mergePerShardCategoryResults(List<CategorySearchResultEntry>
-                                                                                 searchResults) {
+    /**
+     * Different shards/Nodes can contain the same categories, so we need to merge the duplicate categories and sum the scores
+     * @param searchResults the List of Category Results which may contain duplicate categories
+     * @return De-dupped List ofcategories
+     */
+    private List<CategorySearchResultEntry> mergeCategoryResults(List<CategorySearchResultEntry>
+                                                                         searchResults) {
         Map<String, Double> mergedResults = new LinkedHashMap<>();
         List<CategorySearchResultEntry> finalResult = new ArrayList<>();
         for (CategorySearchResultEntry perShardResults : searchResults) {
@@ -737,7 +752,8 @@ public class AnalyticsDataIndexer {
 
     private List<CategorySearchResultEntry> drilldowncategories(int tenantId, IndexReader indexReader,
                                                                 TaxonomyReader taxonomyReader,
-                                                                CategoryDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
+                                                                CategoryDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
         List<CategorySearchResultEntry> searchResults = new ArrayList<>();
         try {
             IndexSearcher indexSearcher = new IndexSearcher(indexReader);
@@ -950,12 +966,43 @@ public class AnalyticsDataIndexer {
         if (startIndex < 0 ) throw new AnalyticsIndexException("Start index should be greater than 0");
         int endIndex = startIndex + drillDownRequest.getRecordCount();
         if (endIndex <= startIndex) throw new AnalyticsIndexException("Record Count should be greater than 0");
+        List<SearchResultEntry> resultFacetList;
+        if (this.isClusteringEnabled()) {
+            List<List<SearchResultEntry>> entries = this.executeIndexLookup(new DrillDownSearchCall(tenantId, drillDownRequest));
+            resultFacetList = new ArrayList<>();
+            for (List<SearchResultEntry> entry : entries) {
+                resultFacetList.addAll(entry);
+            }
+            Collections.sort(resultFacetList);
+            Collections.reverse(resultFacetList);
+            if (resultFacetList.size() < startIndex) {
+                return new ArrayList<>();
+            }
+            if (resultFacetList.size() < endIndex) {
+                return resultFacetList.subList(startIndex, resultFacetList.size());
+            }
+            return resultFacetList.subList(startIndex, endIndex);
+        } else {
+            return doDrillDownPerNode(tenantId, drillDownRequest, rangeField, range);
+        }
+    }
+
+    public List<SearchResultEntry> doDrillDownPerNode(int tenantId,
+                                                      AnalyticsDrillDownRequest drillDownRequest,
+                                                      String rangeField,
+                                                      AnalyticsDrillDownRange range)
+            throws AnalyticsIndexException {
+        int startIndex = drillDownRequest.getRecordStartIndex();
+        if (startIndex < 0 ) throw new AnalyticsIndexException("Start index should be greater than 0");
+        int endIndex = startIndex + drillDownRequest.getRecordCount();
+        if (endIndex <= startIndex) throw new AnalyticsIndexException("Record Count should be greater than 0");
         List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
         List<SearchResultEntry> resultFacetList = new ArrayList<>();
         for (int shardId : taxonomyShardIds) {
             resultFacetList.addAll(this.drillDownRecordsPerShard(tenantId, shardId, drillDownRequest, rangeField, range));
         }
         Collections.sort(resultFacetList);
+        Collections.reverse(resultFacetList);
         if (resultFacetList.size() < startIndex) {
             return new ArrayList<>();
         }
@@ -965,7 +1012,7 @@ public class AnalyticsDataIndexer {
         return resultFacetList.subList(startIndex, endIndex);
     }
 
-    private List<CategorySearchResultEntry> getDrillDownCategories(int tenantId,
+    public List<CategorySearchResultEntry> getDrillDownCategories(int tenantId,
                    CategoryDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
         List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
         List<CategorySearchResultEntry> categoriesPerShard = new ArrayList<>();
@@ -977,6 +1024,21 @@ public class AnalyticsDataIndexer {
 
     public double getDrillDownRecordCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
                                          String rangeField, AnalyticsDrillDownRange range)
+            throws AnalyticsIndexException {
+        if (this.isClusteringEnabled()) {
+            double totalCount = 0;
+            List<Double> countsPerNodes = this.executeIndexLookup(new DrillDownSearchCountCall(tenantId, drillDownRequest));
+            for (Double countPerNode : countsPerNodes) {
+                totalCount += countPerNode;
+            }
+            return totalCount;
+        } else {
+            return doDrillDownCountPerNode(tenantId, drillDownRequest, rangeField, range);
+        }
+    }
+
+    public double doDrillDownCountPerNode(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
+                                          String rangeField, AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
         List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
         double totalCount = 0;
@@ -1310,7 +1372,8 @@ public class AnalyticsDataIndexer {
                                 IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
                         this.indexTaxonomyWriters.put(shardedTableId, taxonomyWriter);
                     } catch (IOException e) {
-                        throw new AnalyticsIndexException("Error in creating index writer: " + e.getMessage(), e);
+                        throw new AnalyticsIndexException("Error in creating index writer: " +
+                                                          e.getMessage(), e);
                     }
                 }
             }
@@ -1375,7 +1438,8 @@ public class AnalyticsDataIndexer {
             this.shardWorkerExecutor.shutdownNow();
             try {
                 this.shardWorkerExecutor.awaitTermination(
-                        org.wso2.carbon.analytics.dataservice.core.Constants.INDEX_WORKER_STOP_WAIT_TIME, TimeUnit.MILLISECONDS);
+                        org.wso2.carbon.analytics.dataservice.core.Constants.INDEX_WORKER_STOP_WAIT_TIME,
+                        TimeUnit.MILLISECONDS);
             } catch (InterruptedException ignore) {
                 /* ignore */
             }
@@ -1427,9 +1491,22 @@ public class AnalyticsDataIndexer {
             final AggregateRequest aggregateRequest)
             throws AnalyticsException {
         final AnalyticsDataIndexer indexer = this;
+        List<String[]> subCategories;
+        Set<String> finalUniqueCategories;
         try {
-            List<String[]> subCategories = getUniqueGroupings(tenantId, aggregateRequest);
-            AnalyticsIterator<Record> iterator = new AggregateRecordIterator(tenantId, subCategories, aggregateRequest, indexer);
+            if (this.isClusteringEnabled()) {
+                finalUniqueCategories = new HashSet<>();
+                List<Set<String>> entries = this.executeIndexLookup(
+                        new SearchWithAggregateCall(tenantId, aggregateRequest));
+                for (Set<String> entry : entries) {
+                    finalUniqueCategories.addAll(entry);
+                }
+            } else {
+                finalUniqueCategories = getUniqueGroupings(tenantId, aggregateRequest);
+            }
+            subCategories =  getUniqueSubCategories(aggregateRequest, finalUniqueCategories);
+            AnalyticsIterator<Record> iterator = new AggregateRecordIterator(tenantId, subCategories,
+                                                                             aggregateRequest, indexer);
             return iterator;
         } catch (IOException e) {
             log.error("Error occured while performing aggregation, " + e.getMessage(), e);
@@ -1437,19 +1514,20 @@ public class AnalyticsDataIndexer {
         }
     }
 
-	private List<String[]> getUniqueGroupings(int tenantId, AggregateRequest aggregateRequest)
+	public Set<String> getUniqueGroupings(int tenantId, AggregateRequest aggregateRequest)
             throws AnalyticsIndexException, IOException {
         if (aggregateRequest.getAggregateLevel() >= 0) {
             List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
             if (taxonomyShardIds.size() == 0) {
-                return new ArrayList<>();
+                return new HashSet<>();
             }
             ExecutorService pool = Executors.newFixedThreadPool(taxonomyShardIds.size());
             Set<Future<Set<String>>> perShardUniqueCategories = new HashSet<>();
             Set<String> finalUniqueCategories = new HashSet<>();
             for (int i = 0; i < taxonomyShardIds.size(); i++) {
                 String tableId = this.generateTableId(tenantId, aggregateRequest.getTableName());
-                TaxonomyReader reader = new DirectoryTaxonomyReader(this.lookupTaxonomyIndexWriter(taxonomyShardIds.get(i), tableId));
+                TaxonomyReader reader = new DirectoryTaxonomyReader(this.lookupTaxonomyIndexWriter(taxonomyShardIds.get(i),
+                                                                                                   tableId));
                 Callable<Set<String>> callable = new TaxonomyWorker(reader, aggregateRequest);
                 Future<Set<String>> result = pool.submit(callable);
                 perShardUniqueCategories.add(result);
@@ -1458,7 +1536,7 @@ public class AnalyticsDataIndexer {
                 for (Future<Set<String>> result : perShardUniqueCategories) {
                     finalUniqueCategories.addAll(result.get());
                 }
-                return getUniqueSubCategories(aggregateRequest, finalUniqueCategories);
+                return finalUniqueCategories;
             } catch (Exception e) {
                 log.error("Error while generating Unique categories for aggregation, " + e.getMessage(), e);
                 throw new AnalyticsIndexException("Error while generating Unique categories for aggregation, " +
@@ -1564,7 +1642,8 @@ public class AnalyticsDataIndexer {
             throws AnalyticsException {
         Map<String, AggregateFunction> perAliasAggregateFunction = new HashMap<>();
         for (AggregateField field : aggregateRequest.getFields()) {
-            AggregateFunction function = getAggregateFunctionFactory().create(field.getAggregateFunction(), optionalParams);
+            AggregateFunction function = getAggregateFunctionFactory().create(field.getAggregateFunction(),
+                                                                              optionalParams);
             if (function == null) {
                 throw new AnalyticsException("Unknown aggregate function!");
             } else if (field.getFieldName() == null || field.getFieldName().isEmpty()) {
@@ -1635,11 +1714,13 @@ public class AnalyticsDataIndexer {
                         if (currentRecord != null) {
                             return true;
                         } else {
-                            currentRecord = indexer.aggregatePerGrouping(tenantId, currentGrouping, request);
+                            currentRecord = indexer.aggregatePerGrouping(tenantId, currentGrouping,
+                                                                         request);
                         }
                     } catch (AnalyticsException e) {
                         logger.error("Failed to create aggregated record: " + e.getMessage(), e);
-                        throw new RuntimeException("Error while iterating aggregate records: " + e.getMessage(), e);
+                        throw new RuntimeException("Error while iterating aggregate records: " +
+                                                   e.getMessage(), e);
                     }
                     if (currentRecord == null) {
                         groupings.remove(currentGrouping);
@@ -1796,7 +1877,8 @@ public class AnalyticsDataIndexer {
             }
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
-                return adsImpl.getIndexer().doSearchCount(this.shardIndices, this.tenantId, this.tableName, this.query);
+                return adsImpl.getIndexer().doSearchCount(this.shardIndices, this.tenantId, this.tableName,
+                                                          this.query);
             }
             return 0;
         }
@@ -1838,7 +1920,8 @@ public class AnalyticsDataIndexer {
             }
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
-                return adsImpl.getIndexer().doSearch(this.shardIndices, this.tenantId, this.tableName, this.query, this.start, this.count);
+                return adsImpl.getIndexer().doSearch(this.shardIndices, this.tenantId, this.tableName,
+                                                     this.query, this.start, this.count);
             }
             return new ArrayList<>();
         }
@@ -1849,5 +1932,164 @@ public class AnalyticsDataIndexer {
         }
         
     }
-    
+
+    public static class DrillDownSearchCall extends IndexLookupOperationCall<List<SearchResultEntry>> {
+
+
+        private static final long serialVersionUID = 8317130568980809116L;
+        private int tenantId;
+        private AnalyticsDrillDownRequest request;
+
+        public DrillDownSearchCall(int tenantId, AnalyticsDrillDownRequest request) {
+            this.tenantId = tenantId;
+            this.request = request;
+        }
+
+        @Override
+        public List<SearchResultEntry> call()  throws Exception{
+            AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
+            if (ads == null) {
+                throw new AnalyticsException("The Analtyics data service implementation is not registered");
+            }
+            if (ads instanceof AnalyticsDataServiceImpl) {
+                AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
+                return adsImpl.getIndexer().doDrillDownPerNode(tenantId, request, null, null);
+            }
+            return new ArrayList<>();
+        }
+
+
+        @Override
+        public IndexLookupOperationCall<List<SearchResultEntry>> copy() {
+            return new DrillDownSearchCall(tenantId, request);
+        }
+    }
+
+    public static class DrillDownSearchCountCall extends IndexLookupOperationCall<Double> {
+
+
+        private static final long serialVersionUID = -2319119330228041861L;
+        private int tenantId;
+        private AnalyticsDrillDownRequest request;
+
+        public DrillDownSearchCountCall(int tenantId,
+                                        AnalyticsDrillDownRequest request) {
+            this.tenantId = tenantId;
+            this.request = request;
+        }
+
+        @Override
+        public IndexLookupOperationCall<Double> copy() {
+            return new DrillDownSearchCountCall(tenantId, request);
+        }
+
+        @Override
+        public Double call() throws Exception {
+            AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
+            if (ads == null) {
+                throw new AnalyticsException("The Analytics data service implementation is not registered");
+            }
+            if (ads instanceof AnalyticsDataServiceImpl) {
+                AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
+                return adsImpl.getIndexer().doDrillDownCountPerNode(tenantId, request, null, null);
+            }
+            return 0.0;
+        }
+    }
+
+    public static class DrillDownCategoriesCall extends IndexLookupOperationCall<List<CategorySearchResultEntry>> {
+
+
+        private static final long serialVersionUID = -2277888731238692285L;
+        private int tenantId;
+        private CategoryDrillDownRequest request;
+
+        public DrillDownCategoriesCall(int tenantId,
+                                       CategoryDrillDownRequest request) {
+            this.tenantId = tenantId;
+            this.request = request;
+        }
+
+        @Override
+        public IndexLookupOperationCall<List<CategorySearchResultEntry>> copy() {
+            return new DrillDownCategoriesCall(tenantId, request);
+        }
+
+        @Override
+        public List<CategorySearchResultEntry> call() throws Exception {
+            AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
+            if (ads == null) {
+                throw new AnalyticsException("The Analytics data service implementation is not registered");
+            }
+            if (ads instanceof AnalyticsDataServiceImpl) {
+                AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
+                return adsImpl.getIndexer().getDrillDownCategories(tenantId, request);
+            }
+            return new ArrayList<>();
+        }
+    }
+
+    public static class DrillDownRangeCountCall extends IndexLookupOperationCall<List<AnalyticsDrillDownRange>> {
+
+
+        private static final long serialVersionUID = 4949911704640332561L;
+        private int tenantId;
+        private AnalyticsDrillDownRequest request;
+
+        public DrillDownRangeCountCall(int tenantId,
+                                       AnalyticsDrillDownRequest request) {
+            this.tenantId = tenantId;
+            this.request = request;
+        }
+
+        @Override
+        public IndexLookupOperationCall<List<AnalyticsDrillDownRange>> copy() {
+            return new DrillDownRangeCountCall(tenantId, request);
+        }
+
+        @Override
+        public List<AnalyticsDrillDownRange> call() throws Exception {
+            AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
+            if (ads == null) {
+                throw new AnalyticsException("The Analytics data service implementation is not registered");
+            }
+            if (ads instanceof AnalyticsDataServiceImpl) {
+                AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
+                return adsImpl.getIndexer().drillDownRangeCount(tenantId, request);
+            }
+            return new ArrayList<>();
+        }
+    }
+
+    public static class SearchWithAggregateCall extends IndexLookupOperationCall<Set<String>> {
+
+
+        private static final long serialVersionUID = -5074344695392737981L;
+        private int tenantId;
+        private AggregateRequest request;
+
+        public SearchWithAggregateCall(int tenantId,
+                                       AggregateRequest request) {
+            this.tenantId = tenantId;
+            this.request = request;
+        }
+
+        @Override
+        public IndexLookupOperationCall<Set<String>> copy() {
+            return new SearchWithAggregateCall(tenantId, request);
+        }
+
+        @Override
+        public Set<String> call() throws Exception {
+            AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
+            if (ads == null) {
+                throw new AnalyticsException("The Analytics data service implementation is not registered");
+            }
+            if (ads instanceof AnalyticsDataServiceImpl) {
+                AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
+                return adsImpl.getIndexer().getUniqueGroupings(tenantId, request);
+            }
+            return new HashSet<>();
+        }
+    }
 }
