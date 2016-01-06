@@ -139,7 +139,7 @@ public class AnalyticsDataIndexer {
     
     private static final int MAX_NON_TOKENIZED_INDEX_STRING_SIZE = 1000;
     
-    public static final String DISABLE_INDEX_THROTTLING_ENV_PROP = "disableIndexThrottling";
+    private static final String ENABLE_INDEXING_STATS_SYS_PROP = "enableIndexingStats";
     
     private static final String INDEX_DATA_FS_BASE_PATH = File.separator + "_data" + 
             File.separator + "index" + File.separator;
@@ -180,6 +180,10 @@ public class AnalyticsDataIndexer {
     private LocalIndexDataStore localIndexDataStore;
     
     private Set<Integer> localShards = new HashSet<>();
+    
+    private boolean indexingStatsEnabled;
+    
+    private AnalyticsDataIndexingStatsCollector statsCollector;
         
     public AnalyticsDataIndexer(AnalyticsIndexerInfo indexerInfo) throws AnalyticsException {
     	this.indexerInfo = indexerInfo;
@@ -190,11 +194,21 @@ public class AnalyticsDataIndexer {
      * @throws AnalyticsException
      */
     public void init() throws AnalyticsException {
+        if (System.getProperty(ENABLE_INDEXING_STATS_SYS_PROP) != null) {
+            this.indexingStatsEnabled = true;
+        }
+        if (this.indexingStatsEnabled) {
+            this.statsCollector = new AnalyticsDataIndexingStatsCollector();
+        }
         this.getAnalyticsRecordStore().createTable(org.wso2.carbon.analytics.dataservice.core.Constants.META_INFO_TENANT_ID, 
                 org.wso2.carbon.analytics.dataservice.core.Constants.GLOBAL_SHARD_ALLOCATION_CONFIG_TABLE);
         this.localIndexDataStore = new LocalIndexDataStore(this);
         this.indexNodeCoordinator = new IndexNodeCoordinator(this);
         this.indexNodeCoordinator.init();
+    }
+    
+    public boolean isIndexingStatsEnabled() {
+        return indexingStatsEnabled;
     }
     
     public int getReplicationFactor() {
@@ -1073,6 +1087,9 @@ public class AnalyticsDataIndexer {
         try {
             indexWriter.deleteDocuments(terms.toArray(new Term[terms.size()]));
             indexWriter.commit();
+            if (this.isIndexingStatsEnabled()) {
+                this.statsCollector.processedRecords(terms.size());
+            }
         } catch (IOException e) {
             throw new AnalyticsException("Error in deleting indices: " + e.getMessage(), e);
         }
@@ -1128,6 +1145,9 @@ public class AnalyticsDataIndexer {
             }
             indexWriter.commit();
             taxonomyWriter.commit();
+            if (this.isIndexingStatsEnabled()) {
+                this.statsCollector.processedRecords(recordBatch.size());
+            }
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in updating index: " + e.getMessage(), e);
         }

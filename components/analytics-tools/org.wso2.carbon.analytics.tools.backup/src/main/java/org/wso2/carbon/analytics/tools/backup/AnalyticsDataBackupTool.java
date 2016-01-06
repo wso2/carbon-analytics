@@ -28,7 +28,6 @@ import org.apache.commons.cli.Options;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
@@ -161,8 +160,6 @@ public class AnalyticsDataBackupTool {
             if (line.hasOption(ENABLE_INDEXING)) {
                 System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
                 forceIndexing = true;
-            } else {
-                System.setProperty(AnalyticsDataIndexer.DISABLE_INDEX_THROTTLING_ENV_PROP, Boolean.TRUE.toString());
             }
         }
         if (line.hasOption(BACKUP_RECORD_STORE)) {
