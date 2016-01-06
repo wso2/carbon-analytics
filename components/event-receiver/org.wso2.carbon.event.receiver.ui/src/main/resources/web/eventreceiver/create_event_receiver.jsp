@@ -17,6 +17,7 @@
 <%@ page import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.receiver.stub.types.DetailInputAdapterPropertyDto" %>
 <%@ page import="org.wso2.carbon.event.receiver.stub.types.InputAdapterConfigurationDto" %>
+<%@ page import="java.util.Arrays" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
@@ -56,6 +57,7 @@
 
     EventStreamAdminServiceStub eventStreamAdminServiceStub = EventReceiverUIUtils.getEventStreamAdminService(config, session, request);
     String[] streamIds = eventStreamAdminServiceStub.getStreamNames();
+    Arrays.sort(streamIds);
     if (streamId == null && streamIds != null && streamIds.length > 0) {
         streamId = streamIds[0];
     }
