@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -105,6 +106,9 @@ public class AnalyticsDataBackupTool {
     }
 
     public static void main(String[] args) throws Exception {
+        // Set $CARBON_HOME
+        final String carbonHome = Paths.get("").toAbsolutePath().toString();
+        System.setProperty("CARBON_HOME", carbonHome);
         Options options = populateOptions();
         CommandLineParser parser = new BasicParser();
         CommandLine line = parser.parse(options, args);
