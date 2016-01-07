@@ -185,7 +185,6 @@ public class IndexNodeCoordinator implements GroupEventListener {
                     globalAllocationLock = AnalyticsServiceHolder.getHazelcastInstance().getLock(GSA_LOCK);
                     globalAllocationLock.lock();
                 }
-                this.cleanupLocalNodeShardsFromGlobal();
                 initialAllocation = true;
             }
             this.syncGlobalWithLocal();
@@ -438,7 +437,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
             records.add(record);
             if (records.size() >= Constants.RECORDS_BATCH_SIZE) {
                 this.indexer.putLocal(records);
-                records = new ArrayList<>(Constants.RECORDS_BATCH_SIZE);
+                records.clear();
             }
         }
         this.indexer.putLocal(records);
@@ -502,14 +501,6 @@ public class IndexNodeCoordinator implements GroupEventListener {
             }
         }
         return result;
-    }
-    
-    private void cleanupLocalNodeShardsFromGlobal() throws AnalyticsException {
-        for (int i = 0; i < this.indexer.getShardCount(); i++) {
-            if (this.globalShardAllocationConfig.getNodeIdsForShard(i).contains(this.myNodeId)) {
-                this.globalShardAllocationConfig.removeNodeIdFromShard(i, this.myNodeId);
-            }
-        }
     }
     
     private void allocateLocalShardsFromGlobal(boolean initialAllocation) throws AnalyticsException {
@@ -667,6 +658,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.indexer.refreshLocalIndexShards(new HashSet<>(Arrays.asList(
                 this.localShardAllocationConfig.getShardIndices())));
         this.refreshStagingWorkers();
+        this.syncLocalWithGlobal();
         log.info("Indexing Initialized: " + (this.isClusteringEnabled() ? 
                 "CLUSTERED " + this.shardMemberMap : "STANDALONE") + " | Current Node Indexing: " + 
                 (checkIfIndexingNode() ? "Yes" : "No"));
@@ -947,7 +939,6 @@ public class IndexNodeCoordinator implements GroupEventListener {
                         }
                     }
                 } catch (Throwable e) {
-                    e.printStackTrace();
                     log.error("Error in processing staging index data: " + e.getMessage(), e);
                 }
                 try {
