@@ -130,12 +130,49 @@ public class IndexNodeCoordinator implements GroupEventListener {
         return result;
     }
     
+    private List<Integer> calculateGlobalLocalShardDiff() throws AnalyticsException {
+        List<Integer> result = new ArrayList<>();
+        int shardCount = this.indexer.getShardCount();
+        for (int i = 0; i < shardCount; i++) {
+            if (this.globalShardAllocationConfig.getNodeIdsForShard(i).contains(this.myNodeId) && 
+                    this.localShardAllocationConfig.getShardStatus(i) == null) {
+                result.add(i);
+            }
+        }
+        return result;
+    }
+    
     private void removeLocalIndexData(int shardIndex) {
         String directory = Constants.DEFAULT_INDEX_STORE_LOCATION + Constants.INDEX_STORE_DIR_PREFIX + shardIndex;
         try {
             FileUtils.deleteDirectory(new File(GenericUtils.resolveLocation(directory)));
         } catch (Exception e) {
             log.warn("Unable to delete index data directory '" + directory + "': " + e.getMessage(), e);
+        }
+    }
+    
+    private void handleInitAndRestoreShards() throws AnalyticsException {
+        ShardStatus status;
+        for (int shardIndex : this.localShardAllocationConfig.getShardIndices()) {
+            status = this.localShardAllocationConfig.getShardStatus(shardIndex);
+            if (status.equals(ShardStatus.RESTORE) || status.equals(ShardStatus.INIT)) {
+                this.globalShardAllocationConfig.addNodeIdForShard(shardIndex, this.myNodeId);
+            }
+        }
+    }
+    
+    private void syncGlobalWithLocal() throws AnalyticsException {
+        this.handleInitAndRestoreShards();
+        List<Integer> globalShardDiff = this.calculateGlobalLocalShardDiff();
+        for (int shardIndex : globalShardDiff) {
+            this.globalShardAllocationConfig.removeNodeIdFromShard(shardIndex, this.myNodeId);
+        }
+    }
+    
+    private void syncLocalWithGlobal() throws AnalyticsException {
+        List<Integer> localShardDiff = this.calculateLocalGlobalShardDiff();
+        for (int shardIndex : localShardDiff) {
+            this.localShardAllocationConfig.removeShardIndex(shardIndex);
         }
     }
     
@@ -151,16 +188,9 @@ public class IndexNodeCoordinator implements GroupEventListener {
                 this.cleanupLocalNodeShardsFromGlobal();
                 initialAllocation = true;
             }
+            this.syncGlobalWithLocal();
             this.allocateLocalShardsFromGlobal(initialAllocation);
-            for (int shardIndex : this.localShardAllocationConfig.getShardIndices()) {
-                if (this.localShardAllocationConfig.getShardStatus(shardIndex).equals(ShardStatus.RESTORE)) {
-                    this.globalShardAllocationConfig.addNodeIdForShard(shardIndex, this.myNodeId);
-                }
-            }
-            List<Integer> localShardDiff = this.calculateLocalGlobalShardDiff();
-            for (int shardIndex : localShardDiff) {
-                this.localShardAllocationConfig.removeShardIndex(shardIndex);
-            }
+            this.syncLocalWithGlobal();
         } finally {
             if (globalAllocationLock != null) {
                 globalAllocationLock.unlock();

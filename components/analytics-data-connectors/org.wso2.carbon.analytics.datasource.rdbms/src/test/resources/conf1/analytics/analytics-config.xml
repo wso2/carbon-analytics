@@ -19,6 +19,9 @@
    <analytics-lucene-analyzer>
    		<implementation>org.apache.lucene.analysis.standard.StandardAnalyzer</implementation>
    </analytics-lucene-analyzer>
+   <!-- The number of index data replicas the system should keep, for H/A, this should be at least 1, e.g. the value 0 means
+        there aren't any copies of the data -->
+   <indexReplicationFactor>1</indexReplicationFactor>
    <!-- The number of index shards, should be equal or higher to the number of indexing nodes that is going to be working,
         ideal count being 'number of indexing nodes * CPU cores' -->
    <shardCount>6</shardCount>
