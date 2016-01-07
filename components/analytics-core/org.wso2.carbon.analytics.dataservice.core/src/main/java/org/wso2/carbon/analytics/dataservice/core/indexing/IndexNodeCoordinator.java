@@ -185,7 +185,6 @@ public class IndexNodeCoordinator implements GroupEventListener {
                     globalAllocationLock = AnalyticsServiceHolder.getHazelcastInstance().getLock(GSA_LOCK);
                     globalAllocationLock.lock();
                 }
-                this.cleanupLocalNodeShardsFromGlobal();
                 initialAllocation = true;
             }
             this.syncGlobalWithLocal();
@@ -504,14 +503,6 @@ public class IndexNodeCoordinator implements GroupEventListener {
         return result;
     }
     
-    private void cleanupLocalNodeShardsFromGlobal() throws AnalyticsException {
-        for (int i = 0; i < this.indexer.getShardCount(); i++) {
-            if (this.globalShardAllocationConfig.getNodeIdsForShard(i).contains(this.myNodeId)) {
-                this.globalShardAllocationConfig.removeNodeIdFromShard(i, this.myNodeId);
-            }
-        }
-    }
-    
     private void allocateLocalShardsFromGlobal(boolean initialAllocation) throws AnalyticsException {
         Set<Integer> existingShards = this.extractExistingLocalShardsFromGlobal();
         Set<Integer> myShards = this.allocateLocalShards(initialAllocation);
@@ -667,6 +658,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.indexer.refreshLocalIndexShards(new HashSet<>(Arrays.asList(
                 this.localShardAllocationConfig.getShardIndices())));
         this.refreshStagingWorkers();
+        this.syncLocalWithGlobal();
         log.info("Indexing Initialized: " + (this.isClusteringEnabled() ? 
                 "CLUSTERED " + this.shardMemberMap : "STANDALONE") + " | Current Node Indexing: " + 
                 (checkIfIndexingNode() ? "Yes" : "No"));
