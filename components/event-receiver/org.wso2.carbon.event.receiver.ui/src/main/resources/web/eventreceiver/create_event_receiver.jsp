@@ -57,7 +57,6 @@
 
     EventStreamAdminServiceStub eventStreamAdminServiceStub = EventReceiverUIUtils.getEventStreamAdminService(config, session, request);
     String[] streamIds = eventStreamAdminServiceStub.getStreamNames();
-    Arrays.sort(streamIds);
     if (streamId == null && streamIds != null && streamIds.length > 0) {
         streamId = streamIds[0];
     }
@@ -219,6 +218,7 @@
                 onchange="loadMappingUiElements()" id="streamIdFilter">
         <%
             if (streamIds != null) {
+                Arrays.sort(streamIds);
                 for (String aStreamId : streamIds) {
         %>
         <option><%=aStreamId%>

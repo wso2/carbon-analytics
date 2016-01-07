@@ -69,7 +69,6 @@
 
     EventStreamAdminServiceStub eventStreamAdminServiceStub = EventPublisherUIUtils.getEventStreamAdminService(config, session, request);
     String[] streamIds = eventStreamAdminServiceStub.getStreamNames();
-    Arrays.sort(streamIds);
     if (streamId == null && streamIds != null && streamIds.length > 0) {
         streamId = streamIds[0];
     }
@@ -148,6 +147,7 @@
         <%
 
             if (streamIds != null) {
+                Arrays.sort(streamIds);
                 for (String aStreamId : streamIds) {
         %>
         <option><%=aStreamId%>
