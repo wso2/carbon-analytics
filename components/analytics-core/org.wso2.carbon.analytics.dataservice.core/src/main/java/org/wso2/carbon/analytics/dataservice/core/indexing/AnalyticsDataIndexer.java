@@ -1020,10 +1020,11 @@ public class AnalyticsDataIndexer {
         if (resultFacetList.size() < startIndex) {
             return new ArrayList<>();
         }
+        //Sublists are wrapped with ArrayLists because, Sublist structore is not serialized.
         if (resultFacetList.size() < endIndex) {
-            return resultFacetList.subList(startIndex, resultFacetList.size());
+            return new ArrayList<>(resultFacetList.subList(startIndex, resultFacetList.size()));
         }
-        return resultFacetList.subList(startIndex, endIndex);
+        return new ArrayList<>(resultFacetList.subList(startIndex, endIndex));
     }
 
     public List<CategorySearchResultEntry> getDrillDownCategories(int tenantId,
