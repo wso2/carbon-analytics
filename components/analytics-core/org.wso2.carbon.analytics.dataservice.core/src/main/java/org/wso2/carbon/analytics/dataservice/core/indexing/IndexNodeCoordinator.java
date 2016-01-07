@@ -437,7 +437,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
             records.add(record);
             if (records.size() >= Constants.RECORDS_BATCH_SIZE) {
                 this.indexer.putLocal(records);
-                records = new ArrayList<>(Constants.RECORDS_BATCH_SIZE);
+                records.clear();
             }
         }
         this.indexer.putLocal(records);
@@ -939,7 +939,6 @@ public class IndexNodeCoordinator implements GroupEventListener {
                         }
                     }
                 } catch (Throwable e) {
-                    e.printStackTrace();
                     log.error("Error in processing staging index data: " + e.getMessage(), e);
                 }
                 try {
