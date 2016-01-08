@@ -22,13 +22,13 @@ function addEventStream(form, option, eventStreamId) {
     var eventStreamDescription = document.getElementById("eventStreamDescription").value.trim();
     var eventStreamNickName = document.getElementById("eventStreamNickName").value.trim();
 
-    if(eventStreamName.indexOf(" ") != -1){
-        CARBON.showErrorDialog("Stream name can not have spaces.");
-        return;
+    if(!isValidName(eventStreamName)){
+         CARBON.showErrorDialog("Invalid stream name. \n");
+         return;
     }
-    if(eventStreamNickName.indexOf(" ") != -1){
-        CARBON.showErrorDialog("Stream nick name can not have spaces.");
-        return;
+    if((eventStreamNickName != "") && (!isValidName(eventStreamNickName))){
+         CARBON.showErrorDialog("Invalid stream nick name. \n");
+         return;
     }
     if ((eventStreamName == "") || (eventStreamVersion == "")) {
         // empty fields are encountered.
@@ -159,13 +159,13 @@ function addEventStreamViaPopup(form, callback) {
     var eventStreamDescription = document.getElementById("eventStreamDescription").value.trim();
     var eventStreamNickName = document.getElementById("eventStreamNickName").value.trim();
 
-    if(eventStreamName.indexOf(" ") != -1){
-        CARBON.showErrorDialog("Stream name can not have spaces.");
+    if(!isValidName(eventStreamName)){
+        CARBON.showErrorDialog("Invalid stream name. \n");
         return;
     }
 
-    if(eventStreamNickName.indexOf(" ") != -1){
-        CARBON.showErrorDialog("Stream nick name can not have spaces.");
+    if((eventStreamNickName != "") && (!isValidName(eventStreamNickName))){
+        CARBON.showErrorDialog("Invalid stream nick name. \n");
         return;
     }
 
@@ -264,8 +264,8 @@ function addStreamAttribute(dataType) {
         error = "Attribute type field is empty. \n";
     }
 
-    if ((attributeName.value).indexOf(" ")!=-1 && (attributeName.value).indexOf(" ")!= (attributeName.value).length-1){
-        error = "Attribute name can not have spaces.\n"
+    if(!isValidName((attributeName.value).trim())){
+        error = "Invalid attribute name. \n"
     }
 
     if (error != "") {
@@ -557,51 +557,70 @@ function addStreamAttribute2(dataType, name, type) {
 
 }
 
+function isValidName(string){
+    var pattern = /^([a-z][A-Z]|_)([a-z]|[A-Z]|[0-9]|_)*$/i;
+    return (pattern.test(string));
+}
+
 function validateStreamDefinition(streamDefinitionString){
     var error = "";
     var streamDefinitionJSON = JSON.parse(streamDefinitionString);
-    var streamId = streamDefinitionJSON["streamId"];
-    var name = streamDefinitionJSON["name"];
-    var nickName = streamDefinitionJSON["nickName"];
+    var streamId = streamDefinitionJSON["streamId"].trim();
+    var name = streamDefinitionJSON["name"].trim();
+    var nickName = streamDefinitionJSON["nickName"].trim();
     var metaData = streamDefinitionJSON["metaData"];
     var correlationData = streamDefinitionJSON["correlationData"];
     var payloadData = streamDefinitionJSON["payloadData"];
 
-    if(streamId.indexOf(" ") != -1){
-        error = "streamId can not have spaces.\n";
+    if(!isValidName(name)){
+        error = "Invalid stream name. \n";
     }
-    if(name.indexOf(" ") != -1){
-        error = "Stream name can not have spaces.\n";
-    }
-    if(nickName.indexOf(" ") != -1){
-        error = "Stream nick name can not have spaces.\n";
+    if((nickName != "") && (!isValidName(nickName))){
+        error = "Invalid stream nick name. \n";
     }
 
     var meta_faultName = "";
+    var noMappingParameters = 1;
     for(i in metaData){
-        if(metaData[i]["name"].indexOf(" ") != -1){
-            meta_faultName = metaData[i]["name"];
-            error = "Attrbute names can not have spaces.\n" +
-                    "Metadata attribute name : " + meta_faultName + " contains spaces";
+        meta_faultName = metaData[i]["name"];
+        if((meta_faultName != "") && (!isValidName(metaData[i]["name"]))){
+            noMappingParameters = 0;
+            error = "Invalid attribute name.\n" +
+                    "Metadata attribute : " + meta_faultName;
+        }
+        else if(isValidName(metaData[i]["name"])){
+            noMappingParameters = 0;
         }
     }
 
     var correlation_faultName = "";
     for(i in correlationData){
-            if(correlationData[i]["name"].indexOf(" ") != -1){
-                correlation_faultName = correlationData[i]["name"];
-                error = "Attrbute names can not have spaces.\n" +
-                        "Correlation data attribute name : " + correlation_faultName + " contains spaces";
-            }
+        correlation_faultName = correlationData[i]["name"];
+        if((correlation_faultName != "") && (!isValidName(correlationData[i]["name"]))){
+            noMappingParameters = 0;
+            error = "Invalid attribute name.\n" +
+                    "Correlation attribute : " + correlation_faultName;
+        }
+        else if(isValidName(correlationData[i]["name"])){
+            noMappingParameters = 0;
+        }
      }
 
     var payload_faultName = "";
     for(i in payloadData){
-            if(payloadData[i]["name"].indexOf(" ") != -1){
-                payload_faultName = payloadData[i]["name"];
-                error = "Attrbute names can not have spaces.\n" +
-                        "Payload data attribute name : " + payload_faultName + " contains spaces";
-            }
+        payload_faultName = payloadData[i]["name"];
+        if((payload_faultName != "") && (!isValidName(payloadData[i]["name"]))){
+            noMappingParameters = 0;
+            error = "Invalid attribute name.\n" +
+                    "Payload attribute : " + payload_faultName;
+        }
+        else if(isValidName(payloadData[i]["name"])){
+            noMappingParameters = 0;
+        }
+     }
+
+     if(noMappingParameters == 1){
+        error = "Mapping parameters cannot be empty.";
      }
 
     return error;
@@ -657,8 +676,6 @@ function editEventStreamByString(form, eventStreamId) {
                     } else {
                         form.submit();
                     }
-
-
                 }
             })
         }, null, null);
