@@ -135,6 +135,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         indexerInfo.setIndexedTableStore(this.indexedTableStore);
         indexerInfo.setShardCount(config.getShardCount());
         indexerInfo.setShardIndexRecordBatchSize(this.extractShardIndexRecordBatchSize(config));
+        indexerInfo.setShardIndexWorkerInterval(this.extractShardIndexWorkerInterval(config));
         indexerInfo.setLuceneAnalyzer(luceneAnalyzer);
         indexerInfo.setIndexStoreLocation(GenericUtils.resolveLocation(Constants.DEFAULT_INDEX_STORE_LOCATION));
         indexerInfo.setIndexReplicationFactor(config.getIndexReplicationFactor());
@@ -151,9 +152,18 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private int extractShardIndexRecordBatchSize(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
     	int value = config.getShardIndexRecordBatchSize();
     	if (value <= 0) {
-    		value = Constants.DEFAULT_SHARD_INDEX_RECORD_BATCH_SIZE;
+    		throw new AnalyticsException("The shard index record batch size must to be greater than zero: " + value);
     	}
     	return value;
+    }
+    
+    private int extractShardIndexWorkerInterval(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
+        int value = config.getShardIndexWorkerInterval();
+        if (value < Constants.SHARD_INDEX_WORKER_INTERVAL_MIN || value > Constants.SHARD_INDEX_WORKER_INTERVAL_MAX) {
+            throw new AnalyticsException("The shard index worker interval value must be between " + 
+                    Constants.SHARD_INDEX_WORKER_INTERVAL_MIN + " and " + Constants.SHARD_INDEX_WORKER_INTERVAL_MAX);
+        }
+        return value;
     }
     
     private void initIndexedTableStore() throws AnalyticsException {

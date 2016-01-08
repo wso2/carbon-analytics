@@ -41,7 +41,9 @@ public class AnalyticsDataServiceConfiguration {
     
     private int indexReplicationFactor = Constants.DEFAULT_INDEX_REPLICATION_FACTOR;
     
-    private int shardIndexRecordBatchSize;
+    private int shardIndexWorkerInterval = Constants.DEFAULT_SHARD_INDEX_WORKER_INTERVAL;
+    
+    private int shardIndexRecordBatchSize = Constants.DEFAULT_SHARD_INDEX_RECORD_BATCH_SIZE;
         
     private int recordsBatchSize = Constants.RECORDS_BATCH_SIZE;
     
@@ -90,7 +92,16 @@ public class AnalyticsDataServiceConfiguration {
         this.indexReplicationFactor = indexReplicationFactor;
     }
     
-    @XmlElement (name = "shardIndexRecordBatchSize", defaultValue = "100")
+    @XmlElement (name = "shardIndexWorkerInterval", defaultValue = "" + Constants.DEFAULT_SHARD_INDEX_WORKER_INTERVAL)
+    public int getShardIndexWorkerInterval() {
+        return shardIndexWorkerInterval;
+    }
+    
+    public void setShardIndexWorkerInterval(int shardIndexWorkerInterval) {
+        this.shardIndexWorkerInterval = shardIndexWorkerInterval;
+    }
+    
+    @XmlElement (name = "shardIndexRecordBatchSize", defaultValue = "" + Constants.DEFAULT_SHARD_INDEX_RECORD_BATCH_SIZE)
     public int getShardIndexRecordBatchSize() {
         return shardIndexRecordBatchSize;
     }

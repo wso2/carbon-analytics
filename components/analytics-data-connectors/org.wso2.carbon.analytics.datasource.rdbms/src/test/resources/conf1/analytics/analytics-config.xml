@@ -28,4 +28,9 @@
    <!-- The number of batch index records, the indexing node will process per each indexing thread. A batch index record basically
         encapsulates a batch of records retrieved from the receiver to be indexed -->
    <shardIndexRecordBatchSize>100</shardIndexRecordBatchSize>
+   <!-- The interval in milliseconds, which a shard index processing worker thread will sleep during index processing operations. This setting
+        along with the 'shardIndexRecordBatchSize' setting can be used to increase the final index batched data amount the indexer processes
+        at a given time. Usually, higher the batch data amount, higher the throughput of the indexing operations, but will have a higher latency
+        of record insertion to indexing. Minimum value of this is 10, and a maximum value is 60000 (1 minute). -->
+   <shardIndexWorkerInterval>1500</shardIndexWorkerInterval>
 </analytics-dataservice-configuration>

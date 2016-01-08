@@ -30,7 +30,6 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
-import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -49,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class represents a tool to backup and restore and re-index analytics data.
@@ -405,31 +403,6 @@ public class AnalyticsDataBackupTool {
                 fileIn.close();
             }
         }
-    }
-
-    /**
-     * Returns an indexing disabled schema from the provided Analytics Schema.
-     *
-     * @param schema schema of the table.
-     * @return analyticsSchema in which the indexing of the columns are set to false.
-     */
-    private static AnalyticsSchema removeIndexingFromSchema(AnalyticsSchema schema) {
-        AnalyticsSchema indexLessSchema = null;
-        List<ColumnDefinition> indexLessColumns = new ArrayList<>();
-
-        if (schema != null) {
-            List<String> primaryKeys = schema.getPrimaryKeys();
-            Map<String, ColumnDefinition> columns = schema.getColumns();
-            for (Map.Entry<String, ColumnDefinition> entry : columns.entrySet()) {
-                ColumnDefinition columnDefinition = entry.getValue();
-                if (columnDefinition.isIndexed()) {
-                    columnDefinition.setIndexed(false);
-                }
-                indexLessColumns.add(columnDefinition);
-            }
-            indexLessSchema = new AnalyticsSchema(indexLessColumns, primaryKeys);
-        }
-        return indexLessSchema;
     }
 
     /**

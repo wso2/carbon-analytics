@@ -239,6 +239,10 @@ public class AnalyticsDataIndexer {
         return this.indexerInfo.getShardIndexRecordBatchSize();
     }
     
+    public int getShardIndexWorkerInterval() {
+        return this.indexerInfo.getShardIndexWorkerInterval();
+    }
+    
     public int getIndexWorkerCount() {
         if (this.workers == null) {
             return 0;
@@ -1780,8 +1784,6 @@ public class AnalyticsDataIndexer {
      * This represents an indexing worker, who does index operations in the background.
      */
     private class IndexWorker implements Runnable {
-
-        private static final int INDEX_WORKER_SLEEP_TIME = 1500;
         
         private boolean stop;
         
@@ -1808,7 +1810,7 @@ public class AnalyticsDataIndexer {
                     log.error("Error in processing index batch operations: " + e.getMessage(), e);
                 }
                 try {
-                    Thread.sleep(INDEX_WORKER_SLEEP_TIME);
+                    Thread.sleep(getShardIndexWorkerInterval());
                 } catch (InterruptedException e) {
                     break;
                 }

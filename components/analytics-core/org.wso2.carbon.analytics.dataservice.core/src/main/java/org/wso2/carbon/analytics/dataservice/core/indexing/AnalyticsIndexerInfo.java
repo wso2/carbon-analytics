@@ -41,6 +41,8 @@ public class AnalyticsIndexerInfo {
 
     private int shardIndexRecordBatchSize;
     
+    private int shardIndexWorkerInterval;
+    
     private String indexStoreLocation;
 
     public Analyzer getLuceneAnalyzer() {
@@ -97,6 +99,14 @@ public class AnalyticsIndexerInfo {
 
     public void setShardIndexRecordBatchSize(int shardIndexRecordBatchSize) {
         this.shardIndexRecordBatchSize = shardIndexRecordBatchSize;
+    }
+    
+    public int getShardIndexWorkerInterval() {
+        return shardIndexWorkerInterval;
+    }
+
+    public void setShardIndexWorkerInterval(int shardIndexWorkerInterval) {
+        this.shardIndexWorkerInterval = shardIndexWorkerInterval;
     }
 
     public String getIndexStoreLocation() {

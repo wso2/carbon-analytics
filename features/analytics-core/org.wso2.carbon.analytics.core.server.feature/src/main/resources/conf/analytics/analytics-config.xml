@@ -47,6 +47,11 @@
    <!-- The number of batch index records, the indexing node will process per each indexing thread. A batch index record basically
         encapsulates a batch of records retrieved from the receiver to be indexed -->
    <shardIndexRecordBatchSize>100</shardIndexRecordBatchSize>
+   <!-- The interval in milliseconds, which a shard index processing worker thread will sleep during index processing operations. This setting
+        along with the 'shardIndexRecordBatchSize' setting can be used to increase the final index batched data amount the indexer processes
+        at a given time. Usually, higher the batch data amount, higher the throughput of the indexing operations, but will have a higher latency
+        of record insertion to indexing. Minimum value of this is 10, and a maximum value is 60000 (1 minute). -->
+   <shardIndexWorkerInterval>1500</shardIndexWorkerInterval>
    <!-- Data purging related configuration -->
    <analytics-data-purging>
       <!-- Below entry will indicate purging is enable or not. If user wants to enable data purging for cluster then this property
@@ -61,11 +66,4 @@
       <!-- All records that insert before the specified retention time will be eligible to purge -->
       <data-retention-days>365</data-retention-days>
    </analytics-data-purging>
-   <!-- Receiver/Indexing flow-control configuration -->
-   <analytics-receiver-indexing-flow-control enabled = "true">
-       <!-- maximum number of records that can be in index staging area before receiving is throttled -->
-       <recordReceivingHighThreshold>10000</recordReceivingHighThreshold>
-       <!-- the limit on number of records to be lower than, to reduce throttling -->
-       <recordReceivingLowThreshold>5000</recordReceivingLowThreshold>    
-   </analytics-receiver-indexing-flow-control>
 </analytics-dataservice-configuration>
