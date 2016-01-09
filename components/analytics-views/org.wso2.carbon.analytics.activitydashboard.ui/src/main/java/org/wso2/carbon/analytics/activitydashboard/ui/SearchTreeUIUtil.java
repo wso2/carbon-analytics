@@ -44,10 +44,11 @@ public class SearchTreeUIUtil {
     private static void searchGraghHTML(ExpressionNode expressionNode, Set<String> graphElements)
             throws InvalidExpressionNodeException {
         if (expressionNode instanceof Operation) {
-            graphElements.add("g.addNode(\'" + expressionNode.getId() + "\', " +
-                    "{label: \'<div onmouseover=\"\" " +
-                    "style=\"cursor: pointer;\"><span class=\"infoType type type-OP type-OP-info\">" +
-                    "</span><span name=\"nameElement\" style=\"margin-right: 25px;\" class=\"name-info\" >" + expressionNode.toString() + "</span></div>\'});\n");
+                graphElements.add("g.addNode(\'" + expressionNode.getId() + "\', " +
+                        "{label: \'<div onmouseover=\"\" " +
+                        "style=\"cursor: pointer;\"><span name=\"nameElement\" class=\"name-info op-name-info\">"
+                        + expressionNode.toString() + "</span></div>\'});\n");
+
             if (!expressionNode.getId().equals("0")) {
                 graphElements.add("g.addEdge(null, \"" + ExpressionNode.getParentId(expressionNode.getId()) + "\", " +
                         "\"" + expressionNode.getId() + "\", {style: 'stroke: #7a0177; stroke-width: 2px;'});\n");
@@ -59,9 +60,8 @@ public class SearchTreeUIUtil {
                 String leftExpNodeId = ExpressionNode.generateLeftExpressionNodeId(expressionNode.getId());
                 graphElements.add("g.addNode(\"AddExpression" + leftExpNodeId + "\", {label: " +
                         "'<div onclick=\"createPopupAddExpression(\\'" + leftExpNodeId + "\\');" +
-                        "\" onmouseover=\"\" style=\"cursor: pointer;\"><span class=" +
-                        "\"infoType type type-EXP  type-EXP-info\"></span><span name=" +
-                        "\"nameElement\" style=\"margin-right: 25px;\" class=\"name-info\">" +
+                        "\" onmouseover=\"\" style=\"cursor: pointer;\"><span name=" +
+                        "\"nameElement\" class=\"name-info exp-name-info\">" +
                         "Add Expression</span></div>'});\n");
                 if (!leftExpNodeId.equals("0")) {
                     graphElements.add("g.addEdge(null, \"" + expressionNode.getId() + "\", " +
@@ -74,9 +74,8 @@ public class SearchTreeUIUtil {
                 String rightExpNodeId = ExpressionNode.generateRightExpressionNodeId(expressionNode.getId());
                 graphElements.add("g.addNode(\"AddExpression" + rightExpNodeId + "\", {label: " +
                         "'<div onclick=\"createPopupAddExpression(\\'" + rightExpNodeId + "\\');" +
-                        "\" onmouseover=\"\" style=\"cursor: pointer;\"><span class=" +
-                        "\"infoType type type-EXP  type-EXP-info\"></span><span name=" +
-                        "\"nameElement\" style=\"margin-right: 25px;\" class=\"name-info\">" +
+                        "\" onmouseover=\"\" style=\"cursor: pointer;\"><span name=" +
+                        "\"nameElement\" class=\"name-info exp-name-info\">" +
                         "Add Expression</span></div>'});\n");
                 if (!rightExpNodeId.equals("0")) {
                     graphElements.add("g.addEdge(null, \"" + expressionNode.getId() + "\", " +
@@ -86,8 +85,7 @@ public class SearchTreeUIUtil {
         } else {
             graphElements.add("g.addNode(\'" + expressionNode.getId() + "\', " +
                     "{label: \'<div onmouseover=\"\" " +
-                    "style=\"cursor: pointer;\"><span class=\"infoType type type-QR type-QR-info\">" +
-                    "</span><span name=\"nameElement\" style=\"margin-right: 25px;\" class=\"name-info\" >" + expressionNode.toString() + "</span></div>\'});\n");
+                    "style=\"cursor: pointer;\"><span name=\"nameElement\" class=\"name-info qr-name-info\">" + expressionNode.toString() + "</span></div>\'});\n");
             if (!expressionNode.getId().equals("0")) {
                 graphElements.add("g.addEdge(null, \"" + ExpressionNode.getParentId(expressionNode.getId()) + "\", " +
                         "\"" + expressionNode.getId() + "\", {style: 'stroke: #7a0177; stroke-width: 2px;'});\n");

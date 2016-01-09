@@ -27,9 +27,8 @@
         responseStr = "g.addNode(\"AddExpression\"," +
                 " {label: '<div onclick=\"createPopupAddExpression(0);" +
                 "\" onmouseover=\"\" style=\"cursor: pointer;\">" +
-                "<span class=\"infoType type type-EXP  type-EXP-info\">" +
-                "</span><span name=\"nameElement\" " +
-                "style=\"margin-right: 25px;\" class=\"name-info\" >Add Expression</span></div>'});";
+                "<span name=\"nameElement\" " +
+                "class=\"name-info exp-name-info\" >Add Expression</span></div>'});";
         response.getWriter().write(responseStr);
     } else {
         SearchExpressionTree searchExpressionTree = (SearchExpressionTree) searchTreeObj;

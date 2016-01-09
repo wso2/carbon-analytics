@@ -28,78 +28,80 @@
     <script type="text/javascript" src="js/d3.v3.min.js"></script>
     <script type="text/javascript" src="js/dagre-d3.min.js"></script>
     <script type="text/javascript" src="js/graphlib-dot.min.js"></script>
+    <link href="css/activity.css" type="text/css" rel="stylesheet"/>
+
     <%--<script type="text/javascript" src="js/jquery-ui-sliderAccess.js"></script>--%>
 
-    <style>
+    <%--<style>--%>
 
-        .type-OP {
-            background-color: #3d35d5;
-        }
+        <%--.type-OP {--%>
+            <%--background-color: #3d35d5;--%>
+        <%--}--%>
 
-        .type-QR {
-            background-color: #0a722b;
-        }
+        <%--.type-QR {--%>
+            <%--background-color: #0a722b;--%>
+        <%--}--%>
 
-        .type-EXP {
-            background-color: #d50e1b;
-        }
+        <%--.type-EXP {--%>
+            <%--background-color: #d50e1b;--%>
+        <%--}--%>
 
-        .node g div {
-            height: 30px;
-            line-height: 30px;
-        }
+        <%--.node g div {--%>
+            <%--height: 30px;--%>
+            <%--line-height: 30px;--%>
+        <%--}--%>
 
-        .name-info {
-            white-space: nowrap;
-            font-weight: bold;
-        }
+        <%--.name-info {--%>
+            <%--white-space: nowrap;--%>
+            <%--font-weight: bold;--%>
+        <%--}--%>
 
-        .name {
-            white-space: nowrap;
-        }
+        <%--.name {--%>
+            <%--white-space: nowrap;--%>
+        <%--}--%>
 
-        .type {
-            height: 30px;
-            width: 10px;
-            display: block;
-            float: left;
-            border-top-left-radius: 5px;
-            border-bottom-left-radius: 5px;
-            margin-right: 4px;
-        }
+        <%--.type {--%>
+            <%--height: 30px;--%>
+            <%--width: 10px;--%>
+            <%--display: block;--%>
+            <%--float: left;--%>
+            <%--border-top-left-radius: 5px;--%>
+            <%--border-bottom-left-radius: 5px;--%>
+            <%--margin-right: 4px;--%>
+        <%--}--%>
 
-        .infoType {
-            background-repeat: no-repeat;
-            background-position: 5px 50%;
-            width: 25px;
-        }
+        <%--.infoType {--%>
+            <%--background-repeat: no-repeat;--%>
+            <%--background-position: 5px 50%;--%>
+            <%--width: 25px;--%>
+        <%--}--%>
 
-        svg {
-            overflow: hidden;
-        }
+        <%--svg {--%>
+            <%--overflow: hidden;--%>
+        <%--}--%>
 
-        text {
-            font-weight: 300;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
-        }
+        <%--text {--%>
+            <%--font-weight: 300;--%>
+            <%--font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;--%>
+        <%--}--%>
 
-        .node rect {
-            stroke-width: 1px;
-            stroke: #707070;
-            fill: #F0F0F0;
-        }
+        <%--.node rect {--%>
+            <%--stroke-width: 1px;--%>
+            <%--stroke: #707070;--%>
+            <%--fill: #F0F0F0;--%>
+        <%--}--%>
 
-        .edgeLabel rect {
-            fill: #fff;
-        }
+        <%--.edgeLabel rect {--%>
+            <%--fill: #fff;--%>
+        <%--}--%>
 
-        .edgePath path {
-            stroke: #333;
-            stroke-width: 1.5px;
-            fill: none;
-        }
+        <%--.edgePath path {--%>
+            <%--stroke: #333;--%>
+            <%--stroke-width: 1.5px;--%>
+            <%--fill: none;--%>
+        <%--}--%>
 
-    </style>
+    <%--</style>--%>
 
     <script type="text/javascript">
 
@@ -142,7 +144,7 @@
             var svgGroup = d3.select("#flowInfo g");
             renderer.zoom(false);
             var layout = dagreD3.layout()
-                    .nodeSep(5)
+                    .nodeSep(15)
                     .edgeSep(30)
                     .rankSep(40)
             renderer.layout(layout);
