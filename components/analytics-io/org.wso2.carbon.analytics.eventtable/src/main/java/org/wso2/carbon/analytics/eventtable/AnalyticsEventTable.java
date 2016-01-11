@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -291,7 +292,7 @@ public class AnalyticsEventTable implements EventTable {
         
         private String tableName;
         
-        private List<Attribute> attrs;
+        private List<Attribute> myAttrs;
         
         private Expression expression;
         
@@ -333,15 +334,15 @@ public class AnalyticsEventTable implements EventTable {
         
         private boolean operatorInit;
         
-        private Map<String, Object> constantRHSValues;
-        
+        private Map<String, Object> primaryKeyRHSValues;
+                
         public AnalyticsTableOperator(int tenantId, String tableName, List<Attribute> attrs, Expression expression, 
                 MetaComplexEvent metaComplexEvent, ExecutionPlanContext executionPlanContext, 
                 List<VariableExpressionExecutor> variableExpressionExecutors, 
                 Map<String, EventTable> eventTableMap, int matchingStreamIndex, long withinTime) {
             this.tenantId = tenantId;
             this.tableName = tableName;
-            this.attrs = attrs;
+            this.myAttrs = attrs;
             this.expression = expression;
             this.metaComplexEvent = metaComplexEvent;
             this.executionPlanContext = executionPlanContext;
@@ -353,7 +354,7 @@ public class AnalyticsEventTable implements EventTable {
             this.candidatePrimaryKeySet = new HashSet<>();
             this.indexedKeySet = new HashSet<String>();
             this.mentionedFields = new HashSet<String>();
-            this.constantRHSValues = new HashMap<>();
+            this.primaryKeyRHSValues = new LinkedHashMap<>();
             this.initMetaStateEvent();
             /* first parse for evaluating the query, since expression evaluation cannot be
              * done in a lazy manner */
@@ -509,7 +510,8 @@ public class AnalyticsEventTable implements EventTable {
                         this.candidatePrimaryKeySet.add(field);
                     }
                     this.mentionedFields.add(field);
-                    this.constantRHSValues.put(field, rhs);
+                    /* for primary keys match */
+                    this.primaryKeyRHSValues.put(field, rhs);
                     return "(" + (this.getFieldType(field, firstPass).equals(ColumnType.STRING) ? 
                             Constants.NON_TOKENIZED_FIELD_PREFIX : "") + 
                             field + ": " + this.toLuceneQueryRHSValue(rhs) + ")";                
@@ -638,7 +640,7 @@ public class AnalyticsEventTable implements EventTable {
                 
         @Override
         public Finder cloneFinder() {
-            return new AnalyticsTableOperator(this.tenantId, this.tableName, this.attrs, this.expression, this.metaComplexEvent, 
+            return new AnalyticsTableOperator(this.tenantId, this.tableName, this.myAttrs, this.expression, this.metaComplexEvent, 
                     this.executionPlanContext, this.variableExpressionExecutors, this.eventTableMap, 
                     this.matchingStreamIndex, this.withinTime);
         }
@@ -653,7 +655,7 @@ public class AnalyticsEventTable implements EventTable {
                 StreamEventCloner streamEventCloner) {
             this.initExpressionLogic();
             List<Record> records = this.findRecords(matchingEvent, candidateEvents, streamEventCloner);
-            return AnalyticsEventTableUtils.recordsToStreamEvent(this.attrs, records);
+            return AnalyticsEventTableUtils.recordsToStreamEvent(this.myAttrs, records);
         }
         
         private List<Record> findRecords(ComplexEvent matchingEvent, Object candidateEvents, 
@@ -666,8 +668,7 @@ public class AnalyticsEventTable implements EventTable {
             if (this.returnAllRecords) {
                 records = AnalyticsEventTableUtils.getAllRecords(this.tenantId, this.tableName);
             } else if (this.pkMatchCompatible) {
-                Record record = AnalyticsEventTableUtils.getRecordWithEventValues(this.tenantId, this.tableName, 
-                        this.attrs, matchingEvent, this.constantRHSValues);
+                Record record = this.getRecordWithEventValues(this.tenantId, this.tableName, matchingEvent);
                 if (record == null) {
                     records = new ArrayList<>(0);
                 } else {
@@ -677,6 +678,33 @@ public class AnalyticsEventTable implements EventTable {
                 records = this.executeLuceneQuery(matchingEvent);
             }
             return records;
+        }
+        
+        private Record getRecordWithEventValues(int tenantId, String tableName, ComplexEvent event) {
+            try {
+                Map<String, Object> values = new HashMap<>();
+                int expressionExIndex = 0;
+                for (Map.Entry<String, Object> entry : this.primaryKeyRHSValues.entrySet()) {
+                    if (entry.getValue().toString().startsWith(LUCENE_QUERY_PARAM)) {
+                        values.put(entry.getKey(), this.expressionExecs.get(expressionExIndex).execute(event));
+                        expressionExIndex++;
+                    } else {
+                        values.put(entry.getKey(), entry.getValue());
+                    }
+                }
+                List<Map<String, Object>> valuesBatch = new ArrayList<Map<String,Object>>();
+                valuesBatch.add(values);
+                AnalyticsDataResponse resp = ServiceHolder.getAnalyticsDataService().getWithKeyValues(
+                        tenantId, tableName, 1, null, valuesBatch);
+                List<Record> records = AnalyticsDataServiceUtils.listRecords(ServiceHolder.getAnalyticsDataService(), resp);
+                if (records.size() > 0) {
+                    return records.get(0);
+                } else {
+                    return null;
+                }
+            } catch (AnalyticsException e) {
+                throw new IllegalStateException("Error in getting event records with values: " + e.getMessage(), e);
+            }
         }
         
         private String getTranslatedLuceneQuery(ComplexEvent matchingEvent) {
@@ -748,8 +776,7 @@ public class AnalyticsEventTable implements EventTable {
         }
         
         private void updateRecordsWithEvent(List<Record> records, ComplexEvent event) {
-            Map<String, Object> values = AnalyticsEventTableUtils.streamEventToRecordValues(this.tenantId, 
-                    this.tableName, this.outputAttrs, event);
+            Map<String, Object> values = AnalyticsEventTableUtils.streamEventToRecordValues(this.outputAttrs, event);
             for (Record record : records) {
                 for (Entry<String, Object> entry : values.entrySet()) {
                     if (record.getValues().containsKey(entry.getKey())) {

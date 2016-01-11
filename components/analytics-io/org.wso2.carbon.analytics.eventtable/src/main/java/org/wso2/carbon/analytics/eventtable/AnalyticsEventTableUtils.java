@@ -55,12 +55,11 @@ public class AnalyticsEventTableUtils {
     
     private static Record streamEventToRecord(int tenantId, String tableName, List<Attribute> attrs,
             StreamEvent event) {
-        Map<String, Object> values = streamEventToRecordValues(tenantId, tableName, attrs, event);
+        Map<String, Object> values = streamEventToRecordValues(attrs, event);
         return new Record(tenantId, tableName, values, event.getTimestamp());
     }
     
-    public static Map<String, Object> streamEventToRecordValues(int tenantId, String tableName, List<Attribute> attrs,
-            ComplexEvent event) {
+    public static Map<String, Object> streamEventToRecordValues(List<Attribute> attrs, ComplexEvent event) {
         Object[] data = event.getOutputData();
         if (data == null) {
             return new HashMap<>(0);
@@ -74,34 +73,6 @@ public class AnalyticsEventTableUtils {
             }
         }
         return values;
-    }
-    
-    private static void mergeMapsWithNoNulls(Map<String, Object> source, Map<String, Object> target) {
-        for (Map.Entry<String, Object> entry : source.entrySet()) {
-            if (target.get(entry.getKey()) == null) {
-                target.put(entry.getKey(), entry.getValue());
-            }
-        }
-    }
-    
-    public static Record getRecordWithEventValues(int tenantId, String tableName, List<Attribute> attrs,
-            ComplexEvent event, Map<String, Object> constantRHSValues) {
-        try {
-            Map<String, Object> values = streamEventToRecordValues(tenantId, tableName, attrs, event);
-            mergeMapsWithNoNulls(constantRHSValues, values);
-            List<Map<String, Object>> valuesBatch = new ArrayList<Map<String,Object>>();
-            valuesBatch.add(values);
-            AnalyticsDataResponse resp = ServiceHolder.getAnalyticsDataService().getWithKeyValues(
-                    tenantId, tableName, 1, null, valuesBatch);
-            List<Record> records = AnalyticsDataServiceUtils.listRecords(ServiceHolder.getAnalyticsDataService(), resp);
-            if (records.size() > 0) {
-                return records.get(0);
-            } else {
-                return null;
-            }
-        } catch (AnalyticsException e) {
-            throw new IllegalStateException("Error in getting event records with values: " + e.getMessage(), e);
-        }
     }
     
     public static List<Record> getAllRecords(int tenantId, String tableName) {
