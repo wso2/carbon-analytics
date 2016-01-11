@@ -28,11 +28,13 @@ import java.io.Serializable;
  */
 public class AnalyticsAggregateRequest implements Serializable {
 
-    private static final long serialVersionUID = 2058181608942295903L;
+    private static final long serialVersionUID = -3388386924173489719L;
     private String tableName;
     private String groupByField;
     private String query;
     private AnalyticsAggregateField[] fields;
+    private int aggregateLevel;
+    private String[] parentPath;
 
     public AnalyticsAggregateRequest() {
     }
@@ -67,5 +69,21 @@ public class AnalyticsAggregateRequest implements Serializable {
 
     public void setFields(AnalyticsAggregateField[] fields) {
         this.fields = fields;
+    }
+
+    public int getAggregateLevel() {
+        return aggregateLevel;
+    }
+
+    public void setAggregateLevel(int aggregateLevel) {
+        this.aggregateLevel = aggregateLevel;
+    }
+
+    public String[] getParentPath() {
+        return parentPath;
+    }
+
+    public void setParentPath(String[] parentPath) {
+        this.parentPath = parentPath;
     }
 }

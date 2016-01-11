@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.dataservice.core.indexing;
 
+import com.hazelcast.spi.exception.TargetNotMemberException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -103,17 +104,18 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutEx
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
-import com.hazelcast.spi.exception.TargetNotMemberException;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Paths;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1710,6 +1712,28 @@ public class AnalyticsDataIndexer {
             ids.add(searchResult.getId());
         }
         return ids;
+    }
+
+    public void reIndex(int tenantId, String table, long startTime, long endTime)
+            throws AnalyticsException {
+        DateFormat format = new SimpleDateFormat("YYYY-MM-dd HH:MM:ss.SSS");
+        log.info("Re-Indexing called for table: " + table + " timestamp between: " +
+                 format.format(new Date(startTime)) + " and " +
+                 format.format(new Date(endTime)));
+        AnalyticsRecordStore rs = this.getAnalyticsRecordStore();
+        RecordGroup[] recordGroups = rs.get(tenantId, table, 1, null, startTime, endTime, 0, -1);
+        Iterator<Record> iterator = GenericUtils.recordGroupsToIterator(rs, recordGroups);
+        List<Record> recordBatch;
+        int i;
+        while (iterator.hasNext()) {
+            i = 0;
+            recordBatch = new ArrayList<>();
+            while (i < org.wso2.carbon.analytics.dataservice.core.Constants.RECORDS_BATCH_SIZE && iterator.hasNext()) {
+                recordBatch.add(iterator.next());
+                i++;
+            }
+            this.put(recordBatch);
+        }
     }
 
     private static class AggregateRecordIterator implements AnalyticsIterator<Record> {

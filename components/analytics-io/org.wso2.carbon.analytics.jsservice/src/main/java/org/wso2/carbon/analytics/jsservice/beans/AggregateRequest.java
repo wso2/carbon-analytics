@@ -33,6 +33,8 @@ public class AggregateRequest {
     private String groupByField;
     private String query;
     private List<AggregateField> fields;
+    private int aggregateLevel;
+    private List<String> parentPath;
 
     public AggregateRequest() {
     }
@@ -67,5 +69,21 @@ public class AggregateRequest {
 
     public void setFields(List<AggregateField> fields) {
         this.fields = fields;
+    }
+
+    public int getAggregateLevel() {
+        return aggregateLevel;
+    }
+
+    public void setAggregateLevel(int aggregateLevel) {
+        this.aggregateLevel = aggregateLevel;
+    }
+
+    public List<String> getParentPath() {
+        return parentPath;
+    }
+
+    public void setParentPath(List<String> parentPath) {
+        this.parentPath = parentPath;
     }
 }

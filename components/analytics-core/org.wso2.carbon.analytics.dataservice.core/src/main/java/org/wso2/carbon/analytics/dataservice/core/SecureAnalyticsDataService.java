@@ -349,6 +349,16 @@ public interface SecureAnalyticsDataService {
      * @return List of records of which the record values will be the aggregate values of the given fields
      */
     AnalyticsIterator<Record> searchWithAggregates(String username, AggregateRequest aggregateRequest) throws AnalyticsException;
+
+    /**
+     * Given the start time and end time, this method will re-index the records of a table.
+     * @param username the username
+     * @param tableName the table name of which the records are being re-indexed.
+     * @param startTime lowerbound of the timestamp range of records
+     * @param endTime upperbound of the timestamp range of records
+     * @throws AnalyticsIndexException
+     */
+    public void reIndex(String username, String tableName, long startTime, long endTime) throws AnalyticsException;
     /**
      * Destroys and frees any resources taken up by the analytics data service implementation.
      */
