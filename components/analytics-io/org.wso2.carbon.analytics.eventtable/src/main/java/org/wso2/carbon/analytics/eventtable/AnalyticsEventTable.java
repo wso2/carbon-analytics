@@ -71,6 +71,10 @@ import org.wso2.siddhi.query.api.expression.constant.FloatConstant;
 import org.wso2.siddhi.query.api.expression.constant.IntConstant;
 import org.wso2.siddhi.query.api.expression.constant.LongConstant;
 import org.wso2.siddhi.query.api.expression.constant.StringConstant;
+import org.wso2.siddhi.query.api.expression.math.Add;
+import org.wso2.siddhi.query.api.expression.math.Divide;
+import org.wso2.siddhi.query.api.expression.math.Multiply;
+import org.wso2.siddhi.query.api.expression.math.Subtract;
 import org.wso2.siddhi.query.api.util.AnnotationHelper;
 import org.wso2.siddhi.core.util.SiddhiConstants;
 
@@ -557,6 +561,9 @@ public class AnalyticsEventTable implements EventTable {
                         return LUCENE_QUERY_PARAM + (this.paramIndex++);
                     }
                 }
+            } else if (expr instanceof Subtract || expr instanceof Add || expr instanceof Multiply || 
+                    expr instanceof Divide || expr instanceof org.wso2.siddhi.query.api.expression.math.Mod) {
+                throw new IllegalArgumentException("Analytics Event Table conditions does not support arithmetic operations: " + expr);
             } else {
                 return true;
             }

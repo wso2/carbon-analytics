@@ -151,8 +151,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     private long extractShardIndexRecordBatchSize(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
     	long value = config.getShardIndexRecordBatchSize();
-    	if (value < 1000) {
-    		throw new AnalyticsException("The shard index record batch size must to be greater than 1000: " + value);
+    	if (value < Constants.SHARD_INDEX_RECORD_BATCH_SIZE_MIN) {
+    		throw new AnalyticsException("The shard index record batch size must to be greater than " + 
+    	            Constants.SHARD_INDEX_RECORD_BATCH_SIZE_MIN + ": " + value);
     	}
     	return value;
     }
