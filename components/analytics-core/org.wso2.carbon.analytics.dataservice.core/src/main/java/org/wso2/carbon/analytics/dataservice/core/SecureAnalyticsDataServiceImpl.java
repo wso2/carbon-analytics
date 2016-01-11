@@ -233,7 +233,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
             throws AnalyticsIndexException {
         try {
             int tenantId = getTenantId(username);
-            if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
+            if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_PUT_RECORD)) {
                 throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                                "permission to get search indexed record count");
             }
