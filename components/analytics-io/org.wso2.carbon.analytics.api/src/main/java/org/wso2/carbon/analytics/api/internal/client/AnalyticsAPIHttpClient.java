@@ -1233,7 +1233,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public int drillDownSearchCount(int tenantId, String username,
+    public double drillDownSearchCount(int tenantId, String username,
                                     AnalyticsDrillDownRequest drillDownRequest,
                                     boolean securityEnabled) {
         URIBuilder builder = new URIBuilder();
@@ -1261,8 +1261,8 @@ public class AnalyticsAPIHttpClient {
             } else {
                 Object searchCountObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
-                if (searchCountObj != null && searchCountObj instanceof Integer) {
-                    return (Integer) searchCountObj;
+                if (searchCountObj != null && searchCountObj instanceof Double) {
+                    return (Double) searchCountObj;
                 } else {
                     throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("preforming drill down search count",
                             drillDownRequest.getTableName(), "number of search result", searchCountObj));
