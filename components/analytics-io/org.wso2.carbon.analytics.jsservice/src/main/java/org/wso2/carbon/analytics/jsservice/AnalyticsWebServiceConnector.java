@@ -669,6 +669,32 @@ public class AnalyticsWebServiceConnector {
         }
     }
 
+    public ResponseBean reIndex(String tableName, String startTime, String endTime) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking re-index for tableName : " + tableName);
+        }
+        if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
+            try {
+                long start = Long.parseLong(startTime);
+                long end = Long.parseLong(endTime);
+                analyticsWebServiceStub.reIndex(tableName, start, end);
+                return handleResponse(ResponseStatus.SUCCESS, "Re-Indexing...");
+            } catch (RemoteException e) {
+                logger.error("Failed to re-index records for table: " + tableName +
+                             " : " + e.getMessage(), e);
+                return handleResponse(ResponseStatus.FAILED,
+                                      " Failed to re-index records for table: " + tableName + ": " + e.getMessage());
+            } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
+                logger.error("Failed to re-index records for table: " + tableName +
+                             " : " + e.getFaultMessage(), e);
+                return handleResponse(ResponseStatus.FAILED,
+                                      " Failed to re-index records for table: " + tableName + ": " + e.getFaultMessage());
+            }
+        } else {
+            return handleResponse(ResponseStatus.FAILED, " Search parameters not provided");
+        }
+    }
+
     public ResponseBean searchCount(String tableName, String queryAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking search count for tableName : " + tableName);

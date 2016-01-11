@@ -874,6 +874,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         return this.getIndexer().searchWithAggregates(tenantId, aggregateRequest);
     }
 
+    @Override
+    public void reIndex(int tenantId, String tableName, long startTime, long endTime)
+            throws AnalyticsException {
+        String table = GenericUtils.normalizeTableName(tableName);
+        this.getIndexer().reIndex(tenantId, table, startTime, endTime);
+
+    }
+
     private void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException {
         tableName = GenericUtils.normalizeTableName(tableName);
         this.getIndexer().clearIndexData(tenantId, tableName);

@@ -794,6 +794,24 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
+    public void reIndex(String username, String tableName, long startTime, long endTime)
+            throws AnalyticsException {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
+            ServiceHolder.getSecureAnalyticsDataService().reIndex(username, tableName, startTime, endTime);
+        } else {
+            try {
+                AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                             analyticsDataConfiguration.getPassword());
+                AnalyticsAPIHttpClient.getInstance().reIndex(MultitenantConstants.INVALID_TENANT_ID, username, tableName, startTime, endTime, true);
+            } catch (AnalyticsServiceUnauthorizedException ex) {
+                AnalyticsAPIHttpClient.getInstance().invalidateSessionAndAuthenticate(analyticsDataConfiguration.
+                        getUsername(), analyticsDataConfiguration.getPassword());
+                AnalyticsAPIHttpClient.getInstance().reIndex(MultitenantConstants.INVALID_TENANT_ID, username, tableName, startTime, endTime, true);
+            }
+        }
+    }
+
+    @Override
     public AnalyticsIterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsException {
         if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getAnalyticsDataService().readRecords(recordStoreName, recordGroup);
@@ -969,6 +987,24 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
                         getUsername(), analyticsDataConfiguration.getPassword());
                 return AnalyticsAPIHttpClient.getInstance().searchWithAggregates(tenantId,
                         null, aggregateRequest, false);
+            }
+        }
+    }
+
+    @Override
+    public void reIndex(int tenantId, String tableName, long startTime, long endTime)
+            throws AnalyticsException {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
+            ServiceHolder.getAnalyticsDataService().reIndex(tenantId, tableName, startTime, endTime);
+        } else {
+            try {
+                AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                             analyticsDataConfiguration.getPassword());
+                AnalyticsAPIHttpClient.getInstance().reIndex(tenantId, null, tableName, startTime, endTime, false);
+            } catch (AnalyticsServiceUnauthorizedException ex) {
+                AnalyticsAPIHttpClient.getInstance().invalidateSessionAndAuthenticate(analyticsDataConfiguration.
+                        getUsername(), analyticsDataConfiguration.getPassword());
+                AnalyticsAPIHttpClient.getInstance().reIndex(tenantId, null, tableName, startTime, endTime, false);
             }
         }
     }

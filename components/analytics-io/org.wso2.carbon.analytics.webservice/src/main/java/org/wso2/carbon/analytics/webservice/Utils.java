@@ -551,6 +551,12 @@ public class Utils {
         aggregateRequest.setGroupByField(request.getGroupByField());
         aggregateRequest.setQuery(request.getQuery());
         aggregateRequest.setFields(createAggregateFields(request.getFields()));
+        aggregateRequest.setAggregateLevel(request.getAggregateLevel());
+        List<String> parentPath = new ArrayList<>();
+        if (request.getParentPath() != null && request.getParentPath()[0]!= null) {
+            parentPath.addAll(Arrays.asList(request.getParentPath()));
+        }
+        aggregateRequest.setParentPath(parentPath);
         return aggregateRequest;
     }
 

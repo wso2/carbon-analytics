@@ -77,7 +77,7 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                         resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                     }
                 }
-            }else {
+            } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : "
                                                                       + operation + " with post request!");
             }
@@ -120,6 +120,53 @@ public class AnalyticsIndexProcessor extends HttpServlet {
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : "
                         + operation + " with delete request!");
+            }
+        }
+    }
+
+    /**
+     * Re-index the records in the given timestamp period.
+     *
+     * @param req  HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
+     * @throws ServletException
+     * @throws IOException
+     */
+
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
+        if (sessionId == null || sessionId.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+        } else {
+            try {
+                ServiceHolder.getAuthenticator().validateSessionId(sessionId);
+            } catch (AnalyticsAPIAuthenticationException e) {
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+            }
+            String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
+            boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
+            if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.REINDEX_OPERATION)) {
+                int tenantIdParam = MultitenantConstants.INVALID_TENANT_ID;
+                if (!securityEnabled)
+                    tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+                String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
+                String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
+                long timeFrom = Long.parseLong(req.getParameter(AnalyticsAPIConstants.TIME_FROM_PARAM));
+                long timeTo = Long.parseLong(req.getParameter(AnalyticsAPIConstants.TIME_TO_PARAM));
+                try {
+                    if (!securityEnabled)
+                        ServiceHolder.getAnalyticsDataService().reIndex(tenantIdParam, tableName,
+                                                                                             timeFrom, timeTo);
+                    else
+                        ServiceHolder.getSecureAnalyticsDataService().reIndex(userName, tableName,
+                                                                                                   timeFrom, timeTo);
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                } catch (AnalyticsException e) {
+                    resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                }
+            } else {
+                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
+                                                                      + " with get request!");
             }
         }
     }

@@ -17,7 +17,13 @@
 */
 package org.wso2.carbon.analytics.dataservice.core;
 
-import org.wso2.carbon.analytics.dataservice.commons.*;
+import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -325,6 +331,17 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
         } catch (AnalyticsException e) {
             throw new AnalyticsIndexException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void reIndex(String username, String tableName, long startTime, long endTime)
+            throws AnalyticsException {
+        int tenantId = getTenantId(username);
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_PUT_RECORD)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to re-index");
+        }
+        analyticsDataService.reIndex(tenantId, tableName, startTime, endTime);
     }
 
     @Override

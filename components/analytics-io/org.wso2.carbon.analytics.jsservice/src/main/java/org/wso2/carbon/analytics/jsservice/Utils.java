@@ -498,6 +498,9 @@ public class Utils {
         request.setQuery(aggregateRequest.getQuery());
         request.setTableName(aggregateRequest.getTableName());
         request.setFields(createAggregateFieds(aggregateRequest.getFields()));
+        request.setAggregateLevel(aggregateRequest.getAggregateLevel());
+        request.setParentPath(aggregateRequest.getParentPath()
+                                      .toArray(new String[aggregateRequest.getParentPath().size()]));
         return request;
     }
 

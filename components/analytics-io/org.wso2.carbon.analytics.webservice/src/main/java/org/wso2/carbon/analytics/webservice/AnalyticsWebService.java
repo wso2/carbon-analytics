@@ -33,7 +33,6 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsAggregateRequest;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRangeBean;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRequestBean;
@@ -514,6 +513,22 @@ public class AnalyticsWebService extends AbstractAdmin {
     public void waitForIndexingForTable(String tableName, long maxWait) throws AnalyticsWebServiceException {
         try {
             analyticsDataAPI.waitForIndexing(getUsername(), tableName, maxWait);
+        } catch (Exception e) {
+            logger.error("An exception occurred: " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("An exception occurred: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Given the start time and end time, this method will re-index the records of a table.
+     * @param tableName the table name of which the records are being re-indexed.
+     * @param startTime lowerbound of the timestamp range of records
+     * @param endTime upperbound of the timestamp range of records
+     * @throws AnalyticsWebServiceException
+     * **/
+    public void reIndex(String tableName, long startTime, long endTime) throws AnalyticsWebServiceException {
+        try {
+            analyticsDataAPI.reIndex(getUsername(), tableName, startTime, endTime);
         } catch (Exception e) {
             logger.error("An exception occurred: " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("An exception occurred: " + e.getMessage(), e);

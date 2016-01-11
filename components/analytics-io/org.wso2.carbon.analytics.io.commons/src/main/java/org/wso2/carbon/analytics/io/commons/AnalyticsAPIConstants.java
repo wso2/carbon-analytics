@@ -79,6 +79,7 @@ public class AnalyticsAPIConstants {
     public static final String DRILL_DOWN_SEARCH_CATEGORY_OPERATION = "drillDownSearchCategory_opr";
     public static final String DRILL_DOWN_SEARCH_RANGE_COUNT_OPERATION = "drillDownRangeCount_opr";
     public static final String SEARCH_WITH_AGGREGATES_OPERATION = "searchWithAggregates_opr";
+    public static final String REINDEX_OPERATION = "reIndex_opr";
     public static final String SEARCH_COUNT_OPERATION = "__search_count_opr";
     public static final String WAIT_FOR_INDEXING_OPERATION = "__wait_for_index_opr";
     public static final String DESTROY_OPERATION = "__destroy_opr";

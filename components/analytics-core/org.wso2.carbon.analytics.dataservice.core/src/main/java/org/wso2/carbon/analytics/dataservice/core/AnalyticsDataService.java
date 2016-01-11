@@ -337,6 +337,17 @@ public interface AnalyticsDataService {
      * @return List of records of which the record values will be the aggregate values of the given fields
      */
     public AnalyticsIterator<Record> searchWithAggregates(int tenantId, AggregateRequest aggregateRequest) throws AnalyticsException;
+
+    /**
+     * Given the start time and end time, this method will re-index the records of a table.
+     * @param tenantId tenant id
+     * @param tableName the table name of which the records are being re-indexed.
+     * @param startTime lowerbound of the timestamp range of records
+     * @param endTime upperbound of the timestamp range of records
+     * @throws AnalyticsIndexException
+     */
+
+    public void reIndex(int tenantId, String tableName, long startTime, long endTime) throws AnalyticsException;
     
     /**
      * This method waits until the current indexing operations for the system is done.

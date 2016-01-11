@@ -1397,4 +1397,35 @@ public class AnalyticsAPIHttpClient {
             throw new AnalyticsServiceException("Error while connecting to the remote service. " + e.getMessage(), e);
         }
     }
+
+    public void reIndex(int tenantId, String username, String tableName, long startTime, long endTime,
+                        boolean securityEnabled) {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
+                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.REINDEX_OPERATION)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled))
+                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
+                .addParameter(AnalyticsAPIConstants.TIME_FROM_PARAM, String.valueOf(startTime))
+                .addParameter(AnalyticsAPIConstants.TIME_TO_PARAM, String.valueOf(endTime));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
+        try {
+            HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
+            HttpResponse httpResponse = httpClient.execute(getMethod);
+            String response = getResponseString(httpResponse);
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                throw new AnalyticsServiceUnauthorizedException("Error while re-indexing. " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                throw new AnalyticsServiceException("Error while re-indexing. " + response);
+            }
+        } catch (URISyntaxException e) {
+            throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AnalyticsServiceException("Error while connecting to the remote service. " + e.getMessage(), e);
+        }
+    }
 }
