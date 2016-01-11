@@ -53,7 +53,7 @@ public class Constants {
     public static final String INDEX_STAGING_DATA_TABLE = "__INDEX_STAGING_DATA__";
     public static final String INDEX_STAGING_DATA_COLUMN = "VALUE";
 
-    public static final int DEFAULT_SHARD_INDEX_RECORD_BATCH_SIZE = 100;
+    public static final long DEFAULT_SHARD_INDEX_RECORD_BATCH_SIZE = 10485760;
     public static final int DEFAULT_SHARD_INDEX_WORKER_INTERVAL = 1500;
     public static final int SHARD_INDEX_WORKER_INTERVAL_MIN = 10;
     public static final int SHARD_INDEX_WORKER_INTERVAL_MAX = 60000;

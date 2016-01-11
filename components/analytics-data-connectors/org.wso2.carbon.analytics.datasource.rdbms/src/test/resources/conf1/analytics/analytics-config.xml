@@ -25,9 +25,8 @@
    <!-- The number of index shards, should be equal or higher to the number of indexing nodes that is going to be working,
         ideal count being 'number of indexing nodes * CPU cores' -->
    <shardCount>6</shardCount>
-   <!-- The number of batch index records, the indexing node will process per each indexing thread. A batch index record basically
-        encapsulates a batch of records retrieved from the receiver to be indexed -->
-   <shardIndexRecordBatchSize>100</shardIndexRecordBatchSize>
+   <!-- The amount of index data (in bytes) to be processed at a time by a shard index worker. Minimum value is 1000. -->
+   <shardIndexRecordBatchSize>10485760</shardIndexRecordBatchSize>
    <!-- The interval in milliseconds, which a shard index processing worker thread will sleep during index processing operations. This setting
         along with the 'shardIndexRecordBatchSize' setting can be used to increase the final index batched data amount the indexer processes
         at a given time. Usually, higher the batch data amount, higher the throughput of the indexing operations, but will have a higher latency

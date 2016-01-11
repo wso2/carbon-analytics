@@ -39,7 +39,7 @@ public class AnalyticsIndexerInfo {
     
     private int indexReplicationFactor;
 
-    private int shardIndexRecordBatchSize;
+    private long shardIndexRecordBatchSize;
     
     private int shardIndexWorkerInterval;
     
@@ -93,11 +93,11 @@ public class AnalyticsIndexerInfo {
         this.indexReplicationFactor = indexReplicationFactor;
     }
 
-    public int getShardIndexRecordBatchSize() {
+    public long getShardIndexRecordBatchSize() {
         return shardIndexRecordBatchSize;
     }
 
-    public void setShardIndexRecordBatchSize(int shardIndexRecordBatchSize) {
+    public void setShardIndexRecordBatchSize(long shardIndexRecordBatchSize) {
         this.shardIndexRecordBatchSize = shardIndexRecordBatchSize;
     }
     

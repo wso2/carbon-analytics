@@ -149,10 +149,10 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         this.initDataPurging(config);
     }
     
-    private int extractShardIndexRecordBatchSize(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
-    	int value = config.getShardIndexRecordBatchSize();
-    	if (value <= 0) {
-    		throw new AnalyticsException("The shard index record batch size must to be greater than zero: " + value);
+    private long extractShardIndexRecordBatchSize(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
+    	long value = config.getShardIndexRecordBatchSize();
+    	if (value < 1000) {
+    		throw new AnalyticsException("The shard index record batch size must to be greater than 1000: " + value);
     	}
     	return value;
     }

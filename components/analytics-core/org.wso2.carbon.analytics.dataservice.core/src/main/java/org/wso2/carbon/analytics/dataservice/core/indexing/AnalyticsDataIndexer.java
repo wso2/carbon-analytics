@@ -235,7 +235,7 @@ public class AnalyticsDataIndexer {
         return this.indexerInfo.getShardCount();
     }
     
-    public int getShardIndexRecordBatchSize() {
+    public long getShardIndexRecordBatchSize() {
         return this.indexerInfo.getShardIndexRecordBatchSize();
     }
     
@@ -254,24 +254,24 @@ public class AnalyticsDataIndexer {
     /* processIndexOperations and processIndexOperationsFlushQueue must be synchronized, they are accessed by
      * indexer threads and wait for indexing tasks, if not done property, index corruption will happen */
     private synchronized void processIndexOperations(int shardIndex) throws AnalyticsException {
-        int maxBatchSize = this.getShardIndexRecordBatchSize();
-        int tmpCount;
+        long maxBatchSize = this.getShardIndexRecordBatchSize();
+        long tmpSize;
         /* process until the queue has sizable amount of records left in it, or else, go back to the
          * indexing thread and wait for more to fill up */
         do {
-            tmpCount = this.processLocalShardDataQueue(shardIndex, 
-                    this.localIndexDataStore.getIndexDataQueue(shardIndex), maxBatchSize);
-        } while (tmpCount >= maxBatchSize);
+            tmpSize = this.processLocalShardDataQueue(shardIndex, 
+                    this.localIndexDataStore.getIndexDataQueue(shardIndex), maxBatchSize)[1];
+        } while (tmpSize >= maxBatchSize);
     }
     
     /* processIndexOperations and processIndexOperationsFlushQueue must be synchronized */
     public synchronized void processIndexOperationsFlushQueue(int shardIndex) throws AnalyticsException {
-        int maxBatchCount = this.getShardIndexRecordBatchSize();
+        long maxBatchCount = this.getShardIndexRecordBatchSize();
         LocalIndexDataQueue queue = this.localIndexDataStore.getIndexDataQueue(shardIndex);
         long queueSizeAtStart = queue.size();
-        int processedCount = 0, tmpCount;
+        long processedCount = 0, tmpCount;
         do {
-            tmpCount = this.processLocalShardDataQueue(shardIndex, queue, maxBatchCount);
+            tmpCount = this.processLocalShardDataQueue(shardIndex, queue, maxBatchCount)[0];
             if (tmpCount == 0) {
                 /* nothing left in the queue, time to leave */
                 break;
@@ -280,12 +280,13 @@ public class AnalyticsDataIndexer {
         } while (processedCount < queueSizeAtStart);
     }
     
-    private int processLocalShardDataQueue(int shardIndex, LocalIndexDataQueue dataQueue, 
-            int maxCount) throws AnalyticsException {
+    private long[] processLocalShardDataQueue(int shardIndex, LocalIndexDataQueue dataQueue, 
+            long maxSize) throws AnalyticsException {
         if (dataQueue == null) {
-            return 0;
+            return new long[] { 0, 0 };
         }
-        int result = 0;
+        long entriesProcessed = 0;
+        long bytesProcessed = 0;
         boolean delete = false;
         int deleteTenantId = 0;
         String deleteTableName = null;
@@ -312,13 +313,19 @@ public class AnalyticsDataIndexer {
                     }
                 }
                 indexOps.add(indexOp);
-                result++;
-                if (result >= maxCount) {
+                entriesProcessed++;
+                bytesProcessed += indexOp.getByteSize();
+                if (bytesProcessed >= maxSize) {
                     break;
                 }
             }
             this.processIndexOperationBatch(shardIndex, indexOps);
-            return result;
+            if (log.isDebugEnabled()) {
+                if (bytesProcessed > 0) {
+                    log.debug("Processed " + bytesProcessed + " bytes of batched index data");
+                }
+            }
+            return new long[] { entriesProcessed, bytesProcessed };
         } finally {
             /* Even if there is an error, we should dequeue the peeked records, or else,
              * for errors like a target table couldn't be found anymore, the same records

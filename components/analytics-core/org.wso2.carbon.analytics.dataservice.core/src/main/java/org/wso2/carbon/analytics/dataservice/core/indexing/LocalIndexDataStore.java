@@ -115,6 +115,8 @@ public class LocalIndexDataStore {
         
         private List<Record> records;
         
+        private long byteSize = 100;
+        
         public IndexOperation() { }
         
         public IndexOperation(boolean delete) {
@@ -166,7 +168,17 @@ public class LocalIndexDataStore {
         }
         
         public static IndexOperation fromBytes(byte[] data) {
-            return (IndexOperation) GenericUtils.deserializeObject(data);
+            IndexOperation result = (IndexOperation) GenericUtils.deserializeObject(data);
+            result.setByteSize(data.length);
+            return result;
+        }
+        
+        public long getByteSize() {
+            return byteSize;
+        }
+        
+        public void setByteSize(long byteSize) {
+            this.byteSize = byteSize;
         }
         
     }
@@ -181,7 +193,7 @@ public class LocalIndexDataStore {
         
         private static final String SECONDARY_QUEUE_SUFFIX = "S";
 
-        private static final int QUEUE_CLEANUP_THRESHOLD = 1000;
+        private static final int QUEUE_CLEANUP_THRESHOLD = 20971520; // 20 MB
         
         private IBigQueue primaryQueue;
         
@@ -191,7 +203,7 @@ public class LocalIndexDataStore {
         
         private long secondaryProcessedCount;
                 
-        private int removeCount = 0;
+        private long removedDataSize = 0;
         
         public LocalIndexDataQueue(int shardIndex) throws AnalyticsException {
             this.primaryQueue = this.createQueue(shardIndex + PRIMARY_QUEUE_SUFFIX);
@@ -261,11 +273,11 @@ public class LocalIndexDataStore {
                 }
                 this.secondaryProcessedCount++;
                 IndexOperation indexOp = IndexOperation.fromBytes(data);
-                this.removeCount++;
-                if (this.removeCount > QUEUE_CLEANUP_THRESHOLD) {
+                this.removedDataSize += indexOp.getByteSize();
+                if (this.removedDataSize > QUEUE_CLEANUP_THRESHOLD) {
                     this.primaryQueue.gc();
                     this.secondaryQueue.gc();
-                    this.removeCount = 0;
+                    this.removedDataSize = 0;
                     if (log.isDebugEnabled()) {
                         log.debug("Queue GC: " + this.primaryQueue + "|" + this.secondaryQueue);
                     }
