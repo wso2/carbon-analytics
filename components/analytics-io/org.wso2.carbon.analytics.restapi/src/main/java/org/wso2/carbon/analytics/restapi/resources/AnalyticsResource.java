@@ -988,6 +988,27 @@ public class AnalyticsResource extends AbstractResource {
         }
     }
 
+    /**
+     * Re-index the records of a given table between given timestamp range.
+     * @param tableName the table name
+     * @param timeFrom the time from
+     * @param timeTo  the time to
+     * @throws AnalyticsException
+     */
+    @POST
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("tables/{tableName}")
+    public Response reIndex(@PathParam("tableName") String tableName,
+                                      @QueryParam("from") long timeFrom, @QueryParam("to") long timeTo,
+                                      @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+            throws AnalyticsException {
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
+        String username = authenticate(authHeader);
+        analyticsDataService.reIndex(username, tableName, timeFrom, timeTo);
+        return handleResponse(ResponseStatus.SUCCESS, "Successfully started re-indexing for table: "
+                                                      + tableName);
+    }
+
     private String authenticate(String authHeader) throws AnalyticsException {
 
         String username;
