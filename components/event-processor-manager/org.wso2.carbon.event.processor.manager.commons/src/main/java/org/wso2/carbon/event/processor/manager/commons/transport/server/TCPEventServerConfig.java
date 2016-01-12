@@ -20,22 +20,19 @@ package org.wso2.carbon.event.processor.manager.commons.transport.server;
 
 public class TCPEventServerConfig {
 
-    private int numberOfThreads = 10;
+    private String hostName;
     private int port;
 
-    public TCPEventServerConfig(int port) {
+    public TCPEventServerConfig(String hostName, int port) {
+        this.hostName = hostName;
         this.port = port;
-    }
-
-    public int getNumberOfThreads() {
-        return numberOfThreads;
-    }
-
-    public void setNumberOfThreads(int numberOfThreads) {
-        this.numberOfThreads = numberOfThreads;
     }
 
     public int getPort() {
         return port;
+    }
+
+    public String getHostName() {
+        return hostName;
     }
 }

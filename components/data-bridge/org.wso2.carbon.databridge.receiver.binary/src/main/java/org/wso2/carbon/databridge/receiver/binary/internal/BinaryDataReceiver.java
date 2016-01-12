@@ -22,7 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConstants;
-import org.wso2.carbon.databridge.commons.utils.DataBridgeThreadFactory;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.receiver.binary.BinaryEventConverter;
@@ -36,7 +35,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil.loadData;
 
@@ -54,10 +52,10 @@ public class BinaryDataReceiver {
                               DataBridgeReceiverService dataBridgeReceiverService) {
         this.dataBridgeReceiverService = dataBridgeReceiverService;
         this.binaryDataReceiverConfiguration = binaryDataReceiverConfiguration;
-        this.sslReceiverExecutorService = Executors.newFixedThreadPool(binaryDataReceiverConfiguration.
-                getSizeOfSSLThreadPool(), new DataBridgeThreadFactory("Receiver-Binary-SSL"));
-        this.tcpReceiverExecutorService = Executors.newFixedThreadPool(binaryDataReceiverConfiguration.
-                getSizeOfTCPThreadPool(), new DataBridgeThreadFactory("Receiver-Binary-TCP"));
+        this.sslReceiverExecutorService = new BinaryDataReceiverThreadPoolExecutor(binaryDataReceiverConfiguration.
+                getSizeOfSSLThreadPool(), "Receiver-Binary-SSL");
+        this.tcpReceiverExecutorService = new BinaryDataReceiverThreadPoolExecutor(binaryDataReceiverConfiguration.
+                getSizeOfTCPThreadPool(), "Receiver-Binary-TCP");
     }
 
     public void start() throws IOException, DataBridgeException {
@@ -66,8 +64,9 @@ public class BinaryDataReceiver {
     }
 
     public void stop() {
-        sslReceiverExecutorService.shutdownNow();
-        tcpReceiverExecutorService.shutdownNow();
+        log.info("Stopping Binary Server..");
+        sslReceiverExecutorService.shutdown();
+        tcpReceiverExecutorService.shutdown();
     }
 
     private void startSecureTransmission() throws IOException, DataBridgeException {
@@ -93,57 +92,85 @@ public class BinaryDataReceiver {
         SSLServerSocket sslserversocket =
                 (SSLServerSocket) sslserversocketfactory.createServerSocket(binaryDataReceiverConfiguration.getSSLPort());
         sslserversocket.setEnabledCipherSuites(sslserversocket.getSupportedCipherSuites());
-        for (int i = 0; i < binaryDataReceiverConfiguration.getSizeOfSSLThreadPool(); i++) {
-            sslReceiverExecutorService.execute(new BinaryTransportReceiver(sslserversocket));
-        }
+        Thread thread = new Thread(new BinarySecureEventServerAcceptor(sslserversocket));
+        thread.start();
         log.info("Started Binary SSL Transport on port : " + binaryDataReceiverConfiguration.getSSLPort());
     }
+
 
     private void startEventTransmission() throws IOException {
         ServerSocketFactory serversocketfactory = ServerSocketFactory.getDefault();
         ServerSocket serversocket = serversocketfactory.createServerSocket(binaryDataReceiverConfiguration.getTCPPort());
-        for (int i = 0; i < binaryDataReceiverConfiguration.getSizeOfTCPThreadPool(); i++) {
-            tcpReceiverExecutorService.submit(new BinaryTransportReceiver(serversocket));
-        }
+        Thread thread = new Thread(new BinaryEventServerAcceptor(serversocket));
+        thread.start();
         log.info("Started Binary TCP Transport on port : " + binaryDataReceiverConfiguration.getTCPPort());
     }
 
-    public class BinaryTransportReceiver implements Runnable {
+    public class BinarySecureEventServerAcceptor implements Runnable {
         private ServerSocket serverSocket;
 
-        public BinaryTransportReceiver(ServerSocket serverSocket) {
+        public BinarySecureEventServerAcceptor(ServerSocket serverSocket) {
             this.serverSocket = serverSocket;
         }
 
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    Socket socket = this.serverSocket.accept();
+                    sslReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
+                } catch (IOException e) {
+                    log.error("Error while accepting the connection. ", e);
+                }
+            }
+        }
+    }
+
+    public class BinaryEventServerAcceptor implements Runnable {
+        private ServerSocket serverSocket;
+
+        public BinaryEventServerAcceptor(ServerSocket serverSocket) {
+            this.serverSocket = serverSocket;
+        }
 
         @Override
         public void run() {
-            Socket socket;
-            try {
-                /*
-                Always server needs to listen and accept the socket connection
-                 */
-                while (true) {
-                    socket = this.serverSocket.accept();
-                    InputStream inputstream = new BufferedInputStream(socket.getInputStream());
-                    OutputStream outputStream = new BufferedOutputStream((socket.getOutputStream()));
-
-                    int messageType = inputstream.read();
-                    while (messageType != -1) {
-                        int messageSize = ByteBuffer.wrap(loadData(inputstream, new byte[4])).getInt();
-                        byte[] message = loadData(inputstream, new byte[messageSize]);
-                        processMessage(messageType, message, outputStream);
-                        messageType = inputstream.read();
-                    }
+            while (true) {
+                try {
+                    Socket socket = this.serverSocket.accept();
+                    tcpReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
+                } catch (IOException e) {
+                    log.error("Error while accepting the connection. ", e);
                 }
-            } catch (IOException ex) {
-                log.error("Error while creating SSL socket on port : " + binaryDataReceiverConfiguration.getSizeOfTCPThreadPool(), ex);
-            } catch (Throwable t) {
-                log.error("Error while receiving messages " + t.getMessage(), t);
             }
         }
-
     }
+
+    public class BinaryTransportReceiver implements Runnable {
+        private Socket socket;
+
+        public BinaryTransportReceiver(Socket socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            try {
+                InputStream inputstream = new BufferedInputStream(socket.getInputStream());
+                OutputStream outputStream = new BufferedOutputStream((socket.getOutputStream()));
+                int messageType = inputstream.read();
+                while (messageType != -1) {
+                    int messageSize = ByteBuffer.wrap(loadData(inputstream, new byte[4])).getInt();
+                    byte[] message = loadData(inputstream, new byte[messageSize]);
+                    processMessage(messageType, message, outputStream);
+                    messageType = inputstream.read();
+                }
+            } catch (IOException ex) {
+                log.error("Error while reading from the socket. ", ex);
+            }
+        }
+    }
+
 
     private String processMessage(int messageType, byte[] message, OutputStream outputStream) {
         ByteBuffer byteBuffer = ByteBuffer.wrap(message);

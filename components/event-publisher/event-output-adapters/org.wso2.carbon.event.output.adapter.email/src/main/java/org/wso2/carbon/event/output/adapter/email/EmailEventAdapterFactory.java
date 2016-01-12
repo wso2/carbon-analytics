@@ -19,11 +19,18 @@ package org.wso2.carbon.event.output.adapter.email;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.event.output.adapter.core.*;
+import org.wso2.carbon.event.output.adapter.core.MessageType;
+import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
+import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
+import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
+import org.wso2.carbon.event.output.adapter.core.Property;
 import org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants;
 
 import java.util.*;
 
+/**
+ * The email event adapter factory class to create an email output adapter
+ */
 public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
     private ResourceBundle resourceBundle =
             ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.email.i18n.Resources", Locale.getDefault());

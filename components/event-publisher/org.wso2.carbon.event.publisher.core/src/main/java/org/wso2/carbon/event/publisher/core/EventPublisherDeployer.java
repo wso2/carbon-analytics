@@ -45,7 +45,11 @@ import org.wso2.carbon.event.publisher.core.internal.util.helper.EventPublisherC
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -78,6 +82,7 @@ public class EventPublisherDeployer extends AbstractDeployer implements EventPro
             try {
                 processDeployment(deploymentFileData);
             } catch (Throwable e) {
+                log.error("Cannot deploy event publisher : " + deploymentFileData.getName(), e);
                 throw new DeploymentException("Event publisher file " + deploymentFileData.getName() + " is not deployed ", e);
             }
         } else {
@@ -140,6 +145,7 @@ public class EventPublisherDeployer extends AbstractDeployer implements EventPro
             try {
                 processUndeployment(filePath);
             } catch (Throwable e) {
+                log.error("Cannot undeploy event publisher : " + new File(filePath).getName(), e);
                 throw new DeploymentException("Event publisher file " + new File(filePath).getName() + " is not undeployed properly", e);
             }
         } else {
@@ -198,9 +204,11 @@ public class EventPublisherDeployer extends AbstractDeployer implements EventPro
                             "since it does not contain a proper mapping type : " + eventPublisherFile.getName());
                 }
             } catch (EventPublisherConfigurationException ex) {
-                log.error("Error, Event Publisher not deployed and in inactive state, " + ex.getMessage(), ex);
-                carbonEventPublisherService.addEventPublisherConfigurationFile(createEventPublisherConfigurationFile(eventPublisherName, deploymentFileData.getFile(),
-                        EventPublisherConfigurationFile.Status.ERROR, tenantId, "Exception when deploying event publisher configuration file:\n" + ex.getMessage(), null), tenantId);
+                if (isEditable) {
+                    log.error("Error, Event Publisher not deployed and in inactive state, " + ex.getMessage(), ex);
+                    carbonEventPublisherService.addEventPublisherConfigurationFile(createEventPublisherConfigurationFile(eventPublisherName, deploymentFileData.getFile(),
+                            EventPublisherConfigurationFile.Status.ERROR, tenantId, "Exception when deploying event publisher configuration file:\n" + ex.getMessage(), null), tenantId);
+                }
                 throw new EventPublisherConfigurationException(ex.getMessage(), ex);
             } catch (EventPublisherValidationException ex) {
                 carbonEventPublisherService.addEventPublisherConfigurationFile(createEventPublisherConfigurationFile(eventPublisherName, deploymentFileData.getFile(),
@@ -211,13 +219,15 @@ public class EventPublisherDeployer extends AbstractDeployer implements EventPro
                         EventPublisherConfigurationFile.Status.WAITING_FOR_STREAM_DEPENDENCY, tenantId, e.getMessage(), e.getDependency()), tenantId);
                 log.info("Event Publisher deployment held back and in inactive state :" + eventPublisherFile.getName() + ", Stream validation exception : " + e.getMessage());
             } catch (Throwable e) {
-                log.error("Event Publisher not deployed, invalid configuration found at " + eventPublisherFile.getName() + ", and in inactive state, " + e.getMessage(), e);
-                carbonEventPublisherService.addEventPublisherConfigurationFile(createEventPublisherConfigurationFile(eventPublisherName,
-                        deploymentFileData.getFile(), EventPublisherConfigurationFile.Status.ERROR, tenantId, "Deployment exception: " + e.getMessage(), null), tenantId);
+                if (isEditable) {
+                    log.error("Event Publisher not deployed, invalid configuration found at " + eventPublisherFile.getName() + ", and in inactive state, " + e.getMessage(), e);
+                    carbonEventPublisherService.addEventPublisherConfigurationFile(createEventPublisherConfigurationFile(eventPublisherName,
+                            deploymentFileData.getFile(), EventPublisherConfigurationFile.Status.ERROR, tenantId, "Deployment exception: " + e.getMessage(), null), tenantId);
+                }
                 throw new EventPublisherConfigurationException(e);
             }
         } else {
-            log.info("Event Publisher " + eventPublisherFile.getName() + " is already registered with this tenant (" + tenantId + "), hence ignoring redeployment");
+            throw new EventPublisherConfigurationException("Event Publisher " + eventPublisherFile.getName() + " is already registered with this tenant (" + tenantId + ")");
         }
     }
 

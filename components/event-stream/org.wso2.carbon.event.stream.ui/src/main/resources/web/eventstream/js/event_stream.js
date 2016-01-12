@@ -22,6 +22,14 @@ function addEventStream(form, option, eventStreamId) {
     var eventStreamDescription = document.getElementById("eventStreamDescription").value.trim();
     var eventStreamNickName = document.getElementById("eventStreamNickName").value.trim();
 
+    if(!isValidName(eventStreamName)){
+         CARBON.showErrorDialog("Invalid stream name. \n");
+         return;
+    }
+    if((eventStreamNickName != "") && (!isValidName(eventStreamNickName))){
+         CARBON.showErrorDialog("Invalid stream nick name. \n");
+         return;
+    }
     if ((eventStreamName == "") || (eventStreamVersion == "")) {
         // empty fields are encountered.
         CARBON.showErrorDialog("Empty inputs fields are not allowed.");
@@ -90,6 +98,7 @@ function addEventStream(form, option, eventStreamId) {
                         payloadIndex: payloadIndex,
                         arbitraryIndex: arbitraryIndex,
                         eventPersist: document.getElementById("eventPersistCheckbox").checked,
+                        mergeSchema: document.getElementById("schemaReplaceCheckbox").checked,
                         eventStreamDescription: eventStreamDescription,
                         eventStreamNickName: eventStreamNickName,
                         recordStream: document.getElementById("recordStoreSelect").value
@@ -122,6 +131,7 @@ function addEventStream(form, option, eventStreamId) {
                             payloadIndex: payloadIndex,
                             arbitraryIndex: arbitraryIndex,
                             eventPersist: document.getElementById("eventPersistCheckbox").checked,
+                            mergeSchema: document.getElementById("schemaReplaceCheckbox").checked,
                             eventStreamDescription: eventStreamDescription,
                             eventStreamNickName: eventStreamNickName,
                             recordStream: document.getElementById("recordStoreSelect").value
@@ -147,17 +157,25 @@ function addEventStreamViaPopup(form, callback) {
 
     var eventStreamName = document.getElementById("eventStreamNameId").value.trim();
     var eventStreamVersion = document.getElementById("eventStreamVersionId").value.trim();
-
     var streamId = eventStreamName + ":" + eventStreamVersion;
     var eventStreamDescription = document.getElementById("eventStreamDescription").value.trim();
     var eventStreamNickName = document.getElementById("eventStreamNickName").value.trim();
+
+    if(!isValidName(eventStreamName)){
+        CARBON.showErrorDialog("Invalid stream name. \n");
+        return;
+    }
+
+    if((eventStreamNickName != "") && (!isValidName(eventStreamNickName))){
+        CARBON.showErrorDialog("Invalid stream nick name. \n");
+        return;
+    }
 
     if ((eventStreamName == "") || (eventStreamVersion == "")) {
         // empty fields are encountered.
         CARBON.showErrorDialog("Empty inputs fields are not allowed.");
         return;
     }
-
     else {
         var metaData = "";
         var correlationData = "";
@@ -246,6 +264,10 @@ function addStreamAttribute(dataType) {
 
     if (attributeType.value == "") {
         error = "Attribute type field is empty. \n";
+    }
+
+    if(!isValidName((attributeName.value).trim())){
+        error = "Invalid attribute name. \n"
     }
 
     if (error != "") {
@@ -446,10 +468,6 @@ function convertStringToEventStreamInfoDto() {
                 document.getElementById("eventStreamDescription").value = eventStreamDefinitionDtoJSON.message.description;
                 document.getElementById("eventStreamNickName").value = eventStreamDefinitionDtoJSON.message.nickName;
 
-                //var source =  document.getElementById("sourceWorkArea");
-                //var design =  document.getElementById("designWorkArea");
-
-
                 if (0 == eventStreamDefinitionDtoJSON.message.metaAttributes.length) {
                     var streamAttributeTable = document.getElementById("outputMetaDataTable");
 
@@ -541,10 +559,83 @@ function addStreamAttribute2(dataType, name, type) {
 
 }
 
+function isValidName(string){
+    var pattern = /^([a-z][A-Z]|_|\.|-)([a-z]|[A-Z]|[0-9]|_|\.|-)*$/i;
+    return (pattern.test(string));
+}
+
+function validateStreamDefinition(streamDefinitionString){
+    var error = "";
+    var streamDefinitionJSON = JSON.parse(streamDefinitionString);
+    var streamId = streamDefinitionJSON["streamId"].trim();
+    var name = streamDefinitionJSON["name"].trim();
+    var nickName = streamDefinitionJSON["nickName"].trim();
+    var metaData = streamDefinitionJSON["metaData"];
+    var correlationData = streamDefinitionJSON["correlationData"];
+    var payloadData = streamDefinitionJSON["payloadData"];
+
+    if(!isValidName(name)){
+        error = "Invalid stream name. \n";
+    }
+    if((nickName != "") && (!isValidName(nickName))){
+        error = "Invalid stream nick name. \n";
+    }
+
+    var meta_faultName = "";
+    var noMappingParameters = 1;
+    for(i in metaData){
+        meta_faultName = metaData[i]["name"];
+        if((meta_faultName != "") && (!isValidName(metaData[i]["name"]))){
+            noMappingParameters = 0;
+            error = "Invalid attribute name.\n" +
+                    "Metadata attribute : " + meta_faultName;
+        }
+        else if(isValidName(metaData[i]["name"])){
+            noMappingParameters = 0;
+        }
+    }
+
+    var correlation_faultName = "";
+    for(i in correlationData){
+        correlation_faultName = correlationData[i]["name"];
+        if((correlation_faultName != "") && (!isValidName(correlationData[i]["name"]))){
+            noMappingParameters = 0;
+            error = "Invalid attribute name.\n" +
+                    "Correlation attribute : " + correlation_faultName;
+        }
+        else if(isValidName(correlationData[i]["name"])){
+            noMappingParameters = 0;
+        }
+     }
+
+    var payload_faultName = "";
+    for(i in payloadData){
+        payload_faultName = payloadData[i]["name"];
+        if((payload_faultName != "") && (!isValidName(payloadData[i]["name"]))){
+            noMappingParameters = 0;
+            error = "Invalid attribute name.\n" +
+                    "Payload attribute : " + payload_faultName;
+        }
+        else if(isValidName(payloadData[i]["name"])){
+            noMappingParameters = 0;
+        }
+     }
+
+     if(noMappingParameters == 1){
+        error = "Mapping parameters cannot be empty.";
+     }
+
+    return error;
+}
+
 function addEventStreamByString(form) {
     var eventStreamDefinitionString = document.getElementById("streamDefinitionText").value.trim();
+    var error = validateStreamDefinition(eventStreamDefinitionString);
 
-
+    if(error != ""){
+        CARBON.showErrorDialog(error);
+        return;
+    }
     new Ajax.Request('../eventstream/add_event_stream_by_string_ajaxprocessor.jsp', {
         method: 'POST',
         asynchronous: false,
@@ -587,8 +678,6 @@ function editEventStreamByString(form, eventStreamId) {
                     } else {
                         form.submit();
                     }
-
-
                 }
             })
         }, null, null);

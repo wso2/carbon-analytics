@@ -1,20 +1,21 @@
 /*
-*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.databridge.core.definitionstore;
 
 import org.apache.commons.logging.Log;
@@ -70,7 +71,7 @@ public abstract class AbstractStreamDefinitionStore implements StreamDefinitionS
             return;
         }
         if (!existingDefinition.equals(streamDefinition)) {
-            throw new DifferentStreamDefinitionAlreadyDefinedException("Cannot define Stream definition:"+EventDefinitionConverterUtils.convertToJson(existingDefinition)+ ", Another Stream with same name and version" +
+            throw new DifferentStreamDefinitionAlreadyDefinedException("Cannot define Stream definition:" + EventDefinitionConverterUtils.convertToJson(existingDefinition) + ", Another Stream with same name and version" +
                     " exist :" + EventDefinitionConverterUtils
                     .convertToJson(existingDefinition));
         }
@@ -100,6 +101,11 @@ public abstract class AbstractStreamDefinitionStore implements StreamDefinitionS
         }
     }
 
+    public void invalidateStreamDefinition(String streamName, String streamVersion, int tenantId) {
+        for (StreamAddRemoveListener streamAddRemoveListener : streamAddRemoveListenerList) {
+            streamAddRemoveListener.streamRemoved(tenantId, streamName + ":" + streamVersion);
+        }
+    }
 
     public abstract StreamDefinition getStreamDefinitionFromStore(String name, String version, int tenantId)
             throws StreamDefinitionStoreException;

@@ -27,6 +27,7 @@ import org.wso2.carbon.event.processor.manager.core.EventManagementUtil;
 import org.wso2.carbon.event.processor.manager.core.EventSync;
 import org.wso2.carbon.event.processor.manager.core.Manager;
 import org.wso2.carbon.event.processor.manager.core.config.DistributedConfiguration;
+import org.wso2.carbon.event.processor.manager.core.config.HAConfiguration;
 import org.wso2.carbon.event.processor.manager.core.config.Mode;
 import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
@@ -54,7 +55,7 @@ public class EventReceiver implements EventProducer {
     private boolean traceEnabled = false;
     private boolean statisticsEnabled = false;
     private boolean customMappingEnabled = false;
-    private boolean isManagerNode = false;
+    private boolean isWorkerNode = false;
     private boolean sufficientToSend = false;
     private Logger trace = Logger.getLogger(EventReceiverConstants.EVENT_TRACE_LOGGER);
     private EventReceiverConfiguration eventReceiverConfiguration = null;
@@ -120,9 +121,9 @@ public class EventReceiver implements EventProducer {
 
                 DistributedConfiguration distributedConfiguration = EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getDistributedConfiguration();
                 if(distributedConfiguration != null){
-                    isManagerNode = distributedConfiguration.isManagerNode();
+                    this.isWorkerNode = distributedConfiguration.isWorkerNode();
                 }
-                sufficientToSend = mode != Mode.Distributed || (!isManagerNode && !isEventDuplicatedInCluster);
+                sufficientToSend = mode != Mode.Distributed || (isWorkerNode && !isEventDuplicatedInCluster);
 
             } catch (InputEventAdapterException e) {
                 throw new EventReceiverConfigurationException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error in configuration. " + e.getMessage(), e);
@@ -131,10 +132,14 @@ public class EventReceiver implements EventProducer {
             }
             this.mode = mode;
             if (mode == Mode.HA) {
+                HAConfiguration haConfiguration = EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getHaConfiguration();
                 Lock readLock = EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().getReadLock();
-                inputEventDispatcher = new QueueInputEventDispatcher(tenantId, EventManagementUtil.constructEventSyncId(tenantId, eventReceiverConfiguration.getEventReceiverName(), Manager.ManagerType.Receiver), readLock, exportedStreamDefinition);
+                inputEventDispatcher = new QueueInputEventDispatcher(tenantId,
+                        EventManagementUtil.constructEventSyncId(tenantId, eventReceiverConfiguration.getEventReceiverName(),
+                                Manager.ManagerType.Receiver), readLock, exportedStreamDefinition,
+                        haConfiguration.getEventSyncReceiverMaxQueueSizeInMb(), haConfiguration.getEventSyncReceiverQueueSize());
                 inputEventDispatcher.setSendToOther(!isEventDuplicatedInCluster);
-                EventReceiverServiceValueHolder.getEventManagementService().registerEventSync((EventSync) inputEventDispatcher);
+                EventReceiverServiceValueHolder.getEventManagementService().registerEventSync((EventSync) inputEventDispatcher, Manager.ManagerType.Receiver);
             } else {
                 inputEventDispatcher = new InputEventDispatcher();
             }
@@ -250,7 +255,7 @@ public class EventReceiver implements EventProducer {
             statisticsMonitor.incrementRequest();
         }
         //in distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator. Also do not send if this is a manager node.
-        if (sufficientToSend || (!isManagerNode && EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator())) {
+        if (sufficientToSend || EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator()) {
             this.inputEventDispatcher.onEvent(event);
         }
 
@@ -290,8 +295,8 @@ public class EventReceiver implements EventProducer {
 
     public void destroy() {
         EventReceiverServiceValueHolder.getInputEventAdapterService().destroy(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
-        if (inputEventDispatcher instanceof EventSync) {
-            EventReceiverServiceValueHolder.getEventManagementService().unregisterEventSync(((EventSync) inputEventDispatcher).getStreamDefinition().getId());
+        if (mode == Mode.HA && inputEventDispatcher instanceof EventSync) {
+            EventReceiverServiceValueHolder.getEventManagementService().unregisterEventSync(((EventSync) inputEventDispatcher).getStreamDefinition().getId(), Manager.ManagerType.Receiver);
         }
     }
 

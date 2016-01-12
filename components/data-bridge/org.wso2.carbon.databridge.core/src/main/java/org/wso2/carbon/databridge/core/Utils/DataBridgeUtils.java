@@ -1,15 +1,3 @@
-package org.wso2.carbon.databridge.core.Utils;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.databridge.commons.Attribute;
-import org.wso2.carbon.databridge.commons.AttributeType;
-import org.wso2.carbon.databridge.commons.Event;
-import org.wso2.carbon.databridge.commons.StreamDefinition;
-
-import java.io.IOException;
-import java.util.List;
-
 /**
  * Copyright (c) WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  * <p/>
@@ -25,6 +13,17 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.wso2.carbon.databridge.core.Utils;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.databridge.commons.*;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
+
+import java.io.IOException;
+import java.util.List;
+
 public class DataBridgeUtils {
 
     private static Log log = LogFactory.getLog(DataBridgeUtils.class);
@@ -141,4 +140,11 @@ public class DataBridgeUtils {
         }
         return true;
     }
+
+    public static int getSize(EventComposite eventComposite) {
+        int size = (DataBridgeCommonsUtils.getReferenceSize() * 3) + 4; // for agent size reference.
+        size += eventComposite.getEventConverter().getSize(eventComposite.getEventBundle());
+        return size;
+    }
+
 }

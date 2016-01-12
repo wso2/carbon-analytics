@@ -20,7 +20,9 @@ import org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAda
 
 import java.util.*;
 
-
+/**
+ * The WSO2Event adapter factory class to create a WSO2Event output adapter
+ */
 public class WSO2EventAdapterFactory extends OutputEventAdapterFactory {
 
     ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.wso2event.i18n.Resources", Locale.getDefault());
@@ -81,7 +83,6 @@ public class WSO2EventAdapterFactory extends OutputEventAdapterFactory {
                 resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_PROTOCOL));
         protocolProperty.setHint(resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_HINT_PROTOCOL));
 
-        //TODO verify the hint
         // set publishingMode as property
         Property publishingModeProperty = new Property(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_PUBLISHING_MODE);
         publishingModeProperty.setDefaultValue(WSO2EventAdapterConstants.ADAPTER_PUBLISHING_MODE_NON_BLOCKING);

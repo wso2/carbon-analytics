@@ -17,40 +17,84 @@
  */
 package org.wso2.carbon.event.processor.manager.core.config;
 
+import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisherConfig;
 import org.wso2.carbon.event.processor.manager.commons.utils.HostAndPort;
 
 import java.io.Serializable;
 
 
 public class HAConfiguration implements Serializable {
-    private HostAndPort management;
-    private HostAndPort transport;
-    private int reconnectionInterval;
+
+    //nodeType
+    private boolean workerNode = false;
+
+    private boolean presenterNode = false;
+    private HostAndPort localPresenterConfig = new HostAndPort("localhost", 11000);
+
+    //management
+    private HostAndPort managementConfig = new HostAndPort("localhost", 10005);
+    private int managementStateSyncRetryInterval = 10000;
+    private long managementTryStateChangeInterval = 15000;
+
+    //eventSync
+    private HostAndPort eventSyncConfig = new HostAndPort("localhost", 11224);
+    private int eventSyncPublisherTcpSendBufferSize = 5242880;
+    private String eventSyncPublisherCharSet = "UTF-8";
+    private int eventSyncPublisherBufferSize = 1024;
+    private long eventSyncPublisherConnectionStatusCheckInterval = 30000;
+    private int eventSyncReceiverQueueSize = 1000000;
+    private int eventSyncPublisherQueueSize = 1000000;
+    private int eventSyncReceiverMaxQueueSizeInMb = 50;
+    private int eventSyncPublisherMaxQueueSizeInMb = 50;
+
+    //presentation
+    private int presentationPublisherTcpSendBufferSize = 5242880;
+    private String presentationPublisherCharSet = "UTF-8";
+    private int presentationPublisherBufferSize = 1024;
+    private long presentationPublisherConnectionStatusCheckInterval = 30000;
+
+    private int checkMemberUpdateInterval = 10000;
+
     private String memberUuid;
 
-    public int getReconnectionInterval() {
-        return reconnectionInterval;
+    public boolean isWorkerNode() {
+        return workerNode;
     }
 
-    public void setReconnectionInterval(int reconnectionInterval) {
-        this.reconnectionInterval = reconnectionInterval;
+    public void setWorkerNode(boolean workerNode) {
+        this.workerNode = workerNode;
     }
 
-    public HostAndPort getManagement() {
-        return management;
+    public boolean isPresenterNode() {
+        return presenterNode;
     }
 
-    public HostAndPort getTransport() {
-        return transport;
+    public void setPresenterNode(boolean presenterNode) {
+        this.presenterNode = presenterNode;
+    }
+
+    public HostAndPort getLocalPresenterConfig() {
+        return localPresenterConfig;
+    }
+
+    public void setLocalPresenterConfig(String host, int port) {
+        this.localPresenterConfig = new HostAndPort(host, port);
+    }
+
+    public HostAndPort getManagementConfig() {
+        return managementConfig;
+    }
+
+    public HostAndPort getEventSyncConfig() {
+        return eventSyncConfig;
     }
 
     public void setManagement(String host, int port) {
-        this.management = new HostAndPort(host, port);
+        this.managementConfig = new HostAndPort(host, port);
     }
 
-    public void setTransport(String host, int port, int reconnectionInterval) {
-        this.transport = new HostAndPort(host, port);
-        this.reconnectionInterval = reconnectionInterval;
+    public void setEventSyncConfig(String host, int port) {
+        this.eventSyncConfig = new HostAndPort(host, port);
     }
 
     public String getMemberUuid() {
@@ -59,5 +103,145 @@ public class HAConfiguration implements Serializable {
 
     public void setMemberUuid(String memberUuid) {
         this.memberUuid = memberUuid;
+    }
+
+    public int getCheckMemberUpdateInterval() {
+        return checkMemberUpdateInterval;
+    }
+
+    public void setCheckMemberUpdateInterval(int checkMemberUpdateInterval) {
+        this.checkMemberUpdateInterval = checkMemberUpdateInterval;
+    }
+
+    public int getManagementStateSyncRetryInterval() {
+        return managementStateSyncRetryInterval;
+    }
+
+    public void setManagementStateSyncRetryInterval(int managementStateSyncRetryInterval) {
+        this.managementStateSyncRetryInterval = managementStateSyncRetryInterval;
+    }
+
+    public long getManagementTryStateChangeInterval() {
+        return managementTryStateChangeInterval;
+    }
+
+    public void setManagementTryStateChangeInterval(long managementTryStateChangeInterval) {
+        this.managementTryStateChangeInterval = managementTryStateChangeInterval;
+    }
+
+    public int getEventSyncPublisherBufferSize() {
+        return eventSyncPublisherBufferSize;
+    }
+
+    public void setEventSyncPublisherBufferSize(int eventSyncPublisherBufferSize) {
+        this.eventSyncPublisherBufferSize = eventSyncPublisherBufferSize;
+    }
+
+    public long getEventSyncPublisherConnectionStatusCheckInterval() {
+        return eventSyncPublisherConnectionStatusCheckInterval;
+    }
+
+    public void setEventSyncPublisherConnectionStatusCheckInterval(long eventSyncPublisherConnectionStatusCheckInterval) {
+        this.eventSyncPublisherConnectionStatusCheckInterval = eventSyncPublisherConnectionStatusCheckInterval;
+    }
+
+    public String getEventSyncPublisherCharSet() {
+        return eventSyncPublisherCharSet;
+    }
+
+    public void setEventSyncPublisherCharSet(String eventSyncPublisherCharSet) {
+        this.eventSyncPublisherCharSet = eventSyncPublisherCharSet;
+    }
+
+    public int getEventSyncPublisherTcpSendBufferSize() {
+        return eventSyncPublisherTcpSendBufferSize;
+    }
+
+    public void setEventSyncPublisherTcpSendBufferSize(int eventSyncPublisherTcpSendBufferSize) {
+        this.eventSyncPublisherTcpSendBufferSize = eventSyncPublisherTcpSendBufferSize;
+    }
+
+    public int getPresentationPublisherTcpSendBufferSize() {
+        return presentationPublisherTcpSendBufferSize;
+    }
+
+    public String getPresentationPublisherCharSet() {
+        return presentationPublisherCharSet;
+    }
+
+    public int getPresentationPublisherBufferSize() {
+        return presentationPublisherBufferSize;
+    }
+
+    public long getPresentationPublisherConnectionStatusCheckInterval() {
+        return presentationPublisherConnectionStatusCheckInterval;
+    }
+
+    public void setPresentationPublisherTcpSendBufferSize(int presentationPublisherTcpSendBufferSize) {
+        this.presentationPublisherTcpSendBufferSize = presentationPublisherTcpSendBufferSize;
+    }
+
+    public void setPresentationPublisherCharSet(String presentationPublisherCharSet) {
+        this.presentationPublisherCharSet = presentationPublisherCharSet;
+    }
+
+    public void setPresentationPublisherBufferSize(int presentationPublisherBufferSize) {
+        this.presentationPublisherBufferSize = presentationPublisherBufferSize;
+    }
+
+    public void setPresentationPublisherConnectionStatusCheckInterval(long presentationPublisherConnectionStatusCheckInterval) {
+        this.presentationPublisherConnectionStatusCheckInterval = presentationPublisherConnectionStatusCheckInterval;
+    }
+
+    public TCPEventPublisherConfig constructEventSyncPublisherConfig() {
+
+        TCPEventPublisherConfig tcpEventPublisherConfig = new TCPEventPublisherConfig();
+        tcpEventPublisherConfig.setBufferSize(getEventSyncPublisherBufferSize());
+        tcpEventPublisherConfig.setConnectionStatusCheckInterval(getEventSyncPublisherConnectionStatusCheckInterval());
+        tcpEventPublisherConfig.setCharset(getEventSyncPublisherCharSet());
+        tcpEventPublisherConfig.setTcpSendBufferSize(getEventSyncPublisherTcpSendBufferSize());
+        return tcpEventPublisherConfig;
+    }
+
+    public TCPEventPublisherConfig constructPresenterPublisherConfig() {
+
+        TCPEventPublisherConfig tcpEventPublisherConfig = new TCPEventPublisherConfig();
+        tcpEventPublisherConfig.setBufferSize(getPresentationPublisherBufferSize());
+        tcpEventPublisherConfig.setConnectionStatusCheckInterval(getPresentationPublisherConnectionStatusCheckInterval());
+        tcpEventPublisherConfig.setCharset(getPresentationPublisherCharSet());
+        tcpEventPublisherConfig.setTcpSendBufferSize(getPresentationPublisherTcpSendBufferSize());
+        return tcpEventPublisherConfig;
+    }
+
+    public int getEventSyncReceiverQueueSize() {
+        return eventSyncReceiverQueueSize;
+    }
+
+    public void setEventSyncReceiverQueueSize(int eventSyncReceiverQueueSize) {
+        this.eventSyncReceiverQueueSize = eventSyncReceiverQueueSize;
+    }
+
+    public int getEventSyncPublisherQueueSize() {
+        return eventSyncPublisherQueueSize;
+    }
+
+    public void setEventSyncPublisherQueueSize(int eventSyncPublisherQueueSize) {
+        this.eventSyncPublisherQueueSize = eventSyncPublisherQueueSize;
+    }
+
+    public int getEventSyncReceiverMaxQueueSizeInMb() {
+        return eventSyncReceiverMaxQueueSizeInMb;
+    }
+
+    public void setEventSyncReceiverMaxQueueSizeInMb(int eventSyncReceiverMaxQueueSizeInMb) {
+        this.eventSyncReceiverMaxQueueSizeInMb = eventSyncReceiverMaxQueueSizeInMb;
+    }
+
+    public int getEventSyncPublisherMaxQueueSizeInMb() {
+        return eventSyncPublisherMaxQueueSizeInMb;
+    }
+
+    public void setEventSyncPublisherMaxQueueSizeInMb(int eventSyncPublisherMaxQueueSizeInMb) {
+        this.eventSyncPublisherMaxQueueSizeInMb = eventSyncPublisherMaxQueueSizeInMb;
     }
 }

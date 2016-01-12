@@ -28,6 +28,7 @@ public class EventComposite {
     private Object eventBundle;
     private AgentSession agentSession;
     private EventConverter eventConverter;
+    private int size;
 
     public EventComposite(Object eventBundle,
                           StreamTypeHolder streamTypeHolder, AgentSession agentSession,
@@ -52,5 +53,13 @@ public class EventComposite {
 
     public EventConverter getEventConverter() {
         return eventConverter;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 }

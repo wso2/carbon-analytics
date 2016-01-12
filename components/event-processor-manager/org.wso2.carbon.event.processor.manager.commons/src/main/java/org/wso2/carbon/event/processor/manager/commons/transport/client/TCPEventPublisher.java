@@ -36,10 +36,13 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 public class TCPEventPublisher {
+    public static final int PING_HEADER_VALUE = -99;
 
     private static Logger log = Logger.getLogger(TCPEventPublisher.class);
     private final String hostUrl;
@@ -49,7 +52,8 @@ public class TCPEventPublisher {
     private OutputStream outputStream;
     private Socket clientSocket;
     private TCPEventPublisherConfig publisherConfig;
-    public  String defaultCharset;
+    public String defaultCharset;
+    private Timer connectionStatusCheckTimer;
 
     /**
      * Indicate synchronous or asynchronous mode. In asynchronous mode Disruptor pattern is used and in synchronous mode sendEvent call
@@ -57,9 +61,12 @@ public class TCPEventPublisher {
      */
     private boolean isSynchronous;
     private ConnectionCallback connectionCallback;
+    /**
+     * Callback to handle when the connection fails in middle
+     */
+    private ConnectionFailureHandler failureHandler = null;
 
     /**
-     *
      * @param hostUrl
      * @param publisherConfig
      * @param isSynchronous
@@ -70,7 +77,7 @@ public class TCPEventPublisher {
             throws IOException {
         this.hostUrl = hostUrl;
         this.publisherConfig = publisherConfig;
-        this.defaultCharset= publisherConfig.getDefaultCharset();
+        this.defaultCharset = publisherConfig.getCharset();
         this.streamRuntimeInfoMap = new ConcurrentHashMap<String, StreamRuntimeInfo>();
         this.isSynchronous = isSynchronous;
         this.connectionCallback = connectionCallback;
@@ -87,7 +94,7 @@ public class TCPEventPublisher {
         }
     }
 
-    private void connect(String hostUrl) throws IOException {
+    private synchronized void connect(String hostUrl) throws IOException {
         String[] hp = hostUrl.split(":");
         String host = hp[0];
         int port = Integer.parseInt(hp[1]);
@@ -98,9 +105,12 @@ public class TCPEventPublisher {
         this.clientSocket.setSendBufferSize(publisherConfig.getTcpSendBufferSize());
         this.outputStream = new BufferedOutputStream(this.clientSocket.getOutputStream());
         log.info("Connecting to " + hostUrl);
-        if(connectionCallback != null){
+        if (connectionCallback != null) {
             connectionCallback.onCepReceiverConnect();
         }
+
+        connectionStatusCheckTimer = new Timer();
+        connectionStatusCheckTimer.schedule(new ConnectionStatusCheckTask(), publisherConfig.getConnectionStatusCheckInterval(), publisherConfig.getConnectionStatusCheckInterval());
     }
 
     public TCPEventPublisher(String hostUrl, boolean isSynchronous, ConnectionCallback connectionCallback) throws IOException {
@@ -113,6 +123,10 @@ public class TCPEventPublisher {
 
     public void removeStreamDefinition(StreamDefinition streamDefinition) {
         streamRuntimeInfoMap.remove(streamDefinition.getId());
+    }
+
+    public void registerConnectionFailureHandler(ConnectionFailureHandler failureHandler) {
+        this.failureHandler = failureHandler;
     }
 
     /**
@@ -158,18 +172,25 @@ public class TCPEventPublisher {
                     buf.putDouble((Double) eventData[i]);
                     continue;
                 case STRING:
-                    int length = ((String) eventData[i]).getBytes(defaultCharset).length;
-                    buf.putInt(length);
+                    if (eventData[i] == null) {
+                        buf.putInt(-1);
+                    } else {
+                        int length = ((String) eventData[i]).getBytes(defaultCharset).length;
+                        buf.putInt(length);
+                        stringSize += length;
+                    }
                     stringDataIndex[stringIndex] = i;
                     stringIndex++;
-                    stringSize += length;
             }
         }
         arrayOutputStream.write(buf.array());
 
         buf = ByteBuffer.allocate(stringSize);
         for (int aStringIndex : stringDataIndex) {
-            buf.put(((String) eventData[aStringIndex]).getBytes(defaultCharset));
+            Object data = eventData[aStringIndex];
+            if (data != null) {
+                buf.put(((String) eventData[aStringIndex]).getBytes(defaultCharset));
+            }
         }
         arrayOutputStream.write(buf.array());
 
@@ -190,14 +211,14 @@ public class TCPEventPublisher {
         }
     }
 
-    private void publishEvent(byte[] data, boolean flush) throws IOException {
+    private synchronized void publishEvent(byte[] data, boolean flush) throws IOException {
         outputStream.write(data);
         if (flush) {
             outputStream.flush();
         }
     }
 
-    private void publishEventAsync(byte[] data, boolean flush) throws IOException {
+    private synchronized void publishEventAsync(byte[] data, boolean flush) throws IOException {
         if (outputStream != null) {
             try {
                 outputStream.write(data);
@@ -259,24 +280,34 @@ public class TCPEventPublisher {
 
 
     /**
-     * Gracefully shutdown the TCPEventPublisher.
-     * When this method is used already consumer threads of distruptor will try to publishToDisruptor the queued messages in the RingBuffer.
+     * Gracefully shutdown the TCPEventPublisher and flush the data in output buffer.
+     * When this method is used already consumer threads of disruptor will try to publishToDisruptor the queued messages in the RingBuffer.
      */
     public void shutdown() {
         try {
-            if (!isSynchronous) {
-                disruptor.shutdown();
-            }
             outputStream.flush();
         } catch (IOException e) {
-            log.warn("Error while closing stream to " + hostUrl + " : " + e.getMessage(), e);
+            log.warn("Error while flushing output stream to " + hostUrl + " : " + e.getMessage(), e);
         } finally {
-            disconnect();
+            terminate();
         }
+    }
 
+    /**
+     * Immediately shutdown the TCPEventPublisher and discard the data in output buffer.
+     */
+    public void terminate() {
+        connectionStatusCheckTimer.cancel();
+        if (!isSynchronous) {
+            disruptor.shutdown();
+        }
+        disconnect();
     }
 
     private void disconnect() {
+        if (connectionStatusCheckTimer != null) {
+            connectionStatusCheckTimer.cancel();
+        }
         try {
             if (outputStream != null) {
                 outputStream.close();
@@ -292,8 +323,8 @@ public class TCPEventPublisher {
             }
         } catch (IOException e) {
             log.debug("Error while closing socket to " + hostUrl + " : " + e.getMessage(), e);
-        }  finally {
-            if(connectionCallback != null){
+        } finally {
+            if (connectionCallback != null) {
                 connectionCallback.onCepReceiverDisconnect();
             }
         }
@@ -305,5 +336,34 @@ public class TCPEventPublisher {
 
     public String getHostUrl() {
         return hostUrl;
+    }
+
+
+    class ConnectionStatusCheckTask extends TimerTask {
+
+        private byte[] createPing() throws IOException {
+            ByteBuffer buffer = ByteBuffer.allocate(4);
+            buffer.putInt(TCPEventPublisher.PING_HEADER_VALUE);
+            ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+            arrayOutputStream.write(buffer.array());
+            return arrayOutputStream.toByteArray();
+        }
+
+        /**
+         * The action to be performed by this timer task.
+         */
+        @Override
+        public void run() {
+            try {
+                publishEvent(createPing(), true);
+            } catch (IOException e) {
+                log.warn("Ping failed to " + getHostUrl() + " with error: " + e.getMessage());
+                connectionStatusCheckTimer.cancel();
+                if (failureHandler != null) {
+                    failureHandler.onConnectionFail(e);
+                }
+
+            }
+        }
     }
 }

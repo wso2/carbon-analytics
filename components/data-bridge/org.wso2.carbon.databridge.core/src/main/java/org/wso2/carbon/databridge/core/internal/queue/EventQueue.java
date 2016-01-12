@@ -26,7 +26,6 @@ import org.wso2.carbon.databridge.core.Utils.EventComposite;
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
 
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -52,7 +51,8 @@ public class EventQueue {
         this.rawDataSubscribers = rawDataSubscribers;
         // Note : Using a fixed worker thread pool and a bounded queue to prevent the server dying if load is too high
         executorService = Executors.newFixedThreadPool(dataBridgeConfiguration.getWorkerThreads(), new DataBridgeThreadFactory("Core"));
-        eventQueue = new ArrayBlockingQueue<EventComposite>(dataBridgeConfiguration.getEventBufferCapacity());
+        eventQueue = new EventBlockingQueue(dataBridgeConfiguration.getEventBufferSize(),
+                dataBridgeConfiguration.getMaxEventBufferCapacity());
     }
 
     public void publish(EventComposite eventComposite) {

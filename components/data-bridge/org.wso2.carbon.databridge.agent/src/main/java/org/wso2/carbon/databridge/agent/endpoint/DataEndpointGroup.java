@@ -23,6 +23,7 @@ import com.lmax.disruptor.dsl.Disruptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.agent.DataEndpointAgent;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.EventQueueFullException;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.databridge.agent.util.DataPublisherUtil;
@@ -54,13 +55,13 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private int reconnectionInterval;
 
-    private AtomicInteger currentDataPublisherIndex = new AtomicInteger();
+    private final Integer START_INDEX = 0;
+
+    private AtomicInteger currentDataPublisherIndex = new AtomicInteger(START_INDEX);
 
     private AtomicInteger maximumDataPublisherIndex = new AtomicInteger();
 
     private ScheduledExecutorService reconnectionService;
-
-    private final Integer START_INDEX = 0;
 
     public enum HAType {
         FAILOVER, LOADBALANCE
@@ -74,6 +75,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         this.eventQueue = new EventQueue(agent.getAgentConfiguration().getQueueSize());
         this.reconnectionService.scheduleAtFixedRate(new ReconnectionTask(), reconnectionInterval,
                 reconnectionInterval, TimeUnit.SECONDS);
+        currentDataPublisherIndex.set(START_INDEX);
     }
 
     public void addDataEndpoint(DataEndpoint dataEndpoint) {
@@ -95,19 +97,13 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     }
 
     class EventQueue {
-        private RingBuffer<Event> ringBuffer;
-        private Disruptor<Event> eventQueueDisruptor;
+        private RingBuffer<WrappedEventFactory.WrappedEvent> ringBuffer;
+        private Disruptor<WrappedEventFactory.WrappedEvent> eventQueueDisruptor;
         private ExecutorService eventQueuePool;
-
-        public final EventFactory<Event> EVENT_FACTORY = new EventFactory<Event>() {
-            public Event newInstance() {
-                return new Event();
-            }
-        };
 
         EventQueue(int queueSize) {
             eventQueuePool = Executors.newCachedThreadPool(new DataBridgeThreadFactory("EventQueue"));
-            eventQueueDisruptor = new Disruptor<>(EVENT_FACTORY, queueSize, eventQueuePool);
+            eventQueueDisruptor = new Disruptor<>(new WrappedEventFactory(), queueSize, eventQueuePool);
             eventQueueDisruptor.handleEventsWith(new EventQueueWorker());
             this.ringBuffer = eventQueueDisruptor.start();
         }
@@ -116,8 +112,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             long sequence;
             try {
                 sequence = this.ringBuffer.tryNext(1);
-                Event bufferedEvent = this.ringBuffer.get(sequence);
-                updateEvent(bufferedEvent, event);
+                WrappedEventFactory.WrappedEvent bufferedEvent = this.ringBuffer.get(sequence);
+                bufferedEvent.setEvent(event);
                 this.ringBuffer.publish(sequence);
             } catch (InsufficientCapacityException e) {
                 throw new EventQueueFullException("Cannot send events because the event queue is full", e);
@@ -130,8 +126,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             while (true) {
                 try {
                     sequence = this.ringBuffer.tryNext(1);
-                    Event bufferedEvent = this.ringBuffer.get(sequence);
-                    updateEvent(bufferedEvent, event);
+                    WrappedEventFactory.WrappedEvent bufferedEvent = this.ringBuffer.get(sequence);
+                    bufferedEvent.setEvent(event);
                     this.ringBuffer.publish(sequence);
                     break;
                 } catch (InsufficientCapacityException ex) {
@@ -140,8 +136,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                     }
                     try {
                         Thread.sleep(1);
-                    } catch (InterruptedException e) {
-
+                    } catch (InterruptedException ignored) {
                     }
                 }
             }
@@ -152,22 +147,17 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             do {
                 try {
                     long sequence = this.ringBuffer.tryNext(1);
-                    Event bufferedEvent = this.ringBuffer.get(sequence);
-                    updateEvent(bufferedEvent, event);
+                    WrappedEventFactory.WrappedEvent bufferedEvent = this.ringBuffer.get(sequence);
+                    bufferedEvent.setEvent(event);
                     this.ringBuffer.publish(sequence);
                     return;
-                } catch (InsufficientCapacityException ignored) {
+                } catch (InsufficientCapacityException ex) {
+                    try {
+                        Thread.sleep(2);
+                    } catch (InterruptedException ignored) {
+                    }
                 }
             } while (isActiveDataEndpointExists());
-        }
-
-        private void updateEvent(Event oldEvent, Event newEvent) {
-            oldEvent.setArbitraryDataMap(newEvent.getArbitraryDataMap());
-            oldEvent.setCorrelationData(newEvent.getCorrelationData());
-            oldEvent.setMetaData(newEvent.getMetaData());
-            oldEvent.setPayloadData(newEvent.getPayloadData());
-            oldEvent.setStreamId(newEvent.getStreamId());
-            oldEvent.setTimeStamp(newEvent.getTimeStamp());
         }
 
         private void shutdown() {
@@ -176,11 +166,12 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         }
     }
 
-    class EventQueueWorker implements EventHandler<Event> {
+    class EventQueueWorker implements EventHandler<WrappedEventFactory.WrappedEvent> {
 
         @Override
-        public void onEvent(Event event, long sequence, boolean endOfBatch) throws Exception {
+        public void onEvent(WrappedEventFactory.WrappedEvent wrappedEvent, long sequence, boolean endOfBatch) throws Exception {
             DataEndpoint endpoint = getDataEndpoint(true);
+            Event event = wrappedEvent.getEvent();
             if (endpoint != null) {
                 endpoint.collectAndSend(event);
                 if (endOfBatch) {
@@ -214,7 +205,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
      */
     private DataEndpoint getDataEndpoint(boolean isBusyWait) {
         int startIndex;
-        if (haType.equals(HAType.FAILOVER)) {
+        if (haType.equals(HAType.LOADBALANCE)) {
             startIndex = getDataPublisherIndex();
         } else {
             startIndex = START_INDEX;
@@ -250,7 +241,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                         } else {
                             if (!isActiveDataEndpointExists()) {
                                 return null;
-                            }else {
+                            } else {
                                 busyWait(1);
                             }
                         }
@@ -286,7 +277,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private synchronized int getDataPublisherIndex() {
         int index = currentDataPublisherIndex.getAndIncrement();
-        if (index == maximumDataPublisherIndex.get()) {
+        if (index == maximumDataPublisherIndex.get() - 1) {
             currentDataPublisherIndex.set(START_INDEX);
         }
         return index;
@@ -329,10 +320,15 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                         dataEndpoint.deactivate();
                     }
                 } else {
-                    String[] urlElements = DataPublisherUtil.getProtocolHostPort(
-                            dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
-                    if (!isServerExists(urlElements[1], Integer.parseInt(urlElements[2]))) {
-                        dataEndpoint.deactivate();
+                    try {
+                        String[] urlElements = DataPublisherUtil.getProtocolHostPort(
+                                dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
+                        if (!isServerExists(urlElements[1], Integer.parseInt(urlElements[2]))) {
+                            dataEndpoint.deactivate();
+                        }
+                    } catch (DataEndpointConfigurationException exception) {
+                        log.warn("Data Endpoint with receiver URL:" + dataEndpoint.getDataEndpointConfiguration().getReceiverURL()
+                                + " could not be deactivated", exception);
                     }
                 }
                 if (dataEndpoint.isConnected()) {

@@ -24,6 +24,9 @@ import org.wso2.carbon.event.output.adapter.cassandra.internal.util.CassandraEve
 
 import java.util.*;
 
+/**
+ * The cassandra event adapter factory class to create a cassandra output adapter
+ */
 public class CassandraEventAdapterFactory extends OutputEventAdapterFactory {
     private static final Log log = LogFactory.getLog(CassandraEventAdapterFactory.class);
 

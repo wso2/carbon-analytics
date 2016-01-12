@@ -24,6 +24,7 @@ package org.wso2.carbon.event.stream.ui.beans;
 public class AnalyticsTable {
 
     private boolean persist;
+    private boolean mergeSchema;
     private String recordStoreName;
     private AnalyticsTableRecord[] analyticsTableRecords;
 
@@ -50,5 +51,13 @@ public class AnalyticsTable {
     public void setAnalyticsTableRecords(
             AnalyticsTableRecord[] analyticsTableRecords) {
         this.analyticsTableRecords = analyticsTableRecords;
+    }
+
+    public boolean isMergeSchema() {
+        return mergeSchema;
+    }
+
+    public void setMergeSchema(boolean isMergeSchema) {
+        this.mergeSchema = isMergeSchema;
     }
 }

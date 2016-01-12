@@ -30,7 +30,12 @@ import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterExc
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants;
 
-import javax.mail.*;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -79,7 +84,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
     @Override
     public void init() throws OutputEventAdapterException {
 
-        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         //ThreadPoolExecutor will be assigned  if it is null.
         if (threadPoolExecutor == null) {
@@ -201,22 +206,18 @@ public class EmailEventAdapter implements OutputEventAdapter {
 
 
             //initializing SMTP server to create session object.
-            if (smtpUsername != null && smtpPassword != null) {
+            if (smtpUsername != null && smtpPassword != null && !smtpUsername.isEmpty() && !smtpPassword.isEmpty()) {
                 session = Session.getInstance(props, new Authenticator() {
-                    public PasswordAuthentication getPasswordAuthentication() {
+                    public PasswordAuthentication
+                    getPasswordAuthentication() {
                         return new PasswordAuthentication(smtpUsername, smtpPassword);
                     }
                 });
             } else {
-                log.error("Error in smtp username & password verification");
-                String msg = "failed to connect to the mail server due to failed " +
-                        "user password authorization";
-                throw new ConnectionUnavailableException("The adapter " +
-                        eventAdapterConfiguration.getName() + " " + msg);
+                session = Session.getInstance(props);
+                log.info("Connecting adapter " + eventAdapterConfiguration.getName() + "without user authentication for tenant " + tenantId);
             }
         }
-
-
     }
 
     /**

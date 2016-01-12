@@ -23,6 +23,9 @@ import org.wso2.carbon.event.output.adapter.soap.internal.util.SoapEventAdapterC
 
 import java.util.*;
 
+/**
+ * The soap event adapter factory class to create a soap output adapter
+ */
 public class SoapEventAdapterFactory extends OutputEventAdapterFactory {
     private ResourceBundle resourceBundle =
             ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.soap.i18n.Resources", Locale.getDefault());

@@ -21,7 +21,9 @@ import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.*;
 
-
+/**
+ * The WSO2Event adapter factory class to create a WSO2Event input adapter
+ */
 public class WSO2EventEventAdapterFactory extends InputEventAdapterFactory {
     ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.input.adapter.wso2event.i18n.Resources", Locale.getDefault());
     private int thriftTCPPort;

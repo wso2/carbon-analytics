@@ -101,8 +101,6 @@ public class TCPEventTestClient {
 //            } catch (InterruptedException e) {
 //                e.printStackTrace();
                 }
-
-//
             }
         }
     }

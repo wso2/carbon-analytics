@@ -1,27 +1,38 @@
 /*
-*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.event.input.adapter.jms;
 
-import org.wso2.carbon.event.input.adapter.core.*;
+import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
+import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
+import org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory;
+import org.wso2.carbon.event.input.adapter.core.MessageType;
+import org.wso2.carbon.event.input.adapter.core.Property;
 import org.wso2.carbon.event.input.adapter.jms.internal.util.JMSEventAdapterConstants;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 
+/**
+ * The jms event adapter factory class to create a jms input adapter
+ */
 public class JMSEventAdapterFactory extends InputEventAdapterFactory {
 
     private ResourceBundle resourceBundle = ResourceBundle.getBundle
@@ -120,12 +131,12 @@ public class JMSEventAdapterFactory extends InputEventAdapterFactory {
         propertyList.add(isDurableSubscriptionProperty);
 
         // Connection Factory JNDI Name
-        Property subscriberNameProperty = new Property(JMSEventAdapterConstants.ADAPTER_JMS_DURABLE_SUBSCRIBER_NAME);
+        Property subscriberNameProperty = new Property(JMSEventAdapterConstants.ADAPTER_JMS_DURABLE_SUBSCRIBER_CLIENT_ID);
         subscriberNameProperty.setRequired(false);
         subscriberNameProperty.setDisplayName(
-                resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_DURABLE_SUBSCRIBER_NAME));
+                resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_DURABLE_SUBSCRIBER_CLIENT_ID));
         subscriberNameProperty.setHint(resourceBundle.getString(
-                JMSEventAdapterConstants.ADAPTER_JMS_DURABLE_SUBSCRIBER_NAME_HINT));
+                JMSEventAdapterConstants.ADAPTER_JMS_DURABLE_SUBSCRIBER_CLIENT_ID_HINT));
         propertyList.add(subscriberNameProperty);
 
         Property jmsProperties = new Property(JMSEventAdapterConstants.ADAPTER_PROPERTIES);

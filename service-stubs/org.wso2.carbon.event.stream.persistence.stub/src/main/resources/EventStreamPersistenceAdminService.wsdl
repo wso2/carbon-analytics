@@ -5,6 +5,18 @@
         <xs:schema xmlns:ax224="http://exception.persistence.stream.analytics.carbon.wso2.org/xsd" xmlns:ax226="http://dto.persistence.stream.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://persistence.stream.analytics.carbon.wso2.org">
             <xs:import namespace="http://exception.persistence.stream.analytics.carbon.wso2.org/xsd"/>
             <xs:import namespace="http://dto.persistence.stream.analytics.carbon.wso2.org/xsd"/>
+            <xs:element name="isBackendServicePresent">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isBackendServicePresentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="EventStreamPersistenceAdminServiceEventStreamPersistenceAdminServiceException">
                 <xs:complexType>
                     <xs:sequence>
@@ -24,18 +36,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" nillable="true" type="ax225:AnalyticsTable"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="isBackendServicePresent">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="isBackendServicePresentResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -63,6 +63,7 @@
             <xs:complexType name="AnalyticsTable">
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="analyticsTableRecords" nillable="true" type="ax225:AnalyticsTableRecord"/>
+                    <xs:element minOccurs="0" name="mergeSchema" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="persist" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="recordStoreName" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="streamVersion" nillable="true" type="xs:string"/>

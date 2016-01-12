@@ -48,14 +48,14 @@
 <link rel="stylesheet" type="text/css" href="../resources/css/registry.css"/>
 
 
-<%
-    EventReceiverAdminServiceStub stub = EventReceiverUIUtils.getEventReceiverAdminService(config, session, request);
-    String eventReceiverName = request.getParameter("eventReceiverName");
-    EventReceiverConfigurationDto eventReceiverConfigurationDto = null;
-    if (eventReceiverName != null) {
-        eventReceiverConfigurationDto = stub.getActiveEventReceiverConfiguration(eventReceiverName);
-%>
-<script language="javascript">
+    <%
+        EventReceiverAdminServiceStub stub = EventReceiverUIUtils.getEventReceiverAdminService(config, session, request);
+        String eventReceiverName = request.getParameter("eventReceiverName");
+        EventReceiverConfigurationDto eventReceiverConfigurationDto = null;
+        if (eventReceiverName != null) {
+            eventReceiverConfigurationDto = stub.getActiveEventReceiverConfiguration(eventReceiverName);
+    %>
+    <script language="javascript">
 
     function clearTextIn(obj) {
         if (YAHOO.util.Dom.hasClass(obj, 'initE')) {
@@ -409,9 +409,10 @@
             </tr>
 
             <%
-                String toStreamProperties[] = eventReceiverConfigurationDto.getToStreamNameWithVersion().split(":");
-                String toEventStreamName = toStreamProperties[0];
-                String toEventStreamVersion = toStreamProperties[1];
+                //get from stream properties for WSO2Event custom mapping
+                String fromStreamProperties[] = eventReceiverConfigurationDto.getFromStreamNameWithVersion().split(":");
+                String fromEventStreamName = fromStreamProperties[0];
+                String fromEventStreamVersion = fromStreamProperties[1];
             %>
 
 
@@ -422,7 +423,7 @@
                 <td>
                     <input type="text" name="outputStreamName" id="outputStreamNameId"
                            class="initE"
-                           value="<%=toEventStreamName%>"
+                           value="<%=fromEventStreamName%>"
                            style="width:75%" disabled="disabled"/>
                 </td>
             </tr>
@@ -433,7 +434,7 @@
                 <td>
                     <input type="text" name="outputStreamVersion" id="outputStreamVersionId"
                            class="initE"
-                           value="<%=toEventStreamVersion%>"
+                           value="<%=fromEventStreamVersion%>"
                            style="width:75%" disabled="disabled"/>
                 </td>
             </tr>
@@ -457,7 +458,7 @@
                         <tbody>
                         <%
                             EventMappingPropertyDto[] metaMappingDto = eventReceiverConfigurationDto.getMetaMappingPropertyDtos();
-                            if(metaMappingDto != null && metaMappingDto.length > 0){
+                            if (metaMappingDto != null && metaMappingDto.length > 0) {
                                 for (EventMappingPropertyDto metaEbProperties : metaMappingDto) {
 
                         %>
@@ -478,7 +479,7 @@
                         %>
                         <%
                             EventMappingPropertyDto[] correlationMappingDto = eventReceiverConfigurationDto.getCorrelationMappingPropertyDtos();
-                            if(correlationMappingDto != null && correlationMappingDto.length > 0){
+                            if (correlationMappingDto != null && correlationMappingDto.length > 0) {
                                 for (EventMappingPropertyDto correlationEbProperties : correlationMappingDto) {
                         %>
                         <tr id="mappingRow">
@@ -498,7 +499,7 @@
                         %>
                         <%
                             EventMappingPropertyDto[] payLoadMappingDto = eventReceiverConfigurationDto.getMappingPropertyDtos();
-                            if(payLoadMappingDto != null && payLoadMappingDto.length > 0){
+                            if (payLoadMappingDto != null && payLoadMappingDto.length > 0) {
                                 for (EventMappingPropertyDto payloadEbProperties : payLoadMappingDto) {
                         %>
                         <tr id="mappingRow">

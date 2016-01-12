@@ -66,12 +66,18 @@ public class TenantEventRetrievalEndpoint{
     public Response retrieveEvents(@PathParam("streamname") String streamName, @PathParam("version") String version,
             @QueryParam("lastUpdatedTime") String lastUpdatedTime, @PathParam("tdomain") String tdomain) {
 
-        PrivilegedCarbonContext.startTenantFlow();
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tdomain,true);
-        PrivilegedCarbonContext.startTenantFlow();
-        String streamId = streamName + UIConstants.ADAPTER_UI_COLON + version;
-        JsonObject eventDetails = uiOutputCallbackControllerService.retrieveEvents(streamName, version,lastUpdatedTime);
-        PrivilegedCarbonContext.endTenantFlow();
+        String streamId;
+        JsonObject eventDetails;
+
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tdomain, true);
+            streamId = streamName + UIConstants.ADAPTER_UI_COLON + version;
+            eventDetails = uiOutputCallbackControllerService.retrieveEvents(streamName, version, lastUpdatedTime);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+
         String jsonString;
         if(eventDetails == null){
             JsonObject errorData = new JsonObject();

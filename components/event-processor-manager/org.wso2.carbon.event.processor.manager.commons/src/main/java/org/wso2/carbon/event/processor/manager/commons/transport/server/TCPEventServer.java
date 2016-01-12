@@ -19,6 +19,7 @@
 package org.wso2.carbon.event.processor.manager.commons.transport.server;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisher;
 import org.wso2.carbon.event.processor.manager.commons.transport.common.EventServerUtils;
 import org.wso2.carbon.event.processor.manager.commons.transport.common.StreamRuntimeInfo;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -27,6 +28,7 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -39,7 +41,7 @@ import java.util.concurrent.Executors;
 
 public class TCPEventServer {
     private static Logger log = Logger.getLogger(TCPEventServer.class);
-    private TCPEventServerConfig tcpEventServerConfig = new TCPEventServerConfig(7211);
+    private TCPEventServerConfig tcpEventServerConfig = new TCPEventServerConfig("0.0.0.0", 7211);
     private ExecutorService executorService;
     private StreamCallback streamCallback;
     private ConnectionCallback connectionCallback;
@@ -63,13 +65,14 @@ public class TCPEventServer {
         this.streamRuntimeInfoMap.remove(streamId);
     }
 
-    public void start() {
+    public synchronized void start() throws IOException {
         if (!serverWorker.isRunning()) {
+            serverWorker.startServerWorker();
             new Thread(serverWorker).start();
         }
     }
 
-    public void shutdown() {
+    public synchronized void shutdown() {
         serverWorker.shutdownServerWorker();
     }
 
@@ -81,10 +84,20 @@ public class TCPEventServer {
             return isRunning;
         }
 
+        public void startServerWorker() throws IOException {
+            InetAddress inetAddress = InetAddress.getByName(tcpEventServerConfig.getHostName());
+            log.info("EventServer starting event listener on " + inetAddress.getHostAddress() + ":" + tcpEventServerConfig.getPort());
+            receiverSocket = new ServerSocket(tcpEventServerConfig.getPort(), 50, inetAddress);
+            isRunning = true;
+            receiverSocket.setReuseAddress(true);
+        }
+
         public void shutdownServerWorker() {
             isRunning = false;
             try {
-                receiverSocket.close();
+                if (receiverSocket != null) {
+                    receiverSocket.close();
+                }
             } catch (IOException e) {
                 log.error("Error occurred while trying to shutdown socket: " + e.getMessage(), e);
             }
@@ -93,10 +106,7 @@ public class TCPEventServer {
         @Override
         public void run() {
             try {
-                log.info("EventServer starting event listener on port " + tcpEventServerConfig.getPort());
-                isRunning = true;
-                receiverSocket = new ServerSocket(tcpEventServerConfig.getPort());
-                receiverSocket.setReuseAddress(true);
+
                 while (isRunning) {
                     final Socket connectionSocket = receiverSocket.accept();
                     connectionSocket.setKeepAlive(true);
@@ -129,7 +139,7 @@ public class TCPEventServer {
             @Override
             public void run() {
                 try {
-                    if(connectionCallback != null){
+                    if (connectionCallback != null) {
                         connectionCallback.onPublisherBoltConnect();
                     }
                     BufferedInputStream in = new BufferedInputStream(connectionSocket.getInputStream());
@@ -138,11 +148,14 @@ public class TCPEventServer {
                         byte[] streamNameByteSize = loadData(in, new byte[4]);
                         ByteBuffer sizeBuf = ByteBuffer.wrap(streamNameByteSize);
                         int streamNameSize = sizeBuf.getInt();
+                        if (streamNameSize == TCPEventPublisher.PING_HEADER_VALUE) {
+                            continue;
+                        }
                         byte[] streamNameData = loadData(in, new byte[streamNameSize]);
                         String streamId = new String(streamNameData, 0, streamNameData.length);
                         StreamRuntimeInfo streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
                         while (streamRuntimeInfo == null) {
-                            Thread.sleep(100);
+                            Thread.sleep(1000);
                             log.warn("TCP server on port :'" + tcpEventServerConfig.getPort() + "' waiting for streamId:'" + streamId + "' to process incoming events");
                             streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
                         }
@@ -182,9 +195,14 @@ public class TCPEventServer {
                         for (int i = 0; i < attributeTypes.length; i++) {
                             Attribute.Type type = attributeTypes[i];
                             if (Attribute.Type.STRING == type) {
-                                byte[] stringData = loadData(in, new byte[stringValueSizes.get(stringSizePosition)]);
+                                int size = stringValueSizes.get(stringSizePosition);
+                                if (size == -1) {
+                                    eventData[i] = null;
+                                } else {
+                                    byte[] stringData = loadData(in, new byte[size]);
+                                    eventData[i] = new String(stringData, 0, stringData.length);
+                                }
                                 stringSizePosition++;
-                                eventData[i] = new String(stringData, 0, stringData.length);
                             }
                         }
                         streamCallback.receive(streamId, timestamp, eventData);
@@ -196,7 +214,7 @@ public class TCPEventServer {
                 } catch (Throwable t) {
                     log.error("Error :" + t.getMessage(), t);
                 } finally {
-                    if(connectionCallback != null){
+                    if (connectionCallback != null) {
                         connectionCallback.onPublisherBoltDisconnect();
                     }
                 }

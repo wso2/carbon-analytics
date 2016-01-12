@@ -19,11 +19,11 @@
 package org.wso2.carbon.databridge.receiver.thrift.converter;
 
 
-import com.google.gson.Gson;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import org.wso2.carbon.databridge.core.EventConverter;
 import org.wso2.carbon.databridge.core.StreamTypeHolder;
@@ -33,12 +33,12 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * the util class that converts Events and its definitions in to various forms
  */
 public final class ThriftEventConverter implements EventConverter {
-    private static Gson gson = new Gson();
 
     public Object[] toObjectArray(ThriftEventBundle thriftEventBundle,
                                   AttributeType[] attributeTypeOrder,
@@ -95,6 +95,41 @@ public final class ThriftEventConverter implements EventConverter {
     }
 
     @Override
+    public int getSize(Object eventBundle) {
+        if (eventBundle instanceof ThriftEventBundle) {
+            ThriftEventBundle thriftEventBundle = (ThriftEventBundle) eventBundle;
+            int eventBundleSize = 0;
+            //arbitray data
+            if (thriftEventBundle.isSetArbitraryDataMapMap()){
+                Set<Map.Entry<Integer, Map<String, String>>> arbitraryDataMap = thriftEventBundle.getArbitraryDataMapMap().entrySet();
+                for (Map.Entry<Integer, Map<String, String>> arbitraryData : arbitraryDataMap){
+                    eventBundleSize += DataBridgeCommonsUtils.getSize(arbitraryData.getValue());
+                }
+                eventBundleSize += arbitraryDataMap.size() * 4; // 4 byte per integer
+                eventBundleSize += arbitraryDataMap.size() * DataBridgeCommonsUtils.getReferenceSize() * 2; //for the reference
+            }
+            eventBundleSize += thriftEventBundle.getBoolAttributeListSize();  //1 byte per boolean field
+            eventBundleSize += thriftEventBundle.getBoolAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize(); // for each reference
+            eventBundleSize += thriftEventBundle.getDoubleAttributeListSize() * 8; //8 bytes per double field
+            eventBundleSize += thriftEventBundle.getDoubleAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize(); // for each double reference.
+            eventBundleSize += thriftEventBundle.getIntAttributeListSize() * 4; // 4 bytes per int field
+            eventBundleSize += thriftEventBundle.getIntAttributeListSize()  * DataBridgeCommonsUtils.getReferenceSize(); // for each int reference
+            eventBundleSize += thriftEventBundle.getLongAttributeListSize() * 8; // 8 bytes per long field
+            eventBundleSize += thriftEventBundle.getLongAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize(); // for each long reference
+            for (String aStringField : thriftEventBundle.getStringAttributeList()){
+                eventBundleSize += aStringField.getBytes().length;
+            }
+            eventBundleSize += thriftEventBundle.getStringAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize(); // for each string reference
+            eventBundleSize += 4; //for eventNum field
+            eventBundleSize += DataBridgeCommonsUtils.getSize(thriftEventBundle.getSessionId());
+            eventBundleSize += 7 * DataBridgeCommonsUtils.getReferenceSize(); // for the references of list and string attributes in thrift event bundle
+            return eventBundleSize;
+        } else {
+            throw new EventConversionException("Wrong type of event received " + eventBundle.getClass());
+        }
+    }
+
+    @Override
     public int getNumberOfEvents(Object eventBundle) {
         if (eventBundle instanceof ThriftEventBundle) {
             return ((ThriftEventBundle) eventBundle).getEventNum();
@@ -107,7 +142,7 @@ public final class ThriftEventConverter implements EventConverter {
                                         StreamTypeHolder streamTypeHolder) {
 
         IndexCounter indexCounter = new IndexCounter();
-        List<Event> eventList = new ArrayList<Event>(thriftEventBundle.getEventNum());
+        List<Event> eventList = new ArrayList<>(thriftEventBundle.getEventNum());
         String streamId = null;
         try {
             for (int i = 0; i < thriftEventBundle.getEventNum(); i++) {
