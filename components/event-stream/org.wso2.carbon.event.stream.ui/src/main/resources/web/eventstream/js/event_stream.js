@@ -560,7 +560,7 @@ function addStreamAttribute2(dataType, name, type) {
 }
 
 function isValidName(string){
-    var pattern = /^([a-z][A-Z]|_|\.|-)([a-z]|[A-Z]|[0-9]|_|\.|-)*$/i;
+    var pattern = /^([a-z]|[A-Z]|_|\.|-)([a-z]|[A-Z]|[0-9]|_|\.|-)*$/i;
     return (pattern.test(string));
 }
 
