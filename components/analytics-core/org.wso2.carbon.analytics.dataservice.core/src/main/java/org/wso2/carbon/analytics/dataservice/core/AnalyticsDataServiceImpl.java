@@ -879,8 +879,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public void reIndex(int tenantId, String tableName, long startTime, long endTime)
             throws AnalyticsException {
         String table = GenericUtils.normalizeTableName(tableName);
-        this.getIndexer().reIndex(tenantId, table, startTime, endTime);
-
+        if (this.isTableIndexed(this.lookupTableInfo(tenantId, table))) {
+            this.getIndexer().reIndex(tenantId, table, startTime, endTime);
+        }
     }
 
     private void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException {

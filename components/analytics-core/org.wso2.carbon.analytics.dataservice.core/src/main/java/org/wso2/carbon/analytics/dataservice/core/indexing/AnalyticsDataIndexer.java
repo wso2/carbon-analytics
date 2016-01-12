@@ -125,11 +125,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -163,18 +166,22 @@ public class AnalyticsDataIndexer {
     
     public static final String PATH_SEPARATOR = "___####___";
     
-    public static final int TAXONOMYWORKER_TIMEOUT = 60;
-    
+    public static final int WORKER_TIMEOUT = 60;
+    public static final int REINDEX_THREAD_COUNT = 5;
+    public static final int REINDEX_QUEUE_LIMIT = 100;
+
     private Map<String, IndexWriter> indexWriters = new HashMap<>();
 
     private Map<String, DirectoryTaxonomyWriter> indexTaxonomyWriters = new HashMap<>();
 
     private AggregateFunctionFactory aggregateFunctionFactory;
     
-    private ExecutorService shardWorkerExecutor;
+    private ExecutorService shardWorkerExecutor, reIndexWorkerExecutor;
     
     private List<IndexWorker> workers;
-    
+
+    private List<TaxonomyWorker> taxonomyWorkers;
+
     private AnalyticsIndexerInfo indexerInfo;
     
     private IndexNodeCoordinator indexNodeCoordinator;
@@ -1480,6 +1487,18 @@ public class AnalyticsDataIndexer {
             this.workers = null;
             this.shardWorkerExecutor = null;
         }
+
+        if (this.reIndexWorkerExecutor != null) {
+            this.reIndexWorkerExecutor.shutdownNow();
+            try {
+                this.reIndexWorkerExecutor.awaitTermination(
+                        org.wso2.carbon.analytics.dataservice.core.Constants.REINDEX_WORKER_STOP_WAIT_TIME,
+                        TimeUnit.MILLISECONDS);
+            } catch (InterruptedException ignore) {
+                /* ignore */
+            }
+            this.reIndexWorkerExecutor = null;
+        }
     }
 
     public void close() throws AnalyticsIndexException {
@@ -1576,25 +1595,25 @@ public class AnalyticsDataIndexer {
                 throw new AnalyticsIndexException("Error while generating Unique categories for aggregation, " +
                                                   e.getMessage(), e);
             } finally {
-                shutdownTaxonomyWorkerThreadPool(pool);
+                shutdownWorkerThreadPool(pool);
             }
         } else {
             throw new AnalyticsIndexException("Aggregate level cannot be less than zero");
         }
     }
 
-    private void shutdownTaxonomyWorkerThreadPool(ExecutorService pool)
+    private void shutdownWorkerThreadPool(ExecutorService pool)
             throws AnalyticsIndexException {
         if (pool != null) {
             pool.shutdown();
         }
         try {
-            if(!pool.awaitTermination(TAXONOMYWORKER_TIMEOUT, TimeUnit.SECONDS)) {
+            if(!pool.awaitTermination(WORKER_TIMEOUT, TimeUnit.SECONDS)) {
                 pool.shutdownNow();
             }
         } catch (InterruptedException e) {
-            log.error("Error while shutting down the Taxonomyworker threadpool , " + e.getMessage(), e);
-            throw new AnalyticsIndexException("Error while shutting down the Taxonomyworker threadpool , " +
+            log.error("Error while shutting down the threadpool , " + e.getMessage(), e);
+            throw new AnalyticsIndexException("Error while shutting down the threadpool , " +
                                               e.getMessage(), e);
         } finally {
             pool = null;
@@ -1716,23 +1735,16 @@ public class AnalyticsDataIndexer {
 
     public void reIndex(int tenantId, String table, long startTime, long endTime)
             throws AnalyticsException {
-        DateFormat format = new SimpleDateFormat("YYYY-MM-dd HH:MM:ss.SSS");
-        log.info("Re-Indexing called for table: " + table + " timestamp between: " +
-                 format.format(new Date(startTime)) + " and " +
-                 format.format(new Date(endTime)));
-        AnalyticsRecordStore rs = this.getAnalyticsRecordStore();
-        RecordGroup[] recordGroups = rs.get(tenantId, table, 1, null, startTime, endTime, 0, -1);
-        Iterator<Record> iterator = GenericUtils.recordGroupsToIterator(rs, recordGroups);
-        List<Record> recordBatch;
-        int i;
-        while (iterator.hasNext()) {
-            i = 0;
-            recordBatch = new ArrayList<>();
-            while (i < org.wso2.carbon.analytics.dataservice.core.Constants.RECORDS_BATCH_SIZE && iterator.hasNext()) {
-                recordBatch.add(iterator.next());
-                i++;
-            }
-            this.put(recordBatch);
+        if (this.reIndexWorkerExecutor == null) {
+            this.reIndexWorkerExecutor = new ThreadPoolExecutor(0, REINDEX_THREAD_COUNT,
+                                                                Long.MAX_VALUE, TimeUnit.SECONDS,
+                                                                new ArrayBlockingQueue<Runnable>(REINDEX_QUEUE_LIMIT));
+        }
+        try {
+            this.reIndexWorkerExecutor.submit(new ReIndexWorker(tenantId, this, table, startTime, endTime));
+        } catch (RejectedExecutionException e) {
+            String msg = "Reindex operation limit has reached: " + REINDEX_QUEUE_LIMIT;
+            throw new AnalyticsException(msg);
         }
     }
 
@@ -1846,6 +1858,58 @@ public class AnalyticsDataIndexer {
                     break;
                 }
             }
+        }
+    }
+
+    /**
+     * This represents a re-indexing worker, who does index operations in the background.
+     */
+    private class ReIndexWorker implements Runnable {
+
+        private boolean stop;
+        private AnalyticsDataIndexer indexer;
+        private String tableName;
+        private long fromTime;
+        private int tenantId;
+        private long toTime;
+
+        public ReIndexWorker(int tenantId, AnalyticsDataIndexer indexer, String tableName, long from, long to) {
+            this.indexer = indexer;
+            this.tenantId = tenantId;
+            this.tableName = tableName;
+            this.fromTime = from;
+            this.toTime = to;
+        }
+
+        public void stop() {
+            this.stop = true;
+        }
+
+        @Override
+        public void run() {
+            DateFormat format = new SimpleDateFormat("YYYY-MM-dd HH:MM:ss.SSS");
+            log.info("Re-Indexing called for table: " + tableName + " timestamp between: " +
+                     format.format(new Date(fromTime)) + " and " +
+                     format.format(new Date(toTime)));
+            AnalyticsRecordStore rs = indexer.getAnalyticsRecordStore();
+            try {
+                RecordGroup[] recordGroups = rs.get(tenantId, tableName, 1, null, fromTime, toTime, 0, -1);
+                Iterator<Record> iterator = GenericUtils.recordGroupsToIterator(rs, recordGroups);
+                List<Record> recordBatch;
+                int i;
+                while (iterator.hasNext() && !this.stop) {
+                    i = 0;
+                    recordBatch = new ArrayList<>();
+                    while (i < org.wso2.carbon.analytics.dataservice.core.Constants.RECORDS_BATCH_SIZE && iterator.hasNext()) {
+                        recordBatch.add(iterator.next());
+                        i++;
+                    }
+                    indexer.put(recordBatch);
+                }
+            } catch (Throwable e) {
+                log.error("Error in re-indexing records: " + e.getMessage(), e);
+            }
+
         }
     }
 

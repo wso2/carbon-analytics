@@ -17,9 +17,9 @@
 */
 package org.wso2.carbon.analytics.dataservice.core;
 
-import java.io.File;
-
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
+
+import java.io.File;
 
 /**
  * This class hold constants that required for data service
@@ -48,6 +48,8 @@ public class Constants {
     public static final String CRON_STRING = "cronString";
 
     public static final int INDEX_WORKER_STOP_WAIT_TIME = 60000;
+    public static final int REINDEX_WORKER_STOP_WAIT_TIME = 60000;
+    public static final int TAXONOMY_WORKER_STOP_WAIT_TIME = 60000;
     public static final int META_INFO_TENANT_ID = -1000;
     public static final String GLOBAL_SHARD_ALLOCATION_CONFIG_TABLE = "__GLOBAL_SHARD_ALLOCATION_CONFIG__";
     public static final String INDEX_STAGING_DATA_TABLE = "__INDEX_STAGING_DATA__";
