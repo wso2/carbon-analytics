@@ -21,8 +21,11 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
  * Created on 5/26/15.
  */
 public interface EventSync {
-
     void process(org.wso2.siddhi.core.event.Event event);
 
     public StreamDefinition getStreamDefinition();
+
+    public boolean isContinueProcess();
+
+    public void setContinueProcess(boolean isContinue);
 }

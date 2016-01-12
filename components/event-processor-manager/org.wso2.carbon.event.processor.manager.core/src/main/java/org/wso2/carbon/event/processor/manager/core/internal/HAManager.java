@@ -54,6 +54,7 @@ public class HAManager {
     private final EventHandler presenterEventHandler;
     private boolean activeLockAcquired;
     private boolean passiveLockAcquired;
+    private boolean isBackup;
     private ILock activeLock;
     private ILock passiveLock;
     private IMap<String, HAConfiguration> roleToMembershipMap;
@@ -64,7 +65,6 @@ public class HAManager {
     private String passiveId;
 
     private HAConfiguration otherMember;
-    private HAConfiguration otherMember2;
 
     public HAManager(HazelcastInstance hazelcastInstance, HAConfiguration haConfiguration,
                      ScheduledExecutorService executorService,
@@ -102,7 +102,22 @@ public class HAManager {
     }
 
     public void tryChangeState() {
-        if (!activeLockAcquired && !passiveLockAcquired) {
+        if (!activeLockAcquired && !passiveLockAcquired && !isBackup) {
+            if (passiveLock.tryLock()) {
+                passiveLockAcquired = true;
+                if (activeLock.tryLock()) {
+                    activeLockAcquired = true;
+                    becomeActive();
+                    passiveLockAcquired = false;
+                    passiveLock.forceUnlock();
+                } else {
+                    becomePassive();
+                }
+            }else{
+                isBackup = true;
+                becomeBackup();
+            }
+        } else if (!activeLockAcquired && !passiveLockAcquired) {
             if (passiveLock.tryLock()) {
                 passiveLockAcquired = true;
                 if (activeLock.tryLock()) {
@@ -121,8 +136,6 @@ public class HAManager {
                 passiveLockAcquired = false;
                 passiveLock.forceUnlock();
             }
-        }else{
-            becomeBackup();
         }
     }
 
@@ -133,6 +146,11 @@ public class HAManager {
                 passiveLockAcquired = true;
                 activeLockAcquired = false;
                 becomePassive();
+                executorService.execute(new PeriodicStateChanger());
+            }else{
+                passiveLockAcquired = false;
+                activeLockAcquired = false;
+                becomeBackup();
                 executorService.execute(new PeriodicStateChanger());
             }
         }
@@ -186,7 +204,6 @@ public class HAManager {
         if (activeLockAcquired) {
             roleToMembershipMap.remove(activeId);
             activeLock.forceUnlock();
-
         }
         stateChanger.cancel(false);
 
@@ -214,6 +231,7 @@ public class HAManager {
         if (eventReceiverManagementService != null) {
             eventReceiverManagementService.start();
         }
+        receiverEventHandler.allowContinueProcess(true);
         presenterEventHandler.allowEventSync(true);
         log.info("Became CEP HA Active Member");
     }
@@ -229,6 +247,7 @@ public class HAManager {
             final CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder
                     .getCarbonEventManagementService();
             receiverEventHandler.addEventPublisher(activeMember.getEventSyncConfig());
+            receiverEventHandler.allowContinueProcess(true);
             presenterEventHandler.allowEventSync(false);
             executorService.execute(new Runnable() {
                 @Override
@@ -256,48 +275,11 @@ public class HAManager {
     }
 
     private void becomeBackup() {
-        roleToMembershipMap.set(passiveId, haConfiguration);
-
-        final HAConfiguration activeMember = roleToMembershipMap.get(activeId);
-        otherMember = activeMember;
-
+        final HAConfiguration activeMember = roleToMembershipMap.get(passiveId);
+        receiverEventHandler.addEventPublisher(activeMember.getEventSyncConfig());
         final HAConfiguration passiveMember = roleToMembershipMap.get(passiveId);
-        otherMember2 = passiveMember;
-
-        // Send non-duplicate events to active member
-        final CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder.getCarbonEventManagementService();
-        List<HostAndPort> receiverList = new ArrayList<HostAndPort>();
-        receiverList.add(otherMember.getTransport());
-        eventManagementService.setReceiverMembers(receiverList);
-        eventManagementService.addMember(otherMember.getTransport());
-
-        // Send non-duplicate events to passive member
-        final CarbonEventManagementService eventManagementService2 = EventManagementServiceValueHolder.getCarbonEventManagementService();
-        List<HostAndPort> receiverList2 = new ArrayList<HostAndPort>();
-        receiverList.add(otherMember2.getTransport());
-        eventManagementService2.setReceiverMembers(receiverList2);
-        eventManagementService2.addMember(otherMember2.getTransport());
-
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        log.info("CEP HA State syncing started..");
-                        syncState(activeMember, eventManagementService);
-                        syncState(passiveMember, eventManagementService2);
-                        log.info("CEP HA State successfully synced.");
-                        return;
-                    } catch (EventManagementException e) {
-                        log.error("CEP HA State syncing failed, " + e.getMessage(), e);
-                    }
-                    try {
-                        Thread.sleep(10000); //Todo move to config file
-                    } catch (InterruptedException e) {
-                    }
-                }
-            }
-        });
+        receiverEventHandler.addEventPublisher(passiveMember.getEventSyncConfig());
+        presenterEventHandler.allowEventSync(false);
         log.info("Became CEP HA Backup Member");
     }
 

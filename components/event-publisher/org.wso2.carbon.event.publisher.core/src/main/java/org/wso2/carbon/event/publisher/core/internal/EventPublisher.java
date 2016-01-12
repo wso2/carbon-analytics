@@ -70,6 +70,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     private Mode mode = Mode.SingleNode;
     private String syncId;
     private boolean sendToOther = false;
+    private boolean isContinue = false;
     private org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition;
     private BlockingEventQueue eventQueue;
 
@@ -131,13 +132,13 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         }
         if (traceEnabled) {
             this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER +
-                    " : " + eventPublisherConfiguration.getEventPublisherName()+ ", " +
+                    " : " + eventPublisherConfiguration.getFromStreamName() + ", " +
                     EventPublisherConstants.EVENT_STREAM + " : " +
                     EventPublisherUtil.getImportedStreamIdFrom(eventPublisherConfiguration) +
                     ", before processing " + System.getProperty("line.separator");
 
             this.afterTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER + " : " +
-                    eventPublisherConfiguration.getEventPublisherName() + ", after processing " +
+                    eventPublisherConfiguration.getFromStreamName() + ", after processing " +
                     System.getProperty("line.separator");
         }
 
@@ -365,6 +366,16 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     @Override
     public org.wso2.siddhi.query.api.definition.StreamDefinition getStreamDefinition() {
         return streamDefinition;
+    }
+
+    @Override
+    public boolean isContinueProcess() {
+        return isContinue;
+    }
+
+    @Override
+    public void setContinueProcess(boolean isContinue) {
+        this.isContinue = isContinue;
     }
 
     public void prepareDestroy() {

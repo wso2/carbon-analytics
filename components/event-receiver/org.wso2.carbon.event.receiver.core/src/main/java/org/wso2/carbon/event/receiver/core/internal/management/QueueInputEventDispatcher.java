@@ -45,6 +45,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
     private int tenantId;
     private ReentrantLock threadBarrier = new ReentrantLock();
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private boolean isContinue = false;
 
     public QueueInputEventDispatcher(int tenantId, String syncId, Lock readLock,
                                      org.wso2.carbon.databridge.commons.StreamDefinition exportedStreamDefinition,
@@ -95,14 +96,26 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
 
     @Override
     public void process(Event event) {
-        readLock.lock();
-        readLock.unlock();
-        callBack.sendEvent(event);
+        if(isContinueProcess()){
+            readLock.lock();
+            readLock.unlock();
+            callBack.sendEvent(event);
+        }
     }
 
     @Override
     public StreamDefinition getStreamDefinition() {
         return streamDefinition;
+    }
+
+    @Override
+    public boolean isContinueProcess() {
+        return isContinue;
+    }
+
+    @Override
+    public void setContinueProcess(boolean isContinue) {
+        this.isContinue = isContinue;
     }
 
     class QueueInputEventDispatcherWorker implements Runnable {
@@ -131,7 +144,9 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
                         Event event = eventQueue.take();
                         readLock.lock();
                         readLock.unlock();
-                        callBack.sendEvent(event);
+                        if(isContinueProcess()){
+                            callBack.sendEvent(event);
+                        }
                         if (isSendToOther()) {
                             EventReceiverServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Receiver, event);
                         }

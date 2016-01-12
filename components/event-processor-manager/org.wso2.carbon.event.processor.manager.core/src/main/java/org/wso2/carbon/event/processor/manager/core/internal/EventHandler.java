@@ -51,6 +51,7 @@ public class EventHandler {
     private TCPEventPublisherConfig localEventPublisherConfiguration;
     private boolean allowEventSync = true;
     private boolean isMemberNode;
+    private boolean allowContinueProcess=false;
 
     public void init(String memberType, HostAndPort localMember,
                      TCPEventPublisherConfig localEventPublisherConfiguration, boolean isMemberNode) {
@@ -100,7 +101,10 @@ public class EventHandler {
         }
     }
 
-    public void registerEventSync(EventSync eventSync) {
+    public synchronized void registerEventSync(EventSync eventSync) {
+        if(allowContinueProcess){
+            eventSync.setContinueProcess(allowContinueProcess);
+        }
         eventSyncMap.putIfAbsent(eventSync.getStreamDefinition().getId(), eventSync);
         for (TCPEventPublisher tcpEventPublisher : tcpEventPublisherPool.values()) {
             tcpEventPublisher.addStreamDefinition(eventSync.getStreamDefinition());
@@ -229,5 +233,12 @@ public class EventHandler {
 
     public void allowEventSync(boolean allowEventSync) {
         this.allowEventSync = allowEventSync;
+    }
+
+    public synchronized void allowContinueProcess(boolean allowContinueProcess){
+        this.allowContinueProcess = allowContinueProcess;
+        for (EventSync eventSync : eventSyncMap.values()) {
+            eventSync.setContinueProcess(allowContinueProcess);
+        }
     }
 }
