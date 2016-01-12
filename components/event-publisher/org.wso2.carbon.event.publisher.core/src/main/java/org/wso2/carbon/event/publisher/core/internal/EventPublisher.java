@@ -132,13 +132,13 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         }
         if (traceEnabled) {
             this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER +
-                    " : " + eventPublisherConfiguration.getFromStreamName() + ", " +
+                    " : " + eventPublisherConfiguration.getEventPublisherName()+ ", " +
                     EventPublisherConstants.EVENT_STREAM + " : " +
                     EventPublisherUtil.getImportedStreamIdFrom(eventPublisherConfiguration) +
                     ", before processing " + System.getProperty("line.separator");
 
             this.afterTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER + " : " +
-                    eventPublisherConfiguration.getFromStreamName() + ", after processing " +
+                    eventPublisherConfiguration.getEventPublisherName() + ", after processing " +
                     System.getProperty("line.separator");
         }
 
