@@ -180,8 +180,6 @@ public class AnalyticsDataIndexer {
     
     private List<IndexWorker> workers;
 
-    private List<TaxonomyWorker> taxonomyWorkers;
-
     private AnalyticsIndexerInfo indexerInfo;
     
     private IndexNodeCoordinator indexNodeCoordinator;
@@ -250,14 +248,6 @@ public class AnalyticsDataIndexer {
     
     public int getShardIndexWorkerInterval() {
         return this.indexerInfo.getShardIndexWorkerInterval();
-    }
-    
-    public int getIndexWorkerCount() {
-        if (this.workers == null) {
-            return 0;
-        } else {
-            return this.workers.size();
-        }
     }
     
     /* processIndexOperations and processIndexOperationsFlushQueue must be synchronized, they are accessed by
@@ -613,6 +603,8 @@ public class AnalyticsDataIndexer {
         }
     }
 
+
+
     public List<AnalyticsDrillDownRange> drillDownRangeCount(final int tenantId,
             final AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
         if (drillDownRequest.getRangeField() == null) {
@@ -621,29 +613,51 @@ public class AnalyticsDataIndexer {
         if (drillDownRequest.getRanges() == null) {
             throw new AnalyticsIndexException("Ranges are not set");
         }
-        IndexReader indexReader = null;
-        try {
-            indexReader = getCombinedIndexReader(this.localShards, tenantId, drillDownRequest.getTableName());
-            return getAnalyticsDrillDownRanges(tenantId, drillDownRequest, indexReader);
-        } catch (org.apache.lucene.queryparser.classic.ParseException e) {
-            throw new AnalyticsIndexException("Error while parsing the lucene query: " +
-                                              e.getMessage(), e);
-        } catch (IOException e) {
-            throw new AnalyticsIndexException("Error while reading sharded indices: " +
-                                              e.getMessage(), e);
-        } finally {
-            if (indexReader != null) {
-                try {
-                    indexReader.close();
-                } catch (IOException e) {
-                    log.error("Error in closing the index reader: " +
-                                                      e.getMessage(), e);
+        List<AnalyticsDrillDownRange> finalResult;
+        Map<String, AnalyticsDrillDownRange> entryMap;
+        if (this.isClusteringEnabled()) {
+            List<List<AnalyticsDrillDownRange>> entries =
+                        this.executeIndexLookup(new DrillDownRangeCountCall(tenantId, drillDownRequest));
+            finalResult = new ArrayList<>();
+            entryMap = new LinkedHashMap<>();
+            for (List<AnalyticsDrillDownRange> entry : entries) {
+                for (AnalyticsDrillDownRange range : entry) {
+                    if (entryMap.get(range.getLabel())== null) {
+                        entryMap.put(range.getLabel(), range);
+                    } else {
+                        AnalyticsDrillDownRange newRange = entryMap.get(range.getLabel());
+                        entryMap.put(range.getLabel(), new AnalyticsDrillDownRange(range.getLabel(),
+                                                                                   range.getFrom(), range.getTo(), range.getScore() + newRange.getScore()));
+                    }
                 }
             }
-        }    
+            finalResult.addAll(entryMap.values());
+        } else {
+            IndexReader indexReader = null;
+            try {
+                indexReader = getCombinedIndexReader(this.localShards, tenantId, drillDownRequest.getTableName());
+                finalResult = getAnalyticsDrillDownRanges(tenantId, drillDownRequest, indexReader);
+            } catch (org.apache.lucene.queryparser.classic.ParseException e) {
+                throw new AnalyticsIndexException("Error while parsing the lucene query: " +
+                                                  e.getMessage(), e);
+            } catch (IOException e) {
+                throw new AnalyticsIndexException("Error while reading sharded indices: " +
+                                                  e.getMessage(), e);
+            } finally {
+                if (indexReader != null) {
+                    try {
+                        indexReader.close();
+                    } catch (IOException e) {
+                        log.error("Error in closing the index reader: " +
+                                  e.getMessage(), e);
+                    }
+                }
+            }
+        }
+        return finalResult;
     }
 
-    private List<AnalyticsDrillDownRange> getAnalyticsDrillDownRanges(int tenantId,
+    public List<AnalyticsDrillDownRange> getAnalyticsDrillDownRanges(int tenantId,
                                                                       AnalyticsDrillDownRequest drillDownRequest,
                                                                       IndexReader indexReader)
             throws AnalyticsIndexException, org.apache.lucene.queryparser.classic.ParseException,
@@ -2149,7 +2163,6 @@ public class AnalyticsDataIndexer {
 
     public static class DrillDownRangeCountCall extends IndexLookupOperationCall<List<AnalyticsDrillDownRange>> {
 
-
         private static final long serialVersionUID = 4949911704640332561L;
         private int tenantId;
         private AnalyticsDrillDownRequest request;
@@ -2173,14 +2186,15 @@ public class AnalyticsDataIndexer {
             }
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
-                return adsImpl.getIndexer().drillDownRangeCount(tenantId, request);
+                IndexReader reader = adsImpl.getIndexer().getCombinedIndexReader(this.shardIndices,
+                                                          tenantId, request.getTableName());
+                return adsImpl.getIndexer().getAnalyticsDrillDownRanges(tenantId, request, reader);
             }
             return new ArrayList<>();
         }
     }
 
     public static class SearchWithAggregateCall extends IndexLookupOperationCall<Set<String>> {
-
 
         private static final long serialVersionUID = -5074344695392737981L;
         private int tenantId;
