@@ -130,7 +130,7 @@ public class AnalyticsEventTable implements EventTable {
             waitForIndexingProp = waitForIndexingProp.trim();
             this.waitForIndexing = Boolean.parseBoolean(waitForIndexingProp);
         } else {
-            this.waitForIndexing = false;
+            this.waitForIndexing = true;
         }
         String maxSearchResultCountProp = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_MAX_SEARCH_RESULT_COUNT);
         if (maxSearchResultCountProp != null) {
