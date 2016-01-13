@@ -112,10 +112,11 @@ public class HAManager {
                     passiveLock.forceUnlock();
                 } else {
                     becomePassive();
+                    isBackup=false;
                 }
             }else{
-                isBackup = true;
                 becomeBackup();
+                isBackup = true;
             }
         } else if (!activeLockAcquired && !passiveLockAcquired) {
             if (passiveLock.tryLock()) {
@@ -127,9 +128,10 @@ public class HAManager {
                     passiveLock.forceUnlock();
                 } else {
                     becomePassive();
+                    isBackup = false;
                 }
             }
-        } else if (!activeLockAcquired) {
+        } else if (!activeLockAcquired && !isBackup) {
             if (activeLock.tryLock()) {
                 activeLockAcquired = true;
                 becomeActive();
@@ -146,11 +148,13 @@ public class HAManager {
                 passiveLockAcquired = true;
                 activeLockAcquired = false;
                 becomePassive();
+                isBackup=false;
                 executorService.execute(new PeriodicStateChanger());
             }else{
                 passiveLockAcquired = false;
                 activeLockAcquired = false;
                 becomeBackup();
+                isBackup=true;
                 executorService.execute(new PeriodicStateChanger());
             }
         }
