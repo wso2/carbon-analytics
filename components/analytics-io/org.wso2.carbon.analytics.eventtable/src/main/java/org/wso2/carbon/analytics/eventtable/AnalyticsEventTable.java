@@ -150,7 +150,9 @@ public class AnalyticsEventTable implements EventTable {
     private void checkAndProcessPostInit() {
         if (!this.postInit) {
             try {
-                synchronized (this) {
+                /* to make sure, other event tables with the same schema do
+                 * not get a race condition when merging schemas */
+                synchronized (this.getClass()) {
                     if (!this.postInit) {
                         this.processTableSchema();
                         this.postInit = true;
@@ -777,8 +779,39 @@ public class AnalyticsEventTable implements EventTable {
         
         private void updateRecordsWithEvent(List<Record> records, ComplexEvent event) {
             Map<String, Object> values = AnalyticsEventTableUtils.streamEventToRecordValues(this.outputAttrs, event);
+            Set<String> pks = null;
+            try {
+                AnalyticsDataService service = ServiceHolder.getAnalyticsDataService();
+                List<String> tmpPks = service.getTableSchema(this.tenantId, this.tableName).getPrimaryKeys();
+                if (tmpPks != null) {
+                    pks = new HashSet<>(tmpPks);
+                }
+            } catch (AnalyticsException e) {
+                throw new IllegalStateException(e.getMessage(), e);
+            }
+            Object lhs, rhs;
+            boolean pkMismatch;
             for (Record record : records) {
                 for (Entry<String, Object> entry : values.entrySet()) {
+                    if (pks != null && pks.contains(entry.getKey())) {
+                        lhs = entry.getValue();
+                        rhs = record.getValue(entry.getKey());
+                        pkMismatch = false;
+                        if (lhs != null) {
+                            if (!lhs.equals(rhs)) {
+                                pkMismatch = true;
+                            }
+                        } else if (rhs != null) {
+                            if (!rhs.equals(lhs)) {
+                                pkMismatch = true;
+                            }
+                        }
+                        if (pkMismatch) {
+                            throw new IllegalStateException("The primary key cannot be updated, "
+                                    + "new values: " + values + ", existing values: " + 
+                                    record.getValues() + " PKs: " + pks);
+                        }
+                    }
                     if (record.getValues().containsKey(entry.getKey())) {
                         record.getValues().put(entry.getKey(), entry.getValue());
                     }
