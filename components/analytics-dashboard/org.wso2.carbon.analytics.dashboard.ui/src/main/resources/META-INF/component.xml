@@ -29,6 +29,15 @@
             <order>20</order>
             <style-class>tools</style-class>
             <icon>../analytics-dashboard/assets/img/dashboard.png</icon>
+            <require-permission>/permission/admin/manage/analytics-dashboard</require-permission>
         </menu>
     </menus>
+
+    <ManagementPermissions>
+        <ManagementPermission>
+            <DisplayName>Analytics Dashboard</DisplayName>
+            <ResourceId>/permission/admin/manage/analytics-dashboard</ResourceId>
+        </ManagementPermission>
+    </ManagementPermissions>
+
 </component>

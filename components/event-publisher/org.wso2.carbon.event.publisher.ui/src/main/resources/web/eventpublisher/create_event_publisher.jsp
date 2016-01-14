@@ -24,6 +24,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.wso2.carbon.event.publisher.stub.types.DetailOutputAdapterPropertyDto" %>
 <%@ page import="org.wso2.carbon.event.publisher.stub.types.OutputAdapterConfigurationDto" %>
+<%@ page import="java.util.Arrays" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
@@ -146,6 +147,7 @@
         <%
 
             if (streamIds != null) {
+                Arrays.sort(streamIds);
                 for (String aStreamId : streamIds) {
         %>
         <option><%=aStreamId%>

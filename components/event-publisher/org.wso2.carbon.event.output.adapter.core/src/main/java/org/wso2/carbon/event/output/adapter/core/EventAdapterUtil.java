@@ -21,8 +21,12 @@ import org.apache.commons.logging.Log;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
+import org.wso2.carbon.event.output.adapter.core.internal.config.AdapterConfig;
+import org.wso2.carbon.event.output.adapter.core.internal.config.AdapterConfigs;
 import org.wso2.carbon.event.output.adapter.core.internal.ds.OutputEventAdapterServiceValueHolder;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+
+import java.util.Map;
 
 public class EventAdapterUtil {
 
@@ -44,17 +48,17 @@ public class EventAdapterUtil {
     }
 
     public static void logAndDrop(String adapterName, Object event, String message, Throwable e, Log log,
-            int tenantId) {
+                                  int tenantId) {
         if (message != null) {
             message = message + ", ";
         } else {
             message = "";
         }
         log.error("Event dropped at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', " + message + e
-                        .getMessage(), e);
+                .getMessage(), e);
         if (log.isDebugEnabled()) {
             log.debug("Error at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', dropping event: \n"
-                            + event, e);
+                    + event, e);
         }
     }
 
@@ -62,7 +66,19 @@ public class EventAdapterUtil {
         log.error("Event dropped at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', " + message);
         if (log.isDebugEnabled()) {
             log.debug("Error at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', dropping event: \n"
-                            + event);
+                    + event);
         }
     }
+
+    public static Map<String, String> getGlobalProperties(String type) {
+        AdapterConfigs adapterConfigs = OutputEventAdapterServiceValueHolder.getGlobalAdapterConfigs();
+        if (adapterConfigs != null) {
+            AdapterConfig adapterConfig = adapterConfigs.getAdapterConfig(type);
+            if (adapterConfig != null) {
+                return adapterConfig.getGlobalPropertiesAsMap();
+            }
+        }
+        return null;
+    }
+
 }

@@ -221,6 +221,12 @@ public class EventReceiverAdminService extends AbstractAdmin {
                     eventReceiverConfigurationDto.setMetaMappingPropertyDtos(metaMappingPropertyDtos.toArray(new EventMappingPropertyDto[metaMappingPropertyDtos.size()]));
                     eventReceiverConfigurationDto.setCorrelationMappingPropertyDtos(correlationMappingPropertyDtos.toArray(new EventMappingPropertyDto[correlationMappingPropertyDtos.size()]));
                     eventReceiverConfigurationDto.setMappingPropertyDtos(payloadMappingPropertyDtos.toArray(new EventMappingPropertyDto[payloadMappingPropertyDtos.size()]));
+
+                    //Get fromStreamNameWithVersion for WSO2Event type custom mapping
+                    WSO2EventInputMapping wso2EventInputMapping = (WSO2EventInputMapping) inputMapping;
+                    String fromStreamNameWithVersion = wso2EventInputMapping.getFromEventName() + ":" + wso2EventInputMapping.getFromEventVersion();
+                    eventReceiverConfigurationDto.setFromStreamNameWithVersion(fromStreamNameWithVersion);
+
                 } else if (inputMapping.getMappingType().equalsIgnoreCase(EventReceiverConstants.ER_XML_MAPPING_TYPE)) {
 
                     List<EventMappingPropertyDto> xPathDefinitions = new ArrayList<EventMappingPropertyDto>();
@@ -737,7 +743,7 @@ public class EventReceiverAdminService extends AbstractAdmin {
         eventReceiverConfiguration.setFromAdapterConfiguration(inputEventAdapterConfiguration);
     }
 
-    public boolean isReceiverEditable(String eventReceiverName){
+    public boolean isReceiverEditable(String eventReceiverName) {
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
         List<EventReceiverConfiguration> eventReceiverConfigurationList = null;
         boolean isEditable = false;
@@ -753,7 +759,7 @@ public class EventReceiverAdminService extends AbstractAdmin {
         return isEditable;
     }
 
-    public boolean isReceiverStatisticsEnabled(String eventReceiverName){
+    public boolean isReceiverStatisticsEnabled(String eventReceiverName) {
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
         List<EventReceiverConfiguration> eventReceiverConfigurationList = null;
         boolean isStatisticsEnabled = false;
@@ -769,7 +775,7 @@ public class EventReceiverAdminService extends AbstractAdmin {
         return isStatisticsEnabled;
     }
 
-    public boolean isReceiverTraceEnabled(String eventReceiverName){
+    public boolean isReceiverTraceEnabled(String eventReceiverName) {
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
         List<EventReceiverConfiguration> eventReceiverConfigurationList = null;
         boolean isTraceEnabled = false;

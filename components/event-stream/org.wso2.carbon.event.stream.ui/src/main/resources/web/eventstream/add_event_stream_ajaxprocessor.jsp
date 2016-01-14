@@ -140,6 +140,7 @@
             analyticsTable.setRecordStoreName(request.getParameter("recordStream"));
             analyticsTable.setStreamVersion(request.getParameter("eventStreamVersion"));
             analyticsTable.setPersist(Boolean.parseBoolean(request.getParameter("eventPersist")));
+            analyticsTable.setMergeSchema(Boolean.parseBoolean(request.getParameter("mergeSchema")));
             analyticsTable.setAnalyticsTableRecords(
                     analyticsTableRecords.toArray(new AnalyticsTableRecord[analyticsTableRecords.size()]));
             streamPersistenceAdminServiceStub.addAnalyticsTable(analyticsTable);

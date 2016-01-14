@@ -52,7 +52,15 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
         if (authenticated) {
 
             String tenantDomain = MultitenantUtils.getTenantDomain(userName);
-
+            String tenantLessUserName = MultitenantUtils.getTenantAwareUsername(userName);
+            try {
+                int tenantId = DataBridgeServiceValueHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
+                authenticated = DataBridgeServiceValueHolder.getRealmService().
+                        getTenantUserRealm(tenantId).getAuthorizationManager().
+                        isUserAuthorized(tenantLessUserName, "/permission/admin/publish/wso2event", "ui.execute");
+            } catch (UserStoreException e) {
+                log.error("Error while checking the authorization of the user"+userName+ ". "+e.getMessage(), e);
+            }
             // Load tenant : This is needed because we have removed ActivationHandler,
             // which did the tenant loading part earlier with login. So we load tenant after successful login
             try {

@@ -19,7 +19,7 @@ package org.wso2.carbon.databridge.agent.util;
 
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
-
+import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,7 +64,7 @@ public class DataPublisherUtil {
 
     /**
      * Returns an object array which has first element as boolean
-     * for specify the URLs are failover configuration or LB configuration.
+     * for specify the URLs are fail over configuration or LB configuration.
      * From the 2nd element onwards the object array will hold the separated URLs
      *
      * @param aURLGroup one receiver group's URL
@@ -151,8 +151,11 @@ public class DataPublisherUtil {
         for (int i = 1; i < urlGroup.length; i++) {
             urlSet += urlGroup[i];
             if (i != urlGroup.length - 1) {
-                if (isFailOver) urlSet += DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR;
-                else urlSet += DataEndpointConstants.LB_URL_GROUP_SEPARATOR;
+                if (isFailOver) {
+                    urlSet += DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR;
+                } else {
+                    urlSet += DataEndpointConstants.LB_URL_GROUP_SEPARATOR;
+                }
             }
         }
         return urlSet;
@@ -164,9 +167,13 @@ public class DataPublisherUtil {
      * @param url String of URL that needs to be processed.
      * @return Array which has elements - protocol, host, and port in the given order.
      */
-    public static String[] getProtocolHostPort(String url) {
+    public static String[] getProtocolHostPort(String url) throws DataEndpointConfigurationException {
         String[] keyElements = url.split(DataEndpointConstants.SEPARATOR);
         String[] urlElements = keyElements[0].split(":");
+        if (urlElements.length != 3) {
+            throw new DataEndpointConfigurationException("Invalid URL is provided :" + url +
+                    ". Receiver URL property should take the format : " + "protocol://host:port");
+        }
         return new String[]{urlElements[0], urlElements[1].replace("//", ""), urlElements[2]};
     }
 
@@ -176,7 +183,7 @@ public class DataPublisherUtil {
      * @param receiverURL receiver URL for which it's required to get the authentication URL.
      * @return default authentication URL.
      */
-    public static String getDefaultAuthUrl(String receiverURL) {
+    public static String getDefaultAuthUrl(String receiverURL) throws DataEndpointConfigurationException {
         String[] urlElements = getProtocolHostPort(receiverURL);
         int port = Integer.parseInt(urlElements[2]);
         String host = urlElements[1];
@@ -200,8 +207,11 @@ public class DataPublisherUtil {
             for (int j = 1; j < receiverGroup.length; j++) {
                 authURLSet += DataPublisherUtil.getDefaultAuthUrl(receiverGroup[j].toString());
                 if (j != receiverGroup.length - 1) {
-                    if (failOver) authURLSet += DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR;
-                    else authURLSet += DataEndpointConstants.LB_URL_GROUP_SEPARATOR;
+                    if (failOver) {
+                        authURLSet += DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR;
+                    } else {
+                        authURLSet += DataEndpointConstants.LB_URL_GROUP_SEPARATOR;
+                    }
                 }
             }
             authURLSet += "}";

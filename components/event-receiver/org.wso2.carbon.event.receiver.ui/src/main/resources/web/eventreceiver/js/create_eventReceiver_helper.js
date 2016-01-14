@@ -458,12 +458,13 @@ function getMapDataMappingValues(dataTable) {
         var column0 = document.getElementById("inputMapPropName_" + i).value;
         var column1 = document.getElementById("inputMapPropValueOf_" + i).value;
         var column2 = document.getElementById("inputMapPropType_" + i).value;
+        var column3 = document.getElementById("inputMapDefaultValue_" + i).value;
 
         if (column0.trim() == "") {
             return "invalid";
         }
 
-        mapEventData = mapEventData + column0 + "^=" + column1 + "^=" + column2 + "^=" + "$=";
+        mapEventData = mapEventData + column0 + "^=" + column1 + "^=" + column2 + "^=" + column3 + "^=" + "$=";
     }
     return mapEventData;
 }
@@ -880,8 +881,3 @@ function updateAttributeType() {
     var selectedIndex = document.getElementById("inputPropertyName").selectedIndex;
     document.getElementById("inputPropertyType").value = typeMap[selectedIndex];
 }
-
-
-
-
-

@@ -61,9 +61,6 @@ public class TextInputMapper implements InputMapper {
                     throw new EventReceiverConfigurationException("Text input mapping attribute list cannot be null!");
                 }
                 List<Integer> attribPositionList = new LinkedList<Integer>();
-                int metaCount = 0;
-                int correlationCount = 0;
-                int attributeCount = 0;
                 for (InputMappingAttribute inputMappingAttribute : textInputMapping.getInputMappingAttributes()) {
                     String regex = inputMappingAttribute.getFromElementKey();
                     if (regexData == null || !regex.equals(regexData.getRegex())) {
@@ -74,19 +71,13 @@ public class TextInputMapper implements InputMapper {
                             throw new EventReceiverConfigurationException("Error parsing regular expression: " + regex, e);
                         }
                     }
-                    if (EventReceiverUtil.isMetaAttribute(inputMappingAttribute.getToElementKey())) {
-                        attribPositionList.add(metaCount++, attributeCount++);
-                    } else if (EventReceiverUtil.isCorrelationAttribute(inputMappingAttribute.getToElementKey())) {
-                        attribPositionList.add(metaCount + correlationCount++, attributeCount++);
-                    } else {
-                        attribPositionList.add(attributeCount++);
-                    }
+                    attribPositionList.add(getEventAttributeLocation(inputMappingAttribute, streamDefinition));
                     String type = EventReceiverConstants.ATTRIBUTE_TYPE_CLASS_TYPE_MAP.get(inputMappingAttribute.getToElementType());
                     String defaultValue = inputMappingAttribute.getDefaultValue();
                     regexData.addMapping(type, defaultValue);
                 }
                 for (int i = 0; i < attribPositionList.size(); i++) {
-                    attributePositions[attribPositionList.get(i)] = i;
+                    attributePositions[i] = attribPositionList.get(i);
                 }
             } else {
                 this.noMetaData = streamDefinition.getMetaData() != null ? streamDefinition.getMetaData().size() : 0;
@@ -217,6 +208,36 @@ public class TextInputMapper implements InputMapper {
         } else {
             return propertyValue;
         }
+    }
+
+    private int getEventAttributeLocation(InputMappingAttribute inputMappingAttribute, StreamDefinition streamDefinition) {
+
+        int attributeLocation = 0;
+
+        if (EventReceiverUtil.isMetaAttribute(inputMappingAttribute.getToElementKey())) {
+            for (Attribute metaAttribute : streamDefinition.getMetaData()) {
+                if ((EventReceiverConstants.META_DATA_PREFIX).concat(metaAttribute.getName()).equals(inputMappingAttribute.getToElementKey())) {
+                    return attributeLocation;
+                }
+                attributeLocation++;
+            }
+        } else if (EventReceiverUtil.isCorrelationAttribute(inputMappingAttribute.getToElementKey())) {
+            for (Attribute correlationData : streamDefinition.getCorrelationData()) {
+                if (EventReceiverConstants.CORRELATION_DATA_PREFIX.concat(correlationData.getName()).equals(inputMappingAttribute.getToElementKey())) {
+                    return attributeLocation + streamDefinition.getMetaData().size();
+                }
+                attributeLocation++;
+            }
+        } else {
+            for (Attribute payloadData : streamDefinition.getPayloadData()) {
+                if (payloadData.getName().equals(inputMappingAttribute.getToElementKey())) {
+                    return attributeLocation + streamDefinition.getMetaData().size() + streamDefinition.getCorrelationData().size();
+                }
+                attributeLocation++;
+            }
+
+        }
+        return -1;
     }
 
 }

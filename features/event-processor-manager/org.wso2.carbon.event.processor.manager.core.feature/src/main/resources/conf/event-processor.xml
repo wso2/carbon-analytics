@@ -50,11 +50,11 @@
             <!--Number of events that could be queued at receiver before they are synced between CEP/DAS nodes-->
             <receiverQueueSize>1000000</receiverQueueSize>
             <!--Max total size of events that could be queued at receiver before they are synced between CEP/DAS nodes-->
-            <receiverQueueMaxSizeMb>50</receiverQueueMaxSizeMb>
+            <receiverQueueMaxSizeMb>10</receiverQueueMaxSizeMb>
             <!--Number of events that could be queued at publisher to sync output between CEP/DAS nodes-->
             <publisherQueueSize>1000000</publisherQueueSize>
             <!--Max total size of events that could be queued at publisher to sync output between CEP/DAS nodes-->
-            <publisherQueueMaxSizeMb>50</publisherQueueMaxSizeMb>
+            <publisherQueueMaxSizeMb>10</publisherQueueMaxSizeMb>
         </eventSync>
         <management>
             <hostName>0.0.0.0</hostName>
