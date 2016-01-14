@@ -26,7 +26,6 @@ public final class ConfigurationConstants {
     }
 
     public static final String CEP_MANAGEMENT_XML = "event-processor.xml";
-
     public static final String CARBON_CONFIG_PORT_OFFSET_NODE = "Ports.Offset";
     public static final String MODE_ELEMENT = "mode";
     public static final String PROCESSING_MODE_NAME_ATTRIBUTE = "name";
@@ -41,8 +40,6 @@ public final class ConfigurationConstants {
     public static final String HA_WORKER = "worker";
     public static final String HA_PRESENTER = "presenter";
     public static final String HA_NODE_TYPE = "nodeType";
-
-
     public static final String PROCESSING_MODE_HA = "HA";
 
     public static final int HA_DEFAULT_TRANSPORT_PORT = 11224;
@@ -59,11 +56,9 @@ public final class ConfigurationConstants {
     public static final String HA_NODE_CONFIG_RECEIVER_QUEUE_MAX_SIZE_MB = "receiverQueueMaxSizeMb";
     public static final String HA_NODE_CONFIG_PUBLISHER_QUEUE_SIZE = "publisherQueueSize";
     public static final String HA_NODE_CONFIG_PUBLISHER_QUEUE_MAX_SIZE_MB = "publisherQueueMaxSizeMb";
-
     public static final String HA_NODE_CONFIG_MANAGEMENT_STATE_RETRY_INTERVAL = "stateSyncRetryInterval";
     public static final String HA_NODE_CONFIG_MANAGEMENT_TRY_STATE_CHANGE_INTERVAL = "tryStateChangeInterval";
     public static final String HA_NODE_CONFIG_CHECK_MEMBER_UPDATE_INTERVAL = "checkMemberUpdateInterval";
-
 
     public static final String PROCESSING_MODE_SN = "SingleNode";
     public static final String SN_PERSISTENCE_ELEMENT = "persistence";
@@ -97,14 +92,12 @@ public final class ConfigurationConstants {
     public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_BUFFER_SIZE = "tcpEventPublisherSendBufferSize";
     public static final String DISTRIBUTED_NODE_CONFIG_TCP_PUBLISHER_CHAR_SET = "tcpEventPublisherCharSet";
     public static final String DISTRIBUTED_NODE_CONFIG_STORM_SPOUT_BUFFER_SIZE = "stormSpoutBufferSize";
-
     public static final String DISTRIBUTED_NODE_CONFIG_PRESENTATION_ELEMENT = "presentation";
     public static final String DISTRIBUTED_NODE_CONFIG_MEMBER_UPDATE_CHECK_INTERVAL = "memberUpdateCheckInterval";
     public static final String DISTRIBUTED_NODE_CONFIG_CON_STATUS_CHECK_INTERVAL = "connectionStatusCheckInterval";
     public static final String DISTRIBUTED_NODE_CONFIG_PRESENTER_QUEUE_SIZE = "presentationOutputQueueSize";
 
     public static final String ENABLE_ATTRIBUTE = "enable";
-
     public static final String PREFIX = "org.wso2.cep.org.wso2.carbon.event.processor.management";
     public static final String ROLE_MEMBERSHIP_MAP = PREFIX + "role_membership_map";
     public static final String ACTIVEID = PREFIX + "Active";
@@ -115,7 +108,6 @@ public final class ConfigurationConstants {
     public static enum HAMode {Active, Passive, Backup}
 
     public static final String HA_EVENT_PUBLISHER_TIME_SYNC_MAP = "haEventPublisherTimeSyncMap";
-
     public static final String PROPERTY_META_PREFIX = "meta_";
     public static final String PROPERTY_CORRELATION_PREFIX = "correlation_";
 }
