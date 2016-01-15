@@ -30,6 +30,12 @@ public class Constants {
     public static final String START = "start";
     public static final String COUNT = "count";
     public static final String WAIT_TIME = "waitTime";
+    public static final String STRING_TYPE = "STRING";
+    public static final String BOOLEAN_TYPE = "BOOLEAN";
+    public static final String FLOAT_TYPE = "FLOAT";
+    public static final String DOUBLE_TYPE = "DOUBLE";
+    public static final String INTEGER_TYPE = "INTEGER";
+    public static final String LONG_TYPE = "LONG";
 
 
     /**

@@ -28,7 +28,7 @@ import java.util.List;
  * aliases represents the output field names for aggregated values over the fields.
  */
 
-public class AggregateRequest {
+public class AggregateRequestBean {
     private String tableName;
     private String groupByField;
     private String query;
@@ -36,7 +36,7 @@ public class AggregateRequest {
     private int aggregateLevel;
     private List<String> parentPath;
 
-    public AggregateRequest() {
+    public AggregateRequestBean() {
     }
 
     public String getTableName() {

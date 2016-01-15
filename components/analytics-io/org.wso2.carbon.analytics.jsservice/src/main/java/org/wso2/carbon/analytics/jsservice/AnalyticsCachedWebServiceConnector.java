@@ -17,6 +17,17 @@
 */
 package org.wso2.carbon.analytics.jsservice;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.Weigher;
+import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MaxSizeConfig;
+import com.hazelcast.config.MaxSizeConfig.MaxSizePolicy;
+import com.hazelcast.core.HazelcastInstance;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
+import org.wso2.carbon.analytics.jsservice.beans.ResponseBean;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,41 +38,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.axis2.context.ConfigurationContext;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
-import org.wso2.carbon.analytics.jsservice.beans.ResponseBean;
-import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceStub;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.Weigher;
-import com.hazelcast.config.MapConfig;
-import com.hazelcast.config.MaxSizeConfig;
-import com.hazelcast.config.MaxSizeConfig.MaxSizePolicy;
-import com.hazelcast.core.HazelcastInstance;
-
 /**
  * This is a thin wrapper on top of {@link AnalyticsWebServiceConnector} to provide caching functionality.
  */
 public class AnalyticsCachedWebServiceConnector extends AnalyticsWebServiceConnector {
     
     private AnalyticsCache cache;
-
-    public AnalyticsCachedWebServiceConnector(ConfigurationContext configCtx, String backendServerURL, 
-            String cookie, AnalyticsCache cache) {
-        super(configCtx, backendServerURL, cookie);
-        this.cache = cache;
-    }
     
-    public AnalyticsCachedWebServiceConnector(ConfigurationContext configCtx, String backendServerURL,
-            String username, String password, AnalyticsCache cache) {
-        super(configCtx, backendServerURL, username, password);
-        this.cache = cache;
-    }
-    
-    public AnalyticsCachedWebServiceConnector(AnalyticsWebServiceStub analyticsStub, AnalyticsCache cache) {
-        super(analyticsStub);
+    public AnalyticsCachedWebServiceConnector(AnalyticsCache cache) {
+        super();
         this.cache = cache;
     }
     
@@ -82,89 +67,89 @@ public class AnalyticsCachedWebServiceConnector extends AnalyticsWebServiceConne
     }
     
     @Override
-    public ResponseBean getRecordCount(String tableName) {
+    public ResponseBean getRecordCount(String username, String tableName) {
         String cacheItemId = this.calculateCacheItemId("getRecordCount", tableName);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
-            result = super.getRecordCount(tableName);
+            result = super.getRecordCount(username, tableName);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
     }
     
     @Override
-    public ResponseBean getRecordsByRange(String tableName, String timeFrom, String timeTo, String recordsFrom,
+    public ResponseBean getRecordsByRange(String username, String tableName, String timeFrom, String timeTo, String recordsFrom,
             String count, String columns) {
         String cacheItemId = this.calculateCacheItemId("getRecordsByRange", tableName, timeFrom, timeTo, recordsFrom, count, columns);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
-            result = super.getRecordsByRange(tableName, timeFrom, timeTo, recordsFrom, count, columns);
+            result = super.getRecordsByRange(username, tableName, timeFrom, timeTo, recordsFrom, count, columns);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
     }
     
     @Override
-    public ResponseBean getWithKeyValues(String tableName, String valuesBatch) {
+    public ResponseBean getWithKeyValues(String username, String tableName, String valuesBatch) {
         String cacheItemId = this.calculateCacheItemId("getWithKeyValues", tableName, valuesBatch);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
-            result = super.getWithKeyValues(tableName, valuesBatch);
+            result = super.getWithKeyValues(username, tableName, valuesBatch);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
     }
     
     @Override
-    public ResponseBean getRecordsByIds(String tableName, String idsAsString) {
+    public ResponseBean getRecordsByIds(String username, String tableName, String idsAsString) {
         String cacheItemId = this.calculateCacheItemId("getRecordsByIds", tableName, idsAsString);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
-            result = super.getRecordsByIds(tableName, idsAsString);
+            result = super.getRecordsByIds(username, tableName, idsAsString);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
     }
     
     @Override
-    public ResponseBean search(String tableName, String queryAsString) {
+    public ResponseBean search(String username, String tableName, String queryAsString) {
         String cacheItemId = this.calculateCacheItemId("search", tableName, queryAsString);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
-            result = super.search(tableName, queryAsString);
+            result = super.search(username, tableName, queryAsString);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
     }
     
     @Override
-    public ResponseBean searchWithAggregates(String tableName, String requestAsString) {
+    public ResponseBean searchWithAggregates(String username, String tableName, String requestAsString) {
         String cacheItemId = this.calculateCacheItemId("searchWithAggregates", tableName, requestAsString);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
-            result = super.searchWithAggregates(tableName, requestAsString);
+            result = super.searchWithAggregates(username, tableName, requestAsString);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
     }
     
     @Override
-    public ResponseBean searchCount(String tableName, String queryAsString) {
+    public ResponseBean searchCount(String username, String tableName, String queryAsString) {
         String cacheItemId = this.calculateCacheItemId("searchCount", tableName, queryAsString);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
-            result = super.searchCount(tableName, queryAsString);
+            result = super.searchCount(username, tableName, queryAsString);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
     }
     
     @Override
-    public ResponseBean getTableSchema(String tableName) {
+    public ResponseBean getTableSchema(String username, String tableName) {
         String cacheItemId = this.calculateCacheItemId("getTableSchema", tableName);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
-            result = super.getTableSchema(tableName);
+            result = super.getTableSchema(username, tableName);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
@@ -182,33 +167,33 @@ public class AnalyticsCachedWebServiceConnector extends AnalyticsWebServiceConne
     }
     
     @Override
-    public ResponseBean drillDownCategories(String tableName, String queryAsString) {
+    public ResponseBean drillDownCategories(String username, String tableName, String queryAsString) {
         String cacheItemId = this.calculateCacheItemId("drillDownCategories", tableName, queryAsString);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
-            result = super.drillDownCategories(tableName, queryAsString);
+            result = super.drillDownCategories(username, tableName, queryAsString);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
     }
     
     @Override
-    public ResponseBean drillDownSearch(String tableName, String queryAsString) {
+    public ResponseBean drillDownSearch(String username, String tableName, String queryAsString) {
         String cacheItemId = this.calculateCacheItemId("drillDownSearch", tableName, queryAsString);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
-            result = super.drillDownSearch(tableName, queryAsString);
+            result = super.drillDownSearch(username, tableName, queryAsString);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
     }
     
     @Override
-    public ResponseBean drillDownSearchCount(String tableName, String queryAsString) {
+    public ResponseBean drillDownSearchCount(String username, String tableName, String queryAsString) {
         String cacheItemId = this.calculateCacheItemId("drillDownSearchCount", tableName, queryAsString);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
-            result = super.drillDownSearchCount(tableName, queryAsString);
+            result = super.drillDownSearchCount(username, tableName, queryAsString);
             this.setCachedValue(cacheItemId, result);
         }
         return result;

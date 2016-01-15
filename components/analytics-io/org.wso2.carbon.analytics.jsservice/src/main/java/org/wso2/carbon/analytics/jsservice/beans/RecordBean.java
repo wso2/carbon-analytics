@@ -30,7 +30,7 @@ import java.util.Map.Entry;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "record")
-public class Record {
+public class RecordBean {
 
     /** The id. */
     @XmlElement(required = false, name = "id")

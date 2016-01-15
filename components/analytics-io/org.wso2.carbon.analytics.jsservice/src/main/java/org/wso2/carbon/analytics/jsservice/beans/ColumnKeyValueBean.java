@@ -34,7 +34,7 @@ public class ColumnKeyValueBean {
     @XmlElement(name = "valueBatches", required = true)
     private List<Map<String, Object>> valueBatches;
     @XmlElement(name = "columns", required = false)
-    private String[] columns;
+    private List<String> columns;
 
     public ColumnKeyValueBean() {
 
@@ -44,7 +44,7 @@ public class ColumnKeyValueBean {
         return valueBatches;
     }
 
-    public String[] getColumns() {
+    public List<String> getColumns() {
         return columns;
     }
 }

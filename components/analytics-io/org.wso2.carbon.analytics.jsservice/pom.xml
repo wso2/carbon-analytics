@@ -46,10 +46,26 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.webservice.stub</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.stream.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.databridge.commons</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -58,10 +74,17 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Carbon-Component>UIBundle</Carbon-Component>
+                        <Private-Package>org.wso2.carbon.analytics.jsservice.internal.*</Private-Package>
                         <Import-Package>
-                            org.wso2.carbon.analytics.webservice.stub.*;version="${carbon.analytics.imp.pkg.version}"
+                            org.apache.commons.logging.*,
+                            org.wso2.carbon.analytics.api.*;version="${carbon.analytics.imp.pkg.version}",
+                            org.wso2.carbon.event.stream.core.*;version="${carbon.analytics.common.imp.pkg.version}",
+                            org.wso2.carbon.databridge.commons.*;version="${carbon.analytics.common.imp.pkg.version}",
+                            *;resolution:=optional
                         </Import-Package>
+                        <Export-Package>
+                            org.wso2.carbon.analytics.jsservice.*;version="${carbon.analytics.version}"
+                        </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>

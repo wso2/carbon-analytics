@@ -17,8 +17,20 @@
 package org.wso2.carbon.analytics.jsservice;
 
 import org.apache.axiom.om.util.Base64;
+import org.apache.commons.collections.IteratorUtils;
+import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.jsservice.beans.AggregateField;
-import org.wso2.carbon.analytics.jsservice.beans.AggregateRequest;
+import org.wso2.carbon.analytics.jsservice.beans.AggregateRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.jsservice.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.ColumnDefinitionBean;
@@ -27,28 +39,23 @@ import org.wso2.carbon.analytics.jsservice.beans.DrillDownPathBean;
 import org.wso2.carbon.analytics.jsservice.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.jsservice.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.EventBean;
-import org.wso2.carbon.analytics.jsservice.beans.Record;
+import org.wso2.carbon.analytics.jsservice.beans.RecordBean;
 import org.wso2.carbon.analytics.jsservice.beans.StreamDefinitionBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsAggregateField;
-import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsAggregateRequest;
-import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsCategoryPathBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsDrillDownRangeBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsDrillDownRequestBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.CategoryPathBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.CategorySearchResultEntryBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.RecordValueEntryBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.SchemaColumnBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.StreamDefAttributeBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.SubCategoriesBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.ValuesBatchBean;
+import org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean;
+import org.wso2.carbon.analytics.jsservice.exception.JSServiceException;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.databridge.commons.AttributeType;
+import org.wso2.carbon.databridge.commons.Event;
+import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,113 +71,29 @@ public class Utils {
 
     private static final String DEFAULT_CHARSET = "UTF-8";
 
-    public static List<Record> getRecordBeans(RecordBean[] recordBeans) {
-        List<Record> records = new ArrayList<>();
-        if (recordBeans != null) {
-            for (RecordBean recordBean : recordBeans) {
-                Record record = new Record();
+    public static List<RecordBean> getRecordBeans(List<Record> records) {
+        List<RecordBean> recordBeans = new ArrayList<>();
+        if (records != null) {
+            for (Record recordBean : records) {
+                RecordBean record = new RecordBean();
                 record.setId(recordBean.getId());
                 record.setTableName(recordBean.getTableName());
-                record.setValues(validateAndReturn(recordBean.getValues()));
-                records.add(record);
+                record.setTimestamp(recordBean.getTimestamp());
+                record.setValues(recordBean.getValues());
+                recordBeans.add(record);
             }
         }
-        return records;
+        return recordBeans;
     }
 
-    public static List<String> getIds(RecordBean[] beans) {
+    public static List<String> getIds(List<SearchResultEntry> searchResults) {
         List<String> ids = new ArrayList<>();
-        if (beans != null) {
-            for (RecordBean bean : beans) {
-                ids.add(bean.getId());
+        if (searchResults != null) {
+            for (SearchResultEntry resultEntry : searchResults) {
+                ids.add(resultEntry.getId());
             }
         }
         return ids;
-    }
-
-    private static Map<String, Object> validateAndReturn(RecordValueEntryBean[] values) {
-        Map<String, Object> columnValues = new LinkedHashMap<>();
-        for (RecordValueEntryBean valueEntryBean : values) {
-            switch (valueEntryBean.getType()) {
-                case "INTEGER":
-                    columnValues.put(valueEntryBean.getFieldName(), valueEntryBean.getIntValue());
-                    break;
-                case "DOUBLE":
-                    columnValues.put(valueEntryBean.getFieldName(), valueEntryBean.getDoubleValue());
-                    break;
-                case "LONG":
-                    columnValues.put(valueEntryBean.getFieldName(), valueEntryBean.getLongValue());
-                    break;
-                case "FLOAT":
-                    columnValues.put(valueEntryBean.getFieldName(), valueEntryBean.getFloatValue());
-                    break;
-                case "STRING":
-                    columnValues.put(valueEntryBean.getFieldName(), valueEntryBean.getStringValue());
-                    break;
-                case "BOOLEAN":
-                    columnValues.put(valueEntryBean.getFieldName(), valueEntryBean.getBooleanValue());
-                    break;
-                case "FACET":
-                    AnalyticsCategoryPathBean categoryPathBean = valueEntryBean.getAnalyticsCategoryPathBeanValue();
-                    List<String> facet = new ArrayList<>();
-                    facet.addAll(Arrays.asList(categoryPathBean.getPath()));
-                    columnValues.put(valueEntryBean.getFieldName(), facet);
-                    break;
-                default:
-                    columnValues.put(valueEntryBean.getFieldName(), valueEntryBean.getStringValue());
-            }
-        }
-        return columnValues;
-    }
-
-    public static RecordBean[] getRecords(List<Record> recordBeans) {
-        List<RecordBean> records = new ArrayList<>();
-        for (Record recordBean : recordBeans) {
-            RecordBean record = new RecordBean();
-            record.setId(recordBean.getId());
-            record.setTableName(recordBean.getTableName());
-            record.setValues(getRecordValueEntryBeans(recordBean.getValues()));
-            records.add(record);
-        }
-        return records.toArray(new  RecordBean[records.size()]);
-    }
-    public static RecordBean[] getRecords(String tableName, List<Record> recordBeans) {
-        List<RecordBean> records = new ArrayList<>();
-        for (Record recordBean : recordBeans) {
-            RecordBean record = new RecordBean();
-            record.setId(recordBean.getId());
-            record.setTableName(tableName);
-            record.setValues(getRecordValueEntryBeans(recordBean.getValues()));
-            records.add(record);
-        }
-        return records.toArray(new  RecordBean[records.size()]);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static AnalyticsCategoryPathBean validateAndReturn(Object value) {
-        List<String> pathList = (List<String>) value;
-        AnalyticsCategoryPathBean categoryPathBean = new AnalyticsCategoryPathBean();
-        if (pathList != null && pathList.size() > 0) {
-            String[] path = pathList.toArray(new String[pathList.size()]);
-            categoryPathBean.setPath(path);
-        }
-        return categoryPathBean;
-    }
-
-    private static RecordValueEntryBean[] getRecordValueEntryBeans(Map<String, Object> values) {
-        List<RecordValueEntryBean> recordValueEntryBeans = new ArrayList<>();
-        for (Map.Entry<String, Object> entry : values.entrySet()) {
-            RecordValueEntryBean recordValueEntryBean = new RecordValueEntryBean();
-            recordValueEntryBean.setFieldName(entry.getKey());
-            Object value = entry.getValue();
-            if (value != null) {
-                recordValueEntryBean.setType("STRING");
-                recordValueEntryBean.setStringValue(value.toString());
-
-            }
-            recordValueEntryBeans.add(recordValueEntryBean);
-        }
-        return recordValueEntryBeans.toArray(new RecordValueEntryBean[recordValueEntryBeans.size()]);
     }
 
     /**
@@ -179,30 +102,44 @@ public class Utils {
      * @param analyticsSchemaBean bean table schema to be converted to Analytics Schema.
      * @return Analytics schema
      */
-    public static org.wso2.carbon.analytics.
-            webservice.stub.beans.AnalyticsSchemaBean createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
-        org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean
-                schemaBean = new org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean();
-        schemaBean.setColumns(createSchemaColumns(analyticsSchemaBean.getColumns()));
-        schemaBean.setPrimaryKeys(createPrimaryKeys(analyticsSchemaBean.getPrimaryKeys()));
-        return schemaBean;
-    }
 
-    private static String[] createPrimaryKeys(List<String> primaryKeys) {
-        return primaryKeys.toArray(new String[primaryKeys.size()]);
-    }
-
-    private static SchemaColumnBean[] createSchemaColumns(Map<String, ColumnDefinitionBean> columns) {
-        List<SchemaColumnBean> columnBeans = new ArrayList<>();
-        for (Map.Entry<String, ColumnDefinitionBean> entry : columns.entrySet()) {
-            SchemaColumnBean bean = new SchemaColumnBean();
-            bean.setColumnName(entry.getKey());
-            bean.setColumnType(entry.getValue().getType().toString());
-            bean.setIndex(entry.getValue().isIndex());
-            bean.setScoreParam(entry.getValue().isScoreParam());
-            columnBeans.add(bean);
+    public static AnalyticsSchema getAnalyticsSchema(AnalyticsSchemaBean schemaBean) {
+        Map<String, ColumnDefinitionBean> columnBeans = schemaBean.getColumns();
+        List<String> primaryKeys = schemaBean.getPrimaryKeys();
+        List<ColumnDefinition> columnDefinitions = new ArrayList<>();
+        if (columnBeans != null) {
+            for (Map.Entry<String, ColumnDefinitionBean> columnBean : columnBeans.entrySet()) {
+                ColumnDefinition columnDefinition = new ColumnDefinition(columnBean.getKey(),
+                                                                         getColumnType(columnBean.getValue().getType()),
+                                                                         columnBean.getValue().isIndex(),
+                                                                         columnBean.getValue().isScoreParam());
+                columnDefinitions.add(columnDefinition);
+            }
         }
-        return columnBeans.toArray(new SchemaColumnBean[columnBeans.size()]);
+        return new AnalyticsSchema(columnDefinitions, primaryKeys);
+    }
+
+    private static AnalyticsSchema.ColumnType getColumnType(ColumnTypeBean columnType) {
+        switch (columnType) {
+            case STRING:
+                return AnalyticsSchema.ColumnType.STRING;
+            case INTEGER:
+                return AnalyticsSchema.ColumnType.INTEGER;
+            case LONG:
+                return AnalyticsSchema.ColumnType.LONG;
+            case FLOAT:
+                return AnalyticsSchema.ColumnType.FLOAT;
+            case DOUBLE:
+                return AnalyticsSchema.ColumnType.DOUBLE;
+            case BOOLEAN:
+                return AnalyticsSchema.ColumnType.BOOLEAN;
+            case BINARY:
+                return AnalyticsSchema.ColumnType.BINARY;
+            case FACET:
+                return AnalyticsSchema.ColumnType.FACET;
+            default:
+                return AnalyticsSchema.ColumnType.STRING;
+        }
     }
 
     /**
@@ -211,21 +148,19 @@ public class Utils {
      * @param analyticsSchema Analytics schema to be converted to table schema bean
      * @return Table schema bean
      */
-    public static AnalyticsSchemaBean createTableSchemaBean(
-            org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean analyticsSchema) {
+    public static AnalyticsSchemaBean createTableSchemaBean(AnalyticsSchema analyticsSchema) {
         Map<String, ColumnDefinitionBean> columnDefinitions = new HashMap<>();
         List<String> primaryKeys = new ArrayList<>();
         if (analyticsSchema.getColumns() != null) {
-            for (SchemaColumnBean columnBean :
-                    analyticsSchema.getColumns()) {
-                columnDefinitions.put(columnBean.getColumnName(),
-                                      getColumnTypeBean(columnBean.getColumnType(),
-                                                        columnBean.getIndex(),
-                                                        columnBean.getScoreParam()));
+            for (Map.Entry<String, ColumnDefinition> columnBean : analyticsSchema.getColumns().entrySet()) {
+                columnDefinitions.put(columnBean.getKey(),
+                                      getColumnTypeBean(columnBean.getValue().getType(),
+                                                        columnBean.getValue().isIndexed(),
+                                                        columnBean.getValue().isScoreParam()));
             }
         }
         if (analyticsSchema.getPrimaryKeys() != null) {
-            primaryKeys = Arrays.asList(analyticsSchema.getPrimaryKeys());
+            primaryKeys = analyticsSchema.getPrimaryKeys();
         }
         return new AnalyticsSchemaBean(columnDefinitions, primaryKeys);
     }
@@ -236,31 +171,32 @@ public class Utils {
      * @param columnType the ColumnType to be converted to bean type
      * @return ColumnTypeBean instance
      */
-    private static ColumnDefinitionBean getColumnTypeBean(String columnType, boolean isIndexed, boolean isScoreParam) {
+    private static ColumnDefinitionBean getColumnTypeBean(AnalyticsSchema.ColumnType columnType, boolean isIndexed,
+                                                          boolean isScoreParam) {
         ColumnDefinitionBean bean = new ColumnDefinitionBean();
         switch (columnType) {
-            case "STRING":
+            case STRING:
                 bean.setType(ColumnTypeBean.STRING);
                 break;
-            case "INTEGER":
+            case INTEGER:
                 bean.setType(ColumnTypeBean.INTEGER);
                 break;
-            case "LONG":
+            case LONG:
                 bean.setType(ColumnTypeBean.LONG);
                 break;
-            case "FLOAT":
+            case FLOAT:
                 bean.setType(ColumnTypeBean.FLOAT);
                 break;
-            case "DOUBLE":
+            case DOUBLE:
                 bean.setType(ColumnTypeBean.DOUBLE);
                 break;
-            case "BOOLEAN":
+            case BOOLEAN:
                 bean.setType(ColumnTypeBean.BOOLEAN);
                 break;
-            case "BINARY":
+            case BINARY:
                 bean.setType(ColumnTypeBean.BINARY);
                 break;
-            case "FACET":
+            case FACET:
                 bean.setType(ColumnTypeBean.FACET);
                 break;
             default:
@@ -272,80 +208,84 @@ public class Utils {
         return bean;
     }
 
-    public static org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean createCategoryDrillDownRequest(
+    public static CategoryDrillDownRequest createCategoryDrillDownRequest(
             String tableName, CategoryDrillDownRequestBean queryBean) {
-        org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean bean = new
-                org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean();
-        bean.setTableName(tableName);
-        bean.setScoreFunction(queryBean.getScoreFunction());
+        CategoryDrillDownRequest request = new CategoryDrillDownRequest();
+        request.setTableName(tableName);
+        request.setScoreFunction(queryBean.getScoreFunction());
         List<String> drillDownPath = queryBean.getCategoryPath();
         if (drillDownPath != null) {
-            bean.setPath(drillDownPath.toArray(new String[drillDownPath.size()]));
+            request.setPath(drillDownPath.toArray(new String[drillDownPath.size()]));
         }
-        bean.setFieldName(queryBean.getFieldName());
-        bean.setQuery(queryBean.getQuery());
-        return bean;
+        request.setFieldName(queryBean.getFieldName());
+        request.setQuery(queryBean.getQuery());
+        return request;
     }
 
-    public static AnalyticsDrillDownRequestBean createDrillDownSearchRequest(
+    public static AnalyticsDrillDownRequest createDrillDownSearchRequest(
             String tableName, DrillDownRequestBean queryBean) {
-        AnalyticsDrillDownRequestBean bean = new AnalyticsDrillDownRequestBean();
+        AnalyticsDrillDownRequest bean = new AnalyticsDrillDownRequest();
         bean.setTableName(tableName);
         bean.setQuery(queryBean.getQuery());
         bean.setScoreFunction(queryBean.getScoreFunction());
         bean.setRecordCount(queryBean.getRecordCount());
-        bean.setRecordStart(queryBean.getRecordStart());
+        bean.setRecordStartIndex(queryBean.getRecordStart());
         bean.setRangeField(queryBean.getRangeField());
         bean.setCategoryPaths(createCategoryPathBeans(queryBean.getCategories()));
         bean.setRanges(createRanges(queryBean.getRanges()));
         return bean;
     }
 
-    private static AnalyticsDrillDownRangeBean[] createRanges(
+    private static List<AnalyticsDrillDownRange> createRanges(
             List<DrillDownRangeBean> ranges) {
-        List<AnalyticsDrillDownRangeBean> beans = new ArrayList<>();
+        List<AnalyticsDrillDownRange> beans = new ArrayList<>();
         if (ranges != null) {
             for (DrillDownRangeBean range : ranges) {
-                AnalyticsDrillDownRangeBean bean = new AnalyticsDrillDownRangeBean();
+                AnalyticsDrillDownRange bean = new AnalyticsDrillDownRange();
                 bean.setFrom(range.getFrom());
                 bean.setTo(range.getTo());
                 bean.setLabel(range.getLabel());
                 beans.add(bean);
             }
         }
-        return beans.toArray(new AnalyticsDrillDownRangeBean[beans.size()]);
+        return beans;
     }
 
-    private static CategoryPathBean[] createCategoryPathBeans(List<DrillDownPathBean> categories) {
-        List<CategoryPathBean> beans = new ArrayList<>();
+    private static Map<String, List<String>> createCategoryPathBeans(List<DrillDownPathBean> categories) {
+        Map<String, List<String>> beans = new HashMap<>();
         for (DrillDownPathBean category : categories) {
-            CategoryPathBean bean = new CategoryPathBean();
-            bean.setFieldName(category.getFieldName());
-            bean.setPath(category.getPath());
-            beans.add(bean);
+            List<String> path = new ArrayList<>(Arrays.asList(category.getPath()));
+            beans.put(category.getFieldName(), path);
         }
-        return beans.toArray(new CategoryPathBean[beans.size()]);
+        return beans;
     }
 
-    public static org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean getSubCategories(
-            SubCategoriesBean searchResults) {
-        org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean bean =
-                new org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean();
+    public static SubCategoriesBean getSubCategories(
+            SubCategories searchResults) {
+        SubCategoriesBean bean =
+                new SubCategoriesBean();
         bean.setCategories(getCategories(searchResults.getCategories()));
         bean.setCategoryPath(searchResults.getPath());
         return bean;
     }
 
-    private static Map<String, Double> getCategories(CategorySearchResultEntryBean[] categories) {
+    private static Map<String, Double> getCategories(List<CategorySearchResultEntry> categories) {
         Map<String, Double> subCategories = new LinkedHashMap<>();
         if (categories != null) {
-            for (CategorySearchResultEntryBean bean : categories) {
-                subCategories.put(bean.getCategoryName(), bean.getScore());
+            for (CategorySearchResultEntry bean : categories) {
+                subCategories.put(bean.getCategoryValue(), bean.getScore());
             }
         }
         return subCategories;
     }
 
+    /**
+     * Authenticate an user given the auth header (basic auth ) Note : This method is used in jaggery page, Do not remove.
+     * @param authHeader
+     * @return
+     * @throws UnauthenticatedUserException
+     */
+    @SuppressWarnings("unchecked")
     public static String[] authenticate(String authHeader) throws UnauthenticatedUserException{
 
         String credentials[];
@@ -393,126 +333,205 @@ public class Utils {
         return credentials;
     }
 
-    public static org.wso2.carbon.analytics.webservice.stub.beans.StreamDefinitionBean getStreamDefinition(
-            StreamDefinitionBean streamDefinitionBean) {
-        org.wso2.carbon.analytics.webservice.stub.beans.StreamDefinitionBean streamDef =
-                new org.wso2.carbon.analytics.webservice.stub.beans.StreamDefinitionBean();
+    public static StreamDefinition getStreamDefinition(
+            StreamDefinitionBean streamDefinitionBean)
+            throws MalformedStreamDefinitionException, JSServiceException {
+        StreamDefinition streamDef =
+                new StreamDefinition(streamDefinitionBean.getName(), streamDefinitionBean.getVersion());
         streamDef.setDescription(streamDefinitionBean.getDescription());
         streamDef.setNickName(streamDefinitionBean.getNickName());
-        streamDef.setName(streamDefinitionBean.getName());
-        streamDef.setVersion(streamDefinitionBean.getVersion());
         List<String> tags = streamDefinitionBean.getTags();
         Map<String, String> metaData = streamDefinitionBean.getMetaData();
         Map<String, String> correlationData = streamDefinitionBean.getCorrelationData();
         Map<String, String> payloadData = streamDefinitionBean.getPayloadData();
-        if (tags != null) streamDef.setTags(tags.toArray(new String[tags.size()]));
+        if (tags != null) streamDef.setTags(tags);
         if (metaData != null) streamDef.setMetaData(getStreamDefAttributes(metaData));
         if (correlationData != null) streamDef.setCorrelationData(getStreamDefAttributes(correlationData));
         if (payloadData != null) streamDef.setPayloadData(getStreamDefAttributes(payloadData));
         return streamDef;
     }
 
-    private static StreamDefAttributeBean[] getStreamDefAttributes(Map<String, String> metaData) {
-        List<StreamDefAttributeBean> attributeBeans = new ArrayList<>();
+    private static List<Attribute> getStreamDefAttributes(Map<String, String> metaData)
+            throws JSServiceException {
+        List<Attribute> attributeBeans = new ArrayList<>();
         for (Map.Entry<String, String> entry : metaData.entrySet()) {
-            StreamDefAttributeBean bean = new StreamDefAttributeBean();
-            bean.setName(entry.getKey());
-            bean.setType(entry.getValue());
+            Attribute bean = new Attribute(entry.getKey(), getAttributeType(entry.getValue()));
             attributeBeans.add(bean);
         }
-        return attributeBeans.toArray(new StreamDefAttributeBean[metaData.size()]);
+        return attributeBeans;
     }
 
-    public static org.wso2.carbon.analytics.webservice.stub.beans.EventBean getStreamEvent(
-            EventBean eventBean) {
-        org.wso2.carbon.analytics.webservice.stub.beans.EventBean bean =
-                new org.wso2.carbon.analytics.webservice.stub.beans.EventBean();
-        bean.setTimeStamp(eventBean.getTimeStamp());
-        bean.setStreamName(eventBean.getStreamName());
-        bean.setStreamVersion(eventBean.getStreamVersion());
+    private static AttributeType getAttributeType(String type) throws JSServiceException {
+        if (type != null) {
+            switch (type) {
+                case Constants.STRING_TYPE: {
+                    return AttributeType.STRING;
+                }
+                case Constants.BOOLEAN_TYPE: {
+                    return AttributeType.BOOL;
+                }
+                case Constants.FLOAT_TYPE: {
+                    return AttributeType.FLOAT;
+                }
+                case Constants.DOUBLE_TYPE: {
+                    return AttributeType.DOUBLE;
+                }
+                case Constants.INTEGER_TYPE: {
+                    return AttributeType.INT;
+                }
+                case Constants.LONG_TYPE: {
+                    return AttributeType.LONG;
+                }
+                default: {
+                    throw new JSServiceException("Unkown type found while reading stream definition bean.");
+                }
+            }
+        } else {
+            throw new JSServiceException("Type is not defined.");
+        }
+    }
+
+    public static Event getStreamEvent(StreamDefinition streamDefinition, EventBean eventBean)
+            throws JSServiceException {
+        Event event =
+                new Event();
+        event.setTimeStamp(eventBean.getTimeStamp());
+        event.setStreamId(streamDefinition.getStreamId());
         Map<String, Object> metaData = eventBean.getMetaData();
         Map<String, Object> correlationData = eventBean.getCorrelationData();
         Map<String, Object> payloadData = eventBean.getPayloadData();
         Map<String, Object> arbitraryValues = eventBean.getArbitraryDataMap();
-        if (metaData != null) bean.setMetaData(getRecordValueEntryBeans(metaData));
-        if (correlationData != null) bean.setCorrelationData(getRecordValueEntryBeans(correlationData));
-        if (payloadData != null) bean.setPayloadData(getRecordValueEntryBeans(payloadData));
-        if (arbitraryValues != null) bean.setArbitraryData(getRecordValueEntryBeans(arbitraryValues));
-        return bean;
+        if (metaData != null) event.setMetaData(getEventData(metaData, streamDefinition.getMetaData()));
+        if (correlationData != null) event.setCorrelationData(getEventData(correlationData, streamDefinition.getCorrelationData()));
+        if (payloadData != null) event.setPayloadData(getEventData(payloadData, streamDefinition.getPayloadData()));
+        if (arbitraryValues != null) event.setArbitraryDataMap(getArbitraryValues(arbitraryValues));
+        return event;
     }
 
-    public static StreamDefinitionBean getStreamDefinitionBean(
-            org.wso2.carbon.analytics.webservice.stub.beans.StreamDefinitionBean streamDefinitionBean) {
+    private static Map<String, String> getArbitraryValues(Map<String, Object> arbitraryValues) {
+        Map<String, String> values = new HashMap<>();
+        for (Map.Entry<String, Object> entry : arbitraryValues.entrySet()) {
+            values.put(entry.getKey(), entry.getValue().toString());
+        }
+        return values;
+    }
+
+    private static Object[] getEventData(Map<String, Object> entries, List<Attribute> columns)
+            throws JSServiceException {
+        List<Object> values = new ArrayList<>();
+        if (entries.keySet() != null) {
+            for (Attribute column : columns) {
+                if (column != null) {
+                    AttributeType type = column.getType();
+                    String columnName = column.getName();
+                    Object value = entries.get(columnName);
+                    if (value != null) {
+                        switch (type) {
+                            case DOUBLE:
+                                values.add(new BigDecimal(value.toString()).doubleValue());
+                                break;
+                            case INT:
+                                values.add(new BigDecimal(value.toString()).intValue());
+                                break;
+                            case BOOL:
+                                values.add(Boolean.parseBoolean(value.toString()));
+                                break;
+                            case LONG:
+                                values.add(new BigDecimal(value.toString()).longValue());
+                                break;
+                            case FLOAT:
+                                values.add(new BigDecimal(value.toString()).floatValue());
+                                break;
+                            case STRING:
+                                values.add(value.toString());
+                                break;
+                            default:
+                                throw new JSServiceException("DataType is not valid for [" +
+                                                                       columnName);
+                        }
+                    } else {
+                        throw new JSServiceException("value is not given for field: " +
+                                                               columnName);
+                    }
+                } else {
+                    throw new JSServiceException("Record Values are null");
+                }
+            }
+        }
+        return values.toArray(new Object[values.size()]);
+    }
+    public static StreamDefinitionBean getStreamDefinitionBean(StreamDefinition streamDefinition) {
         StreamDefinitionBean bean = new StreamDefinitionBean();
-        bean.setName(streamDefinitionBean.getName());
-        bean.setVersion(streamDefinitionBean.getVersion());
-        bean.setDescription(streamDefinitionBean.getDescription());
-        bean.setNickName(streamDefinitionBean.getNickName());
-        String[] tags = streamDefinitionBean.getTags();
-        StreamDefAttributeBean[] metaData = streamDefinitionBean.getMetaData();
-        StreamDefAttributeBean[] correlationData = streamDefinitionBean.getCorrelationData();
-        StreamDefAttributeBean[] payloadData = streamDefinitionBean.getPayloadData();
-        if (tags != null) bean.setTags(Arrays.asList(tags));
+        bean.setName(streamDefinition.getName());
+        bean.setVersion(streamDefinition.getVersion());
+        bean.setDescription(streamDefinition.getDescription());
+        bean.setNickName(streamDefinition.getNickName());
+        List<String> tags = streamDefinition.getTags();
+        List<Attribute> metaData = streamDefinition.getMetaData();
+        List<Attribute> correlationData = streamDefinition.getCorrelationData();
+        List<Attribute> payloadData = streamDefinition.getPayloadData();
+        if (tags != null) bean.setTags(tags);
         if (metaData != null) bean.setMetaData(getStreamAttributesAsMap(metaData));
         if (correlationData != null) bean.setCorrelationData(getStreamAttributesAsMap(correlationData));
         if (payloadData != null) bean.setPayloadData(getStreamAttributesAsMap(payloadData));
         return bean;
     }
 
-    private static Map<String, String> getStreamAttributesAsMap(StreamDefAttributeBean[] attributeBeans) {
+    private static Map<String, String> getStreamAttributesAsMap(List<Attribute> attributes) {
         Map<String, String> attributeMap= new LinkedHashMap<>();
-        for (StreamDefAttributeBean bean : attributeBeans) {
-            if (bean != null) {
-                attributeMap.put(bean.getName(), bean.getType());
+        for (Attribute attribute : attributes) {
+            if (attribute != null) {
+                attributeMap.put(attribute.getName(), gerAttribute(attribute.getType()));
             }
         }
         return attributeMap;
     }
 
-    public static ValuesBatchBean[] getValuesBatch(List<Map<String, Object>> valueBatchList) {
-        List<ValuesBatchBean> valuesBatchBeans = new ArrayList<>();
-        for (Map<String, Object> keyValueMap : valueBatchList) {
-            if (keyValueMap != null) {
-                ValuesBatchBean valuesBatchBean = new ValuesBatchBean();
-                List<RecordValueEntryBean> keyValues = new ArrayList<>();
-                for (Map.Entry<String, Object> entry : keyValueMap.entrySet()) {
-                    RecordValueEntryBean recordValueEntryBean = new RecordValueEntryBean();
-                    recordValueEntryBean.setFieldName(entry.getKey());
-                    if (entry.getValue() instanceof List) {
-                        recordValueEntryBean.setAnalyticsCategoryPathBeanValue(validateAndReturn(entry.getValue()));
-                    } else {
-                        recordValueEntryBean.setStringValue(entry.getValue().toString());
-                    }
-                    keyValues.add(recordValueEntryBean);
-                }
-                valuesBatchBean.setKeyValues(keyValues.toArray(new RecordValueEntryBean[keyValues.size()]));
-                valuesBatchBeans.add(valuesBatchBean);
-            }
+    private static String gerAttribute(AttributeType type) {
+        switch (type) {
+            case DOUBLE:
+                return Constants.DOUBLE_TYPE;
+            case STRING:
+                return Constants.STRING_TYPE;
+            case INT:
+                return Constants.INTEGER_TYPE;
+            case FLOAT:
+                return Constants.FLOAT_TYPE;
+            case LONG:
+                return Constants.LONG_TYPE;
+            case BOOL:
+                return Constants.BOOLEAN_TYPE;
+            default:
+                return Constants.STRING_TYPE;
         }
-        return valuesBatchBeans.toArray(new ValuesBatchBean[valuesBatchBeans.size()]);
     }
 
-    public static AnalyticsAggregateRequest getAggregateRequest(AggregateRequest aggregateRequest) {
-        AnalyticsAggregateRequest request = new AnalyticsAggregateRequest();
+    public static AggregateRequest getAggregateRequest(AggregateRequestBean aggregateRequest) {
+        AggregateRequest request = new AggregateRequest();
         request.setGroupByField(aggregateRequest.getGroupByField());
         request.setQuery(aggregateRequest.getQuery());
         request.setTableName(aggregateRequest.getTableName());
         request.setFields(createAggregateFieds(aggregateRequest.getFields()));
         request.setAggregateLevel(aggregateRequest.getAggregateLevel());
-        request.setParentPath(aggregateRequest.getParentPath()
-                                      .toArray(new String[aggregateRequest.getParentPath().size()]));
+        request.setParentPath(aggregateRequest.getParentPath());
         return request;
     }
 
-    private static AnalyticsAggregateField[] createAggregateFieds(List<AggregateField> fields) {
-        List<AnalyticsAggregateField> analyticsAggregateFields = new ArrayList<>();
+    private static List<org.wso2.carbon.analytics.dataservice.commons.AggregateField> createAggregateFieds(List<AggregateField> fields) {
+        List<org.wso2.carbon.analytics.dataservice.commons.AggregateField> analyticsAggregateFields = new ArrayList<>();
         for (AggregateField field : fields) {
-            AnalyticsAggregateField aggregateField = new AnalyticsAggregateField();
+            org.wso2.carbon.analytics.dataservice.commons.AggregateField aggregateField = new org.wso2.carbon.analytics.dataservice.commons.AggregateField();
             aggregateField.setFieldName(field.getFieldName());
-            aggregateField.setAggregate(field.getAggregate());
+            aggregateField.setAggregateFunction(field.getAggregate());
             aggregateField.setAlias(field.getAlias());
             analyticsAggregateFields.add(aggregateField);
         }
-        return analyticsAggregateFields.toArray(new AnalyticsAggregateField[analyticsAggregateFields.size()]);
+        return analyticsAggregateFields;
+    }
+
+    public static List createList(AnalyticsIterator<Record> iterator) {
+        List<Record> records = new ArrayList<>();
+        records.addAll(IteratorUtils.toList(iterator));
+        return records;
     }
 }
