@@ -61,15 +61,15 @@ import java.util.Map;
 /**
  * This class will expose all the MessageConsoleService stub operations.
  */
-public class AnalyticsWebServiceConnector {
+public class AnalyticsJSServiceConnector {
 
     private static final long AXIS2_MIN = Long.MIN_VALUE + 1; //Long.MIN_VALUE is used for unset long variables inside stub
-    private Log logger = LogFactory.getLog(AnalyticsWebServiceConnector.class);
+    private Log logger = LogFactory.getLog(AnalyticsJSServiceConnector.class);
     private AnalyticsDataAPI analyticsDataAPI;
     private EventStreamService eventStreamService;
     private Gson gson;
 
-    public AnalyticsWebServiceConnector() {
+    public AnalyticsJSServiceConnector() {
         analyticsDataAPI = ServiceHolder.getAnalyticsDataAPI();
         eventStreamService = ServiceHolder.getEventStreamService();
         gson = new Gson();

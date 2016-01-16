@@ -39,13 +39,13 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This is a thin wrapper on top of {@link AnalyticsWebServiceConnector} to provide caching functionality.
+ * This is a thin wrapper on top of {@link AnalyticsJSServiceConnector} to provide caching functionality.
  */
-public class AnalyticsCachedWebServiceConnector extends AnalyticsWebServiceConnector {
+public class AnalyticsCachedJSServiceConnector extends AnalyticsJSServiceConnector {
     
     private AnalyticsCache cache;
     
-    public AnalyticsCachedWebServiceConnector(AnalyticsCache cache) {
+    public AnalyticsCachedJSServiceConnector(AnalyticsCache cache) {
         super();
         this.cache = cache;
     }
@@ -248,7 +248,7 @@ public class AnalyticsCachedWebServiceConnector extends AnalyticsWebServiceConne
 
         @SuppressWarnings({ "rawtypes", "unchecked" })
         private HazelcastInstance loadHazelcast() {
-            BundleContext ctx = FrameworkUtil.getBundle(AnalyticsCachedWebServiceConnector.class).getBundleContext();
+            BundleContext ctx = FrameworkUtil.getBundle(AnalyticsCachedJSServiceConnector.class).getBundleContext();
             ServiceReference ref = ctx.getServiceReference(HazelcastInstance.class);
             if (ref != null) {
                 return (HazelcastInstance) ctx.getService(ref);
