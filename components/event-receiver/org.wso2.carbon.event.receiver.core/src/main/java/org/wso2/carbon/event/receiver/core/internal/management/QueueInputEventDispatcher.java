@@ -20,18 +20,16 @@ package org.wso2.carbon.event.receiver.core.internal.management;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.databridge.commons.Event;
+import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.processor.manager.core.EventManagementUtil;
 import org.wso2.carbon.event.processor.manager.core.EventSync;
 import org.wso2.carbon.event.processor.manager.core.Manager;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
-import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.util.snapshot.ByteSerializer;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -47,14 +45,14 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public QueueInputEventDispatcher(int tenantId, String syncId, Lock readLock,
-                                     org.wso2.carbon.databridge.commons.StreamDefinition exportedStreamDefinition,
+                                     StreamDefinition exportedStreamDefinition,
                                      int eventQueueSizeMb, int eventSyncQueueSize) {
         this.readLock = readLock;
         this.tenantId = tenantId;
         this.syncId = syncId;
-        this.eventQueue = new BlockingEventQueue(eventQueueSizeMb ,eventSyncQueueSize);
-        this.streamDefinition = EventManagementUtil.constructStreamDefinition(syncId, exportedStreamDefinition);
-        executorService.submit(new QueueInputEventDispatcherWorker());
+        this.eventQueue = new BlockingEventQueue(eventQueueSizeMb, eventSyncQueueSize);
+        this.streamDefinition = EventManagementUtil.constructDatabridgeStreamDefinition(syncId, exportedStreamDefinition);
+        this.executorService.submit(new QueueInputEventDispatcherWorker());
     }
 
     @Override
@@ -83,9 +81,9 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
 
     @Override
     public void syncState(byte[] bytes) {
-        BlockingQueue<Event> events = (BlockingQueue<Event>) ByteSerializer.BToO(bytes);
-        for (Event event : events) {
-            if (event.equals(eventQueue.peek())) {
+        BlockingEventQueue events = (BlockingEventQueue) ByteSerializer.BToO(bytes);
+        while (events.peek() != null) {
+            if (events.poll().equals(eventQueue.peek())) {
                 eventQueue.poll();
             } else {
                 break;
@@ -105,19 +103,8 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
         return streamDefinition;
     }
 
-    class QueueInputEventDispatcherWorker implements Runnable {
+    private class QueueInputEventDispatcherWorker implements Runnable {
 
-        /**
-         * When an object implementing interface <code>Runnable</code> is used
-         * to create a thread, starting the thread causes the object's
-         * <code>run</code> method to be called in that separately executing
-         * thread.
-         * <p/>
-         * The general contract of the method <code>run</code> is that it may
-         * take any action whatsoever.
-         *
-         * @see Thread#run()
-         */
         @Override
         public void run() {
             try {
@@ -140,7 +127,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
                     }
                 }
             } catch (Exception e) {
-                log.error("Error in dispatching events.");
+                log.error("Error in dispatching events:" + e.getMessage(), e);
             } finally {
                 PrivilegedCarbonContext.endTenantFlow();
             }

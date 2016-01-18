@@ -23,12 +23,8 @@ import java.util.List;
  */
 public interface EventProducerCallback {
 
-    public void sendEvent(org.wso2.siddhi.core.event.Event event);
+    void sendEvent(Event event);
 
-    public void sendEvent(Event event);
-
-    public void sendEvents(List<Event> events);
-
-    public void sendEvents(org.wso2.siddhi.core.event.Event[] events);
+    void sendEvents(List<Event> events);
 
 }

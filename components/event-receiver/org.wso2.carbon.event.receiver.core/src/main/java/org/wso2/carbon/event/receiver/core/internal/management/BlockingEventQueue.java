@@ -20,8 +20,8 @@ package org.wso2.carbon.event.receiver.core.internal.management;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
-import org.wso2.siddhi.core.event.Event;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -69,7 +69,7 @@ public class BlockingEventQueue {
             }
         }
         if (log.isDebugEnabled()) {
-            log.debug("current queue size in bytes : " + currentSize + ", remaining capacity : " +
+            log.debug("Current queue size in bytes : " + currentSize + ", remaining capacity : " +
                     this.queue.remainingCapacity());
         }
 

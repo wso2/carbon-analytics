@@ -22,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
@@ -31,8 +32,8 @@ import org.wso2.carbon.event.receiver.core.config.mapping.JSONInputMapping;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingException;
 import org.wso2.carbon.event.receiver.core.exception.InvalidPropertyValueException;
+import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
-import org.wso2.siddhi.core.event.Event;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,6 +124,13 @@ public class JSONInputMapper implements InputMapper {
 
     private Event processSingleEvent(Object obj) throws EventReceiverProcessingException {
         Object[] outObjArray = null;
+        StreamDefinition outStreamDefinition = this.streamDefinition;
+        int metaDataCount = outStreamDefinition.getMetaData() != null ? outStreamDefinition.getMetaData().size() : 0;
+        int correlationDataCount = outStreamDefinition.getCorrelationData() != null ? outStreamDefinition.getCorrelationData().size() : 0;
+        int payloadDataCount = outStreamDefinition.getPayloadData() != null ? outStreamDefinition.getPayloadData().size() : 0;
+        Object[] metaDataArray = new Object[metaDataCount];
+        Object[] correlationDataArray = new Object[correlationDataCount];
+        Object[] payloadDataArray = new Object[payloadDataCount];
         if (obj instanceof String) {
             String jsonString = (String) obj;
             List<Object> objList = new ArrayList<Object>();
@@ -165,12 +173,12 @@ public class JSONInputMapper implements InputMapper {
             }
             outObjArray = objList.toArray(new Object[objList.size()]);
         }
-        return new Event(System.currentTimeMillis(), outObjArray);
+        return EventReceiverUtil.getEventFromArray(outObjArray, outStreamDefinition, metaDataArray, correlationDataArray, payloadDataArray);
     }
 
     private Event[] processTypedMultipleEvents(Object obj)
             throws EventReceiverProcessingException {
-        Event[] eventArray = null;
+        Event[] eventArray;
         String events = (String) obj;
         JSONArray jsonArray;
         try {
@@ -190,6 +198,13 @@ public class JSONInputMapper implements InputMapper {
 
         Object attributeArray[] = new Object[noMetaData + noCorrelationData + noPayloadData];
         int attributeCount = 0;
+        StreamDefinition outStreamDefinition = this.streamDefinition;
+        int metaDataCount = outStreamDefinition.getMetaData() != null ? outStreamDefinition.getMetaData().size() : 0;
+        int correlationDataCount = outStreamDefinition.getCorrelationData() != null ? outStreamDefinition.getCorrelationData().size() : 0;
+        int payloadDataCount = outStreamDefinition.getPayloadData() != null ? outStreamDefinition.getPayloadData().size() : 0;
+        Object[] metaDataArray = new Object[metaDataCount];
+        Object[] correlationDataArray = new Object[correlationDataCount];
+        Object[] payloadDataArray = new Object[payloadDataCount];
 
         try {
             if (obj instanceof String) {
@@ -257,7 +272,7 @@ public class JSONInputMapper implements InputMapper {
                     throw new EventReceiverProcessingException("Event attributes are not matching with the stream : " + this.eventReceiverConfiguration.getToStreamName() + ":" + eventReceiverConfiguration.getToStreamVersion());
                 }
             }
-            return new Event(System.currentTimeMillis(), attributeArray);
+            return EventReceiverUtil.getEventFromArray(attributeArray, outStreamDefinition, metaDataArray, correlationDataArray, payloadDataArray);
         } catch (InvalidPropertyValueException e) {
             log.error(e.getMessage() + ", hence dropping the event : " + obj.toString());
             return null;

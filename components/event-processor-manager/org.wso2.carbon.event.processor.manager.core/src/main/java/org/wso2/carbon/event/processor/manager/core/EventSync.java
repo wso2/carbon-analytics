@@ -15,14 +15,15 @@
 
 package org.wso2.carbon.event.processor.manager.core;
 
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
+import org.wso2.carbon.databridge.commons.Event;
+import org.wso2.carbon.databridge.commons.StreamDefinition;
 
 /**
  * Created on 5/26/15.
  */
 public interface EventSync {
 
-    void process(org.wso2.siddhi.core.event.Event event);
+    void process(Event event);
 
-    public StreamDefinition getStreamDefinition();
+    StreamDefinition getStreamDefinition();
 }

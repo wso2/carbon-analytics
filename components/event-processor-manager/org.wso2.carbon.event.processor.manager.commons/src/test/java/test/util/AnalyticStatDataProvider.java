@@ -17,6 +17,7 @@
  */
 package test.util;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class AnalyticStatDataProvider implements DataProvider {
@@ -29,5 +30,10 @@ public class AnalyticStatDataProvider implements DataProvider {
         int userIndex = Math.round((float) Math.random() * MULTIPLIER);
         int termIndex = Math.round((float) Math.random() * MULTIPLIER);
         return new Object[]{SamplingDataSet.IP_ADDRESSES.get(ipIndex), eventCount.incrementAndGet(), System.currentTimeMillis(), System.nanoTime(), SamplingDataSet.USER_IDS.get(userIndex), SamplingDataSet.SEARCH_TERMS.get(termIndex)};
+    }
+
+    @Override
+    public Map<String, String> getArbitraryAttributeMap() {
+        return null;
     }
 }

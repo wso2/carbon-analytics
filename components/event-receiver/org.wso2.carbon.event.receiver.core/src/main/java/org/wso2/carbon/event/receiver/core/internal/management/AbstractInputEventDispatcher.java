@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.event.receiver.core.internal.management;
 
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.event.stream.core.EventProducerCallback;
-import org.wso2.siddhi.core.event.Event;
 
 public abstract class AbstractInputEventDispatcher {
 

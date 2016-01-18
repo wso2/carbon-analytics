@@ -15,31 +15,42 @@
 package org.wso2.carbon.event.receiver.core.config.mapping;
 
 
-import org.wso2.carbon.event.receiver.core.config.InputMapping;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
+import org.wso2.carbon.event.receiver.core.config.InputMapping;
 
 public class WSO2EventInputMapping extends InputMapping {
 
     private String fromEventName;
     private String fromEventVersion;
+    private boolean arbitraryMapsEnabled = false;
 
     @Override
     public String getMappingType() {
         return EventReceiverConstants.ER_WSO2EVENT_MAPPING_TYPE;
     }
 
-    public void setFromEventName(String fromEventName){
+    public void setFromEventName(String fromEventName) {
         this.fromEventName = fromEventName;
     }
-    public String getFromEventName(){
+
+    public String getFromEventName() {
         return fromEventName;
     }
-    public void setFromEventVersion(String fromEventVersion){
+
+    public void setFromEventVersion(String fromEventVersion) {
         this.fromEventVersion = fromEventVersion;
     }
-    public String getFromEventVersion(){
+
+    public String getFromEventVersion() {
         return fromEventVersion;
     }
 
 
+    public boolean isArbitraryMapsEnabled() {
+        return arbitraryMapsEnabled;
+    }
+
+    public void setArbitraryMapsEnabled(boolean arbitraryMapsEnabled) {
+        this.arbitraryMapsEnabled = arbitraryMapsEnabled;
+    }
 }

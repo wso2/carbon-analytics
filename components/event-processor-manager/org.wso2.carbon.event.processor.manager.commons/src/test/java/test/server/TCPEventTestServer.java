@@ -24,6 +24,8 @@ import org.wso2.carbon.event.processor.manager.commons.transport.server.TCPEvent
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
+import java.util.Map;
+
 public class TCPEventTestServer {
 
 
@@ -48,7 +50,7 @@ public class TCPEventTestServer {
         TCPEventServer eventServer = new TCPEventServer(new TCPEventServerConfig("0.0.0.0", 7612), new StreamCallback() {
 
             public int count;
-            public long start=System.currentTimeMillis();
+            public long start = System.currentTimeMillis();
 
             /**
              * @param streamId the stream id for the incoming event
@@ -56,8 +58,7 @@ public class TCPEventTestServer {
              * @param event    the event as an object array of attributes
              */
             @Override
-            public void receive(String streamId, long timestamp, Object[] event) {
-//                    System.out.println(streamId +" :  "+Arrays.deepToString(event));
+            public void receive(String streamId, long timestamp, Object[] event, Map<String, String> arbitraryMapData) {
 
                 count++;
                 if (count % 2000000 == 0) {
@@ -66,11 +67,6 @@ public class TCPEventTestServer {
                     System.out.println("Throughput = " + tp + " Event/sec");
                     start = end;
                 }
-//                try {
-//                    Thread.sleep(2);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
             }
         }, null);
 
