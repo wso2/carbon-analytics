@@ -135,7 +135,9 @@ public class FileTailEventAdapter implements InputEventAdapter {
     private void validateInputEventAdapterConfigurations() throws InputEventAdapterException {
         String delayInMillisProperty = eventAdapterConfiguration.getProperties().get(FileTailEventAdapterConstants.EVENT_ADAPTER_DELAY_MILLIS);
         try{
-            Integer.parseInt(delayInMillisProperty);
+            if(delayInMillisProperty != null){
+                Integer.parseInt(delayInMillisProperty);
+            }
         } catch (NumberFormatException e){
             throw new InputEventAdapterException("Invalid value set for property Delay: " + delayInMillisProperty, e);
         }

@@ -233,6 +233,7 @@ function populateAnalyticsIndexTable(eventStreamName, eventStreamVersion) {
                 var currentPayloadCount = payloadIndexTable.rows.length;
 
                 document.getElementById('eventPersistCheckbox').checked = resultJson.persist;
+                document.getElementById('schemaReplaceCheckbox').checked = resultJson.mergeSchema;
                 document.getElementById('recordStoreSelect').value = resultJson.recordStoreName;
                 document.getElementById('attributeFieldSet').disabled = !resultJson.persist;
                 document.getElementById('recordStoreSelect').disabled = true;
@@ -407,4 +408,12 @@ function uncheckedRoot(type) {
 
 function enableAttribute(ele) {
     document.getElementById('attributeFieldSet').disabled = !ele.checked;
+}
+
+function showHideAttribute() {
+    var advancedOptionsDiv = document.getElementById('advancedOptions');
+    if (advancedOptionsDiv.style.display === 'block' || advancedOptionsDiv.style.display === '')
+        advancedOptionsDiv.style.display = 'none';
+    else
+        advancedOptionsDiv.style.display = 'block'
 }

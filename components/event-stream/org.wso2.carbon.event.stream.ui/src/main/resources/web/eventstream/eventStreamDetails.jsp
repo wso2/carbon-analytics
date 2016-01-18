@@ -535,6 +535,23 @@
                                                         </table>
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                    <td>
+                                                        <table class="styledLeft noBorders spacer-bot" style="width:100%">
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="noDataDiv-advanced-plain">
+                                                                        <input type="checkbox" onclick="return false"
+                                                                                <% if (analyticsTable.getMergeSchema())
+																					{ %>
+                                                                               checked   <% } %>
+                                                                                /><fmt:message key="merge.schema"/>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
                                                 <%
                                                     }
                                                 } catch (Exception e) {

@@ -8,7 +8,7 @@
 
 ---
 
-Latest Released Version v5.0.3.
+Latest Released Version v5.0.8.
 
 This project contains compontents which implements common functionalities used in WSO2 analytics platform.
 

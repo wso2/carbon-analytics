@@ -202,5 +202,16 @@
             </tr>
             </tbody>
         </table>
+        <table class="styledLeft noBorders spacer-bot" style="width:100%">
+            <tr>
+                <td align="left">
+                    <input type="button" class="ninjaButton" value="<fmt:message key="advanced.options"/>"
+                           onclick="showHideAttribute()" style="float: left"/>
+                    <div class="noDataDiv-advanced" id="advancedOptions" style="display: none">
+                        <input type="checkbox" id="schemaReplaceCheckbox"/><fmt:message key="merge.schema"/>
+                    </div>
+                </td>
+            </tr>
+        </table>
     </fieldset>
 </fmt:bundle>
