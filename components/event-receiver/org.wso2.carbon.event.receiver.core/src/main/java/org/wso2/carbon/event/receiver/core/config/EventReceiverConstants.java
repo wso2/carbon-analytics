@@ -23,6 +23,9 @@ import java.util.Map;
 
 @SuppressWarnings("unchecked")
 public final class EventReceiverConstants {
+    private EventReceiverConstants() {
+
+    }
 
     public static final String ER_CONF_NS = "http://wso2.org/carbon/eventreceiver";
     public static final String ER_ELEMENT_ROOT_ELEMENT = "eventReceiver";
@@ -123,10 +126,8 @@ public final class EventReceiverConstants {
 
     public static final String ER_ATTR_ENCRYPTED = "encrypted";
 
-    private EventReceiverConstants() {
-
-    }
+    public static final String METRICS_ROOT = "CEP";
+    public static final String METRICS_EVENT_RECEIVERS = "EventReceivers";
 
     public static final String HTTP_RECEIVER_ENDPOINT_PREFIX = "endpoints";
-
 }

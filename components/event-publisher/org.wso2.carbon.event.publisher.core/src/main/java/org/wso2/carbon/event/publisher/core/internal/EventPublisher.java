@@ -40,20 +40,24 @@ import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
 import org.wso2.carbon.event.statistics.EventStatisticsMonitor;
 import org.wso2.carbon.event.stream.core.SiddhiEventConsumer;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
+import org.wso2.carbon.metrics.manager.Counter;
+import org.wso2.carbon.metrics.manager.Level;
+import org.wso2.carbon.metrics.manager.MetricManager;
 import org.wso2.siddhi.core.event.Event;
 
-import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class EventPublisher implements SiddhiEventConsumer, EventSync {
-
     private static final Log log = LogFactory.getLog(EventPublisher.class);
-
     private final boolean traceEnabled;
     private final boolean statisticsEnabled;
-
+    private final String metricId;
     List<String> dynamicMessagePropertyList = new ArrayList<String>();
+    private Counter eventCounter;
     private Logger trace = Logger.getLogger(EventPublisherConstants.EVENT_TRACE_LOGGER);
     private EventPublisherConfiguration eventPublisherConfiguration = null;
     private int tenantId;
@@ -66,25 +70,26 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     private boolean dynamicMessagePropertyEnabled = false;
     private boolean customMappingEnabled = false;
     private boolean isPolled = false;
-
     private Mode mode = Mode.SingleNode;
     private String syncId;
     private boolean sendToOther = false;
     private org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition;
     private BlockingEventQueue eventQueue;
 
-
     public EventPublisher(EventPublisherConfiguration eventPublisherConfiguration)
             throws EventPublisherConfigurationException {
-
         this.eventPublisherConfiguration = eventPublisherConfiguration;
         this.customMappingEnabled = eventPublisherConfiguration.getOutputMapping().isCustomMappingEnabled();
         this.tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        this.metricId = EventPublisherConstants.METRICS_ROOT + "[+]." +
+                EventPublisherConstants.METRICS_EVENT_PUBLISHERS + "[+]." +
+                eventPublisherConfiguration.getEventPublisherName() + ".published-events";
 
         String inputStreamName = eventPublisherConfiguration.getFromStreamName();
         String inputStreamVersion = eventPublisherConfiguration.getFromStreamVersion();
 
-        //Stream Definition must same for any event source, There are cannot be different stream definition for same stream id in multiple event sourced
+        // Stream Definition must same for any event source,
+        // There are cannot be different stream definition for same stream id in multiple event sourced.
         StreamDefinition inputStreamDefinition = null;
 
         try {
@@ -103,8 +108,8 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         this.streamId = inputStreamDefinition.getStreamId();
         createPropertyPositionMap(inputStreamDefinition);
         outputMapper = EventPublisherServiceValueHolder.getMappingFactoryMap().get(eventPublisherConfiguration.
-                getOutputMapping().getMappingType()).constructOutputMapper(eventPublisherConfiguration, propertyPositionMap,
-                tenantId, inputStreamDefinition);
+                getOutputMapping().getMappingType()).constructOutputMapper(eventPublisherConfiguration,
+                propertyPositionMap, tenantId, inputStreamDefinition);
 
         Map<String, String> dynamicOutputAdapterProperties = eventPublisherConfiguration.getToAdapterDynamicProperties();
         for (Map.Entry<String, String> entry : dynamicOutputAdapterProperties.entrySet()) {
@@ -128,6 +133,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
             this.statisticsMonitor = EventPublisherServiceValueHolder.getEventStatisticsService().
                     getEventStatisticMonitor(tenantId, EventPublisherConstants.EVENT_PUBLISHER,
                             eventPublisherConfiguration.getEventPublisherName(), null);
+            this.eventCounter = MetricManager.counter(this.metricId, Level.INFO, Level.INFO, Level.INFO);
         }
         if (traceEnabled) {
             this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER +
@@ -171,7 +177,8 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
             } else if (mode == Mode.HA && managementModeInfo.getHaConfiguration().isWorkerNode()) {
                 sendToOther = true;
                 HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
-                eventQueue = new BlockingEventQueue(haConfiguration.getEventSyncPublisherMaxQueueSizeInMb(), haConfiguration.getEventSyncPublisherQueueSize());
+                eventQueue = new BlockingEventQueue(haConfiguration.getEventSyncPublisherMaxQueueSizeInMb(),
+                        haConfiguration.getEventSyncPublisherQueueSize());
             }
             EventPublisherServiceValueHolder.getEventManagementService().registerEventSync(this, Manager.ManagerType.Publisher);
         }
@@ -215,11 +222,13 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
                     while (!eventQueue.offer(eventWrapper)) {
                         EventWrapper wrapper = eventQueue.poll();
                         if (log.isDebugEnabled()) {
-                            log.debug("Dropping event arrived at " + wrapper.getTimestampInMillis() + " due to insufficient capacity at Event Publisher Queue, dropped event: " + wrapper.getEvent());
+                            log.debug("Dropping event arrived at " + wrapper.getTimestampInMillis() +
+                                    " due to insufficient capacity at Event Publisher Queue, dropped event: " +
+                                    wrapper.getEvent());
                         }
                     }
 
-                    // get last processed time and remove old events from the queue
+                    // Get last processed time and remove old events from the queue.
                     long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService().getLatestEventSentTime(
                             eventPublisherConfiguration.getEventPublisherName(), tenantId);
 
@@ -281,9 +290,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     }
 
     private List<String> getDynamicOutputMessageProperties(String messagePropertyValue) {
-
         String text = messagePropertyValue;
-
         while (text.contains("{{") && text.indexOf("}}") > 0) {
             dynamicMessagePropertyList.add(text.substring(text.indexOf("{{") + 2, text.indexOf("}}")));
             text = text.substring(text.indexOf("}}") + 2);
@@ -292,7 +299,6 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     }
 
     private void changeDynamicEventAdapterMessageProperties(Object[] eventData, Map<String, String> dynamicProperties) {
-
         for (String dynamicMessageProperty : dynamicMessagePropertyList) {
             if (eventData.length != 0 && dynamicMessageProperty != null) {
                 int position = propertyPositionMap.get(dynamicMessageProperty);
@@ -303,7 +309,6 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
     private void changePropertyValue(int position, String messageProperty, Object[] eventData,
                                      Map<String, String> dynamicProperties) {
-
         for (Map.Entry<String, String> entry : dynamicProperties.entrySet()) {
             String mapValue = "{{" + messageProperty + "}}";
             String regexValue = "\\{\\{" + messageProperty + "\\}\\}";
@@ -316,7 +321,6 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
                 }
             }
         }
-
     }
 
     public void destroy() {
@@ -328,15 +332,15 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
     @Override
     public void process(Event event) {
-
         Map<String, String> dynamicProperties = new HashMap<String, String>(eventPublisherConfiguration.getToAdapterDynamicProperties());
-
         Object outObject;
+
         if (traceEnabled) {
             trace.info(beforeTracerPrefix + event);
         }
         if (statisticsEnabled) {
             statisticsMonitor.incrementResponse();
+            eventCounter.inc();
         }
         try {
             if (customMappingEnabled) {
@@ -359,7 +363,6 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
         OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();
         eventAdapterService.publish(eventPublisherConfiguration.getEventPublisherName(), dynamicProperties, outObject);
-
     }
 
     @Override
@@ -377,7 +380,6 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     }
 
     public class EventWrapper {
-
         private Event event;
         private long timestampInMillis;
         private int size;

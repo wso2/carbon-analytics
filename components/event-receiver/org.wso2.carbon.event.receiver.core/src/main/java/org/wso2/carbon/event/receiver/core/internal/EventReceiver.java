@@ -43,6 +43,9 @@ import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverCon
 import org.wso2.carbon.event.statistics.EventStatisticsMonitor;
 import org.wso2.carbon.event.stream.core.EventProducer;
 import org.wso2.carbon.event.stream.core.EventProducerCallback;
+import org.wso2.carbon.metrics.manager.Counter;
+import org.wso2.carbon.metrics.manager.Level;
+import org.wso2.carbon.metrics.manager.MetricManager;
 import org.wso2.siddhi.core.event.Event;
 
 import java.util.List;
@@ -54,6 +57,8 @@ public class EventReceiver implements EventProducer {
     private boolean isEventDuplicatedInCluster;
     private boolean traceEnabled = false;
     private boolean statisticsEnabled = false;
+    private String metricId;
+    private Counter eventCounter;
     private boolean customMappingEnabled = false;
     private boolean isWorkerNode = false;
     private boolean sufficientToSend = false;
@@ -79,6 +84,7 @@ public class EventReceiver implements EventProducer {
             this.customMappingEnabled = eventReceiverConfiguration.getInputMapping().isCustomMappingEnabled();
             String mappingType = this.eventReceiverConfiguration.getInputMapping().getMappingType();
             this.inputMapper = EventReceiverServiceValueHolder.getMappingFactoryMap().get(mappingType).constructInputMapper(this.eventReceiverConfiguration, exportedStreamDefinition);
+            this.metricId = EventReceiverConstants.METRICS_ROOT + "[+]." + EventReceiverConstants.METRICS_EVENT_RECEIVERS + "[+]." + eventReceiverConfiguration.getEventReceiverName() + ".received-events";
 
             // The input mapper should not be null. For configurations where custom mapping is disabled,
             // an input mapper would be created without the mapping details
@@ -96,6 +102,7 @@ public class EventReceiver implements EventProducer {
             if (statisticsEnabled) {
                 this.statisticsMonitor = EventReceiverServiceValueHolder.getEventStatisticsService().getEventStatisticMonitor(
                         tenantId, EventReceiverConstants.EVENT_RECEIVER, eventReceiverConfiguration.getEventReceiverName(), null);
+                this.eventCounter = MetricManager.counter(this.metricId, Level.INFO, Level.INFO, Level.INFO);
             }
             if (traceEnabled) {
                 this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventReceiverConstants.EVENT_RECEIVER + " : "
@@ -253,6 +260,7 @@ public class EventReceiver implements EventProducer {
         }
         if (statisticsEnabled) {
             statisticsMonitor.incrementRequest();
+            eventCounter.inc();
         }
         //in distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator. Also do not send if this is a manager node.
         if (sufficientToSend || EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator()) {
