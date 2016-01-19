@@ -59,11 +59,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This class will expose all the MessageConsoleService stub operations.
+ * This class will contain all the analytics data service APIs which will be called from Analytics.jag.
  */
 public class AnalyticsJSServiceConnector {
 
-    private static final long AXIS2_MIN = Long.MIN_VALUE + 1; //Long.MIN_VALUE is used for unset long variables inside stub
     private Log logger = LogFactory.getLog(AnalyticsJSServiceConnector.class);
     private AnalyticsDataAPI analyticsDataAPI;
     private EventStreamService eventStreamService;
@@ -351,7 +350,7 @@ public class AnalyticsJSServiceConnector {
             logger.debug("Invoking getRecordCount for tableName: " + tableName);
         }
         try {
-            long recordCount = analyticsDataAPI.getRecordCount(username, tableName, AXIS2_MIN, Long.MAX_VALUE);
+            long recordCount = analyticsDataAPI.getRecordCount(username, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
             if (logger.isDebugEnabled()) {
                 logger.debug("RecordCount for tableName: " + tableName + " is " + recordCount);
             }
