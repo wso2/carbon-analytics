@@ -124,27 +124,6 @@ public class AnalyticsJSServiceConnector {
                               "Table : " + tableName + " exists.");
     }
 
-    public ResponseBean addStreamDefinition(String streamDefAsString) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("invoking addStreamDefinition");
-        }
-        try {
-            if (streamDefAsString != null && !streamDefAsString.isEmpty()) {
-                StreamDefinitionBean streamDefinitionBean = gson.fromJson(streamDefAsString, StreamDefinitionBean.class);
-                StreamDefinition streamDefinition = Utils.getStreamDefinition(streamDefinitionBean);
-                eventStreamService.addEventStreamDefinition(streamDefinition);
-                String streamId = streamDefinition.getStreamId();
-                return handleResponse(ResponseStatus.CREATED, streamId);
-            } else {
-                return handleResponse(ResponseStatus.NON_EXISTENT, "StreamDefinition is not given");
-            }
-        } catch (Exception e) {
-            logger.error("Failed to add the stream definition: " + e.getMessage(), e);
-            return handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
-                                                                     ": " + e.getMessage());
-        }
-    }
-
     public ResponseBean getStreamDefinition(String requestAsString) {
         try {
             if (requestAsString != null && !requestAsString.isEmpty()) {
@@ -167,30 +146,6 @@ public class AnalyticsJSServiceConnector {
         }
     }
 
-    public ResponseBean publishEvent(String eventAsString) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("invoking publishEvent");
-        }
-        try {
-            if (eventAsString != null && !eventAsString.isEmpty()) {
-                EventBean eventBean = gson.fromJson(eventAsString, EventBean.class);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("publishing event: stream : " + eventBean.getStreamName() + ", version: " +
-                                 eventBean.getStreamVersion());
-                }
-                StreamDefinition streamDefinition = eventStreamService.getStreamDefinition(eventBean.getStreamName(), eventBean.getStreamVersion());
-                eventStreamService.publish(Utils.getStreamEvent(streamDefinition, eventBean));
-                return handleResponse(ResponseStatus.SUCCESS, "Event published successfully");
-
-            } else {
-                return handleResponse(ResponseStatus.NON_EXISTENT, "Stream event is not provided");
-            }
-        } catch (Exception e) {
-            logger.error("Failed to publish event: " + e.getMessage(), e);
-            return handleResponse(ResponseStatus.FAILED, "Failed to publish event: " +
-                                                         ": " + e.getMessage());
-        }
-    }
 
     private StreamDefinition validateAndGetStreamDefinition(String name, String version)
             throws JSServiceException {
@@ -830,6 +785,52 @@ public class AnalyticsJSServiceConnector {
         } else {
             return handleResponse(ResponseStatus.FAILED, "drilldownSearch parameters " +
                                                          "are not provided");
+        }
+    }
+
+    public ResponseBean addStreamDefinition(String streamDefAsString) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("invoking addStreamDefinition");
+        }
+        try {
+            if (streamDefAsString != null && !streamDefAsString.isEmpty()) {
+                StreamDefinitionBean streamDefinitionBean = gson.fromJson(streamDefAsString, StreamDefinitionBean.class);
+                StreamDefinition streamDefinition = Utils.getStreamDefinition(streamDefinitionBean);
+                eventStreamService.addEventStreamDefinition(streamDefinition);
+                String streamId = streamDefinition.getStreamId();
+                return handleResponse(ResponseStatus.CREATED, streamId);
+            } else {
+                return handleResponse(ResponseStatus.NON_EXISTENT, "StreamDefinition is not given");
+            }
+        } catch (Exception e) {
+            logger.error("Failed to add the stream definition: " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
+                                                         ": " + e.getMessage());
+        }
+    }
+
+    public ResponseBean publishEvent(String eventAsString) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("invoking publishEvent");
+        }
+        try {
+            if (eventAsString != null && !eventAsString.isEmpty()) {
+                EventBean eventBean = gson.fromJson(eventAsString, EventBean.class);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("publishing event: stream : " + eventBean.getStreamName() + ", version: " +
+                                 eventBean.getStreamVersion());
+                }
+                StreamDefinition streamDefinition = eventStreamService.getStreamDefinition(eventBean.getStreamName(), eventBean.getStreamVersion());
+                eventStreamService.publish(Utils.getStreamEvent(streamDefinition, eventBean));
+                return handleResponse(ResponseStatus.SUCCESS, "Event published successfully");
+
+            } else {
+                return handleResponse(ResponseStatus.NON_EXISTENT, "Stream event is not provided");
+            }
+        } catch (Exception e) {
+            logger.error("Failed to publish event: " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to publish event: " +
+                                                         ": " + e.getMessage());
         }
     }
 
