@@ -81,7 +81,7 @@ public class TCPEventSendingTestCase {
     @Test
     public void testEventSendingWithArbitraryMapsToServer() throws InterruptedException, IOException {
         String hostname = "0.0.0.0";
-        int port = 7652;
+        int port = 7657;
 
         StreamDefinition streamDefinition = StreamDefinition.id("TestStreamWithArbitrary")
                 .attribute("att1", Attribute.Type.INT)
