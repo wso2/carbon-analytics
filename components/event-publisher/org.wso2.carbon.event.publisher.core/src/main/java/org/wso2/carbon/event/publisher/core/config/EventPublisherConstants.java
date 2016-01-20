@@ -105,6 +105,7 @@ public final class EventPublisherConstants {
 
     public static final String EVENT_TRACE_LOGGER = "EVENT_TRACE_LOGGER";
 
-    public static final String METRICS_ROOT = "CEP";
+    public static final String METRICS_ROOT = "WSO2_CEP";
     public static final String METRICS_EVENT_PUBLISHERS = "EventPublishers";
+    public static final String METRIC_DELIMITER = ".";
 }
