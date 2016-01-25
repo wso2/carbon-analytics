@@ -57,7 +57,6 @@ public class EventReceiver implements EventProducer {
     private boolean isEventDuplicatedInCluster;
     private boolean traceEnabled = false;
     private boolean statisticsEnabled = false;
-    private String metricId;
     private Counter eventCounter;
     private boolean customMappingEnabled = false;
     private boolean isWorkerNode = false;
@@ -83,14 +82,18 @@ public class EventReceiver implements EventProducer {
             this.statisticsEnabled = eventReceiverConfiguration.isStatisticsEnabled();
             this.customMappingEnabled = eventReceiverConfiguration.getInputMapping().isCustomMappingEnabled();
             String mappingType = this.eventReceiverConfiguration.getInputMapping().getMappingType();
-            this.inputMapper = EventReceiverServiceValueHolder.getMappingFactoryMap().get(mappingType).constructInputMapper(this.eventReceiverConfiguration, exportedStreamDefinition);
-            this.metricId = EventReceiverConstants.METRICS_ROOT + "[+]." + EventReceiverConstants.METRICS_EVENT_RECEIVERS + "[+]." + eventReceiverConfiguration.getEventReceiverName() + ".received-events";
+            this.inputMapper = EventReceiverServiceValueHolder.getMappingFactoryMap().get(mappingType)
+                    .constructInputMapper(this.eventReceiverConfiguration, exportedStreamDefinition);
+            String metricId = EventReceiverConstants.METRICS_ROOT + "[+]." +
+                    EventReceiverConstants.METRICS_EVENT_RECEIVERS + "[+]." +
+                    eventReceiverConfiguration.getEventReceiverName() + ".received-events";
 
             // The input mapper should not be null. For configurations where custom mapping is disabled,
             // an input mapper would be created without the mapping details
             if (this.inputMapper != null) {
                 if (customMappingEnabled) {
-                    EventReceiverConfigurationHelper.validateExportedStream(eventReceiverConfiguration, exportedStreamDefinition, this.inputMapper);
+                    EventReceiverConfigurationHelper.validateExportedStream(
+                            eventReceiverConfiguration, exportedStreamDefinition, this.inputMapper);
                 }
                 this.exportedStreamDefinition = exportedStreamDefinition;
             } else {
@@ -99,17 +102,21 @@ public class EventReceiver implements EventProducer {
             }
 
             // Initialize tracer and statistics.
+            this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO, Level.INFO);
             if (statisticsEnabled) {
-                this.statisticsMonitor = EventReceiverServiceValueHolder.getEventStatisticsService().getEventStatisticMonitor(
-                        tenantId, EventReceiverConstants.EVENT_RECEIVER, eventReceiverConfiguration.getEventReceiverName(), null);
-                this.eventCounter = MetricManager.counter(this.metricId, Level.INFO, Level.INFO, Level.INFO);
+                this.statisticsMonitor = EventReceiverServiceValueHolder.getEventStatisticsService()
+                        .getEventStatisticMonitor(tenantId, EventReceiverConstants.EVENT_RECEIVER,
+                                eventReceiverConfiguration.getEventReceiverName(), null);
             }
             if (traceEnabled) {
-                this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventReceiverConstants.EVENT_RECEIVER + " : "
-                        + eventReceiverConfiguration.getEventReceiverName() + ", before processing " + System.getProperty("line.separator");
-                this.afterTracerPrefix = "TenantId : " + tenantId + ", " + EventReceiverConstants.EVENT_RECEIVER + " : "
-                        + eventReceiverConfiguration.getEventReceiverName() + ", " + EventReceiverConstants.EVENT_STREAM + " : "
-                        + EventReceiverUtil.getExportedStreamIdFrom(eventReceiverConfiguration) + ", after processing " + System.getProperty("line.separator");
+                this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventReceiverConstants.EVENT_RECEIVER +
+                        " : " + eventReceiverConfiguration.getEventReceiverName() + ", before processing " +
+                        System.getProperty("line.separator");
+                this.afterTracerPrefix = "TenantId : " + tenantId + ", " + EventReceiverConstants.EVENT_RECEIVER +
+                        " : " + eventReceiverConfiguration.getEventReceiverName() + ", " +
+                        EventReceiverConstants.EVENT_STREAM + " : " +
+                        EventReceiverUtil.getExportedStreamIdFrom(eventReceiverConfiguration) + ", after processing " +
+                        System.getProperty("line.separator");
             }
 
             String inputEventAdapterName = eventReceiverConfiguration.getFromAdapterConfiguration().getName();
@@ -123,30 +130,36 @@ public class EventReceiver implements EventProducer {
                 EventReceiverServiceValueHolder.getInputEventAdapterService().create(
                         eventReceiverConfiguration.getFromAdapterConfiguration(), inputEventAdapterSubscription);
 
-                isEventDuplicatedInCluster = EventReceiverServiceValueHolder.getInputEventAdapterService().isEventDuplicatedInCluster(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
+                isEventDuplicatedInCluster = EventReceiverServiceValueHolder.getInputEventAdapterService()
+                        .isEventDuplicatedInCluster(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
 
-
-                DistributedConfiguration distributedConfiguration = EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getDistributedConfiguration();
-                if(distributedConfiguration != null){
+                DistributedConfiguration distributedConfiguration = EventReceiverServiceValueHolder
+                        .getEventManagementService().getManagementModeInfo().getDistributedConfiguration();
+                if (distributedConfiguration != null) {
                     this.isWorkerNode = distributedConfiguration.isWorkerNode();
                 }
                 sufficientToSend = mode != Mode.Distributed || (isWorkerNode && !isEventDuplicatedInCluster);
 
             } catch (InputEventAdapterException e) {
-                throw new EventReceiverConfigurationException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error in configuration. " + e.getMessage(), e);
+                throw new EventReceiverConfigurationException("Cannot subscribe to input event adapter :" +
+                        inputEventAdapterName + ", error in configuration. " + e.getMessage(), e);
             } catch (InputEventAdapterRuntimeException e) {
-                throw new EventReceiverProcessingException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error while connecting by adapter. " + e.getMessage(), e);
+                throw new EventReceiverProcessingException("Cannot subscribe to input event adapter :" +
+                        inputEventAdapterName + ", error while connecting by adapter. " + e.getMessage(), e);
             }
             this.mode = mode;
             if (mode == Mode.HA) {
-                HAConfiguration haConfiguration = EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getHaConfiguration();
+                HAConfiguration haConfiguration = EventReceiverServiceValueHolder.getEventManagementService()
+                        .getManagementModeInfo().getHaConfiguration();
                 Lock readLock = EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().getReadLock();
                 inputEventDispatcher = new QueueInputEventDispatcher(tenantId,
-                        EventManagementUtil.constructEventSyncId(tenantId, eventReceiverConfiguration.getEventReceiverName(),
-                                Manager.ManagerType.Receiver), readLock, exportedStreamDefinition,
-                        haConfiguration.getEventSyncReceiverMaxQueueSizeInMb(), haConfiguration.getEventSyncReceiverQueueSize());
+                        EventManagementUtil.constructEventSyncId(tenantId,
+                                eventReceiverConfiguration.getEventReceiverName(), Manager.ManagerType.Receiver),
+                        readLock, exportedStreamDefinition, haConfiguration.getEventSyncReceiverMaxQueueSizeInMb(),
+                        haConfiguration.getEventSyncReceiverQueueSize());
                 inputEventDispatcher.setSendToOther(!isEventDuplicatedInCluster);
-                EventReceiverServiceValueHolder.getEventManagementService().registerEventSync((EventSync) inputEventDispatcher, Manager.ManagerType.Receiver);
+                EventReceiverServiceValueHolder.getEventManagementService()
+                        .registerEventSync((EventSync) inputEventDispatcher, Manager.ManagerType.Receiver);
             } else {
                 inputEventDispatcher = new InputEventDispatcher();
             }
@@ -260,10 +273,13 @@ public class EventReceiver implements EventProducer {
         }
         if (statisticsEnabled) {
             statisticsMonitor.incrementRequest();
-            eventCounter.inc();
         }
-        //in distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator. Also do not send if this is a manager node.
-        if (sufficientToSend || EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator()) {
+        eventCounter.inc();
+
+        // In distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator.
+        // Also do not send if this is a manager node.
+        if (sufficientToSend
+                || EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator()) {
             this.inputEventDispatcher.onEvent(event);
         }
 
@@ -275,18 +291,21 @@ public class EventReceiver implements EventProducer {
 
     protected void defineEventStream(Object definition) throws EventReceiverConfigurationException {
         if (log.isDebugEnabled()) {
-            log.debug("EventReceiver: " + eventReceiverConfiguration.getEventReceiverName() + ", notifying event definition addition :" + definition.toString());
+            log.debug("EventReceiver: " + eventReceiverConfiguration.getEventReceiverName() +
+                    ", notifying event definition addition :" + definition.toString());
         }
         if (definition instanceof StreamDefinition) {
             StreamDefinition inputStreamDefinition = (StreamDefinition) definition;
             String mappingType = eventReceiverConfiguration.getInputMapping().getMappingType();
-            this.inputMapper = EventReceiverServiceValueHolder.getMappingFactoryMap().get(mappingType).constructInputMapper(eventReceiverConfiguration, exportedStreamDefinition);
+            this.inputMapper = EventReceiverServiceValueHolder.getMappingFactoryMap().get(mappingType)
+                    .constructInputMapper(eventReceiverConfiguration, exportedStreamDefinition);
         }
     }
 
     protected void removeEventStream(Object definition) {
         if (log.isDebugEnabled()) {
-            log.debug("EventReceiver: " + eventReceiverConfiguration.getEventReceiverName() + ", notifying event definition addition :" + definition.toString());
+            log.debug("EventReceiver: " + eventReceiverConfiguration.getEventReceiverName() +
+                    ", notifying event definition addition :" + definition.toString());
         }
         this.inputMapper = null;
     }
@@ -302,9 +321,11 @@ public class EventReceiver implements EventProducer {
     }
 
     public void destroy() {
-        EventReceiverServiceValueHolder.getInputEventAdapterService().destroy(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
+        EventReceiverServiceValueHolder.getInputEventAdapterService()
+                .destroy(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
         if (mode == Mode.HA && inputEventDispatcher instanceof EventSync) {
-            EventReceiverServiceValueHolder.getEventManagementService().unregisterEventSync(((EventSync) inputEventDispatcher).getStreamDefinition().getId(), Manager.ManagerType.Receiver);
+            EventReceiverServiceValueHolder.getEventManagementService().unregisterEventSync(
+                    ((EventSync) inputEventDispatcher).getStreamDefinition().getId(), Manager.ManagerType.Receiver);
         }
     }
 

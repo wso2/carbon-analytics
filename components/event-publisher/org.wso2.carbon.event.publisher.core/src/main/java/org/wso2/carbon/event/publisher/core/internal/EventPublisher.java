@@ -55,8 +55,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     private static final Log log = LogFactory.getLog(EventPublisher.class);
     private final boolean traceEnabled;
     private final boolean statisticsEnabled;
-    private final String metricId;
-    List<String> dynamicMessagePropertyList = new ArrayList<String>();
+    private List<String> dynamicMessagePropertyList = new ArrayList<String>();
     private Counter eventCounter;
     private Logger trace = Logger.getLogger(EventPublisherConstants.EVENT_TRACE_LOGGER);
     private EventPublisherConfiguration eventPublisherConfiguration = null;
@@ -81,10 +80,9 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         this.eventPublisherConfiguration = eventPublisherConfiguration;
         this.customMappingEnabled = eventPublisherConfiguration.getOutputMapping().isCustomMappingEnabled();
         this.tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        this.metricId = EventPublisherConstants.METRICS_ROOT + "[+]." +
+        String metricId = EventPublisherConstants.METRICS_ROOT + "[+]." +
                 EventPublisherConstants.METRICS_EVENT_PUBLISHERS + "[+]." +
                 eventPublisherConfiguration.getEventPublisherName() + ".published-events";
-
         String inputStreamName = eventPublisherConfiguration.getFromStreamName();
         String inputStreamVersion = eventPublisherConfiguration.getFromStreamVersion();
 
@@ -129,15 +127,15 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
         this.traceEnabled = eventPublisherConfiguration.isTracingEnabled();
         this.statisticsEnabled = eventPublisherConfiguration.isStatisticsEnabled();
+        this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO, Level.INFO);
         if (statisticsEnabled) {
             this.statisticsMonitor = EventPublisherServiceValueHolder.getEventStatisticsService().
                     getEventStatisticMonitor(tenantId, EventPublisherConstants.EVENT_PUBLISHER,
                             eventPublisherConfiguration.getEventPublisherName(), null);
-            this.eventCounter = MetricManager.counter(this.metricId, Level.INFO, Level.INFO, Level.INFO);
         }
         if (traceEnabled) {
             this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER +
-                    " : " + eventPublisherConfiguration.getEventPublisherName()+ ", " +
+                    " : " + eventPublisherConfiguration.getEventPublisherName() + ", " +
                     EventPublisherConstants.EVENT_STREAM + " : " +
                     EventPublisherUtil.getImportedStreamIdFrom(eventPublisherConfiguration) +
                     ", before processing " + System.getProperty("line.separator");
@@ -180,7 +178,8 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
                 eventQueue = new BlockingEventQueue(haConfiguration.getEventSyncPublisherMaxQueueSizeInMb(),
                         haConfiguration.getEventSyncPublisherQueueSize());
             }
-            EventPublisherServiceValueHolder.getEventManagementService().registerEventSync(this, Manager.ManagerType.Publisher);
+            EventPublisherServiceValueHolder.getEventManagementService()
+                    .registerEventSync(this, Manager.ManagerType.Publisher);
         }
     }
 
@@ -192,17 +191,18 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
         if (isPolled) {
             if (sendToOther) {
-                EventPublisherServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Publisher, event);
+                EventPublisherServiceValueHolder.getEventManagementService()
+                        .syncEvent(syncId, Manager.ManagerType.Publisher, event);
             }
             process(event);
         } else {
             if (!EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
                 if (mode == Mode.HA) {
-                    //is queue not empty send events from last time
+                    // Is queue not empty send events from last time.
                     long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis();
                     if (!eventQueue.isEmpty()) {
-                        long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService().getLatestEventSentTime(
-                                eventPublisherConfiguration.getEventPublisherName(), tenantId);
+                        long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService()
+                                .getLatestEventSentTime(eventPublisherConfiguration.getEventPublisherName(), tenantId);
                         while (!eventQueue.isEmpty()) {
                             EventWrapper eventWrapper = eventQueue.poll();
                             if (eventWrapper.getTimestampInMillis() > lastProcessedTime) {
@@ -216,7 +216,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
                 process(event);
             } else {
                 if (mode == Mode.HA) {
-                    //add to Queue
+                    // Add to Queue.
                     long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis();
                     EventWrapper eventWrapper = new EventWrapper(event, currentTime);
                     while (!eventQueue.offer(eventWrapper)) {
@@ -229,8 +229,8 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
                     }
 
                     // Get last processed time and remove old events from the queue.
-                    long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService().getLatestEventSentTime(
-                            eventPublisherConfiguration.getEventPublisherName(), tenantId);
+                    long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService()
+                            .getLatestEventSentTime(eventPublisherConfiguration.getEventPublisherName(), tenantId);
 
                     while (!eventQueue.isEmpty() && eventQueue.peek().getTimestampInMillis() <= lastProcessedTime) {
                         eventQueue.remove();
@@ -325,9 +325,11 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
     public void destroy() {
         if (mode == Mode.Distributed || mode == Mode.HA) {
-            EventPublisherServiceValueHolder.getEventManagementService().unregisterEventSync(syncId, Manager.ManagerType.Publisher);
+            EventPublisherServiceValueHolder.getEventManagementService()
+                    .unregisterEventSync(syncId, Manager.ManagerType.Publisher);
         }
-        EventPublisherServiceValueHolder.getOutputEventAdapterService().destroy(eventPublisherConfiguration.getEventPublisherName());
+        EventPublisherServiceValueHolder.getOutputEventAdapterService()
+                .destroy(eventPublisherConfiguration.getEventPublisherName());
     }
 
     @Override
@@ -340,8 +342,9 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         }
         if (statisticsEnabled) {
             statisticsMonitor.incrementResponse();
-            eventCounter.inc();
         }
+        eventCounter.inc();
+
         try {
             if (customMappingEnabled) {
                 outObject = outputMapper.convertToMappedInputEvent(event);
@@ -372,7 +375,8 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
     public void prepareDestroy() {
         if (EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA &&
-                EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getHaConfiguration().isWorkerNode()) {
+                EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo()
+                        .getHaConfiguration().isWorkerNode()) {
             EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
                     eventPublisherConfiguration.getEventPublisherName(), tenantId,
                     EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis());
