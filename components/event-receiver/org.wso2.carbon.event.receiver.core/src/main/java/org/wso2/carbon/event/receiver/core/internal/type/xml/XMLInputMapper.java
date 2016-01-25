@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
@@ -38,7 +39,6 @@ import org.wso2.carbon.event.receiver.core.internal.type.xml.config.ReflectionBa
 import org.wso2.carbon.event.receiver.core.internal.type.xml.config.XPathData;
 import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
-import org.wso2.siddhi.core.event.Event;
 
 import javax.xml.stream.XMLStreamException;
 import java.lang.reflect.InvocationTargetException;
@@ -56,11 +56,13 @@ public class XMLInputMapper implements InputMapper {
     private List<XPathDefinition> xPathDefinitions = null;
     private ReflectionBasedObjectSupplier reflectionBasedObjectSupplier = new ReflectionBasedObjectSupplier();
     private AXIOMXPath parentSelectorXpath = null;
+    private StreamDefinition streamDefinition = null;
 
     public XMLInputMapper(EventReceiverConfiguration eventReceiverConfiguration,
                           StreamDefinition exportedStreamDefinition)
             throws EventReceiverConfigurationException {
         this.eventReceiverConfiguration = eventReceiverConfiguration;
+        this.streamDefinition = exportedStreamDefinition;
 
         if (eventReceiverConfiguration != null && eventReceiverConfiguration.getInputMapping() instanceof XMLInputMapping) {
             XMLInputMapping xmlInputMapping = (XMLInputMapping) eventReceiverConfiguration.getInputMapping();
@@ -212,6 +214,13 @@ public class XMLInputMapper implements InputMapper {
 
     private Event processSingleEvent(Object obj) throws EventReceiverProcessingException {
         Object[] outObjArray = null;
+        StreamDefinition outStreamDefinition = this.streamDefinition;
+        int metaDataCount = outStreamDefinition.getMetaData() != null ? outStreamDefinition.getMetaData().size() : 0;
+        int correlationDataCount = outStreamDefinition.getCorrelationData() != null ? outStreamDefinition.getCorrelationData().size() : 0;
+        int payloadDataCount = outStreamDefinition.getPayloadData() != null ? outStreamDefinition.getPayloadData().size() : 0;
+        Object[] metaDataArray = new Object[metaDataCount];
+        Object[] correlationDataArray = new Object[correlationDataCount];
+        Object[] payloadDataArray = new Object[payloadDataCount];
         OMElement eventOMElement = null;
         if (obj instanceof String) {
             String textMessage = (String) obj;
@@ -242,9 +251,9 @@ public class XMLInputMapper implements InputMapper {
                     Class<?> beanClass = Class.forName(type);
                     Object returnedObj = null;
                     if (omElementResult != null) {
-                        if(omElementResult.getFirstElement() != null){
+                        if (omElementResult.getFirstElement() != null) {
                             returnedObj = omElementResult.toString();
-                        }else {
+                        } else {
                             returnedObj = BeanUtil.deserialize(beanClass,
                                     omElementResult, reflectionBasedObjectSupplier, null);
                         }
@@ -280,6 +289,6 @@ public class XMLInputMapper implements InputMapper {
             }
             outObjArray = objList.toArray(new Object[objList.size()]);
         }
-        return new Event(System.currentTimeMillis(), outObjArray);
+        return EventReceiverUtil.getEventFromArray(outObjArray, outStreamDefinition, metaDataArray, correlationDataArray, payloadDataArray);
     }
 }

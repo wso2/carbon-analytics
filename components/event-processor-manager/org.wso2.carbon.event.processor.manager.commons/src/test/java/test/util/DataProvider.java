@@ -18,6 +18,10 @@
 
 package test.util;
 
+import java.util.Map;
+
 public interface DataProvider {
     public Object[] getEvent();
+
+    Map<String, String> getArbitraryAttributeMap();
 }

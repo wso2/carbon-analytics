@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSubscription;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
@@ -133,8 +134,8 @@ public class EventReceiver implements EventProducer {
                 isEventDuplicatedInCluster = EventReceiverServiceValueHolder.getInputEventAdapterService()
                         .isEventDuplicatedInCluster(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
 
-                DistributedConfiguration distributedConfiguration = EventReceiverServiceValueHolder
-                        .getEventManagementService().getManagementModeInfo().getDistributedConfiguration();
+
+                DistributedConfiguration distributedConfiguration = EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getDistributedConfiguration();
                 if (distributedConfiguration != null) {
                     this.isWorkerNode = distributedConfiguration.isWorkerNode();
                 }
@@ -170,9 +171,11 @@ public class EventReceiver implements EventProducer {
         }
     }
 
+/*
     public int getTenantId() {
         return PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
     }
+*/
 
     /**
      * Returns the stream definition that is exported by this event receiver.
@@ -289,6 +292,7 @@ public class EventReceiver implements EventProducer {
         return inputEventDispatcher;
     }
 
+/*
     protected void defineEventStream(Object definition) throws EventReceiverConfigurationException {
         if (log.isDebugEnabled()) {
             log.debug("EventReceiver: " + eventReceiverConfiguration.getEventReceiverName() +
@@ -309,6 +313,7 @@ public class EventReceiver implements EventProducer {
         }
         this.inputMapper = null;
     }
+*/
 
     @Override
     public String getStreamId() {
@@ -325,7 +330,7 @@ public class EventReceiver implements EventProducer {
                 .destroy(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
         if (mode == Mode.HA && inputEventDispatcher instanceof EventSync) {
             EventReceiverServiceValueHolder.getEventManagementService().unregisterEventSync(
-                    ((EventSync) inputEventDispatcher).getStreamDefinition().getId(), Manager.ManagerType.Receiver);
+                    ((EventSync) inputEventDispatcher).getStreamDefinition().getStreamId(), Manager.ManagerType.Receiver);
         }
     }
 

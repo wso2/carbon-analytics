@@ -21,22 +21,22 @@
 }
 
 .ninjaButton {
-    font-weight: bold;
-    background: rgba(0,0,0,0);
-    color: #6b6b6b;
-    border: none;
+	font-weight: bold;
+	background: rgba(0, 0, 0, 0);
+	color: #6b6b6b;
+	border: none;
 }
 
 .noDataDiv-advanced {
-    float: left;
-    padding-left: 22px;
-    width: 400px;
-    color: #6b6b6b;
+	float: left;
+	padding-left: 22px;
+	width: 400px;
+	color: #6b6b6b;
 }
 
 .noDataDiv-advanced-plain {
-    float: left;
-    color: #6b6b6b;
+	float: left;
+	color: #6b6b6b;
 }
 
 .noDataDiv-plain {

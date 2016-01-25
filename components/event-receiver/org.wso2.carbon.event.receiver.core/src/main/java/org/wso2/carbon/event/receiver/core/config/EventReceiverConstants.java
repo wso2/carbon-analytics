@@ -126,6 +126,7 @@ public final class EventReceiverConstants {
 
     public static final String ER_ATTR_ENCRYPTED = "encrypted";
     public static final String HTTP_RECEIVER_ENDPOINT_PREFIX = "endpoints";
+    public static final String ER_ATTR_ARBITRARY_MAPS_ENABLED = "arbitraryMaps";
 
     public static final String METRICS_ROOT = "WSO2_CEP";
     public static final String METRICS_EVENT_RECEIVERS = "EventReceivers";

@@ -74,7 +74,10 @@
                         <Export-Package>
                             org.wso2.carbon.databridge.commons.thrift.*
                         </Export-Package>
-                        <Import-Package>org.osgi.framework, *;resolution:=optional</Import-Package>
+                        <Import-Package>
+			    org.apache.thrift;version="${libthrift.wso2.imp.pkg.version.range}",
+			    org.osgi.framework, *;resolution:=optional
+			</Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>

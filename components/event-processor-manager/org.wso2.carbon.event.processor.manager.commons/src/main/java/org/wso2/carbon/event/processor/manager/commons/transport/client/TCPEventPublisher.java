@@ -136,18 +136,41 @@ public class TCPEventPublisher {
      * @param streamId  ID of the stream
      * @param timestamp timestamp of the event
      * @param eventData data to send
-     * @throws java.io.IOException
+     * @param flush     whether to flush the output stream in synchronous mode
+     * @throws IOException
      */
     public void sendEvent(String streamId, long timestamp, Object[] eventData, boolean flush) throws IOException {
+        sendEvent(streamId, timestamp, eventData, null, flush);
+    }
+
+    /**
+     * Send Events to the remote server. In synchronous mode this method call returns only after writing data to the socket
+     * in asynchronous mode disruptor pattern is used
+     *
+     * @param streamId  ID of the stream
+     * @param timestamp timestamp of the event
+     * @param eventData data to send
+     * @throws java.io.IOException
+     */
+    public void sendEvent(String streamId, long timestamp, Object[] eventData, Map<String, String> arbitraryMap, boolean flush) throws IOException {
         StreamRuntimeInfo streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
 
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+        boolean hasArbitraryAttributes = arbitraryMap != null;
 
         int streamIdSize = (streamRuntimeInfo.getStreamId()).getBytes(defaultCharset).length;
-        ByteBuffer buf = ByteBuffer.allocate(streamRuntimeInfo.getFixedMessageSize() + streamIdSize + 12);
+        int arbitraryMapSize = 0;
+        if (hasArbitraryAttributes) {
+            for (Map.Entry<String, String> entry : arbitraryMap.entrySet()) {
+                arbitraryMapSize += 4 + entry.getKey().length();
+                arbitraryMapSize += 4 + entry.getValue().length();
+            }
+        }
+        ByteBuffer buf = ByteBuffer.allocate(streamRuntimeInfo.getFixedMessageSize() + streamIdSize + 16);
         buf.putInt(streamIdSize);
         buf.put((streamRuntimeInfo.getStreamId()).getBytes(defaultCharset));
         buf.putLong(timestamp);
+        buf.putInt(arbitraryMapSize);
 
         int[] stringDataIndex = new int[streamRuntimeInfo.getNoOfStringAttributes()];
         int stringIndex = 0;
@@ -193,6 +216,18 @@ public class TCPEventPublisher {
             }
         }
         arrayOutputStream.write(buf.array());
+
+        if (arbitraryMapSize > 0) {
+            buf = ByteBuffer.allocate(arbitraryMapSize);
+            for (Map.Entry<String, String> entry : arbitraryMap.entrySet()) {
+                buf.putInt(entry.getKey().length());
+                buf.put(entry.getKey().getBytes(defaultCharset));
+                buf.putInt(entry.getValue().length());
+                buf.put(entry.getValue().getBytes(defaultCharset));
+            }
+            arrayOutputStream.write(buf.array());
+        }
+
 
         if (!isSynchronous) {
             publishToDisruptor(arrayOutputStream.toByteArray());

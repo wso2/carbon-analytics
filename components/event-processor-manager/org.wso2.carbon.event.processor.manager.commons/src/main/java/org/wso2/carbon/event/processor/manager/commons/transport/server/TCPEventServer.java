@@ -33,6 +33,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,7 +47,7 @@ public class TCPEventServer {
     private StreamCallback streamCallback;
     private ConnectionCallback connectionCallback;
     private ServerWorker serverWorker;
-    private Map<String, StreamRuntimeInfo> streamRuntimeInfoMap = new ConcurrentHashMap<String, StreamRuntimeInfo>();
+    private Map<String, StreamRuntimeInfo> streamRuntimeInfoMap = new ConcurrentHashMap<>();
 
     public TCPEventServer(TCPEventServerConfig tcpeventserverconfig, StreamCallback streamCallback, ConnectionCallback connectionCallback) {
         this.tcpEventServerConfig = tcpeventserverconfig;
@@ -160,10 +161,11 @@ public class TCPEventServer {
                             streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
                         }
                         Object[] eventData = new Object[streamRuntimeInfo.getNoOfAttributes()];
-                        byte[] fixedMessageData = loadData(in, new byte[8 + streamRuntimeInfo.getFixedMessageSize()]);
+                        byte[] fixedMessageData = loadData(in, new byte[12 + streamRuntimeInfo.getFixedMessageSize()]);
 
                         ByteBuffer bbuf = ByteBuffer.wrap(fixedMessageData, 0, fixedMessageData.length);
                         long timestamp = bbuf.getLong();
+                        int arbitraryMapSize = bbuf.getInt();
 
                         List<Integer> stringValueSizes = new ArrayList<>();
                         Attribute.Type[] attributeTypes = streamRuntimeInfo.getAttributeTypes();
@@ -205,7 +207,31 @@ public class TCPEventServer {
                                 stringSizePosition++;
                             }
                         }
-                        streamCallback.receive(streamId, timestamp, eventData);
+
+                        Map<String, String> arbitraryMap = null;
+                        if (arbitraryMapSize > 0) {
+                            arbitraryMap = new HashMap<>();
+                            int arbitraryMapBytesRead = 0;
+                            int keyStringSize, valueStringSize;
+                            //TODO Consider loading all the attributes at once for better performance
+                            byte[] arbitraryMapAttributeSizeData;
+                            ByteBuffer arbitraryMapAttributeSizeByteBuf;
+                            while (arbitraryMapBytesRead < arbitraryMapSize) {
+                                arbitraryMapAttributeSizeData = loadData(in, new byte[4]);
+                                arbitraryMapAttributeSizeByteBuf = ByteBuffer.wrap(arbitraryMapAttributeSizeData);
+                                keyStringSize = arbitraryMapAttributeSizeByteBuf.getInt();
+                                byte[] keyStringData = loadData(in, new byte[keyStringSize]);
+                                arbitraryMapBytesRead += 4 + keyStringSize;
+                                arbitraryMapAttributeSizeData = loadData(in, new byte[4]);
+                                arbitraryMapAttributeSizeByteBuf = ByteBuffer.wrap(arbitraryMapAttributeSizeData);
+                                valueStringSize = arbitraryMapAttributeSizeByteBuf.getInt();
+                                byte[] valueStringData = loadData(in, new byte[valueStringSize]);
+                                arbitraryMapBytesRead += 4 + valueStringSize;
+                                arbitraryMap.put(new String(keyStringData), new String(valueStringData));
+                            }
+                        }
+
+                        streamCallback.receive(streamId, timestamp, eventData, arbitraryMap);
                     }
                 } catch (EOFException e) {
                     log.info("Closing listener socket. " + e.getMessage());
@@ -252,7 +278,6 @@ public class TCPEventServer {
                     }
                 }
             }
-
         }
     }
 }
