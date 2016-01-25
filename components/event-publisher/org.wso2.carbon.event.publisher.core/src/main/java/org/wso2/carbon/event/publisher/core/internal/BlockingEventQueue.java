@@ -21,11 +21,12 @@ package org.wso2.carbon.event.publisher.core.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
+
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class BlockingEventQueue extends LinkedBlockingQueue<EventPublisher.EventWrapper>{
+public class BlockingEventQueue extends LinkedBlockingQueue<EventPublisher.EventWrapper> {
     private static final Log log = LogFactory.getLog(BlockingEventQueue.class);
     private int maxSizeInBytes;
     private Semaphore semaphore;
@@ -69,7 +70,6 @@ public class BlockingEventQueue extends LinkedBlockingQueue<EventPublisher.Event
             log.debug("current queue size in bytes : " + currentSize + ", remaining capacity : " +
                     remainingCapacity());
         }
-
     }
 
 
@@ -110,28 +110,28 @@ public class BlockingEventQueue extends LinkedBlockingQueue<EventPublisher.Event
         }
     }
 
-    public boolean offer(EventPublisher.EventWrapper event){
+    public boolean offer(EventPublisher.EventWrapper event) {
         int size = EventPublisherUtil.getSize(event.getEvent()) + 4 + 8; //for the int and long value for size field.
         event.setSize(size);
         boolean acquired = true;
         boolean offered = false;
         if (currentSize.get() >= maxSizeInBytes) {
-                acquired = semaphore.tryAcquire();
-                if (acquired) {
-                    if (semaphore.availablePermits() == 0) {
-                        synchronized (lock) {
-                            if (semaphore.availablePermits() == 0) {
-                                semaphore.release();
-                            }
+            acquired = semaphore.tryAcquire();
+            if (acquired) {
+                if (semaphore.availablePermits() == 0) {
+                    synchronized (lock) {
+                        if (semaphore.availablePermits() == 0) {
+                            semaphore.release();
                         }
                     }
                 }
+            }
         }
         if (acquired) {
             offered = super.offer(event);
         }
         if (currentSize.addAndGet(size) >= maxSizeInBytes) {
-                semaphore.tryAcquire();
+            semaphore.tryAcquire();
         }
         if (log.isDebugEnabled()) {
             log.debug("current queue size in bytes : " + currentSize.get() + ", remaining capacity : " +
@@ -140,9 +140,9 @@ public class BlockingEventQueue extends LinkedBlockingQueue<EventPublisher.Event
         return offered;
     }
 
-    public EventPublisher.EventWrapper remove(){
+    public EventPublisher.EventWrapper remove() {
         EventPublisher.EventWrapper eventWrapper = super.remove();
-        if (eventWrapper != null){
+        if (eventWrapper != null) {
             releaseEvent(eventWrapper);
         }
         return eventWrapper;

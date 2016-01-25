@@ -14,6 +14,7 @@
  */
 package org.wso2.carbon.event.publisher.core.internal.util;
 
+import com.google.common.collect.ObjectArrays;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
@@ -26,6 +27,7 @@ import org.wso2.siddhi.core.event.Event;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 public class EventPublisherUtil {
 
@@ -34,10 +36,10 @@ public class EventPublisherUtil {
 
     static {
         String arch = System.getProperty(JVM_BIT_ARCH_SYSTEM_PROPERTY);
-        if (arch.equals("32")){
+        if (arch.equals("32")) {
             //32-bit architecture
             referenceSize = 4;
-        }else {
+        } else {
             referenceSize = 8;
         }
     }
@@ -93,16 +95,47 @@ public class EventPublisherUtil {
         return axisConfiguration;
     }
 
-    public static int getSize(Event event){
+    public static int getSize(Event event) {
         int size = 8; // For long timestamp field
         size += getSize(event.getData());
         size += 1; // for expired field
         return size;
     }
 
-    private static int getSize(Object[] objects){
+    public static int getSize(org.wso2.carbon.databridge.commons.Event event) {
+        int size = 8; // For long timestamp field
+        size += getSize(event.getStreamId());
+        if (event.getMetaData() != null) {
+            size += getSize(event.getMetaData());
+        }
+        if (event.getCorrelationData() != null) {
+            size += getSize(event.getCorrelationData());
+        }
+        if (event.getPayloadData() != null) {
+            size += getSize(event.getPayloadData());
+        }
+        size += referenceSize; // for the arbitrary map reference
+        if (event.getArbitraryDataMap() != null) {
+            size += getSize(event.getArbitraryDataMap());
+        }
+        return size;
+    }
+
+    private static int getSize(Map<String, String> arbitraryDataMap) {
         int size = 0;
-        for (Object object : objects){
+        if (arbitraryDataMap != null) {
+            for (Map.Entry<String, String> entry : arbitraryDataMap.entrySet()) {
+                size += getSize(entry.getKey());
+                size += getSize(entry.getValue());
+                size += referenceSize * 2; // Two string references for key and value
+            }
+        }
+        return size;
+    }
+
+    private static int getSize(Object[] objects) {
+        int size = 0;
+        for (Object object : objects) {
             if (object != null) {
                 if (object instanceof Integer) {
                     size += 4;
@@ -123,7 +156,7 @@ public class EventPublisherUtil {
         return size;
     }
 
-    public static int getSize(String value){
+    public static int getSize(String value) {
         int size = 0;
         if (value != null) {
             try {
@@ -135,4 +168,18 @@ public class EventPublisherUtil {
         return size;
     }
 
+    public static Event convertToSiddhiEvent(org.wso2.carbon.databridge.commons.Event inputEvent) {
+        Object[] data = new Object[0];
+        if (inputEvent.getMetaData() != null) {
+            data = ObjectArrays.concat(data, inputEvent.getMetaData(), Object.class);
+        }
+        if (inputEvent.getCorrelationData() != null) {
+            data = ObjectArrays.concat(data, inputEvent.getCorrelationData(), Object.class);
+        }
+        if (inputEvent.getPayloadData() != null) {
+            data = ObjectArrays.concat(data, inputEvent.getPayloadData(), Object.class);
+        }
+
+        return new Event(inputEvent.getTimeStamp(), data);
+    }
 }

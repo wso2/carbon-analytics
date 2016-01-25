@@ -26,7 +26,11 @@ import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.core.Property;
 import org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  * The email event adapter factory class to create an email output adapter

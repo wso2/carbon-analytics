@@ -29,11 +29,14 @@ import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingExce
 import org.wso2.carbon.event.receiver.core.internal.type.text.config.RegexData;
 import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
-import org.wso2.siddhi.core.event.Event;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.PatternSyntaxException;
 
 public class TextInputMapper implements InputMapper {
@@ -45,11 +48,13 @@ public class TextInputMapper implements InputMapper {
     private int noCorrelationData;
     private int noPayloadData;
     private Map<String, AttributeType> attributeDescriptionMap = new LinkedHashMap<>();
+    private StreamDefinition streamDefinition = null;
 
     public TextInputMapper(EventReceiverConfiguration eventReceiverConfiguration,
                            StreamDefinition streamDefinition)
             throws EventReceiverConfigurationException {
         this.eventReceiverConfiguration = eventReceiverConfiguration;
+        this.streamDefinition = streamDefinition;
 
         if (eventReceiverConfiguration != null && eventReceiverConfiguration.getInputMapping() instanceof TextInputMapping) {
             if (eventReceiverConfiguration.getInputMapping().isCustomMappingEnabled()) {
@@ -109,6 +114,13 @@ public class TextInputMapper implements InputMapper {
     @Override
     public Object convertToMappedInputEvent(Object obj) throws EventReceiverProcessingException {
         Object attributeArray[] = new Object[attributePositions.length];
+        StreamDefinition outStreamDefinition = this.streamDefinition;
+        int metaDataCount = outStreamDefinition.getMetaData() != null ? outStreamDefinition.getMetaData().size() : 0;
+        int correlationDataCount = outStreamDefinition.getCorrelationData() != null ? outStreamDefinition.getCorrelationData().size() : 0;
+        int payloadDataCount = outStreamDefinition.getPayloadData() != null ? outStreamDefinition.getPayloadData().size() : 0;
+        Object[] metaDataArray = new Object[metaDataCount];
+        Object[] correlationDataArray = new Object[correlationDataCount];
+        Object[] payloadDataArray = new Object[payloadDataCount];
         if (obj instanceof String) {
             String inputString = (String) obj;
             int attributeCount = 0;
@@ -139,13 +151,20 @@ public class TextInputMapper implements InputMapper {
                 }
             }
         }
-        return new Event(System.currentTimeMillis(), attributeArray);
+        return EventReceiverUtil.getEventFromArray(attributeArray, outStreamDefinition, metaDataArray, correlationDataArray, payloadDataArray);
     }
 
     @Override
     public Object convertToTypedInputEvent(Object obj) throws EventReceiverProcessingException {
 
         Object attributeArray[] = new Object[noMetaData + noCorrelationData + noPayloadData];
+        StreamDefinition outStreamDefinition = this.streamDefinition;
+        int metaDataCount = outStreamDefinition.getMetaData() != null ? outStreamDefinition.getMetaData().size() : 0;
+        int correlationDataCount = outStreamDefinition.getCorrelationData() != null ? outStreamDefinition.getCorrelationData().size() : 0;
+        int payloadDataCount = outStreamDefinition.getPayloadData() != null ? outStreamDefinition.getPayloadData().size() : 0;
+        Object[] metaDataArray = new Object[metaDataCount];
+        Object[] correlationDataArray = new Object[correlationDataCount];
+        Object[] payloadDataArray = new Object[payloadDataCount];
         if (obj instanceof String) {
             String inputString = ((String) obj).trim();
             int attributeCount = 0;
@@ -183,7 +202,7 @@ public class TextInputMapper implements InputMapper {
                 throw new EventReceiverProcessingException("Event attributes are not matching with the stream : " + this.eventReceiverConfiguration.getToStreamName() + ":" + eventReceiverConfiguration.getToStreamVersion());
             }
         }
-        return new Event(System.currentTimeMillis(), attributeArray);
+        return EventReceiverUtil.getEventFromArray(attributeArray, outStreamDefinition, metaDataArray, correlationDataArray, payloadDataArray);
     }
 
     @Override

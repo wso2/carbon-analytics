@@ -48,6 +48,7 @@ public class WSO2EventInputMapper implements InputMapper {
     private StreamDefinition exportedStreamDefinition = null;
     private StreamDefinition importedStreamDefinition = null;
     private Map<InputDataType, int[]> inputDataTypeSpecificPositionMap = null;
+    private boolean arbitraryMapsEnabled = false;
 
     public WSO2EventInputMapper(EventReceiverConfiguration eventReceiverConfiguration,
                                 StreamDefinition exportedStreamDefinition)
@@ -60,6 +61,7 @@ public class WSO2EventInputMapper implements InputMapper {
 
         String fromStreamName = wso2EventInputMapping.getFromEventName();
         String fromStreamVersion = wso2EventInputMapping.getFromEventVersion();
+        this.arbitraryMapsEnabled = wso2EventInputMapping.isArbitraryMapsEnabled();
 
         if (fromStreamName == null || fromStreamVersion == null || (fromStreamName.isEmpty()) || (fromStreamVersion.isEmpty())) {
             importedStreamDefinition = exportedStreamDefinition;
@@ -226,14 +228,15 @@ public class WSO2EventInputMapper implements InputMapper {
     //TODO Profile performance of this method
     @Override
     public Object convertToMappedInputEvent(Object obj) throws EventReceiverProcessingException {
-        Object[] outObjArray;
         if (obj instanceof Event) {
             Event event = (Event) obj;
             Map<String, String> arbitraryMap = event.getArbitraryDataMap();
             if (arbitraryMap != null && !arbitraryMap.isEmpty()) {
-                outObjArray = processArbitraryMap(event);
+                return processArbitraryMap(event);
             } else if (inputDataTypeSpecificPositionMap != null) {
-                List<Object> outObjList = new ArrayList<Object>();
+                List<Object> outMetaAttrList = new ArrayList<>();
+                List<Object> outCorrelationAttrList = new ArrayList<>();
+                List<Object> outPayloadAttrList = new ArrayList<>();
                 Object[] inEventArray = new Object[0];
                 if (event.getMetaData() != null) {
                     inEventArray = ObjectArrays.concat(inEventArray, event.getMetaData(), Object.class);
@@ -246,38 +249,32 @@ public class WSO2EventInputMapper implements InputMapper {
                 }
                 int[] metaPositions = inputDataTypeSpecificPositionMap.get(InputDataType.META_DATA);
                 for (int metaPosition : metaPositions) {
-                    outObjList.add(inEventArray[metaPosition]);
+                    outMetaAttrList.add(inEventArray[metaPosition]);
                 }
                 int[] correlationPositions = inputDataTypeSpecificPositionMap.get(InputDataType.CORRELATION_DATA);
                 for (int correlationPosition : correlationPositions) {
-                    outObjList.add(inEventArray[correlationPosition]);
+                    outCorrelationAttrList.add(inEventArray[correlationPosition]);
                 }
                 int[] payloadPositions = inputDataTypeSpecificPositionMap.get(InputDataType.PAYLOAD_DATA);
                 for (int payloadPosition : payloadPositions) {
-                    outObjList.add(inEventArray[payloadPosition]);
+                    outPayloadAttrList.add(inEventArray[payloadPosition]);
                 }
-                outObjArray = outObjList.toArray();
+                return new Event(exportedStreamDefinition.getStreamId(), event.getTimeStamp(), outMetaAttrList.toArray(),
+                        outCorrelationAttrList.toArray(), outPayloadAttrList.toArray());
             } else {
                 return null;
             }
-            return new org.wso2.siddhi.core.event.Event(event.getTimeStamp(), outObjArray);
         }
         return null;
     }
 
     @Override
     public Object convertToTypedInputEvent(Object obj) throws EventReceiverProcessingException {
-        org.wso2.siddhi.core.event.Event event = null;
         if (obj instanceof Event) {
-            event = new org.wso2.siddhi.core.event.Event();
-            Event inputEvent = (Event) obj;
-            Object[] metaCorrArray = ObjectArrays.concat(inputEvent.getMetaData() != null ? inputEvent.getMetaData() : new Object[0]
-                    , inputEvent.getCorrelationData() != null ? inputEvent.getCorrelationData() : new Object[0], Object.class);
-            event.setData(ObjectArrays.concat
-                    (metaCorrArray, inputEvent.getPayloadData() != null ? inputEvent.getPayloadData() : new Object[0], Object.class));
-            event.setTimestamp(inputEvent.getTimeStamp());
+            return obj;
+        } else {
+            return null;
         }
-        return event;
     }
 
     @Override
@@ -288,7 +285,7 @@ public class WSO2EventInputMapper implements InputMapper {
     }
 
     //TODO This method needs to be optimized for performance
-    private Object[] processArbitraryMap(Event inEvent) {
+    private Event processArbitraryMap(Event inEvent) {
         Map<String, String> arbitraryMap = inEvent.getArbitraryDataMap();
         Object[] metaData, correlationData, payloadData;
         if (exportedStreamDefinition.getMetaData() != null) {
@@ -314,7 +311,7 @@ public class WSO2EventInputMapper implements InputMapper {
                 Object attributeObj = EventReceiverUtil.getConvertedAttributeObject(value, metaAttribute.getType());
                 metaData[i] = attributeObj;
             } else {
-                metaData[i] = inEvent.getMetaData()[i] != null ? inEvent.getMetaData()[i] : null;
+                metaData[i] = inEvent.getMetaData()[i];
             }
         }
         for (int i = 0; i < correlationData.length; i++) {
@@ -325,7 +322,7 @@ public class WSO2EventInputMapper implements InputMapper {
                 Object attributeObj = EventReceiverUtil.getConvertedAttributeObject(value, correlationAttribute.getType());
                 correlationData[i] = attributeObj;
             } else {
-                correlationData[i] = inEvent.getCorrelationData()[i] != null ? inEvent.getCorrelationData()[i] : null;
+                correlationData[i] = inEvent.getCorrelationData()[i];
             }
         }
         for (int i = 0; i < payloadData.length; i++) {
@@ -336,22 +333,10 @@ public class WSO2EventInputMapper implements InputMapper {
                 Object attributeObj = EventReceiverUtil.getConvertedAttributeObject(value, payloadAttribute.getType());
                 payloadData[i] = attributeObj;
             } else {
-                payloadData[i] = inEvent.getPayloadData()[i] != null ? inEvent.getPayloadData()[i] : null;
+                payloadData[i] = inEvent.getPayloadData()[i];
             }
         }
-        int indexCount = 0;
-        Object[] outObjArray = new Object[metaData.length + correlationData.length + payloadData.length];
-        for (Object attributeObj : metaData) {
-            outObjArray[indexCount++] = attributeObj;
-        }
-        for (Object attributeObj : correlationData) {
-            outObjArray[indexCount++] = attributeObj;
-        }
-        for (Object attributeObj : payloadData) {
-            outObjArray[indexCount++] = attributeObj;
-        }
-
-        return outObjArray;
+        return new Event(inEvent.getStreamId(), inEvent.getTimeStamp(), metaData, correlationData, payloadData, arbitraryMap);
     }
 
     private enum InputDataType {

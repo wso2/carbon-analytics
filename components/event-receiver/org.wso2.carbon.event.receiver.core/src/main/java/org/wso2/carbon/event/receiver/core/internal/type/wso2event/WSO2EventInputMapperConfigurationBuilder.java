@@ -72,8 +72,12 @@ public class WSO2EventInputMapperConfigurationBuilder {
                 inputMappingAttribute.setToStreamPosition(streamPosition++);
             }
             wso2EventInputMapping.setInputMappingAttributes(sortedInputMappingAttributes);
-        } else{
+        } else {
             wso2EventInputMapping.setCustomMappingEnabled(false);
+        }
+        String arbitraryMappingEnabledAttribute = mappingElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_ARBITRARY_MAPS_ENABLED));
+        if (arbitraryMappingEnabledAttribute != null && arbitraryMappingEnabledAttribute.equalsIgnoreCase(EventReceiverConstants.ENABLE_CONST)) {
+            wso2EventInputMapping.setArbitraryMapsEnabled(true);
         }
 
         return wso2EventInputMapping;
@@ -126,7 +130,7 @@ public class WSO2EventInputMapperConfigurationBuilder {
                         throw new EventReceiverConfigurationException("An attribute mapping must provide a valid 'to' element");
                     }
                     if (propertyToElement.getAttribute(new QName(EventReceiverConstants.ER_ATTR_NAME)) == null ||
-                        propertyToElement.getAttribute(new QName(EventReceiverConstants.ER_ATTR_TYPE)) == null) {
+                            propertyToElement.getAttribute(new QName(EventReceiverConstants.ER_ATTR_TYPE)) == null) {
                         throw new EventReceiverConfigurationException("An attribute mapping must provide name and type for its 'to' element.");
                     }
                 }

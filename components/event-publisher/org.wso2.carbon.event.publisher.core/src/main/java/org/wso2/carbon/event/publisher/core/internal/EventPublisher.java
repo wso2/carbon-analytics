@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -38,22 +39,23 @@ import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValida
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
 import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
 import org.wso2.carbon.event.statistics.EventStatisticsMonitor;
-import org.wso2.carbon.event.stream.core.SiddhiEventConsumer;
+import org.wso2.carbon.event.stream.core.WSO2EventConsumer;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
-import org.wso2.siddhi.core.event.Event;
 
-import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-public class EventPublisher implements SiddhiEventConsumer, EventSync {
+public class EventPublisher implements WSO2EventConsumer, EventSync {
 
     private static final Log log = LogFactory.getLog(EventPublisher.class);
 
     private final boolean traceEnabled;
     private final boolean statisticsEnabled;
 
-    List<String> dynamicMessagePropertyList = new ArrayList<String>();
+    private List<String> dynamicMessagePropertyList = new ArrayList<String>();
     private Logger trace = Logger.getLogger(EventPublisherConstants.EVENT_TRACE_LOGGER);
     private EventPublisherConfiguration eventPublisherConfiguration = null;
     private int tenantId;
@@ -70,7 +72,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     private Mode mode = Mode.SingleNode;
     private String syncId;
     private boolean sendToOther = false;
-    private org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition;
+    private StreamDefinition streamDefinition;
     private BlockingEventQueue eventQueue;
 
 
@@ -164,7 +166,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
                     eventPublisherConfiguration.getToAdapterConfiguration().getName(),
                     Manager.ManagerType.Publisher);
 
-            streamDefinition = EventManagementUtil.constructStreamDefinition(syncId, inputStreamDefinition);
+            streamDefinition = EventManagementUtil.constructDatabridgeStreamDefinition(syncId, inputStreamDefinition);
 
             if (mode == Mode.Distributed && managementModeInfo.getDistributedConfiguration().isWorkerNode()) {
                 sendToOther = true;
@@ -264,19 +266,17 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     }
 
     @Override
-    public void consumeEvents(Event[] events) {
-        for (Event event : events) {
-            sendEvent(event);
-        }
-    }
-
-    @Override
-    public void consumeEvent(Event event) {
+    public void onEvent(Event event) {
         sendEvent(event);
     }
 
     @Override
-    public void shutdown() {
+    public void onAddDefinition(StreamDefinition definition) {
+
+    }
+
+    @Override
+    public void onRemoveDefinition(StreamDefinition definition) {
 
     }
 
@@ -340,9 +340,9 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         }
         try {
             if (customMappingEnabled) {
-                outObject = outputMapper.convertToMappedInputEvent(event);
+                outObject = outputMapper.convertToMappedInputEvent(EventPublisherUtil.convertToSiddhiEvent(event));
             } else {
-                outObject = outputMapper.convertToTypedInputEvent(event);
+                outObject = outputMapper.convertToTypedInputEvent(EventPublisherUtil.convertToSiddhiEvent(event));
             }
         } catch (EventPublisherConfigurationException e) {
             log.error("Cannot send " + event + " from " + eventPublisherConfiguration.getEventPublisherName(), e);
@@ -354,7 +354,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         }
 
         if (dynamicMessagePropertyEnabled) {
-            changeDynamicEventAdapterMessageProperties(event.getData(), dynamicProperties);
+            changeDynamicEventAdapterMessageProperties(EventPublisherUtil.convertToSiddhiEvent(event).getData(), dynamicProperties);
         }
 
         OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();
@@ -363,7 +363,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     }
 
     @Override
-    public org.wso2.siddhi.query.api.definition.StreamDefinition getStreamDefinition() {
+    public StreamDefinition getStreamDefinition() {
         return streamDefinition;
     }
 

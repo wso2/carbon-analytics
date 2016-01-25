@@ -18,10 +18,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.event.stream.core.*;
+import org.wso2.carbon.event.stream.core.EventProducer;
+import org.wso2.carbon.event.stream.core.EventProducerCallback;
+import org.wso2.carbon.event.stream.core.SiddhiEventConsumer;
+import org.wso2.carbon.event.stream.core.WSO2EventConsumer;
+import org.wso2.carbon.event.stream.core.WSO2EventListConsumer;
 import org.wso2.carbon.event.stream.core.internal.util.EventConverter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -133,45 +136,6 @@ public class EventJunction implements EventProducerCallback {
         return streamDefinition;
     }
 
-
-    @Override
-    public void sendEvent(org.wso2.siddhi.core.event.Event event) {
-        if (!siddhiEventConsumers.isEmpty()) {
-            for (SiddhiEventConsumer consumer : siddhiEventConsumers) {
-                try {
-                    consumer.consumeEvent(event);
-                } catch (Exception e) {
-                    log.error("Error while dispatching events: " + e.getMessage(), e);
-                }
-            }
-        }
-
-        if (!wso2EventConsumers.isEmpty() || !wso2EventListConsumers.isEmpty()) {
-            Event convertedEvent = EventConverter.convertToWSO2Event(event, streamDefinition);
-
-            if (!wso2EventConsumers.isEmpty()) {
-                for (WSO2EventConsumer consumer : wso2EventConsumers) {
-                    try {
-                        consumer.onEvent(convertedEvent);
-                    } catch (Exception e) {
-                        log.error("Error while dispatching events: " + e.getMessage(), e);
-                    }
-                }
-            }
-
-            if (!wso2EventListConsumers.isEmpty()) {
-                for (WSO2EventListConsumer consumer : wso2EventListConsumers) {
-                    try {
-                        consumer.onEvent(convertedEvent);
-                    } catch (Exception e) {
-                        log.error("Error while dispatching events: " + e.getMessage(), e);
-                    }
-                }
-            }
-        }
-
-    }
-
     @Override
     public void sendEvent(Event event) {
 
@@ -240,51 +204,6 @@ public class EventJunction implements EventProducerCallback {
             for (WSO2EventListConsumer eventListConsumer : wso2EventListConsumers) {
                 try {
                     eventListConsumer.onEventList(events);
-                } catch (Exception e) {
-                    log.error("Error while dispatching events: " + e.getMessage(), e);
-                }
-            }
-        }
-    }
-
-    @Override
-    public void sendEvents(org.wso2.siddhi.core.event.Event[] events) {
-
-        if (!siddhiEventConsumers.isEmpty()) {
-            for (SiddhiEventConsumer consumer : siddhiEventConsumers) {
-                try {
-                    consumer.consumeEvents(events);
-                } catch (Exception e) {
-                    log.error("Error while dispatching events: " + e.getMessage(), e);
-                }
-            }
-        }
-
-        List<Event> wso2EventList = new ArrayList<Event>();
-
-        for (org.wso2.siddhi.core.event.Event event : events) {
-
-            if (!wso2EventConsumers.isEmpty() || !wso2EventListConsumers.isEmpty()) {
-                Event convertedEvent = EventConverter.convertToWSO2Event(event, streamDefinition);
-
-                for (WSO2EventConsumer consumer : wso2EventConsumers) {
-                    try {
-                        consumer.onEvent(convertedEvent);
-                    } catch (Exception e) {
-                        log.error("Error while dispatching events: " + e.getMessage(), e);
-                    }
-                }
-
-                if (!wso2EventListConsumers.isEmpty()) {
-                    wso2EventList.add(convertedEvent);
-                }
-            }
-        }
-
-        if (!wso2EventListConsumers.isEmpty()) {
-            for (WSO2EventListConsumer consumer : wso2EventListConsumers) {
-                try {
-                    consumer.onEventList(wso2EventList);
                 } catch (Exception e) {
                     log.error("Error while dispatching events: " + e.getMessage(), e);
                 }
