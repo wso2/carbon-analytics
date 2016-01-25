@@ -329,7 +329,10 @@
                             org.apache.spark.sql.jdbc.carbon.*;version="${carbon.analytics.version}"
                         </Export-Package>
                         <Import-Package>
-
+                            org.apache.spark.*;version="${spark.sql.version.range}",
+                            org.apache.spark.sql.*;version="${spark.sql.version.range}",
+                            org.apache.spark.sql.types.*;version="${spark.sql.version.range}",
+                            org.apache.spark.api.java.*;version="${spark.sql.version.range}"
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Private-Package>
