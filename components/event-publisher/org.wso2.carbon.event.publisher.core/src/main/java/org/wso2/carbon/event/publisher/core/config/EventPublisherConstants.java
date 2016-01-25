@@ -107,5 +107,7 @@ public final class EventPublisherConstants {
 
     public static final String METRICS_ROOT = "WSO2_CEP";
     public static final String METRICS_EVENT_PUBLISHERS = "EventPublishers";
+    public static final String METRICS_PUBLISHED_EVENTS = "PublishedEvents";
     public static final String METRIC_DELIMITER = ".";
+    public static final String METRIC_AGGREGATE_ANNOTATION = "[+]";
 }

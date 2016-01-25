@@ -130,5 +130,7 @@ public final class EventReceiverConstants {
 
     public static final String METRICS_ROOT = "WSO2_CEP";
     public static final String METRICS_EVENT_RECEIVERS = "EventReceivers";
+    public static final String METRICS_RECEIVED_EVENTS = "ReceivedEvents";
     public static final String METRIC_DELIMITER = ".";
+    public static final String METRIC_AGGREGATE_ANNOTATION = "[+]";
 }

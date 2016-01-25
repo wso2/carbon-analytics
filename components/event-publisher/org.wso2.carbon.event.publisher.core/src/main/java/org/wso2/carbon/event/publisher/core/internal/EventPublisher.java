@@ -82,9 +82,10 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         this.eventPublisherConfiguration = eventPublisherConfiguration;
         this.customMappingEnabled = eventPublisherConfiguration.getOutputMapping().isCustomMappingEnabled();
         this.tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        String metricId = EventPublisherConstants.METRICS_ROOT + "[+]." +
-                EventPublisherConstants.METRICS_EVENT_PUBLISHERS + "[+]." +
-                eventPublisherConfiguration.getEventPublisherName() + ".published-events";
+        String metricId = EventPublisherConstants.METRICS_ROOT + EventPublisherConstants.METRIC_DELIMITER +
+                EventPublisherConstants.METRICS_EVENT_PUBLISHERS + EventPublisherConstants.METRIC_AGGREGATE_ANNOTATION +
+                EventPublisherConstants.METRIC_DELIMITER + eventPublisherConfiguration.getEventPublisherName() +
+                EventPublisherConstants.METRIC_DELIMITER + EventPublisherConstants.METRICS_PUBLISHED_EVENTS;
         String inputStreamName = eventPublisherConfiguration.getFromStreamName();
         String inputStreamVersion = eventPublisherConfiguration.getFromStreamVersion();
 
@@ -129,7 +130,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
 
         this.traceEnabled = eventPublisherConfiguration.isTracingEnabled();
         this.statisticsEnabled = eventPublisherConfiguration.isStatisticsEnabled();
-        this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO, Level.INFO);
+        this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO);
         if (statisticsEnabled) {
             this.statisticsMonitor = EventPublisherServiceValueHolder.getEventStatisticsService().
                     getEventStatisticMonitor(tenantId, EventPublisherConstants.EVENT_PUBLISHER,

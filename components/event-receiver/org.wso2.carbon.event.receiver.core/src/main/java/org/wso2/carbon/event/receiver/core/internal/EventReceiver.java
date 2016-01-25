@@ -47,7 +47,6 @@ import org.wso2.carbon.event.stream.core.EventProducerCallback;
 import org.wso2.carbon.metrics.manager.Counter;
 import org.wso2.carbon.metrics.manager.Level;
 import org.wso2.carbon.metrics.manager.MetricManager;
-import org.wso2.siddhi.core.event.Event;
 
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -85,9 +84,10 @@ public class EventReceiver implements EventProducer {
             String mappingType = this.eventReceiverConfiguration.getInputMapping().getMappingType();
             this.inputMapper = EventReceiverServiceValueHolder.getMappingFactoryMap().get(mappingType)
                     .constructInputMapper(this.eventReceiverConfiguration, exportedStreamDefinition);
-            String metricId = EventReceiverConstants.METRICS_ROOT + "[+]." +
-                    EventReceiverConstants.METRICS_EVENT_RECEIVERS + "[+]." +
-                    eventReceiverConfiguration.getEventReceiverName() + ".received-events";
+            String metricId = EventReceiverConstants.METRICS_ROOT + EventReceiverConstants.METRIC_DELIMITER +
+                    EventReceiverConstants.METRICS_EVENT_RECEIVERS + EventReceiverConstants.METRIC_AGGREGATE_ANNOTATION +
+                    EventReceiverConstants.METRIC_DELIMITER + eventReceiverConfiguration.getEventReceiverName() +
+                    EventReceiverConstants.METRIC_DELIMITER + EventReceiverConstants.METRICS_RECEIVED_EVENTS;
 
             // The input mapper should not be null. For configurations where custom mapping is disabled,
             // an input mapper would be created without the mapping details
@@ -103,7 +103,7 @@ public class EventReceiver implements EventProducer {
             }
 
             // Initialize tracer and statistics.
-            this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO, Level.INFO);
+            this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO);
             if (statisticsEnabled) {
                 this.statisticsMonitor = EventReceiverServiceValueHolder.getEventStatisticsService()
                         .getEventStatisticMonitor(tenantId, EventReceiverConstants.EVENT_RECEIVER,
