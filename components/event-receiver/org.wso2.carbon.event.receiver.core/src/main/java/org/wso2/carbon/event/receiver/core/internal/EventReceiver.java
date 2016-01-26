@@ -79,7 +79,8 @@ public class EventReceiver implements EventProducer {
 
         if (this.eventReceiverConfiguration != null) {
             this.traceEnabled = eventReceiverConfiguration.isTraceEnabled();
-            this.statisticsEnabled = eventReceiverConfiguration.isStatisticsEnabled();
+            this.statisticsEnabled = eventReceiverConfiguration.isStatisticsEnabled() &&
+                    EventReceiverServiceValueHolder.getEventStatisticsService().isGlobalStatisticsEnabled();
             this.customMappingEnabled = eventReceiverConfiguration.getInputMapping().isCustomMappingEnabled();
             String mappingType = this.eventReceiverConfiguration.getInputMapping().getMappingType();
             this.inputMapper = EventReceiverServiceValueHolder.getMappingFactoryMap().get(mappingType)
@@ -90,7 +91,7 @@ public class EventReceiver implements EventProducer {
                     EventReceiverConstants.METRIC_DELIMITER + EventReceiverConstants.METRICS_RECEIVED_EVENTS;
 
             // The input mapper should not be null. For configurations where custom mapping is disabled,
-            // an input mapper would be created without the mapping details
+            // an input mapper would be created without the mapping details.
             if (this.inputMapper != null) {
                 if (customMappingEnabled) {
                     EventReceiverConfigurationHelper.validateExportedStream(
@@ -103,11 +104,11 @@ public class EventReceiver implements EventProducer {
             }
 
             // Initialize tracer and statistics.
-            this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO);
             if (statisticsEnabled) {
                 this.statisticsMonitor = EventReceiverServiceValueHolder.getEventStatisticsService()
                         .getEventStatisticMonitor(tenantId, EventReceiverConstants.EVENT_RECEIVER,
                                 eventReceiverConfiguration.getEventReceiverName(), null);
+                this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO);
             }
             if (traceEnabled) {
                 this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventReceiverConstants.EVENT_RECEIVER +
@@ -134,8 +135,8 @@ public class EventReceiver implements EventProducer {
                 isEventDuplicatedInCluster = EventReceiverServiceValueHolder.getInputEventAdapterService()
                         .isEventDuplicatedInCluster(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
 
-
-                DistributedConfiguration distributedConfiguration = EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getDistributedConfiguration();
+                DistributedConfiguration distributedConfiguration = EventReceiverServiceValueHolder
+                        .getEventManagementService().getManagementModeInfo().getDistributedConfiguration();
                 if (distributedConfiguration != null) {
                     this.isWorkerNode = distributedConfiguration.isWorkerNode();
                 }
@@ -276,16 +277,14 @@ public class EventReceiver implements EventProducer {
         }
         if (statisticsEnabled) {
             statisticsMonitor.incrementRequest();
+            eventCounter.inc();
         }
-        eventCounter.inc();
-
         // In distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator.
         // Also do not send if this is a manager node.
         if (sufficientToSend
                 || EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator()) {
             this.inputEventDispatcher.onEvent(event);
         }
-
     }
 
     public AbstractInputEventDispatcher getInputEventDispatcher() {

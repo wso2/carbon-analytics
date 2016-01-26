@@ -129,12 +129,13 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         }
 
         this.traceEnabled = eventPublisherConfiguration.isTracingEnabled();
-        this.statisticsEnabled = eventPublisherConfiguration.isStatisticsEnabled();
-        this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO);
+        this.statisticsEnabled = eventPublisherConfiguration.isStatisticsEnabled() &&
+                EventPublisherServiceValueHolder.getEventStatisticsService().isGlobalStatisticsEnabled();
         if (statisticsEnabled) {
             this.statisticsMonitor = EventPublisherServiceValueHolder.getEventStatisticsService().
                     getEventStatisticMonitor(tenantId, EventPublisherConstants.EVENT_PUBLISHER,
                             eventPublisherConfiguration.getEventPublisherName(), null);
+            this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO);
         }
         if (traceEnabled) {
             this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER +
@@ -343,8 +344,8 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         }
         if (statisticsEnabled) {
             statisticsMonitor.incrementResponse();
+            eventCounter.inc();
         }
-        eventCounter.inc();
 
         try {
             if (customMappingEnabled) {
