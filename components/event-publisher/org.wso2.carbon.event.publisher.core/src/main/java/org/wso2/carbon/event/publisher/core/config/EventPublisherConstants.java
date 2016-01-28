@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class EventPublisherConstants {
+    private EventPublisherConstants() {
+
+    }
 
     public static final String NORMALIZATION_STRING = "_";
     public static final String EF_CONF_NS = "http://wso2.org/carbon/eventpublisher";
@@ -102,7 +105,9 @@ public final class EventPublisherConstants {
 
     public static final String EVENT_TRACE_LOGGER = "EVENT_TRACE_LOGGER";
 
-
-    private EventPublisherConstants() {
-    }
+    public static final String METRICS_ROOT = "WSO2_CEP";
+    public static final String METRICS_EVENT_PUBLISHERS = "EventPublishers";
+    public static final String METRICS_PUBLISHED_EVENTS = "PublishedEvents";
+    public static final String METRIC_DELIMITER = ".";
+    public static final String METRIC_AGGREGATE_ANNOTATION = "[+]";
 }

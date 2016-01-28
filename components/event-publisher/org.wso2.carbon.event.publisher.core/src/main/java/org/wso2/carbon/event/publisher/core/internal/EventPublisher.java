@@ -41,6 +41,9 @@ import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
 import org.wso2.carbon.event.statistics.EventStatisticsMonitor;
 import org.wso2.carbon.event.stream.core.WSO2EventConsumer;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
+import org.wso2.carbon.metrics.manager.Counter;
+import org.wso2.carbon.metrics.manager.Level;
+import org.wso2.carbon.metrics.manager.MetricManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,8 +57,8 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
 
     private final boolean traceEnabled;
     private final boolean statisticsEnabled;
-
     private List<String> dynamicMessagePropertyList = new ArrayList<String>();
+    private Counter eventCounter;
     private Logger trace = Logger.getLogger(EventPublisherConstants.EVENT_TRACE_LOGGER);
     private EventPublisherConfiguration eventPublisherConfiguration = null;
     private int tenantId;
@@ -68,25 +71,26 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     private boolean dynamicMessagePropertyEnabled = false;
     private boolean customMappingEnabled = false;
     private boolean isPolled = false;
-
     private Mode mode = Mode.SingleNode;
     private String syncId;
     private boolean sendToOther = false;
     private StreamDefinition streamDefinition;
     private BlockingEventQueue eventQueue;
 
-
     public EventPublisher(EventPublisherConfiguration eventPublisherConfiguration)
             throws EventPublisherConfigurationException {
-
         this.eventPublisherConfiguration = eventPublisherConfiguration;
         this.customMappingEnabled = eventPublisherConfiguration.getOutputMapping().isCustomMappingEnabled();
         this.tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-
+        String metricId = EventPublisherConstants.METRICS_ROOT + EventPublisherConstants.METRIC_DELIMITER +
+                EventPublisherConstants.METRICS_EVENT_PUBLISHERS + EventPublisherConstants.METRIC_AGGREGATE_ANNOTATION +
+                EventPublisherConstants.METRIC_DELIMITER + eventPublisherConfiguration.getEventPublisherName() +
+                EventPublisherConstants.METRIC_DELIMITER + EventPublisherConstants.METRICS_PUBLISHED_EVENTS;
         String inputStreamName = eventPublisherConfiguration.getFromStreamName();
         String inputStreamVersion = eventPublisherConfiguration.getFromStreamVersion();
 
-        //Stream Definition must same for any event source, There are cannot be different stream definition for same stream id in multiple event sourced
+        // Stream Definition must same for any event source,
+        // There are cannot be different stream definition for same stream id in multiple event sourced.
         StreamDefinition inputStreamDefinition = null;
 
         try {
@@ -105,8 +109,8 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         this.streamId = inputStreamDefinition.getStreamId();
         createPropertyPositionMap(inputStreamDefinition);
         outputMapper = EventPublisherServiceValueHolder.getMappingFactoryMap().get(eventPublisherConfiguration.
-                getOutputMapping().getMappingType()).constructOutputMapper(eventPublisherConfiguration, propertyPositionMap,
-                tenantId, inputStreamDefinition);
+                getOutputMapping().getMappingType()).constructOutputMapper(eventPublisherConfiguration,
+                propertyPositionMap, tenantId, inputStreamDefinition);
 
         Map<String, String> dynamicOutputAdapterProperties = eventPublisherConfiguration.getToAdapterDynamicProperties();
         for (Map.Entry<String, String> entry : dynamicOutputAdapterProperties.entrySet()) {
@@ -125,15 +129,17 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         }
 
         this.traceEnabled = eventPublisherConfiguration.isTracingEnabled();
-        this.statisticsEnabled = eventPublisherConfiguration.isStatisticsEnabled();
+        this.statisticsEnabled = eventPublisherConfiguration.isStatisticsEnabled() &&
+                EventPublisherServiceValueHolder.getEventStatisticsService().isGlobalStatisticsEnabled();
         if (statisticsEnabled) {
             this.statisticsMonitor = EventPublisherServiceValueHolder.getEventStatisticsService().
                     getEventStatisticMonitor(tenantId, EventPublisherConstants.EVENT_PUBLISHER,
                             eventPublisherConfiguration.getEventPublisherName(), null);
+            this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO);
         }
         if (traceEnabled) {
             this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER +
-                    " : " + eventPublisherConfiguration.getEventPublisherName()+ ", " +
+                    " : " + eventPublisherConfiguration.getEventPublisherName() + ", " +
                     EventPublisherConstants.EVENT_STREAM + " : " +
                     EventPublisherUtil.getImportedStreamIdFrom(eventPublisherConfiguration) +
                     ", before processing " + System.getProperty("line.separator");
@@ -173,9 +179,11 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
             } else if (mode == Mode.HA && managementModeInfo.getHaConfiguration().isWorkerNode()) {
                 sendToOther = true;
                 HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
-                eventQueue = new BlockingEventQueue(haConfiguration.getEventSyncPublisherMaxQueueSizeInMb(), haConfiguration.getEventSyncPublisherQueueSize());
+                eventQueue = new BlockingEventQueue(haConfiguration.getEventSyncPublisherMaxQueueSizeInMb(),
+                        haConfiguration.getEventSyncPublisherQueueSize());
             }
-            EventPublisherServiceValueHolder.getEventManagementService().registerEventSync(this, Manager.ManagerType.Publisher);
+            EventPublisherServiceValueHolder.getEventManagementService()
+                    .registerEventSync(this, Manager.ManagerType.Publisher);
         }
     }
 
@@ -187,17 +195,18 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
 
         if (isPolled) {
             if (sendToOther) {
-                EventPublisherServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Publisher, event);
+                EventPublisherServiceValueHolder.getEventManagementService()
+                        .syncEvent(syncId, Manager.ManagerType.Publisher, event);
             }
             process(event);
         } else {
             if (!EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
                 if (mode == Mode.HA) {
-                    //is queue not empty send events from last time
+                    // Is queue not empty send events from last time.
                     long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis();
                     if (!eventQueue.isEmpty()) {
-                        long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService().getLatestEventSentTime(
-                                eventPublisherConfiguration.getEventPublisherName(), tenantId);
+                        long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService()
+                                .getLatestEventSentTime(eventPublisherConfiguration.getEventPublisherName(), tenantId);
                         while (!eventQueue.isEmpty()) {
                             EventWrapper eventWrapper = eventQueue.poll();
                             if (eventWrapper.getTimestampInMillis() > lastProcessedTime) {
@@ -211,19 +220,21 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
                 process(event);
             } else {
                 if (mode == Mode.HA) {
-                    //add to Queue
+                    // Add to Queue.
                     long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis();
                     EventWrapper eventWrapper = new EventWrapper(event, currentTime);
                     while (!eventQueue.offer(eventWrapper)) {
                         EventWrapper wrapper = eventQueue.poll();
                         if (log.isDebugEnabled()) {
-                            log.debug("Dropping event arrived at " + wrapper.getTimestampInMillis() + " due to insufficient capacity at Event Publisher Queue, dropped event: " + wrapper.getEvent());
+                            log.debug("Dropping event arrived at " + wrapper.getTimestampInMillis() +
+                                    " due to insufficient capacity at Event Publisher Queue, dropped event: " +
+                                    wrapper.getEvent());
                         }
                     }
 
-                    // get last processed time and remove old events from the queue
-                    long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService().getLatestEventSentTime(
-                            eventPublisherConfiguration.getEventPublisherName(), tenantId);
+                    // Get last processed time and remove old events from the queue.
+                    long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService()
+                            .getLatestEventSentTime(eventPublisherConfiguration.getEventPublisherName(), tenantId);
 
                     while (!eventQueue.isEmpty() && eventQueue.peek().getTimestampInMillis() <= lastProcessedTime) {
                         eventQueue.remove();
@@ -281,9 +292,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     }
 
     private List<String> getDynamicOutputMessageProperties(String messagePropertyValue) {
-
         String text = messagePropertyValue;
-
         while (text.contains("{{") && text.indexOf("}}") > 0) {
             dynamicMessagePropertyList.add(text.substring(text.indexOf("{{") + 2, text.indexOf("}}")));
             text = text.substring(text.indexOf("}}") + 2);
@@ -292,7 +301,6 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     }
 
     private void changeDynamicEventAdapterMessageProperties(Object[] eventData, Map<String, String> dynamicProperties) {
-
         for (String dynamicMessageProperty : dynamicMessagePropertyList) {
             if (eventData.length != 0 && dynamicMessageProperty != null) {
                 int position = propertyPositionMap.get(dynamicMessageProperty);
@@ -303,7 +311,6 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
 
     private void changePropertyValue(int position, String messageProperty, Object[] eventData,
                                      Map<String, String> dynamicProperties) {
-
         for (Map.Entry<String, String> entry : dynamicProperties.entrySet()) {
             String mapValue = "{{" + messageProperty + "}}";
             String regexValue = "\\{\\{" + messageProperty + "\\}\\}";
@@ -316,28 +323,30 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
                 }
             }
         }
-
     }
 
     public void destroy() {
         if (mode == Mode.Distributed || mode == Mode.HA) {
-            EventPublisherServiceValueHolder.getEventManagementService().unregisterEventSync(syncId, Manager.ManagerType.Publisher);
+            EventPublisherServiceValueHolder.getEventManagementService()
+                    .unregisterEventSync(syncId, Manager.ManagerType.Publisher);
         }
-        EventPublisherServiceValueHolder.getOutputEventAdapterService().destroy(eventPublisherConfiguration.getEventPublisherName());
+        EventPublisherServiceValueHolder.getOutputEventAdapterService()
+                .destroy(eventPublisherConfiguration.getEventPublisherName());
     }
 
     @Override
     public void process(Event event) {
-
         Map<String, String> dynamicProperties = new HashMap<String, String>(eventPublisherConfiguration.getToAdapterDynamicProperties());
-
         Object outObject;
+
         if (traceEnabled) {
             trace.info(beforeTracerPrefix + event);
         }
         if (statisticsEnabled) {
             statisticsMonitor.incrementResponse();
+            eventCounter.inc();
         }
+
         try {
             if (customMappingEnabled) {
                 outObject = outputMapper.convertToMappedInputEvent(EventPublisherUtil.convertToSiddhiEvent(event));
@@ -359,7 +368,6 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
 
         OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();
         eventAdapterService.publish(eventPublisherConfiguration.getEventPublisherName(), dynamicProperties, outObject);
-
     }
 
     @Override
@@ -369,7 +377,8 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
 
     public void prepareDestroy() {
         if (EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA &&
-                EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getHaConfiguration().isWorkerNode()) {
+                EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo()
+                        .getHaConfiguration().isWorkerNode()) {
             EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
                     eventPublisherConfiguration.getEventPublisherName(), tenantId,
                     EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis());
@@ -377,7 +386,6 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     }
 
     public class EventWrapper {
-
         private Event event;
         private long timestampInMillis;
         private int size;

@@ -556,6 +556,11 @@
                 <artifactId>org.wso2.carbon.ntask.core</artifactId>
                 <version>${carbon.commons.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.metrics</groupId>
+                <artifactId>org.wso2.carbon.metrics.manager</artifactId>
+                <version>${carbon.metrics.version}</version>
+            </dependency>
             <!--carbon analytics common dependencies stop-->
 
             <!-- spark commons dependencies start -->
@@ -1188,6 +1193,9 @@
 
         <!--CEP versions-->
         <siddhi.version>3.0.5-SNAPSHOT</siddhi.version>
+
+        <!-- Carbon metrics version -->
+        <carbon.metrics.version>1.2.0</carbon.metrics.version>
 
         <orbit.version.json>1.0.0.wso2v1</orbit.version.json>
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>

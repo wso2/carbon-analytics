@@ -85,6 +85,10 @@
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.metrics</groupId>
+            <artifactId>org.wso2.carbon.metrics.manager</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
