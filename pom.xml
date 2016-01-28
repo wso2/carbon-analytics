@@ -28,7 +28,7 @@
     <groupId>org.wso2.carbon.analytics-common</groupId>
     <artifactId>carbon-analytics-common</artifactId>
     <packaging>pom</packaging>
-    <version>5.0.9-SNAPSHOT</version>
+    <version>5.0.10-SNAPSHOT</version>
     <name>WSO2 Carbon - Carbon Analytics Common Aggregator Module</name>
     <url>http://wso2.org</url>
 
@@ -555,6 +555,11 @@
                 <groupId>org.wso2.carbon.commons</groupId>
                 <artifactId>org.wso2.carbon.ntask.core</artifactId>
                 <version>${carbon.commons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.metrics</groupId>
+                <artifactId>org.wso2.carbon.metrics.manager</artifactId>
+                <version>${carbon.metrics.version}</version>
             </dependency>
             <!--carbon analytics common dependencies stop-->
 
@@ -1176,7 +1181,7 @@
     </repositories>
 
     <properties>
-        <carbon.analytics.common.version>5.0.9-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.0.10-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.4.2</carbon.kernel.version>
@@ -1188,6 +1193,9 @@
 
         <!--CEP versions-->
         <siddhi.version>3.0.5-SNAPSHOT</siddhi.version>
+
+        <!-- Carbon metrics version -->
+        <carbon.metrics.version>1.2.0</carbon.metrics.version>
 
         <orbit.version.json>1.0.0.wso2v1</orbit.version.json>
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>

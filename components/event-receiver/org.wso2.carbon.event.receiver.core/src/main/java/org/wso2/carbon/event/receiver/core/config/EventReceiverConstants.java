@@ -23,6 +23,9 @@ import java.util.Map;
 
 @SuppressWarnings("unchecked")
 public final class EventReceiverConstants {
+    private EventReceiverConstants() {
+
+    }
 
     public static final String ER_CONF_NS = "http://wso2.org/carbon/eventreceiver";
     public static final String ER_ELEMENT_ROOT_ELEMENT = "eventReceiver";
@@ -122,12 +125,12 @@ public final class EventReceiverConstants {
     public static final String EVENT_PAYLOAD_TAG = "payloadData";
 
     public static final String ER_ATTR_ENCRYPTED = "encrypted";
+    public static final String HTTP_RECEIVER_ENDPOINT_PREFIX = "endpoints";
     public static final String ER_ATTR_ARBITRARY_MAPS_ENABLED = "arbitraryMaps";
 
-    private EventReceiverConstants() {
-
-    }
-
-    public static final String HTTP_RECEIVER_ENDPOINT_PREFIX = "endpoints";
-
+    public static final String METRICS_ROOT = "WSO2_CEP";
+    public static final String METRICS_EVENT_RECEIVERS = "EventReceivers";
+    public static final String METRICS_RECEIVED_EVENTS = "ReceivedEvents";
+    public static final String METRIC_DELIMITER = ".";
+    public static final String METRIC_AGGREGATE_ANNOTATION = "[+]";
 }
