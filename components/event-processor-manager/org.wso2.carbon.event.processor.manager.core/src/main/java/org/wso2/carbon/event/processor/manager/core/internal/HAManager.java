@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied. See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
  */
 package org.wso2.carbon.event.processor.manager.core.internal;
 
@@ -54,6 +54,7 @@ public class HAManager {
     private final EventHandler presenterEventHandler;
     private boolean activeLockAcquired;
     private boolean passiveLockAcquired;
+    private boolean isBackup;
     private ILock activeLock;
     private ILock passiveLock;
     private IMap<String, HAConfiguration> roleToMembershipMap;
@@ -101,7 +102,7 @@ public class HAManager {
     }
 
     public void tryChangeState() {
-        if (!activeLockAcquired && !passiveLockAcquired) {
+        if (!activeLockAcquired && !passiveLockAcquired && !isBackup) {
             if (passiveLock.tryLock()) {
                 passiveLockAcquired = true;
                 if (activeLock.tryLock()) {
@@ -111,9 +112,26 @@ public class HAManager {
                     passiveLock.forceUnlock();
                 } else {
                     becomePassive();
+                    isBackup=false;
+                }
+            }else{
+                becomeBackup();
+                isBackup = true;
+            }
+        } else if (!activeLockAcquired && !passiveLockAcquired) {
+            if (passiveLock.tryLock()) {
+                passiveLockAcquired = true;
+                if (activeLock.tryLock()) {
+                    activeLockAcquired = true;
+                    becomeActive();
+                    passiveLockAcquired = false;
+                    passiveLock.forceUnlock();
+                } else {
+                    becomePassive();
+                    isBackup = false;
                 }
             }
-        } else if (!activeLockAcquired) {
+        } else if (!activeLockAcquired && !isBackup) {
             if (activeLock.tryLock()) {
                 activeLockAcquired = true;
                 becomeActive();
@@ -130,6 +148,13 @@ public class HAManager {
                 passiveLockAcquired = true;
                 activeLockAcquired = false;
                 becomePassive();
+                isBackup=false;
+                executorService.execute(new PeriodicStateChanger());
+            }else{
+                passiveLockAcquired = false;
+                activeLockAcquired = false;
+                becomeBackup();
+                isBackup=true;
                 executorService.execute(new PeriodicStateChanger());
             }
         }
@@ -183,7 +208,6 @@ public class HAManager {
         if (activeLockAcquired) {
             roleToMembershipMap.remove(activeId);
             activeLock.forceUnlock();
-
         }
         stateChanger.cancel(false);
 
@@ -211,6 +235,7 @@ public class HAManager {
         if (eventReceiverManagementService != null) {
             eventReceiverManagementService.start();
         }
+        receiverEventHandler.allowContinueProcess(true);
         presenterEventHandler.allowEventSync(true);
         log.info("Became CEP HA Active Member");
     }
@@ -226,6 +251,7 @@ public class HAManager {
             final CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder
                     .getCarbonEventManagementService();
             receiverEventHandler.addEventPublisher(activeMember.getEventSyncConfig());
+            receiverEventHandler.allowContinueProcess(true);
             presenterEventHandler.allowEventSync(false);
             executorService.execute(new Runnable() {
                 @Override
@@ -250,6 +276,15 @@ public class HAManager {
         }catch (Exception ex){
             log.error("Error while setting the member as passive member. ", ex);
         }
+    }
+
+    private void becomeBackup() {
+        final HAConfiguration activeMember = roleToMembershipMap.get(passiveId);
+        receiverEventHandler.addEventPublisher(activeMember.getEventSyncConfig());
+        final HAConfiguration passiveMember = roleToMembershipMap.get(passiveId);
+        receiverEventHandler.addEventPublisher(passiveMember.getEventSyncConfig());
+        presenterEventHandler.allowEventSync(false);
+        log.info("Became CEP HA Backup Member");
     }
 
     private void syncState(HAConfiguration activeMember, CarbonEventManagementService eventManagementService) {

@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied. See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
  */
 
 package org.wso2.carbon.event.receiver.core.internal.management;
@@ -43,6 +43,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
     private int tenantId;
     private ReentrantLock threadBarrier = new ReentrantLock();
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private boolean isContinue = false;
 
     public QueueInputEventDispatcher(int tenantId, String syncId, Lock readLock,
                                      StreamDefinition exportedStreamDefinition,
@@ -93,9 +94,11 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
 
     @Override
     public void process(Event event) {
-        readLock.lock();
-        readLock.unlock();
-        callBack.sendEvent(event);
+        if(isContinueProcess()){
+            readLock.lock();
+            readLock.unlock();
+            callBack.sendEvent(event);
+        }
     }
 
     @Override
@@ -103,7 +106,18 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
         return streamDefinition;
     }
 
-    private class QueueInputEventDispatcherWorker implements Runnable {
+    @Override
+    public boolean isContinueProcess() {
+        return isContinue;
+    }
+
+    @Override
+    public void setContinueProcess(boolean isContinue) {
+        this.isContinue = isContinue;
+    }
+
+
+    class QueueInputEventDispatcherWorker implements Runnable {
 
         @Override
         public void run() {
@@ -118,7 +132,9 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
                         Event event = eventQueue.take();
                         readLock.lock();
                         readLock.unlock();
-                        callBack.sendEvent(event);
+                        if(isContinueProcess()){
+                            callBack.sendEvent(event);
+                        }
                         if (isSendToOther()) {
                             EventReceiverServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Receiver, event);
                         }
