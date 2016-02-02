@@ -299,7 +299,7 @@ public class Utils {
             String username = values[0];
             String password = values[1];
             credentials = values;
-            if ("".equals(username) || username == null || "".equals(password) || password == null) {
+            if ("".equals(username) || username == null || "".equals(password) || password == null) { //first check null then empty
                 throw new UnauthenticatedUserException("Username and password cannot be empty");
             }
             String tenantDomain = MultitenantUtils.getTenantDomain(username);

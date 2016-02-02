@@ -74,34 +74,6 @@ public class AnalyticsJSServiceConnector {
         gson = new Gson();
     }
 
-    /*public String createTable(String tableName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking createTable tableName : " +
-                         tableName);
-        }
-        if (tableName != null) {
-            try {
-                if (analyticsWebServiceStub.tableExists(tableName)) {
-                    return gson.toJson(handleResponse(ResponseStatus.CONFLICT, "table :" + tableName +
-                                                                               " already exists"));
-                }
-                analyticsWebServiceStub.createTable(tableName);
-                return gson.toJson(handleResponse(ResponseStatus.CREATED,
-                                                  "Successfully created table: " + tableName));
-            } catch (RemoteException e) {
-                logger.error("Failed to create table: " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to create Table: " +
-                                                                          e.getMessage()));
-            } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
-                logger.error("Failed to create table: " + e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to create Table: " +
-                                                                         e.getFaultMessage()));
-            }
-        } else {
-            return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "table is not defined"));
-        }
-    }*/
-
     public ResponseBean tableExists(String username, String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking tableExists for table: " + tableName);
@@ -218,88 +190,6 @@ public class AnalyticsJSServiceConnector {
         return handleResponse(ResponseStatus.SUCCESS, gson.toJson(recordStore));
     }
 
-    /*public String deleteTable(String tableName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking deleteTable for tableName : " +
-                         tableName);
-        }
-        if (tableName != null) {
-            try {
-                if (analyticsWebServiceStub.tableExists(tableName)) {
-                    analyticsWebServiceStub.deleteTable(tableName);
-                    return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "Successfully deleted table: " +
-                                                                  tableName));
-                }
-                return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "table: " + tableName +
-                                                                   " does not exists."));
-            } catch (RemoteException e) {
-                logger.error("Unable to delete table: " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete table: " +
-                                                                         tableName + ": " + e.getMessage()));
-            } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
-                logger.error("Unable to delete table: " + e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete table: " +
-                                                                         tableName + ": " + e.getFaultMessage()));
-            }
-        } else {
-            return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "Table: " + tableName +
-                                                                           " does not exist"));
-        }
-    }*/
-
-    /*public String deleteRecordsByRange(String tableName, long timeFrom, long timeTo) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking deleteRecords for tableName : " +
-                         tableName);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("deleting the records from " + timeFrom + " to " + timeTo);
-        }
-        try {
-            analyticsWebServiceStub.deleteByRange(tableName, timeFrom, timeTo);
-            return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "Successfully deleted records in table: " +
-                                                                      tableName));
-        } catch (RemoteException e) {
-            logger.error("Failed to delete records by range: " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete records by range for table: " +
-                                                                     tableName + ": " + e.getMessage()));
-        } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
-            logger.error("Failed to delete records by range: " + e.getFaultMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete records by range for table: " +
-                                                                     tableName + ": " + e.getFaultMessage()));
-        }
-    }*/
-
-    /*public String deleteRecordsByIds(String tableName, String idsAsString) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking deleteRecords for tableName : " +
-                         tableName);
-        }
-
-        if (idsAsString != null) {
-            try {
-                Type idsListType = new TypeToken<List<String>>(){}.getType();
-                List<String> ids = gson.fromJson(idsAsString, idsListType);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("deleting the records for ids :" + ids);
-                }
-                analyticsWebServiceStub.deleteByIds(tableName, ids.toArray(new String[ids.size()]));
-                return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "Successfully deleted records in table: " +
-                                                                          tableName));
-            } catch (RemoteException e) {
-                logger.error("Failed to delete records by ids: " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete records by IDs for table: " +
-                                                                         tableName + ": " + e.getMessage()));
-            } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
-                logger.error("Failed to delete records by ids: " + e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete records by IDs for table: " +
-                                                                         tableName + ": " + e.getFaultMessage()));
-            }
-        } else {
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Id list is empty"));
-        }
-    }*/
-
     public ResponseBean getRecordCount(String username, String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getRecordCount for tableName: " + tableName);
@@ -415,74 +305,6 @@ public class AnalyticsJSServiceConnector {
             return handleResponse(ResponseStatus.FAILED, "Id list is empty");
         }
     }
-
-    /*public String insertRecords(String recordsAsString) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking insertRecords");
-        }
-
-        if (recordsAsString != null) {
-            try {
-                Type recordListType = new TypeToken<List<Record>>(){}.getType();
-                List<Record> records = gson.fromJson(recordsAsString, recordListType);
-                if (logger.isDebugEnabled()) {
-                    for (Record record : records) {
-                        logger.debug(" inserting -- Record Id: " + record.getId() + " values :" +
-                                     record.toString());
-                    }
-                }
-                RecordBean[] recordBeans = Utils.getRecords(records);
-                RecordBean[] beansWithIds = analyticsWebServiceStub.put(recordBeans);
-                List<String> ids = Utils.getIds(beansWithIds);
-                return gson.toJson(ids);
-            } catch (RemoteException e) {
-                logger.error("Failed to put records: " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to put records: " + e.getMessage()));
-            } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
-                logger.error("Failed to put records: " + e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to put records: " + e.getFaultMessage()));
-            }
-        } else {
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Record list is empty"));
-        }
-    }*/
-
-    /*public String insertRecordsToTable(String tableName, String recordsAsString) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking insertRecordsToTable");
-        }
-
-        if (recordsAsString != null && tableName != null) {
-            try {
-                Type recordListType = new TypeToken<List<Record>>(){}.getType();
-                List<Record> records = gson.fromJson(recordsAsString, recordListType);
-                if (logger.isDebugEnabled()) {
-                    for (Record record : records) {
-                        logger.debug(" inserting -- Record Id: " + record.getId() + " values :" +
-                                     record.toString() + "to table: " + tableName);
-                    }
-                }
-                RecordBean[] recordBeans = Utils.getRecords(tableName, records);
-                RecordBean[] beansWithIds = analyticsWebServiceStub.put(recordBeans);
-                List<String> ids = Utils.getIds(beansWithIds);
-                return gson.toJson(ids);
-            } catch (RemoteException e) {
-                logger.error("Failed to put records: " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to put records: " + e.getMessage()));
-            } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
-                logger.error("Failed to put records: " + e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to put records: " + e.getFaultMessage()));
-            }
-        } else {
-            String errorMsg = "";
-            if (recordsAsString == null){
-                errorMsg = gson.toJson(handleResponse(ResponseStatus.FAILED, "Record list is empty"));
-            } else if (tableName == null) {
-                errorMsg =  gson.toJson(handleResponse(ResponseStatus.FAILED, "tableName is not provided"));
-            }
-            return errorMsg;
-        }
-    }*/
 
     public ResponseBean clearIndexData(String username, String tableName) {
         if (logger.isDebugEnabled()) {
