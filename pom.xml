@@ -1251,7 +1251,7 @@
         <hbase.client.version>1.1.2</hbase.client.version>
         <hadoop.client.260.version>2.6.0</hadoop.client.260.version>
         <hbase.client.orbit.version>1.1.2.wso2v1</hbase.client.orbit.version>
-        <hadoop.client.260.orbit.version>2.6.0.wso2v2</hadoop.client.260.orbit.version>
+        <hadoop.client.260.orbit.version>2.6.0.wso2v3</hadoop.client.260.orbit.version>
         <hbase.client.import.version>[1.0.0, 1.2.0)</hbase.client.import.version>
         <hadoop.client.import.version>[2.6.0, 2.7.0)</hadoop.client.import.version>
 
@@ -1341,6 +1341,8 @@
         <hector.version>1.0-5</hector.version>
 
         <spark.sql.version.range>[1.4.2.wso2v1,1.5.0)</spark.sql.version.range>
+
+	<guava.version.range>[15.0.0, 16.0.0)</guava.version.range>
     </properties>
 
     <pluginRepositories>
