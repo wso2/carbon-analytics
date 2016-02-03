@@ -329,6 +329,7 @@
                             org.apache.spark.sql.jdbc.carbon.*;version="${carbon.analytics.version}"
                         </Export-Package>
                         <Import-Package>
+			    com.google.common.*;version="${guava.version.range}",
                             org.apache.spark.*;version="${spark.sql.version.range}",
                             org.apache.spark.sql.*;version="${spark.sql.version.range}",
                             org.apache.spark.sql.types.*;version="${spark.sql.version.range}",
