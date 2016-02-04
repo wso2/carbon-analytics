@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.core.ServerStatus;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
 
@@ -114,8 +115,10 @@ public class MQTTAdapterListener implements MqttCallback, Runnable {
     public void stopListener(String adapterName) {
         if (connectionSucceeded) {
             try {
-                // Disconnect to the MQTT server
-                mqttClient.unsubscribe(topic);
+                // Un-subscribe accordingly and disconnect from the MQTT server.
+                if (!ServerStatus.getCurrentStatus().equals(ServerStatus.STATUS_SHUTTING_DOWN) || cleanSession) {
+                    mqttClient.unsubscribe(topic);
+                }
                 mqttClient.disconnect(3000);
             } catch (MqttException e) {
                 log.error("Can not unsubscribe from the destination " + topic
