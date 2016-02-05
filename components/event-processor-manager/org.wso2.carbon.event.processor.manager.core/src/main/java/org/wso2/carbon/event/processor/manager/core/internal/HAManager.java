@@ -47,19 +47,17 @@ import java.util.concurrent.TimeUnit;
 
 public class HAManager {
     private static final Log log = LogFactory.getLog(HAManager.class);
-
-    private HAConfiguration haConfiguration;
     private final ScheduledExecutorService executorService;
     private final EventHandler receiverEventHandler;
     private final EventHandler presenterEventHandler;
+    private final SnapshotServer snapshotServer;
+    private HAConfiguration haConfiguration;
     private boolean activeLockAcquired;
     private boolean passiveLockAcquired;
     private boolean isBackup;
     private ILock activeLock;
     private ILock passiveLock;
     private IMap<String, HAConfiguration> roleToMembershipMap;
-    private final SnapshotServer snapshotServer;
-
     private Future stateChanger = null;
     private String activeId;
     private String passiveId;
@@ -112,9 +110,9 @@ public class HAManager {
                     passiveLock.forceUnlock();
                 } else {
                     becomePassive();
-                    isBackup=false;
+                    isBackup = false;
                 }
-            }else{
+            } else {
                 becomeBackup();
                 isBackup = true;
             }
@@ -148,13 +146,13 @@ public class HAManager {
                 passiveLockAcquired = true;
                 activeLockAcquired = false;
                 becomePassive();
-                isBackup=false;
+                isBackup = false;
                 executorService.execute(new PeriodicStateChanger());
-            }else{
+            } else {
                 passiveLockAcquired = false;
                 activeLockAcquired = false;
                 becomeBackup();
-                isBackup=true;
+                isBackup = true;
                 executorService.execute(new PeriodicStateChanger());
             }
         }
@@ -201,6 +199,8 @@ public class HAManager {
     }
 
     public void shutdown() {
+        CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder
+                .getCarbonEventManagementService();
         if (passiveLockAcquired) {
             roleToMembershipMap.remove(passiveId);
             passiveLock.forceUnlock();
@@ -210,7 +210,7 @@ public class HAManager {
             activeLock.forceUnlock();
         }
         stateChanger.cancel(false);
-
+        eventManagementService.stopPersistence();
         if (snapshotServer != null) {
             snapshotServer.shutDown();
         }
@@ -228,7 +228,7 @@ public class HAManager {
         otherMember = null;
 
         if (eventPublisherManagementService != null) {
-            for (EventPublisherManagementService service: eventPublisherManagementService){
+            for (EventPublisherManagementService service : eventPublisherManagementService) {
                 service.setDrop(false);
             }
         }
@@ -237,6 +237,8 @@ public class HAManager {
         }
         receiverEventHandler.allowContinueProcess(true);
         presenterEventHandler.allowEventSync(true);
+
+        eventManagementService.initPersistence();
         log.info("Became CEP HA Active Member");
     }
 
@@ -272,18 +274,22 @@ public class HAManager {
                     }
                 }
             });
+            eventManagementService.stopPersistence();
             log.info("Became CEP HA Passive Member");
-        }catch (Exception ex){
+        } catch (Exception ex) {
             log.error("Error while setting the member as passive member. ", ex);
         }
     }
 
     private void becomeBackup() {
+        CarbonEventManagementService eventManagementService = EventManagementServiceValueHolder
+                .getCarbonEventManagementService();
         final HAConfiguration activeMember = roleToMembershipMap.get(passiveId);
         receiverEventHandler.addEventPublisher(activeMember.getEventSyncConfig());
         final HAConfiguration passiveMember = roleToMembershipMap.get(passiveId);
         receiverEventHandler.addEventPublisher(passiveMember.getEventSyncConfig());
         presenterEventHandler.allowEventSync(false);
+        eventManagementService.stopPersistence();
         log.info("Became CEP HA Backup Member");
     }
 
@@ -302,7 +308,7 @@ public class HAManager {
             eventProcessorManagementService.pause();
         }
         if (eventPublisherManagementService != null) {
-            for (EventPublisherManagementService service: eventPublisherManagementService){
+            for (EventPublisherManagementService service : eventPublisherManagementService) {
                 service.setDrop(true);
             }
         }
