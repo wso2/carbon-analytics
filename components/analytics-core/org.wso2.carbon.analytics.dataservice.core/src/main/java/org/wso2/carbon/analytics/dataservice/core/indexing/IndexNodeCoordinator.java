@@ -94,6 +94,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
     
     private RemoteMemberIndexCommunicator remoteCommunicator;
     
+    private ExecutorService localShardProcessExecutor = Executors.newSingleThreadExecutor();
+    
     public IndexNodeCoordinator(AnalyticsDataIndexer indexer) throws AnalyticsException {
         this.indexer = indexer;
         this.localShardAllocationConfig = new LocalShardAllocationConfig();
@@ -238,6 +240,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         } finally {
             globalAllocationLock.unlock();
         }
+        this.processLocalShards();
     }
     
     public GlobalShardMemberMapping getShardMemberMap() {
@@ -245,27 +248,32 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
     
     private void processLocalShards() throws AnalyticsException {
-        final List<Integer> initShards = new ArrayList<>();
-        for (int shardIndex : this.localShardAllocationConfig.getShardIndices()) {
-            switch (this.localShardAllocationConfig.getShardStatus(shardIndex)) {
-            case INIT:
-                initShards.add(shardIndex);
-                break;
-            case NORMAL:
-                break;
-            case RESTORE:
-                this.localShardAllocationConfig.setShardStatus(shardIndex, ShardStatus.NORMAL);
-                break;   
-            }
-        }
-        /* first remove all existing local index data in init shards */
-        for (int shardIndex : initShards) {
-            this.removeLocalIndexData(shardIndex);
-        }
-        if (!initShards.isEmpty()) {
-            log.info("Initializing indexing shards: " + initShards);
-            new Thread() { 
-                public void run() {
+        this.localShardProcessExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final List<Integer> initShards = new ArrayList<>();
+                for (int shardIndex : localShardAllocationConfig.getShardIndices()) {
+                    switch (localShardAllocationConfig.getShardStatus(shardIndex)) {
+                    case INIT:
+                        initShards.add(shardIndex);
+                        break;
+                    case NORMAL:
+                        break;
+                    case RESTORE:
+                        try {
+                            localShardAllocationConfig.setShardStatus(shardIndex, ShardStatus.NORMAL);
+                        } catch (AnalyticsException e) {
+                            throw new RuntimeException("Error in setting shard status: " + e.getMessage(), e);
+                        }
+                        break;
+                    }
+                }
+                if (!initShards.isEmpty()) {
+                    log.info("Initializing indexing shards: " + initShards);
+                    /* first remove all existing local index data in init shards */
+                    for (int shardIndex : initShards) {
+                        removeLocalIndexData(shardIndex);
+                    }
                     try {
                         processLocalInitShards(initShards);
                         for (int shardIndex : initShards) {
@@ -273,10 +281,10 @@ public class IndexNodeCoordinator implements GroupEventListener {
                         }
                     } catch (AnalyticsException e) {
                         log.error("Error in processing local init shards: " + e.getMessage(), e);
-                    }                    
+                    }
                 }
-            }.start();
-        }
+            }
+        });
     }
     
     private Object[] convertToObjectShardArray(List<Integer> initShards) {
@@ -646,6 +654,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
     public void close() {
         this.remoteCommunicator.close();
         this.stopAndCleanupStagingWorkers();
+        this.localShardProcessExecutor.shutdownNow();
     }
     
     public void refreshIndexShardInfo() throws AnalyticsException {
