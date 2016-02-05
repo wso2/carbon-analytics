@@ -22,7 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.Constants;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.ntask.core.AbstractTask;
 
 import java.util.Calendar;
@@ -56,7 +55,7 @@ public class AnalyticsDataPurgingTask extends AbstractTask {
                             "] will be purged from " + table);
                 AnalyticsServiceHolder.getAnalyticsDataService().delete(Integer.parseInt(tenantId), table, Long.MIN_VALUE,
                                                                calendar.getTimeInMillis());
-            } catch (AnalyticsException e) {
+            } catch (Exception e) {
                 log.error("Unable to perform data purging task due to " + e.getMessage(), e);
             }
         } else {
