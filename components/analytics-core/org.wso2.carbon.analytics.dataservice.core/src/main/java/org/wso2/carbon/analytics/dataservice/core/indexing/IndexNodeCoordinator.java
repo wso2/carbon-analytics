@@ -34,6 +34,8 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
@@ -94,7 +96,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
     
     private RemoteMemberIndexCommunicator remoteCommunicator;
     
-    private ExecutorService localShardProcessExecutor = Executors.newSingleThreadExecutor();
+    /* this executor is specifically used, rather than a single thread executor, so there won't be a thread always live, mostly unused */
+    private ExecutorService localShardProcessExecutor = new ThreadPoolExecutor(0, 1, 0L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
     
     public IndexNodeCoordinator(AnalyticsDataIndexer indexer) throws AnalyticsException {
         this.indexer = indexer;
