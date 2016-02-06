@@ -137,6 +137,7 @@ public class HAManager {
                 passiveLock.forceUnlock();
             }
         }
+        haConfiguration.setActive(activeLockAcquired);
     }
 
     public void verifyState() {
@@ -156,6 +157,7 @@ public class HAManager {
                 executorService.execute(new PeriodicStateChanger());
             }
         }
+        haConfiguration.setActive(activeLockAcquired);
     }
 
     public byte[] getState() {
@@ -210,10 +212,10 @@ public class HAManager {
             activeLock.forceUnlock();
         }
         stateChanger.cancel(false);
-        eventManagementService.stopPersistence();
         if (snapshotServer != null) {
             snapshotServer.shutDown();
         }
+        eventManagementService.stopPersistence();
     }
 
     private void becomeActive() {
@@ -223,9 +225,17 @@ public class HAManager {
                 .getEventReceiverManagementService();
         List<EventPublisherManagementService> eventPublisherManagementService = eventManagementService
                 .getEventPublisherManagementService();
+        EventProcessorManagementService eventProcessorManagementService = eventManagementService
+                .getEventProcessorManagementService();
 
         roleToMembershipMap.set(activeId, haConfiguration);
         otherMember = null;
+
+        if (!this.haConfiguration.isSynced()) {
+            // If not already synced, restore to last known state.
+            eventProcessorManagementService.restoreLastState();
+            log.info("Restored to Last Known State.");
+        }
 
         if (eventPublisherManagementService != null) {
             for (EventPublisherManagementService service : eventPublisherManagementService) {
@@ -274,7 +284,6 @@ public class HAManager {
                     }
                 }
             });
-            eventManagementService.stopPersistence();
             log.info("Became CEP HA Passive Member");
         } catch (Exception ex) {
             log.error("Error while setting the member as passive member. ", ex);
@@ -289,7 +298,6 @@ public class HAManager {
         final HAConfiguration passiveMember = roleToMembershipMap.get(passiveId);
         receiverEventHandler.addEventPublisher(passiveMember.getEventSyncConfig());
         presenterEventHandler.allowEventSync(false);
-        eventManagementService.stopPersistence();
         log.info("Became CEP HA Backup Member");
     }
 
@@ -320,7 +328,7 @@ public class HAManager {
             log.error(e);
         }
         HashMap<Manager.ManagerType, byte[]> stateMap = (HashMap<Manager.ManagerType, byte[]>) ByteSerializer.BToO(state);
-        // Synchronize the duplicate events with active member
+        // Synchronize the duplicate events with active member.
         try {
             if (eventProcessorManagementService != null) {
                 eventProcessorManagementService.restoreState(stateMap.get(Manager.ManagerType.Processor));
@@ -328,7 +336,7 @@ public class HAManager {
             if (eventReceiverManagementService != null) {
                 eventReceiverManagementService.syncState(stateMap.get(Manager.ManagerType.Receiver));
             }
-
+            this.haConfiguration.setSynced(true);
         } finally {
             if (eventProcessorManagementService != null) {
                 eventProcessorManagementService.resume();
@@ -336,7 +344,6 @@ public class HAManager {
             if (eventReceiverManagementService != null) {
                 eventReceiverManagementService.resume();
             }
-
         }
     }
 
@@ -357,7 +364,9 @@ public class HAManager {
         public void run() {
             tryChangeState();
             if (!activeLockAcquired) {
-                stateChanger = executorService.schedule(this, haConfiguration.getManagementTryStateChangeInterval(), TimeUnit.MILLISECONDS);
+                stateChanger = executorService.schedule(this,
+                        haConfiguration.getManagementTryStateChangeInterval(),
+                        TimeUnit.MILLISECONDS);
             }
         }
     }
