@@ -57,25 +57,6 @@ public class HAConfiguration implements Serializable {
 
     private String memberUuid;
 
-    private boolean isSynced = false;
-    private boolean isActive = false;
-
-    public boolean isSynced() {
-        return isSynced;
-    }
-
-    public void setSynced(boolean isSynced) {
-        this.isSynced = isSynced;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean isActive) {
-        this.isActive = isActive;
-    }
-
     public boolean isWorkerNode() {
         return workerNode;
     }
