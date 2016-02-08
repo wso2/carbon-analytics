@@ -91,13 +91,12 @@ public class ManagementModeConfigurationLoader {
                     managementModeInfo.setMode(Mode.SingleNode);
                     log.info("CEP started in Single node mode");
                 }
-            } else {
-                managementModeInfo.setMode(Mode.SingleNode);
-                log.info("CEP started in Single node mode");
+                return managementModeInfo;
             }
-            return managementModeInfo;
         }
-        throw new ManagementConfigurationException("Invalid XML. No element with name " + ConfigurationConstants.MODE_ELEMENT + " found in file CEP_MANAGEMENT_XML");
+        managementModeInfo.setMode(Mode.SingleNode);
+        log.info("CEP started in Single node mode");
+        return managementModeInfo;
     }
 
     private static OMElement loadConfigXML() throws ManagementConfigurationException {
