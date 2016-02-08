@@ -48,6 +48,8 @@ public abstract class EventProcessorManagementService implements Manager{
 
     public abstract ManagementModeInfo getManagementModeInfo();
 
+    public abstract void restoreLastState();
+
     @Override
     public ManagerType getType() {
         return ManagerType.Processor;

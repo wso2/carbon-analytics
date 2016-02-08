@@ -86,10 +86,21 @@ public class CarbonEventManagementService implements EventManagementService {
             throw new EventManagementException("Error getting management mode information", e);
         }
         if (mode == Mode.HA) {
+            // HA Configuration.
             HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
             isWorkerNode = haConfiguration.isWorkerNode();
             isPresenterNode = haConfiguration.isPresenterNode();
             if (isWorkerNode) {
+                // Persistence Configuration.
+                PersistenceConfiguration persistConfig = managementModeInfo.getPersistenceConfiguration();
+                if (persistConfig != null) {
+                    ScheduledExecutorService scheduledExecutorService = Executors
+                            .newScheduledThreadPool(persistConfig.getThreadPoolSize());
+                    long persistenceTimeInterval = persistConfig.getPersistenceTimeInterval();
+                    if (persistenceTimeInterval > 0) {
+                        persistenceManager = new PersistenceManager(scheduledExecutorService, persistenceTimeInterval);
+                    }
+                }
                 receiverEventHandler.startServer(haConfiguration.getEventSyncConfig());
             }
             if (isPresenterNode && !isWorkerNode) {
@@ -348,5 +359,17 @@ public class CarbonEventManagementService implements EventManagementService {
     @Override
     public long getClusterTimeInMillis() {
         return EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime();
+    }
+
+    public void initPersistence() {
+        if (persistenceManager != null) {
+            persistenceManager.init();
+        }
+    }
+
+    public void stopPersistence() {
+        if (persistenceManager != null) {
+            persistenceManager.shutdown();
+        }
     }
 }
