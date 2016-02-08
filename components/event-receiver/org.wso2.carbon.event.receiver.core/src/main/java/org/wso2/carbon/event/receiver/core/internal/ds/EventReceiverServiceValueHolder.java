@@ -26,7 +26,6 @@ import org.wso2.carbon.event.receiver.core.internal.type.map.MapInputMapperFacto
 import org.wso2.carbon.event.receiver.core.internal.type.text.TextInputMapperFactory;
 import org.wso2.carbon.event.receiver.core.internal.type.wso2event.WSO2EventInputMapperFactory;
 import org.wso2.carbon.event.receiver.core.internal.type.xml.XMLInputMapperFactory;
-import org.wso2.carbon.event.statistics.EventStatisticsService;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -48,6 +47,7 @@ public class EventReceiverServiceValueHolder {
     private static CarbonEventReceiverManagementService carbonEventReceiverManagementService;
     public static Set<String> inputEventAdapterTypes = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
     private static RealmService realmService;
+    private static boolean globalStatisticsEnabled = false;
 
     static {
         mappingFactoryMap = new ConcurrentHashMap<String, InputMapperFactory>();
@@ -58,7 +58,6 @@ public class EventReceiverServiceValueHolder {
         mappingFactoryMap.put(MessageType.JSON, new JSONInputMapperFactory());
     }
 
-    private static EventStatisticsService eventStatisticsService;
 
     private EventReceiverServiceValueHolder() {
 
@@ -83,15 +82,6 @@ public class EventReceiverServiceValueHolder {
 
     public static InputEventAdapterService getInputEventAdapterService() {
         return EventReceiverServiceValueHolder.inputEventAdapterService;
-    }
-
-    public static void registerEventStatisticsService(
-            EventStatisticsService eventStatisticsService) {
-        EventReceiverServiceValueHolder.eventStatisticsService = eventStatisticsService;
-    }
-
-    public static EventStatisticsService getEventStatisticsService() {
-        return eventStatisticsService;
     }
 
     public static void registerRegistryService(RegistryService registryService) {
@@ -155,4 +145,11 @@ public class EventReceiverServiceValueHolder {
         EventReceiverServiceValueHolder.realmService = realmService;
     }
 
+    public static void setGlobalStatisticsEnabled(boolean globalStatisticsEnabled) {
+        EventReceiverServiceValueHolder.globalStatisticsEnabled = globalStatisticsEnabled;
+    }
+
+    public static boolean isGlobalStatisticsEnabled() {
+        return globalStatisticsEnabled;
+    }
 }

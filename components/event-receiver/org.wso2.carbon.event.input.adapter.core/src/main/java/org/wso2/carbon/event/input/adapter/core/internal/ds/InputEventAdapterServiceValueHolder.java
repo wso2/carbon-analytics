@@ -16,7 +16,6 @@ package org.wso2.carbon.event.input.adapter.core.internal.ds;
 
 import com.hazelcast.core.HazelcastInstance;
 import org.wso2.carbon.event.input.adapter.core.internal.config.AdapterConfigs;
-import org.wso2.carbon.event.statistics.EventStatisticsService;
 import org.wso2.carbon.event.input.adapter.core.internal.CarbonInputEventAdapterService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.ConfigurationContextService;
@@ -25,7 +24,6 @@ public class InputEventAdapterServiceValueHolder {
 
     private static CarbonInputEventAdapterService carbonInputEventAdapterService;
     private static RegistryService registryService;
-    private static EventStatisticsService eventStatisticsService;
     private static AdapterConfigs globalAdapterConfigs;
     private static ConfigurationContextService configurationContextService;
     private static HazelcastInstance hazelcastInstance;
@@ -49,14 +47,6 @@ public class InputEventAdapterServiceValueHolder {
 
     public static void setRegistryService(RegistryService registryService) {
         InputEventAdapterServiceValueHolder.registryService = registryService;
-    }
-
-    public static EventStatisticsService getEventStatisticsService() {
-        return eventStatisticsService;
-    }
-
-    public static void setEventStatisticsService(EventStatisticsService eventStatisticsService) {
-        InputEventAdapterServiceValueHolder.eventStatisticsService = eventStatisticsService;
     }
 
     public static void setGlobalAdapterConfigs(AdapterConfigs globalAdapterConfigs) {

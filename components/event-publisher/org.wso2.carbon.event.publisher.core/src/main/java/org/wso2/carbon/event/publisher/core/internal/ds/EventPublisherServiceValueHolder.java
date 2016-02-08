@@ -26,7 +26,6 @@ import org.wso2.carbon.event.publisher.core.internal.type.map.MapOutputMapperFac
 import org.wso2.carbon.event.publisher.core.internal.type.text.TextOutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.internal.type.wso2event.WSO2EventOutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.internal.type.xml.XMLOutputMapperFactory;
-import org.wso2.carbon.event.statistics.EventStatisticsService;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
@@ -47,6 +46,8 @@ public class EventPublisherServiceValueHolder {
     private static EventManagementService eventManagementService;
     private static ConcurrentHashMap<String, OutputMapperFactory> mappingFactoryMap = new ConcurrentHashMap<String, OutputMapperFactory>();
     public static Set<String> outputEventAdapterTypes = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+    private static ConfigurationContextService configurationContextService;
+    private static boolean globalStatisticsEnabled = false;
 
     static {
         mappingFactoryMap.put(MessageType.MAP, new MapOutputMapperFactory());
@@ -55,9 +56,6 @@ public class EventPublisherServiceValueHolder {
         mappingFactoryMap.put(MessageType.XML, new XMLOutputMapperFactory());
         mappingFactoryMap.put(MessageType.JSON, new JSONOutputMapperFactory());
     }
-
-    private static EventStatisticsService eventStatisticsService;
-    private static ConfigurationContextService configurationContextService;
 
     private EventPublisherServiceValueHolder() {
 
@@ -114,15 +112,6 @@ public class EventPublisherServiceValueHolder {
         return mappingFactoryMap;
     }
 
-    public static void registerEventStatisticsService(
-            EventStatisticsService eventStatisticsService) {
-        EventPublisherServiceValueHolder.eventStatisticsService = eventStatisticsService;
-    }
-
-    public static EventStatisticsService getEventStatisticsService() {
-        return eventStatisticsService;
-    }
-
     public static EventManagementService getEventManagementService() {
         return eventManagementService;
     }
@@ -153,5 +142,13 @@ public class EventPublisherServiceValueHolder {
 
     public static void removeOutputEventAdapterType(String outputEventAdapterType) {
         EventPublisherServiceValueHolder.outputEventAdapterTypes.remove(outputEventAdapterType);
+    }
+
+    public static void setGlobalStatisticsEnabled(boolean globalStatisticsEnabled) {
+        EventPublisherServiceValueHolder.globalStatisticsEnabled = globalStatisticsEnabled;
+    }
+
+    public static boolean isGlobalStatisticsEnabled() {
+        return globalStatisticsEnabled;
     }
 }

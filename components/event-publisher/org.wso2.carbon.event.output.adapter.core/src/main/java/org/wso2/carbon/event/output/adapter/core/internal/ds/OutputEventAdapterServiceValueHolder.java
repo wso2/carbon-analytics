@@ -19,7 +19,6 @@ package org.wso2.carbon.event.output.adapter.core.internal.ds;
 
 import org.wso2.carbon.event.output.adapter.core.internal.CarbonOutputEventAdapterService;
 import org.wso2.carbon.event.output.adapter.core.internal.config.AdapterConfigs;
-import org.wso2.carbon.event.statistics.EventStatisticsService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.securevault.SecretCallbackHandlerService;
 import org.wso2.carbon.utils.ConfigurationContextService;
@@ -28,7 +27,6 @@ public class OutputEventAdapterServiceValueHolder {
 
     private static CarbonOutputEventAdapterService carbonOutputEventAdapterService;
     private static RegistryService registryService;
-    private static EventStatisticsService eventStatisticsService;
     private static AdapterConfigs globalAdapterConfigs;
     private static ConfigurationContextService configurationContextService;
     private static SecretCallbackHandlerService secretCallbackHandlerService;
@@ -51,14 +49,6 @@ public class OutputEventAdapterServiceValueHolder {
 
     public static void setRegistryService(RegistryService registryService) {
         OutputEventAdapterServiceValueHolder.registryService = registryService;
-    }
-
-    public static EventStatisticsService getEventStatisticsService() {
-        return eventStatisticsService;
-    }
-
-    public static void setEventStatisticsService(EventStatisticsService eventStatisticsService) {
-        OutputEventAdapterServiceValueHolder.eventStatisticsService = eventStatisticsService;
     }
 
     public static void setGlobalAdapterConfigs(AdapterConfigs globalAdapterConfigs) {

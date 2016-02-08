@@ -41,7 +41,6 @@ import org.wso2.carbon.event.receiver.core.internal.management.InputEventDispatc
 import org.wso2.carbon.event.receiver.core.internal.management.QueueInputEventDispatcher;
 import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
-import org.wso2.carbon.event.statistics.EventStatisticsMonitor;
 import org.wso2.carbon.event.stream.core.EventProducer;
 import org.wso2.carbon.event.stream.core.EventProducerCallback;
 import org.wso2.carbon.metrics.manager.Counter;
@@ -65,7 +64,6 @@ public class EventReceiver implements EventProducer {
     private EventReceiverConfiguration eventReceiverConfiguration = null;
     private StreamDefinition exportedStreamDefinition;
     private InputMapper inputMapper = null;
-    private EventStatisticsMonitor statisticsMonitor;
     private String beforeTracerPrefix;
     private String afterTracerPrefix;
     private AbstractInputEventDispatcher inputEventDispatcher;
@@ -80,7 +78,7 @@ public class EventReceiver implements EventProducer {
         if (this.eventReceiverConfiguration != null) {
             this.traceEnabled = eventReceiverConfiguration.isTraceEnabled();
             this.statisticsEnabled = eventReceiverConfiguration.isStatisticsEnabled() &&
-                    EventReceiverServiceValueHolder.getEventStatisticsService().isGlobalStatisticsEnabled();
+                    EventReceiverServiceValueHolder.isGlobalStatisticsEnabled();
             this.customMappingEnabled = eventReceiverConfiguration.getInputMapping().isCustomMappingEnabled();
             String mappingType = this.eventReceiverConfiguration.getInputMapping().getMappingType();
             this.inputMapper = EventReceiverServiceValueHolder.getMappingFactoryMap().get(mappingType)
@@ -105,9 +103,6 @@ public class EventReceiver implements EventProducer {
 
             // Initialize tracer and statistics.
             if (statisticsEnabled) {
-                this.statisticsMonitor = EventReceiverServiceValueHolder.getEventStatisticsService()
-                        .getEventStatisticMonitor(tenantId, EventReceiverConstants.EVENT_RECEIVER,
-                                eventReceiverConfiguration.getEventReceiverName(), null);
                 this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO);
             }
             if (traceEnabled) {
@@ -276,7 +271,6 @@ public class EventReceiver implements EventProducer {
             trace.info(afterTracerPrefix + event);
         }
         if (statisticsEnabled) {
-            statisticsMonitor.incrementRequest();
             eventCounter.inc();
         }
         // In distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator.

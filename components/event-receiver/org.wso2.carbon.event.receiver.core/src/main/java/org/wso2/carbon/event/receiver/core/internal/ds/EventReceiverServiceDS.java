@@ -18,6 +18,7 @@ package org.wso2.carbon.event.receiver.core.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterService;
 import org.wso2.carbon.event.processor.manager.core.EventManagementService;
@@ -27,7 +28,6 @@ import org.wso2.carbon.event.receiver.core.internal.CarbonEventReceiverManagemen
 import org.wso2.carbon.event.receiver.core.internal.CarbonEventReceiverService;
 import org.wso2.carbon.event.receiver.core.internal.EventStreamListenerImpl;
 import org.wso2.carbon.event.receiver.core.internal.tenantmgt.TenantLazyLoaderValve;
-import org.wso2.carbon.event.statistics.EventStatisticsService;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
@@ -54,9 +54,6 @@ import java.util.Set;
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService"
  * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
- * @scr.reference name="eventStatistics.service"
- * interface="org.wso2.carbon.event.statistics.EventStatisticsService" cardinality="1..1"
- * policy="dynamic" bind="setEventStatisticsService" unbind="unsetEventStatisticsService"
  * @scr.reference name="eventStreamManager.service"
  * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
  * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
@@ -72,6 +69,7 @@ public class EventReceiverServiceDS {
     protected void activate(ComponentContext context) {
         try {
 
+            checkIsStatsEnabled();
             CarbonEventReceiverService carbonEventReceiverService = new CarbonEventReceiverService();
             EventReceiverServiceValueHolder.registerEventReceiverService(carbonEventReceiverService);
 
@@ -96,6 +94,18 @@ public class EventReceiverServiceDS {
         }
     }
 
+    private void checkIsStatsEnabled() {
+        ServerConfiguration config = ServerConfiguration.getInstance();
+        String confStatisticsReporterDisabled = config.getFirstProperty("StatisticsReporterDisabled");
+        if (!"".equals(confStatisticsReporterDisabled)) {
+            boolean disabled = Boolean.valueOf(confStatisticsReporterDisabled);
+            if (disabled) {
+                return;
+            }
+        }
+        EventReceiverServiceValueHolder.setGlobalStatisticsEnabled(true);
+    }
+
     private void activateInactiveEventReceiverConfigurations(CarbonEventReceiverService carbonEventReceiverService) {
         Set<String> inputEventAdapterTypes = EventReceiverServiceValueHolder.getInputEventAdapterTypes();
         inputEventAdapterTypes.addAll(EventReceiverServiceValueHolder.getInputEventAdapterService().getInputEventAdapterTypes());
@@ -116,14 +126,6 @@ public class EventReceiverServiceDS {
             InputEventAdapterService inputEventAdapterService) {
         EventReceiverServiceValueHolder.getInputEventAdapterTypes().clear();
         EventReceiverServiceValueHolder.registerInputEventAdapterService(null);
-    }
-
-    protected void setEventStatisticsService(EventStatisticsService eventStatisticsService) {
-        EventReceiverServiceValueHolder.registerEventStatisticsService(eventStatisticsService);
-    }
-
-    protected void unsetEventStatisticsService(EventStatisticsService eventStatisticsService) {
-        EventReceiverServiceValueHolder.registerEventStatisticsService(null);
     }
 
     protected void setRegistryService(RegistryService registryService) throws RegistryException {

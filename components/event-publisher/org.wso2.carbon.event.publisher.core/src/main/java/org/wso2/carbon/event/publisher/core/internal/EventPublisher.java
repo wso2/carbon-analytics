@@ -38,7 +38,6 @@ import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfiguratio
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
 import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
-import org.wso2.carbon.event.statistics.EventStatisticsMonitor;
 import org.wso2.carbon.event.stream.core.WSO2EventConsumer;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.metrics.manager.Counter;
@@ -65,7 +64,6 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     private Map<String, Integer> propertyPositionMap = new TreeMap<String, Integer>();
     private OutputMapper outputMapper = null;
     private String streamId = null;
-    private EventStatisticsMonitor statisticsMonitor;
     private String beforeTracerPrefix;
     private String afterTracerPrefix;
     private boolean dynamicMessagePropertyEnabled = false;
@@ -131,11 +129,8 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
 
         this.traceEnabled = eventPublisherConfiguration.isTracingEnabled();
         this.statisticsEnabled = eventPublisherConfiguration.isStatisticsEnabled() &&
-                EventPublisherServiceValueHolder.getEventStatisticsService().isGlobalStatisticsEnabled();
+                EventPublisherServiceValueHolder.isGlobalStatisticsEnabled();
         if (statisticsEnabled) {
-            this.statisticsMonitor = EventPublisherServiceValueHolder.getEventStatisticsService().
-                    getEventStatisticMonitor(tenantId, EventPublisherConstants.EVENT_PUBLISHER,
-                            eventPublisherConfiguration.getEventPublisherName(), null);
             this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO);
         }
         if (traceEnabled) {
@@ -344,7 +339,6 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
             trace.info(beforeTracerPrefix + event);
         }
         if (statisticsEnabled) {
-            statisticsMonitor.incrementResponse();
             eventCounter.inc();
         }
 
