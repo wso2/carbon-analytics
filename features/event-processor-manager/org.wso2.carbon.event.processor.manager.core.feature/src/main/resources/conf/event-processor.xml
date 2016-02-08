@@ -61,7 +61,7 @@
             <publisherBufferSize>1024</publisherBufferSize>
             <publisherConnectionStatusCheckInterval>30000</publisherConnectionStatusCheckInterval>
         </presentation>
-        <persistence enable="false">
+        <persistence enable="true">
             <persistenceIntervalInMinutes>15</persistenceIntervalInMinutes>
             <persisterSchedulerPoolSize>10</persisterSchedulerPoolSize>
             <persister class="org.wso2.carbon.event.processor.core.internal.persistence.FileSystemPersistenceStore">
