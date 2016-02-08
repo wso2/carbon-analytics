@@ -17,17 +17,30 @@
 -->
 <component xmlns="http://products.wso2.org/carbon">
 	<menus>
+        <!--<menu>-->
+            <!--<id>event_statistics_menu</id>-->
+            <!--<i18n-key>event.statistics.menu</i18n-key>-->
+            <!--<i18n-bundle>org.wso2.carbon.event.statistics.ui.i18n.Resources</i18n-bundle>-->
+            <!--<parent-menu>monitor_menu</parent-menu>-->
+            <!--<link>../event-statistics/event_statistics_view.jsp</link>-->
+            <!--<region>region4</region>-->
+            <!--<order>7</order>-->
+            <!--<style-class>monitor</style-class>-->
+            <!--<icon>../event-statistics/images/event-statistics.png</icon>-->
+            <!--<require-permission>/permission/admin/monitor/event-streams</require-permission>-->
+        <!--</menu>-->
         <menu>
-            <id>event_statistics_menu</id>
-            <i18n-key>event.statistics.menu</i18n-key>
+            <id>events_metrics_menu</id>
+            <i18n-key>event.metrics.menu.text</i18n-key>
             <i18n-bundle>org.wso2.carbon.event.statistics.ui.i18n.Resources</i18n-bundle>
-            <parent-menu>monitor_menu</parent-menu>
+            <parent-menu>metrics_menu</parent-menu>
             <link>../event-statistics/event_statistics_view.jsp</link>
             <region>region4</region>
-            <order>7</order>
+            <order>2</order>
             <style-class>monitor</style-class>
             <icon>../event-statistics/images/event-statistics.png</icon>
-            <require-permission>/permission/admin/monitor/event-streams</require-permission>
+            <require-permission>/permission/admin/monitor/metrics</require-permission>
+            <require-super-tenant>true</require-super-tenant>
         </menu>
     </menus>
 </component>

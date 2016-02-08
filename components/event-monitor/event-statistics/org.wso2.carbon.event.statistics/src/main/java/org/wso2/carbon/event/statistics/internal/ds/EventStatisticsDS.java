@@ -35,7 +35,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 public class EventStatisticsDS {
 
     private static final Log log = LogFactory.getLog(EventStatisticsDS.class);
-    private StatisticsReporterThread reporterThread;
+//    private StatisticsReporterThread reporterThread;
 
     protected void activate(ComponentContext context) throws Exception {
         try {
@@ -72,62 +72,62 @@ public class EventStatisticsDS {
 
         EventStatisticsServiceHolder.getInstance().setEventStatisticsManager(new EventStatisticsManager());
 
-        //JMX-based event-stat monitoring is supported only for super tenant because other tenants cannot use it to monitor event-stats.
-        reporterThread = new StatisticsReporterThread(MultitenantConstants.SUPER_TENANT_ID);
-
-        // Set a custom interval value if required
-        ServerConfiguration serverConf = ServerConfiguration.getInstance();
-        String interval = serverConf.getFirstProperty(Constants.STAT_REPORTING_INTERVAL);
-        if (interval != null) {
-            reporterThread.setDelay(Long.parseLong(interval));
-        }
-
-        // Engage custom observer implementations (user written extensions)
-        String observers = serverConf.getFirstProperty(Constants.STAT_OBSERVERS);
-        if (observers != null && !"".equals(observers)) {
-            String[] classNames = observers.split(",");
-            for (String className : classNames) {
-                try {
-                    Class clazz = this.getClass().getClassLoader().loadClass(className.trim());
-                    EventStatisticsObserver o = (EventStatisticsObserver)
-                            clazz.newInstance();
-                    EventStatisticsServiceHolder.getInstance().getEventStatisticsManager().registerObserver(o);
-                } catch (Exception e) {
-                    log.error("Error while initializing the event statistics " + "observer : " + className, e);
-                }
-            }
-        }
-
-        reporterThread.start();
-
-        if (log.isDebugEnabled()) {
-            log.debug("Registering the mediation statistics service");
-        }
+//        //JMX-based event-stat monitoring is supported only for super tenant because other tenants cannot use it to monitor event-stats.
+//        reporterThread = new StatisticsReporterThread(MultitenantConstants.SUPER_TENANT_ID);
+//
+//        // Set a custom interval value if required
+//        ServerConfiguration serverConf = ServerConfiguration.getInstance();
+//        String interval = serverConf.getFirstProperty(Constants.STAT_REPORTING_INTERVAL);
+//        if (interval != null) {
+//            reporterThread.setDelay(Long.parseLong(interval));
+//        }
+//
+//        // Engage custom observer implementations (user written extensions)
+//        String observers = serverConf.getFirstProperty(Constants.STAT_OBSERVERS);
+//        if (observers != null && !"".equals(observers)) {
+//            String[] classNames = observers.split(",");
+//            for (String className : classNames) {
+//                try {
+//                    Class clazz = this.getClass().getClassLoader().loadClass(className.trim());
+//                    EventStatisticsObserver o = (EventStatisticsObserver)
+//                            clazz.newInstance();
+//                    EventStatisticsServiceHolder.getInstance().getEventStatisticsManager().registerObserver(o);
+//                } catch (Exception e) {
+//                    log.error("Error while initializing the event statistics " + "observer : " + className, e);
+//                }
+//            }
+//        }
+//
+//        reporterThread.start();
+//
+//        if (log.isDebugEnabled()) {
+//            log.debug("Registering the mediation statistics service");
+//        }
 
     }
 
 
     protected void deactivate(ComponentContext compCtx) throws Exception {
 
-        reporterThread.shutdown();
-        reporterThread.interrupt(); // This should wake up the thread if it is asleep
+//        reporterThread.shutdown();
+//        reporterThread.interrupt(); // This should wake up the thread if it is asleep
+//
+//        // Wait for the reporting thread to gracefully terminate
+//        // Observers should not be disengaged before this thread halts
+//        // Otherwise some of the collected data may not be sent to the observers
+//        while (reporterThread.isAlive()) {
+//            if (log.isDebugEnabled()) {
+//                log.debug("Waiting for the event statistics reporter thread to terminate");
+//            }
+//
+//            try {
+//                Thread.sleep(100);
+//            } catch (InterruptedException ignore) {
+//
+//            }
+//        }
 
-        // Wait for the reporting thread to gracefully terminate
-        // Observers should not be disengaged before this thread halts
-        // Otherwise some of the collected data may not be sent to the observers
-        while (reporterThread.isAlive()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Waiting for the event statistics reporter thread to terminate");
-            }
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ignore) {
-
-            }
-        }
-
-        EventStatisticsServiceHolder.getInstance().getEventStatisticsManager().unregisterObservers();
+//        EventStatisticsServiceHolder.getInstance().getEventStatisticsManager().unregisterObservers();
     }
 
 
