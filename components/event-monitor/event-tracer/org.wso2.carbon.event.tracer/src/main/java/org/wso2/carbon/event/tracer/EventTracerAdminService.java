@@ -48,15 +48,13 @@ public class EventTracerAdminService {
             } else {
                 return new String[]{
                         "--- No trace entries found. " +
-                        "You can enable tracing on transport adapters, event formatters, " +
-                        "event builders or event processors by vising the relevant pages ---"};
+                        "You can enable tracing on event receivers, event publishers or execution plans by vising the relevant pages ---"};
             }
             if ((memoryAppender.getCircularQueue().getObjects(amount) == null) ||
                 (memoryAppender.getCircularQueue().getObjects(amount).length == 0)) {
                 return new String[]{
                         "--- No trace entries found. " +
-                        "You can enable tracing on transport adapters, event formatters, " +
-                        "event builders or event processors by vising the relevant pages ---"};
+                        "You can enable tracing on event receivers, event publishers or execution plans by vising the relevant pages ---"};
             }
             Object[] objects;
             if (amount < 1) {
