@@ -83,14 +83,6 @@ public class ManagementModeConfigurationLoader {
                     } else {
                         log.info("CEP started in HA mode");
                     }
-                } else if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_SN)) {
-                    managementModeInfo.setMode(Mode.SingleNode);
-                    OMElement nodeConfig = processingMode
-                            .getFirstChildWithName(new QName(ConfigurationConstants.SN_PERSISTENCE_ELEMENT));
-                    if (nodeConfig != null && nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, nodeConfig)) {
-                        managementModeInfo.setPersistenceConfiguration(getPersistConfigurations(nodeConfig));
-                        log.info("CEP started in Persistence mode");
-                    }
                 } else if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_DISTRIBUTED)) {
                     managementModeInfo.setMode(Mode.Distributed);
                     log.info("CEP started in Distributed mode");

@@ -18,17 +18,6 @@
 
 <eventProcessorConfiguration>
 
-    <mode name="SingleNode" enable="true">
-        <persistence enable="false">
-            <persistenceIntervalInMinutes>15</persistenceIntervalInMinutes>
-            <persisterSchedulerPoolSize>10</persisterSchedulerPoolSize>
-            <persister class="org.wso2.carbon.event.processor.core.internal.persistence.FileSystemPersistenceStore">
-                <property key="persistenceLocation">cep_persistence</property>
-            </persister>
-        </persistence>
-    </mode>
-
-
     <!-- HA Mode Config -->
     <mode name="HA" enable="false">
         <nodeType>
