@@ -53,27 +53,35 @@ public class ManagementModeConfigurationLoader {
         while (iterator.hasNext()) {
             OMElement processingMode = iterator.next();
             if (processingMode.getAttribute(new QName(ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE)) == null) {
-                throw new ManagementConfigurationException("Invalid Mode Element with no mode attribute '" + ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE + "' in file " + ConfigurationConstants.CEP_MANAGEMENT_XML);
+                throw new ManagementConfigurationException("Invalid Mode Element with no mode attribute '" +
+                        ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE + "' in file " +
+                        ConfigurationConstants.CEP_MANAGEMENT_XML);
             }
-            String attribute = processingMode.getAttribute(new QName(ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE)).getAttributeValue();
+            String attribute = processingMode
+                    .getAttribute(new QName(ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE)).getAttributeValue();
 
             if (processingMode.getAttribute(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)) == null) {
-                throw new ManagementConfigurationException("Invalid Mode Element '" + attribute + "' with no mode attribute '" + ConfigurationConstants.ENABLE_ATTRIBUTE + "' in file " + ConfigurationConstants.CEP_MANAGEMENT_XML);
+                throw new ManagementConfigurationException("Invalid Mode Element '" + attribute +
+                        "' with no mode attribute '" + ConfigurationConstants.ENABLE_ATTRIBUTE +
+                        "' in file " + ConfigurationConstants.CEP_MANAGEMENT_XML);
             }
-            String enabled = processingMode.getAttribute(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)).getAttributeValue();
+            String enabled = processingMode
+                    .getAttribute(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE))
+                    .getAttributeValue();
 
             if (enabled.equalsIgnoreCase("true")) {
                 if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_HA)) {
                     managementModeInfo.setMode(Mode.HA);
-                    log.info("CEP started in HA mode");
+                    // Set HA Configurations.
                     managementModeInfo.setHaConfiguration(getHAConfiguration(processingMode));
-                } else if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_SN)) {
-                    managementModeInfo.setMode(Mode.SingleNode);
-                    OMElement nodeConfig = processingMode.getFirstChildWithName(
-                            new QName(ConfigurationConstants.SN_PERSISTENCE_ELEMENT));
+                    // Set Persist Configurations.
+                    OMElement nodeConfig = processingMode
+                            .getFirstChildWithName(new QName(ConfigurationConstants.SN_PERSISTENCE_ELEMENT));
                     if (nodeConfig != null && nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, nodeConfig)) {
                         managementModeInfo.setPersistenceConfiguration(getPersistConfigurations(nodeConfig));
-                        log.info("CEP started in Persistence mode");
+                        log.info("CEP started in Persistence enabled HA mode");
+                    } else {
+                        log.info("CEP started in HA mode");
                     }
                 } else if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_DISTRIBUTED)) {
                     managementModeInfo.setMode(Mode.Distributed);
