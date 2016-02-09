@@ -250,7 +250,13 @@ public class TextInputMapper implements InputMapper {
         } else {
             for (Attribute payloadData : streamDefinition.getPayloadData()) {
                 if (payloadData.getName().equals(inputMappingAttribute.getToElementKey())) {
-                    return attributeLocation + streamDefinition.getMetaData().size() + streamDefinition.getCorrelationData().size();
+                    if (streamDefinition.getMetaData() != null) {
+                        attributeLocation = attributeLocation + streamDefinition.getMetaData().size();
+                    }
+                    if (streamDefinition.getCorrelationData() != null) {
+                        attributeLocation = attributeLocation + streamDefinition.getCorrelationData().size();
+                    }
+                    return attributeLocation;
                 }
                 attributeLocation++;
             }
