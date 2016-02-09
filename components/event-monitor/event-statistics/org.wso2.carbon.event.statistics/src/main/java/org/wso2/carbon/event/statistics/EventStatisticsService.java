@@ -27,6 +27,7 @@ import org.wso2.carbon.event.statistics.internal.ds.EventStatisticsServiceHolder
 
 public class EventStatisticsService {
 
+    @Deprecated
     public StatsDTO getGlobalCount(int tenantId) {
         EventStatisticsManager eventStatisticsManager =
                 EventStatisticsServiceHolder.getInstance().getEventStatisticsManager();
@@ -42,6 +43,7 @@ public class EventStatisticsService {
         return EventStatsHelper.constructStatsDTO(tenantData);
     }
 
+    @Deprecated
     public StatsDTO getCategoryCount(int tenantId, String categoryName) {
         EventStatisticsManager eventStatisticsManager =
                 EventStatisticsServiceHolder.getInstance().getEventStatisticsManager();
@@ -63,6 +65,7 @@ public class EventStatisticsService {
         return EventStatsHelper.constructStatsDTO(categoryData);
     }
 
+    @Deprecated
     public StatsDTO getDeploymentCount(int tenantId, String categoryName, String deploymentName) {
         EventStatisticsManager eventStatisticsManager =
                 EventStatisticsServiceHolder.getInstance().getEventStatisticsManager();
@@ -86,6 +89,7 @@ public class EventStatisticsService {
         return EventStatsHelper.constructStatsDTO(deploymentData);
     }
 
+    @Deprecated
     public StatsDTO getElementCount(int tenantId, String categoryName, String deploymentName, String elementName) {
         EventStatisticsManager eventStatisticsManager =
                 EventStatisticsServiceHolder.getInstance().getEventStatisticsManager();
@@ -113,6 +117,7 @@ public class EventStatisticsService {
         return EventStatsHelper.constructStatsDTO(elementData);
     }
 
+    @Deprecated
     public synchronized EventStatisticsMonitor getEventStatisticMonitor(int tenantId, String category,
                                                                         String deployment, String element) {
         EventStatisticsManager eventStatisticsManager =
@@ -123,6 +128,7 @@ public class EventStatisticsService {
         return eventStatisticsManager.getEventStatisticMonitor(tenantId, category, deployment, element);
     }
 
+    @Deprecated
     public synchronized void reset() {
         EventStatisticsManager eventStatisticsManager =
                 EventStatisticsServiceHolder.getInstance().getEventStatisticsManager();
@@ -134,6 +140,7 @@ public class EventStatisticsService {
      *
      * @param o The EventStatisticsObserver instance to be notified of data updates
      */
+    @Deprecated
     public void registerObserver(EventStatisticsObserver o) {
         EventStatisticsManager eventStatisticsManager =
                 EventStatisticsServiceHolder.getInstance().getEventStatisticsManager();
@@ -145,18 +152,21 @@ public class EventStatisticsService {
      *
      * @param o The EventStatisticsObserver instance to be removed
      */
+    @Deprecated
     public void unregisterObserver(EventStatisticsObserver o) {
         EventStatisticsManager eventStatisticsManager =
                 EventStatisticsServiceHolder.getInstance().getEventStatisticsManager();
         eventStatisticsManager.unregisterObserver(o);
     }
 
+    @Deprecated
     public void unregisterObservers() {
         EventStatisticsManager eventStatisticsManager =
                 EventStatisticsServiceHolder.getInstance().getEventStatisticsManager();
         eventStatisticsManager.unregisterObservers();
     }
 
+    @Deprecated
     public boolean isGlobalStatisticsEnabled() {
         EventStatisticsManager eventStatisticsManager =
                 EventStatisticsServiceHolder.getInstance().getEventStatisticsManager();
