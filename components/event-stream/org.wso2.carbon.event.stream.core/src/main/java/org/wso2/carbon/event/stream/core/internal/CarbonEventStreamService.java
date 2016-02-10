@@ -172,32 +172,35 @@ public class CarbonEventStreamService implements EventStreamService {
 
     public void validateEventStreamDefinition(StreamDefinition streamDefinition) throws EventStreamConfigurationException {
         // validate meta attribute
-        for (int i = 0; i < streamDefinition.getMetaData().size(); i++) {
-            String check_name = streamDefinition.getMetaData().get(i).getName();
-            for (int j = i + 1; j < streamDefinition.getMetaData().size(); j++) {
-                String name = streamDefinition.getMetaData().get(j).getName();
-                if (check_name.equals(name)) {
-                    throw new EventStreamConfigurationException("Cannot have same name for meta data attribute, give the different value");
+        if (streamDefinition.getMetaData()!=null && streamDefinition.getMetaData().size()!= 0) {
+            for (int i = 0; i < streamDefinition.getMetaData().size(); i++) {
+                String check_name = streamDefinition.getMetaData().get(i).getName();
+                for (int j = i + 1; j < streamDefinition.getMetaData().size(); j++) {
+                    if (check_name.equals(streamDefinition.getMetaData().get(j).getName())) {
+                        throw new EventStreamConfigurationException("Cannot have same name for meta data attribute, give the different value");
+                    }
                 }
             }
         }
         // validate correlation attribute
-        for (int i = 0; i < streamDefinition.getCorrelationData().size(); i++) {
-            String check_name = streamDefinition.getCorrelationData().get(i).getName();
-            for (int j = i + 1; j < streamDefinition.getCorrelationData().size(); j++) {
-                String name = streamDefinition.getCorrelationData().get(j).getName();
-                if (check_name.equals(name)) {
-                    throw new EventStreamConfigurationException("Cannot have same name for correlation data attribute, give the different value");
+        if(streamDefinition.getCorrelationData()!=null && streamDefinition.getCorrelationData().size()!= 0 ) {
+            for (int i = 0; i < streamDefinition.getCorrelationData().size(); i++) {
+                String check_name = streamDefinition.getCorrelationData().get(i).getName();
+                for (int j = i + 1; j < streamDefinition.getCorrelationData().size(); j++) {
+                    if (check_name.equals(streamDefinition.getCorrelationData().get(j).getName())) {
+                        throw new EventStreamConfigurationException("Cannot have same name for correlation data attribute, give the different value");
+                    }
                 }
             }
         }
         // validate payload attribute
-        for (int i = 0; i < streamDefinition.getPayloadData().size(); i++) {
-            String check_name = streamDefinition.getPayloadData().get(i).getName();
-            for (int j = i + 1; j < streamDefinition.getPayloadData().size(); j++) {
-                String name = streamDefinition.getPayloadData().get(j).getName();
-                if (check_name.equals(name)) {
-                    throw new EventStreamConfigurationException("Cannot have same name for payload data attribute, give the different value");
+        if(streamDefinition.getPayloadData()!=null && streamDefinition.getPayloadData().size()!=0 ) {
+            for (int i = 0; i < streamDefinition.getPayloadData().size(); i++) {
+                String check_name = streamDefinition.getPayloadData().get(i).getName();
+                for (int j = i + 1; j < streamDefinition.getPayloadData().size(); j++) {
+                    if (check_name.equals(streamDefinition.getPayloadData().get(j).getName())) {
+                        throw new EventStreamConfigurationException("Cannot have same name for payload data attribute, give the different value");
+                    }
                 }
             }
         }
