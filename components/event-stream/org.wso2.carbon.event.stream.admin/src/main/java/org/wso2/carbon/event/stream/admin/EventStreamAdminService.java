@@ -48,7 +48,6 @@ public class EventStreamAdminService extends AbstractAdmin {
                     streamDefinition.setNickName(eventStreamDefinitionDto.getNickName());
                     EventStreamAttributeDto[] metaEventStreamAttributeDtos = eventStreamDefinitionDto.getMetaData();
                     if (eventStreamDefinitionDto.getMetaData() != null) {
-
                         for (EventStreamAttributeDto eventStreamAttributeDto : metaEventStreamAttributeDtos) {
                             streamDefinition.addMetaData(eventStreamAttributeDto.getAttributeName(), EventAttributeTypeConstants.STRING_ATTRIBUTE_TYPE_MAP.get(eventStreamAttributeDto.getAttributeType()));
                         }
