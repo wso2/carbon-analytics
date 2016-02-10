@@ -18,9 +18,27 @@
  */
 package org.wso2.carbon.analytics.dataservice.core.indexing;
 
-import com.hazelcast.nio.ObjectDataInput;
-import com.hazelcast.nio.ObjectDataOutput;
-import com.hazelcast.nio.serialization.DataSerializable;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,24 +60,9 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.utils.FileUtil;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.DataSerializable;
 
 /**
  * Analytics index operations node coordinator.
@@ -93,6 +96,9 @@ public class IndexNodeCoordinator implements GroupEventListener {
     private int failedIndexOperationCount;
     
     private RemoteMemberIndexCommunicator remoteCommunicator;
+    
+    /* this executor is specifically used, rather than a single thread executor, so there won't be a thread always live, mostly unused */
+    private ExecutorService localShardProcessExecutor = new ThreadPoolExecutor(0, 1, 0L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
     
     public IndexNodeCoordinator(AnalyticsDataIndexer indexer) throws AnalyticsException {
         this.indexer = indexer;
@@ -238,6 +244,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         } finally {
             globalAllocationLock.unlock();
         }
+        this.processLocalShards();
     }
     
     public GlobalShardMemberMapping getShardMemberMap() {
@@ -245,27 +252,32 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
     
     private void processLocalShards() throws AnalyticsException {
-        final List<Integer> initShards = new ArrayList<>();
-        for (int shardIndex : this.localShardAllocationConfig.getShardIndices()) {
-            switch (this.localShardAllocationConfig.getShardStatus(shardIndex)) {
-            case INIT:
-                initShards.add(shardIndex);
-                break;
-            case NORMAL:
-                break;
-            case RESTORE:
-                this.localShardAllocationConfig.setShardStatus(shardIndex, ShardStatus.NORMAL);
-                break;   
-            }
-        }
-        /* first remove all existing local index data in init shards */
-        for (int shardIndex : initShards) {
-            this.removeLocalIndexData(shardIndex);
-        }
-        if (!initShards.isEmpty()) {
-            log.info("Initializing indexing shards: " + initShards);
-            new Thread() { 
-                public void run() {
+        this.localShardProcessExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final List<Integer> initShards = new ArrayList<>();
+                for (int shardIndex : localShardAllocationConfig.getShardIndices()) {
+                    switch (localShardAllocationConfig.getShardStatus(shardIndex)) {
+                    case INIT:
+                        initShards.add(shardIndex);
+                        break;
+                    case NORMAL:
+                        break;
+                    case RESTORE:
+                        try {
+                            localShardAllocationConfig.setShardStatus(shardIndex, ShardStatus.NORMAL);
+                        } catch (AnalyticsException e) {
+                            throw new RuntimeException("Error in setting shard status: " + e.getMessage(), e);
+                        }
+                        break;
+                    }
+                }
+                if (!initShards.isEmpty()) {
+                    log.info("Initializing indexing shards: " + initShards);
+                    /* first remove all existing local index data in init shards */
+                    for (int shardIndex : initShards) {
+                        removeLocalIndexData(shardIndex);
+                    }
                     try {
                         processLocalInitShards(initShards);
                         for (int shardIndex : initShards) {
@@ -273,10 +285,10 @@ public class IndexNodeCoordinator implements GroupEventListener {
                         }
                     } catch (AnalyticsException e) {
                         log.error("Error in processing local init shards: " + e.getMessage(), e);
-                    }                    
+                    }
                 }
-            }.start();
-        }
+            }
+        });
     }
     
     private Object[] convertToObjectShardArray(List<Integer> initShards) {
@@ -646,6 +658,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
     public void close() {
         this.remoteCommunicator.close();
         this.stopAndCleanupStagingWorkers();
+        this.localShardProcessExecutor.shutdownNow();
     }
     
     public void refreshIndexShardInfo() throws AnalyticsException {
