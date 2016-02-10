@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsQueueInterruptException;
+import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsInterruptException;
 import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -226,7 +226,7 @@ public class LocalIndexDataStore {
             try {
                 this.primaryQueue.enqueue(indexOp.getBytes());
             } catch (ClosedByInterruptException e) {
-                throw new AnalyticsQueueInterruptException("Error in index data enqueue (Interrupted..): " + e.getMessage(), e);
+                throw new AnalyticsInterruptException("Error in index data enqueue (Interrupted..): " + e.getMessage(), e);
             } catch (IOException e) {
                 throw new AnalyticsException("Error in index data enqueue: " + e.getMessage(), e);
             }

@@ -26,7 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
-import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsQueueInterruptException;
+import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsInterruptException;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
@@ -902,8 +902,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
             if (log.isDebugEnabled()) {
                 log.debug("Processing staged operation [" + shardIndex + "] PUT: " + records.size() + " DELETE: " + deleteIds.size());
             }
-        } catch (AnalyticsQueueInterruptException e) {
-            throw new AnalyticsQueueInterruptException("Error in processing index staging entry: " + e.getMessage(), e);
+        } catch (AnalyticsInterruptException e) {
+            throw e;
         } catch (Throwable e) {
             throw new AnalyticsException("Error in processing index staging entry: " + e.getMessage(), e);
         }
@@ -940,7 +940,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
                             processStagingEntry(this.shardIndex, entry);
                         }
                     }
-                } catch (AnalyticsQueueInterruptException e) {
+                } catch (AnalyticsInterruptException e) {
                     //This can be thrown if the queues are interrupted by the shutdown hook
                     return;
                 } catch (AnalyticsException e) {
