@@ -20,14 +20,12 @@ package org.wso2.carbon.analytics.dataservice.core.indexing;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.channels.ClosedByInterruptException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsQueueInterruptException;
 import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -54,7 +52,7 @@ public class LocalIndexDataStore {
     }
     
     public void refreshLocalIndexShards() throws AnalyticsException {
-        this.flushQueues();
+        this.closeQueues();
         for (int shardIndex : this.indexer.getLocalShards()) {
             this.indexDataQueues.put(shardIndex, new LocalIndexDataQueue(shardIndex));
         }
@@ -85,10 +83,10 @@ public class LocalIndexDataStore {
         }
     }
     
-    private void flushQueues() {
+    private void closeQueues() {
         for (LocalIndexDataQueue queue : this.indexDataQueues.values()) {
             try {
-                queue.flush();
+                queue.close();
             } catch (IOException e) {
                 log.warn("Error in closing queue: " + e.getMessage(), e);
             }
@@ -96,7 +94,7 @@ public class LocalIndexDataStore {
     }
     
     public void close() {
-        this.flushQueues();
+        this.closeQueues();
     }
     
     public LocalIndexDataQueue getIndexDataQueue(int shardIndex) {
@@ -225,8 +223,6 @@ public class LocalIndexDataStore {
         public void enqueue(IndexOperation indexOp) throws AnalyticsException {
             try {
                 this.primaryQueue.enqueue(indexOp.getBytes());
-            } catch (ClosedByInterruptException e) {
-                throw new AnalyticsQueueInterruptException("Error in index data enqueue (Interrupted..): " + e.getMessage(), e);
             } catch (IOException e) {
                 throw new AnalyticsException("Error in index data enqueue: " + e.getMessage(), e);
             }
@@ -300,7 +296,7 @@ public class LocalIndexDataStore {
             return this.primaryQueue.size() + this.secondaryQueue.size() - this.secondaryProcessedCount;
         }
         
-        public void flush() throws IOException {
+        public void close() throws IOException {
             this.primaryQueue.close();
             this.secondaryQueue.close();
         }

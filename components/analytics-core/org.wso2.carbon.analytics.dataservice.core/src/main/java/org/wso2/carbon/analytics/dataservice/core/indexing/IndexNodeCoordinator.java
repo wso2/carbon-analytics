@@ -18,30 +18,6 @@
  */
 package org.wso2.carbon.analytics.dataservice.core.indexing;
 
-import com.hazelcast.nio.ObjectDataInput;
-import com.hazelcast.nio.ObjectDataOutput;
-import com.hazelcast.nio.serialization.DataSerializable;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
-import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
-import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsQueueInterruptException;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.core.Constants;
-import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
-import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
-import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsIndexedTableStore.IndexedTableId;
-import org.wso2.carbon.analytics.dataservice.core.indexing.LocalShardAllocationConfig.ShardStatus;
-import org.wso2.carbon.analytics.dataservice.core.indexing.StagingIndexDataStore.StagingIndexDataEntry;
-import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-import org.wso2.carbon.utils.FileUtil;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -60,6 +36,30 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.core.Constants;
+import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
+import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
+import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsIndexedTableStore.IndexedTableId;
+import org.wso2.carbon.analytics.dataservice.core.indexing.LocalShardAllocationConfig.ShardStatus;
+import org.wso2.carbon.analytics.dataservice.core.indexing.StagingIndexDataStore.StagingIndexDataEntry;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.utils.FileUtil;
+
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.DataSerializable;
 
 /**
  * Analytics index operations node coordinator.
@@ -893,7 +893,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
     private void processStagingEntry(int shardIndex, StagingIndexDataEntry entry) throws AnalyticsException {
         try {
             AnalyticsDataService ads = this.indexer.getAnalyticsDataService();
-            List<Record> records = AnalyticsDataServiceUtils.listRecords(ads,
+            List<Record> records = AnalyticsDataServiceUtils.listRecords(ads, 
                     ads.get(entry.getTenantId(), entry.getTableName(), 1, null, entry.getIds()));
             this.indexer.putLocal(records);
             Set<String> deleteIds = new HashSet<>(entry.getIds());
@@ -902,10 +902,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
             if (log.isDebugEnabled()) {
                 log.debug("Processing staged operation [" + shardIndex + "] PUT: " + records.size() + " DELETE: " + deleteIds.size());
             }
-        } catch (AnalyticsQueueInterruptException e) {
-            throw new AnalyticsQueueInterruptException("Error in processing index staging entry: " + e.getMessage(), e);
         } catch (Throwable e) {
-            throw new AnalyticsException("Error in processing index staging entry: " + e.getMessage(), e);
+            log.error("Error in processing index staging entry (deleting entry..): " + e.getMessage(), e);
         }
         this.stagingIndexDataStore.removeEntries(this.myNodeId, shardIndex, Arrays.asList(entry.getRecordId()));
     }
@@ -940,10 +938,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
                             processStagingEntry(this.shardIndex, entry);
                         }
                     }
-                } catch (AnalyticsQueueInterruptException e) {
-                    //This can be thrown if the queues are interrupted by the shutdown hook
-                    return;
-                } catch (AnalyticsException e) {
+                } catch (Throwable e) {
                     log.error("Error in processing staging index data: " + e.getMessage(), e);
                 }
                 try {
