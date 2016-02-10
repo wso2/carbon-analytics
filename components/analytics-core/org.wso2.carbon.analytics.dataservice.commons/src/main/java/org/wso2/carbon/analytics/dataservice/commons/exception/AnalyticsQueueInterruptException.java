@@ -5,15 +5,15 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 /**
  * This class represents the exception class where the queue is being interrupted when shutdown hook is triggered.
  */
-public class AnalyticsInterruptException extends AnalyticsException {
+public class AnalyticsQueueInterruptException extends AnalyticsException {
 
     private static final long serialVersionUID = 2945719572725443092L;
 
-    public AnalyticsInterruptException(String msg) {
+    public AnalyticsQueueInterruptException(String msg) {
         super(msg);
     }
 
-    public AnalyticsInterruptException(String msg, Throwable cause) {
+    public AnalyticsQueueInterruptException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

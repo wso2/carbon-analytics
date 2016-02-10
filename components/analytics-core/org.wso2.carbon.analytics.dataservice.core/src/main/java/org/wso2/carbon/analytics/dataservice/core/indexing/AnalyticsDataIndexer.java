@@ -86,7 +86,6 @@ import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsQueryParser;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterException;
@@ -1911,18 +1910,21 @@ public class AnalyticsDataIndexer {
             AnalyticsDataService ads = indexer.getAnalyticsDataService();
             try {
                 AnalyticsDataResponse response = ads.get(tenantId, tableName, 1, null, fromTime, toTime, 0, -1);
-                Iterator<Record> iterator = AnalyticsDataServiceUtils.responseToIterator(ads, response);
-                List<Record> recordBatch;
-                int i;
-                while (iterator.hasNext() && !this.stop) {
-                    i = 0;
-                    recordBatch = new ArrayList<>();
-                    while (i < org.wso2.carbon.analytics.dataservice.core.Constants.RECORDS_BATCH_SIZE
-                           && iterator.hasNext()) {
-                        recordBatch.add(iterator.next());
-                        i++;
+                RecordGroup[] recordGroups = response.getRecordGroups();
+                for (RecordGroup recordGroup : recordGroups) {
+                    Iterator<Record> iterator = ads.readRecords(response.getRecordStoreName(), recordGroup);
+                    List <Record> recordBatch;
+                    int i;
+                    while (iterator.hasNext() && !this.stop) {
+                        i = 0;
+                        recordBatch = new ArrayList<>();
+                        while (i < org.wso2.carbon.analytics.dataservice.core.Constants.RECORDS_BATCH_SIZE
+                               && iterator.hasNext()) {
+                            recordBatch.add(iterator.next());
+                            i++;
+                        }
+                        indexer.put(recordBatch);
                     }
-                    indexer.put(recordBatch);
                 }
             } catch (Throwable e) {
                 log.error("Error in re-indexing records: " + e.getMessage(), e);
