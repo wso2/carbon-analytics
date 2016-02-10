@@ -236,13 +236,8 @@ public class CarbonEventStreamService implements EventStreamService {
                     return;
                 }
             }
-
-            try {
-                validateEventStreamDefinition(streamDefinition);
-                EventStreamConfigurationFileSystemInvoker.save(streamDefinition, filePath, axisConfig);
-            } catch (EventStreamConfigurationException ex) {
-                throw ex;
-            }
+            validateEventStreamDefinition(streamDefinition);
+            EventStreamConfigurationFileSystemInvoker.save(streamDefinition, filePath, axisConfig);
         } else {
             synchronized (pendingStreams) {
                 if (EventStreamServiceValueHolder.getConfigurationContextService() != null) {
