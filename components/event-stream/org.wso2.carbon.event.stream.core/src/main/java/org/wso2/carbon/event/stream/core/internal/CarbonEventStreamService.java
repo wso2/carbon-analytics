@@ -170,9 +170,43 @@ public class CarbonEventStreamService implements EventStreamService {
         }
     }
 
+    public void validateEventStreamDefinition(StreamDefinition streamDefinition) throws EventStreamConfigurationException {
+        // validate meta attribute
+        for (int i = 0; i < streamDefinition.getMetaData().size(); i++) {
+            String check_name = streamDefinition.getMetaData().get(i).getName();
+            for (int j = i + 1; j < streamDefinition.getMetaData().size(); j++) {
+                String name = streamDefinition.getMetaData().get(j).getName();
+                if (check_name.equals(name)) {
+                    throw new EventStreamConfigurationException("Cannot have same name for meta data attribute, give the different value");
+                }
+            }
+        }
+        // validate correlation attribute
+        for (int i = 0; i < streamDefinition.getCorrelationData().size(); i++) {
+            String check_name = streamDefinition.getCorrelationData().get(i).getName();
+            for (int j = i + 1; j < streamDefinition.getCorrelationData().size(); j++) {
+                String name = streamDefinition.getCorrelationData().get(j).getName();
+                if (check_name.equals(name)) {
+                    throw new EventStreamConfigurationException("Cannot have same name for correlation data attribute, give the different value");
+                }
+            }
+        }
+        // validate payload attribute
+        for (int i = 0; i < streamDefinition.getPayloadData().size(); i++) {
+            String check_name = streamDefinition.getPayloadData().get(i).getName();
+            for (int j = i + 1; j < streamDefinition.getPayloadData().size(); j++) {
+                String name = streamDefinition.getPayloadData().get(j).getName();
+                if (check_name.equals(name)) {
+                    throw new EventStreamConfigurationException("Cannot have same name for payload data attribute, give the different value");
+                }
+            }
+        }
+    }
+
     @Override
     public void addEventStreamDefinition(StreamDefinition streamDefinition) throws
             EventStreamConfigurationException {
+
         //If ConfigurationContextService is available stream will be saved,
         //Else stream will be added pendingStreams list to save once ConfigurationContextService is available
         if (EventStreamServiceValueHolder.getConfigurationContextService() != null) {
@@ -199,7 +233,13 @@ public class CarbonEventStreamService implements EventStreamService {
                     return;
                 }
             }
-            EventStreamConfigurationFileSystemInvoker.save(streamDefinition, filePath, axisConfig);
+
+            try {
+                validateEventStreamDefinition(streamDefinition);
+                EventStreamConfigurationFileSystemInvoker.save(streamDefinition, filePath, axisConfig);
+            } catch (EventStreamConfigurationException ex) {
+                throw ex;
+            }
         } else {
             synchronized (pendingStreams) {
                 if (EventStreamServiceValueHolder.getConfigurationContextService() != null) {
@@ -210,6 +250,7 @@ public class CarbonEventStreamService implements EventStreamService {
             }
         }
     }
+
 
     private AxisConfiguration getAxisConfiguration() {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
