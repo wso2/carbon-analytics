@@ -85,6 +85,7 @@ import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsQueryParser;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterException;
@@ -1930,27 +1931,22 @@ public class AnalyticsDataIndexer {
                      format.format(new Date(toTime)));
             AnalyticsDataService ads = indexer.getAnalyticsDataService();
             try {
-                AnalyticsDataResponse dataResponse = ads.get(tenantId, tableName, 1, null, fromTime, toTime, 0, -1);
-                String recordStore = ads.getRecordStoreNameByTable(tenantId, tableName);
-                RecordGroup[] recordGroups = dataResponse.getRecordGroups();
+                AnalyticsDataResponse response = ads.get(tenantId, tableName, 1, null, fromTime, toTime, 0, -1);
                 List<Record> recordBatch;
-                for (RecordGroup recordGroup : recordGroups) {
-                    int i;
-                    Iterator<Record> iterator = ads.readRecords(recordStore, recordGroup);
-                    while (iterator.hasNext() && !this.stop) {
-                        i = 0;
-                        recordBatch = new ArrayList<>();
-                        while (i < org.wso2.carbon.analytics.dataservice.core.Constants.RECORDS_BATCH_SIZE && iterator.hasNext()) {
-                            recordBatch.add(iterator.next());
-                            i++;
-                        }
-                        indexer.put(recordBatch);
+                int i;
+                Iterator<Record> iterator = AnalyticsDataServiceUtils.responseToIterator(ads, response);
+                while (iterator.hasNext() && !this.stop) {
+                    i = 0;
+                    recordBatch = new ArrayList<>();
+                    while (i < org.wso2.carbon.analytics.dataservice.core.Constants.RECORDS_BATCH_SIZE && iterator.hasNext()) {
+                        recordBatch.add(iterator.next());
+                        i++;
                     }
+                    indexer.put(recordBatch);
                 }
             } catch (Throwable e) {
                 log.error("Error in re-indexing records: " + e.getMessage(), e);
             }
-
         }
     }
 
