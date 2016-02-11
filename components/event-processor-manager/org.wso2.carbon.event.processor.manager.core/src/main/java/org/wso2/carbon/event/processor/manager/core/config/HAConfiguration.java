@@ -54,19 +54,8 @@ public class HAConfiguration implements Serializable {
     private long presentationPublisherConnectionStatusCheckInterval = 30000;
 
     private int checkMemberUpdateInterval = 10000;
-
     private String memberUuid;
-
-    private boolean isSynced = false;
     private boolean isActive = false;
-
-    public boolean isSynced() {
-        return isSynced;
-    }
-
-    public void setSynced(boolean isSynced) {
-        this.isSynced = isSynced;
-    }
 
     public boolean isActive() {
         return isActive;
