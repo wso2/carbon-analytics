@@ -91,7 +91,6 @@ public class HAManager {
             }
 
         }, activeId, false);
-        synced = false;
     }
 
     public void init() {
@@ -139,6 +138,7 @@ public class HAManager {
                 passiveLock.forceUnlock();
             }
         }
+        haConfiguration.setActive(activeLockAcquired);
     }
 
     public void verifyState() {
@@ -158,6 +158,7 @@ public class HAManager {
                 executorService.execute(new PeriodicStateChanger());
             }
         }
+        haConfiguration.setActive(activeLockAcquired);
     }
 
     public byte[] getState() {
@@ -231,7 +232,7 @@ public class HAManager {
         roleToMembershipMap.set(activeId, haConfiguration);
         otherMember = null;
 
-        if (!synced) {
+        if (!this.haConfiguration.isSynced()) {
             // If not already synced, restore to last known state.
             eventProcessorManagementService.restoreLastState();
             log.info("Restored to Last Known State.");
@@ -336,7 +337,7 @@ public class HAManager {
             if (eventReceiverManagementService != null) {
                 eventReceiverManagementService.syncState(stateMap.get(Manager.ManagerType.Receiver));
             }
-            synced = true;
+            haConfiguration.setSynced(true);
         } finally {
             if (eventProcessorManagementService != null) {
                 eventProcessorManagementService.resume();
