@@ -177,7 +177,7 @@ public class CarbonEventStreamService implements EventStreamService {
                 String checkName = streamDefinition.getMetaData().get(i).getName();
                 for (int j = i + 1; j < streamDefinition.getMetaData().size(); j++) {
                     if (checkName.equals(streamDefinition.getMetaData().get(j).getName())) {
-                        throw new EventStreamConfigurationException("Cannot have same name \'" + checkName +"\' for meta data attribute, give different values");
+                        throw new EventStreamConfigurationException("Cannot have same name \'" + checkName +"\' for multiple meta data attributes, give different names");
                     }
                 }
             }
@@ -188,7 +188,7 @@ public class CarbonEventStreamService implements EventStreamService {
                 String checkName = streamDefinition.getCorrelationData().get(i).getName();
                 for (int j = i + 1; j < streamDefinition.getCorrelationData().size(); j++) {
                     if (checkName.equals(streamDefinition.getCorrelationData().get(j).getName())) {
-                        throw new EventStreamConfigurationException("Cannot have same name \'" + checkName + "\' for correlation data attribute, give different values");
+                        throw new EventStreamConfigurationException("Cannot have same name \'" + checkName + "\' for multiple correlation data attributes, give different names");
                     }
                 }
             }
@@ -199,7 +199,7 @@ public class CarbonEventStreamService implements EventStreamService {
                 String checkName = streamDefinition.getPayloadData().get(i).getName();
                 for (int j = i + 1; j < streamDefinition.getPayloadData().size(); j++) {
                     if (checkName.equals(streamDefinition.getPayloadData().get(j).getName())) {
-                        throw new EventStreamConfigurationException("Cannot have same name \'" + checkName +"\' for payload data attribute, give different values");
+                        throw new EventStreamConfigurationException("Cannot have same name \'" + checkName +"\' for multiple payload data attributes, give different names");
                     }
                 }
             }
