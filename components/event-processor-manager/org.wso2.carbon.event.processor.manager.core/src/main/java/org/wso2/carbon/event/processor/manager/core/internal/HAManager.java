@@ -232,7 +232,7 @@ public class HAManager {
         roleToMembershipMap.set(activeId, haConfiguration);
         otherMember = null;
 
-        if (!this.haConfiguration.isSynced()) {
+        if (!synced) {
             // If not already synced, restore to last known state.
             eventProcessorManagementService.restoreLastState();
             log.info("Restored to Last Known State.");
@@ -337,7 +337,7 @@ public class HAManager {
             if (eventReceiverManagementService != null) {
                 eventReceiverManagementService.syncState(stateMap.get(Manager.ManagerType.Receiver));
             }
-            haConfiguration.setSynced(true);
+            synced = true;
         } finally {
             if (eventProcessorManagementService != null) {
                 eventProcessorManagementService.resume();
