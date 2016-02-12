@@ -91,7 +91,6 @@ public class HAManager {
             }
 
         }, activeId, false);
-        synced = false;
     }
 
     public void init() {
@@ -139,6 +138,7 @@ public class HAManager {
                 passiveLock.forceUnlock();
             }
         }
+        haConfiguration.setActive(activeLockAcquired);
     }
 
     public void verifyState() {
@@ -158,6 +158,7 @@ public class HAManager {
                 executorService.execute(new PeriodicStateChanger());
             }
         }
+        haConfiguration.setActive(activeLockAcquired);
     }
 
     public byte[] getState() {

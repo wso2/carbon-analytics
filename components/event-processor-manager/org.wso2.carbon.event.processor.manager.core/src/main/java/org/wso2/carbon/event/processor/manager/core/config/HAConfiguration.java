@@ -54,8 +54,16 @@ public class HAConfiguration implements Serializable {
     private long presentationPublisherConnectionStatusCheckInterval = 30000;
 
     private int checkMemberUpdateInterval = 10000;
-
     private String memberUuid;
+    private boolean isActive = false;
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
 
     public boolean isWorkerNode() {
         return workerNode;
