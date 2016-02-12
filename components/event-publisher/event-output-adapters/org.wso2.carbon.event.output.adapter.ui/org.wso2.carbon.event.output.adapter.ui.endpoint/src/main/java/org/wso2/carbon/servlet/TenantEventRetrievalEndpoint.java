@@ -43,12 +43,8 @@ import javax.ws.rs.core.Response;
 public class TenantEventRetrievalEndpoint{
 
     private static final Log log = LogFactory.getLog(SuperTenantEventRetrievalEndpoint.class);
-    protected UIOutputCallbackControllerService uiOutputCallbackControllerService;
 
     public TenantEventRetrievalEndpoint() {
-        uiOutputCallbackControllerService = (UIOutputCallbackControllerService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(UIOutputCallbackControllerService.class,null);
 
     }
 
@@ -73,7 +69,7 @@ public class TenantEventRetrievalEndpoint{
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tdomain, true);
             streamId = streamName + UIConstants.ADAPTER_UI_COLON + version;
-            eventDetails = uiOutputCallbackControllerService.retrieveEvents(streamName, version, lastUpdatedTime);
+            eventDetails = ServiceHolder.getInstance().getUiOutputCallbackControllerService().retrieveEvents(streamName, version, lastUpdatedTime);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }

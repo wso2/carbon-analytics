@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.output.adapter.ui.UIOutputCallbackControllerService;
+import org.wso2.carbon.servlet.ServiceHolder;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Session;
@@ -33,12 +34,9 @@ import javax.websocket.Session;
 public class SubscriptionEndpoint {
 
     private static final Log log = LogFactory.getLog(SubscriptionEndpoint.class);
-    protected UIOutputCallbackControllerService uiOutputCallbackControllerService;
 
     public SubscriptionEndpoint() {
-        uiOutputCallbackControllerService = (UIOutputCallbackControllerService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(UIOutputCallbackControllerService.class, null);
+
     }
 
     /**
@@ -53,7 +51,7 @@ public class SubscriptionEndpoint {
         if (log.isDebugEnabled()) {
             log.debug("Closing a WebSocket due to "+reason.getReasonPhrase()+", for session ID:"+session.getId()+", for request URI - "+session.getRequestURI());
         }
-        uiOutputCallbackControllerService.unsubscribeWebsocket(streamName, version, session);
+        ServiceHolder.getInstance().getUiOutputCallbackControllerService().unsubscribeWebsocket(streamName, version, session);
     }
 
     /**
@@ -66,6 +64,6 @@ public class SubscriptionEndpoint {
      */
     public void onError (Session session, Throwable throwable, String streamName, String version) {
         log.error("Error occurred in session ID: "+session.getId()+", for request URI - "+session.getRequestURI()+", "+throwable.getMessage(),throwable);
-        uiOutputCallbackControllerService.unsubscribeWebsocket(streamName, version, session);
+        ServiceHolder.getInstance().getUiOutputCallbackControllerService().unsubscribeWebsocket(streamName, version, session);
     }
 }

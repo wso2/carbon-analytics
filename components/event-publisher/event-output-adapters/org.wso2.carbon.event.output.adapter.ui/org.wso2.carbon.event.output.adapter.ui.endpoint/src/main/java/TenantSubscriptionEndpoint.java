@@ -19,6 +19,7 @@
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.servlet.ServiceHolder;
 
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
@@ -56,7 +57,7 @@ public class TenantSubscriptionEndpoint extends SubscriptionEndpoint {
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tdomain, true);
-            uiOutputCallbackControllerService.subscribeWebsocket(streamName, version, session);
+            ServiceHolder.getInstance().getUiOutputCallbackControllerService().subscribeWebsocket(streamName, version, session);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }

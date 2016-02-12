@@ -39,12 +39,9 @@ import javax.ws.rs.core.Response;
 @Path("/")
 public class SuperTenantEventRetrievalEndpoint{
 
-    protected UIOutputCallbackControllerService uiOutputCallbackControllerService;
 
     public SuperTenantEventRetrievalEndpoint() {
-        uiOutputCallbackControllerService = (UIOutputCallbackControllerService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(UIOutputCallbackControllerService.class,null);
+
     }
 
     /**
@@ -68,7 +65,7 @@ public class SuperTenantEventRetrievalEndpoint{
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(MultitenantConstants.SUPER_TENANT_ID);
             streamId = streamName + UIConstants.ADAPTER_UI_COLON + version;
 
-            eventDetails = uiOutputCallbackControllerService.retrieveEvents(streamName, version,
+            eventDetails = ServiceHolder.getInstance().getUiOutputCallbackControllerService().retrieveEvents(streamName, version,
                     lastUpdatedTime);
 
         } finally {
