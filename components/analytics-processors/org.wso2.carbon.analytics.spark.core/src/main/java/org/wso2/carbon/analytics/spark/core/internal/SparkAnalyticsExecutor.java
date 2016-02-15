@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.spark.core.internal;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.Member;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.SparkConf;
@@ -50,6 +51,7 @@ import org.wso2.carbon.analytics.spark.core.deploy.StartWorkerExecutionCall;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsRelationProvider;
+import org.wso2.carbon.analytics.spark.core.sources.CompressedEventAnalyticsRelationProvider;
 import org.wso2.carbon.analytics.spark.core.udf.AnalyticsUDFsRegister;
 import org.wso2.carbon.analytics.spark.core.udf.config.UDFConfiguration;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
@@ -58,6 +60,7 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.SparkTableNamesHolder;
 import org.wso2.carbon.analytics.spark.utils.ComputeClasspath;
 import org.wso2.carbon.utils.CarbonUtils;
+
 import scala.None$;
 import scala.Option;
 import scala.Tuple2;
@@ -65,6 +68,7 @@ import scala.Tuple2;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -804,6 +808,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                                 AnalyticsRelationProvider.class.getName());
         this.addShorthandString(AnalyticsConstants.SPARK_JDBC_SHORTHAND_STRING,
                                 AnalyticsJDBCRelationProvider.class.getName());
+        this.addShorthandString(AnalyticsConstants.COMPRESSED_EVENT_ANALYTICS_SHORTHAND, 
+                                CompressedEventAnalyticsRelationProvider.class.getName());
     }
 
     private void addShorthandString(String shorthand, String className) {

@@ -118,4 +118,13 @@ public class AnalyticsConstants {
     public static final String SPARK_UI_PORT = "spark.ui.port";
     public static final String SPARK_RECOVERY_MODE = "spark.deploy.recoveryMode";
     public static final String SPARK_RECOVERY_MODE_FACTORY = "spark.deploy.recoveryMode.factory";
+    
+    // Compressed Event Analytics related strings
+    public static final String COMPRESSED_EVENT_ANALYTICS_SHORTHAND = "CompressedEventAnalytics";
+    public static final String JSON_FIELD_EVENTS = "events";
+    public static final String JSON_FIELD_EVENT = "event";
+    public static final String JSON_FIELD_PAYLOADS = "payloads";
+    public static final String JSON_FIELD_PAYLOAD = "payload";
+    public static final String JSON_FIELD_ATTRIBUTE = "attribute";
+
 }
