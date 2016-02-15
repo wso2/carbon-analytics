@@ -349,15 +349,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             }
             throw new AnalyticsException("Unable to create analytics client. " + e.getMessage(), e);
         }
-        try {
-            jsc.setLocalProperty(AnalyticsConstants.SPARK_SCHEDULER_POOL,
-                                 conf.get(AnalyticsConstants.CARBON_SCHEDULER_POOL));
-        } catch (NoSuchElementException e) {
-            logDebug("No carbon.scheduler.pool present the config file. Setting the default scheduler " +
-                     "pool name : " + AnalyticsConstants.DEFAULT_CARBON_SCHEDULER_POOL_NAME);
-            jsc.setLocalProperty(AnalyticsConstants.SPARK_SCHEDULER_POOL,
-                                 AnalyticsConstants.DEFAULT_CARBON_SCHEDULER_POOL_NAME);
-        }
 
         return jsc;
     }
@@ -380,7 +371,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     }
 
-    private void initializeSqlContext(JavaSparkContext jsc) throws AnalyticsUDFException {
+    private void    initializeSqlContext(JavaSparkContext jsc) throws AnalyticsUDFException {
         this.sqlCtx = new SQLContext(jsc);
         registerUDFs(this.sqlCtx);
     }
@@ -597,6 +588,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         conf.setIfMissing(AnalyticsConstants.SPARK_WORKER_WEBUI_PORT, "11500");
 
         conf.setIfMissing(AnalyticsConstants.SPARK_SCHEDULER_MODE, "FAIR");
+        conf.setIfMissing(AnalyticsConstants.SPARK_SCHEDULER_POOL, AnalyticsConstants.
+                DEFAULT_CARBON_SCHEDULER_POOL_NAME);
         conf.setIfMissing(AnalyticsConstants.SPARK_SCHEDULER_ALLOCATION_FILE,
                           analyticsSparkConfDir + File.separator + AnalyticsConstants.FAIR_SCHEDULER_XML);
         conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE, "CUSTOM");
@@ -605,12 +598,15 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         String agentConfPath = carbonHome + File.separator + "repository" + File.separator +
                 "conf"  + File.separator + "data-bridge" + File.separator + "data-agent-config.xml";
-        conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + carbonConfDir
+
+        String jvmOpts = conf.get("spark.executor.extraJavaOptions", "");
+        conf.set("spark.executor.extraJavaOptions", jvmOpts + " -Dwso2_custom_conf_dir=" + carbonConfDir
                 + " -Djavax.net.ssl.trustStore=" + System.getProperty("javax.net.ssl.trustStore")
                 + " -Djavax.net.ssl.trustStorePassword=" + System.getProperty("javax.net.ssl.trustStorePassword")
                 + " -DAgent.Config.Path=" + agentConfPath);
 
-        conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + carbonConfDir
+        jvmOpts = conf.get("spark.driver.extraJavaOptions", "");
+        conf.set("spark.driver.extraJavaOptions", jvmOpts + " -Dwso2_custom_conf_dir=" + carbonConfDir
                 + " -Djavax.net.ssl.trustStore=" + System.getProperty("javax.net.ssl.trustStore")
                 + " -Djavax.net.ssl.trustStorePassword=" + System.getProperty("javax.net.ssl.trustStorePassword")
                 + " -DAgent.Config.Path=" + agentConfPath);
@@ -728,6 +724,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 throw new AnalyticsExecutionException("Spark SQL Context is not available. " +
                                                       "Check if the cluster has instantiated properly.");
             }
+            this.sqlCtx.sparkContext().setLocalProperty(AnalyticsConstants.SPARK_SCHEDULER_POOL,
+                                                        this.sparkConf.get(AnalyticsConstants.SPARK_SCHEDULER_POOL));
             DataFrame result = this.sqlCtx.sql(query);
             return toResult(result);
         } finally {
