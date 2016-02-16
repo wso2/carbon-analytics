@@ -120,7 +120,7 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
         this.recordStore = extractValuesFromMap(AnalyticsConstants.RECORD_STORE, parameters,
                 AnalyticsConstants.DEFAULT_PROCESSED_DATA_STORE_NAME);
         this.mergeFlag = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.MERGE_SCHEMA, parameters,
-                "true"));
+                "false"));
         this.dataColumn = extractValuesFromMap(AnalyticsConstants.DATA_COLUMN,parameters, "");
     }
 
