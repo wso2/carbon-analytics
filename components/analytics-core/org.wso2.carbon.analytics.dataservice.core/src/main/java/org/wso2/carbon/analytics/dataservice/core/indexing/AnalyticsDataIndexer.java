@@ -46,7 +46,6 @@ import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.facet.LabelAndValue;
 import org.apache.lucene.facet.range.DoubleRange;
-import org.apache.lucene.facet.range.DoubleRangeFacetCounts;
 import org.apache.lucene.facet.taxonomy.TaxonomyFacetSumValueSource;
 import org.apache.lucene.facet.taxonomy.TaxonomyReader;
 import org.apache.lucene.facet.taxonomy.TaxonomyWriter;
@@ -86,6 +85,7 @@ import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsQueryParser;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterException;
@@ -636,7 +636,7 @@ public class AnalyticsDataIndexer {
             IndexReader indexReader = null;
             try {
                 indexReader = getCombinedIndexReader(this.localShards, tenantId, drillDownRequest.getTableName());
-                finalResult = getAnalyticsDrillDownRanges(tenantId, drillDownRequest, indexReader);
+                finalResult = getAnalyticsDrillDownRanges(tenantId, drillDownRequest);
             } catch (org.apache.lucene.queryparser.classic.ParseException e) {
                 throw new AnalyticsIndexException("Error while parsing the lucene query: " +
                                                   e.getMessage(), e);
@@ -657,7 +657,7 @@ public class AnalyticsDataIndexer {
         return finalResult;
     }
 
-    public List<AnalyticsDrillDownRange> getAnalyticsDrillDownRanges(int tenantId,
+    /*public List<AnalyticsDrillDownRange> getAnalyticsDrillDownRanges(int tenantId,
                                                                       AnalyticsDrillDownRequest drillDownRequest,
                                                                       IndexReader indexReader)
             throws AnalyticsIndexException, org.apache.lucene.queryparser.classic.ParseException,
@@ -691,6 +691,28 @@ public class AnalyticsDataIndexer {
             range.setScore(facetResult.labelValues[i].value.doubleValue());
         }
         return drillDownRanges;
+    }*/
+
+    public List<AnalyticsDrillDownRange> getAnalyticsDrillDownRanges(int tenantId,
+                                                                     AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException, org.apache.lucene.queryparser.classic.ParseException,
+                   IOException {
+        Map<String, AnalyticsDrillDownRange> drillDownRanges = new LinkedHashMap<>();
+        String rangeField = drillDownRequest.getRangeField();
+        for (int shard : this.getLocalShards()) {
+            for (AnalyticsDrillDownRange range : drillDownRequest.getRanges()) {
+                double score = this.getDrillDownRecordCountPerShard(tenantId, shard, drillDownRequest, rangeField, range);
+                if (drillDownRanges.get(range.getLabel()) == null) {
+                    drillDownRanges.put(range.getLabel(), new AnalyticsDrillDownRange(range.getLabel(),
+                        range.getFrom(), range.getTo(), score));
+                } else {
+                    AnalyticsDrillDownRange oldRange = drillDownRanges.get(range.getLabel());
+                    drillDownRanges.put(range.getLabel(), new AnalyticsDrillDownRange(range.getLabel(),
+                        range.getFrom(), range.getTo(), oldRange.getScore() + score));
+                }
+            }
+        }
+        return new ArrayList<>(drillDownRanges.values());
     }
 
     private DoubleRange[] createRangeBuckets(List<AnalyticsDrillDownRange> ranges) {
@@ -872,6 +894,8 @@ public class AnalyticsDataIndexer {
                         count += category.value.doubleValue();
                     }
                 }
+            } else {
+                count = indexSearcher.search(drillDownQuery, Integer.MAX_VALUE).totalHits;
             }
             return count;
         } catch (IndexNotFoundException ignore) {
@@ -1905,12 +1929,12 @@ public class AnalyticsDataIndexer {
             log.info("Re-Indexing called for table: " + tableName + " timestamp between: " +
                      format.format(new Date(fromTime)) + " and " +
                      format.format(new Date(toTime)));
-            AnalyticsRecordStore rs = indexer.getAnalyticsRecordStore();
+            AnalyticsDataService ads = indexer.getAnalyticsDataService();
             try {
-                RecordGroup[] recordGroups = rs.get(tenantId, tableName, 1, null, fromTime, toTime, 0, -1);
-                Iterator<Record> iterator = GenericUtils.recordGroupsToIterator(rs, recordGroups);
+                AnalyticsDataResponse response = ads.get(tenantId, tableName, 1, null, fromTime, toTime, 0, -1);
                 List<Record> recordBatch;
                 int i;
+                Iterator<Record> iterator = AnalyticsDataServiceUtils.responseToIterator(ads, response);
                 while (iterator.hasNext() && !this.stop) {
                     i = 0;
                     recordBatch = new ArrayList<>();
@@ -1923,7 +1947,6 @@ public class AnalyticsDataIndexer {
             } catch (Throwable e) {
                 log.error("Error in re-indexing records: " + e.getMessage(), e);
             }
-
         }
     }
 
@@ -2186,9 +2209,7 @@ public class AnalyticsDataIndexer {
             }
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
-                IndexReader reader = adsImpl.getIndexer().getCombinedIndexReader(this.shardIndices,
-                                                          tenantId, request.getTableName());
-                return adsImpl.getIndexer().getAnalyticsDrillDownRanges(tenantId, request, reader);
+                return adsImpl.getIndexer().getAnalyticsDrillDownRanges(tenantId, request);
             }
             return new ArrayList<>();
         }

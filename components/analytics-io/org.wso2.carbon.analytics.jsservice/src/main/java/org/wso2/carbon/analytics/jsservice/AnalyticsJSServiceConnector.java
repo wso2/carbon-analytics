@@ -59,11 +59,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This class will expose all the MessageConsoleService stub operations.
+ * This class will contain all the analytics data service APIs which will be called from Analytics.jag.
  */
 public class AnalyticsJSServiceConnector {
 
-    private static final long AXIS2_MIN = Long.MIN_VALUE + 1; //Long.MIN_VALUE is used for unset long variables inside stub
     private Log logger = LogFactory.getLog(AnalyticsJSServiceConnector.class);
     private AnalyticsDataAPI analyticsDataAPI;
     private EventStreamService eventStreamService;
@@ -74,34 +73,6 @@ public class AnalyticsJSServiceConnector {
         eventStreamService = ServiceHolder.getEventStreamService();
         gson = new Gson();
     }
-
-    /*public String createTable(String tableName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking createTable tableName : " +
-                         tableName);
-        }
-        if (tableName != null) {
-            try {
-                if (analyticsWebServiceStub.tableExists(tableName)) {
-                    return gson.toJson(handleResponse(ResponseStatus.CONFLICT, "table :" + tableName +
-                                                                               " already exists"));
-                }
-                analyticsWebServiceStub.createTable(tableName);
-                return gson.toJson(handleResponse(ResponseStatus.CREATED,
-                                                  "Successfully created table: " + tableName));
-            } catch (RemoteException e) {
-                logger.error("Failed to create table: " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to create Table: " +
-                                                                          e.getMessage()));
-            } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
-                logger.error("Failed to create table: " + e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to create Table: " +
-                                                                         e.getFaultMessage()));
-            }
-        } else {
-            return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "table is not defined"));
-        }
-    }*/
 
     public ResponseBean tableExists(String username, String tableName) {
         if (logger.isDebugEnabled()) {
@@ -123,27 +94,6 @@ public class AnalyticsJSServiceConnector {
         }
         return handleResponse(ResponseStatus.SUCCESS,
                               "Table : " + tableName + " exists.");
-    }
-
-    public ResponseBean addStreamDefinition(String streamDefAsString) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("invoking addStreamDefinition");
-        }
-        try {
-            if (streamDefAsString != null && !streamDefAsString.isEmpty()) {
-                StreamDefinitionBean streamDefinitionBean = gson.fromJson(streamDefAsString, StreamDefinitionBean.class);
-                StreamDefinition streamDefinition = Utils.getStreamDefinition(streamDefinitionBean);
-                eventStreamService.addEventStreamDefinition(streamDefinition);
-                String streamId = streamDefinition.getStreamId();
-                return handleResponse(ResponseStatus.CREATED, streamId);
-            } else {
-                return handleResponse(ResponseStatus.NON_EXISTENT, "StreamDefinition is not given");
-            }
-        } catch (Exception e) {
-            logger.error("Failed to add the stream definition: " + e.getMessage(), e);
-            return handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
-                                                                     ": " + e.getMessage());
-        }
     }
 
     public ResponseBean getStreamDefinition(String requestAsString) {
@@ -168,30 +118,6 @@ public class AnalyticsJSServiceConnector {
         }
     }
 
-    public ResponseBean publishEvent(String eventAsString) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("invoking publishEvent");
-        }
-        try {
-            if (eventAsString != null && !eventAsString.isEmpty()) {
-                EventBean eventBean = gson.fromJson(eventAsString, EventBean.class);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("publishing event: stream : " + eventBean.getStreamName() + ", version: " +
-                                 eventBean.getStreamVersion());
-                }
-                StreamDefinition streamDefinition = eventStreamService.getStreamDefinition(eventBean.getStreamName(), eventBean.getStreamVersion());
-                eventStreamService.publish(Utils.getStreamEvent(streamDefinition, eventBean));
-                return handleResponse(ResponseStatus.SUCCESS, "Event published successfully");
-
-            } else {
-                return handleResponse(ResponseStatus.NON_EXISTENT, "Stream event is not provided");
-            }
-        } catch (Exception e) {
-            logger.error("Failed to publish event: " + e.getMessage(), e);
-            return handleResponse(ResponseStatus.FAILED, "Failed to publish event: " +
-                                                         ": " + e.getMessage());
-        }
-    }
 
     private StreamDefinition validateAndGetStreamDefinition(String name, String version)
             throws JSServiceException {
@@ -264,94 +190,12 @@ public class AnalyticsJSServiceConnector {
         return handleResponse(ResponseStatus.SUCCESS, gson.toJson(recordStore));
     }
 
-    /*public String deleteTable(String tableName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking deleteTable for tableName : " +
-                         tableName);
-        }
-        if (tableName != null) {
-            try {
-                if (analyticsWebServiceStub.tableExists(tableName)) {
-                    analyticsWebServiceStub.deleteTable(tableName);
-                    return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "Successfully deleted table: " +
-                                                                  tableName));
-                }
-                return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "table: " + tableName +
-                                                                   " does not exists."));
-            } catch (RemoteException e) {
-                logger.error("Unable to delete table: " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete table: " +
-                                                                         tableName + ": " + e.getMessage()));
-            } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
-                logger.error("Unable to delete table: " + e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete table: " +
-                                                                         tableName + ": " + e.getFaultMessage()));
-            }
-        } else {
-            return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "Table: " + tableName +
-                                                                           " does not exist"));
-        }
-    }*/
-
-    /*public String deleteRecordsByRange(String tableName, long timeFrom, long timeTo) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking deleteRecords for tableName : " +
-                         tableName);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("deleting the records from " + timeFrom + " to " + timeTo);
-        }
-        try {
-            analyticsWebServiceStub.deleteByRange(tableName, timeFrom, timeTo);
-            return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "Successfully deleted records in table: " +
-                                                                      tableName));
-        } catch (RemoteException e) {
-            logger.error("Failed to delete records by range: " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete records by range for table: " +
-                                                                     tableName + ": " + e.getMessage()));
-        } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
-            logger.error("Failed to delete records by range: " + e.getFaultMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete records by range for table: " +
-                                                                     tableName + ": " + e.getFaultMessage()));
-        }
-    }*/
-
-    /*public String deleteRecordsByIds(String tableName, String idsAsString) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking deleteRecords for tableName : " +
-                         tableName);
-        }
-
-        if (idsAsString != null) {
-            try {
-                Type idsListType = new TypeToken<List<String>>(){}.getType();
-                List<String> ids = gson.fromJson(idsAsString, idsListType);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("deleting the records for ids :" + ids);
-                }
-                analyticsWebServiceStub.deleteByIds(tableName, ids.toArray(new String[ids.size()]));
-                return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "Successfully deleted records in table: " +
-                                                                          tableName));
-            } catch (RemoteException e) {
-                logger.error("Failed to delete records by ids: " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete records by IDs for table: " +
-                                                                         tableName + ": " + e.getMessage()));
-            } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
-                logger.error("Failed to delete records by ids: " + e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete records by IDs for table: " +
-                                                                         tableName + ": " + e.getFaultMessage()));
-            }
-        } else {
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Id list is empty"));
-        }
-    }*/
-
     public ResponseBean getRecordCount(String username, String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getRecordCount for tableName: " + tableName);
         }
         try {
-            long recordCount = analyticsDataAPI.getRecordCount(username, tableName, AXIS2_MIN, Long.MAX_VALUE);
+            long recordCount = analyticsDataAPI.getRecordCount(username, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
             if (logger.isDebugEnabled()) {
                 logger.debug("RecordCount for tableName: " + tableName + " is " + recordCount);
             }
@@ -461,74 +305,6 @@ public class AnalyticsJSServiceConnector {
             return handleResponse(ResponseStatus.FAILED, "Id list is empty");
         }
     }
-
-    /*public String insertRecords(String recordsAsString) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking insertRecords");
-        }
-
-        if (recordsAsString != null) {
-            try {
-                Type recordListType = new TypeToken<List<Record>>(){}.getType();
-                List<Record> records = gson.fromJson(recordsAsString, recordListType);
-                if (logger.isDebugEnabled()) {
-                    for (Record record : records) {
-                        logger.debug(" inserting -- Record Id: " + record.getId() + " values :" +
-                                     record.toString());
-                    }
-                }
-                RecordBean[] recordBeans = Utils.getRecords(records);
-                RecordBean[] beansWithIds = analyticsWebServiceStub.put(recordBeans);
-                List<String> ids = Utils.getIds(beansWithIds);
-                return gson.toJson(ids);
-            } catch (RemoteException e) {
-                logger.error("Failed to put records: " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to put records: " + e.getMessage()));
-            } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
-                logger.error("Failed to put records: " + e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to put records: " + e.getFaultMessage()));
-            }
-        } else {
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Record list is empty"));
-        }
-    }*/
-
-    /*public String insertRecordsToTable(String tableName, String recordsAsString) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking insertRecordsToTable");
-        }
-
-        if (recordsAsString != null && tableName != null) {
-            try {
-                Type recordListType = new TypeToken<List<Record>>(){}.getType();
-                List<Record> records = gson.fromJson(recordsAsString, recordListType);
-                if (logger.isDebugEnabled()) {
-                    for (Record record : records) {
-                        logger.debug(" inserting -- Record Id: " + record.getId() + " values :" +
-                                     record.toString() + "to table: " + tableName);
-                    }
-                }
-                RecordBean[] recordBeans = Utils.getRecords(tableName, records);
-                RecordBean[] beansWithIds = analyticsWebServiceStub.put(recordBeans);
-                List<String> ids = Utils.getIds(beansWithIds);
-                return gson.toJson(ids);
-            } catch (RemoteException e) {
-                logger.error("Failed to put records: " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to put records: " + e.getMessage()));
-            } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
-                logger.error("Failed to put records: " + e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to put records: " + e.getFaultMessage()));
-            }
-        } else {
-            String errorMsg = "";
-            if (recordsAsString == null){
-                errorMsg = gson.toJson(handleResponse(ResponseStatus.FAILED, "Record list is empty"));
-            } else if (tableName == null) {
-                errorMsg =  gson.toJson(handleResponse(ResponseStatus.FAILED, "tableName is not provided"));
-            }
-            return errorMsg;
-        }
-    }*/
 
     public ResponseBean clearIndexData(String username, String tableName) {
         if (logger.isDebugEnabled()) {
@@ -831,6 +607,52 @@ public class AnalyticsJSServiceConnector {
         } else {
             return handleResponse(ResponseStatus.FAILED, "drilldownSearch parameters " +
                                                          "are not provided");
+        }
+    }
+
+    public ResponseBean addStreamDefinition(String streamDefAsString) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("invoking addStreamDefinition");
+        }
+        try {
+            if (streamDefAsString != null && !streamDefAsString.isEmpty()) {
+                StreamDefinitionBean streamDefinitionBean = gson.fromJson(streamDefAsString, StreamDefinitionBean.class);
+                StreamDefinition streamDefinition = Utils.getStreamDefinition(streamDefinitionBean);
+                eventStreamService.addEventStreamDefinition(streamDefinition);
+                String streamId = streamDefinition.getStreamId();
+                return handleResponse(ResponseStatus.CREATED, streamId);
+            } else {
+                return handleResponse(ResponseStatus.NON_EXISTENT, "StreamDefinition is not given");
+            }
+        } catch (Exception e) {
+            logger.error("Failed to add the stream definition: " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
+                                                         ": " + e.getMessage());
+        }
+    }
+
+    public ResponseBean publishEvent(String eventAsString) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("invoking publishEvent");
+        }
+        try {
+            if (eventAsString != null && !eventAsString.isEmpty()) {
+                EventBean eventBean = gson.fromJson(eventAsString, EventBean.class);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("publishing event: stream : " + eventBean.getStreamName() + ", version: " +
+                                 eventBean.getStreamVersion());
+                }
+                StreamDefinition streamDefinition = eventStreamService.getStreamDefinition(eventBean.getStreamName(), eventBean.getStreamVersion());
+                eventStreamService.publish(Utils.getStreamEvent(streamDefinition, eventBean));
+                return handleResponse(ResponseStatus.SUCCESS, "Event published successfully");
+
+            } else {
+                return handleResponse(ResponseStatus.NON_EXISTENT, "Stream event is not provided");
+            }
+        } catch (Exception e) {
+            logger.error("Failed to publish event: " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to publish event: " +
+                                                         ": " + e.getMessage());
         }
     }
 

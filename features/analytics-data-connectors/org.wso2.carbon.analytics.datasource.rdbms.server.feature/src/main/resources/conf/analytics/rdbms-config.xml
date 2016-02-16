@@ -17,7 +17,8 @@
             <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
         </recordTableDeleteQueries>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BINARY, partition_key INT, PRIMARY KEY(record_id))</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(128), timestamp BIGINT, data BINARY, partition_key
+                INT, PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
             <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
         </recordTableInitQueries>
@@ -41,7 +42,8 @@
             <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
         </recordTableDeleteQueries>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data LONGBLOB, partition_key INT, PRIMARY KEY(record_id)) ENGINE='MyISAM'</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(128), timestamp BIGINT, data LONGBLOB, partition_key
+                INT, PRIMARY KEY(record_id)) ENGINE='MyISAM'</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
             <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
         </recordTableInitQueries>     
@@ -65,7 +67,8 @@
             <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
         </recordTableDeleteQueries>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data LONGBLOB, partition_key INT, PRIMARY KEY(record_id)) ENGINE='InnoDB'</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(128), timestamp BIGINT, data LONGBLOB, partition_key
+                INT, PRIMARY KEY(record_id)) ENGINE='InnoDB'</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
             <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
         </recordTableInitQueries>    
@@ -89,7 +92,8 @@
             <query>DROP TABLE {{TABLE_NAME}}</query>
         </recordTableDeleteQueries>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR2(50), timestamp NUMBER(19), data BLOB, partition_key NUMBER(10), PRIMARY KEY(record_id))</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR2(128), timestamp NUMBER(19), data BLOB, partition_key
+                NUMBER(10), PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
             <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
         </recordTableInitQueries>
@@ -115,7 +119,8 @@
             <query>DROP TABLE {{TABLE_NAME}}</query>
         </recordTableDeleteQueries>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data VARBINARY(max), partition_key INTEGER, PRIMARY KEY(record_id))</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(128), timestamp BIGINT, data VARBINARY(max),
+                partition_key INTEGER, PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
             <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
         </recordTableInitQueries>
@@ -141,7 +146,8 @@
             <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
         </recordTableDeleteQueries>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BYTEA, partition_key INTEGER, PRIMARY KEY(record_id))</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(128), timestamp BIGINT, data BYTEA, partition_key
+                INTEGER, PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
             <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
         </recordTableInitQueries>
@@ -166,7 +172,8 @@
             <query>DROP TABLE {{TABLE_NAME}}</query>
         </recordTableDeleteQueries>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50) NOT NULL, timestamp BIGINT, data BLOB(2G) NOT LOGGED, partition_key INTEGER, PRIMARY KEY(record_id))</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(128) NOT NULL, timestamp BIGINT, data BLOB(2G) NOT
+                LOGGED, partition_key INTEGER, PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
             <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
         </recordTableInitQueries>
