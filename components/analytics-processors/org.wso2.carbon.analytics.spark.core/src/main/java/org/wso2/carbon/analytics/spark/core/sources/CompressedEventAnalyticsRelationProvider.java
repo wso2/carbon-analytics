@@ -67,7 +67,6 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
     private String recordStore;
     private boolean mergeFlag;
     private String dataColumn;
-    private StructType schemaStruct;
 
     public CompressedEventAnalyticsRelationProvider() {
         this.dataService = ServiceHolder.getAnalyticsDataService();
@@ -93,24 +92,27 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
         }
         if (isSchemaProvided()) {
             try {
-                setSchemaIfProvided();
+                return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, 
+                    this.dataColumn, this.mergeFlag, sqlContext, generateSchema());
             } catch (AnalyticsExecutionException e) {
-                String msg = "Error while merging the schema for the table : " + this.tableName + " : " + 
-                        e.getMessage();
+                String msg = "Error while generating the schema for the table : " + this.tableName + " : " + e.getMessage();
                 log.error(msg, e);
                 throw new RuntimeException(msg, e);
             }
-            return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, this.dataColumn, 
-                this.mergeFlag, sqlContext, this.schemaStruct);
         } else {
             return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, this.dataColumn, 
                 this.mergeFlag, sqlContext);
         }
     }
+    
 
+    /**
+     * Set the parameters passed in the spark script
+     * 
+     * @param parameters    Map of parameters
+     */
     private void setParameters(Map<String, String> parameters) {
-        this.tenantId = Integer.parseInt(extractValuesFromMap(AnalyticsConstants.TENANT_ID,
-                                                              parameters, "-1234"));
+        this.tenantId = Integer.parseInt(extractValuesFromMap(AnalyticsConstants.TENANT_ID, parameters, "-1234"));
         this.tableName = extractValuesFromMap(AnalyticsConstants.TABLE_NAME, parameters, "");
         this.schemaString = extractValuesFromMap(AnalyticsConstants.SCHEMA_STRING, parameters, "");
         this.streamName = extractValuesFromMap(AnalyticsConstants.STREAM_NAME, parameters, "");
@@ -119,10 +121,15 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
                 AnalyticsConstants.DEFAULT_PROCESSED_DATA_STORE_NAME);
         this.mergeFlag = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.MERGE_SCHEMA, parameters,
                 "true"));
-        // TODO: Remove hard-coded name
-        this.dataColumn = extractValuesFromMap("dataColumn",parameters, "");
+        this.dataColumn = extractValuesFromMap(AnalyticsConstants.DATA_COLUMN,parameters, "");
     }
 
+    
+    /**
+     * Create a temporary table if not exists
+     * 
+     * @throws AnalyticsExecutionException
+     */
     private void createTableIfNotExist() throws AnalyticsExecutionException {
         if (!this.tableName.isEmpty()) {
             try {
@@ -154,64 +161,54 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
             throw new AnalyticsExecutionException("Empty " + AnalyticsConstants.TABLE_NAME + " OR "
                                                   + AnalyticsConstants.STREAM_NAME);
         }
-
     }
 
-    private void setSchemaIfProvided() throws AnalyticsExecutionException {
-        if (isSchemaProvided()) {
-            logDebug("Schema is provided, hence setting the schema in the analytics data service");
-            List<ColumnDefinition> colList = this.createColumnDefinitionsFromString(this.schemaString);
-            List<String> pKeyList;
-            if (!this.primaryKeys.isEmpty()) {
-                pKeyList = this.createPrimaryKeyList(this.primaryKeys);
-            } else {
-                logDebug("No primary keys present, hence setting an empty list");
-                pKeyList = Collections.emptyList();
-            }
+    private StructType generateSchema() throws AnalyticsExecutionException {
+        logDebug("Schema is provided, hence setting the schema in the analytics data service");
+        List<ColumnDefinition> colList = this.createColumnDefinitionsFromString(this.schemaString);
+        List<String> pKeyList;
+        if (!this.primaryKeys.isEmpty()) {
+            pKeyList = this.createPrimaryKeyList(this.primaryKeys);
+        } else {
+            logDebug("No primary keys present, hence setting an empty list");
+            pKeyList = Collections.emptyList();
+        }
 
-            AnalyticsSchema finalSchema = new AnalyticsSchema(colList, pKeyList);
-            if (this.mergeFlag) {
-                logDebug("MergeSchema flag is set. Hence merging the schema with the existing schema");
-                try {
-                    AnalyticsSchema existingSchema = this.dataService.getTableSchema(this.tenantId, this.tableName);
-                    if (!isEmptyAnalyticsSchema(existingSchema)) {
-                        logDebug("There is an existing schema already present. Hence, merging the schemas");
-                        finalSchema = AnalyticsDataServiceUtils.createMergedSchema
-                                (existingSchema, pKeyList, colList, Collections.<String>emptyList());
-                    }
-                } catch (AnalyticsException e) {
-                    throw new AnalyticsExecutionException("Error while reading " + this.tableName + " table schema: "
-                            + e.getMessage(), e);
-                }
-            } else {
-                logDebug("MergeSchema flag is not set. Hence using the given schema");
-            }
-
+        AnalyticsSchema finalSchema = new AnalyticsSchema(colList, pKeyList);
+        if (this.mergeFlag) {
+            logDebug("MergeSchema flag is set. Hence merging the schema with the existing schema");
             try {
-                this.dataService.setTableSchema(this.tenantId, this.tableName, finalSchema);
+                AnalyticsSchema existingSchema = this.dataService.getTableSchema(this.tenantId, this.tableName);
+                if (!isEmptyAnalyticsSchema(existingSchema)) {
+                    logDebug("There is an existing schema already present. Hence, merging the schemas");
+                    finalSchema = AnalyticsDataServiceUtils.createMergedSchema(existingSchema, pKeyList, colList,
+                            Collections.<String> emptyList());
+                }
             } catch (AnalyticsException e) {
-                throw new AnalyticsExecutionException("Error while setting " + this.tableName + " table schema: " + 
-                        e.getMessage(), e);
-            }
-
-            StructType tempStruct = structTypeFromAnalyticsSchema(finalSchema);
-            if (this.schemaString.contains(AnalyticsConstants.TIMESTAMP_FIELD)) {
-                this.schemaStruct = tempStruct.merge(new StructType(new StructField[]{new StructField(
-                        AnalyticsConstants.TIMESTAMP_FIELD, DataTypes.LongType, true, Metadata.empty())}));
-            } else {
-                this.schemaStruct = tempStruct;
+                throw new AnalyticsExecutionException("Error while reading " + this.tableName + " table schema: " +
+                    e.getMessage(), e);
             }
         } else {
-            if (!this.primaryKeys.isEmpty()) {
-                throw new AnalyticsExecutionException("Primary keys set to an empty Schema");
-            }
+            logDebug("MergeSchema flag is not set. Hence using the given schema");
         }
+
+        StructType schemaStruct;
+        StructType tempStruct = structTypeFromAnalyticsSchema(finalSchema);
+        if (this.schemaString.contains(AnalyticsConstants.TIMESTAMP_FIELD)) {
+            schemaStruct = tempStruct.merge(new StructType(new StructField[] { 
+                new StructField(AnalyticsConstants.TIMESTAMP_FIELD, DataTypes.LongType, true, Metadata.empty()) }));
+        } else {
+            schemaStruct = tempStruct;
+        }
+        return schemaStruct;
     }
 
+    
     private boolean isSchemaProvided() {
         return !this.schemaString.isEmpty();
     }
 
+    
     private String extractValuesFromMap(String key, Map<String, String> map, final String defaultVal) {
         return map.getOrElse(key, new AbstractFunction0<String>() {
             public String apply() {
@@ -240,7 +237,6 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
                              "the analytics schema");
                     continue;
                 }
-
                 AnalyticsSchema.ColumnType type = AnalyticsCommonUtils.stringToColumnType(tokens[1]);
                 switch (tokens.length) {
                     case 2:
@@ -297,9 +293,6 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
      */
     @Override
     public BaseRelation createRelation(SQLContext sqlContext, Map<String, String> parameters, StructType schema) {
-        // Here the schema is provided as struct type & NOT in the parameters
-        // This extracts the schema information, set schema in the ds and create a new analytics relation. 
-        // NOTE: this schema contains comments, which are included in the metadata fields
         setParameters(parameters);
         try {
             createTableIfNotExist();
@@ -308,14 +301,6 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }
-        try {
-            setSchemaIfProvided();
-        } catch (AnalyticsExecutionException e) {
-            String msg = "Error while merging the schema for the table : " + this.tableName + " : " + e.getMessage();
-            log.error(msg, e);
-            throw new RuntimeException(msg, e);
-        }
-
         try {
             AnalyticsSchema schemaFromDS;
             schemaFromDS = dataService.getTableSchema(this.tenantId, this.tableName);
@@ -329,7 +314,6 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }
-
         return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, this.dataColumn,
             this.mergeFlag, sqlContext, schema);
     }

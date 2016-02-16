@@ -65,7 +65,7 @@ import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.isE
  */
 public class CompressedEventAnalyticsRelation extends BaseRelation implements TableScan,
                                                                InsertableRelation, Serializable {
-    private static final long serialVersionUID = -7773419083178608517L;
+    private static final long serialVersionUID = -6621212018440626281L;
     private static final Log log = LogFactory.getLog(CompressedEventAnalyticsRelation.class);
     private SQLContext sqlContext;
     private StructType schema;
@@ -77,17 +77,6 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
     private AnalyticsDataService dataService;
 
     public CompressedEventAnalyticsRelation() {
-    }
-
-    @Deprecated
-    public CompressedEventAnalyticsRelation(int tenantId, String tableName, String dataColumn, boolean schemaMerge,
-            SQLContext sqlContext, String schemaString) {
-        this.tenantId = tenantId;
-        this.tableName = tableName;
-        this.sqlContext = sqlContext;
-        this.schema = new StructType(extractFieldsFromString(schemaString));
-        this.dataColumn = dataColumn;
-        this.schemaMerge = schemaMerge;
     }
 
     /**

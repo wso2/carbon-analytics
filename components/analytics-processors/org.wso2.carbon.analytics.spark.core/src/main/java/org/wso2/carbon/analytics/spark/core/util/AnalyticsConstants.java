@@ -121,10 +121,11 @@ public class AnalyticsConstants {
     
     // Compressed Event Analytics related strings
     public static final String COMPRESSED_EVENT_ANALYTICS_SHORTHAND = "CompressedEventAnalytics";
+    public static final String DATA_COLUMN = "dataColumn";
     public static final String JSON_FIELD_EVENTS = "events";
     public static final String JSON_FIELD_EVENT = "event";
     public static final String JSON_FIELD_PAYLOADS = "payloads";
     public static final String JSON_FIELD_PAYLOAD = "payload";
     public static final String JSON_FIELD_ATTRIBUTE = "attribute";
-
+    public static final String JSON_FIELD_EVENT_INDEX = "eventIndex";
 }
