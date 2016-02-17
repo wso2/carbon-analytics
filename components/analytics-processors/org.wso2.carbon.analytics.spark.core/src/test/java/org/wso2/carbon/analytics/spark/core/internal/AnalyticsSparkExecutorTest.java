@@ -108,12 +108,12 @@ public class AnalyticsSparkExecutorTest {
     public void testCreateTableUsingCompressedEventAnalytics() throws AnalyticsException, Exception {
         log.info(testString("start : create temp table using Compressed Event Analytics test"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
-        List<Record> records = generateRecordsForCompressedEventAnalytics(1, "CompressedEventsTable1", false);
-        this.service.deleteTable(1, "CompressedEventsTable1");
-        this.service.createTable(1, "CompressedEventsTable1");
+        List<Record> records = generateRecordsForCompressedEventAnalytics(1, "CompressedEventsTable", false);
+        this.service.deleteTable(1, "CompressedEventsTable");
+        this.service.createTable(1, "CompressedEventsTable");
         this.service.put(records);
         ex.executeQuery(1, "CREATE TEMPORARY TABLE EventsTable USING CompressedEventAnalytics " +
-            "OPTIONS(tableName \"CompressedEventsTable1\", schema \"id STRING, compotentType STRING, componentId " +
+            "OPTIONS(tableName \"CompressedEventsTable\", schema \"id STRING, compotentType STRING, componentId " +
             "STRING, startTime LONG, endTime LONG, duration FLOAT, beforePayload STRING, afterPayload STRING, " +
             "contextPropertyMap STRING, transportPropertyMap STRING, children STRING, entryPoint STRING\", " +
             "dataColumn \"data\", tenantId \"1\")");
@@ -139,7 +139,7 @@ public class AnalyticsSparkExecutorTest {
         // Check mapping for unavailable payloads
         Assert.assertEquals(resultRows.get(2).get(8), null);
         
-        this.service.deleteTable(1, "EventsTable");
+        this.service.deleteTable(1, "CompressedEventsTable");
         log.info(testString("end : create temp table using Compressed Event Analytics test"));
     }
     
