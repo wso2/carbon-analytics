@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.analytics.spark.core.internal;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.spark.SparkException;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -35,17 +38,20 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 
 import javax.naming.NamingException;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AnalyticsSparkExecutorTest {
 
-
+    private static final Log log = LogFactory.getLog(AnalyticsSparkExecutorTest.class);
     private AnalyticsDataService service;
 
     /**
@@ -96,6 +102,69 @@ public class AnalyticsSparkExecutorTest {
         System.out.println(result);
         this.service.deleteTable(1, "Log1");
         System.out.println(testString("end : create temp table test"));
+    }
+    
+    @Test
+    public void testCreateTableUsingCompressedEventAnalytics() throws AnalyticsException, Exception {
+        log.info(testString("start : create temp table using Compressed Event Analytics test"));
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        List<Record> records = generateRecordsForCompressedEventAnalytics(1, "CompressedEventsTable1", false);
+        this.service.deleteTable(1, "CompressedEventsTable1");
+        this.service.createTable(1, "CompressedEventsTable1");
+        this.service.put(records);
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE EventsTable USING CompressedEventAnalytics " +
+            "OPTIONS(tableName \"CompressedEventsTable1\", schema \"id STRING, compotentType STRING, componentId " +
+            "STRING, startTime LONG, endTime LONG, duration FLOAT, beforePayload STRING, afterPayload STRING, " +
+            "contextPropertyMap STRING, transportPropertyMap STRING, children STRING, entryPoint STRING\", " +
+            "dataColumn \"data\", tenantId \"1\")");
+        
+        // Check the rows split
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT id FROM EventsTable");
+        log.info(result);
+        Assert.assertEquals(result.getRows().size(), 7, "Incorrect number of rows after spliting");
+        result = ex.executeQuery(1, "SELECT id FROM EventsTable WHERE id=\"1\"");
+        Assert.assertEquals(result.getRows().size(), 4, "Incorrect number of rows after spliting");
+        
+        // Check payload mapping 
+        String xmlPayload = "<?xml version=\'1.0\' encoding=\'utf-8\'?><soapenv:Envelope xmlns:soapenv=" +
+            "\'http://www.w3.org/2003/05/soap-envelope\'><soapenv:Body><sam:getCertificateID xmlns:sam=" +
+            "\'http://sample.esb.org\'><sam:vehicleNumber>123456</sam:vehicleNumber></sam:getCertificateID>" +
+            "</soapenv:Body></soapenv:Envelope>";
+        result = ex.executeQuery(1, "SELECT * FROM EventsTable");
+        log.info(result);
+        List<List<Object>> resultRows = result.getRows();
+        Assert.assertEquals(resultRows.get(0).get(6), xmlPayload);
+        Assert.assertEquals(resultRows.get(0).get(7), resultRows.get(1).get(6));
+
+        // Check mapping for unavailable payloads
+        Assert.assertEquals(resultRows.get(2).get(8), null);
+        
+        this.service.deleteTable(1, "EventsTable");
+        log.info(testString("end : create temp table using Compressed Event Analytics test"));
+    }
+    
+    public List<Record> generateRecordsForCompressedEventAnalytics(int tenantId, String tableName,
+        boolean generateRecordIds) throws Exception {
+        List<Record> result = new ArrayList<>();
+        Map<String, Object> values;
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        String[] sampleData = null;
+        try {
+            sampleData =
+                IOUtils.toString(classLoader.getResourceAsStream("sample-data/CompressedEventData")).split("\n");
+        } catch (IOException e) {
+            throw new AnalyticsException(e.getMessage());
+        }
+        long timeTmp;
+        for (int j = 0; j < sampleData.length; j++) {
+            values = new HashMap<>();
+            values.put("id", String.valueOf(j));
+            values.put("data", sampleData[j]);
+            timeTmp = System.currentTimeMillis();
+            result.add(new Record(generateRecordIds ? GenericUtils.generateRecordID() : null, tenantId, tableName,
+                values, timeTmp));
+        }
+        return result;
     }
 
     @Test
