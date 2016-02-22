@@ -183,6 +183,9 @@ public class AnalyticsSearchProcessor extends HttpServlet {
             } else if (operation != null && operation.trim()
                     .equalsIgnoreCase(AnalyticsAPIConstants.DRILL_DOWN_SEARCH_RANGE_COUNT_OPERATION)) {
                 doDrillDownRangeCount(req, resp, securityEnabled, tenantIdParam, userName);
+            } else if (operation != null && operation.trim()
+                    .equalsIgnoreCase(AnalyticsAPIConstants.SEARCH_MULTITABLES_WITH_AGGREGATES_OPERATION)) {
+                doSearchMultiTablesWithAggregates(req, resp, securityEnabled, tenantIdParam, userName);
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
                         + " with get request!");
@@ -262,6 +265,29 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                 ranges = ServiceHolder.getSecureAnalyticsDataService().drillDownRangeCount(userName, drillDownRequest);
             }
             GenericUtils.serializeObject(ranges, resp.getOutputStream());
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } catch (AnalyticsException e) {
+            resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+        }
+    }
+
+    private void doSearchMultiTablesWithAggregates(HttpServletRequest req, HttpServletResponse resp,
+                                       boolean securityEnabled, int tenantIdParam, String userName)
+            throws IOException {
+        ServletInputStream servletInputStream = req.getInputStream();
+        try {
+            AggregateRequest[] requests = (AggregateRequest[]) GenericUtils.deserializeObject(servletInputStream);
+            AnalyticsIterator<Record> iterator;
+            if (!securityEnabled) {
+                iterator = ServiceHolder.getAnalyticsDataService().searchWithAggregates(tenantIdParam, requests);
+            } else {
+                iterator = ServiceHolder.getSecureAnalyticsDataService().searchWithAggregates(userName, requests);
+            }
+            while (iterator.hasNext()) {
+                Record record = iterator.next();
+                GenericUtils.serializeObject(record, resp.getOutputStream());
+            }
+            iterator.close();
             resp.setStatus(HttpServletResponse.SC_OK);
         } catch (AnalyticsException e) {
             resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());

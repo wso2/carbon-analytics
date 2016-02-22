@@ -346,9 +346,21 @@ public interface SecureAnalyticsDataService {
      * groupByField is used to group the records. It should be a facet field created by the grouping fields.
      * fields attribute represents the record fields and the respective aggregate function.
      * aliases represents the output field names for aggregated values over the fields.
-     * @return List of records of which the record values will be the aggregate values of the given fields
+     * @return Iterator of records of which the record values will be the aggregate values of the given fields
      */
     AnalyticsIterator<Record> searchWithAggregates(String username, AggregateRequest aggregateRequest) throws AnalyticsException;
+
+    /**
+     * Returns a list of records containing the aggregate values computed over the given fields map
+     * , grouped by a predefined FACET field for multiple tables.
+     * @param username The username
+     * @param aggregateRequests The array of aggregateRequests which represents different tables
+     * groupByField is used to group the records. It should be a facet field created by the grouping fields.
+     * fields attribute represents the record fields and the respective aggregate function.
+     * aliases represents the output field names for aggregated values over the fields.
+     * @return Iterator of records of which the record values will be the aggregate values of the given fields
+     */
+    AnalyticsIterator<Record> searchWithAggregates(String username, AggregateRequest[] aggregateRequests) throws AnalyticsException;
 
     /**
      * Given the start time and end time, this method will re-index the records of a table.
