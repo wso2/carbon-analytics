@@ -1398,6 +1398,38 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    public AnalyticsIterator<Record> searchWithAggregates(int tenantId, String username,
+                                                          AggregateRequest[] aggregateRequests,
+                                                          boolean securityEnabled) {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
+                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SEARCH_MULTITABLES_WITH_AGGREGATES_OPERATION)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
+        try {
+            HttpPost postMethod = new HttpPost(builder.build().toString());
+            postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
+            postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(aggregateRequests)));
+            HttpResponse httpResponse = httpClient.execute(postMethod);
+            String response = getResponseString(httpResponse);
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                throw new AnalyticsServiceUnauthorizedException("Error while searching with aggregates. " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                throw new AnalyticsServiceException("Error while searching with aggregates. " + response);
+            } else {
+                return new RemoteRecordIterator(httpResponse.getEntity().getContent());
+            }
+        } catch (URISyntaxException e) {
+            throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AnalyticsServiceException("Error while connecting to the remote service. " + e.getMessage(), e);
+        }
+    }
+
     public void reIndex(int tenantId, String username, String tableName, long startTime, long endTime,
                         boolean securityEnabled) {
         URIBuilder builder = new URIBuilder();

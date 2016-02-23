@@ -327,16 +327,28 @@ public interface AnalyticsDataService {
         throws AnalyticsIndexException;
     
     /**
-     * Returns a list of records containing the aggregate values computed over the given fields map
+     * Returns an iterator of records containing the aggregate values computed over the given fields map
      * , grouped by a predefined FACET field.
      * @param tenantId The tenant Id
      * @param aggregateRequest The inputs required for performing aggregation.
      * groupByField is used to group the records. It should be a facet field created by the grouping fields.
      * fields attribute represents the record fields and the respective aggregate function.
      * aliases represents the output field names for aggregated values over the fields.
-     * @return List of records of which the record values will be the aggregate values of the given fields
+     * @return iterator of records of which the record values will be the aggregate values of the given fields
      */
     public AnalyticsIterator<Record> searchWithAggregates(int tenantId, AggregateRequest aggregateRequest) throws AnalyticsException;
+
+    /**
+     * Returns an iterator of records containing the aggregate values computed over the given fields map
+     * , grouped by a predefined FACET field for multiple tables.
+     * @param tenantId The tenant Id
+     * @param aggregateRequests The array of aggregateRequests representing different tables
+     * groupByField is used to group the records. It should be a facet field created by the grouping fields.
+     * fields attribute represents the record fields and the respective aggregate function.
+     * aliases represents the output field names for aggregated values over the fields.
+     * @return Iterator of records of which the record values will be the aggregate values of the given fields
+     */
+    public AnalyticsIterator<Record> searchWithAggregates(int tenantId, AggregateRequest[] aggregateRequests) throws AnalyticsException;
 
     /**
      * Given the start time and end time, this method will re-index the records of a table.
