@@ -794,7 +794,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public AnalyticsIterator<Record> searchWithAggregates(String username,
+    public List<AnalyticsIterator<Record>> searchWithAggregates(String username,
                                                                 AggregateRequest[] aggregateRequests)
             throws AnalyticsException {
         if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
@@ -1013,7 +1013,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public AnalyticsIterator<Record> searchWithAggregates(int tenantId,
+    public List<AnalyticsIterator<Record>> searchWithAggregates(int tenantId,
                                                                 AggregateRequest[] aggregateRequests)
             throws AnalyticsException {
         if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {

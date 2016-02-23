@@ -877,14 +877,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public AnalyticsIterator<Record> searchWithAggregates(int tenantId,
+    public List<AnalyticsIterator<Record>> searchWithAggregates(int tenantId,
                                                           AggregateRequest[] aggregateRequests)
             throws AnalyticsException {
         List<AnalyticsIterator<Record>> iterators = new ArrayList<>();
         for (AggregateRequest request : aggregateRequests) {
             iterators.add(this.searchWithAggregates(tenantId, request));
         }
-        return new MultiTableAggregateIterator(iterators);
+        return iterators;
     }
 
     @Override

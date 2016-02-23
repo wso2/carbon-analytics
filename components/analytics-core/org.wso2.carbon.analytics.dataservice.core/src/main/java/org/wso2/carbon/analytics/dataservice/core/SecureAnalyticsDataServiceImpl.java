@@ -334,7 +334,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     }
 
     @Override
-    public AnalyticsIterator<Record> searchWithAggregates(String username,
+    public List<AnalyticsIterator<Record>> searchWithAggregates(String username,
                                                                 AggregateRequest[] aggregateRequests)
             throws AnalyticsException {
         try {

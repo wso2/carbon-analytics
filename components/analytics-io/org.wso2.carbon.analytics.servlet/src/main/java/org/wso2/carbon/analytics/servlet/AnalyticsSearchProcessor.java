@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.commons.collections.IteratorUtils;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateField;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -277,17 +278,17 @@ public class AnalyticsSearchProcessor extends HttpServlet {
         ServletInputStream servletInputStream = req.getInputStream();
         try {
             AggregateRequest[] requests = (AggregateRequest[]) GenericUtils.deserializeObject(servletInputStream);
-            AnalyticsIterator<Record> iterator;
+            List<AnalyticsIterator<Record>> iterators;
             if (!securityEnabled) {
-                iterator = ServiceHolder.getAnalyticsDataService().searchWithAggregates(tenantIdParam, requests);
+                iterators = ServiceHolder.getAnalyticsDataService().searchWithAggregates(tenantIdParam, requests);
             } else {
-                iterator = ServiceHolder.getSecureAnalyticsDataService().searchWithAggregates(userName, requests);
+                iterators = ServiceHolder.getSecureAnalyticsDataService().searchWithAggregates(userName, requests);
             }
-            while (iterator.hasNext()) {
-                Record record = iterator.next();
-                GenericUtils.serializeObject(record, resp.getOutputStream());
+            List<List<Record>> aggregatedRecords = new ArrayList<>();
+            for (AnalyticsIterator<Record> iterator : iterators) {
+                aggregatedRecords.add(IteratorUtils.toList(iterator));
             }
-            iterator.close();
+            GenericUtils.serializeObject(aggregatedRecords, resp.getOutputStream());
             resp.setStatus(HttpServletResponse.SC_OK);
         } catch (AnalyticsException e) {
             resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
