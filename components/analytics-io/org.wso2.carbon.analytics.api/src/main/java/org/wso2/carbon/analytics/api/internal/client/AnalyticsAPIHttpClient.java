@@ -72,6 +72,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -1398,6 +1399,50 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    public List<AnalyticsIterator<Record>> searchWithAggregates(int tenantId, String username,
+                                                          AggregateRequest[] aggregateRequests,
+                                                          boolean securityEnabled) {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
+                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SEARCH_MULTITABLES_WITH_AGGREGATES_OPERATION)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
+        try {
+            HttpPost postMethod = new HttpPost(builder.build().toString());
+            postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
+            postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(aggregateRequests)));
+            HttpResponse httpResponse = httpClient.execute(postMethod);
+            String response = getResponseString(httpResponse);
+            if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                throw new AnalyticsServiceUnauthorizedException("Error while searching with aggregates. " + response);
+            } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                throw new AnalyticsServiceException("Error while searching with aggregates. " + response);
+            } else {
+                Object aggregateObjs = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                List<AnalyticsIterator<Record>> iterators;
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
+                if (aggregateObjs != null && aggregateObjs instanceof List) {
+                    List<List<Record>> aggregatedRecords = (List<List<Record>>) aggregateObjs;
+                    iterators = new ArrayList<>();
+                    for (List<Record> aggregateRecordsPerTable : aggregatedRecords) {
+                        iterators.add(new RecordIterator(aggregateRecordsPerTable));
+                    }
+                    return iterators;
+                } else {
+                    throw new AnalyticsServiceException("Error while reading MultiTable Aggregate response.. (unknown format or null..)");
+                }
+            }
+        } catch (URISyntaxException e) {
+            throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AnalyticsServiceException("Error while connecting to the remote service. " + e.getMessage(), e);
+        }
+    }
+
     public void reIndex(int tenantId, String username, String tableName, long startTime, long endTime,
                         boolean securityEnabled) {
         URIBuilder builder = new URIBuilder();
@@ -1426,6 +1471,47 @@ public class AnalyticsAPIHttpClient {
             throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
             throw new AnalyticsServiceException("Error while connecting to the remote service. " + e.getMessage(), e);
+        }
+    }
+
+    private class RecordIterator implements AnalyticsIterator<Record> {
+
+        private List<Record> records;
+        private Iterator<Record> iterator;
+
+        public RecordIterator(List<Record> records) {
+            this.records = records;
+        }
+
+        @Override
+        public void close() throws IOException {
+            // ignored
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (records == null || records.isEmpty()) {
+                return false;
+            } else {
+                if (iterator == null) {
+                    iterator = records.iterator();
+                }
+                return iterator.hasNext();
+            }
+        }
+
+        @Override
+        public Record next() {
+            if (this.hasNext()) {
+                return iterator.next();
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public void remove() {
+           //ignored
         }
     }
 }

@@ -59,6 +59,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -876,6 +877,17 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
+    public List<AnalyticsIterator<Record>> searchWithAggregates(int tenantId,
+                                                          AggregateRequest[] aggregateRequests)
+            throws AnalyticsException {
+        List<AnalyticsIterator<Record>> iterators = new ArrayList<>();
+        for (AggregateRequest request : aggregateRequests) {
+            iterators.add(this.searchWithAggregates(tenantId, request));
+        }
+        return iterators;
+    }
+
+    @Override
     public void reIndex(int tenantId, String tableName, long startTime, long endTime)
             throws AnalyticsException {
         String table = GenericUtils.normalizeTableName(tableName);
@@ -996,6 +1008,65 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             this.schema = schema;
         }
         
+    }
+
+    public static class MultiTableAggregateIterator implements AnalyticsIterator<Record> {
+
+        private AnalyticsIterator<Record> currentItr;
+        private List<AnalyticsIterator<Record>> iterators;
+
+        public MultiTableAggregateIterator(List<AnalyticsIterator<Record>> iterators)
+                throws AnalyticsException {
+            this.iterators = iterators;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (iterators == null) {
+                return false;
+            } else {
+                if (currentItr == null) {
+                    if (!iterators.isEmpty()) {
+                        currentItr = iterators.remove(0);
+                        return this.hasNext();
+                    } else {
+                        return false;
+                    }
+                } else {
+                    if (!currentItr.hasNext()) {
+                        if (!iterators.isEmpty()) {
+                            currentItr = iterators.remove(0);
+                            return this.hasNext();
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        @Override
+        public Record next() {
+            if (this.hasNext()) {
+                return currentItr.next();
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public void remove() {
+            /* ignored */
+        }
+
+        @Override
+        public void close() throws IOException {
+            for (AnalyticsIterator<Record> iterator : iterators) {
+                iterator.close();
+            }
+        }
     }
     
 }

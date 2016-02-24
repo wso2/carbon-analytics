@@ -794,6 +794,27 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
+    public List<AnalyticsIterator<Record>> searchWithAggregates(String username,
+                                                                AggregateRequest[] aggregateRequests)
+            throws AnalyticsException {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
+            return ServiceHolder.getSecureAnalyticsDataService().searchWithAggregates(username, aggregateRequests);
+        } else {
+            try {
+                AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                             analyticsDataConfiguration.getPassword());
+                return AnalyticsAPIHttpClient.getInstance().searchWithAggregates(MultitenantConstants.INVALID_TENANT_ID,
+                                                                                 username, aggregateRequests, true);
+            } catch (AnalyticsServiceUnauthorizedException ex) {
+                AnalyticsAPIHttpClient.getInstance().invalidateSessionAndAuthenticate(analyticsDataConfiguration.
+                        getUsername(), analyticsDataConfiguration.getPassword());
+                return AnalyticsAPIHttpClient.getInstance().searchWithAggregates(MultitenantConstants.INVALID_TENANT_ID,
+                                                                                 username, aggregateRequests, true);
+            }
+        }
+    }
+
+    @Override
     public void reIndex(String username, String tableName, long startTime, long endTime)
             throws AnalyticsException {
         if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
@@ -987,6 +1008,27 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
                         getUsername(), analyticsDataConfiguration.getPassword());
                 return AnalyticsAPIHttpClient.getInstance().searchWithAggregates(tenantId,
                         null, aggregateRequest, false);
+            }
+        }
+    }
+
+    @Override
+    public List<AnalyticsIterator<Record>> searchWithAggregates(int tenantId,
+                                                                AggregateRequest[] aggregateRequests)
+            throws AnalyticsException {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
+            return ServiceHolder.getAnalyticsDataService().searchWithAggregates(tenantId, aggregateRequests);
+        } else {
+            try {
+                AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                             analyticsDataConfiguration.getPassword());
+                return AnalyticsAPIHttpClient.getInstance().searchWithAggregates(tenantId,
+                                                                                 null, aggregateRequests, false);
+            } catch (AnalyticsServiceUnauthorizedException ex) {
+                AnalyticsAPIHttpClient.getInstance().invalidateSessionAndAuthenticate(analyticsDataConfiguration.
+                        getUsername(), analyticsDataConfiguration.getPassword());
+                return AnalyticsAPIHttpClient.getInstance().searchWithAggregates(tenantId,
+                                                                                 null, aggregateRequests, false);
             }
         }
     }

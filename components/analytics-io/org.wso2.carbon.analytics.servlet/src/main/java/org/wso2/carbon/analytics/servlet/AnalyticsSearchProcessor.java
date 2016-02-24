@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.commons.collections.IteratorUtils;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateField;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -183,6 +184,9 @@ public class AnalyticsSearchProcessor extends HttpServlet {
             } else if (operation != null && operation.trim()
                     .equalsIgnoreCase(AnalyticsAPIConstants.DRILL_DOWN_SEARCH_RANGE_COUNT_OPERATION)) {
                 doDrillDownRangeCount(req, resp, securityEnabled, tenantIdParam, userName);
+            } else if (operation != null && operation.trim()
+                    .equalsIgnoreCase(AnalyticsAPIConstants.SEARCH_MULTITABLES_WITH_AGGREGATES_OPERATION)) {
+                doSearchMultiTablesWithAggregates(req, resp, securityEnabled, tenantIdParam, userName);
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
                         + " with get request!");
@@ -262,6 +266,29 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                 ranges = ServiceHolder.getSecureAnalyticsDataService().drillDownRangeCount(userName, drillDownRequest);
             }
             GenericUtils.serializeObject(ranges, resp.getOutputStream());
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } catch (AnalyticsException e) {
+            resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+        }
+    }
+
+    private void doSearchMultiTablesWithAggregates(HttpServletRequest req, HttpServletResponse resp,
+                                       boolean securityEnabled, int tenantIdParam, String userName)
+            throws IOException {
+        ServletInputStream servletInputStream = req.getInputStream();
+        try {
+            AggregateRequest[] requests = (AggregateRequest[]) GenericUtils.deserializeObject(servletInputStream);
+            List<AnalyticsIterator<Record>> iterators;
+            if (!securityEnabled) {
+                iterators = ServiceHolder.getAnalyticsDataService().searchWithAggregates(tenantIdParam, requests);
+            } else {
+                iterators = ServiceHolder.getSecureAnalyticsDataService().searchWithAggregates(userName, requests);
+            }
+            List<List<Record>> aggregatedRecords = new ArrayList<>();
+            for (AnalyticsIterator<Record> iterator : iterators) {
+                aggregatedRecords.add(IteratorUtils.toList(iterator));
+            }
+            GenericUtils.serializeObject(aggregatedRecords, resp.getOutputStream());
             resp.setStatus(HttpServletResponse.SC_OK);
         } catch (AnalyticsException e) {
             resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
