@@ -529,9 +529,29 @@ public class Utils {
         return analyticsAggregateFields;
     }
 
-    public static List createList(AnalyticsIterator<Record> iterator) {
+    public static List<Record> createList(AnalyticsIterator<Record> iterator) {
         List<Record> records = new ArrayList<>();
         records.addAll(IteratorUtils.toList(iterator));
         return records;
+    }
+
+    public static AggregateRequest[] getAggregateRequests(
+            AggregateRequestBean[] aggregateRequests) {
+        List<AggregateRequest> requests = new ArrayList<>();
+        if (aggregateRequests != null) {
+            for (AggregateRequestBean requestBean : aggregateRequests) {
+                requests.add(getAggregateRequest(requestBean));
+            }
+        }
+        return requests.toArray(new AggregateRequest[requests.size()]);
+    }
+
+    public static List<List<RecordBean>> getAggregatedRecordsForMultipleTables(
+            List<AnalyticsIterator<Record>> iterators) {
+        List<List<RecordBean>> aggregatedRecords = new ArrayList<>();
+        for (AnalyticsIterator<Record> iterator : iterators) {
+            aggregatedRecords.add(getRecordBeans(createList(iterator)));
+        }
+        return aggregatedRecords;
     }
 }

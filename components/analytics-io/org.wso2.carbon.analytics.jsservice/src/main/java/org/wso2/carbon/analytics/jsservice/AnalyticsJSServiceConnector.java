@@ -31,6 +31,7 @@ import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -374,6 +375,36 @@ public class AnalyticsJSServiceConnector {
                 return handleResponse(ResponseStatus.FAILED,
                                       "Failed to perform search with aggregate on table: " + tableName + ": " +
                                       e.getMessage());
+            }
+        } else {
+            return handleResponse(ResponseStatus.FAILED, "Search parameters are not provided");
+        }
+    }
+
+    public ResponseBean searchMultiTablesWithAggregates(String username, String requestsAsString) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking search with aggregate for multiple tables");
+        }
+        if (requestsAsString != null && !requestsAsString.isEmpty()) {
+            try {
+                Type aggregateRequestsType = new TypeToken<AggregateRequestBean[]>(){}.getType();
+                AggregateRequestBean[] aggregateRequests = gson.fromJson(requestsAsString, aggregateRequestsType);
+                AggregateRequest[] requests = Utils.getAggregateRequests(aggregateRequests);
+                List<AnalyticsIterator<Record>> iterators = analyticsDataAPI.searchWithAggregates(username, requests);
+                List<List<RecordBean>> aggregatedRecords = Utils.getAggregatedRecordsForMultipleTables(iterators);
+                if (logger.isDebugEnabled()) {
+                    for (List<RecordBean> recordsPerTable : aggregatedRecords) {
+                        for (RecordBean recordBean : recordsPerTable) {
+                            logger.debug("Search Result -- Record Id: " + recordBean.getId() + " values :" +
+                                         recordBean.toString());
+                        }
+                    }
+                }
+                return handleResponse(ResponseStatus.SUCCESS, gson.toJson(aggregatedRecords));
+            } catch (Exception e) {
+                logger.error("Failed to perform search with aggregate on multiple tables: " + e.getMessage(), e);
+                return handleResponse(ResponseStatus.FAILED,
+                                      "Failed to perform search with aggregate on multiple tables: " + e.getMessage());
             }
         } else {
             return handleResponse(ResponseStatus.FAILED, "Search parameters are not provided");

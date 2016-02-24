@@ -450,7 +450,7 @@ public class Utils {
 
     public static AggregateRequest[] createAggregateRequests(AggregateRequestBean[] aggregateRequestBeans) {
         List<AggregateRequest> requests = new ArrayList<>();
-        if (aggregateRequestBeans != null && aggregateRequestBeans.length != 0) {
+        if (aggregateRequestBeans != null) {
             for (AggregateRequestBean requestBean : aggregateRequestBeans) {
                 requests.add(createAggregateRequest(requestBean));
             }
