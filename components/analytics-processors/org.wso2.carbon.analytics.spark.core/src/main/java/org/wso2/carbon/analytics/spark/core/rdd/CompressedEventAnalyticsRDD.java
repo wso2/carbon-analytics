@@ -193,9 +193,10 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
             Map<String, Object> recordVals = record.getValues();
             try {
                 if (recordVals.get(AnalyticsConstants.DATA_COLUMN) != null) {
-                    JSONObject eventsAggregated = new JSONObject(recordVals.get(AnalyticsConstants.DATA_COLUMN).toString());
+                    JSONObject eventsAggregated = new JSONObject(recordVals.get(AnalyticsConstants.DATA_COLUMN)
+                        .toString());
                     JSONArray eventsArray = eventsAggregated.getJSONArray(AnalyticsConstants.JSON_FIELD_EVENTS);
-                    Map <Integer, Map<String,String>> payloadsMap = null;
+                    Map<Integer, Map<String, String>> payloadsMap = null;
                     if (eventsAggregated.has(AnalyticsConstants.JSON_FIELD_PAYLOADS)) {
                         JSONArray payloadsArray = eventsAggregated.getJSONArray(AnalyticsConstants.JSON_FIELD_PAYLOADS);
                         payloadsMap = getPayloadsAsMap(payloadsArray);
@@ -204,8 +205,9 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
 
                     // Iterate over the array of events
                     for (int j = 0; j < eventsArray.length(); j++) {
-                        //Create a row with extended fields
-                        tempRows.add(RowFactory.create(getFieldValues(messageFlowId, eventsArray.getJSONObject(j), payloadsMap, j)));
+                        // Create a row with extended fields
+                        tempRows.add(RowFactory.create(getFieldValues(messageFlowId, eventsArray.getJSONObject(j),
+                            payloadsMap, j)));
                     }
                 } else {
                     Map<String, Object> rowVals = new LinkedHashMap<String, Object>();
@@ -226,36 +228,38 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
          * @param eventIndex    Index of the current event
          * @return              Array of values of the fields in the event
          */
-        private Object[] getFieldValues(String messageFlowId, JSONObject event, Map <Integer, Map<String,String>> payloadsMap, int eventIndex) {
-                Map<String, Object> extendedRowVals = new LinkedHashMap<String, Object>();
-                // Iterate over new (split) fields and add them
-                try {
-                    for (int k = 0 ; k < outputColumns.size() ; k++) {
-                        // Add the component index
-                        if (outputColumns.get(k).equalsIgnoreCase(AnalyticsConstants.COMPONENT_INDEX)) {
-                            extendedRowVals.put(outputColumns.get(k), eventIndex);
-                        } else if (outputColumns.get(k).equalsIgnoreCase(AnalyticsConstants.JSON_FIELD_MESSAGE_FLOW_ID)) {
-                            // Add the event flow ID
-                            extendedRowVals.put(outputColumns.get(k), messageFlowId);
-                        } else if (event.has(outputColumns.get(k))) {
-                            String fieldValue = event.getString(outputColumns.get(k));
-                            if (fieldValue == null || "null".equalsIgnoreCase(fieldValue)) {
-                                if (payloadsMap != null && payloadsMap.containsKey(eventIndex)) {
-                                    extendedRowVals.put(outputColumns.get(k), payloadsMap.get(eventIndex).get(outputColumns.get(k)));
-                                } else {
-                                    extendedRowVals.put(outputColumns.get(k), null);
-                                }
+        private Object[] getFieldValues(String messageFlowId, JSONObject event,
+                Map<Integer, Map<String, String>> payloadsMap, int eventIndex) {
+            Map<String, Object> extendedRowVals = new LinkedHashMap<String, Object>();
+            // Iterate over new (split) fields and add them
+            try {
+                for (int k = 0; k < outputColumns.size(); k++) {
+                    // Add the component index
+                    if (outputColumns.get(k).equalsIgnoreCase(AnalyticsConstants.COMPONENT_INDEX)) {
+                        extendedRowVals.put(outputColumns.get(k), eventIndex);
+                    } else if (outputColumns.get(k).equalsIgnoreCase(AnalyticsConstants.JSON_FIELD_MESSAGE_FLOW_ID)) {
+                        // Add the event flow ID
+                        extendedRowVals.put(outputColumns.get(k), messageFlowId);
+                    } else if (event.has(outputColumns.get(k))) {
+                        String fieldValue = event.getString(outputColumns.get(k));
+                        if (fieldValue == null || "null".equalsIgnoreCase(fieldValue)) {
+                            if (payloadsMap != null && payloadsMap.containsKey(eventIndex)) {
+                                extendedRowVals.put(outputColumns.get(k), payloadsMap.get(eventIndex)
+                                    .get(outputColumns.get(k)));
                             } else {
-                                extendedRowVals.put(outputColumns.get(k), fieldValue);
+                                extendedRowVals.put(outputColumns.get(k), null);
                             }
                         } else {
-                            extendedRowVals.put(outputColumns.get(k), null);
+                            extendedRowVals.put(outputColumns.get(k), fieldValue);
                         }
+                    } else {
+                        extendedRowVals.put(outputColumns.get(k), null);
                     }
-                    return extendedRowVals.values().toArray();
-                } catch (JSONException e) {
-                    throw new RuntimeException("Error occured while splitting the record to rows: " + e.getMessage(), e);
                 }
+                return extendedRowVals.values().toArray();
+            } catch (JSONException e) {
+                throw new RuntimeException("Error occured while splitting the record to rows: " + e.getMessage(), e);
+            }
         }
         
         /**
