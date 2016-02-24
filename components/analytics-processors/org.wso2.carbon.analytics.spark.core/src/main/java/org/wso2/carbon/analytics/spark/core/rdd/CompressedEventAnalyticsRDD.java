@@ -23,6 +23,7 @@ import static scala.collection.JavaConversions.asScalaIterator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -210,8 +211,7 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
                             payloadsMap, j)));
                     }
                 } else {
-                    Map<String, Object> rowVals = new LinkedHashMap<String, Object>();
-                    tempRows.add(RowFactory.create(rowVals.values().toArray()));
+                    tempRows.add(RowFactory.create(Collections.emptyList().toArray()));
                 }
             } catch (JSONException e) {
                 throw new RuntimeException("Error occured while splitting the record to rows: " + e.getMessage(), e);
@@ -234,26 +234,25 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
             // Iterate over new (split) fields and add them
             try {
                 for (int k = 0; k < outputColumns.size(); k++) {
+                    String fieldName = outputColumns.get(k);
                     // Add the component index
-                    if (outputColumns.get(k).equalsIgnoreCase(AnalyticsConstants.COMPONENT_INDEX)) {
-                        extendedRowVals.put(outputColumns.get(k), eventIndex);
-                    } else if (outputColumns.get(k).equalsIgnoreCase(AnalyticsConstants.JSON_FIELD_MESSAGE_FLOW_ID)) {
+                    if (fieldName.equalsIgnoreCase(AnalyticsConstants.COMPONENT_INDEX)) {
+                        extendedRowVals.put(fieldName, eventIndex);
+                    } else if (fieldName.equalsIgnoreCase(AnalyticsConstants.JSON_FIELD_MESSAGE_FLOW_ID)) {
                         // Add the event flow ID
-                        extendedRowVals.put(outputColumns.get(k), messageFlowId);
-                    } else if (event.has(outputColumns.get(k))) {
-                        String fieldValue = event.getString(outputColumns.get(k));
-                        if (fieldValue == null || "null".equalsIgnoreCase(fieldValue)) {
+                        extendedRowVals.put(fieldName, messageFlowId);
+                    } else if (event.has(fieldName)) {
+                        if (event.isNull(fieldName)) {
                             if (payloadsMap != null && payloadsMap.containsKey(eventIndex)) {
-                                extendedRowVals.put(outputColumns.get(k), payloadsMap.get(eventIndex)
-                                    .get(outputColumns.get(k)));
+                                extendedRowVals.put(fieldName, payloadsMap.get(eventIndex).get(fieldName));
                             } else {
-                                extendedRowVals.put(outputColumns.get(k), null);
+                                extendedRowVals.put(fieldName, null);
                             }
                         } else {
-                            extendedRowVals.put(outputColumns.get(k), fieldValue);
+                            extendedRowVals.put(fieldName, event.get(fieldName));
                         }
                     } else {
-                        extendedRowVals.put(outputColumns.get(k), null);
+                        extendedRowVals.put(fieldName, null);
                     }
                 }
                 return extendedRowVals.values().toArray();
