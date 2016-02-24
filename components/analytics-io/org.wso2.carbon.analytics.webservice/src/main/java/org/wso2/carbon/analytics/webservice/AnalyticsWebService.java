@@ -33,6 +33,7 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.webservice.beans.AggregateResponse;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsAggregateRequest;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRangeBean;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRequestBean;
@@ -202,6 +203,28 @@ public class AnalyticsWebService extends AbstractAdmin {
                          e.getMessage(), e);
             throw new AnalyticsWebServiceException("unable to search with aggregates: " + request.getTableName() +
                                                    ", " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Returns a list of records containing the aggregate values computed over the given fields map
+     * , grouped by a predefined FACET field for multiple tables.
+     * @param requests The Array of AnalyticsAggregateRequests representing multiple tables
+     * groupByField is used to group the records. It should be a facet field created by the grouping fields.
+     * fields attribute represents the record fields and the respective aggregate function.
+     * aliases represents the output field names for aggregated values over the fields.
+     * @return Array of AggregatedObjects containing arrays of records of which the record values will be the aggregate values of the given fields
+     */
+    public AggregateResponse[] searchMultiTablesWithAggregates(AnalyticsAggregateRequest[] requests)
+            throws AnalyticsWebServiceException {
+        try {
+            AggregateRequest[] aggregateRequest = Utils.getAggregateRequests(requests);
+            List<AnalyticsIterator<Record>> iterators = analyticsDataAPI.searchWithAggregates(getUsername(), aggregateRequest);
+            AggregateResponse[] responses = Utils.createAggregateResponses(iterators);
+            return responses;
+        } catch (Exception e) {
+            logger.error("unable to search with aggregates for  multiple tables: " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("unable to search with aggregates for multiple tables: " + e.getMessage(), e);
         }
     }
 

@@ -24,6 +24,7 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.webservice.beans.AggregateResponse;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsAggregateField;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsAggregateRequest;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsCategoryPathBean;
@@ -575,5 +576,31 @@ public class Utils {
         List<Record> records = new ArrayList<>();
         records.addAll(IteratorUtils.toList(iterator));
         return records;
+    }
+
+    public static AggregateRequest[] getAggregateRequests(AnalyticsAggregateRequest[] requests) {
+        List<AggregateRequest> aggregateRequests = new ArrayList<>();
+        if (requests != null) {
+           for (AnalyticsAggregateRequest request : requests) {
+               aggregateRequests.add(getAggregateRequest(request));
+           }
+        }
+        return aggregateRequests.toArray(new AggregateRequest[aggregateRequests.size()]);
+    }
+
+    public static AggregateResponse[] createAggregateResponses(
+            List<AnalyticsIterator<Record>> iterators) {
+        List<AggregateResponse> responses = new ArrayList<>();
+        for (AnalyticsIterator<Record> iterator : iterators) {
+            AggregateResponse response;
+            List<Record> records = Utils.createList(iterator);
+            if (!records.isEmpty()) {
+                response = new AggregateResponse();
+                response.setTableName(records.get(0).getTableName());
+                response.setRecordBeans(records.toArray(new RecordBean[records.size()]));
+                responses.add(response);
+            }
+        }
+        return responses.toArray(new AggregateResponse[responses.size()]);
     }
 }
