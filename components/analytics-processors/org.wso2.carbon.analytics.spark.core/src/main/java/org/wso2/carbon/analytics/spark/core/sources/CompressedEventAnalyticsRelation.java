@@ -18,47 +18,32 @@
 
 package org.wso2.carbon.analytics.spark.core.sources;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.DataFrame;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.RowFactory;
-import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.sources.BaseRelation;
-import org.apache.spark.sql.sources.InsertableRelation;
-import org.apache.spark.sql.sources.TableScan;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
-import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
-import org.wso2.carbon.analytics.spark.core.rdd.AnalyticsRDD;
-import org.wso2.carbon.analytics.spark.core.rdd.CompressedEventAnalyticsRDD;
-import org.wso2.carbon.analytics.spark.core.util.CarbonScalaUtils;
-
-import scala.reflect.ClassTag$;
+import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.extractFieldsFromColumns;
+import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.isEmptyAnalyticsSchema;
+import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.isEmptySchema;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
-import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.extractFieldsFromColumns;
-import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.extractFieldsFromString;
-import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.isEmptyAnalyticsSchema;
-import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.isEmptySchema;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.sources.BaseRelation;
+import org.apache.spark.sql.sources.InsertableRelation;
+import org.apache.spark.sql.sources.TableScan;
+import org.apache.spark.sql.types.StructType;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
+import org.wso2.carbon.analytics.spark.core.rdd.CompressedEventAnalyticsRDD;
+import org.wso2.carbon.analytics.spark.core.util.CarbonScalaUtils;
+
+import scala.reflect.ClassTag$;
 
 /**
  * This class represents a Spark SQL relation with respect to the Analytics Data Service.
@@ -71,29 +56,26 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
     private StructType schema;
     private int tenantId;
     private String tableName;
-    private String dataColumn;
     private boolean schemaMerge;
     private String recordStore;
-    private AnalyticsDataService dataService;
-
+    
     public CompressedEventAnalyticsRelation() {
     }
 
     /**
-     * Creates a relation between the spark table and physical DB table
+     * Creates a relation between the spark table and physical DB table.
      * 
      * @param tenantId      Tenant ID
-     * @param recordStore
+     * @param recordStore   Record Store name
      * @param tableName     Name of the table
      * @param sqlContext    Spark SQl Context
      */
-    public CompressedEventAnalyticsRelation(int tenantId, String recordStore, String tableName, String dataColumn,
+    public CompressedEventAnalyticsRelation(int tenantId, String recordStore, String tableName,
             boolean schemaMerge, SQLContext sqlContext) {
         this.tenantId = tenantId;
         this.recordStore = recordStore;
         this.tableName = tableName;
         this.sqlContext = sqlContext;
-        this.dataColumn = dataColumn;
         this.schemaMerge = schemaMerge;
 
         try {
@@ -114,7 +96,7 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
     }
 
     /**
-     * Creates a relation between the spark table and physical DB table
+     * Creates a relation between the spark table and physical DB table.
      * 
      * @param tenantId      Tenant ID
      * @param recordStore   Record Store name
@@ -122,17 +104,15 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
      * @param sqlContext    Spark SQL Context
      * @param schema        Schema of the Table
      */
-    public CompressedEventAnalyticsRelation(int tenantId, String recordStore, String tableName, String dataColumn,
+    public CompressedEventAnalyticsRelation(int tenantId, String recordStore, String tableName,
             boolean schemaMerge, SQLContext sqlContext, StructType schema) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.recordStore = recordStore;
         this.sqlContext = sqlContext;
         this.schema = schema;
-        this.dataColumn = dataColumn;
         this.schemaMerge = schemaMerge;
     }
-
 
     @SuppressWarnings("unchecked")
     @Override
@@ -143,14 +123,8 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
             throw new RuntimeException(msg);
         }
         return new CompressedEventAnalyticsRDD(this.tenantId, this.tableName, new ArrayList<>(Arrays.asList(this.schema
-            .fieldNames())), this.dataColumn, this.schemaMerge, this.sqlContext.sparkContext(),
+            .fieldNames())), this.schemaMerge, this.sqlContext.sparkContext(),
             scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<Row> apply(Row.class));
-    }
-
-    private void logDebug(String s) {
-        if (log.isDebugEnabled()) {
-            log.debug(s);
-        }
     }
 
     @Override

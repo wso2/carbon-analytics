@@ -39,10 +39,10 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import scala.collection.immutable.Map;
 import scala.runtime.AbstractFunction0;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -51,7 +51,7 @@ import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.str
 
 /**
  * This class allows spark to communicate with the the Analytics Dataservice when used in Spark SQL
- * with the 'USING' keyword
+ * with the 'USING' keyword.
  */
 public class CompressedEventAnalyticsRelationProvider implements RelationProvider, SchemaRelationProvider, Serializable {
 
@@ -62,11 +62,9 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
     private String tableName;
     private String schemaString;
     private String streamName;
-    private String primaryKeys;
     private AnalyticsDataService dataService;
     private String recordStore;
     private boolean mergeFlag;
-    private String dataColumn;
 
     public CompressedEventAnalyticsRelationProvider() {
         this.dataService = ServiceHolder.getAnalyticsDataService();
@@ -93,40 +91,39 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
         if (isSchemaProvided()) {
             try {
                 return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, 
-                    this.dataColumn, this.mergeFlag, sqlContext, generateSchema());
+                    this.mergeFlag, sqlContext, generateSchema());
             } catch (AnalyticsExecutionException e) {
                 String msg = "Error while generating the schema for the table : " + this.tableName + " : " + e.getMessage();
                 log.error(msg, e);
                 throw new RuntimeException(msg, e);
             }
         } else {
-            return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, this.dataColumn, 
+            return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, 
                 this.mergeFlag, sqlContext);
         }
     }
     
 
     /**
-     * Set the parameters passed in the spark script
+     * Set the parameters passed in the spark script.
      * 
      * @param parameters    Map of parameters
      */
     private void setParameters(Map<String, String> parameters) {
-        this.tenantId = Integer.parseInt(extractValuesFromMap(AnalyticsConstants.TENANT_ID, parameters, "-1234"));
+        this.tenantId = Integer.parseInt(extractValuesFromMap(AnalyticsConstants.TENANT_ID, parameters, 
+            String.valueOf(MultitenantConstants.SUPER_TENANT_ID)));
         this.tableName = extractValuesFromMap(AnalyticsConstants.TABLE_NAME, parameters, "");
         this.schemaString = extractValuesFromMap(AnalyticsConstants.SCHEMA_STRING, parameters, "");
         this.streamName = extractValuesFromMap(AnalyticsConstants.STREAM_NAME, parameters, "");
-        this.primaryKeys = extractValuesFromMap(AnalyticsConstants.PRIMARY_KEYS, parameters, "");
         this.recordStore = extractValuesFromMap(AnalyticsConstants.RECORD_STORE, parameters,
                 AnalyticsConstants.DEFAULT_PROCESSED_DATA_STORE_NAME);
         this.mergeFlag = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.MERGE_SCHEMA, parameters,
                 "false"));
-        this.dataColumn = extractValuesFromMap(AnalyticsConstants.DATA_COLUMN,parameters, "");
     }
 
     
     /**
-     * Create a temporary table if not exists
+     * Create a temporary table if not exists.
      * 
      * @throws AnalyticsExecutionException
      */
@@ -163,17 +160,16 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
         }
     }
 
+    /**
+     * Generate the schema for the output spark table.
+     * 
+     * @return  Schema for the output spark table
+     * @throws  AnalyticsExecutionException
+     */
     private StructType generateSchema() throws AnalyticsExecutionException {
         logDebug("Schema is provided, hence setting the schema in the analytics data service");
         List<ColumnDefinition> colList = this.createColumnDefinitionsFromString(this.schemaString);
-        List<String> pKeyList;
-        if (!this.primaryKeys.isEmpty()) {
-            pKeyList = this.createPrimaryKeyList(this.primaryKeys);
-        } else {
-            logDebug("No primary keys present, hence setting an empty list");
-            pKeyList = Collections.emptyList();
-        }
-
+        List<String> pKeyList = Collections.emptyList();
         AnalyticsSchema finalSchema = new AnalyticsSchema(colList, pKeyList);
         if (this.mergeFlag) {
             logDebug("MergeSchema flag is set. Hence merging the schema with the existing schema");
@@ -202,13 +198,11 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
         }
         return schemaStruct;
     }
-
     
     private boolean isSchemaProvided() {
         return !this.schemaString.isEmpty();
     }
 
-    
     private String extractValuesFromMap(String key, Map<String, String> map, final String defaultVal) {
         return map.getOrElse(key, new AbstractFunction0<String>() {
             public String apply() {
@@ -218,8 +212,8 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
     }
 
     /**
-     * this method creates a list of column definitions, which will be used to set the schema in the
-     * analytics data service. additionally, it creates a structType object for spark schema
+     * This method creates a list of column definitions, which will be used to set the schema in the
+     * analytics data service. Additionally, it creates a structType object for spark schema.
      *
      * @param colsStr   String containing comma separated column names
      * @return          A List of column definitions
@@ -277,11 +271,6 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
         return false;
     }
 
-    
-    private List<String> createPrimaryKeyList(String primaryKeyStr) {
-        return new ArrayList<>(Arrays.asList(primaryKeyStr.trim().split("\\s*,\\s*")));
-    }
-
     /**
      * Returns a new base relation with the given parameters and user defined schema.
      * Note: the parameters' keywords are case insensitive and this insensitivity is enforced
@@ -314,10 +303,9 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }
-        return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, this.dataColumn,
-            this.mergeFlag, sqlContext, schema);
+        return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, this.mergeFlag,
+            sqlContext, schema);
     }
-
 
     private void logDebug(String msg) {
         if (log.isDebugEnabled()) {

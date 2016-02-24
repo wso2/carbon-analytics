@@ -65,20 +65,29 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
     private List<String> outputColumns;
     private int tenantId;
     private String tableName;
-    private String dataColumn;
 
     public CompressedEventAnalyticsRDD() {
         super(null, null, null);
     }
 
-    public CompressedEventAnalyticsRDD(int tenantId, String tableName, List<String> columns, String dataColumn, 
+    /**
+     * Create a Compressed Event Analytics RDD.
+     * 
+     * @param tenantId      Tenant ID
+     * @param tableName     Name of the associated table
+     * @param allColumns       List of allColumns to include in the rdd as fields
+     * @param mergeSchema   Flag to merge the existing schema and the defined schema
+     * @param sc            Spark Context
+     * @param deps          Scala Sequence
+     * @param evidence      Class Tag
+     */
+    public CompressedEventAnalyticsRDD(int tenantId, String tableName, List<String> columns, 
             boolean mergeSchema, SparkContext sc, Seq<Dependency<?>> deps, ClassTag<Row> evidence) {
         super(sc, deps, evidence);
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.allColumns = columns;
         this.outputColumns = new ArrayList<String>(columns);
-        this.dataColumn = dataColumn;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -92,7 +101,6 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-
     }
 
     @Override
@@ -114,8 +122,8 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
     @Override
     public Partition[] getPartitions() {
         AnalyticsDataResponse resp;
-        if (!this.dataColumn.isEmpty() && !this.allColumns.contains(this.dataColumn)) {
-            this.allColumns.add(this.dataColumn);
+        if (!this.allColumns.contains(AnalyticsConstants.DATA_COLUMN)) {
+            this.allColumns.add(AnalyticsConstants.DATA_COLUMN);
         }
         try {
             resp = ServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName,
@@ -142,7 +150,6 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
      * Row iterator implementation to act as an adaptor for a record iterator.
      */
     private class RowRecordIteratorAdaptor implements Iterator<Row>, Serializable {
-
         private static final long serialVersionUID = -8866801517386445810L;
         private Iterator<Record> recordItr;
         private Iterator<Row> rows;
@@ -153,96 +160,106 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
 
         @Override
         public boolean hasNext() {
-            if (rows == null) {
-                return this.recordItr.hasNext();
+            if (this.rows == null && this.recordItr.hasNext()) {
+                this.rows = this.recordToRows(this.recordItr.next());
             }
-            if (!rows.hasNext() && this.recordItr.hasNext()) {
-                recordToRows(this.recordItr.next());
+            if (this.rows == null) {
+                return false;
             }
-            return rows.hasNext();
+            if (this.rows.hasNext()) {
+                return true;
+            } else {
+                this.rows = null;
+                return this.hasNext();
+            }
         }
 
         @Override
         public Row next() {
-            if (rows == null || !rows.hasNext()) {
-                if (!this.recordItr.hasNext()) {
-                    return null;
-                } else {
-                    recordToRows(this.recordItr.next());
-                }
+            if (this.hasNext()) {
+                return this.rows.next();
+            } else {
+                return null;
             }
-            return rows.next();
         }
 
         /**
-         * Converts a DB record to Spark Row. Create one ore more rows from a single record.
+         * Converts a DB record to Spark Row(s). Create one ore more rows from a single record.
          * 
          * @param record    Record to be converted to row(s)
          */
-        private void recordToRows(Record record) {
+        private Iterator<Row> recordToRows(Record record) {
             List<Row> tempRows = new ArrayList<Row>();
             Map<String, Object> recordVals = record.getValues();
             try {
-                if (recordVals.get(dataColumn) != null) {
-                    JSONObject eventsAggregated = new JSONObject(recordVals.get(dataColumn).toString());
+                if (recordVals.get(AnalyticsConstants.DATA_COLUMN) != null) {
+                    JSONObject eventsAggregated = new JSONObject(recordVals.get(AnalyticsConstants.DATA_COLUMN).toString());
                     JSONArray eventsArray = eventsAggregated.getJSONArray(AnalyticsConstants.JSON_FIELD_EVENTS);
-                    
                     Map <Integer, Map<String,String>> payloadsMap = null;
                     if (eventsAggregated.has(AnalyticsConstants.JSON_FIELD_PAYLOADS)) {
                         JSONArray payloadsArray = eventsAggregated.getJSONArray(AnalyticsConstants.JSON_FIELD_PAYLOADS);
                         payloadsMap = getPayloadsAsMap(payloadsArray);
                     }
-                   
-                    String [] extendedFieldNames = JSONObject.getNames(eventsArray.getJSONObject(0));
-                    Map<String, Object> existingRowVals = new LinkedHashMap<String, Object>();
-                   
-                    // Iterate over existing fields
-                    for (int i = 0; i < outputColumns.size(); i++) {
-                        if (outputColumns.get(i).equals(AnalyticsConstants.TIMESTAMP_FIELD)) {
-                            existingRowVals.put(outputColumns.get(i), record.getTimestamp());
-                        } else {
-                            existingRowVals.put(outputColumns.get(i), recordVals.get(outputColumns.get(i)));
-                        }
-                    }
+                    String messageFlowId = eventsAggregated.getString(AnalyticsConstants.JSON_FIELD_MESSAGE_FLOW_ID);
+
                     // Iterate over the array of events
                     for (int j = 0; j < eventsArray.length(); j++) {
-                        Map<String, Object> extendedRowVals = new LinkedHashMap<String, Object>(existingRowVals);
-                        // Iterate over new (split) fields and add them
-                        for (int k = 0 ; k < extendedFieldNames.length ; k++) {
-                            String fieldValue = eventsArray.getJSONObject(j).getString(extendedFieldNames[k]);
-                            if (fieldValue == null || "null".equalsIgnoreCase(fieldValue)) {
-                                if (payloadsMap != null && payloadsMap.containsKey(j)) {
-                                    extendedRowVals.put(extendedFieldNames[k], payloadsMap.get(j).get(extendedFieldNames[k]));
-                                } else {
-                                    extendedRowVals.put(extendedFieldNames[k], null);
-                                }
-                            } else {
-                                extendedRowVals.put(extendedFieldNames[k], fieldValue);
-                            }
-                        }
-                        //Create a row with existing fields and extended fields
-                        tempRows.add(RowFactory.create(extendedRowVals.values().toArray()));
+                        //Create a row with extended fields
+                        tempRows.add(RowFactory.create(getFieldValues(messageFlowId, eventsArray.getJSONObject(j), payloadsMap, j)));
                     }
                 } else {
                     Map<String, Object> rowVals = new LinkedHashMap<String, Object>();
-                    for (int i = 0; i < outputColumns.size(); i++) {
-                        if (outputColumns.get(i).equals(AnalyticsConstants.TIMESTAMP_FIELD)) {
-                            rowVals.put(outputColumns.get(i), record.getTimestamp());
-                        } else {
-                            rowVals.put(outputColumns.get(i), recordVals.get(outputColumns.get(i)));
-                        }
-                    }
                     tempRows.add(RowFactory.create(rowVals.values().toArray()));
                 }
             } catch (JSONException e) {
                 throw new RuntimeException("Error occured while splitting the record to rows: " + e.getMessage(), e);
             }
-            rows = tempRows.iterator();
+            return tempRows.iterator();
         }
-
         
         /**
-         * Convert json payload to map
+         * Get the values of each field of an event, as an Array.
+         * 
+         * @param messageFlowId ID of the message flow
+         * @param event         Current event 
+         * @param payloadsMap   Payloads Map
+         * @param eventIndex    Index of the current event
+         * @return              Array of values of the fields in the event
+         */
+        private Object[] getFieldValues(String messageFlowId, JSONObject event, Map <Integer, Map<String,String>> payloadsMap, int eventIndex) {
+                Map<String, Object> extendedRowVals = new LinkedHashMap<String, Object>();
+                // Iterate over new (split) fields and add them
+                try {
+                    for (int k = 0 ; k < outputColumns.size() ; k++) {
+                        // Add the component index
+                        if (outputColumns.get(k).equalsIgnoreCase(AnalyticsConstants.COMPONENT_INDEX)) {
+                            extendedRowVals.put(outputColumns.get(k), eventIndex);
+                        } else if (outputColumns.get(k).equalsIgnoreCase(AnalyticsConstants.JSON_FIELD_MESSAGE_FLOW_ID)) {
+                            // Add the event flow ID
+                            extendedRowVals.put(outputColumns.get(k), messageFlowId);
+                        } else if (event.has(outputColumns.get(k))) {
+                            String fieldValue = event.getString(outputColumns.get(k));
+                            if (fieldValue == null || "null".equalsIgnoreCase(fieldValue)) {
+                                if (payloadsMap != null && payloadsMap.containsKey(eventIndex)) {
+                                    extendedRowVals.put(outputColumns.get(k), payloadsMap.get(eventIndex).get(outputColumns.get(k)));
+                                } else {
+                                    extendedRowVals.put(outputColumns.get(k), null);
+                                }
+                            } else {
+                                extendedRowVals.put(outputColumns.get(k), fieldValue);
+                            }
+                        } else {
+                            extendedRowVals.put(outputColumns.get(k), null);
+                        }
+                    }
+                    return extendedRowVals.values().toArray();
+                } catch (JSONException e) {
+                    throw new RuntimeException("Error occured while splitting the record to rows: " + e.getMessage(), e);
+                }
+        }
+        
+        /**
+         * Convert json payload to map.
          * 
          * @param payloadsArray     JSON Array containing payload details
          * @return                  map of payloads
@@ -251,19 +268,19 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
             Map<Integer, Map<String, String>> payloadsMap = new HashMap<Integer, Map<String, String>>();
             for (int i = 0; i < payloadsArray.length(); i++) {
                 try {
+                    String payload = payloadsArray.getJSONObject(i).getString(AnalyticsConstants.JSON_FIELD_PAYLOAD);
                     JSONArray eventRefs = payloadsArray.getJSONObject(i).getJSONArray(AnalyticsConstants.JSON_FIELD_EVENTS);
                     for (int j = 0; j < eventRefs.length(); j++) {
                         int eventIndex = eventRefs.getJSONObject(j).getInt(AnalyticsConstants.JSON_FIELD_EVENT_INDEX);
-                        if (payloadsMap.get(eventIndex) == null) {
+                        Map<String, String> existingPayloadMap = payloadsMap.get(eventIndex);
+                        if (existingPayloadMap == null) {
                             Map<String, String> attributesMap = new HashMap<String, String>();
                             attributesMap.put(eventRefs.getJSONObject(j).getString(AnalyticsConstants.
-                                JSON_FIELD_ATTRIBUTE), payloadsArray.getJSONObject(i).getString(AnalyticsConstants.
-                                JSON_FIELD_PAYLOAD));
+                                JSON_FIELD_ATTRIBUTE), payload);
                             payloadsMap.put(eventIndex, attributesMap);
                         } else {
-                            payloadsMap.get(eventIndex).put(eventRefs.getJSONObject(j).getString(AnalyticsConstants.
-                                JSON_FIELD_ATTRIBUTE),payloadsArray.getJSONObject(i).getString(AnalyticsConstants.
-                                JSON_FIELD_PAYLOAD));
+                            existingPayloadMap.put(eventRefs.getJSONObject(j).getString(AnalyticsConstants.
+                                JSON_FIELD_ATTRIBUTE), payload);
                         }
                     }
                 } catch (JSONException e) {
@@ -272,7 +289,6 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
             }
             return payloadsMap;
         }
-        
         
         @Override
         public void remove() {

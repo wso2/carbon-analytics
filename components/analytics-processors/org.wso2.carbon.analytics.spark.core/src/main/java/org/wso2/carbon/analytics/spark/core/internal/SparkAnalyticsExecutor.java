@@ -790,8 +790,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private boolean isCarbonQuery(String query) {
-        return query.contains(AnalyticsConstants.SPARK_SHORTHAND_STRING);
+        return (query.contains(AnalyticsConstants.SPARK_SHORTHAND_STRING) || query
+            .contains(AnalyticsConstants.COMPRESSED_EVENT_ANALYTICS_SHORTHAND));
     }
+    
 
     private String replaceShorthandStrings(String query) {
         Set<String> keys = this.shorthandStringsMap.keySet();
