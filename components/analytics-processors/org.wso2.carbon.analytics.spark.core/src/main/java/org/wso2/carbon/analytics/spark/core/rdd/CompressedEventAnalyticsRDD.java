@@ -214,7 +214,7 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
             try {
                 if (recordVals.get(AnalyticsConstants.DATA_COLUMN) != null) {
                     String eventsJson = recordVals.get(AnalyticsConstants.DATA_COLUMN).toString();
-                    if (recordVals.get(AnalyticsConstants.META_FIELD_COMPRESSED).equals(true)) {
+                    if ((Boolean) recordVals.get(AnalyticsConstants.META_FIELD_COMPRESSED)) {
                         eventsJson = decompress(eventsJson);
                     }
                     JSONObject eventsAggregated = new JSONObject(eventsJson);
@@ -341,9 +341,15 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
                 throw new RuntimeException("Error occured while decompressing events string: " + e.getMessage(), e);
             } finally {
                 try {
-                    byteInputStream.close();
-                    gzipInputStream.close();
-                    br.close();
+                    if (byteInputStream != null) {
+                        byteInputStream.close();
+                    }
+                    if (gzipInputStream != null) {
+                        gzipInputStream.close();
+                    }
+                    if (br != null) {
+                        br.close();
+                    }
                 } catch (IOException e) {
                     log.error("Error occured while closing streams: " + e.getMessage(), e);
                 }
