@@ -511,7 +511,7 @@ public class Utils {
         request.setGroupByField(aggregateRequest.getGroupByField());
         request.setQuery(aggregateRequest.getQuery());
         request.setTableName(aggregateRequest.getTableName());
-        request.setFields(createAggregateFieds(aggregateRequest.getFields()));
+        request.setFields(createAggregateFieds(aggregateRequest.getAggregateFields()));
         request.setAggregateLevel(aggregateRequest.getAggregateLevel());
         request.setParentPath(aggregateRequest.getParentPath());
         return request;

@@ -32,7 +32,7 @@ public class AggregateRequestBean {
     private String tableName;
     private String groupByField;
     private String query;
-    private List<AggregateField> fields;
+    private List<AggregateField> aggregateFields;
     private int aggregateLevel;
     private List<String> parentPath;
 
@@ -63,12 +63,12 @@ public class AggregateRequestBean {
         this.query = query;
     }
 
-    public List<AggregateField> getFields() {
-        return fields;
+    public List<AggregateField> getAggregateFields() {
+        return aggregateFields;
     }
 
-    public void setFields(List<AggregateField> fields) {
-        this.fields = fields;
+    public void setAggregateFields(List<AggregateField> aggregateFields) {
+        this.aggregateFields = aggregateFields;
     }
 
     public int getAggregateLevel() {

@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
+import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskManager;
@@ -31,6 +32,9 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class holds the OSGI services registered with Declarative service component.
@@ -55,6 +59,8 @@ public class ServiceHolder {
     private static TenantRegistryLoader tenantRegistryLoader;
     
     private static SparkAnalyticsExecutor analyticskExecutor;
+
+    private static List<Object> carbonUDFs = new ArrayList<>();
 
     private static boolean analyticsExecutionEnabled = true;
 
@@ -152,5 +158,13 @@ public class ServiceHolder {
         ServiceHolder.analyticsStatsEnabled = analyticsStatsEnabled;
     }
 
-
+    public static void addCarbonUDFs(CarbonUDF carbonUDF) {
+        ServiceHolder.carbonUDFs.add(carbonUDF);
+    }
+    public static void removeCarbonUDF(CarbonUDF carbonUDF) {
+        ServiceHolder.carbonUDFs.remove(carbonUDF);
+    }
+    public static List<Object> getCarbonUDFs() {
+        return ServiceHolder.carbonUDFs;
+    }
 }
