@@ -155,16 +155,17 @@ public class AnalyticsSparkExecutorTest {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         String[] sampleData = null;
         try {
-            sampleData =
-                IOUtils.toString(classLoader.getResourceAsStream("sample-data/CompressedEventData")).split("\n");
+            sampleData = IOUtils.toString(classLoader.getResourceAsStream("sample-data/CompressedEventData"))
+                    .split("\n");
         } catch (IOException e) {
             throw new AnalyticsException(e.getMessage());
         }
         long timeTmp;
         for (int j = 0; j < sampleData.length; j++) {
             values = new HashMap<>();
-            values.put("messageId", String.valueOf(j));
-            values.put("flowData", sampleData[j]);
+            String [] fields = sampleData[j].split(",",2);
+            values.put("meta_compressed", Boolean.parseBoolean(fields[0]));
+            values.put("flowData", fields[1]);
             timeTmp = System.currentTimeMillis();
             result.add(new Record(generateRecordIds ? GenericUtils.generateRecordID() : null, tenantId, tableName,
                 values, timeTmp));
