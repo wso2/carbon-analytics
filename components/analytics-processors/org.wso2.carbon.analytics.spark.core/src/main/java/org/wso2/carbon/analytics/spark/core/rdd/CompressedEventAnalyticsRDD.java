@@ -20,6 +20,10 @@ package org.wso2.carbon.analytics.spark.core.rdd;
 
 import static scala.collection.JavaConversions.asScalaIterator;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +33,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
+import javax.xml.bind.DatatypeConverter;
+
+import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.Dependency;
@@ -87,8 +95,8 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
         super(sc, deps, evidence);
         this.tenantId = tenantId;
         this.tableName = tableName;
-        this.allColumns = columns;
         this.outputColumns = new ArrayList<String>(columns);
+        this.allColumns = getAllColumns(columns);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -120,12 +128,23 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
         }
     }
 
+    /**
+     * Get a list of all columns.
+     * 
+     * @param columns defined columns
+     * @return
+     */
+    private List<String> getAllColumns(List<String> columns) {
+        if (!columns.contains(AnalyticsConstants.DATA_COLUMN)) {
+            columns.add(AnalyticsConstants.DATA_COLUMN);
+        }
+        columns.add(AnalyticsConstants.META_FIELD_COMPRESSED);
+        return columns;
+    }
+    
     @Override
     public Partition[] getPartitions() {
         AnalyticsDataResponse resp;
-        if (!this.allColumns.contains(AnalyticsConstants.DATA_COLUMN)) {
-            this.allColumns.add(AnalyticsConstants.DATA_COLUMN);
-        }
         try {
             resp = ServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName,
                 computePartitions(), this.allColumns, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
@@ -194,8 +213,11 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
             Map<String, Object> recordVals = record.getValues();
             try {
                 if (recordVals.get(AnalyticsConstants.DATA_COLUMN) != null) {
-                    JSONObject eventsAggregated = new JSONObject(recordVals.get(AnalyticsConstants.DATA_COLUMN)
-                        .toString());
+                    String eventsJson = recordVals.get(AnalyticsConstants.DATA_COLUMN).toString();
+                    if (recordVals.get(AnalyticsConstants.META_FIELD_COMPRESSED).equals(true)) {
+                        eventsJson = decompress(eventsJson);
+                    }
+                    JSONObject eventsAggregated = new JSONObject(eventsJson);
                     JSONArray eventsArray = eventsAggregated.getJSONArray(AnalyticsConstants.JSON_FIELD_EVENTS);
                     Map<Integer, Map<String, String>> payloadsMap = null;
                     if (eventsAggregated.has(AnalyticsConstants.JSON_FIELD_PAYLOADS)) {
@@ -203,7 +225,6 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
                         payloadsMap = getPayloadsAsMap(payloadsArray);
                     }
                     String messageFlowId = eventsAggregated.getString(AnalyticsConstants.JSON_FIELD_MESSAGE_FLOW_ID);
-
                     // Iterate over the array of events
                     for (int j = 0; j < eventsArray.length(); j++) {
                         // Create a row with extended fields
@@ -242,12 +263,8 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
                         // Add the event flow ID
                         extendedRowVals.put(fieldName, messageFlowId);
                     } else if (event.has(fieldName)) {
-                        if (event.isNull(fieldName)) {
-                            if (payloadsMap != null && payloadsMap.containsKey(eventIndex)) {
-                                extendedRowVals.put(fieldName, payloadsMap.get(eventIndex).get(fieldName));
-                            } else {
-                                extendedRowVals.put(fieldName, null);
-                            }
+                        if (event.isNull(fieldName) && payloadsMap != null && payloadsMap.containsKey(eventIndex)) {
+                            extendedRowVals.put(fieldName, payloadsMap.get(eventIndex).get(fieldName));
                         } else {
                             extendedRowVals.put(fieldName, event.get(fieldName));
                         }
@@ -272,18 +289,19 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
             for (int i = 0; i < payloadsArray.length(); i++) {
                 try {
                     String payload = payloadsArray.getJSONObject(i).getString(AnalyticsConstants.JSON_FIELD_PAYLOAD);
-                    JSONArray eventRefs = payloadsArray.getJSONObject(i).getJSONArray(AnalyticsConstants.JSON_FIELD_EVENTS);
+                    JSONArray eventRefs = payloadsArray.getJSONObject(i).getJSONArray(AnalyticsConstants.
+                            JSON_FIELD_EVENTS);
                     for (int j = 0; j < eventRefs.length(); j++) {
                         int eventIndex = eventRefs.getJSONObject(j).getInt(AnalyticsConstants.JSON_FIELD_EVENT_INDEX);
                         Map<String, String> existingPayloadMap = payloadsMap.get(eventIndex);
                         if (existingPayloadMap == null) {
                             Map<String, String> attributesMap = new HashMap<String, String>();
                             attributesMap.put(eventRefs.getJSONObject(j).getString(AnalyticsConstants.
-                                JSON_FIELD_ATTRIBUTE), payload);
+                                    JSON_FIELD_ATTRIBUTE), payload);
                             payloadsMap.put(eventIndex, attributesMap);
                         } else {
                             existingPayloadMap.put(eventRefs.getJSONObject(j).getString(AnalyticsConstants.
-                                JSON_FIELD_ATTRIBUTE), payload);
+                                    JSON_FIELD_ATTRIBUTE), payload);
                         }
                     }
                 } catch (JSONException e) {
@@ -296,6 +314,40 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
         @Override
         public void remove() {
             this.recordItr.remove();
+        }
+        
+        
+        /**
+         * Decompress a compressed event string.
+         * 
+         * @param str   Compressed string
+         * @return      Decompressed string
+         */
+        private String decompress(String str) {
+            ByteArrayInputStream byteInputStream = null;
+            GZIPInputStream gzipInputStream = null;
+            BufferedReader br = null;
+            try {
+                byteInputStream = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(str));
+                gzipInputStream = new GZIPInputStream(byteInputStream);
+                br = new BufferedReader(new InputStreamReader(gzipInputStream, CharEncoding.UTF_8));
+                StringBuilder jsonStringBuilder = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    jsonStringBuilder.append(line);
+                }
+                return jsonStringBuilder.toString();
+            } catch (IOException e) {
+                throw new RuntimeException("Error occured while decompressing events string: " + e.getMessage(), e);
+            } finally {
+                try {
+                    byteInputStream.close();
+                    gzipInputStream.close();
+                    br.close();
+                } catch (IOException e) {
+                    log.error("Error occured while closing streams: " + e.getMessage(), e);
+                }
+            }
         }
     }
 }
