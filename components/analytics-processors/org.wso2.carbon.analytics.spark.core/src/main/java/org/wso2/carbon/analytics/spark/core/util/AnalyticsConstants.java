@@ -130,4 +130,5 @@ public class AnalyticsConstants {
     public static final String JSON_FIELD_EVENT_INDEX = "eventIndex";
     public static final String JSON_FIELD_MESSAGE_FLOW_ID = "messageFlowId";
     public static final String COMPONENT_INDEX = "componentIndex";
+    public static final String META_FIELD_COMPRESSED = "meta_compressed";
 }
