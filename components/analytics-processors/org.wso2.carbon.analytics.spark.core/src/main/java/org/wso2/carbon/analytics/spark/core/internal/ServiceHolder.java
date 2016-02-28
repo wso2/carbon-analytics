@@ -33,8 +33,8 @@ import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class holds the OSGI services registered with Declarative service component.
@@ -60,7 +60,7 @@ public class ServiceHolder {
     
     private static SparkAnalyticsExecutor analyticskExecutor;
 
-    private static List<Object> carbonUDFs = new ArrayList<>();
+    private static Map<String, CarbonUDF> carbonUDFs = new HashMap();
 
     private static boolean analyticsExecutionEnabled = true;
 
@@ -159,12 +159,12 @@ public class ServiceHolder {
     }
 
     public static void addCarbonUDFs(CarbonUDF carbonUDF) {
-        ServiceHolder.carbonUDFs.add(carbonUDF);
+        ServiceHolder.carbonUDFs.put(carbonUDF.getClass().getName(), carbonUDF);
     }
-    public static void removeCarbonUDF(CarbonUDF carbonUDF) {
-        ServiceHolder.carbonUDFs.remove(carbonUDF);
+    public static void removeCarbonUDFs() {
+        ServiceHolder.carbonUDFs = null;
     }
-    public static List<Object> getCarbonUDFs() {
+    public static Map<String, CarbonUDF> getCarbonUDFs() {
         return ServiceHolder.carbonUDFs;
     }
 }

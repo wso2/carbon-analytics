@@ -21,11 +21,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.util.tracker.ServiceTracker;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.CarbonAnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.SparkScriptCAppDeployer;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
@@ -50,7 +50,7 @@ import java.net.SocketException;
  * @scr.reference name="tenant.registryloader" interface="org.wso2.carbon.registry.core.service.TenantRegistryLoader"
  * cardinality="1..1" policy="dynamic" bind="setTenantRegistryLoader" unbind="unsetTenantRegistryLoader"
  * @scr.reference name="carbon.udf" interface="org.wso2.carbon.analytics.spark.core.udf.CarbonUDF"
- * cardinality="1..n" policy="dynamic" bind="addCarbonUDF" unbind="removeCarbonUDF"
+ * cardinality="0..n" policy="dynamic" bind="addCarbonUDF" unbind="removeCarbonUDFs"
  */
 public class AnalyticsComponent {
 
@@ -68,8 +68,6 @@ public class AnalyticsComponent {
             checkAnalyticsEnabled();
             checkAnalyticsStatsEnabled();
             BundleContext bundleContext = ctx.getBundleContext();
-            ServiceTracker serviceTracker = new ServiceTracker(bundleContext, CarbonUDF.class.getName(), null);
-            Object[] services = serviceTracker.getServices();
             if (ServiceHolder.isAnalyticsEngineEnabled()) {
                 try {
                     int portOffset = CarbonUtils.getPortFromServerConfig(PORT_OFFSET_SERVER_PROP) + 1;
@@ -143,11 +141,19 @@ public class AnalyticsComponent {
     }
 
     protected void addCarbonUDF(CarbonUDF carbonUDF) {
-        ServiceHolder.addCarbonUDFs(carbonUDF);
+        try {
+            if (ServiceHolder.getAnalyticskExecutor() != null) {
+                ServiceHolder.getAnalyticskExecutor().registerUDFFromOSGIComponent(carbonUDF);
+            } else {
+                ServiceHolder.addCarbonUDFs(carbonUDF);
+            }
+        } catch (AnalyticsUDFException e) {
+            log.error("Error while registering UDFs from OSGI components: " + e.getMessage(), e);
+        }
     }
 
-    protected void removeCarbonUDF(CarbonUDF carbonUDF) {
-        ServiceHolder.removeCarbonUDF(carbonUDF);
+    protected void removeCarbonUDFs(CarbonUDF carbonUDF) {
+        ServiceHolder.removeCarbonUDFs();
     }
 
     private void checkAnalyticsEnabled() {

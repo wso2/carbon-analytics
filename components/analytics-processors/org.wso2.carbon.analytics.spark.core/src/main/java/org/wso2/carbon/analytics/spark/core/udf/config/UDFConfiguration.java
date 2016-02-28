@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.spark.core.udf.config;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 /**
  * This class represents the bean class for Custom UDF classes
@@ -28,18 +29,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "udf-configuration")
 public class UDFConfiguration {
 
-    private String[] customUDFClass;
+    private List<String> customUDFClass;
 
     public UDFConfiguration() {
     }
 
     @XmlElementWrapper(name = "custom-udf-classes")
     @XmlElement(name = "class-name")
-    public String[] getCustomUDFClass() {
+    public List<String> getCustomUDFClass() {
         return customUDFClass;
     }
 
-    public void setCustomUDFClass(String[] customUDFClass) {
+    public void setCustomUDFClass(List<String> customUDFClass) {
         this.customUDFClass = customUDFClass;
     }
 }
