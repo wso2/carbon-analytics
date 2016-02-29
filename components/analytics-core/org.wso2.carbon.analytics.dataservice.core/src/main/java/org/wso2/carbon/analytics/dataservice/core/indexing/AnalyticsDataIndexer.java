@@ -791,6 +791,8 @@ public class AnalyticsDataIndexer {
         for (Map.Entry<String, Double> entry : mergedResults.entrySet()) {
             finalResult.add(new CategorySearchResultEntry(entry.getKey(), entry.getValue()));
         }
+        Collections.sort(finalResult);
+        Collections.reverse(finalResult);
         return finalResult;
     }
 
