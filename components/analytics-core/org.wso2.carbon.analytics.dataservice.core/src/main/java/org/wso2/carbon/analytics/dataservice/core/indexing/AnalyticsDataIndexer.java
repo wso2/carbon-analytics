@@ -167,8 +167,12 @@ public class AnalyticsDataIndexer {
     public static final String PATH_SEPARATOR = "___####___";
     
     public static final int WORKER_TIMEOUT = 60;
+
     public static final int REINDEX_THREAD_COUNT = 5;
+
     public static final int REINDEX_QUEUE_LIMIT = 100;
+
+    private static final String LUCENE_QUERY_FOR_AGGREGATION = "luceneQuery";
 
     private Map<String, IndexWriter> indexWriters = new HashMap<>();
 
@@ -491,7 +495,8 @@ public class AnalyticsDataIndexer {
         Analyzer perFieldAnalyzerWrapper;
         Map<String, Analyzer> analyzersPerField = new HashMap<>();
         for (Map.Entry<String, ColumnDefinition> index : indices.entrySet()) {
-            if (index.getValue().getType() == AnalyticsSchema.ColumnType.STRING) {
+            if (index.getValue().getType() == AnalyticsSchema.ColumnType.STRING ||
+                    index.getValue().getType() == AnalyticsSchema.ColumnType.FACET) {
                 analyzersPerField.put(Constants.NON_TOKENIZED_FIELD_PREFIX + index.getKey(), new KeywordAnalyzer());
             }
         }
@@ -1358,6 +1363,10 @@ public class AnalyticsDataIndexer {
                 values = EMPTY_FACET_VALUE;
             }
             doc.add(new FacetField(name, values.split(",")));
+            doc.add(new TextField(name, obj.toString(), Store.NO));
+            doc.add(new StringField(Constants.NON_TOKENIZED_FIELD_PREFIX + name,
+                                    this.trimNonTokenizedIndexStringField(obj.toString()), Store.NO));
+
         }
     }
 
@@ -1725,6 +1734,7 @@ public class AnalyticsDataIndexer {
         }
         aggregatedValues.put(aggregateRequest.getGroupByField(),
                              path);
+        aggregatedValues.put(LUCENE_QUERY_FOR_AGGREGATION, aggregateRequest.getQuery());
         return aggregatedValues;
     }
 
