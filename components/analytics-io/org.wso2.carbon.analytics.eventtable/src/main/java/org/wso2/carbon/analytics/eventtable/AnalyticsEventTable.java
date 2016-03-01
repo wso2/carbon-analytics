@@ -286,7 +286,6 @@ public class AnalyticsEventTable implements EventTable {
     @Override
     public void overwriteOrAdd(ComplexEventChunk complexEventChunk, Operator operator, int[] ints) {
         throw new RuntimeException("Unsupprted method invoked!");
-
     }
 
     /**
