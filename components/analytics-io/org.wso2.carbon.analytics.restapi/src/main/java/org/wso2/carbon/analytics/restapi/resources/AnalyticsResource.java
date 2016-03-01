@@ -986,6 +986,7 @@ public class AnalyticsResource extends AbstractResource {
                             recordWriter.write(STR_JSON_COMMA);
                         }
                     }
+                    recordWriter.write(STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET);
                     recordWriter.flush();
                 }
             };
@@ -1003,17 +1004,18 @@ public class AnalyticsResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON})
     @Produces({ MediaType.APPLICATION_JSON })
-    @Path(Constants.ResourcePath.AGGREGATES)
+    @Path("tables/{tableName}/aggregates")
     public StreamingOutput searchWithAggregates(AggregateRequestBean aggregateRequestBean,
+                                                @PathParam("tableName") String tableName,
                                                 @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Invoking search with aggregates for tableName : " + aggregateRequestBean.getTableName());
+            logger.debug("Invoking search with aggregates for tableName : " + tableName);
         }
         AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (aggregateRequestBean != null) {
-            AggregateRequest aggregateRequest = Utils.createAggregateRequest(aggregateRequestBean);
+            AggregateRequest aggregateRequest = Utils.createAggregateRequest(aggregateRequestBean, tableName);
             final AnalyticsIterator<Record> iterator = analyticsDataService.searchWithAggregates(username, aggregateRequest);
             return new StreamingOutput() {
                 @Override

@@ -438,6 +438,18 @@ public class Utils {
         return request;
     }
 
+    public static AggregateRequest createAggregateRequest(
+            AggregateRequestBean aggregateRequestBean, String tableName) {
+        AggregateRequest request = new AggregateRequest();
+        request.setTableName(tableName);
+        request.setQuery(aggregateRequestBean.getQuery());
+        request.setGroupByField(aggregateRequestBean.getGroupByField());
+        request.setFields(createAggregatingFields(aggregateRequestBean.getFields()));
+        request.setAggregateLevel(aggregateRequestBean.getAggregateLevel());
+        request.setParentPath(aggregateRequestBean.getParentPath());
+        return request;
+    }
+
     private static List<AggregateField> createAggregatingFields(List<AggregateFieldBean> fields) {
         List<AggregateField> aggregateFields = new ArrayList<>();
         for (AggregateFieldBean fieldBean : fields) {
