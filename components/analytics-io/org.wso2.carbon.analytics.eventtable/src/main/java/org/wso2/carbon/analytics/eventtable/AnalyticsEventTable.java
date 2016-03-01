@@ -282,7 +282,13 @@ public class AnalyticsEventTable implements EventTable {
     public void update(ComplexEventChunk updatingEventChunk, Operator operator, int[] mappingPosition) {
         operator.update(updatingEventChunk, null, null);
     }
-    
+
+    @Override
+    public void overwriteOrAdd(ComplexEventChunk complexEventChunk, Operator operator, int[] ints) {
+        throw new RuntimeException("Unsupprted method invoked!");
+
+    }
+
     /**
      * Analytics table {@link Operator} implementation.
      */
@@ -775,6 +781,11 @@ public class AnalyticsEventTable implements EventTable {
             } catch (AnalyticsException e) {
                 throw new IllegalStateException("Error in executing update query: " + e.getMessage(), e);
             }
+        }
+
+        @Override
+        public void overwriteOrAdd(ComplexEventChunk complexEventChunk, Object o, int[] ints) {
+            throw new RuntimeException("Unsupprted method invoked!");
         }
         
         private void updateRecordsWithEvent(List<Record> records, ComplexEvent event) {
