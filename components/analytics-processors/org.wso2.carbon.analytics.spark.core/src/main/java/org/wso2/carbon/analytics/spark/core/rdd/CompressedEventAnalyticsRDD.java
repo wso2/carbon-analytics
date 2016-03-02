@@ -224,12 +224,11 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
                         JSONArray payloadsArray = eventsAggregated.getJSONArray(AnalyticsConstants.JSON_FIELD_PAYLOADS);
                         payloadsMap = getPayloadsAsMap(payloadsArray);
                     }
-                    String messageFlowId = eventsAggregated.getString(AnalyticsConstants.JSON_FIELD_MESSAGE_FLOW_ID);
                     // Iterate over the array of events
-                    for (int j = 0; j < eventsArray.length(); j++) {
+                    for (int i = 0; i < eventsArray.length(); i++) {
                         // Create a row with extended fields
-                        tempRows.add(RowFactory.create(getFieldValues(messageFlowId, eventsArray.getJSONObject(j),
-                            payloadsMap, j)));
+                        tempRows.add(RowFactory.create(getFieldValues(eventsAggregated, eventsArray.getJSONObject(i),
+                            payloadsMap, i)));
                     }
                 } else {
                     tempRows.add(RowFactory.create(Collections.emptyList().toArray()));
@@ -249,19 +248,17 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
          * @param eventIndex    Index of the current event
          * @return              Array of values of the fields in the event
          */
-        private Object[] getFieldValues(String messageFlowId, JSONObject event,
+        private Object[] getFieldValues(JSONObject eventsAggregated, JSONObject event,
                 Map<Integer, Map<String, String>> payloadsMap, int eventIndex) {
             Map<String, Object> extendedRowVals = new LinkedHashMap<String, Object>();
-            // Iterate over new (split) fields and add them
+            String[] commonColumns = null;
             try {
-                for (int k = 0; k < outputColumns.size(); k++) {
-                    String fieldName = outputColumns.get(k);
+                // Iterate over new (split) fields and add them
+                for (int j = 0; j < outputColumns.size(); j++) {
+                    String fieldName = outputColumns.get(j);
                     // Add the component index
                     if (fieldName.equalsIgnoreCase(AnalyticsConstants.COMPONENT_INDEX)) {
                         extendedRowVals.put(fieldName, eventIndex);
-                    } else if (fieldName.equalsIgnoreCase(AnalyticsConstants.JSON_FIELD_MESSAGE_FLOW_ID)) {
-                        // Add the event flow ID
-                        extendedRowVals.put(fieldName, messageFlowId);
                     } else if (event.has(fieldName)) {
                         if (event.isNull(fieldName) && payloadsMap != null && payloadsMap.containsKey(eventIndex)) {
                             extendedRowVals.put(fieldName, payloadsMap.get(eventIndex).get(fieldName));
@@ -270,6 +267,16 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
                         }
                     } else {
                         extendedRowVals.put(fieldName, null);
+                    }
+                }
+                
+                // Iterate over common fields to all events, and add them
+                commonColumns = JSONObject.getNames(eventsAggregated);
+                for (int k = 0; k < commonColumns.length; k++) {
+                    String fieldName = commonColumns[k];
+                    if (!fieldName.equalsIgnoreCase(AnalyticsConstants.DATA_COLUMN) ||
+                        !fieldName.equalsIgnoreCase(AnalyticsConstants.JSON_FIELD_EVENTS)) {
+                        extendedRowVals.put(fieldName, eventsAggregated.get(fieldName));
                     }
                 }
                 return extendedRowVals.values().toArray();
