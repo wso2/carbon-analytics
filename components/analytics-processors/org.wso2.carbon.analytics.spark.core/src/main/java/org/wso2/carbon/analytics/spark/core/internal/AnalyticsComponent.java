@@ -25,6 +25,8 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.CarbonAnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.SparkScriptCAppDeployer;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
+import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
 import org.wso2.carbon.ntask.common.TaskException;
@@ -47,6 +49,8 @@ import java.net.SocketException;
  * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
  * @scr.reference name="tenant.registryloader" interface="org.wso2.carbon.registry.core.service.TenantRegistryLoader"
  * cardinality="1..1" policy="dynamic" bind="setTenantRegistryLoader" unbind="unsetTenantRegistryLoader"
+ * @scr.reference name="carbon.udf" interface="org.wso2.carbon.analytics.spark.core.udf.CarbonUDF"
+ * cardinality="0..n" policy="dynamic" bind="addCarbonUDF" unbind="removeCarbonUDFs"
  */
 public class AnalyticsComponent {
 
@@ -63,6 +67,7 @@ public class AnalyticsComponent {
         try {
             checkAnalyticsEnabled();
             checkAnalyticsStatsEnabled();
+            BundleContext bundleContext = ctx.getBundleContext();
             if (ServiceHolder.isAnalyticsEngineEnabled()) {
                 try {
                     int portOffset = CarbonUtils.getPortFromServerConfig(PORT_OFFSET_SERVER_PROP) + 1;
@@ -74,7 +79,6 @@ public class AnalyticsComponent {
                     log.error(msg, e);
                 }
             }
-            BundleContext bundleContext = ctx.getBundleContext();
             AnalyticsProcessorService analyticsProcessorService = new CarbonAnalyticsProcessorService();
             bundleContext.registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
             ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
@@ -82,6 +86,7 @@ public class AnalyticsComponent {
             SparkScriptCAppDeployer sparkScriptCAppDeployer = new SparkScriptCAppDeployer();
             bundleContext.registerService(
                     AppDeploymentHandler.class.getName(), sparkScriptCAppDeployer, null);
+
             if (log.isDebugEnabled()) {
                 log.debug("Finished activating Analytics Spark Core");
             }
@@ -133,6 +138,22 @@ public class AnalyticsComponent {
 
     protected void unsetTenantRegistryLoader(TenantRegistryLoader tenantRegistryLoader) {
         ServiceHolder.setTenantRegistryLoader(null);
+    }
+
+    protected void addCarbonUDF(CarbonUDF carbonUDF) {
+        try {
+            if (ServiceHolder.getAnalyticskExecutor() != null) {
+                ServiceHolder.getAnalyticskExecutor().registerUDFFromOSGIComponent(carbonUDF);
+            } else {
+                ServiceHolder.addCarbonUDFs(carbonUDF);
+            }
+        } catch (AnalyticsUDFException e) {
+            log.error("Error while registering UDFs from OSGI components: " + e.getMessage(), e);
+        }
+    }
+
+    protected void removeCarbonUDFs(CarbonUDF carbonUDF) {
+        ServiceHolder.removeCarbonUDFs();
     }
 
     private void checkAnalyticsEnabled() {

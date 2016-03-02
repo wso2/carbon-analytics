@@ -33,6 +33,15 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
  */
 public class AnalyticsUDFsRegister {
 
+    private static AnalyticsUDFsRegister analyticsUDFsRegister = new AnalyticsUDFsRegister();
+
+    private AnalyticsUDFsRegister() {
+        //private constructor to prevent initialize
+    }
+
+    public static AnalyticsUDFsRegister getInstance() {
+        return analyticsUDFsRegister;
+    }
     /**
      * Create the UDFAdaptor for the given method name in the custom UDF class user has given in
      * the configuration

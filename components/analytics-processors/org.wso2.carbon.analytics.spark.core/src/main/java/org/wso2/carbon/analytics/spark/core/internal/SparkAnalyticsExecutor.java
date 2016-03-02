@@ -37,6 +37,7 @@ import org.apache.spark.sql.jdbc.carbon.AnalyticsJDBCRelationProvider;
 import org.apache.spark.sql.jdbc.carbon.DialectRegister;
 import org.apache.spark.util.Utils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
@@ -380,25 +381,44 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         registerUDFs(this.sqlCtx);
     }
 
+    public void registerUDFFromOSGIComponent(CarbonUDF carbonUDF) throws AnalyticsUDFException {
+        if (this.sqlCtx != null) {
+            AnalyticsUDFsRegister analyticsUDFsRegister = AnalyticsUDFsRegister.getInstance();
+            Class udf = carbonUDF.getClass();
+            Method[] methods = udf.getDeclaredMethods();
+            for (Method method : methods) {
+                analyticsUDFsRegister.registerUDF(udf, method, sqlCtx);
+            }
+        } else {
+            ServiceHolder.addCarbonUDFs(carbonUDF);
+        }
+    }
+
     private void registerUDFs(SQLContext sqlCtx)
             throws AnalyticsUDFException {
-        String[] udfClassesNames = this.udfConfiguration.getCustomUDFClass();
-        if (udfClassesNames != null && udfClassesNames.length > 0) {
-            AnalyticsUDFsRegister udfAdaptorBuilder = new AnalyticsUDFsRegister();
-            try {
-                for (String udfClassName : udfClassesNames) {
-                    udfClassName = udfClassName.trim();
-                    if (!udfClassName.isEmpty()) {
-                        Class udf = Class.forName(udfClassName);
-                        Method[] methods = udf.getDeclaredMethods();
-                        for (Method method : methods) {
-                            udfAdaptorBuilder.registerUDF(udf, method, sqlCtx);
-                        }
+        List<String> udfClassNames = new ArrayList<>();
+        this.udfConfiguration.getCustomUDFClass();
+        if (!this.udfConfiguration.getCustomUDFClass().isEmpty()) {
+            udfClassNames.addAll(this.udfConfiguration.getCustomUDFClass());
+        }
+        if (!ServiceHolder.getCarbonUDFs().isEmpty()) {
+            //get the class names as String from the map's keySet.
+            udfClassNames.addAll(ServiceHolder.getCarbonUDFs().keySet());
+        }
+        AnalyticsUDFsRegister udfAdaptorBuilder = AnalyticsUDFsRegister.getInstance();
+        try {
+            for (String udfClassName : udfClassNames) {
+                udfClassName = udfClassName.trim();
+                if (!udfClassName.isEmpty()) {
+                    Class udf = Class.forName(udfClassName);
+                    Method[] methods = udf.getDeclaredMethods();
+                    for (Method method : methods) {
+                        udfAdaptorBuilder.registerUDF(udf, method, sqlCtx);
                     }
                 }
-            } catch (ClassNotFoundException e) {
-                throw new AnalyticsUDFException("Error While registering UDFs: " + e.getMessage(), e);
             }
+        } catch (ClassNotFoundException e) {
+            throw new AnalyticsUDFException("Error While registering UDFs: " + e.getMessage(), e);
         }
     }
 

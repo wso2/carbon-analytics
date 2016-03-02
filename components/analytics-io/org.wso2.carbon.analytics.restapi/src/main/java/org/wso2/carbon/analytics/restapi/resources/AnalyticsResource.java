@@ -920,7 +920,7 @@ public class AnalyticsResource extends AbstractResource {
 
     /**
      * Gets the analytics schema of a table
-     * @param tableName the table name of which the schema to be retreived
+     * @param tableName the table name of which the schema to be retrieved
      * @return Response containing the analytics schema
      * @throws AnalyticsException
      */
@@ -942,7 +942,7 @@ public class AnalyticsResource extends AbstractResource {
 
     /**
      * Returns the aggregated values of the given fields grouped by the given facet field.
-     * @param aggregateRequestBean the aggregate request bean
+     * @param aggregateRequestBeans the aggregate request bean
      * @return the {@link Response}response
      * @throws AnalyticsException
      */
@@ -950,16 +950,72 @@ public class AnalyticsResource extends AbstractResource {
     @Consumes({ MediaType.APPLICATION_JSON})
     @Produces({ MediaType.APPLICATION_JSON })
     @Path(Constants.ResourcePath.AGGREGATES)
-    public StreamingOutput searchWithAggregates(AggregateRequestBean aggregateRequestBean,
+    public StreamingOutput searchWithAggregates(AggregateRequestBean[] aggregateRequestBeans,
                                 @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Invoking search with aggregates for tableName : " + aggregateRequestBean.getTableName());
+            logger.debug("Invoking search with aggregates for multiple tables");
+        }
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
+        String username = authenticate(authHeader);
+        if (aggregateRequestBeans != null) {
+            AggregateRequest[] aggregateRequests = Utils.createAggregateRequests(aggregateRequestBeans);
+            final List<AnalyticsIterator<Record>> iterators = analyticsDataService.searchWithAggregates(username, aggregateRequests);
+            return new StreamingOutput() {
+                @Override
+                public void write(OutputStream outputStream)
+                        throws IOException, WebApplicationException {
+                    Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+                    recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
+                    for (int i=0; i < iterators.size(); i++) {
+                        recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
+                        while (iterators.get(i).hasNext()) {
+                            Record record = iterators.get(i).next();
+                            RecordBean recordBean = Utils.createRecordBean(record);
+                            recordWriter.write(gson.toJson(recordBean));
+                            if (iterators.get(i).hasNext()) {
+                                recordWriter.write(STR_JSON_COMMA);
+                            }
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Retrieved -- Record Id: " + recordBean.getId() + " values :" +
+                                             recordBean.toString());
+                            }
+                        }
+                        recordWriter.write(STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET);
+                        if (i < iterators.size()-1) {
+                            recordWriter.write(STR_JSON_COMMA);
+                        }
+                    }
+                    recordWriter.write(STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET);
+                    recordWriter.flush();
+                }
+            };
+        } else {
+            throw new AnalyticsException("Search parameters not found");
+        }
+    }
+
+    /**
+     * Returns the aggregated values of the given fields grouped by the given facet field.
+     * @param aggregateRequestBean the aggregate request bean
+     * @return the {@link Response}response
+     * @throws AnalyticsException
+     */
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("tables/{tableName}/aggregates")
+    public StreamingOutput searchWithAggregates(AggregateRequestBean aggregateRequestBean,
+                                                @PathParam("tableName") String tableName,
+                                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+            throws AnalyticsException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking search with aggregates for tableName : " + tableName);
         }
         AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (aggregateRequestBean != null) {
-            AggregateRequest aggregateRequest = Utils.createAggregateRequest(aggregateRequestBean);
+            AggregateRequest aggregateRequest = Utils.createAggregateRequest(aggregateRequestBean, tableName);
             final AnalyticsIterator<Record> iterator = analyticsDataService.searchWithAggregates(username, aggregateRequest);
             return new StreamingOutput() {
                 @Override

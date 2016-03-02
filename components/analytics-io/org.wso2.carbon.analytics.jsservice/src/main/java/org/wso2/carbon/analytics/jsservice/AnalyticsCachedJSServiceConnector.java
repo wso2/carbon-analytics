@@ -132,6 +132,17 @@ public class AnalyticsCachedJSServiceConnector extends AnalyticsJSServiceConnect
         }
         return result;
     }
+
+    @Override
+    public ResponseBean searchMultiTablesWithAggregates(String username, String requestAsString) {
+        String cacheItemId = this.calculateCacheItemId("searchMultiTablesWithAggregates", requestAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.searchMultiTablesWithAggregates(username, requestAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
     
     @Override
     public ResponseBean searchCount(String username, String tableName, String queryAsString) {

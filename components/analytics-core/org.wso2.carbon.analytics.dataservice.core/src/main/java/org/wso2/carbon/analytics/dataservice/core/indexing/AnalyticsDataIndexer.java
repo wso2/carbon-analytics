@@ -98,7 +98,6 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
@@ -167,8 +166,12 @@ public class AnalyticsDataIndexer {
     public static final String PATH_SEPARATOR = "___####___";
     
     public static final int WORKER_TIMEOUT = 60;
+
     public static final int REINDEX_THREAD_COUNT = 5;
+
     public static final int REINDEX_QUEUE_LIMIT = 100;
+
+    private static final String LUCENE_QUERY_FOR_AGGREGATION = "luceneQuery";
 
     private Map<String, IndexWriter> indexWriters = new HashMap<>();
 
@@ -491,7 +494,8 @@ public class AnalyticsDataIndexer {
         Analyzer perFieldAnalyzerWrapper;
         Map<String, Analyzer> analyzersPerField = new HashMap<>();
         for (Map.Entry<String, ColumnDefinition> index : indices.entrySet()) {
-            if (index.getValue().getType() == AnalyticsSchema.ColumnType.STRING) {
+            if (index.getValue().getType() == AnalyticsSchema.ColumnType.STRING ||
+                    index.getValue().getType() == AnalyticsSchema.ColumnType.FACET) {
                 analyzersPerField.put(Constants.NON_TOKENIZED_FIELD_PREFIX + index.getKey(), new KeywordAnalyzer());
             }
         }
@@ -786,6 +790,8 @@ public class AnalyticsDataIndexer {
         for (Map.Entry<String, Double> entry : mergedResults.entrySet()) {
             finalResult.add(new CategorySearchResultEntry(entry.getKey(), entry.getValue()));
         }
+        Collections.sort(finalResult);
+        Collections.reverse(finalResult);
         return finalResult;
     }
 
@@ -1358,6 +1364,10 @@ public class AnalyticsDataIndexer {
                 values = EMPTY_FACET_VALUE;
             }
             doc.add(new FacetField(name, values.split(",")));
+            doc.add(new TextField(name, obj.toString(), Store.NO));
+            doc.add(new StringField(Constants.NON_TOKENIZED_FIELD_PREFIX + name,
+                                    this.trimNonTokenizedIndexStringField(obj.toString()), Store.NO));
+
         }
     }
 
@@ -1609,31 +1619,32 @@ public class AnalyticsDataIndexer {
             throws AnalyticsIndexException, IOException {
         if (aggregateRequest.getAggregateLevel() >= 0) {
             List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
-            if (taxonomyShardIds.size() == 0) {
-                return new HashSet<>();
-            }
-            ExecutorService pool = Executors.newFixedThreadPool(taxonomyShardIds.size());
-            Set<Future<Set<String>>> perShardUniqueCategories = new HashSet<>();
-            Set<String> finalUniqueCategories = new HashSet<>();
-            for (int i = 0; i < taxonomyShardIds.size(); i++) {
-                String tableId = this.generateTableId(tenantId, aggregateRequest.getTableName());
-                TaxonomyReader reader = new DirectoryTaxonomyReader(this.lookupTaxonomyIndexWriter(taxonomyShardIds.get(i),
-                                                                                                   tableId));
-                Callable<Set<String>> callable = new TaxonomyWorker(reader, aggregateRequest);
-                Future<Set<String>> result = pool.submit(callable);
-                perShardUniqueCategories.add(result);
-            }
-            try {
-                for (Future<Set<String>> result : perShardUniqueCategories) {
-                    finalUniqueCategories.addAll(result.get());
+            if (aggregateRequest.getGroupByField() != null && !aggregateRequest.getGroupByField().isEmpty()) {
+                ExecutorService pool = Executors.newFixedThreadPool(taxonomyShardIds.size());
+                Set<Future<Set<String>>> perShardUniqueCategories = new HashSet<>();
+                Set<String> finalUniqueCategories = new HashSet<>();
+                for (int i = 0; i < taxonomyShardIds.size(); i++) {
+                    String tableId = this.generateTableId(tenantId, aggregateRequest.getTableName());
+                    TaxonomyReader reader = new DirectoryTaxonomyReader(this.lookupTaxonomyIndexWriter(taxonomyShardIds.get(i),
+                                                                                                       tableId));
+                    Callable<Set<String>> callable = new TaxonomyWorker(reader, aggregateRequest);
+                    Future<Set<String>> result = pool.submit(callable);
+                    perShardUniqueCategories.add(result);
                 }
-                return finalUniqueCategories;
-            } catch (Exception e) {
-                log.error("Error while generating Unique categories for aggregation, " + e.getMessage(), e);
-                throw new AnalyticsIndexException("Error while generating Unique categories for aggregation, " +
-                                                  e.getMessage(), e);
-            } finally {
-                shutdownWorkerThreadPool(pool);
+                try {
+                    for (Future<Set<String>> result : perShardUniqueCategories) {
+                        finalUniqueCategories.addAll(result.get());
+                    }
+                    return finalUniqueCategories;
+                } catch (Exception e) {
+                    log.error("Error while generating Unique categories for aggregation, " + e.getMessage(), e);
+                    throw new AnalyticsIndexException("Error while generating Unique categories for aggregation, " +
+                                                      e.getMessage(), e);
+                } finally {
+                    shutdownWorkerThreadPool(pool);
+                }
+            } else {
+                return new HashSet<>();
             }
         } else {
             throw new AnalyticsIndexException("Aggregate level cannot be less than zero");
@@ -1662,53 +1673,54 @@ public class AnalyticsDataIndexer {
                                                   Set<String> uniqueCategories)
             throws AnalyticsIndexException {
         List<String[]> groupings = new ArrayList<>();
-        try {
-            int totalAggregateLevel = aggregateRequest.getAggregateLevel() + 1;
-            for (String category : uniqueCategories) {
-                String[] path = category.split(PATH_SEPARATOR);
-                if (path.length == totalAggregateLevel) {
-                    groupings.add(path);
-                }
+        int totalAggregateLevel = aggregateRequest.getAggregateLevel() + 1;
+        for (String category : uniqueCategories) {
+            String[] path = category.split(PATH_SEPARATOR);
+            if (path.length == totalAggregateLevel) {
+                groupings.add(path);
             }
-            return groupings;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new AnalyticsIndexException("The field: " + aggregateRequest.getGroupByField() +
-                                              " do not have " + aggregateRequest.getAggregateLevel() +
-                                              " layers of sub categories");
         }
+        if (aggregateRequest.getGroupByField() == null || aggregateRequest.getGroupByField().isEmpty()) {
+            // for sure, uniqueCategories is empty
+            // and groupings is empty too. adding a dummy String array to aggregate all the records without facet field.
+            groupings.add(new String[]{});
+        }
+        return groupings;
     }
 
     private Record aggregatePerGrouping(int tenantId, String[] path,
-                                         AggregateRequest aggregateRequest)
+                                        AggregateRequest aggregateRequest)
             throws AnalyticsException {
         Map<String, Number> optionalParams = new HashMap<>();
         Map<String, AggregateFunction> perAliasAggregateFunction = initPerAliasAggregateFunctions(aggregateRequest,
                 optionalParams);
         AnalyticsDataResponse analyticsDataResponse = null;
         Record aggregatedRecord = null;
-        List<SearchResultEntry> searchResultEntries = getRecordSearchEntries(tenantId, path, aggregateRequest);
+        List<SearchResultEntry> searchResultEntries = null;
+        if (aggregateRequest.getGroupByField() != null && !aggregateRequest.getGroupByField().isEmpty()) {
+            searchResultEntries = getRecordSearchEntries(tenantId, path, aggregateRequest);
+        } else {
+            //Lucene ArrayUtils calculates max number of documents it can retreive to memory from start = 0,
+            searchResultEntries = this.search(tenantId, aggregateRequest.getTableName(), aggregateRequest.getQuery(),
+                                              0, 1000);
+        }
         if (!searchResultEntries.isEmpty()) {
             List<String> recordIds = getRecordIds(searchResultEntries);
-            analyticsDataResponse = this.indexerInfo.getAnalyticsDataService().get(
-                    tenantId, aggregateRequest.getTableName(), 1, null, recordIds);
-            RecordGroup[] recordGroups = analyticsDataResponse.getRecordGroups();
-            if (recordGroups != null) {
-                for (RecordGroup recordGroup : recordGroups) {
-                    AnalyticsIterator<Record> iterator = this.indexerInfo.getAnalyticsDataService().readRecords(
-                            analyticsDataResponse.getRecordStoreName(), recordGroup);
-                    while (iterator.hasNext()) {
-                        Record record = iterator.next();
-                        for (AggregateField field : aggregateRequest.getFields()) {
-                            Number value = (Number) record.getValue(field.getFieldName());
-                            AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
-                            function.process(value);
-                        }
-                    }
-                    Map<String, Object> aggregatedValues = generateAggregateRecordValues(path, aggregateRequest,
-                            perAliasAggregateFunction);
-                    aggregatedRecord = new Record(tenantId, aggregateRequest.getTableName(), aggregatedValues);
+            analyticsDataResponse = this.indexerInfo.getAnalyticsDataService().get(tenantId, aggregateRequest.getTableName(),
+                                                                                   1, null, recordIds);
+            Iterator<Record> iterator = AnalyticsDataServiceUtils.responseToIterator(this.indexerInfo.getAnalyticsDataService(),
+                                                                                     analyticsDataResponse);
+            while (iterator.hasNext()) {
+                Record record = iterator.next();
+                for (AggregateField field : aggregateRequest.getFields()) {
+                    Number value = (Number) record.getValue(field.getFieldName());
+                    AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
+                    function.process(value);
                 }
             }
+            Map<String, Object> aggregatedValues = generateAggregateRecordValues(path, aggregateRequest,
+                                                                                 perAliasAggregateFunction);
+            aggregatedRecord = new Record(tenantId, aggregateRequest.getTableName(), aggregatedValues);
         }
         return aggregatedRecord;
     }
@@ -1718,13 +1730,20 @@ public class AnalyticsDataIndexer {
                                                               Map<String, AggregateFunction> perAliasAggregateFunction)
             throws AnalyticsException {
         Map<String, Object> aggregatedValues = new HashMap<>();
+        String luceneQuery = "*:*";
+        if (aggregateRequest.getQuery() != null && !aggregateRequest.getQuery().isEmpty()) {
+            luceneQuery = aggregateRequest.getQuery();
+        }
         for (AggregateField field : aggregateRequest.getFields()) {
             String alias = field.getAlias();
             Number result = perAliasAggregateFunction.get(alias).finish();
             aggregatedValues.put(alias, result);
         }
-        aggregatedValues.put(aggregateRequest.getGroupByField(),
-                             path);
+        if (aggregateRequest.getGroupByField() != null && !aggregateRequest.getGroupByField().isEmpty()) {
+            aggregatedValues.put(aggregateRequest.getGroupByField(),
+                                 path);
+        }
+        aggregatedValues.put(LUCENE_QUERY_FOR_AGGREGATION, luceneQuery);
         return aggregatedValues;
     }
 
@@ -1750,6 +1769,7 @@ public class AnalyticsDataIndexer {
     private List<SearchResultEntry> getRecordSearchEntries(int tenantId, String[] path,
                                                            AggregateRequest aggregateRequest)
             throws AnalyticsIndexException {
+
         AnalyticsDrillDownRequest analyticsDrillDownRequest = new AnalyticsDrillDownRequest();
         analyticsDrillDownRequest.setTableName(aggregateRequest.getTableName());
         analyticsDrillDownRequest.setQuery(aggregateRequest.getQuery());
@@ -1813,35 +1833,29 @@ public class AnalyticsDataIndexer {
 
         @Override
         public synchronized boolean hasNext() {
-            if (groupings!= null && !groupings.isEmpty()) {
+            if (groupings != null && !groupings.isEmpty()) {
                 currentGrouping = groupings.get(0);
-                if (currentGrouping != null && currentGrouping.length > 0) {
-                    try {
-                        if (currentRecord != null) {
-                            return true;
-                        } else {
-                            currentRecord = indexer.aggregatePerGrouping(tenantId, currentGrouping,
-                                                                         request);
-                        }
-                    } catch (AnalyticsException e) {
-                        logger.error("Failed to create aggregated record: " + e.getMessage(), e);
-                        throw new RuntimeException("Error while iterating aggregate records: " +
-                                                   e.getMessage(), e);
-                    }
-                    if (currentRecord == null) {
-                        groupings.remove(currentGrouping);
-                        return  this.hasNext();
-                    } else {
+                try {
+                    if (currentRecord != null) {
                         return true;
+                    } else {
+                        currentRecord = indexer.aggregatePerGrouping(tenantId, currentGrouping,
+                                                                     request);
                     }
-                } else {
+                } catch (AnalyticsException e) {
+                    logger.error("Failed to create aggregated record: " + e.getMessage(), e);
+                    throw new RuntimeException("Error while iterating aggregate records: " +
+                                               e.getMessage(), e);
+                }
+                if (currentRecord == null) {
                     groupings.remove(currentGrouping);
-                    this.hasNext();
+                    return this.hasNext();
+                } else {
+                    return true;
                 }
             } else {
                     return false;
             }
-            return false;
         }
 
         @Override
