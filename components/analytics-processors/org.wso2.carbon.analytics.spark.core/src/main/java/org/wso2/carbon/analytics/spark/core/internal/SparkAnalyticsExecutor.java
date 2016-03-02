@@ -54,6 +54,7 @@ import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsRelationProvider;
 import org.wso2.carbon.analytics.spark.core.sources.CompressedEventAnalyticsRelationProvider;
 import org.wso2.carbon.analytics.spark.core.udf.AnalyticsUDFsRegister;
+import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.spark.core.udf.config.UDFConfiguration;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
@@ -207,21 +208,21 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    private void cleanupMasterMap(Member myself, Set<Member> members,
-                                  Map<String, Object> masterMap) {
-        Iterator<Map.Entry<String, Object>> itr = masterMap.entrySet().iterator();
-        Map.Entry<String, Object> currentEntry;
-        List<String> removeIds = new ArrayList<>();
-        while (itr.hasNext()) {
-            currentEntry = itr.next();
-            if (!members.contains(currentEntry.getValue()) || (currentEntry.getValue().equals(myself))) {
-                removeIds.add(currentEntry.getKey());
-            }
-        }
-        for (String key : removeIds) {
-            masterMap.remove(key);
-        }
-    }
+//    private void cleanupMasterMap(Member myself, Set<Member> members,
+//                                  Map<String, Object> masterMap) {
+//        Iterator<Map.Entry<String, Object>> itr = masterMap.entrySet().iterator();
+//        Map.Entry<String, Object> currentEntry;
+//        List<String> removeIds = new ArrayList<>();
+//        while (itr.hasNext()) {
+//            currentEntry = itr.next();
+//            if (!members.contains(currentEntry.getValue()) || (currentEntry.getValue().equals(myself))) {
+//                removeIds.add(currentEntry.getKey());
+//            }
+//        }
+//        for (String key : removeIds) {
+//            masterMap.remove(key);
+//        }
+//    }
 
     private void runClusteredSetupLogic() throws AnalyticsClusterException {
 
@@ -376,7 +377,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     }
 
-    private void    initializeSqlContext(JavaSparkContext jsc) throws AnalyticsUDFException {
+    private void initializeSqlContext(JavaSparkContext jsc) throws AnalyticsUDFException {
         this.sqlCtx = new SQLContext(jsc);
         registerUDFs(this.sqlCtx);
     }
@@ -455,7 +456,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private boolean isElectedLeaderAvailable() throws AnalyticsClusterException {
-        if (acm.getMembers(CLUSTER_GROUP_NAME).isEmpty()){
+        if (acm.getMembers(CLUSTER_GROUP_NAME).isEmpty()) {
             log.info("Cluster is empty. Hence no elected leader available");
             return false;
         }
@@ -621,19 +622,21 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                           AnalyticsRecoveryModeFactory.class.getName());
 
         String agentConfPath = carbonHome + File.separator + "repository" + File.separator +
-                "conf"  + File.separator + "data-bridge" + File.separator + "data-agent-config.xml";
+                               "conf" + File.separator + "data-bridge" + File.separator + "data-agent-config.xml";
 
-        String jvmOpts = conf.get("spark.executor.extraJavaOptions", "");
-        conf.set("spark.executor.extraJavaOptions", jvmOpts + " -Dwso2_custom_conf_dir=" + carbonConfDir
-                + " -Djavax.net.ssl.trustStore=" + System.getProperty("javax.net.ssl.trustStore")
-                + " -Djavax.net.ssl.trustStorePassword=" + System.getProperty("javax.net.ssl.trustStorePassword")
-                + " -DAgent.Config.Path=" + agentConfPath);
+        String jvmOpts = conf.get("spark.executor.extraJavaOptions", "") + " -Dwso2_custom_conf_dir=" + carbonConfDir
+                         + " -Djavax.net.ssl.trustStore=" + System.getProperty("javax.net.ssl.trustStore")
+                         + " -Djavax.net.ssl.trustStorePassword=" + System.getProperty("javax.net.ssl.trustStorePassword")
+                         + " -DAgent.Config.Path=" + agentConfPath
+                         + getLog4jPropertiesJvmOpt(analyticsSparkConfDir);
+        conf.set("spark.executor.extraJavaOptions", jvmOpts);
 
-        jvmOpts = conf.get("spark.driver.extraJavaOptions", "");
-        conf.set("spark.driver.extraJavaOptions", jvmOpts + " -Dwso2_custom_conf_dir=" + carbonConfDir
-                + " -Djavax.net.ssl.trustStore=" + System.getProperty("javax.net.ssl.trustStore")
-                + " -Djavax.net.ssl.trustStorePassword=" + System.getProperty("javax.net.ssl.trustStorePassword")
-                + " -DAgent.Config.Path=" + agentConfPath);
+        jvmOpts = conf.get("spark.driver.extraJavaOptions", "") + " -Dwso2_custom_conf_dir=" + carbonConfDir
+                  + " -Djavax.net.ssl.trustStore=" + System.getProperty("javax.net.ssl.trustStore")
+                  + " -Djavax.net.ssl.trustStorePassword=" + System.getProperty("javax.net.ssl.trustStorePassword")
+                  + " -DAgent.Config.Path=" + agentConfPath
+                  + getLog4jPropertiesJvmOpt(analyticsSparkConfDir);
+        conf.set("spark.driver.extraJavaOptions", jvmOpts);
 
         //setting the default limit for the spark query results
         conf.setIfMissing("carbon.spark.results.limit", "1000");
@@ -668,6 +671,16 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             conf.set("spark.driver.extraClassPath", conf.get("spark.driver.extraClassPath") + ";" + sparkClasspath);
         } catch (NoSuchElementException e) {
             conf.set("spark.driver.extraClassPath", sparkClasspath);
+        }
+    }
+
+    private String getLog4jPropertiesJvmOpt(String analyticsSparkConfDir) {
+        File tempFile = new File(analyticsSparkConfDir + File.separator + "log4j.properties");
+
+        if (tempFile.exists()) {
+            return " -Dlog4j.configuration=file:" + File.separator+ File.separator+ tempFile.getAbsolutePath();
+        } else {
+            return "";
         }
     }
 
@@ -708,7 +721,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         /* all workers will not have the same CPU count, this is just an approximation */
         int workerCount = this.getWorkerCount();
 
-        if(workerCount == 0) {
+        if (workerCount == 0) {
             throw new AnalyticsException("Error while calculating NumPartitionsHint. Worker count is zero.");
         }
 
@@ -744,7 +757,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         long start = System.currentTimeMillis();
         try {
-            if (this.sqlCtx == null){
+            if (this.sqlCtx == null) {
                 throw new AnalyticsExecutionException("Spark SQL Context is not available. " +
                                                       "Check if the cluster has instantiated properly.");
             }
@@ -811,9 +824,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private boolean isCarbonQuery(String query) {
         return (query.contains(AnalyticsConstants.SPARK_SHORTHAND_STRING) || query
-            .contains(AnalyticsConstants.COMPRESSED_EVENT_ANALYTICS_SHORTHAND));
+                .contains(AnalyticsConstants.COMPRESSED_EVENT_ANALYTICS_SHORTHAND));
     }
-    
+
 
     private String replaceShorthandStrings(String query) {
         Set<String> keys = this.shorthandStringsMap.keySet();
@@ -828,7 +841,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                                 AnalyticsRelationProvider.class.getName());
         this.addShorthandString(AnalyticsConstants.SPARK_JDBC_SHORTHAND_STRING,
                                 AnalyticsJDBCRelationProvider.class.getName());
-        this.addShorthandString(AnalyticsConstants.COMPRESSED_EVENT_ANALYTICS_SHORTHAND, 
+        this.addShorthandString(AnalyticsConstants.COMPRESSED_EVENT_ANALYTICS_SHORTHAND,
                                 CompressedEventAnalyticsRelationProvider.class.getName());
     }
 
@@ -1092,7 +1105,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         return ((long) Math.pow(2, retryCount) * 100L);
     }
 
-    private void retryWait(long waitTime)  {
+    private void retryWait(long waitTime) {
         try {
             Thread.sleep(waitTime);
         } catch (InterruptedException ignored) {
