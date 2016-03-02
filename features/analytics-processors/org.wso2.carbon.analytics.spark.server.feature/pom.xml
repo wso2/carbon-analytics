@@ -263,6 +263,7 @@
                     <include>spark-udf-config.xml</include>
                     <include>external-spark-classpath.conf</include>
                     <include>fairscheduler.xml</include>
+                    <include>log4j.properties.template</include>
                     <!-- moved to product-das DAS-110 -->
                     <!--<include>wso2server.sh</include>
                     <include>wso2server.bat</include>
