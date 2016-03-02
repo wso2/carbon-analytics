@@ -35,6 +35,7 @@ public class AggregateRequestBean {
     private List<AggregateField> aggregateFields;
     private int aggregateLevel;
     private List<String> parentPath;
+    private int noOfRecords;
 
     public AggregateRequestBean() {
     }
@@ -85,5 +86,13 @@ public class AggregateRequestBean {
 
     public void setParentPath(List<String> parentPath) {
         this.parentPath = parentPath;
+    }
+
+    public int getNoOfRecords() {
+        return noOfRecords;
+    }
+
+    public void setNoOfRecords(int noOfRecords) {
+        this.noOfRecords = noOfRecords;
     }
 }

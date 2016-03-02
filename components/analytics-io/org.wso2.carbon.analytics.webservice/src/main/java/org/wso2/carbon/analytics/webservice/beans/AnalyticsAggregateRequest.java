@@ -35,6 +35,7 @@ public class AnalyticsAggregateRequest implements Serializable {
     private AnalyticsAggregateField[] fields;
     private int aggregateLevel;
     private String[] parentPath;
+    private int noOfRecords;
 
     public AnalyticsAggregateRequest() {
     }
@@ -85,5 +86,13 @@ public class AnalyticsAggregateRequest implements Serializable {
 
     public void setParentPath(String[] parentPath) {
         this.parentPath = parentPath;
+    }
+
+    public int getNoOfRecords() {
+        return noOfRecords;
+    }
+
+    public void setNoOfRecords(int noOfRecords) {
+        this.noOfRecords = noOfRecords;
     }
 }

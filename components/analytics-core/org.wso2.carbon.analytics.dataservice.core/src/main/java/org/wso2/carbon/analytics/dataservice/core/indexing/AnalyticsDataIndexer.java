@@ -1702,9 +1702,12 @@ public class AnalyticsDataIndexer {
         if (aggregateRequest.getGroupByField() != null && !aggregateRequest.getGroupByField().isEmpty()) {
             searchResultEntries = getRecordSearchEntries(tenantId, path, aggregateRequest);
         } else {
-            int noOfRecords = aggregateRequest.getNoOfRecords() > 0 ? aggregateRequest.getNoOfRecords() : Integer.MAX_VALUE;
-            searchResultEntries = this.search(tenantId, aggregateRequest.getTableName(), aggregateRequest.getQuery(),
-                                              0, noOfRecords);
+            if (aggregateRequest.getNoOfRecords() > 0) {
+                searchResultEntries = this.search(tenantId, aggregateRequest.getTableName(), aggregateRequest.getQuery(),
+                                                  0, aggregateRequest.getNoOfRecords());
+            } else {
+                throw new AnalyticsException("No of records to be iterated is missing.. ( Parameter : NoOfRecords is zero..)");
+            }
         }
         if (!searchResultEntries.isEmpty()) {
             List<String> recordIds = getRecordIds(searchResultEntries);

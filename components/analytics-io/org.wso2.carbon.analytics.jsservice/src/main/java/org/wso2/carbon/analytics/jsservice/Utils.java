@@ -514,6 +514,7 @@ public class Utils {
         request.setFields(createAggregateFieds(aggregateRequest.getAggregateFields()));
         request.setAggregateLevel(aggregateRequest.getAggregateLevel());
         request.setParentPath(aggregateRequest.getParentPath());
+        request.setNoOfRecords(aggregateRequest.getNoOfRecords());
         return request;
     }
 
