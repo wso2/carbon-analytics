@@ -1374,7 +1374,8 @@ public class AnalyticsAPIHttpClient {
                 .addParameter(AnalyticsAPIConstants.AGGREGATING_FIELDS, gson.toJson(aggregateRequest.getFields()))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, aggregateRequest.getTableName())
                 .addParameter(AnalyticsAPIConstants.AGGREGATE_LEVEL, String.valueOf(aggregateRequest.getAggregateLevel()))
-                .addParameter(AnalyticsAPIConstants.AGGREGATE_PARENT_PATH, gson.toJson(aggregateRequest.getParentPath()));
+                .addParameter(AnalyticsAPIConstants.AGGREGATE_PARENT_PATH, gson.toJson(aggregateRequest.getParentPath()))
+                .addParameter(AnalyticsAPIConstants.AGGREGATE_NO_OF_RECORDS, gson.toJson(aggregateRequest.getNoOfRecords()));
         if (!securityEnabled) {
             builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
         } else {

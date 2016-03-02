@@ -173,6 +173,8 @@ public class AnalyticsDataIndexer {
 
     private static final String LUCENE_QUERY_FOR_AGGREGATION = "luceneQuery";
 
+    private static final String NO_OF_RECORDS = "noOfRecords";
+
     private Map<String, IndexWriter> indexWriters = new HashMap<>();
 
     private Map<String, DirectoryTaxonomyWriter> indexTaxonomyWriters = new HashMap<>();
@@ -1700,12 +1702,13 @@ public class AnalyticsDataIndexer {
         if (aggregateRequest.getGroupByField() != null && !aggregateRequest.getGroupByField().isEmpty()) {
             searchResultEntries = getRecordSearchEntries(tenantId, path, aggregateRequest);
         } else {
-            //Lucene ArrayUtils calculates max number of documents it can retreive to memory from start = 0,
+            int noOfRecords = aggregateRequest.getNoOfRecords() > 0 ? aggregateRequest.getNoOfRecords() : Integer.MAX_VALUE;
             searchResultEntries = this.search(tenantId, aggregateRequest.getTableName(), aggregateRequest.getQuery(),
-                                              0, 1000);
+                                              0, noOfRecords);
         }
         if (!searchResultEntries.isEmpty()) {
             List<String> recordIds = getRecordIds(searchResultEntries);
+            int actualNoOfRecords = recordIds.size();
             analyticsDataResponse = this.indexerInfo.getAnalyticsDataService().get(tenantId, aggregateRequest.getTableName(),
                                                                                    1, null, recordIds);
             Iterator<Record> iterator = AnalyticsDataServiceUtils.responseToIterator(this.indexerInfo.getAnalyticsDataService(),
@@ -1718,14 +1721,14 @@ public class AnalyticsDataIndexer {
                     function.process(value);
                 }
             }
-            Map<String, Object> aggregatedValues = generateAggregateRecordValues(path, aggregateRequest,
+            Map<String, Object> aggregatedValues = generateAggregateRecordValues(path, actualNoOfRecords, aggregateRequest,
                                                                                  perAliasAggregateFunction);
             aggregatedRecord = new Record(tenantId, aggregateRequest.getTableName(), aggregatedValues);
         }
         return aggregatedRecord;
     }
 
-    private Map<String, Object> generateAggregateRecordValues(String[] path,
+    private Map<String, Object> generateAggregateRecordValues(String[] path, int noOfRecords,
                                                               AggregateRequest aggregateRequest,
                                                               Map<String, AggregateFunction> perAliasAggregateFunction)
             throws AnalyticsException {
@@ -1744,6 +1747,7 @@ public class AnalyticsDataIndexer {
                                  path);
         }
         aggregatedValues.put(LUCENE_QUERY_FOR_AGGREGATION, luceneQuery);
+        aggregatedValues.put(NO_OF_RECORDS, noOfRecords);
         return aggregatedValues;
     }
 
@@ -1770,11 +1774,12 @@ public class AnalyticsDataIndexer {
                                                            AggregateRequest aggregateRequest)
             throws AnalyticsIndexException {
 
+        int recordCount = aggregateRequest.getNoOfRecords() > 0 ? aggregateRequest.getNoOfRecords() : Integer.MAX_VALUE;
         AnalyticsDrillDownRequest analyticsDrillDownRequest = new AnalyticsDrillDownRequest();
         analyticsDrillDownRequest.setTableName(aggregateRequest.getTableName());
         analyticsDrillDownRequest.setQuery(aggregateRequest.getQuery());
         analyticsDrillDownRequest.setRecordStartIndex(0);
-        analyticsDrillDownRequest.setRecordCount(Integer.MAX_VALUE);
+        analyticsDrillDownRequest.setRecordCount(recordCount);
         Map<String, List<String>> groupByCategory = new HashMap<>();
         List<String> groupByValue = new ArrayList<>();
         groupByValue.addAll(Arrays.asList(path));
