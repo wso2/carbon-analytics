@@ -108,7 +108,8 @@ public class AnalyticsServiceHolder {
             AnalyticsServiceHolder.aggregateFunctions.put(aggregateFunction.getAggregateName(), aggregateFunction.getClass());
         } else {
             throw new RuntimeException("Error while reading AggregateFunctions as OSGI Components: " +
-                                       "getAggregateName is not properly implemented (return null or return empty String");
+                                       "AggregateFunction.getAggregateName() is not properly implemented " +
+                                       "(return null or return empty String");
         }
     }
 
