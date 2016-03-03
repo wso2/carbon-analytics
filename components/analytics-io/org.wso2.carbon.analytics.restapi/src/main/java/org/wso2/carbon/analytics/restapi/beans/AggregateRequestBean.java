@@ -40,6 +40,7 @@ public class AggregateRequestBean {
     private String query;
     @XmlElement(name = "aggregateFields", required = true)
     private List<AggregateFieldBean> fields;
+    private int noOfRecords;
 
     public AggregateRequestBean() {
 
@@ -99,6 +100,14 @@ public class AggregateRequestBean {
 
     public void setParentPath(List<String> parentPath) {
         this.parentPath = parentPath;
+    }
+
+    public int getNoOfRecords() {
+        return noOfRecords;
+    }
+
+    public void setNoOfRecords(int noOfRecords) {
+        this.noOfRecords = noOfRecords;
     }
 }
 

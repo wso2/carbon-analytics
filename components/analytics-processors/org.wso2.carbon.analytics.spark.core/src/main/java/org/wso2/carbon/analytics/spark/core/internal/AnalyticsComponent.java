@@ -204,6 +204,17 @@ public class AnalyticsComponent {
 //        this is removed because, NetworkUtils.getLocalHostname() would return the carbon.xml
 //        hostname if provided. but in the spark environment, it would need a unique hostname DAS-171
 //        return NetworkUtils.getLocalHostname();
-        return org.apache.axis2.util.Utils.getIpAddress();
+        String localIP = System.getenv(AnalyticsConstants.SPARK_LOCAL_IP_PROP);
+        if (localIP != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Spark host is set from the SPARK_LOCAL_IP property : " + localIP);
+            }
+            return localIP;
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Spark host is set NOT set, hence using the node network interface");
+            }
+            return org.apache.axis2.util.Utils.getIpAddress();
+        }
     }
 }

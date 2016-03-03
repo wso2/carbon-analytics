@@ -121,6 +121,7 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                     Type aggregateParentPath = new TypeToken<List<String>>(){}.getType();
                     List<String> parentPath = gson.fromJson(parentPathAsString, aggregateParentPath);
                     int aggregateLevel = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.AGGREGATE_LEVEL));
+                    int noOfRecords = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.AGGREGATE_NO_OF_RECORDS));
                     AggregateRequest aggregateRequest = new AggregateRequest();
                     aggregateRequest.setTableName(tableName);
                     aggregateRequest.setQuery(query);
@@ -128,6 +129,7 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                     aggregateRequest.setGroupByField(groupByField);
                     aggregateRequest.setAggregateLevel(aggregateLevel);
                     aggregateRequest.setParentPath(parentPath);
+                    aggregateRequest.setNoOfRecords(noOfRecords);
                     if (!securityEnabled) iterator = ServiceHolder.getAnalyticsDataService()
                             .searchWithAggregates(tenantIdParam, aggregateRequest);
                     else

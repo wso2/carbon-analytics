@@ -49,6 +49,7 @@ public class AnalyticsAPIConstants {
     public static final String AGGREGATING_FIELDS = "aggregatingFields";
     public static final String AGGREGATE_LEVEL = "aggregateLevel";
     public static final String AGGREGATE_PARENT_PATH = "aggregateParentPath";
+    public static final String AGGREGATE_NO_OF_RECORDS = "noOfRecords";
             ;
     public static final String OPERATION = "__operation";
     public static final String SESSION_ID = "__sessionId";

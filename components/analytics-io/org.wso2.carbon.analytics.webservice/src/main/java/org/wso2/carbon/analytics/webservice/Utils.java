@@ -558,6 +558,7 @@ public class Utils {
             parentPath.addAll(Arrays.asList(request.getParentPath()));
         }
         aggregateRequest.setParentPath(parentPath);
+        aggregateRequest.setNoOfRecords(request.getNoOfRecords());
         return aggregateRequest;
     }
 
