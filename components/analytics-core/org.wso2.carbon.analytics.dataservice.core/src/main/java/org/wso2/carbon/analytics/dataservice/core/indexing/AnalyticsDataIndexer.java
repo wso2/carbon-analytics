@@ -1693,9 +1693,7 @@ public class AnalyticsDataIndexer {
     private Record aggregatePerGrouping(int tenantId, String[] path,
                                         AggregateRequest aggregateRequest)
             throws AnalyticsException {
-        Map<String, Number> optionalParams = new HashMap<>();
-        Map<String, AggregateFunction> perAliasAggregateFunction = initPerAliasAggregateFunctions(aggregateRequest,
-                optionalParams);
+        Map<String, AggregateFunction> perAliasAggregateFunction = initPerAliasAggregateFunctions(aggregateRequest);
         AnalyticsDataResponse analyticsDataResponse = null;
         Record aggregatedRecord = null;
         List<SearchResultEntry> searchResultEntries = null;
@@ -1719,9 +1717,8 @@ public class AnalyticsDataIndexer {
             while (iterator.hasNext()) {
                 Record record = iterator.next();
                 for (AggregateField field : aggregateRequest.getFields()) {
-                    Number value = (Number) record.getValue(field.getFieldName());
                     AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
-                    function.process(value);
+                    function.process(record.getValue(field.getFieldName()));
                 }
             }
             Map<String, Object> aggregatedValues = generateAggregateRecordValues(path, actualNoOfRecords, aggregateRequest,
@@ -1742,7 +1739,7 @@ public class AnalyticsDataIndexer {
         }
         for (AggregateField field : aggregateRequest.getFields()) {
             String alias = field.getAlias();
-            Number result = perAliasAggregateFunction.get(alias).finish();
+            Object result = perAliasAggregateFunction.get(alias).finish();
             aggregatedValues.put(alias, result);
         }
         if (aggregateRequest.getGroupByField() != null && !aggregateRequest.getGroupByField().isEmpty()) {
@@ -1755,12 +1752,11 @@ public class AnalyticsDataIndexer {
     }
 
     private Map<String, AggregateFunction> initPerAliasAggregateFunctions(
-            AggregateRequest aggregateRequest, Map<String, Number> optionalParams)
+            AggregateRequest aggregateRequest)
             throws AnalyticsException {
         Map<String, AggregateFunction> perAliasAggregateFunction = new HashMap<>();
         for (AggregateField field : aggregateRequest.getFields()) {
-            AggregateFunction function = getAggregateFunctionFactory().create(field.getAggregateFunction(),
-                                                                              optionalParams);
+            AggregateFunction function = getAggregateFunctionFactory().create(field.getAggregateFunction());
             if (function == null) {
                 throw new AnalyticsException("Unknown aggregate function!");
             } else if (field.getFieldName() == null || field.getFieldName().isEmpty()) {

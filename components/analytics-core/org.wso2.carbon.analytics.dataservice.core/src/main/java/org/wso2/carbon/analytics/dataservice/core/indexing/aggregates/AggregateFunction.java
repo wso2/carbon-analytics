@@ -24,6 +24,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
  * This interface is used to implement custom aggregates over the record fields.
  */
 public interface AggregateFunction {
-    public void process(Number value) throws AnalyticsException;
-    public Number finish() throws AnalyticsException;
+    public void process(Object value) throws AnalyticsException;
+    public Object finish() throws AnalyticsException;
+    public String getAggregateName();
 }

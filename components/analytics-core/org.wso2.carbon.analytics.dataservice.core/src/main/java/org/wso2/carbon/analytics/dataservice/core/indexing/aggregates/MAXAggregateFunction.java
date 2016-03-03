@@ -18,9 +18,8 @@
 
 package org.wso2.carbon.analytics.dataservice.core.indexing.aggregates;
 
+import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-
-import java.util.Map;
 
 /**
  * This class represents the MAX aggregate which returns the maximum value of a record field.
@@ -28,20 +27,31 @@ import java.util.Map;
 public class MAXAggregateFunction implements AggregateFunction {
     private double maxValue;
 
-    public MAXAggregateFunction(Map<String, Number> optionalParams) {
+    public MAXAggregateFunction() {
         maxValue = Double.MIN_VALUE;
     }
 
     @Override
-    public void process(Number value)
+    public void process(Object value)
             throws AnalyticsException {
-            if (maxValue < value.doubleValue()) {
-                maxValue = value.doubleValue();
+        if (value instanceof Number) {
+            Number numericValue = (Number) value;
+            if (maxValue < numericValue.doubleValue()) {
+                maxValue = numericValue.doubleValue();
             }
+        } else {
+            throw new AnalyticsException("Error while calculating MAX: value '" + value.toString() +
+                                         "', being aggregated is not numeric.");
+        }
     }
 
     @Override
     public Number finish() throws AnalyticsException {
         return maxValue;
+    }
+
+    @Override
+    public String getAggregateName() {
+        return Constants.MAX_AGGREGATE;
     }
 }

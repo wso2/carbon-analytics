@@ -42,14 +42,14 @@ public class AggregateFunctionFactory {
         this.aggregateFunctions.put(Constants.COUNT_AGGREGATE, COUNTAggregateFunction.class);
     }
 
-    public AggregateFunction create(String type, Map<String, Number> optionalParams) throws AnalyticsException {
+    public AggregateFunction create(String type) throws AnalyticsException {
         Class<?> aggregateClass =  this.aggregateFunctions.get(type);
         AggregateFunction aggregateFunction;
         if (aggregateClass != null) {
             try {
-                Constructor<?> aggregateFuncConstructor = aggregateClass.getConstructor(Map.class);
+                Constructor<?> aggregateFuncConstructor = aggregateClass.getConstructor();
                 //AggregateFunction classes should have a constructor with a Map<String, Number>
-                aggregateFunction = (AggregateFunction) aggregateFuncConstructor.newInstance(optionalParams);
+                aggregateFunction = (AggregateFunction) aggregateFuncConstructor.newInstance();
             } catch (Exception e) {
                 logger.error("error while creating aggregateFunction," + e.getMessage(), e);
                 throw new AnalyticsException("Error while creating aggregateFunction, " + e.getMessage(), e);
