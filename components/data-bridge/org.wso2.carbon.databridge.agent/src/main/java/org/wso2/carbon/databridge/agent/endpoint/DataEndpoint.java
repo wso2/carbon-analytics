@@ -271,12 +271,13 @@ public abstract class DataEndpoint {
             dataEndpointFailureCallback.tryResendEvents(events);
         }
 
-        private void publish() throws DataEndpointException,
-                SessionTimeoutException,
-                UndefinedEventTypeException {
+        private void publish() throws DataEndpointException, SessionTimeoutException, UndefinedEventTypeException {
             Object client = getClient();
-            send(client, this.events);
-            returnClient(client);
+            try {
+                send(client, this.events);
+            } finally {
+                returnClient(client);
+            }
         }
     }
 
