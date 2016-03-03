@@ -1696,17 +1696,7 @@ public class AnalyticsDataIndexer {
         Map<String, AggregateFunction> perAliasAggregateFunction = initPerAliasAggregateFunctions(aggregateRequest);
         AnalyticsDataResponse analyticsDataResponse = null;
         Record aggregatedRecord = null;
-        List<SearchResultEntry> searchResultEntries = null;
-        if (aggregateRequest.getGroupByField() != null && !aggregateRequest.getGroupByField().isEmpty()) {
-            searchResultEntries = getRecordSearchEntries(tenantId, path, aggregateRequest);
-        } else {
-            if (aggregateRequest.getNoOfRecords() > 0) {
-                searchResultEntries = this.search(tenantId, aggregateRequest.getTableName(), aggregateRequest.getQuery(),
-                                                  0, aggregateRequest.getNoOfRecords());
-            } else {
-                throw new AnalyticsException("No of records to be iterated is missing.. ( Parameter : NoOfRecords is zero..)");
-            }
-        }
+        List<SearchResultEntry> searchResultEntries = getSearchResultEntries(tenantId, path, aggregateRequest);
         if (!searchResultEntries.isEmpty()) {
             List<String> recordIds = getRecordIds(searchResultEntries);
             int actualNoOfRecords = recordIds.size();
@@ -1718,7 +1708,13 @@ public class AnalyticsDataIndexer {
                 Record record = iterator.next();
                 for (AggregateField field : aggregateRequest.getFields()) {
                     AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
-                    function.process(record.getValue(field.getFieldName()));
+                    Object value = record.getValue(field.getFieldName());
+                    if (value != null) {
+                        function.process(value);
+                    } else {
+                        throw new AnalyticsException("Error in aggregating values for field: " +
+                                                     field.getFieldName() + "Aggregating values for non-existant field");
+                    }
                 }
             }
             Map<String, Object> aggregatedValues = generateAggregateRecordValues(path, actualNoOfRecords, aggregateRequest,
@@ -1726,6 +1722,34 @@ public class AnalyticsDataIndexer {
             aggregatedRecord = new Record(tenantId, aggregateRequest.getTableName(), aggregatedValues);
         }
         return aggregatedRecord;
+    }
+
+    private List<SearchResultEntry> getSearchResultEntries(int tenantId, String[] path,
+                                                           AggregateRequest aggregateRequest)
+            throws AnalyticsException {
+        List<SearchResultEntry> searchResultEntries = null;
+        if (aggregateRequest.getGroupByField() != null && !aggregateRequest.getGroupByField().isEmpty()) {
+            int recordCount = aggregateRequest.getNoOfRecords() > 0 ? aggregateRequest.getNoOfRecords() : Integer.MAX_VALUE;
+            AnalyticsDrillDownRequest analyticsDrillDownRequest = new AnalyticsDrillDownRequest();
+            analyticsDrillDownRequest.setTableName(aggregateRequest.getTableName());
+            analyticsDrillDownRequest.setQuery(aggregateRequest.getQuery());
+            analyticsDrillDownRequest.setRecordStartIndex(0);
+            analyticsDrillDownRequest.setRecordCount(recordCount);
+            Map<String, List<String>> groupByCategory = new HashMap<>();
+            List<String> groupByValue = new ArrayList<>();
+            groupByValue.addAll(Arrays.asList(path));
+            groupByCategory.put(aggregateRequest.getGroupByField(), groupByValue);
+            analyticsDrillDownRequest.setCategoryPaths(groupByCategory);
+            searchResultEntries = this.getDrillDownRecords(tenantId, analyticsDrillDownRequest, null, null);
+        } else {
+            if (aggregateRequest.getNoOfRecords() > 0) {
+                searchResultEntries = this.search(tenantId, aggregateRequest.getTableName(), aggregateRequest.getQuery(),
+                                                  0, aggregateRequest.getNoOfRecords());
+            } else {
+                throw new AnalyticsException("No of records to be iterated is missing.. ( Parameter : NoOfRecords is zero..)");
+            }
+        }
+        return searchResultEntries;
     }
 
     private Map<String, Object> generateAggregateRecordValues(String[] path, int noOfRecords,
@@ -1767,24 +1791,6 @@ public class AnalyticsDataIndexer {
             perAliasAggregateFunction.put(field.getAlias(), function);
         }
         return perAliasAggregateFunction;
-    }
-
-    private List<SearchResultEntry> getRecordSearchEntries(int tenantId, String[] path,
-                                                           AggregateRequest aggregateRequest)
-            throws AnalyticsIndexException {
-
-        int recordCount = aggregateRequest.getNoOfRecords() > 0 ? aggregateRequest.getNoOfRecords() : Integer.MAX_VALUE;
-        AnalyticsDrillDownRequest analyticsDrillDownRequest = new AnalyticsDrillDownRequest();
-        analyticsDrillDownRequest.setTableName(aggregateRequest.getTableName());
-        analyticsDrillDownRequest.setQuery(aggregateRequest.getQuery());
-        analyticsDrillDownRequest.setRecordStartIndex(0);
-        analyticsDrillDownRequest.setRecordCount(recordCount);
-        Map<String, List<String>> groupByCategory = new HashMap<>();
-        List<String> groupByValue = new ArrayList<>();
-        groupByValue.addAll(Arrays.asList(path));
-        groupByCategory.put(aggregateRequest.getGroupByField(), groupByValue);
-        analyticsDrillDownRequest.setCategoryPaths(groupByCategory);
-        return this.getDrillDownRecords(tenantId, analyticsDrillDownRequest, null, null);
     }
 
     private static List<String> getRecordIds(List<SearchResultEntry> searchResults) {

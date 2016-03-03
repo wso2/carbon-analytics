@@ -21,9 +21,13 @@ package org.wso2.carbon.analytics.dataservice.core;
 import com.hazelcast.core.HazelcastInstance;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManagerImpl;
+import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunction;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.user.core.service.RealmService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This represents a service holder class for analytics data service.
@@ -41,6 +45,8 @@ public class AnalyticsServiceHolder {
     private static RealmService realmService;
 
     private static TaskService taskService;
+
+    private static Map<String, Class> aggregateFunctions = new HashMap<>();
 
     public static void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         AnalyticsServiceHolder.hazelcastInstance = hazelcastInstance;
@@ -95,5 +101,22 @@ public class AnalyticsServiceHolder {
 
     public static void setTaskService(TaskService taskService) {
         AnalyticsServiceHolder.taskService = taskService;
+    }
+
+    public static void addAggregateFunction(AggregateFunction aggregateFunction) {
+        if (aggregateFunction.getAggregateName() != null && !aggregateFunction.getAggregateName().isEmpty()) {
+            AnalyticsServiceHolder.aggregateFunctions.put(aggregateFunction.getAggregateName(), aggregateFunction.getClass());
+        } else {
+            throw new RuntimeException("Error while reading AggregateFunctions as OSGI Components: " +
+                                       "getAggregateName is not properly implemented (return null or return empty String");
+        }
+    }
+
+    public static void removeAggregateFunctions() {
+        AnalyticsServiceHolder.aggregateFunctions = null;
+    }
+
+    public static Map<String, Class> getAggregateFunctions() {
+        return AnalyticsServiceHolder.aggregateFunctions;
     }
 }

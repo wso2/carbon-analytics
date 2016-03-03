@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.dataservice.core.indexing.aggregates;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.commons.Constants;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 import java.lang.reflect.Constructor;
@@ -35,11 +36,19 @@ public class AggregateFunctionFactory {
     private Log logger = LogFactory.getLog(AggregateFunctionFactory.class);
     public AggregateFunctionFactory() {
         this.aggregateFunctions = new HashMap<>();
+        //default Aggregates
         this.aggregateFunctions.put(Constants.AVG_AGGREGATE, AVGAggregateFunction.class);
         this.aggregateFunctions.put(Constants.SUM_AGGREGATE, SUMAggregateFunction.class);
         this.aggregateFunctions.put(Constants.MAX_AGGREGATE, MAXAggregateFunction.class);
         this.aggregateFunctions.put(Constants.MIN_AGGREGATE, MINAggregateFunction.class);
         this.aggregateFunctions.put(Constants.COUNT_AGGREGATE, COUNTAggregateFunction.class);
+
+        //Aggregates installed as OSGI Components
+        if (!AnalyticsServiceHolder.getAggregateFunctions().isEmpty()) {
+            for (Map.Entry<String, Class> entry : AnalyticsServiceHolder.getAggregateFunctions().entrySet()) {
+                this.aggregateFunctions.put(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     public AggregateFunction create(String type) throws AnalyticsException {

@@ -145,11 +145,13 @@ public class AnalyticsDataServiceComponent {
         if (log.isDebugEnabled()) {
             log.debug("Setting the Aggregate Function: " + aggregateFunction.getAggregateName());
         }
+        AnalyticsServiceHolder.addAggregateFunction(aggregateFunction);
     }
 
     protected void removeAggregateFunctions(AggregateFunction aggregateFunction) {
         if (log.isDebugEnabled()) {
             log.debug("Removing the aggregate functions..");
         }
+        AnalyticsServiceHolder.removeAggregateFunctions();
     }
 }
