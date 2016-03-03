@@ -211,6 +211,9 @@ public class AnalyticsComponent {
             }
             return localIP;
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Spark host is set NOT set, hence using the node network interface");
+            }
             return org.apache.axis2.util.Utils.getIpAddress();
         }
     }
