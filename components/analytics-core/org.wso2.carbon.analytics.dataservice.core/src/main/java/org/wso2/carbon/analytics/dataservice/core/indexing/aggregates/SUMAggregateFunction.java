@@ -33,8 +33,13 @@ public class SUMAggregateFunction implements AggregateFunction {
     }
 
     @Override
-    public void process(Object value)
+    public void process(RecordValuesContext ctx, String[] aggregateFields)
             throws AnalyticsException {
+        Object value = ctx.getValue(aggregateFields[0]);
+        if (value == null) {
+            throw new AnalyticsException("Error while calculating SUM: value of the field, " +
+                                         aggregateFields[0] + " is null");
+        }
         if (value instanceof Number) {
             sum += ((Number)value).doubleValue();
         } else {

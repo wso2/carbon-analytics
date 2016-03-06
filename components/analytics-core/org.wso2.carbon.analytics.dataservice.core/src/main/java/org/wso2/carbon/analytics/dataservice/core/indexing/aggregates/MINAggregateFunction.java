@@ -33,8 +33,13 @@ public class MINAggregateFunction implements AggregateFunction {
     }
 
     @Override
-    public void process(Object value)
+    public void process(RecordValuesContext ctx, String[] aggregateFields)
             throws AnalyticsException {
+        Object value = ctx.getValue(aggregateFields[0]);
+        if (value == null) {
+            throw new AnalyticsException("Error while calculating MIN: value of the field, " +
+                                         aggregateFields[0] + " is null");
+        }
         if (value instanceof Number) {
             Number numericValue = (Number) value;
             if (numericValue.doubleValue() < minValue) {
