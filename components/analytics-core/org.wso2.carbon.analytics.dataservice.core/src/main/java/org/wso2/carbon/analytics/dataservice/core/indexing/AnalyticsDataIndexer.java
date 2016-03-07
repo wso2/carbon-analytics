@@ -1710,7 +1710,7 @@ public class AnalyticsDataIndexer {
                     AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
                     Object value = record.getValue(field.getFieldName());
                     if (value != null) {
-                        function.process(value);
+                        function.process(null, null);
                     } else {
                         throw new AnalyticsException("Error in aggregating values for field: " +
                                                      field.getFieldName() + "Aggregating values for non-existant field");
