@@ -1385,10 +1385,11 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceUnauthorizedException("Error while searching with aggregates. " + response);
             } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Error while searching with aggregates. " + response);
             } else {
                 return new RemoteRecordIterator(httpResponse.getEntity().getContent());
@@ -1417,10 +1418,11 @@ public class AnalyticsAPIHttpClient {
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(aggregateRequests)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceUnauthorizedException("Error while searching with aggregates. " + response);
             } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Error while searching with aggregates. " + response);
             } else {
                 Object aggregateObjs = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
@@ -1462,10 +1464,11 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceUnauthorizedException("Error while re-indexing. " + response);
             } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Error while re-indexing. " + response);
             }
         } catch (URISyntaxException e) {
