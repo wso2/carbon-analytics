@@ -696,7 +696,7 @@ public class AnalyticsResource extends AbstractResource {
         if (queryBean != null) {
             List<SearchResultEntry> searchResults = analyticsDataService.search(username,
                      queryBean.getTableName(), queryBean.getQuery(),
-                     queryBean.getStart(), queryBean.getCount());
+                     queryBean.getStart(), queryBean.getCount(), Utils.getSortedFields(queryBean.getSortByFieldBeans()));
             List<String> ids = Utils.getRecordIds(searchResults);
             AnalyticsDataResponse resp = analyticsDataService.get(username,
                                                                   queryBean.getTableName(), 1, null, ids);

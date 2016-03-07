@@ -40,6 +40,7 @@ public class AnalyticsAPIConstants {
     public static final String QUERY = "query";
     public static final String START_PARAM = "start";
     public static final String COUNT_PARAM = "count";
+    public static final String SORT_BY_FIELDS_PARAM = "sortByFields";
     public static final String MAX_WAIT_PARAM = "maxWait";
     public static final String PARTITIONER_NO_PARAM = "partitionerNo";
     public static final String COLUMNS_PARAM = "columns";

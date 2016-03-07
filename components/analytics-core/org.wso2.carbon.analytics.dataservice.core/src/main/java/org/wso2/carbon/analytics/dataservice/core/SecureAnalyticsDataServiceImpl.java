@@ -23,6 +23,7 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
@@ -219,13 +220,13 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
 
     @Override
     public List<SearchResultEntry> search(String username, String tableName, String query, int start,
-                                          int count) throws AnalyticsIndexException, AnalyticsException {
+                                          int count, List<SortByField> sortByFields) throws AnalyticsIndexException, AnalyticsException {
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to search indexed records");
         }
-        return analyticsDataService.search(tenantId, tableName, query, start, count);
+        return analyticsDataService.search(tenantId, tableName, query, start, count, sortByFields);
     }
 
     @Override

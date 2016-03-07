@@ -26,6 +26,7 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -83,12 +84,15 @@ public class AnalyticsSearchProcessor extends HttpServlet {
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.SEARCH_OPERATION)) {
                 int start = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.START_PARAM));
                 int count = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.COUNT_PARAM));
+                Type sortByFieldType = new TypeToken<List<SortByField>>() {}.getType();
+                Gson gson = new Gson();
+                List<SortByField> sortByFields = gson.fromJson(req.getParameter(AnalyticsAPIConstants.SORT_BY_FIELDS_PARAM), sortByFieldType);
                 try {
                     List<SearchResultEntry> searchResult;
                     if (!securityEnabled) searchResult = ServiceHolder.getAnalyticsDataService().search(tenantIdParam,
-                            tableName, query, start, count);
+                            tableName, query, start, count, sortByFields);
                     else
-                        searchResult = ServiceHolder.getSecureAnalyticsDataService().search(userName, tableName, query, start, count);
+                        searchResult = ServiceHolder.getSecureAnalyticsDataService().search(userName, tableName, query, start, count, sortByFields);
                     //Have to do this because there is possibility of getting sublist which cannot be serialized
                     searchResult = new ArrayList<>(searchResult);
                     resp.getOutputStream().write(GenericUtils.serializeObject(searchResult));

@@ -24,7 +24,9 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SORT;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
@@ -44,6 +46,7 @@ import org.wso2.carbon.analytics.restapi.beans.DrillDownPathBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.restapi.beans.RecordBean;
+import org.wso2.carbon.analytics.restapi.beans.SortByFieldBean;
 import org.wso2.carbon.analytics.restapi.beans.SubCategoriesBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.UserStoreException;
@@ -469,5 +472,44 @@ public class Utils {
             }
         }
         return requests.toArray(new AggregateRequest[requests.size()]);
+    }
+
+    public static List<SortByField> getSortedFields(List<SortByFieldBean> sortByFieldBeans)
+            throws AnalyticsException {
+        List<SortByField> sortByFields = new ArrayList<>();
+        if (sortByFieldBeans != null) {
+            for (SortByFieldBean sortByFieldBean : sortByFieldBeans) {
+                SortByField sortByField = new SortByField(sortByFieldBean.getField(),
+                                                          getSortType(sortByFieldBean.getField(), sortByFieldBean.getSortType()),
+                                                          sortByFieldBean.isReversed());
+                sortByFields.add(sortByField);
+            }
+        }
+        return sortByFields;
+    }
+
+    private static SORT getSortType(String field, String sortBy) throws AnalyticsException {
+        SORT sort;
+        if (sortBy != null) {
+            switch (sortBy) {
+                case "ASC":
+                    sort = SORT.ASC;
+                    break;
+                case "DESC":
+                    sort = SORT.DESC;
+                    break;
+                case "RELEVANCE":
+                    sort = SORT.RELEVANCE;
+                    break;
+                case "INDEX_ORDER":
+                    sort = SORT.INDEX_ORDER;
+                    break;
+                default:
+                    throw new AnalyticsException("Unknown SORT order: " + sortBy + " for field: " + field);
+            }
+        } else {
+            throw new AnalyticsException("sortType cannot be null for field: " + field);
+        }
+        return sort;
     }
 }

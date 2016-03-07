@@ -25,6 +25,7 @@ import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
 import org.wso2.carbon.analytics.api.internal.ServiceHolder;
 import org.wso2.carbon.analytics.api.internal.client.AnalyticsAPIHttpClient;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
+import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -653,21 +654,21 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public List<SearchResultEntry> search(String username, String tableName, String query, int start, int count)
+    public List<SearchResultEntry> search(String username, String tableName, String query, int start, int count, List<SortByField> sortByFields)
             throws AnalyticsIndexException, AnalyticsException {
         if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
-            return ServiceHolder.getSecureAnalyticsDataService().search(username, tableName, query, start, count);
+            return ServiceHolder.getSecureAnalyticsDataService().search(username, tableName, query, start, count, sortByFields);
         } else {
             try {
                 AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                         analyticsDataConfiguration.getPassword());
                 return AnalyticsAPIHttpClient.getInstance().search(MultitenantConstants.INVALID_TENANT_ID,
-                        username, tableName, query, start, count, true);
+                        username, tableName, query, start, count, sortByFields, true);
             } catch (AnalyticsServiceUnauthorizedException ex) {
                 AnalyticsAPIHttpClient.getInstance().invalidateSessionAndAuthenticate(analyticsDataConfiguration.
                         getUsername(), analyticsDataConfiguration.getPassword());
                 return AnalyticsAPIHttpClient.getInstance().search(MultitenantConstants.INVALID_TENANT_ID,
-                        username, tableName, query, start, count, true);
+                        username, tableName, query, start, count, sortByFields, true);
             }
         }
     }
@@ -885,18 +886,18 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public List<SearchResultEntry> search(int tenantId, String tableName, String query, int start,
-                                          int count) throws AnalyticsException {
+                                          int count, List<SortByField> sortByFields) throws AnalyticsException {
         if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
-            return ServiceHolder.getAnalyticsDataService().search(tenantId, tableName, query, start, count);
+            return ServiceHolder.getAnalyticsDataService().search(tenantId, tableName, query, start, count, sortByFields);
         } else {
             try {
                 AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                         analyticsDataConfiguration.getPassword());
-                return AnalyticsAPIHttpClient.getInstance().search(tenantId, null, tableName, query, start, count, false);
+                return AnalyticsAPIHttpClient.getInstance().search(tenantId, null, tableName, query, start, count, sortByFields, false);
             } catch (AnalyticsServiceUnauthorizedException ex) {
                 AnalyticsAPIHttpClient.getInstance().invalidateSessionAndAuthenticate(analyticsDataConfiguration.
                         getUsername(), analyticsDataConfiguration.getPassword());
-                return AnalyticsAPIHttpClient.getInstance().search(tenantId, null, tableName, query, start, count, false);
+                return AnalyticsAPIHttpClient.getInstance().search(tenantId, null, tableName, query, start, count, sortByFields, false);
             }
         }
     }

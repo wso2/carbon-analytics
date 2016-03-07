@@ -53,6 +53,7 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -705,7 +706,8 @@ public class AnalyticsAPIHttpClient {
 
     @SuppressWarnings("unchecked")
     public List<SearchResultEntry> search(int tenantId, String username, String tableName, String query,
-                                          int start, int count, boolean securityEnabled) throws AnalyticsServiceException {
+                                          int start, int count, List<SortByField> sortByFields, boolean securityEnabled)
+            throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SEARCH_OPERATION)
@@ -713,6 +715,7 @@ public class AnalyticsAPIHttpClient {
                 .addParameter(AnalyticsAPIConstants.QUERY, query)
                 .addParameter(AnalyticsAPIConstants.START_PARAM, String.valueOf(start))
                 .addParameter(AnalyticsAPIConstants.COUNT_PARAM, String.valueOf(count))
+                .addParameter(AnalyticsAPIConstants.SORT_BY_FIELDS_PARAM, gson.toJson(sortByFields))
                 .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
         if (!securityEnabled) {
             builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));

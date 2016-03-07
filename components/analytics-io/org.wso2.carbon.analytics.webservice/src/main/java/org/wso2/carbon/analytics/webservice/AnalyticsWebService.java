@@ -43,6 +43,7 @@ import org.wso2.carbon.analytics.webservice.beans.CategoryPathBean;
 import org.wso2.carbon.analytics.webservice.beans.CategorySearchResultEntryBean;
 import org.wso2.carbon.analytics.webservice.beans.EventBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordBean;
+import org.wso2.carbon.analytics.webservice.beans.SortByFieldBean;
 import org.wso2.carbon.analytics.webservice.beans.StreamDefinitionBean;
 import org.wso2.carbon.analytics.webservice.beans.SubCategoriesBean;
 import org.wso2.carbon.analytics.webservice.beans.ValuesBatchBean;
@@ -213,7 +214,8 @@ public class AnalyticsWebService extends AbstractAdmin {
      * groupByField is used to group the records. It should be a facet field created by the grouping fields.
      * fields attribute represents the record fields and the respective aggregate function.
      * aliases represents the output field names for aggregated values over the fields.
-     * @return Array of AggregatedObjects containing arrays of records of which the record values will be the aggregate values of the given fields
+     * @return Array of AggregatedObjects containing arrays of records of which the record values will be
+     * the aggregate values of the given fields
      */
     public AggregateResponse[] searchMultiTablesWithAggregates(AnalyticsAggregateRequest[] requests)
             throws AnalyticsWebServiceException {
@@ -376,8 +378,8 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @return An array of {@link RecordBean} objects, which represents individual data sets in their local location
      * @throws AnalyticsWebServiceException
      */
-    public RecordBean[] getWithKeyValues(String tableName, int numPartitionsHint, String[] columns, ValuesBatchBean[] valuesBatchBeans)
-            throws AnalyticsWebServiceException {
+    public RecordBean[] getWithKeyValues(String tableName, int numPartitionsHint, String[] columns,
+                                         ValuesBatchBean[] valuesBatchBeans) throws AnalyticsWebServiceException {
 
         try {
             List<String> columnList = null;
@@ -385,9 +387,9 @@ public class AnalyticsWebService extends AbstractAdmin {
                 columnList = Arrays.asList(columns);
             }
             List<Map<String, Object>> valuesBatch = Utils.getValuesBatch(valuesBatchBeans,
-                                                                         analyticsDataAPI.getTableSchema(getUsername(), tableName));
+                                                        analyticsDataAPI.getTableSchema(getUsername(), tableName));
             List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI,
-                                                                         analyticsDataAPI.getWithKeyValues(getUsername(), tableName, numPartitionsHint,
+                                                        analyticsDataAPI.getWithKeyValues(getUsername(), tableName, numPartitionsHint,
                                                                                                            columnList, valuesBatch));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
@@ -421,8 +423,8 @@ public class AnalyticsWebService extends AbstractAdmin {
                 idList = Arrays.asList(ids);
             }
 
-            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(), tableName,
-                                                                                                                numPartitionsHint, columnList, idList));
+            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(),
+                                                     tableName, numPartitionsHint, columnList, idList));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
@@ -476,13 +478,14 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @return An arrays of {@link RecordBean}s
      * @throws AnalyticsWebServiceException
      */
-    public RecordBean[] search(String tableName, String query, int start, int count)
+    public RecordBean[] search(String tableName, String query, int start, int count, SortByFieldBean[] sortByFields)
             throws AnalyticsWebServiceException {
         try {
             List<SearchResultEntry> searchResults = analyticsDataAPI.search(getUsername(), tableName, query,
-                                                                            start, count);
+                                                                            start, count, Utils.getSortByFields(sortByFields));
             List<String> recordIds = Utils.getRecordIds(searchResults);
-            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(), tableName, DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
+            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(),
+                                                                            tableName, DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
@@ -613,7 +616,8 @@ public class AnalyticsWebService extends AbstractAdmin {
             throws AnalyticsWebServiceException {
         SubCategoriesBean subCategoriesBean = new SubCategoriesBean();
         try {
-            SubCategories subCategories = analyticsDataAPI.drillDownCategories(getUsername(), getCategoryDrillDownRequest(drillDownRequest));
+            SubCategories subCategories = analyticsDataAPI.drillDownCategories(getUsername(),
+                                                         getCategoryDrillDownRequest(drillDownRequest));
             subCategoriesBean.setPath(subCategories.getPath());
             if (subCategories.getCategories() != null) {
                 subCategoriesBean.setCategories(getSearchResultEntryBeans(subCategories));

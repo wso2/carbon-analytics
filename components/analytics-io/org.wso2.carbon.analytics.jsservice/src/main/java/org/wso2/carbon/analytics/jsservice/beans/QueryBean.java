@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,6 +44,10 @@ public class QueryBean {
 	/** The count. */
 	@XmlElement(required = false)
 	private int count;
+
+    /** The sorting fields */
+    @XmlElement(required = false)
+    private List<SortByFieldBean> sortBy;
 
 	/**
 	 * Gets the columns.
@@ -75,4 +80,20 @@ public class QueryBean {
 	public int getCount() {
 		return count;
 	}
+
+    /**
+     * get the sortByField list
+     * @return a List of Fields with their sorting types
+     */
+    public List<SortByFieldBean> getSortBy() {
+        return sortBy;
+    }
+
+    /**
+     * Set the sortBy list
+     * @param sortBy List of sorting field with their sort types
+     */
+    public void setSortBy(List<SortByFieldBean> sortBy) {
+        this.sortBy = sortBy;
+    }
 }

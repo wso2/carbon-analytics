@@ -27,6 +27,7 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
@@ -830,9 +831,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public List<SearchResultEntry> search(int tenantId, String tableName, String query,
-            int start, int count) throws AnalyticsIndexException, AnalyticsException {
+            int start, int count, List<SortByField> sortByFields) throws AnalyticsIndexException, AnalyticsException {
         tableName = GenericUtils.normalizeTableName(tableName);
-        return this.getIndexer().search(tenantId, tableName, query, start, count);
+        return this.getIndexer().search(tenantId, tableName, query, start, count, sortByFields);
     }
     
     @Override

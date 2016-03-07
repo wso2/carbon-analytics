@@ -66,8 +66,11 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.TopDocsCollector;
+import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.store.Directory;
@@ -81,6 +84,7 @@ import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
@@ -416,10 +420,11 @@ public class AnalyticsDataIndexer {
     }
     
     public List<SearchResultEntry> search(final int tenantId, final String tableName, final String query,
-            final int start, final int count) throws AnalyticsException {
+            final int start, final int count, List<SortByField> sortByFields) throws AnalyticsException {
         List<SearchResultEntry> result;
         if (this.isClusteringEnabled()) {
-            List<List<SearchResultEntry>> entries = this.executeIndexLookup(new SearchCall(tenantId, tableName, query, start, count));
+            List<List<SearchResultEntry>> entries = this.executeIndexLookup(new SearchCall(tenantId,
+                    tableName, query, start, count, sortByFields));
             result = new ArrayList<>();
             for (List<SearchResultEntry> entry : entries) {
                 result.addAll(entry);
@@ -436,7 +441,7 @@ public class AnalyticsDataIndexer {
                 result = new ArrayList<>(0);
             }
         } else {
-            result = this.doSearch(this.localShards, tenantId, tableName, query, start, count);
+            result = this.doSearch(this.localShards, tenantId, tableName, query, start, count, sortByFields);
         }
         if (log.isDebugEnabled()) {
             log.debug("Search [" + query + "]: " + result.size());
@@ -444,39 +449,32 @@ public class AnalyticsDataIndexer {
         return result;
     }
 
-    private List<SearchResultEntry> doSearch(Set<Integer> shardIndices, int tenantId, String tableName, String query, int start, int count)
+    private List<SearchResultEntry> doSearch(Set<Integer> shardIndices, int tenantId, String tableName,
+                                             String query, int start, int count, List<SortByField> sortByFields)
             throws AnalyticsIndexException {
-        List<SearchResultEntry> result = new ArrayList<>();
+        List<SearchResultEntry> results = new ArrayList<>();
         IndexReader reader = null;
         ExecutorService searchExecutor = Executors.newCachedThreadPool();
+        if (count <= 0) {
+            log.error("Record Count/Page size is ZERO!. Please set Record count/Page size.");
+        }
         try {
             reader = this.getCombinedIndexReader(shardIndices, tenantId, tableName);
             IndexSearcher searcher = new IndexSearcher(reader, searchExecutor);
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, tableName);
-            Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
-            String validatedQuery;
-            if (query == null || query.isEmpty()) {
-                validatedQuery = "*:*";
-                log.warn("Lucene filtering query is not given, So matching all values.");
-            } else {
-                validatedQuery = query;
-            }
-            Query indexQuery = new AnalyticsQueryParser(analyzer, indices).parse(validatedQuery);
-            if (count <= 0) {
-                log.warn("Record Count/Page size is ZERO!. Please set Record count/Page size.");
-            }
-            TopScoreDocCollector collector = TopScoreDocCollector.create(start + count);
+            Query indexQuery = getSearchQueryFromString(query, indices);
+            TopDocsCollector collector = getTopDocsCollector(start, count, sortByFields, indices);
             searcher.search(indexQuery, collector);
             ScoreDoc[] hits = collector.topDocs(start).scoreDocs;
             Document indexDoc;
             for (ScoreDoc doc : hits) {
                 indexDoc = searcher.doc(doc.doc);
-                result.add(new SearchResultEntry(indexDoc.get(INDEX_ID_INTERNAL_FIELD), doc.score));
+                results.add(new SearchResultEntry(indexDoc.get(INDEX_ID_INTERNAL_FIELD), doc.score));
             }
             if (log.isDebugEnabled()) {
-                log.debug("Local Search: " + result.size());
+                log.debug("Local Search: " + results.size());
             }
-            return result;
+            return results;
         } catch (Exception e) {
             log.error("Error in index search: " + e.getMessage(), e);
             throw new AnalyticsIndexException("Error in index search: " + e.getMessage(), e);
@@ -490,6 +488,118 @@ public class AnalyticsDataIndexer {
             }
             searchExecutor.shutdown();
         }
+    }
+
+    private Query getSearchQueryFromString(String query, Map<String, ColumnDefinition> indices)
+            throws org.apache.lucene.queryparser.classic.ParseException, AnalyticsIndexException {
+        Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
+        String validatedQuery = getValidatedLuceneQuery(query);
+        return new AnalyticsQueryParser(analyzer, indices).parse(validatedQuery);
+    }
+
+    private String getValidatedLuceneQuery(String query) {
+        String validatedQuery;
+        if (query == null || query.isEmpty()) {
+            validatedQuery = "*:*";
+            log.info("Lucene filtering query is not given, So matching all values.");
+        } else {
+            validatedQuery = query;
+        }
+        return validatedQuery;
+    }
+
+    private TopDocsCollector getTopDocsCollector(int start, int count, List<SortByField> sortByFields,
+                                                 Map<String, ColumnDefinition> indices)
+            throws AnalyticsException {
+        TopDocsCollector collector;
+        try {
+            if (sortByFields != null && !sortByFields.isEmpty()) {
+                SortField[] sortFields = createSortFields(sortByFields, indices);
+                collector = TopFieldCollector.create(new Sort(sortFields), start + count, false, true, false);
+            } else {
+                collector = TopScoreDocCollector.create(start + count);
+            }
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error while creating TopFieldCollector: " + e.getMessage(), e);
+        }
+        return collector;
+    }
+
+    private SortField[] createSortFields(List<SortByField> sortByFields, Map<String, ColumnDefinition> indices)
+            throws AnalyticsException {
+        List<SortField> sortFields = new ArrayList<>();
+        for (SortByField sortByField : sortByFields) {
+            SortField sortField;
+            String fieldName = sortByField.getFieldName();
+            switch (sortByField.getSort()) {
+                case ASC: {
+                    if (!sortByField.isReversed()) {
+                        sortField = new SortField(fieldName, getSortFieldType(fieldName, indices));
+                    } else {
+                        sortField = new SortField(fieldName, getSortFieldType(fieldName, indices), true);
+                    }
+                    break;
+                }
+                case DESC: {
+                    if (!sortByField.isReversed()) {
+                        sortField = new SortField(fieldName, getSortFieldType(fieldName, indices), true);
+                    } else {
+                        sortField = new SortField(fieldName, getSortFieldType(fieldName, indices));
+                    }
+                    break;
+                }
+                case INDEX_ORDER: {
+                    if (!sortByField.isReversed()) {
+                        sortField = new SortField(null, SortField.Type.DOC);
+                    } else {
+                        sortField = new SortField(null, SortField.Type.DOC, true);
+                    }
+                }
+                case RELEVANCE: {
+                    if (!sortByField.isReversed()) {
+                        sortField = new SortField(null, SortField.Type.SCORE);
+                    } else {
+                        sortField = new SortField(null, SortField.Type.SCORE, true);
+                    }
+                }
+                default:
+                    throw new AnalyticsException("Error while processing Sorting fields: " +
+                                                 sortByField.getSort().toString() + " unsupported sortType");
+            }
+            sortFields.add(sortField);
+        }
+        return sortFields.toArray(new SortField[sortFields.size()]);
+    }
+
+    private SortField.Type getSortFieldType(String fieldName,
+                                            Map<String, ColumnDefinition> indices)
+            throws AnalyticsException {
+        ColumnDefinition columnDefinition = indices.get(fieldName);
+        SortField.Type type;
+        if (columnDefinition == null) {
+            throw new AnalyticsException("Field: " + fieldName + " is not indexed or not found");
+        }
+        switch (columnDefinition.getType()) {
+            case STRING:
+                type = SortField.Type.STRING;
+                break;
+            case INTEGER:
+                type = SortField.Type.INT;
+                break;
+            case LONG:
+                type = SortField.Type.LONG;
+                break;
+            case FLOAT:
+                type = SortField.Type.FLOAT;
+                break;
+            case DOUBLE:
+                type = SortField.Type.DOUBLE;
+                break;
+            default:
+                throw new AnalyticsException("Error while determining the type of the column: " +
+                                             fieldName + ", " + columnDefinition.getType().toString() + " not supported");
+        }
+        return type;
     }
 
     private Analyzer getPerFieldAnalyzerWrapper(Map<String, ColumnDefinition> indices)
@@ -1740,7 +1850,7 @@ public class AnalyticsDataIndexer {
         } else {
             if (aggregateRequest.getNoOfRecords() > 0) {
                 searchResultEntries = this.search(tenantId, aggregateRequest.getTableName(), aggregateRequest.getQuery(),
-                                                  0, aggregateRequest.getNoOfRecords());
+                                                  0, aggregateRequest.getNoOfRecords(), null);
             } else {
                 throw new AnalyticsException("No of records to be iterated is missing.. ( Parameter : NoOfRecords is zero..)");
             }
@@ -2076,13 +2186,16 @@ public class AnalyticsDataIndexer {
         private int start;
         
         private int count;
+
+        private List<SortByField> sortByFields;
         
-        public SearchCall(int tenantId, String tableName, String query, int start, int count) {
+        public SearchCall(int tenantId, String tableName, String query, int start, int count, List<SortByField> sortByFields) {
             this.tenantId = tenantId;
             this.tableName = tableName;
             this.query = query;
             this.start = start;
             this.count = count;
+            this.sortByFields = sortByFields;
         }
         
         @Override
@@ -2094,14 +2207,14 @@ public class AnalyticsDataIndexer {
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
                 return adsImpl.getIndexer().doSearch(this.shardIndices, this.tenantId, this.tableName,
-                                                     this.query, this.start, this.count);
+                                                     this.query, this.start, this.count, sortByFields);
             }
             return new ArrayList<>();
         }
 
         @Override
         public IndexLookupOperationCall<List<SearchResultEntry>> copy() {
-            return new SearchCall(this.tenantId, this.tableName, this.query, this.start, this.count);
+            return new SearchCall(this.tenantId, this.tableName, this.query, this.start, this.count, sortByFields);
         }
         
     }

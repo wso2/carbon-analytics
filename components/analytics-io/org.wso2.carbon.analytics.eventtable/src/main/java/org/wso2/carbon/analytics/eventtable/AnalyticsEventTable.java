@@ -17,28 +17,18 @@
 */
 package org.wso2.carbon.analytics.eventtable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.Constants;
+import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsDataIndexer;
-import org.wso2.carbon.analytics.dataservice.commons.Constants;
-import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
-import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.eventtable.internal.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
@@ -53,6 +43,7 @@ import org.wso2.siddhi.core.event.stream.StreamEventCloner;
 import org.wso2.siddhi.core.executor.ExpressionExecutor;
 import org.wso2.siddhi.core.executor.VariableExpressionExecutor;
 import org.wso2.siddhi.core.table.EventTable;
+import org.wso2.siddhi.core.util.SiddhiConstants;
 import org.wso2.siddhi.core.util.collection.operator.Finder;
 import org.wso2.siddhi.core.util.collection.operator.Operator;
 import org.wso2.siddhi.core.util.parser.ExpressionParser;
@@ -77,7 +68,16 @@ import org.wso2.siddhi.query.api.expression.math.Divide;
 import org.wso2.siddhi.query.api.expression.math.Multiply;
 import org.wso2.siddhi.query.api.expression.math.Subtract;
 import org.wso2.siddhi.query.api.util.AnnotationHelper;
-import org.wso2.siddhi.core.util.SiddhiConstants;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * This class implements the Siddhi event table interface {@link EventTable} for analytics tables.
@@ -738,7 +738,7 @@ public class AnalyticsEventTable implements EventTable {
                 if (count == 0) {
                     return new ArrayList<Record>(0);
                 }
-                List<SearchResultEntry> searchResults = service.search(this.tenantId, this.tableName, query, 0, count);
+                List<SearchResultEntry> searchResults = service.search(this.tenantId, this.tableName, query, 0, count, null);
                 List<String> ids = new ArrayList<String>();
                 for (SearchResultEntry entry : searchResults) {
                     ids.add(entry.getId());
