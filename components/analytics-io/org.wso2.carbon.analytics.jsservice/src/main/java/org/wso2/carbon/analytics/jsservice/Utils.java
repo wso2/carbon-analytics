@@ -522,7 +522,7 @@ public class Utils {
         List<org.wso2.carbon.analytics.dataservice.commons.AggregateField> analyticsAggregateFields = new ArrayList<>();
         for (AggregateField field : fields) {
             org.wso2.carbon.analytics.dataservice.commons.AggregateField aggregateField = new org.wso2.carbon.analytics.dataservice.commons.AggregateField();
-            aggregateField.setFieldName(field.getFieldName());
+            aggregateField.setAggregateVariables(field.getFields());
             aggregateField.setAggregateFunction(field.getAggregate());
             aggregateField.setAlias(field.getAlias());
             analyticsAggregateFields.add(aggregateField);

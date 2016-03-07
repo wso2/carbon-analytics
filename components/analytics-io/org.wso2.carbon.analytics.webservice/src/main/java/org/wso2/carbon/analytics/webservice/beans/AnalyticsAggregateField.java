@@ -27,7 +27,7 @@ import java.io.Serializable;
 public class AnalyticsAggregateField implements Serializable {
 
     private static final long serialVersionUID = 2783679819001791855L;
-    private String fieldName;
+    private String[] fields;
     private String aggregate;
     private String alias;
 
@@ -50,11 +50,11 @@ public class AnalyticsAggregateField implements Serializable {
         this.aggregate = aggregate;
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public String[] getFields() {
+        return fields;
     }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public void setFields(String[] fields) {
+        this.fields = fields;
     }
 }

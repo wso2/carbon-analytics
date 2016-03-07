@@ -27,7 +27,7 @@ import java.io.Serializable;
 public class AggregateField implements Serializable {
 
     private static final long serialVersionUID = 3077504068553108030L;
-    private String fieldName;
+    private String[] aggregateVariables;
     private String aggregateFunction;
     private String alias;
 
@@ -35,18 +35,18 @@ public class AggregateField implements Serializable {
 
     }
 
-    public AggregateField(String fieldName, String aggregateFunction, String alias) {
-        this.fieldName = fieldName;
+    public AggregateField(String[] aggregateVariables, String aggregateFunction, String alias) {
+        this.aggregateVariables = aggregateVariables;
         this.alias = alias;
         this.aggregateFunction = aggregateFunction.toUpperCase();
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public String[] getAggregateVariables() {
+        return aggregateVariables;
     }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public void setAggregateVariables(String[] aggregateVariables) {
+        this.aggregateVariables = aggregateVariables;
     }
 
     public String getAggregateFunction() {

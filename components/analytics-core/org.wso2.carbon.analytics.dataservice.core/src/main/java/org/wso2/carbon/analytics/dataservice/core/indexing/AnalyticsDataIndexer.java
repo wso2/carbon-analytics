@@ -94,6 +94,7 @@ import org.wso2.carbon.analytics.dataservice.core.indexing.LocalIndexDataStore.I
 import org.wso2.carbon.analytics.dataservice.core.indexing.LocalIndexDataStore.LocalIndexDataQueue;
 import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunction;
 import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunctionFactory;
+import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.RecordValuesContext;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
@@ -1708,13 +1709,8 @@ public class AnalyticsDataIndexer {
                 Record record = iterator.next();
                 for (AggregateField field : aggregateRequest.getFields()) {
                     AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
-                    Object value = record.getValue(field.getFieldName());
-                    if (value != null) {
-                        function.process(null, null);
-                    } else {
-                        throw new AnalyticsException("Error in aggregating values for field: " +
-                                                     field.getFieldName() + "Aggregating values for non-existant field");
-                    }
+                    RecordValuesContext recordValues = RecordValuesContext.create(record.getValues());
+                    function.process(recordValues, field.getAggregateVariables());
                 }
             }
             Map<String, Object> aggregatedValues = generateAggregateRecordValues(path, actualNoOfRecords, aggregateRequest,
@@ -1783,8 +1779,6 @@ public class AnalyticsDataIndexer {
             AggregateFunction function = getAggregateFunctionFactory().create(field.getAggregateFunction());
             if (function == null) {
                 throw new AnalyticsException("Unknown aggregate function!");
-            } else if (field.getFieldName() == null || field.getFieldName().isEmpty()) {
-                throw new AnalyticsException("One of the aggregating fields is not provided");
             } else if (field.getAlias() == null || field.getAlias().isEmpty()) {
                 throw new AnalyticsException("One of the aggregating field alias is not provided");
             }

@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class AggregateFieldBean {
-    private String fieldName;
+    private String[] fields;
     private String aggregate;
     private String alias;
 
@@ -38,18 +38,18 @@ public class AggregateFieldBean {
 
     }
 
-    public AggregateFieldBean(String fieldName, String aggregate, String alias) {
-        this.fieldName = fieldName;
+    public AggregateFieldBean(String[] fields, String aggregate, String alias) {
+        this.fields = fields;
         this.aggregate = aggregate;
         this.alias = alias;
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public String[] getFields() {
+        return fields;
     }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public void setFields(String[] fields) {
+        this.fields = fields;
     }
 
     public String getAggregate() {

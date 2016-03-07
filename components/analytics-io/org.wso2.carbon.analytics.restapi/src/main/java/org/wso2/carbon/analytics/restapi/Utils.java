@@ -454,7 +454,7 @@ public class Utils {
     private static List<AggregateField> createAggregatingFields(List<AggregateFieldBean> fields) {
         List<AggregateField> aggregateFields = new ArrayList<>();
         for (AggregateFieldBean fieldBean : fields) {
-            AggregateField aggregateField = new AggregateField(fieldBean.getFieldName(),
+            AggregateField aggregateField = new AggregateField(fieldBean.getFields(),
                 fieldBean.getAggregate(), fieldBean.getAlias());
             aggregateFields.add(aggregateField);
         }

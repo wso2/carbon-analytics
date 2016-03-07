@@ -566,7 +566,7 @@ public class Utils {
         List<AggregateField> aggregateFields = new ArrayList<>();
         if (fields != null) {
             for (AnalyticsAggregateField field : fields) {
-                AggregateField aggregateField = new AggregateField(field.getFieldName(),field.getAggregate(), field.getAlias());
+                AggregateField aggregateField = new AggregateField(field.getFields(), field.getAggregate(), field.getAlias());
                 aggregateFields.add(aggregateField);
             }
         }
