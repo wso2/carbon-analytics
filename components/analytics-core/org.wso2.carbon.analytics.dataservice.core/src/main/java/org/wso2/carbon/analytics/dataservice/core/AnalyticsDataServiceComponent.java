@@ -28,6 +28,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManagerImpl;
+import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunction;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
 import org.wso2.carbon.ntask.core.service.TaskService;
@@ -45,6 +46,8 @@ import org.wso2.carbon.user.core.service.RealmService;
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataSourceService" unbind="unsetAnalyticsDataSourceService"
  * @scr.reference name="ntask.component" interface="org.wso2.carbon.ntask.core.service.TaskService"
  * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
+ * @scr.reference name="analytics.aggregates" interface="org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunction"
+ * cardinality="0..n" policy="dynamic" bind="addAggregateFunction" unbind="removeAggregateFunctions"
  */
 public class AnalyticsDataServiceComponent {
 
@@ -136,5 +139,19 @@ public class AnalyticsDataServiceComponent {
         if (log.isDebugEnabled()) {
             log.debug("Unsetting the Task Service");
         }
+    }
+
+    protected void addAggregateFunction(AggregateFunction aggregateFunction) {
+        if (log.isDebugEnabled()) {
+            log.debug("Setting the Aggregate Function: " + aggregateFunction.getAggregateName());
+        }
+        AnalyticsServiceHolder.addAggregateFunction(aggregateFunction);
+    }
+
+    protected void removeAggregateFunctions(AggregateFunction aggregateFunction) {
+        if (log.isDebugEnabled()) {
+            log.debug("Removing the aggregate functions..");
+        }
+        AnalyticsServiceHolder.removeAggregateFunctions();
     }
 }

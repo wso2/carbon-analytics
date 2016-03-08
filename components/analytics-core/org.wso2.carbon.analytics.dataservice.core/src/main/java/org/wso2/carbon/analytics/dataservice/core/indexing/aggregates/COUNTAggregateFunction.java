@@ -18,9 +18,8 @@
 
 package org.wso2.carbon.analytics.dataservice.core.indexing.aggregates;
 
+import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-
-import java.util.Map;
 
 /**
  * This class represents the COUNT aggregate which COUNT the records
@@ -29,12 +28,12 @@ public class COUNTAggregateFunction implements AggregateFunction {
 
     private long count;
 
-    public COUNTAggregateFunction(Map<String, Number> optionalParams) {
+    public COUNTAggregateFunction() {
         count = 0;
     }
 
     @Override
-    public void process(Number value)
+    public void process(RecordValuesContext ctx, String[] aggregateFields)
             throws AnalyticsException {
             count++;
     }
@@ -42,5 +41,10 @@ public class COUNTAggregateFunction implements AggregateFunction {
     @Override
     public Number finish() throws AnalyticsException {
         return count;
+    }
+
+    @Override
+    public String getAggregateName() {
+        return Constants.COUNT_AGGREGATE;
     }
 }

@@ -18,9 +18,8 @@
 
 package org.wso2.carbon.analytics.dataservice.core.indexing.aggregates;
 
+import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-
-import java.util.Map;
 
 /**
  * This class represents the MIN aggregate which returns the minimum value of a record field.
@@ -29,20 +28,36 @@ public class MINAggregateFunction implements AggregateFunction {
 
     private double minValue;
 
-    public MINAggregateFunction(Map<String, Number> optionalParams) {
+    public MINAggregateFunction() {
         minValue = Double.MAX_VALUE;
     }
 
     @Override
-    public void process(Number value)
+    public void process(RecordValuesContext ctx, String[] aggregateFields)
             throws AnalyticsException {
-        if (value.doubleValue() < minValue) {
-            minValue = value.doubleValue();
+        Object value = ctx.getValue(aggregateFields[0]);
+        if (value == null) {
+            throw new AnalyticsException("Error while calculating MIN: value of the field, " +
+                                         aggregateFields[0] + " is null");
+        }
+        if (value instanceof Number) {
+            Number numericValue = (Number) value;
+            if (numericValue.doubleValue() < minValue) {
+                minValue = numericValue.doubleValue();
+            }
+        } else {
+            throw new AnalyticsException("Error while calculating MIN: Value '" + value.toString() +
+                                         "', being aggregated is not numeric.");
         }
     }
 
     @Override
     public Number finish() throws AnalyticsException {
         return minValue;
+    }
+
+    @Override
+    public String getAggregateName() {
+        return Constants.MIN_AGGREGATE;
     }
 }

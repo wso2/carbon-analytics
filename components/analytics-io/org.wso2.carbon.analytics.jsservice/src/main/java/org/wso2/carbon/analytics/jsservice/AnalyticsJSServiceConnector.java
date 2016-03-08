@@ -332,7 +332,8 @@ public class AnalyticsJSServiceConnector {
                 QueryBean queryBean = gson.fromJson(queryAsString, QueryBean.class);
                 List<SearchResultEntry> searchResults = analyticsDataAPI.search(username, tableName, queryBean.getQuery(),
                                                                             queryBean.getStart(),
-                                                                            queryBean.getCount());
+                                                                            queryBean.getCount(),
+                                                                            Utils.getSortedFields(queryBean.getSortBy()));
                 List<RecordBean> recordBeans = getRecordBeans(username, tableName, searchResults);
                 if (logger.isDebugEnabled()) {
                     for (RecordBean record : recordBeans) {

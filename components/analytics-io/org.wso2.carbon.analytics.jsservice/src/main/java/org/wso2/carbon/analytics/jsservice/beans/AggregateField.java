@@ -23,25 +23,25 @@ package org.wso2.carbon.analytics.jsservice.beans;
  * Aggregate function will be calculated over the given field name.
  */
 public class AggregateField {
-    private String fieldName;
+    private String[] fields;
     private String aggregate;
     private String alias;
 
     public AggregateField(){
 
     }
-    public AggregateField(String fieldName, String aggregate, String alias) {
-        this.fieldName = fieldName;
+    public AggregateField(String[] fields, String aggregate, String alias) {
+        this.fields = fields;
         this.alias = alias;
         this.aggregate = aggregate.toUpperCase();
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public String[] getFields() {
+        return fields;
     }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public void setFields(String[] fields) {
+        this.fields = fields;
     }
 
     public String getAggregate() {

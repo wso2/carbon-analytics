@@ -19,11 +19,14 @@ package org.wso2.carbon.analytics.webservice;
 import org.apache.commons.collections.IteratorUtils;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateField;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
+import org.wso2.carbon.analytics.dataservice.commons.SORT;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.webservice.beans.AggregateResponse;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsAggregateField;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsAggregateRequest;
@@ -33,6 +36,7 @@ import org.wso2.carbon.analytics.webservice.beans.EventBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.beans.SchemaColumnBean;
+import org.wso2.carbon.analytics.webservice.beans.SortByFieldBean;
 import org.wso2.carbon.analytics.webservice.beans.StreamDefAttributeBean;
 import org.wso2.carbon.analytics.webservice.beans.StreamDefinitionBean;
 import org.wso2.carbon.analytics.webservice.beans.ValuesBatchBean;
@@ -558,6 +562,7 @@ public class Utils {
             parentPath.addAll(Arrays.asList(request.getParentPath()));
         }
         aggregateRequest.setParentPath(parentPath);
+        aggregateRequest.setNoOfRecords(request.getNoOfRecords());
         return aggregateRequest;
     }
 
@@ -565,7 +570,7 @@ public class Utils {
         List<AggregateField> aggregateFields = new ArrayList<>();
         if (fields != null) {
             for (AnalyticsAggregateField field : fields) {
-                AggregateField aggregateField = new AggregateField(field.getFieldName(),field.getAggregate(), field.getAlias());
+                AggregateField aggregateField = new AggregateField(field.getFields(), field.getAggregate(), field.getAlias());
                 aggregateFields.add(aggregateField);
             }
         }
@@ -602,5 +607,45 @@ public class Utils {
             }
         }
         return responses.toArray(new AggregateResponse[responses.size()]);
+    }
+
+    public static List<SortByField> getSortByFields(SortByFieldBean[] sortByFieldBeans)
+            throws AnalyticsException {
+        List<SortByField> sortByFields = new ArrayList<>();
+        if (sortByFieldBeans != null) {
+            for (SortByFieldBean sortByFieldBean : sortByFieldBeans) {
+                SortByField sortByField = new SortByField(sortByFieldBean.getFieldName(),
+                                                          getSortType(sortByFieldBean.getFieldName(),
+                                                          sortByFieldBean.getSortType()),
+                                                          sortByFieldBean.isReversed());
+                sortByFields.add(sortByField);
+            }
+        }
+        return sortByFields;
+    }
+
+    private static SORT getSortType(String field, String sortBy) throws AnalyticsException {
+        SORT sort;
+        if (sortBy != null) {
+            switch (sortBy) {
+                case "ASC":
+                    sort = SORT.ASC;
+                    break;
+                case "DESC":
+                    sort = SORT.DESC;
+                    break;
+                case "RELEVANCE":
+                    sort = SORT.RELEVANCE;
+                    break;
+                case "INDEX_ORDER":
+                    sort = SORT.INDEX_ORDER;
+                    break;
+                default:
+                    throw new AnalyticsException("Unknown SORT order: " + sortBy + "for field: " + field);
+            }
+        }  else {
+            throw new AnalyticsException("sortType cannot be null for field: " + field);
+        }
+        return sort;
     }
 }

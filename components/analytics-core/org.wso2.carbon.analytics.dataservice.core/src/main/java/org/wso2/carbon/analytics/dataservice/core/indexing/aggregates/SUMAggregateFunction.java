@@ -18,9 +18,8 @@
 
 package org.wso2.carbon.analytics.dataservice.core.indexing.aggregates;
 
+import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-
-import java.util.Map;
 
 /**
  * This class represents the SUM aggregate which performs summation over a record field
@@ -29,18 +28,33 @@ public class SUMAggregateFunction implements AggregateFunction {
 
     private double sum;
 
-    public SUMAggregateFunction(Map<String, Number> optionalParams) {
+    public SUMAggregateFunction() {
         sum = 0;
     }
 
     @Override
-    public void process(Number value)
+    public void process(RecordValuesContext ctx, String[] aggregateFields)
             throws AnalyticsException {
-        sum += value.doubleValue();
+        Object value = ctx.getValue(aggregateFields[0]);
+        if (value == null) {
+            throw new AnalyticsException("Error while calculating SUM: value of the field, " +
+                                         aggregateFields[0] + " is null");
+        }
+        if (value instanceof Number) {
+            sum += ((Number)value).doubleValue();
+        } else {
+            throw new AnalyticsException("Error while calculating Average: Value '" + value.toString() +
+                                         "', being aggregated is not numeric.");
+        }
     }
 
     @Override
     public Number finish() throws AnalyticsException {
         return sum;
+    }
+
+    @Override
+    public String getAggregateName() {
+        return Constants.SUM_AGGREGATE;
     }
 }

@@ -88,7 +88,6 @@ public class AnalyticsConstants {
     public static final String CARBON_SPARK_MASTER_COUNT = "carbon.spark.master.count";
     public static final String CARBON_SPARK_MASTER = "carbon.spark.master";
     public static final String CARBON_DAS_SYMBOLIC_LINK = "carbon.das.symbolic.link";
-    public static final String CARBON_SCHEDULER_POOL = "carbon.scheduler.pool";
 
     public static final int SPARK_PERSISTENCE_TENANT_ID = -5000;
     public static final String SPARK_MASTER_MAP = "__SPARK_MASTER_MAP__";
@@ -118,6 +117,8 @@ public class AnalyticsConstants {
     public static final String SPARK_UI_PORT = "spark.ui.port";
     public static final String SPARK_RECOVERY_MODE = "spark.deploy.recoveryMode";
     public static final String SPARK_RECOVERY_MODE_FACTORY = "spark.deploy.recoveryMode.factory";
+
+    public static final String SPARK_LOCAL_IP_PROP = "SPARK_LOCAL_IP";
     
     // Compressed Event Analytics related strings
     public static final String COMPRESSED_EVENT_ANALYTICS_SHORTHAND = "CompressedEventAnalytics";

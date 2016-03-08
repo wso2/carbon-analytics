@@ -36,6 +36,7 @@ public class AggregateRequest implements Serializable {
     private String query;
     private List<AggregateField> fields;
     private int aggregateLevel;
+    private int noOfRecords;
 
     public AggregateRequest() {
     }
@@ -86,5 +87,13 @@ public class AggregateRequest implements Serializable {
 
     public void setAggregateLevel(int aggregateLevel) {
         this.aggregateLevel = aggregateLevel;
+    }
+
+    public int getNoOfRecords() {
+        return noOfRecords;
+    }
+
+    public void setNoOfRecords(int noOfRecords) {
+        this.noOfRecords = noOfRecords;
     }
 }

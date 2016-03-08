@@ -17,19 +17,14 @@
 */
 package org.wso2.carbon.analytics.eventtable;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.naming.NamingException;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
@@ -41,6 +36,10 @@ import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.util.EventPrinter;
+
+import javax.naming.NamingException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Analytics event table tests.
@@ -126,7 +125,7 @@ public class AnalyticsEventTableTest {
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 2);
-        Assert.assertEquals(this.service.search(-1, "stocks", "symbol: 'WSO2'", 0, 10).size(), 1);
+        Assert.assertEquals(this.service.search(-1, "stocks", "symbol: 'WSO2'", 0, 10, null).size(), 1);
         this.service.deleteTable(-1, "stocks");
     }
     
@@ -154,7 +153,7 @@ public class AnalyticsEventTableTest {
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 2);
-        Assert.assertEquals(this.service.search(-1, "stocks", "price: [60 TO 80]", 0, 10).size(), 1);
+        Assert.assertEquals(this.service.search(-1, "stocks", "price: [60 TO 80]", 0, 10, null).size(), 1);
         this.service.deleteTable(-1, "stocks");
     }
     

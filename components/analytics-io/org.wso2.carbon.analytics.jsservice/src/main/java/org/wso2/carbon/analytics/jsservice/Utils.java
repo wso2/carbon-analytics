@@ -23,12 +23,15 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SORT;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.jsservice.beans.AggregateField;
 import org.wso2.carbon.analytics.jsservice.beans.AggregateRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
@@ -40,6 +43,7 @@ import org.wso2.carbon.analytics.jsservice.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.jsservice.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.EventBean;
 import org.wso2.carbon.analytics.jsservice.beans.RecordBean;
+import org.wso2.carbon.analytics.jsservice.beans.SortByFieldBean;
 import org.wso2.carbon.analytics.jsservice.beans.StreamDefinitionBean;
 import org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean;
 import org.wso2.carbon.analytics.jsservice.exception.JSServiceException;
@@ -514,6 +518,7 @@ public class Utils {
         request.setFields(createAggregateFieds(aggregateRequest.getAggregateFields()));
         request.setAggregateLevel(aggregateRequest.getAggregateLevel());
         request.setParentPath(aggregateRequest.getParentPath());
+        request.setNoOfRecords(aggregateRequest.getNoOfRecords());
         return request;
     }
 
@@ -521,7 +526,7 @@ public class Utils {
         List<org.wso2.carbon.analytics.dataservice.commons.AggregateField> analyticsAggregateFields = new ArrayList<>();
         for (AggregateField field : fields) {
             org.wso2.carbon.analytics.dataservice.commons.AggregateField aggregateField = new org.wso2.carbon.analytics.dataservice.commons.AggregateField();
-            aggregateField.setFieldName(field.getFieldName());
+            aggregateField.setAggregateVariables(field.getFields());
             aggregateField.setAggregateFunction(field.getAggregate());
             aggregateField.setAlias(field.getAlias());
             analyticsAggregateFields.add(aggregateField);
@@ -553,5 +558,44 @@ public class Utils {
             aggregatedRecords.add(getRecordBeans(createList(iterator)));
         }
         return aggregatedRecords;
+    }
+
+    public static List<SortByField> getSortedFields(List<SortByFieldBean> sortByFieldBeans)
+            throws AnalyticsException {
+        List<SortByField> sortByFields = new ArrayList<>();
+        if (sortByFieldBeans != null) {
+            for (SortByFieldBean sortByFieldBean : sortByFieldBeans) {
+                SortByField sortByField = new SortByField(sortByFieldBean.getField(),
+                                                          getSortType(sortByFieldBean.getField(), sortByFieldBean.getSortType()),
+                                                          sortByFieldBean.isReversed());
+                sortByFields.add(sortByField);
+            }
+        }
+        return sortByFields;
+    }
+
+    private static SORT getSortType(String fieldName, String sortBy) throws AnalyticsException {
+        SORT sort;
+        if (sortBy != null) {
+            switch (sortBy) {
+                case "ASC":
+                    sort = SORT.ASC;
+                    break;
+                case "DESC":
+                    sort = SORT.DESC;
+                    break;
+                case "RELEVANCE":
+                    sort = SORT.RELEVANCE;
+                    break;
+                case "INDEX_ORDER":
+                    sort = SORT.INDEX_ORDER;
+                    break;
+                default:
+                    throw new AnalyticsException("Unknown SORT order: " + sortBy + "for field: " + fieldName);
+            }
+        } else {
+            throw new AnalyticsException("sortType cannot be null for field: " + fieldName);
+        }
+        return sort;
     }
 }

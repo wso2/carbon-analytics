@@ -53,6 +53,7 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -705,7 +706,8 @@ public class AnalyticsAPIHttpClient {
 
     @SuppressWarnings("unchecked")
     public List<SearchResultEntry> search(int tenantId, String username, String tableName, String query,
-                                          int start, int count, boolean securityEnabled) throws AnalyticsServiceException {
+                                          int start, int count, List<SortByField> sortByFields, boolean securityEnabled)
+            throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SEARCH_OPERATION)
@@ -713,6 +715,7 @@ public class AnalyticsAPIHttpClient {
                 .addParameter(AnalyticsAPIConstants.QUERY, query)
                 .addParameter(AnalyticsAPIConstants.START_PARAM, String.valueOf(start))
                 .addParameter(AnalyticsAPIConstants.COUNT_PARAM, String.valueOf(count))
+                .addParameter(AnalyticsAPIConstants.SORT_BY_FIELDS_PARAM, gson.toJson(sortByFields))
                 .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
         if (!securityEnabled) {
             builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
@@ -1374,7 +1377,8 @@ public class AnalyticsAPIHttpClient {
                 .addParameter(AnalyticsAPIConstants.AGGREGATING_FIELDS, gson.toJson(aggregateRequest.getFields()))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, aggregateRequest.getTableName())
                 .addParameter(AnalyticsAPIConstants.AGGREGATE_LEVEL, String.valueOf(aggregateRequest.getAggregateLevel()))
-                .addParameter(AnalyticsAPIConstants.AGGREGATE_PARENT_PATH, gson.toJson(aggregateRequest.getParentPath()));
+                .addParameter(AnalyticsAPIConstants.AGGREGATE_PARENT_PATH, gson.toJson(aggregateRequest.getParentPath()))
+                .addParameter(AnalyticsAPIConstants.AGGREGATE_NO_OF_RECORDS, gson.toJson(aggregateRequest.getNoOfRecords()));
         if (!securityEnabled) {
             builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
         } else {
@@ -1384,10 +1388,11 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceUnauthorizedException("Error while searching with aggregates. " + response);
             } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Error while searching with aggregates. " + response);
             } else {
                 return new RemoteRecordIterator(httpResponse.getEntity().getContent());
@@ -1416,10 +1421,11 @@ public class AnalyticsAPIHttpClient {
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(aggregateRequests)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceUnauthorizedException("Error while searching with aggregates. " + response);
             } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Error while searching with aggregates. " + response);
             } else {
                 Object aggregateObjs = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
@@ -1461,10 +1467,11 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceUnauthorizedException("Error while re-indexing. " + response);
             } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Error while re-indexing. " + response);
             }
         } catch (URISyntaxException e) {

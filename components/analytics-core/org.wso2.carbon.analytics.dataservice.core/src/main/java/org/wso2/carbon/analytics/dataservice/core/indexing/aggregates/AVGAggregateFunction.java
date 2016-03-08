@@ -18,9 +18,8 @@
 
 package org.wso2.carbon.analytics.dataservice.core.indexing.aggregates;
 
+import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-
-import java.util.Map;
 
 /**
  * This class represents the AVERAGE aggregate which computes average over a record field
@@ -31,17 +30,27 @@ public class AVGAggregateFunction implements AggregateFunction {
     private double count;
 
 
-    public AVGAggregateFunction(Map<String, Number> optionalParams) {
+    public AVGAggregateFunction() {
         //No optional params are passed in initializing
         sum = 0;
         count = 0;
     }
 
     @Override
-    public void process(Number value)
+    public void process(RecordValuesContext ctx, String[] aggregateFields)
             throws AnalyticsException {
-        sum += value.doubleValue();
-        count++;
+        Object value = ctx.getValue(aggregateFields[0]);
+        if (value == null) {
+            throw new AnalyticsException("Error while calculating Average: value of the field, " +
+                                         aggregateFields[0] + " is null");
+        }
+        if (value instanceof Number) {
+            sum += ((Number)value).doubleValue();
+            count++;
+        } else {
+            throw new AnalyticsException("Error while calculating Average: Value '" + value.toString() +
+                                         "', being aggregated is not numeric.");
+        }
     }
 
     @Override
@@ -51,5 +60,10 @@ public class AVGAggregateFunction implements AggregateFunction {
         } else {
             throw new AnalyticsException("Cannot compute average, count is zero (Division by Zero!");
         }
+    }
+
+    @Override
+    public String getAggregateName() {
+        return Constants.AVG_AGGREGATE;
     }
 }
