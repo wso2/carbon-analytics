@@ -78,16 +78,21 @@ public class Utils {
     public static List<RecordBean> getRecordBeans(List<Record> records) {
         List<RecordBean> recordBeans = new ArrayList<>();
         if (records != null) {
-            for (Record recordBean : records) {
-                RecordBean record = new RecordBean();
-                record.setId(recordBean.getId());
-                record.setTableName(recordBean.getTableName());
-                record.setTimestamp(recordBean.getTimestamp());
-                record.setValues(recordBean.getValues());
-                recordBeans.add(record);
+            for (Record record : records) {
+                RecordBean recordBean = getRecordBean(record);
+                recordBeans.add(recordBean);
             }
         }
         return recordBeans;
+    }
+
+    private static RecordBean getRecordBean(Record record) {
+        RecordBean recordBean = new RecordBean();
+        recordBean.setId(record.getId());
+        recordBean.setTableName(record.getTableName());
+        recordBean.setTimestamp(record.getTimestamp());
+        recordBean.setValues(record.getValues());
+        return recordBean;
     }
 
     public static List<String> getIds(List<SearchResultEntry> searchResults) {
@@ -597,5 +602,23 @@ public class Utils {
             throw new AnalyticsException("sortType cannot be null for field: " + fieldName);
         }
         return sort;
+    }
+
+    public static Map<String, RecordBean> getRecordBeanKeyedWithIds(List<Record> records) {
+        Map<String, RecordBean> recordBeanMap = new HashMap<>();
+        for (Record record : records) {
+            RecordBean recordBean = Utils.getRecordBean(record);
+            recordBeanMap.put(recordBean.getId(), recordBean);
+        }
+        return recordBeanMap;
+    }
+
+    public static List<RecordBean> getSortedRecordBeans(Map<String, RecordBean> recordBeanMap,
+                                                        List<SearchResultEntry> searchResults) {
+        List<RecordBean> sortedRecords = new ArrayList<>();
+        for (SearchResultEntry entry : searchResults) {
+            sortedRecords.add(recordBeanMap.get(entry.getId()));
+        }
+        return sortedRecords;
     }
 }

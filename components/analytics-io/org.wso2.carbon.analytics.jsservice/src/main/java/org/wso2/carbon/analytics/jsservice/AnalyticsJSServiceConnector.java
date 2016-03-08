@@ -610,7 +610,8 @@ public class AnalyticsJSServiceConnector {
         List<String> ids = Utils.getIds(searchResults);
         AnalyticsDataResponse response = analyticsDataAPI.get(username, tableName, 1, null, ids);
         List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, response);
-        return Utils.getRecordBeans(records);
+        Map<String, RecordBean> recordBeanMap = Utils.getRecordBeanKeyedWithIds(records);
+        return Utils.getSortedRecordBeans(recordBeanMap, searchResults);
     }
 
     public ResponseBean drillDownSearchCount(String username, String tableName, String queryAsString) {

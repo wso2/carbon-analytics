@@ -69,7 +69,7 @@ public class RecordBean {
 	 * @param timestamp the new timestamp
 	 */
 	public void setTimestamp(long timestamp) {
-		this.timestamp = new Long(timestamp);
+		this.timestamp = timestamp;
 	}
 
 	/**
