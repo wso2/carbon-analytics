@@ -230,6 +230,12 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     }
 
     @Override
+    public List<SearchResultEntry> search(String username, String tableName, String query,
+                                          int start, int count) throws AnalyticsException {
+        return this.search(username, tableName, query, start, count, null);
+    }
+
+    @Override
     public int searchCount(String username, String tableName, String query)
             throws AnalyticsIndexException {
         try {

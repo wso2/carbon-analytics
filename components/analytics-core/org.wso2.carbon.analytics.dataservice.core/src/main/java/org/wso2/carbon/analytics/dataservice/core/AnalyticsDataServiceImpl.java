@@ -830,6 +830,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
+    public List<SearchResultEntry> search(int tenantId, String tableName, String query, int start,
+                                          int count) throws AnalyticsException {
+        return this.search(tenantId, tableName, query, start, count, null);
+    }
+
+    @Override
     public List<SearchResultEntry> search(int tenantId, String tableName, String query,
             int start, int count, List<SortByField> sortByFields) throws AnalyticsIndexException, AnalyticsException {
         tableName = GenericUtils.normalizeTableName(tableName);

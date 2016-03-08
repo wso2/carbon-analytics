@@ -54,6 +54,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -674,6 +675,12 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
+    public List<SearchResultEntry> search(String username, String tableName, String query,
+                                          int start, int count) throws AnalyticsException {
+        return this.search(username, tableName, query, start, count, new ArrayList<SortByField>(0));
+    }
+
+    @Override
     public int searchCount(String username, String tableName, String query) throws AnalyticsIndexException {
         if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
             return ServiceHolder.getSecureAnalyticsDataService().searchCount(username, tableName, query);
@@ -882,6 +889,12 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
                 AnalyticsAPIHttpClient.getInstance().deleteRecords(tenantId, null, tableName, ids, false);
             }
         }
+    }
+
+    @Override
+    public List<SearchResultEntry> search(int tenantId, String tableName, String query, int start,
+                                          int count) throws AnalyticsException {
+       return this.search(tenantId, tableName, query, start, count, new ArrayList<SortByField>(0));
     }
 
     @Override

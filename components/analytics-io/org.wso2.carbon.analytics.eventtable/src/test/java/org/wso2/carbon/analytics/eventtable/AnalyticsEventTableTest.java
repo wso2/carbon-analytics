@@ -125,7 +125,7 @@ public class AnalyticsEventTableTest {
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 2);
-        Assert.assertEquals(this.service.search(-1, "stocks", "symbol: 'WSO2'", 0, 10, null).size(), 1, null);
+        Assert.assertEquals(this.service.search(-1, "stocks", "symbol: 'WSO2'", 0, 10, null).size(), 1);
         this.service.deleteTable(-1, "stocks");
     }
     
@@ -487,7 +487,7 @@ public class AnalyticsEventTableTest {
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 3);
-        List<SearchResultEntry> result = this.service.search(-1, "stocks", "symbol: IBM", 0, 1, null);
+        List<SearchResultEntry> result = this.service.search(-1, "stocks", "symbol: IBM", 0, 1);
         Assert.assertEquals(result.size(), 1);
         String id = result.get(0).getId();
         recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,

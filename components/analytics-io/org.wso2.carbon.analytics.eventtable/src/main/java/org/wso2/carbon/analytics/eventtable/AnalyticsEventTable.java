@@ -738,7 +738,7 @@ public class AnalyticsEventTable implements EventTable {
                 if (count == 0) {
                     return new ArrayList<Record>(0);
                 }
-                List<SearchResultEntry> searchResults = service.search(this.tenantId, this.tableName, query, 0, count, null);
+                List<SearchResultEntry> searchResults = service.search(this.tenantId, this.tableName, query, 0, count);
                 List<String> ids = new ArrayList<String>();
                 for (SearchResultEntry entry : searchResults) {
                     ids.add(entry.getId());

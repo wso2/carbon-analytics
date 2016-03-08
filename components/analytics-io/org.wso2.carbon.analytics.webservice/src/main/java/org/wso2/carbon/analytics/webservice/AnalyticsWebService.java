@@ -475,10 +475,11 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @param query     The search query
      * @param start     The start location of the result, 0 based
      * @param count     The maximum number of result entries to be returned
+     * @param sortByFields The fields by which the records needs to be sorted
      * @return An arrays of {@link RecordBean}s
      * @throws AnalyticsWebServiceException
      */
-    public RecordBean[] search(String tableName, String query, int start, int count, SortByFieldBean[] sortByFields)
+    public RecordBean[] searchWithSorting(String tableName, String query, int start, int count, SortByFieldBean[] sortByFields)
             throws AnalyticsWebServiceException {
         try {
             List<SearchResultEntry> searchResults = analyticsDataAPI.search(getUsername(), tableName, query,
@@ -486,6 +487,34 @@ public class AnalyticsWebService extends AbstractAdmin {
             List<String> recordIds = Utils.getRecordIds(searchResults);
             List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(),
                                                                             tableName, DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
+            List<RecordBean> recordBeans = Utils.createRecordBeans(records);
+            RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
+            return recordBeans.toArray(resultRecordBeans);
+        } catch (Exception e) {
+            logger.error("Unable to get search result for table[" + tableName + "] due to " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("Unable to get search result from table[" + tableName + "] due to " + e
+                    .getMessage(), e);
+        }
+    }
+
+    /**
+     * Searches the data with a given search query.
+     *
+     * @param tableName The table name
+     * @param query     The search query
+     * @param start     The start location of the result, 0 based
+     * @param count     The maximum number of result entries to be returned
+     * @return An arrays of {@link RecordBean}s
+     * @throws AnalyticsWebServiceException
+     */
+    public RecordBean[] search(String tableName, String query, int start, int count)
+            throws AnalyticsWebServiceException {
+        try {
+            List<SearchResultEntry> searchResults = analyticsDataAPI.search(getUsername(), tableName, query,
+                                                                            start, count, null);
+            List<String> recordIds = Utils.getRecordIds(searchResults);
+            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(),
+                                                                                                                tableName, DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);

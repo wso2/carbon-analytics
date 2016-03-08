@@ -129,7 +129,7 @@ public interface AnalyticsDataService {
      */
     List<String> listTables(int tenantId) throws AnalyticsException;
 
-    /**
+    /**sear
      * Returns the number of records in the table with the given category and name.
      * @param tenantId The tenant which this table belongs to
      * @param tableName The name of the table to get the count from
@@ -258,6 +258,19 @@ public interface AnalyticsDataService {
     void delete(int tenantId, String tableName, List<String> ids) 
             throws AnalyticsException;
 
+    /**
+     * Searches the data with a given search query.
+     * @param tenantId The tenant id
+     * @param tableName The table name
+     * @param query The search query
+     * @param start The start location of the result, 0 based
+     * @param count The maximum number of result entries to be returned
+     * @return A list of {@link org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry}s
+     * @throws AnalyticsIndexException
+     * @throws AnalyticsException
+     */
+    List<SearchResultEntry> search(int tenantId, String tableName,
+                                   String query, int start, int count) throws AnalyticsException;
     /**
      * Searches the data with a given search query.
      * @param tenantId The tenant id
