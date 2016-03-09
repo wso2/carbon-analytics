@@ -526,7 +526,7 @@ public class AnalyticsDataIndexer {
     }
 
     private SortField[] createSortFields(List<SortByField> sortByFields, Map<String, ColumnDefinition> indices)
-            throws AnalyticsException {
+            throws AnalyticsIndexException {
         List<SortField> sortFields = new ArrayList<>();
         for (SortByField sortByField : sortByFields) {
             SortField sortField;
@@ -554,6 +554,7 @@ public class AnalyticsDataIndexer {
                     } else {
                         sortField = new SortField(null, SortField.Type.DOC, true);
                     }
+                    break;
                 }
                 case RELEVANCE: {
                     if (!sortByField.isReversed()) {
@@ -561,9 +562,10 @@ public class AnalyticsDataIndexer {
                     } else {
                         sortField = new SortField(null, SortField.Type.SCORE, true);
                     }
+                    break;
                 }
                 default:
-                    throw new AnalyticsException("Error while processing Sorting fields: " +
+                    throw new AnalyticsIndexException("Error while processing Sorting fields: " +
                                                  sortByField.getSort().toString() + " unsupported sortType");
             }
             sortFields.add(sortField);
@@ -573,11 +575,11 @@ public class AnalyticsDataIndexer {
 
     private SortField.Type getSortFieldType(String fieldName,
                                             Map<String, ColumnDefinition> indices)
-            throws AnalyticsException {
+            throws AnalyticsIndexException {
         ColumnDefinition columnDefinition = indices.get(fieldName);
         SortField.Type type;
         if (columnDefinition == null) {
-            throw new AnalyticsException("Field: " + fieldName + " is not indexed or not found");
+            throw new AnalyticsIndexException("Field: " + fieldName + " is not indexed or not found");
         }
         switch (columnDefinition.getType()) {
             case STRING:
@@ -596,7 +598,7 @@ public class AnalyticsDataIndexer {
                 type = SortField.Type.DOUBLE;
                 break;
             default:
-                throw new AnalyticsException("Error while determining the type of the column: " +
+                throw new AnalyticsIndexException("Error while determining the type of the column: " +
                                              fieldName + ", " + columnDefinition.getType().toString() + " not supported");
         }
         return type;
@@ -916,15 +918,21 @@ public class AnalyticsDataIndexer {
         try {
             IndexSearcher indexSearcher = new IndexSearcher(indexReader);
             FacetsCollector facetsCollector = new FacetsCollector(true);
-            Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId,
-                                                                drillDownRequest.getTableName());
+            Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
             FacetsConfig config = this.getFacetsConfigurations(indices);
             DrillSideways drillSideways = new DrillSideways(indexSearcher, config, taxonomyReader);
             DrillDownQuery drillDownQuery = this.createDrillDownQuery(drillDownRequest,
-                                              indices, config,rangeField, range);
+                    indices, config,rangeField, range);
             drillSideways.search(drillDownQuery, facetsCollector);
             int topResultCount = drillDownRequest.getRecordStartIndex() + drillDownRequest.getRecordCount();
-            TopDocs topDocs = FacetsCollector.search(indexSearcher, drillDownQuery, topResultCount, facetsCollector);
+            TopDocs topDocs;
+            if (drillDownRequest.getSortByFields() == null || drillDownRequest.getSortByFields().isEmpty()) {
+                topDocs = FacetsCollector.search(indexSearcher, drillDownQuery, topResultCount, facetsCollector);
+            } else {
+                SortField[] sortFields = createSortFields(drillDownRequest.getSortByFields(), indices);
+                topDocs = FacetsCollector.search(indexSearcher, drillDownQuery, null, topResultCount, new Sort(sortFields),
+                        true, false, facetsCollector);
+            }
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
                 Document document = indexSearcher.doc(scoreDoc.doc);
                 searchResults.add(new SearchResultEntry(document.get(INDEX_ID_INTERNAL_FIELD), scoreDoc.score));

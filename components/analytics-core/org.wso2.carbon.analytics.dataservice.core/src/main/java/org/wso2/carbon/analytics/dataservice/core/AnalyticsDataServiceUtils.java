@@ -18,14 +18,6 @@
  */
 package org.wso2.carbon.analytics.dataservice.core;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -33,6 +25,14 @@ import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Analytics data service utilities.
@@ -62,7 +62,7 @@ public class AnalyticsDataServiceUtils {
         newPrimaryKeys.addAll(primaryKeys);
         Map<String, ColumnDefinition> newColumns = existingSchema.getColumns();
         if (newColumns == null) {
-            newColumns = new HashMap<String, ColumnDefinition>();
+            newColumns = new LinkedHashMap<>();
         }
         ColumnDefinition targetColumn;
         for (ColumnDefinition column : columns) {

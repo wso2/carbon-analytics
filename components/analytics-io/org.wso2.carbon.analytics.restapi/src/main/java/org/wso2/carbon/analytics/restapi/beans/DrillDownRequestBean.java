@@ -47,6 +47,8 @@ public class DrillDownRequestBean {
     private List<DrillDownRangeBean> ranges;
     @XmlElement(name = "rangeField", required = false)
     private String rangeField;
+    @XmlElement(name = "sortBy", required = false)
+
 
     public String getTableName() {
         return tableName;

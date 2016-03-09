@@ -273,6 +273,7 @@ public class Utils {
         drillDownRequest.setCategoryPaths(createCategoryPaths(bean.getCategories()));
         drillDownRequest.setRanges(createDrillDownRanges(bean.getRanges()));
         drillDownRequest.setRangeField(bean.getRangeField());
+        drillDownRequest.setSortByFields();
         return drillDownRequest;
     }
 
