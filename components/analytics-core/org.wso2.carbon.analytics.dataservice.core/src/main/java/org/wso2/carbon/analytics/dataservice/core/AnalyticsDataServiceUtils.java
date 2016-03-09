@@ -19,7 +19,7 @@
 package org.wso2.carbon.analytics.dataservice.core;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -62,7 +62,7 @@ public class AnalyticsDataServiceUtils {
         newPrimaryKeys.addAll(primaryKeys);
         Map<String, ColumnDefinition> newColumns = existingSchema.getColumns();
         if (newColumns == null) {
-            newColumns = new HashMap<String, ColumnDefinition>();
+            newColumns = new LinkedHashMap<String, ColumnDefinition>();
         }
         ColumnDefinition targetColumn;
         for (ColumnDefinition column : columns) {
