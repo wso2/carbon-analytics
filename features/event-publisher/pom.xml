@@ -52,6 +52,7 @@
         <module>org.wso2.carbon.event.output.adapter.cassandra.server.feature</module>
         <module>org.wso2.carbon.event.output.adapter.feature</module>
         <module>org.wso2.carbon.event.output.adapter.ui.server.feature</module>
+        <module>org.wso2.carbon.event.publisher.aggregate.feature</module>
     </modules>
 
 
