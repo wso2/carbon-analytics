@@ -71,9 +71,6 @@
             <version>${carbon.analytics.common.version}</version>
             <type>zip</type>
         </dependency>
-
-        <!--- TODO Check event statistics requirements -->
-
     </dependencies>
 
     <build>
