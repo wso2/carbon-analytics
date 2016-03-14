@@ -21,7 +21,6 @@ import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -29,6 +28,7 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -76,6 +76,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The Class AnalyticsResource represents the REST APIs for
@@ -700,15 +701,16 @@ public class AnalyticsResource extends AbstractResource {
             List<String> ids = Utils.getRecordIds(searchResults);
             AnalyticsDataResponse resp = analyticsDataService.get(username,
                                                                   queryBean.getTableName(), 1, null, ids);
-            List<RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataServiceUtils.listRecords(analyticsDataService,
+            Map<String, RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataServiceUtils.listRecords(analyticsDataService,
                                                                                             resp));
+            List<RecordBean> sortedRecordBeans = Utils.getSortedRecordBeans(recordBeans, searchResults);
             if (logger.isDebugEnabled()) {
-                for (RecordBean recordBean : recordBeans) {
-                    logger.debug("Search Result -- Record Id: " + recordBean.getId() + " values :" +
-                                 recordBean.toString());
+                for (Map.Entry<String, RecordBean> entry : recordBeans.entrySet()) {
+                    logger.debug("Search Result -- Record Id: " + entry.getKey() + " values :" +
+                                 entry.getValue().toString());
                 }
             }
-            return Response.ok(recordBeans).build();
+            return Response.ok(sortedRecordBeans).build();
         } else {
             throw new AnalyticsException("Search parameters not provided");
         }
@@ -739,9 +741,10 @@ public class AnalyticsResource extends AbstractResource {
             List<String> ids = Utils.getRecordIds(result);
             AnalyticsDataResponse resp = analyticsDataService.get(username,
                                                                   requestBean.getTableName(), 1, null, ids);
-            List<RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataServiceUtils.listRecords(analyticsDataService,
+            Map<String, RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataServiceUtils.listRecords(analyticsDataService,
                                                                                             resp));
-            return Response.ok(recordBeans).build();
+            List<RecordBean> sortedRecordBeans = Utils.getSortedRecordBeans(recordBeans, result);
+            return Response.ok(sortedRecordBeans).build();
         } else {
             throw new AnalyticsException("Drilldown parameters not provided");
         }

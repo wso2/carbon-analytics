@@ -487,7 +487,8 @@ public class AnalyticsWebService extends AbstractAdmin {
             List<String> recordIds = Utils.getRecordIds(searchResults);
             List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(),
                                                                             tableName, DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
-            List<RecordBean> recordBeans = Utils.createRecordBeans(records);
+            Map<String, RecordBean> recordBeanMap = Utils.createRecordBeansKeyedWithIds(records);
+            List<RecordBean> recordBeans = Utils.getSortedRecordBeans(recordBeanMap, searchResults);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
         } catch (Exception e) {
@@ -515,7 +516,8 @@ public class AnalyticsWebService extends AbstractAdmin {
             List<String> recordIds = Utils.getRecordIds(searchResults);
             List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(),
                                                                                                                 tableName, DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
-            List<RecordBean> recordBeans = Utils.createRecordBeans(records);
+            Map<String, RecordBean> recordBeanMap = Utils.createRecordBeansKeyedWithIds(records);
+            List<RecordBean> recordBeans = Utils.getSortedRecordBeans(recordBeanMap, searchResults);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
         } catch (Exception e) {
@@ -699,9 +701,10 @@ public class AnalyticsWebService extends AbstractAdmin {
                                                                                      getAnalyticsDrillDownRequest(drillDownRequest));
             List<String> recordIds = Utils.getRecordIds(searchResults);
             List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI,
-                                                            analyticsDataAPI.get(getUsername(), drillDownRequest.getTableName(),
-                                                                                 DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
-            List<RecordBean> recordBeans = Utils.createRecordBeans(records);
+                                                                         analyticsDataAPI.get(getUsername(), drillDownRequest.getTableName(),
+                                                                                              DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
+            Map<String, RecordBean> recordBeanMap = Utils.createRecordBeansKeyedWithIds(records);
+            List<RecordBean> recordBeans = Utils.getSortedRecordBeans(recordBeanMap, searchResults);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
         } catch (Exception e) {

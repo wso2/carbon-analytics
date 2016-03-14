@@ -54,6 +54,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -142,13 +143,13 @@ public class Utils {
      * Creates the record beans from records.
      *
      * @param records the records
-     * @return the list of recordBeans
+     * @return the Map of recordBeans <id, recordBean>
      */
-    public static List<RecordBean> createRecordBeans(List<Record> records) {
-        List<RecordBean> recordBeans = new ArrayList<>();
+    public static Map<String, RecordBean> createRecordBeans(List<Record> records) {
+        Map<String, RecordBean> recordBeans = new HashMap<>();
         for (Record record : records) {
             RecordBean recordBean = createRecordBean(record);
-            recordBeans.add(recordBean);
+            recordBeans.put(recordBean.getId(), recordBean);
         }
         return recordBeans;
     }
@@ -511,5 +512,14 @@ public class Utils {
             throw new AnalyticsException("sortType cannot be null for field: " + field);
         }
         return sort;
+    }
+
+    public static List<RecordBean> getSortedRecordBeans(Map<String, RecordBean> recordBeans,
+                                                        List<SearchResultEntry> searchResults) {
+        List<RecordBean> sortedRecords = new ArrayList<>();
+        for (SearchResultEntry searchResultEntry : searchResults) {
+            sortedRecords.add(recordBeans.get(searchResultEntry.getId()));
+        }
+        return sortedRecords;
     }
 }
