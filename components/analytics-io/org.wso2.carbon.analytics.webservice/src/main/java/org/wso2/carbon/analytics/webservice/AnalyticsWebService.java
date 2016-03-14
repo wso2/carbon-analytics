@@ -33,6 +33,7 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.webservice.beans.AggregateResponse;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsAggregateRequest;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRangeBean;
@@ -713,7 +714,8 @@ public class AnalyticsWebService extends AbstractAdmin {
         }
     }
 
-    private AnalyticsDrillDownRequest getAnalyticsDrillDownRequest(AnalyticsDrillDownRequestBean drillDownRequest) {
+    private AnalyticsDrillDownRequest getAnalyticsDrillDownRequest(AnalyticsDrillDownRequestBean drillDownRequest)
+            throws AnalyticsException {
         AnalyticsDrillDownRequest analyticsDrillDownRequest = new AnalyticsDrillDownRequest();
         analyticsDrillDownRequest.setTableName(drillDownRequest.getTableName());
         analyticsDrillDownRequest.setQuery(drillDownRequest.getQuery());
@@ -741,6 +743,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             }
             analyticsDrillDownRequest.setRanges(drillDownRanges);
         }
+        analyticsDrillDownRequest.setSortByFields(Utils.getSortByFields(drillDownRequest.getSortByFields()));
         return analyticsDrillDownRequest;
     }
 

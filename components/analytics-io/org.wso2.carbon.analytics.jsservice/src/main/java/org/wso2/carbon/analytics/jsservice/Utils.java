@@ -232,17 +232,18 @@ public class Utils {
     }
 
     public static AnalyticsDrillDownRequest createDrillDownSearchRequest(
-            String tableName, DrillDownRequestBean queryBean) {
-        AnalyticsDrillDownRequest bean = new AnalyticsDrillDownRequest();
-        bean.setTableName(tableName);
-        bean.setQuery(queryBean.getQuery());
-        bean.setScoreFunction(queryBean.getScoreFunction());
-        bean.setRecordCount(queryBean.getRecordCount());
-        bean.setRecordStartIndex(queryBean.getRecordStart());
-        bean.setRangeField(queryBean.getRangeField());
-        bean.setCategoryPaths(createCategoryPathBeans(queryBean.getCategories()));
-        bean.setRanges(createRanges(queryBean.getRanges()));
-        return bean;
+            String tableName, DrillDownRequestBean queryBean) throws AnalyticsException {
+        AnalyticsDrillDownRequest request = new AnalyticsDrillDownRequest();
+        request.setTableName(tableName);
+        request.setQuery(queryBean.getQuery());
+        request.setScoreFunction(queryBean.getScoreFunction());
+        request.setRecordCount(queryBean.getRecordCount());
+        request.setRecordStartIndex(queryBean.getRecordStart());
+        request.setRangeField(queryBean.getRangeField());
+        request.setCategoryPaths(createCategoryPathBeans(queryBean.getCategories()));
+        request.setRanges(createRanges(queryBean.getRanges()));
+        request.setSortByFields(getSortedFields(queryBean.getSortBy()));
+        return request;
     }
 
     private static List<AnalyticsDrillDownRange> createRanges(
@@ -520,6 +521,22 @@ public class Utils {
         request.setGroupByField(aggregateRequest.getGroupByField());
         request.setQuery(aggregateRequest.getQuery());
         request.setTableName(aggregateRequest.getTableName());
+        request.setFields(createAggregateFieds(aggregateRequest.getAggregateFields()));
+        request.setAggregateLevel(aggregateRequest.getAggregateLevel());
+        request.setParentPath(aggregateRequest.getParentPath());
+        request.setNoOfRecords(aggregateRequest.getNoOfRecords());
+        return request;
+    }
+
+    public static AggregateRequest getAggregateRequest(AggregateRequestBean aggregateRequest, String tableName) {
+        AggregateRequest request = new AggregateRequest();
+        request.setGroupByField(aggregateRequest.getGroupByField());
+        request.setQuery(aggregateRequest.getQuery());
+        if (tableName != null || !tableName.isEmpty()) {
+            request.setTableName(tableName);
+        } else {
+            request.setTableName(aggregateRequest.getTableName());
+        }
         request.setFields(createAggregateFieds(aggregateRequest.getAggregateFields()));
         request.setAggregateLevel(aggregateRequest.getAggregateLevel());
         request.setParentPath(aggregateRequest.getParentPath());

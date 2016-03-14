@@ -44,6 +44,8 @@ public class DrillDownRequestBean {
     private List<DrillDownRangeBean> ranges;
     @XmlElement(name = "rangeField", required = false)
     private String rangeField;
+    @XmlElement(name = "sortBy", required = false)
+    private List<SortByFieldBean> sortBy;
 
     public List<DrillDownPathBean> getCategories() {
         return categories;
@@ -95,5 +97,13 @@ public class DrillDownRequestBean {
 
     public String getRangeField() {
         return rangeField;
+    }
+
+    public List<SortByFieldBean> getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(List<SortByFieldBean> sortBy) {
+        this.sortBy = sortBy;
     }
 }

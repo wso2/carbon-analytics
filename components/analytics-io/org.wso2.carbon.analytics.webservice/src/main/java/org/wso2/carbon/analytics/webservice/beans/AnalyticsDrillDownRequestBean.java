@@ -35,6 +35,7 @@ public class AnalyticsDrillDownRequestBean implements Serializable {
     private String scoreFunction;
     private int recordCount;
     private int recordStart;
+    private SortByFieldBean[] sortByFields;
 
     public AnalyticsDrillDownRequestBean() {
     }
@@ -101,5 +102,13 @@ public class AnalyticsDrillDownRequestBean implements Serializable {
 
     public void setRecordStart(int recordStart) {
         this.recordStart = recordStart;
+    }
+
+    public SortByFieldBean[] getSortByFields() {
+        return sortByFields;
+    }
+
+    public void setSortByFields(SortByFieldBean[] sortByFields) {
+        this.sortByFields = sortByFields;
     }
 }

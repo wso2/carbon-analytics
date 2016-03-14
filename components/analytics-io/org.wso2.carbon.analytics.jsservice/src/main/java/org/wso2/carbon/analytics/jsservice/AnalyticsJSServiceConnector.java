@@ -360,7 +360,7 @@ public class AnalyticsJSServiceConnector {
         if (requestAsString != null && !requestAsString.isEmpty()) {
             try {
                 AggregateRequestBean aggregateRequest = gson.fromJson(requestAsString, AggregateRequestBean.class);
-                AggregateRequest request = Utils.getAggregateRequest(aggregateRequest);
+                AggregateRequest request = Utils.getAggregateRequest(aggregateRequest, tableName);
                 List<Record> records = Utils.createList(analyticsDataAPI.searchWithAggregates(username, request));
                 List<RecordBean> recordBeans = Utils.getRecordBeans(records);
                 if (logger.isDebugEnabled()) {
