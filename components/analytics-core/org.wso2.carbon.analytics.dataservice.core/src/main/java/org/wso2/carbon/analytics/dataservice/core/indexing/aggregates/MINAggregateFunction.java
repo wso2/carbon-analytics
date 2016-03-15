@@ -35,6 +35,9 @@ public class MINAggregateFunction implements AggregateFunction {
     @Override
     public void process(RecordValuesContext ctx, String[] aggregateFields)
             throws AnalyticsException {
+        if (aggregateFields == null || aggregateFields.length == 0) {
+            throw new AnalyticsException("Field to be aggregated, is missing");
+        }
         Object value = ctx.getValue(aggregateFields[0]);
         if (value == null) {
             throw new AnalyticsException("Error while calculating MIN: value of the field, " +
