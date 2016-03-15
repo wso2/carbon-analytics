@@ -42,6 +42,7 @@ public class AggregateFunctionFactory {
         this.aggregateFunctions.put(Constants.MAX_AGGREGATE, MAXAggregateFunction.class);
         this.aggregateFunctions.put(Constants.MIN_AGGREGATE, MINAggregateFunction.class);
         this.aggregateFunctions.put(Constants.COUNT_AGGREGATE, COUNTAggregateFunction.class);
+        this.aggregateFunctions.put(Constants.FIRST_AGGREGATE, FirstAggregateFunction.class);
 
         //Aggregates installed as OSGI Components
         if (!AnalyticsServiceHolder.getAggregateFunctions().isEmpty()) {
