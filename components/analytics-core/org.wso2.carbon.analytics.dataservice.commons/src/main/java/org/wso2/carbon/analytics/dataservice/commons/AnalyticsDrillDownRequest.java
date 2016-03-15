@@ -44,6 +44,8 @@ public class AnalyticsDrillDownRequest implements Serializable {
     private int recordCount;
     //Records start index
     private  int recordStart;
+    //Fields by which the sorting is performed
+    private List<SortByField> sortByFields;
     
     public AnalyticsDrillDownRequest() {
     }
@@ -51,7 +53,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
     public AnalyticsDrillDownRequest(String tableName,
                                      Map<String, List<String>> categoryPaths, String rangeField,
                                      List<AnalyticsDrillDownRange> ranges, String query,
-                                     String scoreFunction, int recordCount,
+                                     String scoreFunction, int recordCount, List<SortByField> sortByFields,
                                      int recordStart) {
         this.tableName = tableName;
         this.categoryPaths = categoryPaths;
@@ -61,6 +63,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
         this.scoreFunction = scoreFunction;
         this.recordCount = recordCount;
         this.recordStart = recordStart;
+        this.sortByFields = sortByFields;
     }
 
     /**
@@ -181,5 +184,13 @@ public class AnalyticsDrillDownRequest implements Serializable {
 
     public void setRangeField(String rangeField) {
         this.rangeField = rangeField;
+    }
+
+    public List<SortByField> getSortByFields() {
+        return sortByFields;
+    }
+
+    public void setSortByFields(List<SortByField> sortByFields) {
+        this.sortByFields = sortByFields;
     }
 }

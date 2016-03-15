@@ -263,7 +263,8 @@ public class Utils {
      * @param bean bean class which represents the drilldown request.
      * @return Equivalent AnalyticsDrilldownRequest object.
      */
-    public static AnalyticsDrillDownRequest createDrilldownRequest(DrillDownRequestBean bean) {
+    public static AnalyticsDrillDownRequest createDrilldownRequest(DrillDownRequestBean bean)
+            throws AnalyticsException {
         AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
         drillDownRequest.setTableName(bean.getTableName());
         drillDownRequest.setRecordCount(bean.getRecordCount());
@@ -273,6 +274,7 @@ public class Utils {
         drillDownRequest.setCategoryPaths(createCategoryPaths(bean.getCategories()));
         drillDownRequest.setRanges(createDrillDownRanges(bean.getRanges()));
         drillDownRequest.setRangeField(bean.getRangeField());
+        drillDownRequest.setSortByFields(Utils.getSortedFields(bean.getSortByFields()));
         return drillDownRequest;
     }
 

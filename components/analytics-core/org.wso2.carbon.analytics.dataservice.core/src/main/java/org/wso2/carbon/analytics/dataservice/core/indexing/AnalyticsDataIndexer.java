@@ -99,6 +99,7 @@ import org.wso2.carbon.analytics.dataservice.core.indexing.LocalIndexDataStore.L
 import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunction;
 import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunctionFactory;
 import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.RecordValuesContext;
+import org.wso2.carbon.analytics.dataservice.core.indexing.sort.RecordSortUtils;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
@@ -429,8 +430,9 @@ public class AnalyticsDataIndexer {
             for (List<SearchResultEntry> entry : entries) {
                 result.addAll(entry);
             }
-            Collections.sort(result);
-            Collections.reverse(result);
+            Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, tableName);
+            result = RecordSortUtils.getSortedSearchResultEntries(tenantId, tableName, sortByFields,
+                                                                  indices, this.getAnalyticsDataService(), result);
             int toIndex = start + count;
             if (toIndex >= result.size()) {
                 toIndex = result.size();
@@ -526,44 +528,22 @@ public class AnalyticsDataIndexer {
     }
 
     private SortField[] createSortFields(List<SortByField> sortByFields, Map<String, ColumnDefinition> indices)
-            throws AnalyticsException {
+            throws AnalyticsIndexException {
         List<SortField> sortFields = new ArrayList<>();
         for (SortByField sortByField : sortByFields) {
             SortField sortField;
             String fieldName = sortByField.getFieldName();
             switch (sortByField.getSort()) {
                 case ASC: {
-                    if (!sortByField.isReversed()) {
-                        sortField = new SortField(fieldName, getSortFieldType(fieldName, indices));
-                    } else {
-                        sortField = new SortField(fieldName, getSortFieldType(fieldName, indices), true);
-                    }
+                    sortField = new SortField(fieldName, getSortFieldType(fieldName, indices));
                     break;
                 }
                 case DESC: {
-                    if (!sortByField.isReversed()) {
-                        sortField = new SortField(fieldName, getSortFieldType(fieldName, indices), true);
-                    } else {
-                        sortField = new SortField(fieldName, getSortFieldType(fieldName, indices));
-                    }
+                    sortField = new SortField(fieldName, getSortFieldType(fieldName, indices), true);
                     break;
                 }
-                case INDEX_ORDER: {
-                    if (!sortByField.isReversed()) {
-                        sortField = new SortField(null, SortField.Type.DOC);
-                    } else {
-                        sortField = new SortField(null, SortField.Type.DOC, true);
-                    }
-                }
-                case RELEVANCE: {
-                    if (!sortByField.isReversed()) {
-                        sortField = new SortField(null, SortField.Type.SCORE);
-                    } else {
-                        sortField = new SortField(null, SortField.Type.SCORE, true);
-                    }
-                }
                 default:
-                    throw new AnalyticsException("Error while processing Sorting fields: " +
+                    throw new AnalyticsIndexException("Error while processing Sorting fields: " +
                                                  sortByField.getSort().toString() + " unsupported sortType");
             }
             sortFields.add(sortField);
@@ -573,31 +553,36 @@ public class AnalyticsDataIndexer {
 
     private SortField.Type getSortFieldType(String fieldName,
                                             Map<String, ColumnDefinition> indices)
-            throws AnalyticsException {
+            throws AnalyticsIndexException {
         ColumnDefinition columnDefinition = indices.get(fieldName);
         SortField.Type type;
         if (columnDefinition == null) {
-            throw new AnalyticsException("Field: " + fieldName + " is not indexed or not found");
-        }
-        switch (columnDefinition.getType()) {
-            case STRING:
-                type = SortField.Type.STRING;
-                break;
-            case INTEGER:
-                type = SortField.Type.INT;
-                break;
-            case LONG:
+            if (fieldName != null && fieldName.equals(INDEX_INTERNAL_TIMESTAMP_FIELD)) {
                 type = SortField.Type.LONG;
-                break;
-            case FLOAT:
-                type = SortField.Type.FLOAT;
-                break;
-            case DOUBLE:
-                type = SortField.Type.DOUBLE;
-                break;
-            default:
-                throw new AnalyticsException("Error while determining the type of the column: " +
-                                             fieldName + ", " + columnDefinition.getType().toString() + " not supported");
+            } else {
+                throw new AnalyticsIndexException("Cannot find index information for field: " + fieldName);
+            }
+        } else {
+            switch (columnDefinition.getType()) {
+                case STRING:
+                    type = SortField.Type.STRING;
+                    break;
+                case INTEGER:
+                    type = SortField.Type.INT;
+                    break;
+                case LONG:
+                    type = SortField.Type.LONG;
+                    break;
+                case FLOAT:
+                    type = SortField.Type.FLOAT;
+                    break;
+                case DOUBLE:
+                    type = SortField.Type.DOUBLE;
+                    break;
+                default:
+                    throw new AnalyticsIndexException("Error while determining the type of the column: " +
+                            fieldName + ", " + columnDefinition.getType().toString() + " not supported");
+            }
         }
         return type;
     }
@@ -916,15 +901,21 @@ public class AnalyticsDataIndexer {
         try {
             IndexSearcher indexSearcher = new IndexSearcher(indexReader);
             FacetsCollector facetsCollector = new FacetsCollector(true);
-            Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId,
-                                                                drillDownRequest.getTableName());
+            Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
             FacetsConfig config = this.getFacetsConfigurations(indices);
             DrillSideways drillSideways = new DrillSideways(indexSearcher, config, taxonomyReader);
             DrillDownQuery drillDownQuery = this.createDrillDownQuery(drillDownRequest,
-                                              indices, config,rangeField, range);
+                    indices, config,rangeField, range);
             drillSideways.search(drillDownQuery, facetsCollector);
             int topResultCount = drillDownRequest.getRecordStartIndex() + drillDownRequest.getRecordCount();
-            TopDocs topDocs = FacetsCollector.search(indexSearcher, drillDownQuery, topResultCount, facetsCollector);
+            TopDocs topDocs;
+            if (drillDownRequest.getSortByFields() == null || drillDownRequest.getSortByFields().isEmpty()) {
+                topDocs = FacetsCollector.search(indexSearcher, drillDownQuery, topResultCount, facetsCollector);
+            } else {
+                SortField[] sortFields = createSortFields(drillDownRequest.getSortByFields(), indices);
+                topDocs = FacetsCollector.search(indexSearcher, drillDownQuery, null, topResultCount, new Sort(sortFields),
+                        true, false, facetsCollector);
+            }
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
                 Document document = indexSearcher.doc(scoreDoc.doc);
                 searchResults.add(new SearchResultEntry(document.get(INDEX_ID_INTERNAL_FIELD), scoreDoc.score));
@@ -1157,6 +1148,7 @@ public class AnalyticsDataIndexer {
         if (startIndex < 0 ) throw new AnalyticsIndexException("Start index should be greater than 0");
         int endIndex = startIndex + drillDownRequest.getRecordCount();
         if (endIndex <= startIndex) throw new AnalyticsIndexException("Record Count should be greater than 0");
+        Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
         List<SearchResultEntry> resultFacetList;
         if (this.isClusteringEnabled()) {
             List<List<SearchResultEntry>> entries = this.executeIndexLookup(new DrillDownSearchCall(tenantId, drillDownRequest));
@@ -1164,14 +1156,14 @@ public class AnalyticsDataIndexer {
             for (List<SearchResultEntry> entry : entries) {
                 resultFacetList.addAll(entry);
             }
-            Collections.sort(resultFacetList);
-            Collections.reverse(resultFacetList);
             if (resultFacetList.size() < startIndex) {
                 return new ArrayList<>();
             }
             if (resultFacetList.size() < endIndex) {
                 return resultFacetList.subList(startIndex, resultFacetList.size());
             }
+            resultFacetList = RecordSortUtils.getSortedSearchResultEntries(tenantId, drillDownRequest.getTableName(),
+                    drillDownRequest.getSortByFields(), indices, this.getAnalyticsDataService(), resultFacetList);
             return resultFacetList.subList(startIndex, endIndex);
         } else {
             return doDrillDownPerNode(tenantId, drillDownRequest, rangeField, range);
@@ -1403,12 +1395,7 @@ public class AnalyticsDataIndexer {
     
     private void checkAndAddDocEntry(Document doc, AnalyticsSchema.ColumnType type, String name, Object obj)
             throws AnalyticsIndexException {
-        FieldType fieldType = new FieldType();
-        fieldType.setStored(false);
-        fieldType.setDocValuesType(DocValuesType.NUMERIC);
-        fieldType.setTokenized(true);
-        fieldType.setOmitNorms(true);
-        fieldType.setIndexOptions(IndexOptions.DOCS);
+        FieldType fieldType = getLuceneFieldType();
         if (obj == null) {
             doc.add(new StringField(name, NULL_INDEX_VALUE, Store.NO));
             return;
@@ -1462,6 +1449,16 @@ public class AnalyticsDataIndexer {
         fieldType.freeze();
     }
 
+    private FieldType getLuceneFieldType() {
+        FieldType fieldType = new FieldType();
+        fieldType.setStored(false);
+        fieldType.setDocValuesType(DocValuesType.NUMERIC);
+        fieldType.setTokenized(true);
+        fieldType.setOmitNorms(true);
+        fieldType.setIndexOptions(IndexOptions.DOCS);
+        return fieldType;
+    }
+
     private void checkAndAddTaxonomyDocEntries(Document doc, AnalyticsSchema.ColumnType type,
                                                    String name, Object obj,
                                                    FacetsConfig facetsConfig)
@@ -1488,8 +1485,10 @@ public class AnalyticsDataIndexer {
                    TaxonomyWriter taxonomyWriter) throws AnalyticsIndexException, IOException {
         Document doc = new Document();
         FacetsConfig config = new FacetsConfig();
+        FieldType fieldType = getLuceneFieldType();
+        fieldType.setNumericType(FieldType.NumericType.LONG);
         doc.add(new StringField(INDEX_ID_INTERNAL_FIELD, record.getId(), Store.YES));
-        doc.add(new LongField(INDEX_INTERNAL_TIMESTAMP_FIELD, record.getTimestamp(), Store.NO));
+        doc.add(new LongField(INDEX_INTERNAL_TIMESTAMP_FIELD, record.getTimestamp(), fieldType));
         /* make the best effort to store in the given timestamp, or else, 
          * fall back to a compatible format, or else, lastly, string */
         String name;
