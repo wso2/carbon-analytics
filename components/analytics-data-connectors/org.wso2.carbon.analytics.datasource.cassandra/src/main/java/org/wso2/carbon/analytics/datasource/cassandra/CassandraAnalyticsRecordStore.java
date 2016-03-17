@@ -29,6 +29,7 @@ import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.TokenRange;
 import com.google.common.cache.CacheBuilder;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
@@ -119,47 +120,74 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         }
         return stmt;
     }
-    
-    private TokenRangeRecordGroup[] calculateTokenRangeGroups(int tenantId, String tableName, List<String> columns, 
-            int numPartitionsHint, int count) {
+
+    private TokenRangeRecordGroup[] calculateTokenRangeGroups(int tenantId, String tableName, List<String> columns,
+                                                              int numPartitionsHint, int count) {
         Metadata md = this.session.getCluster().getMetadata();
         Set<Host> hosts = md.getAllHosts();
         int partitionsPerHost = (int) Math.ceil(numPartitionsHint / (double) hosts.size());
         List<TokenRangeRecordGroup> result = new ArrayList<TokenRangeRecordGroup>(
                 partitionsPerHost * hosts.size());
+        Map<CassandraTokenRange, CassandraTokenRange> tokens = new HashMap<>();
+        Map<Host, Integer> hostTokenCounts = new HashMap<>();
+        Map<Host, List<CassandraTokenRange>> hostTokensMap = new HashMap<>(hosts.size());
         for (Host host : hosts) {
-            result.addAll(this.calculateTokenRangeGroupForHost(tenantId, tableName, columns, 
-                    md, host, partitionsPerHost, count));
+            this.populateTokensForHost(tokens, md, host);
+            hostTokenCounts.put(host, 0);
+            hostTokensMap.put(host, new ArrayList<CassandraTokenRange>());
+        }
+        int maxTokensPerHost = tokens.size() / hosts.size();
+        for (CassandraTokenRange token : tokens.values())  {
+            this.assignTokenRangeToHost(token, hostTokensMap, hostTokenCounts, maxTokensPerHost);
+        }
+        for (Host host : hostTokensMap.keySet()) {
+            String ip = host.getAddress().getHostAddress();
+            List<CassandraTokenRange> hostTokens = hostTokensMap.get(host);
+            for (List<CassandraTokenRange> hostPartitionTokens : Lists.partition(hostTokens, partitionsPerHost)) {
+                result.add(new TokenRangeRecordGroup(tenantId, tableName, columns,
+                        new ArrayList<CassandraTokenRange>(hostPartitionTokens), ip, count));
+            }
         }
         return result.toArray(new TokenRangeRecordGroup[0]);
     }
-    
-    private List<CassandraTokenRange> unwrapTRAndConvertToLocalTR(Set<TokenRange> trs) {
+
+    private void assignTokenRangeToHost(CassandraTokenRange token, Map<Host, List<CassandraTokenRange>> hostTokensMap,
+                                        Map<Host, Integer> hostTokenCounts, int maxTokensPerHost) {
+        int count;
+        for (Host host : token.getHosts()) {
+            count = hostTokenCounts.get(host);
+            if (count < maxTokensPerHost) {
+                hostTokensMap.get(host).add(token);
+                hostTokenCounts.put(host, count + 1);
+                return;
+            }
+        }
+        /* all the candidate hosts counts are more than the threshold,
+         * but we still need to allocate the token range to someone */
+        hostTokensMap.get(token.getHosts().get(0)).add(token);
+    }
+
+    private List<CassandraTokenRange> unwrapTRAndConvertToLocalTR(Set<TokenRange> trs, Host host) {
         List<CassandraTokenRange> trsUnwrapped = new ArrayList<CassandraTokenRange>();
         for (TokenRange tr : trs) {
             for (TokenRange utr : tr.unwrap()) {
-                trsUnwrapped.add(new CassandraTokenRange(utr.getStart().getValue(), utr.getEnd().getValue()));
+                trsUnwrapped.add(new CassandraTokenRange(utr.getStart().getValue(), utr.getEnd().getValue(), host));
             }
         }
         return trsUnwrapped;
     }
-    
-    private List<TokenRangeRecordGroup> calculateTokenRangeGroupForHost(int tenantId, String tableName, 
-            List<String> columns, Metadata md, Host host, int partitionsPerHost, int count) {
-        String ip = host.getAddress().getHostAddress();
-        List<CassandraTokenRange> trs = this.unwrapTRAndConvertToLocalTR(md.getTokenRanges(this.ksName, host));
-        int delta = (int) Math.ceil(trs.size() / (double) partitionsPerHost);
-        List<TokenRangeRecordGroup> result = new ArrayList<TokenRangeRecordGroup>(
-                partitionsPerHost);
-        if (delta > 0) {
-            for (int i = 0; i < trs.size(); i += delta) {
-                /* a new array list is created here, since what sublist returns is not serializable */
-                result.add(new TokenRangeRecordGroup(tenantId, tableName, columns, 
-                       new ArrayList<CassandraTokenRange>(
-                       trs.subList(i, i + delta > trs.size() ? trs.size() : i + delta)), ip, count));
+
+    private void populateTokensForHost(Map<CassandraTokenRange, CassandraTokenRange> tokens, Metadata md, Host host) {
+        List<CassandraTokenRange> trs = this.unwrapTRAndConvertToLocalTR(md.getTokenRanges(this.ksName, host), host);
+        CassandraTokenRange currentToken;
+        for (CassandraTokenRange tr : trs) {
+            currentToken = tokens.get(tr);
+            if (currentToken != null) {
+                currentToken.addHost(host);
+            } else {
+                tokens.put(tr, tr);
             }
         }
-        return result;
     }
     
     private String generateTargetDataTableName(int tenantId, String tableName) {
