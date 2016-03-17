@@ -587,7 +587,13 @@ public class Utils {
         List<AggregateField> aggregateFields = new ArrayList<>();
         if (fields != null) {
             for (AnalyticsAggregateField field : fields) {
-                AggregateField aggregateField = new AggregateField(field.getFields(), field.getAggregate(), field.getAlias());
+                AggregateField aggregateField;
+                // this is only to make backward compatible with older versions of aggregate apis
+                if (field.getFieldName() != null && !field.getFieldName().isEmpty()) {
+                    aggregateField = new AggregateField(new String[]{field.getFieldName()}, field.getAggregate(), field.getAlias());
+                } else {
+                    aggregateField = new AggregateField(field.getFields(), field.getAggregate(), field.getAlias());
+                }
                 aggregateFields.add(aggregateField);
             }
         }

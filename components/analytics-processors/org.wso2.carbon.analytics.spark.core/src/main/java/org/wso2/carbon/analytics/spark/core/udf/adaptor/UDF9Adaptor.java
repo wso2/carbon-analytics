@@ -19,12 +19,14 @@
 package org.wso2.carbon.analytics.spark.core.udf.adaptor;
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.spark.sql.api.java.UDF9;
-import org.apache.spark.sql.types.DataType;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
-import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * This class represents custom UDF type 9 adaptor
@@ -32,24 +34,37 @@ import java.lang.reflect.Method;
 public class UDF9Adaptor implements UDF9 {
 
     private static final long serialVersionUID = 8832980361859623222L;
+    private static Log log = LogFactory.getLog(UDF9Adaptor.class);
     private Class<Object> udfClass;
     private String udfMethodName;
     private Class[] parameterTypes;
 
     public UDF9Adaptor(Class<Object> udfClass, String udfMethodName, Class[] parameterTypes)
             throws AnalyticsUDFException {
-        this.udfClass = udfClass;
-        this.udfMethodName = udfMethodName;
-        this.parameterTypes = parameterTypes;
-
+        try {
+            this.udfClass = udfClass;
+            this.udfMethodName = udfMethodName;
+            this.parameterTypes = parameterTypes;
+        } catch (Exception e) {
+            throw new  AnalyticsUDFException("Error while initializing UDF: " + e.getMessage(), e);
+        }
     }
 
     @Override
     public Object call(Object o, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7,
                        Object o8, Object o9)
             throws Exception {
-        Object udfInstance = udfClass.newInstance();
         Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes);
-        return udfMethod.invoke(udfInstance, o, o2, o3, o4, o5, o6, o7, o8, o9);
+        try {
+            if (Modifier.isStatic(udfMethod.getModifiers())) {
+                return udfMethod.invoke(null, o, o2, o3, o4, o5, o6, o7, o8, o9);
+            } else {
+                Object udfInstance = udfClass.newInstance();
+                return udfMethod.invoke(udfInstance, o, o2, o3, o4, o5, o6, o7, o8, o9);
+            }
+        } catch (InvocationTargetException e) {
+            log.error("Error while invoking method: " + udfMethodName + ", " +e.getMessage(), e.getCause());
+            throw new Exception("Error while invoking method: " + udfMethodName + ", " +e.getMessage(), e.getCause());
+        }
     }
 }

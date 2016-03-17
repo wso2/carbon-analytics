@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class AggregateFieldBean {
     private String[] fields;
+    private String fieldName;
     private String aggregate;
     private String alias;
 
@@ -66,5 +67,13 @@ public class AggregateFieldBean {
 
     public void setAlias(String alias) {
         this.alias = alias;
+    }
+
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
     }
 }

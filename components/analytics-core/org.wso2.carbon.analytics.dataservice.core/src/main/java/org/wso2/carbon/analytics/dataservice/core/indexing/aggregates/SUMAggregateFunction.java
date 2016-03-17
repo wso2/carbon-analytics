@@ -46,7 +46,7 @@ public class SUMAggregateFunction implements AggregateFunction {
         if (value instanceof Number) {
             sum += ((Number)value).doubleValue();
         } else {
-            throw new AnalyticsException("Error while calculating Average: Value '" + value.toString() +
+            throw new AnalyticsException("Error while calculating SUM: Value '" + value.toString() +
                                          "', being aggregated is not numeric.");
         }
     }

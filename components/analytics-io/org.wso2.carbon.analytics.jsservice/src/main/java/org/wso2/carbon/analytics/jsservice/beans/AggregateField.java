@@ -24,6 +24,7 @@ package org.wso2.carbon.analytics.jsservice.beans;
  */
 public class AggregateField {
     private String[] fields;
+    private String fieldName;
     private String aggregate;
     private String alias;
 
@@ -58,5 +59,13 @@ public class AggregateField {
 
     public void setAlias(String alias) {
         this.alias = alias;
+    }
+
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
     }
 }

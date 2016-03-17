@@ -444,7 +444,7 @@ public class Utils {
         return request;
     }
 
-    public static AggregateRequest createAggregateRequest(
+    /*public static AggregateRequest createAggregateRequest(
             AggregateRequestBean aggregateRequestBean, String tableName) {
         AggregateRequest request = new AggregateRequest();
         request.setTableName(tableName);
@@ -456,12 +456,19 @@ public class Utils {
         request.setNoOfRecords(aggregateRequestBean.getNoOfRecords());
         return request;
     }
-
+*/
     private static List<AggregateField> createAggregatingFields(List<AggregateFieldBean> fields) {
         List<AggregateField> aggregateFields = new ArrayList<>();
         for (AggregateFieldBean fieldBean : fields) {
-            AggregateField aggregateField = new AggregateField(fieldBean.getFields(),
-                fieldBean.getAggregate(), fieldBean.getAlias());
+            AggregateField aggregateField;
+            // this is only to make backward compatible with older versions of aggregate apis
+            if (fieldBean.getFieldName() != null && !fieldBean.getFieldName().isEmpty()) {
+                aggregateField = new AggregateField(new String[]{fieldBean.getFieldName()},
+                        fieldBean.getAggregate(), fieldBean.getAlias());
+            } else {
+                aggregateField = new AggregateField(fieldBean.getFields(),
+                                                                   fieldBean.getAggregate(), fieldBean.getAlias());
+            }
             aggregateFields.add(aggregateField);
         }
         return aggregateFields;

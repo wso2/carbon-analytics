@@ -96,5 +96,7 @@ public class Constants {
         public static final String RECORDSTORES = "recordstores";
 
         public static final String AGGREGATES = "aggregates";
+
+        public static final String MULTI_AGGREGATES = "multi_aggregates";
     }
 }

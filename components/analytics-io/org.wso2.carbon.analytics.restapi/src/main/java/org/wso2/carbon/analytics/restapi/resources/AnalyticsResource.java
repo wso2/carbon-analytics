@@ -952,7 +952,7 @@ public class AnalyticsResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON})
     @Produces({ MediaType.APPLICATION_JSON })
-    @Path(Constants.ResourcePath.AGGREGATES)
+    @Path(Constants.ResourcePath.MULTI_AGGREGATES)
     public StreamingOutput searchWithAggregates(AggregateRequestBean[] aggregateRequestBeans,
                                 @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
@@ -1007,18 +1007,17 @@ public class AnalyticsResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON})
     @Produces({ MediaType.APPLICATION_JSON })
-    @Path("tables/{tableName}/aggregates")
+    @Path(Constants.ResourcePath.AGGREGATES)
     public StreamingOutput searchWithAggregates(AggregateRequestBean aggregateRequestBean,
-                                                @PathParam("tableName") String tableName,
                                                 @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Invoking search with aggregates for tableName : " + tableName);
+            logger.debug("Invoking search with aggregates for tableName : " + aggregateRequestBean.getTableName());
         }
         AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (aggregateRequestBean != null) {
-            AggregateRequest aggregateRequest = Utils.createAggregateRequest(aggregateRequestBean, tableName);
+            AggregateRequest aggregateRequest = Utils.createAggregateRequest(aggregateRequestBean);
             final AnalyticsIterator<Record> iterator = analyticsDataService.searchWithAggregates(username, aggregateRequest);
             return new StreamingOutput() {
                 @Override
