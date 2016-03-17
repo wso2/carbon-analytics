@@ -18,7 +18,11 @@
  */
 package org.wso2.carbon.analytics.datasource.cassandra;
 
+import com.datastax.driver.core.Host;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A {@link Serializable} token range class to be used in record groups.
@@ -26,14 +30,17 @@ import java.io.Serializable;
 public class CassandraTokenRange implements Serializable {
 
     private static final long serialVersionUID = 3371665376647640530L;
+
+    private transient List<Host> hosts = new ArrayList<>();
     
     private Object start;
     
     private Object end;
-    
-    public CassandraTokenRange(Object start, Object end) {
+
+    public CassandraTokenRange(Object start, Object end, Host initialHost) {
         this.start = start;
         this.end = end;
+        this.hosts.add(initialHost);
     }
     
     public Object getStart() {
@@ -42,6 +49,28 @@ public class CassandraTokenRange implements Serializable {
     
     public Object getEnd() {
         return end;
+    }
+
+    public void addHost(Host host) {
+        this.hosts.add(host);
+    }
+
+    public List<Host> getHosts() {
+        return hosts;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.start.hashCode() + this.end.hashCode() >> 5;
+    }
+
+    @Override
+    public boolean equals(Object rhs) {
+        if (!(rhs instanceof CassandraTokenRange)) {
+            return false;
+        }
+        CassandraTokenRange obj = (CassandraTokenRange) rhs;
+        return obj.getStart().equals(this.start) && obj.getEnd().equals(this.end);
     }
     
 }
