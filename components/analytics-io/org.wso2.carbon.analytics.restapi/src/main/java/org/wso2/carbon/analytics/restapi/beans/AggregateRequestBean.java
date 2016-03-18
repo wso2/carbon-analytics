@@ -40,6 +40,7 @@ public class AggregateRequestBean {
     private String query;
     @XmlElement(name = "aggregateFields", required = true)
     private List<AggregateFieldBean> fields;
+    @XmlElement(name = "noOfRecords", required = false)
     private int noOfRecords;
 
     public AggregateRequestBean() {

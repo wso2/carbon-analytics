@@ -441,6 +441,7 @@ public class Utils {
         request.setFields(createAggregatingFields(aggregateRequestBean.getFields()));
         request.setAggregateLevel(aggregateRequestBean.getAggregateLevel());
         request.setParentPath(aggregateRequestBean.getParentPath());
+        request.setNoOfRecords(aggregateRequestBean.getNoOfRecords());
         return request;
     }
 
