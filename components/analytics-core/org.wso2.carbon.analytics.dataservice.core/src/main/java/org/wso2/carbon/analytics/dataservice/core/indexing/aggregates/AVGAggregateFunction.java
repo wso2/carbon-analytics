@@ -37,7 +37,7 @@ public class AVGAggregateFunction implements AggregateFunction {
     }
 
     @Override
-    public void process(RecordValuesContext ctx, String[] aggregateFields)
+    public void process(RecordContext ctx, String[] aggregateFields)
             throws AnalyticsException {
         if (aggregateFields == null || aggregateFields.length == 0) {
             throw new AnalyticsException("Field to be aggregated, is missing");

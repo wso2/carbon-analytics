@@ -30,7 +30,7 @@ public interface AggregateFunction {
      * @param aggregateFields user-defined array of fields which will be used for aggregation
      * @throws AnalyticsException
      */
-    public void process(RecordValuesContext ctx, String[] aggregateFields) throws AnalyticsException;
+    public void process(RecordContext ctx, String[] aggregateFields) throws AnalyticsException;
 
     /**
      * Returns the aggregated value.

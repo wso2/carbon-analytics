@@ -98,7 +98,7 @@ import org.wso2.carbon.analytics.dataservice.core.indexing.LocalIndexDataStore.I
 import org.wso2.carbon.analytics.dataservice.core.indexing.LocalIndexDataStore.LocalIndexDataQueue;
 import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunction;
 import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunctionFactory;
-import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.RecordValuesContext;
+import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.RecordContext;
 import org.wso2.carbon.analytics.dataservice.core.indexing.sort.RecordSortUtils;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -1818,7 +1818,7 @@ public class AnalyticsDataIndexer {
                 Record record = iterator.next();
                 for (AggregateField field : aggregateRequest.getFields()) {
                     AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
-                    RecordValuesContext recordValues = RecordValuesContext.create(record.getValues());
+                    RecordContext recordValues = RecordContext.create(record.getValues());
                     function.process(recordValues, field.getAggregateVariables());
                 }
             }
