@@ -414,7 +414,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     Class udf = Class.forName(udfClassName);
                     Method[] methods = udf.getDeclaredMethods();
                     for (Method method : methods) {
-                        udfAdaptorBuilder.registerUDF(udf, method, sqlCtx);
+                        try {
+                            udfAdaptorBuilder.registerUDF(udf, method, sqlCtx);
+                        } catch (AnalyticsUDFException e) {
+                            log.error("Error while registering the UDF method: " + method.getName() + ", " + e.getMessage(), e);
+                        }
                     }
                 }
             }
