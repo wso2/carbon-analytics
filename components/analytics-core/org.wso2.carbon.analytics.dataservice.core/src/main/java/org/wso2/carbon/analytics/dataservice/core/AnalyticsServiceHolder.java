@@ -46,7 +46,7 @@ public class AnalyticsServiceHolder {
 
     private static TaskService taskService;
 
-    private static Map<String, Class> aggregateFunctions = new HashMap<>();
+    private static Map<String, Class<? extends AggregateFunction>> aggregateFunctions = new HashMap<>();
 
     public static void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         AnalyticsServiceHolder.hazelcastInstance = hazelcastInstance;
@@ -117,7 +117,8 @@ public class AnalyticsServiceHolder {
         AnalyticsServiceHolder.aggregateFunctions = null;
     }
 
-    public static Map<String, Class> getAggregateFunctions() {
+    public static Map<String, Class<? extends AggregateFunction>> getAggregateFunctions() {
         return AnalyticsServiceHolder.aggregateFunctions;
     }
+    
 }

@@ -46,7 +46,7 @@ public class AggregateFunctionFactory {
 
         //Aggregates installed as OSGI Components
         if (!AnalyticsServiceHolder.getAggregateFunctions().isEmpty()) {
-            for (Map.Entry<String, Class> entry : AnalyticsServiceHolder.getAggregateFunctions().entrySet()) {
+            for (Map.Entry<String, Class<? extends AggregateFunction>> entry : AnalyticsServiceHolder.getAggregateFunctions().entrySet()) {
                 this.aggregateFunctions.put(entry.getKey(), entry.getValue());
             }
         }

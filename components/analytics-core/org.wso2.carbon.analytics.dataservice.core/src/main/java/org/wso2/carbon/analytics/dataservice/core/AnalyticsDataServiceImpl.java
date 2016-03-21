@@ -732,9 +732,42 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (arsName == null) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
-        RecordGroup[] rgs = this.getAnalyticsRecordStore(arsName).get(tenantId, tableName, numPartitionsHint, columns, timeFrom, 
-                timeTo, recordsFrom, recordsCount);
+        RecordGroup[] rgs;
+        if (this.isTimestampRangePartitionsCompatible(numPartitionsHint, timeFrom, timeTo, recordsFrom, recordsCount)) {
+            List<RecordGroup> rgList = new ArrayList<>(numPartitionsHint);
+            List<Long[]> tsRanges = this.splitTimestampRangeForPartitions(timeFrom, timeTo, numPartitionsHint);
+            for (Long[] tsRange : tsRanges) {
+                rgList.addAll(Arrays.asList(this.getAnalyticsRecordStore(arsName).get(tenantId, tableName, 
+                        1, columns, tsRange[0], tsRange[1], recordsFrom, recordsCount)));
+            }
+            rgs = rgList.toArray(new RecordGroup[0]);
+        } else {
+            rgs = this.getAnalyticsRecordStore(arsName).get(tenantId, tableName, numPartitionsHint, columns, timeFrom, 
+                    timeTo, recordsFrom, recordsCount);            
+        }
         return new AnalyticsDataResponse(arsName, rgs);
+    }
+    
+    private List<Long[]> splitTimestampRangeForPartitions(long timeFrom, long timeTo, int numPartitionsHint) {
+        List<Long[]> result = new ArrayList<>();
+        int delta = (int) Math.ceil((timeTo - timeFrom) / (double) numPartitionsHint);
+        long val = timeFrom;
+        while (true) {
+            if (val + delta >= timeTo) {
+                result.add(new Long[] { val, timeTo });
+                break;
+            } else {
+                result.add(new Long[] { val, val + delta });
+                val += delta;
+            }            
+        }
+        return result;
+    }
+    
+    private boolean isTimestampRangePartitionsCompatible(int numPartitionsHint, long timeFrom, long timeTo, 
+            int recordsFrom, int recordsCount) {
+        return numPartitionsHint > 1 && timeFrom != Long.MIN_VALUE  && timeTo != Long.MAX_VALUE && recordsFrom == 0 && 
+                (recordsCount == -1 || recordsCount == Integer.MAX_VALUE); 
     }
     
     public AnalyticsDataResponse getWithKeyValues(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
@@ -763,7 +796,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         List<List<String>> idsSubLists = getChoppedLists(ids, this.recordsBatchSize);
         List<RecordGroup> recordGroups = new ArrayList<>();
 
-        for(List<String> idSubList : idsSubLists) {
+        for (List<String> idSubList : idsSubLists) {
             ArrayList<RecordGroup> recordGroupSubList = new ArrayList<>(Arrays.asList(
                     this.getAnalyticsRecordStore(arsName).get(tenantId, tableName, numPartitionsHint, columns, idSubList)));
             recordGroups.addAll(recordGroupSubList);

@@ -198,6 +198,41 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         }
     }
     
+    @Test (enabled = true, dependsOnMethods = "testTableCreateDeleteListNegativeTenantIds")
+    public void testMultipleDataRecordAddRetieveWithTimestampRange() throws AnalyticsException {
+        this.service.deleteTable(7, "T1");
+        this.service.createTable(7, "T1");
+        long time = System.currentTimeMillis();
+        int timeOffset = 10;
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(7, "T1", 1, 100, time, timeOffset);
+        this.service.put(records);
+        List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
+                this.service.get(7, "T1", 2, null, time - 10, time + timeOffset * 100, 0, -1));
+        Assert.assertEquals(new HashSet<>(recordsIn), new HashSet<>(records));
+        recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
+                this.service.get(7, "T1", 1, null, time, time + timeOffset * 99 + 1, 0, -1));
+        Assert.assertEquals(new HashSet<>(recordsIn), new HashSet<>(records));
+        recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
+                this.service.get(7, "T1", 1, null, time, time + timeOffset * 99, 0, -1));
+        Assert.assertEquals(recordsIn.size(), 99);
+        recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
+                this.service.get(7, "T1", 2, null, time + 1, time + timeOffset * 99 + 1, 0, -1));
+        Assert.assertEquals(recordsIn.size(), 99);
+        recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
+                this.service.get(7, "T1", 5, null, time + 1, time + timeOffset * 99, 0, -1));
+        Assert.assertEquals(recordsIn.size(), 98);
+        if (this.service.isRecordCountSupported(this.service.getRecordStoreNameByTable(7, "T1"))) {
+            long count = this.service.getRecordCount(7, "T1", time, time + timeOffset * 99);
+            Assert.assertEquals(count, 99);
+            Assert.assertEquals(this.service.getRecordCount(7, "T1", time + 1, time + timeOffset * 99 + 1), 99);
+            Assert.assertEquals(this.service.getRecordCount(7, "T1", time + 1, time + timeOffset * 99), 98);
+        }
+        records.remove(99);
+        records.remove(0);
+        Assert.assertEquals(new HashSet<>(records), new HashSet<>(recordsIn));
+        this.service.deleteTable(7, "T1");
+    }
+    
     private List<Record> generateIndexRecords(int tenantId, String tableName, int n, long startTimestamp) {
         Map<String, Object> values;
         Record record;
@@ -269,7 +304,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.cleanupTable(tenantId, tableName);
     }
     
-    @Test (enabled = true, dependsOnMethods = "testTableCreateDeleteListNegativeTenantIds")
+    @Test (enabled = true, dependsOnMethods = "testMultipleDataRecordAddRetieveWithTimestampRange")
     public void testIndexedDataAddRetrieve() throws AnalyticsException {
         this.indexDataAddRetrieve(5, "TX", 1);
         this.indexDataAddRetrieve(5, "TX", 10);

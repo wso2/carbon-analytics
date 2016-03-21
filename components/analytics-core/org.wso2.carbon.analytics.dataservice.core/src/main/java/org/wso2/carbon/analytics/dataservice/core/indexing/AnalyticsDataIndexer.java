@@ -45,7 +45,6 @@ import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.facet.LabelAndValue;
-import org.apache.lucene.facet.range.DoubleRange;
 import org.apache.lucene.facet.taxonomy.TaxonomyFacetSumValueSource;
 import org.apache.lucene.facet.taxonomy.TaxonomyReader;
 import org.apache.lucene.facet.taxonomy.TaxonomyWriter;
@@ -451,6 +450,7 @@ public class AnalyticsDataIndexer {
         return result;
     }
 
+    @SuppressWarnings("rawtypes")
     private List<SearchResultEntry> doSearch(Set<Integer> shardIndices, int tenantId, String tableName,
                                              String query, int start, int count, List<SortByField> sortByFields)
             throws AnalyticsIndexException {
@@ -510,6 +510,7 @@ public class AnalyticsDataIndexer {
         return validatedQuery;
     }
 
+    @SuppressWarnings("rawtypes")
     private TopDocsCollector getTopDocsCollector(int start, int count, List<SortByField> sortByFields,
                                                  Map<String, ColumnDefinition> indices)
             throws AnalyticsException {
@@ -815,15 +816,6 @@ public class AnalyticsDataIndexer {
             }
         }
         return new ArrayList<>(drillDownRanges.values());
-    }
-
-    private DoubleRange[] createRangeBuckets(List<AnalyticsDrillDownRange> ranges) {
-        List<DoubleRange> buckets = new ArrayList<>();
-        for (AnalyticsDrillDownRange range : ranges) {
-            DoubleRange doubleRange = new DoubleRange(range.getLabel(), range.getFrom(), true, range.getTo(), false);
-            buckets.add(doubleRange);
-        }
-        return buckets.toArray(new DoubleRange[buckets.size()]);
     }
 
     private MultiReader getCombinedIndexReader(Set<Integer> shardIds, int tenantId, String tableName)
@@ -2044,10 +2036,6 @@ public class AnalyticsDataIndexer {
             this.tableName = tableName;
             this.fromTime = from;
             this.toTime = to;
-        }
-
-        public void stop() {
-            this.stop = true;
         }
 
         @Override
