@@ -58,7 +58,7 @@ public class AnalyticsIncrementalMetaStore {
         columns.add(new ColumnDefinition(COLUMN_TABLE_ID, AnalyticsSchema.ColumnType.STRING));
         columns.add(new ColumnDefinition(COLUMN_PRIMARY_VALUE, AnalyticsSchema.ColumnType.LONG));
         columns.add(new ColumnDefinition(COLUMN_TEMP_VALUE, AnalyticsSchema.ColumnType.LONG));
-        AnalyticsSchema schema = new AnalyticsSchema(columns, Arrays.asList(COLUMN_TENANT_ID, COLUMN_TABLE_ID));
+        AnalyticsSchema schema = new AnalyticsSchema(columns, new ArrayList<>(Arrays.asList(COLUMN_TENANT_ID, COLUMN_TABLE_ID)));
         this.ads.setTableSchema(AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID, INC_META_TABLE, schema);
     }
 
@@ -73,7 +73,7 @@ public class AnalyticsIncrementalMetaStore {
             values.put(COLUMN_TEMP_VALUE, ts);
         }
         Record record = new Record(AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID, INC_META_TABLE, values);
-        this.ads.put(Arrays.asList(record));
+        this.ads.put(new ArrayList<>(Arrays.asList(record)));
     }
 
     public long getLastProcessedTimestamp(int tenantId, String id, boolean primary) throws AnalyticsException {
@@ -81,7 +81,8 @@ public class AnalyticsIncrementalMetaStore {
         values.put(COLUMN_TENANT_ID, tenantId);
         values.put(COLUMN_TABLE_ID, id);
         List<Record> result = AnalyticsDataServiceUtils.listRecords(
-                this.ads, this.ads.getWithKeyValues(AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID, INC_META_TABLE, 1, null, Arrays.asList(values)));
+                this.ads, this.ads.getWithKeyValues(AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID,
+                                                    INC_META_TABLE, 1, null, new ArrayList<>(Arrays.asList(values))));
         if (result.size() > 0) {
             Record record = result.get(0);
             Object obj;
