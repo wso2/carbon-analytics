@@ -169,9 +169,11 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
 
         private void updateIncProcessingTS() {
             try {
-                long existingIncTS = ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(this.tenantId, this.incID, false);
+                long existingIncTS = ServiceHolder.getIncrementalMetaStore()
+                        .getLastProcessedTimestamp(this.tenantId, this.incID, false);
                 if (existingIncTS < this.incMaxTS) {
-                    ServiceHolder.getIncrementalMetaStore().setLastProcessedTimestamp(this.tenantId, this.incID, this.incMaxTS, false);
+                    ServiceHolder.getIncrementalMetaStore()
+                            .setLastProcessedTimestamp(this.tenantId, this.incID, this.incMaxTS, false);
                 }
             } catch (AnalyticsException e) {
                 throw new RuntimeException(e);
