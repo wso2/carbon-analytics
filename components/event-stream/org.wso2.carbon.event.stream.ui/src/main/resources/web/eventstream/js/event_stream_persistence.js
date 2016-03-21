@@ -26,11 +26,15 @@ function populateAnalyticsTable(analyticsTable, columnInformation, type) {
         YAHOO.util.Dom.addClass(persistCell, "property-names");
         var persistCheckElement = document.createElement('input');
         persistCheckElement.type = "checkbox";
-        persistCheckElement.className = type;
         persistCheckElement.addEventListener('change',
                                              function () {
                                                  uncheckedRoot(type);
                                              }, false);
+        if (column0 == '_timestamp') {
+            persistCheckElement.disabled = true;
+        } else {
+            persistCheckElement.className = type;
+        }
         persistCell.appendChild(persistCheckElement);
 
         var columnCell = row.insertCell(cellNo++);
@@ -63,19 +67,25 @@ function populateAnalyticsTable(analyticsTable, columnInformation, type) {
         YAHOO.util.Dom.addClass(primaryCell, "property-names");
         var primaryCheckElement = document.createElement('input');
         primaryCheckElement.type = "checkbox";
+        if (column0 == '_timestamp') {
+            primaryCheckElement.disabled = true;
+        }
         primaryCell.appendChild(primaryCheckElement);
 
         var indexCell = row.insertCell(cellNo++);
         YAHOO.util.Dom.addClass(indexCell, "property-names");
         var indexCheckElement = document.createElement('input');
         indexCheckElement.type = "checkbox";
+        if (column0 == '_timestamp') {
+            indexCheckElement.disabled = true;
+        }
         indexCell.appendChild(indexCheckElement);
 
         var scoreParamCell = row.insertCell(cellNo++);
         YAHOO.util.Dom.addClass(scoreParamCell, "property-names");
         var scoreParamCheckElement = document.createElement('input');
         scoreParamCheckElement.type = "checkbox";
-        if (column1 == 'string' || column1 == 'bool') {
+        if (column1 == 'string' || column1 == 'bool' || column0 == '_timestamp') {
             scoreParamCheckElement.disabled = true;
         }
         scoreParamCell.appendChild(scoreParamCheckElement);
