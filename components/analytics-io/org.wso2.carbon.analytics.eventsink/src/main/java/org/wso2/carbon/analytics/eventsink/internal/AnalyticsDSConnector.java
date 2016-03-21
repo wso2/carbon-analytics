@@ -164,18 +164,11 @@ public class AnalyticsDSConnector {
             populateTypedAttributes(analyticsSchema, AnalyticsEventSinkConstants.EVENT_CORRELATION_DATA_TYPE,
                                     streamDefinition.getCorrelationData(),
                                     event.getCorrelationData(), eventAttributes);
-            populateTypedAttributes(analyticsSchema, null,
-                                    streamDefinition.getPayloadData(),
-                                    event.getPayloadData(), eventAttributes);
-            if (streamDefinition.getPayloadData() != null && !streamDefinition.getPayloadData().isEmpty()) {
-                for (int i = 0; i < streamDefinition.getPayloadData().size(); i++) {
-                    Attribute attribute = streamDefinition.getPayloadData().get(i);
-                    if (attribute != null &&
-                        AnalyticsEventSinkConstants.PAYLOAD_TIMESTAMP.equals(attribute.getName())) {
-                        timestamp = (long) event.getPayloadData()[i];
-                        break;
-                    }
-                }
+            Long payloadTimestamp = populateTypedPayloadAttributes(analyticsSchema, null,
+                                                                   streamDefinition.getPayloadData(),
+                                                                   event.getPayloadData(), eventAttributes);
+            if (payloadTimestamp != null) {
+                timestamp = payloadTimestamp;
             } else if (event.getTimeStamp() != 0L) {
                 timestamp = event.getTimeStamp();
             }
@@ -209,6 +202,29 @@ public class AnalyticsDSConnector {
             }
             iteration++;
         }
+    }
+
+    private Long populateTypedPayloadAttributes(AnalyticsSchema schema, String type, List<Attribute> attributes,
+                                                Object[] values, Map<String, Object> eventAttribute)
+            throws AnalyticsException {
+        Long timestamp = null;
+        if (attributes == null) {
+            return null;
+        }
+        int iteration = 0;
+        for (Attribute attribute : attributes) {
+            if (AnalyticsEventSinkConstants.PAYLOAD_TIMESTAMP.equals(attribute.getName())) {
+                timestamp = (long) values[iteration];
+                continue;
+            }
+            String attributeKey = getAttributeKey(type, attribute.getName());
+            Object recordValue = getRecordValue(schema, attributeKey, values[iteration], false);
+            if (recordValue != null) {
+                eventAttribute.put(attributeKey, recordValue);
+            }
+            iteration++;
+        }
+        return timestamp;
     }
 
     private String getAttributeKey(String type, String attributeName) {
