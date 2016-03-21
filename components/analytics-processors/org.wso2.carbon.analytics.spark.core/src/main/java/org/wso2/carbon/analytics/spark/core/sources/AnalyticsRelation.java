@@ -116,9 +116,10 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             this.incEnable = true;
             logDebug("Incremental processing enabled. Setting incremental parameters " + incParamStr);
             String[] splits = incParamStr.split(";");
-            if (splits.length > 0 && splits.length <= 2) {
+            if (splits.length == 2) {
                 this.incID = splits[0];
                 this.incWindowSizeMS = Long.parseLong(splits[1]) * 1000;
+                this.incBuffer = 1;
             } else if (splits.length == 3) {
                 this.incBuffer = Integer.parseInt(splits[2]);
             } else {
@@ -145,6 +146,8 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         if (this.incEnable) {
             try {
                 startTime = ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(this.tenantId, this.incID, true);
+                startTime -= startTime % this.incWindowSizeMS;
+                startTime -= this.incBuffer * this.incWindowSizeMS;
                 endTime = System.currentTimeMillis() + 5000;
             } catch (AnalyticsException e) {
                 throw new RuntimeException(e);
