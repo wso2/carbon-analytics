@@ -68,10 +68,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
     private String recordStore;
     private boolean mergeFlag;
     private StructType schemaStruct;
-    private boolean incEnable;
-    private String incID;
-    private long incWindowSize_ms;
-    private int incBuffer;
+    private String incParams;
 
     public AnalyticsRelationProvider() {
         this.dataService = ServiceHolder.getAnalyticsDataService();
@@ -103,10 +100,11 @@ public class AnalyticsRelationProvider implements RelationProvider,
                 log.error(msg, e);
                 throw new RuntimeException(msg, e);
             }
-            return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext
-                    , this.schemaStruct);
+            return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
+                                         this.schemaStruct, this.incParams);
         } else {
-            return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext);
+            return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
+                                         this.incParams);
         }
     }
 
@@ -121,28 +119,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
                                                 AnalyticsConstants.DEFAULT_PROCESSED_DATA_STORE_NAME);
         this.mergeFlag = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.MERGE_SCHEMA,
                                                                    parameters, "true"));
-        setIncParams(extractValuesFromMap(AnalyticsConstants.INC_PARAMS, parameters, ""));
-    }
-
-    private void setIncParams(String incParamStr) {
-        if(!incParamStr.isEmpty()) {
-            this.incEnable = true;
-            logDebug("Incremental processing enabled. Setting incremental parameters " + incParamStr);
-            String[] splits = incParamStr.split(";");
-            if (splits.length > 0 && splits.length <= 2) {
-                this.incID = splits[0];
-                this.incWindowSize_ms = Long.parseLong(splits[1]);
-            } else if (splits.length == 3) {
-                this.incBuffer = Integer.parseInt(splits[2]);
-            } else {
-                String msg = "Error while setting incremental processing parameters : " + incParamStr;
-                log.error(msg);
-                throw new RuntimeException(msg);
-            }
-        } else {
-            logDebug("Incremental processing disabled");
-            this.incEnable = false;
-        }
+        this.incParams = extractValuesFromMap(AnalyticsConstants.INC_PARAMS, parameters, "");
     }
 
     private void createTableIfNotExist() throws AnalyticsExecutionException {
@@ -353,7 +330,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
         }
 
         return new AnalyticsRelation(this.tenantId, this.tableName, this.recordStore, sqlContext,
-                                     schema);
+                                     schema, this.incParams);
     }
 
 //    todo: Implement the creatable relation

@@ -53,13 +53,10 @@ import static scala.collection.JavaConversions.asScalaIterator;
 public class AnalyticsRDD extends RDD<Row> implements Serializable {
 
     private static final Log log = LogFactory.getLog(AnalyticsRDD.class);
-
     private static final long serialVersionUID = 5948588299500227997L;
 
     private List<String> columns;
-
     private int tenantId;
-
     private String tableName;
 
     public AnalyticsRDD() {
