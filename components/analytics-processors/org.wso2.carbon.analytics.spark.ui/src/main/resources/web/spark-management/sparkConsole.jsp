@@ -103,6 +103,14 @@
                                 '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
                         );
 
+                        $.register_command(
+                                'incremental_table_commit',
+                                'Commits the incremental table information to the meta table.\n' +
+                                'Ex: incremental_table_commit T1',
+                                'INCREMENTAL_TABLE_COMMIT [incremental ID]',
+                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
+                        );
+
                         /* Register Commands and Callbacks*/
 //                        $.register_command(
 //                                'date',

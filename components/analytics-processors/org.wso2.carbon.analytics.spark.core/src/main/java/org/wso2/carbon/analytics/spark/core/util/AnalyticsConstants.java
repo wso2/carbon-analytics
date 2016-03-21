@@ -70,6 +70,7 @@ public class AnalyticsConstants {
     public static final String DEFAULT_CARBON_SCHEDULER_POOL_NAME = "carbon-pool";
 
     //Analytics relation strings
+    public static final String INC_TABLE_COMMIT = "incremental_table_commit";
     public static final String TENANT_ID = "tenantId";
     public static final String TABLE_NAME = "tableName";
     public static final String SCHEMA_STRING = "schema";

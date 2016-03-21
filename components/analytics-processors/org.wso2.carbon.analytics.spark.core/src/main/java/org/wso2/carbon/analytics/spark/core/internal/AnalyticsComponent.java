@@ -26,6 +26,7 @@ import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.CarbonAnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.SparkScriptCAppDeployer;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
+import org.wso2.carbon.analytics.spark.core.sources.AnalyticsIncrementalMetaStore;
 import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
@@ -82,6 +83,7 @@ public class AnalyticsComponent {
             AnalyticsProcessorService analyticsProcessorService = new CarbonAnalyticsProcessorService();
             bundleContext.registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
             ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
+            ServiceHolder.setIncrementalMetaStore(new AnalyticsIncrementalMetaStore());
             // Registering server startup observer
             SparkScriptCAppDeployer sparkScriptCAppDeployer = new SparkScriptCAppDeployer();
             bundleContext.registerService(
