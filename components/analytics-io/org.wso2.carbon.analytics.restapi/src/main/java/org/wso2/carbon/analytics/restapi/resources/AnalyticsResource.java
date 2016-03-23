@@ -42,6 +42,7 @@ import org.wso2.carbon.analytics.restapi.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.restapi.beans.ColumnKeyValueBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownRequestBean;
+import org.wso2.carbon.analytics.restapi.beans.GetByRangeBean;
 import org.wso2.carbon.analytics.restapi.beans.QueryBean;
 import org.wso2.carbon.analytics.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.restapi.beans.SubCategoriesBean;
@@ -449,6 +450,7 @@ public class AnalyticsResource extends AbstractResource {
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
 	                           @PathParam("start") int recordsFrom, @PathParam("count") int count,
+                               List<String> columns,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                          throws AnalyticsException {
 		if (logger.isDebugEnabled()) {
@@ -456,7 +458,8 @@ public class AnalyticsResource extends AbstractResource {
 		}
         AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
-        final AnalyticsDataResponse resp = analyticsDataService.get(username, tableName, 1, null, timeFrom, timeTo, recordsFrom, count);
+        final AnalyticsDataResponse resp = analyticsDataService.get(username, tableName, 1, columns, timeFrom,
+                timeTo, recordsFrom, count);
 
         final List<Iterator<Record>> iterators = Utils.getRecordIterators(resp, analyticsDataService);
         return new StreamingOutput() {
@@ -500,7 +503,7 @@ public class AnalyticsResource extends AbstractResource {
 	                           @PathParam("start") int start,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                         throws AnalyticsException {
-		return getRecords(tableName, timeFrom, timeTo, start, DEFAULT_INFINITY_INDEX, authHeader);
+		return getRecords(tableName, timeFrom, timeTo, start, DEFAULT_INFINITY_INDEX, null, authHeader);
 	}
 
 	/**
@@ -519,7 +522,7 @@ public class AnalyticsResource extends AbstractResource {
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                  throws AnalyticsException {
 		return getRecords(tableName, timeFrom, timeTo, DEFAULT_START_INDEX,
-                          DEFAULT_INFINITY_INDEX, authHeader);
+                          DEFAULT_INFINITY_INDEX, null, authHeader);
 	}
 
 	/**
@@ -537,7 +540,7 @@ public class AnalyticsResource extends AbstractResource {
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                            throws AnalyticsException {
 		return getRecords(tableName, timeFrom, DEFAULT_TO_TIME, DEFAULT_START_INDEX,
-		                  DEFAULT_INFINITY_INDEX, authHeader);
+		                  DEFAULT_INFINITY_INDEX, null, authHeader);
 	}
 
 	/**
@@ -553,8 +556,24 @@ public class AnalyticsResource extends AbstractResource {
                                       @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                                    throws AnalyticsException {
 		return getRecords(tableName, DEFAULT_FROM_TIME, DEFAULT_TO_TIME,
-		                  DEFAULT_START_INDEX, DEFAULT_INFINITY_INDEX, authHeader);
+		                  DEFAULT_START_INDEX, DEFAULT_INFINITY_INDEX, null, authHeader);
 	}
+
+    /**
+     * Gets the records but user can define the fields/columns he wants.
+     * @param tableName the table name
+     * @return the records
+     * @throws AnalyticsException
+     */
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("tables/{tableName}")
+    public StreamingOutput getRecordsWithSpecificColumns(@PathParam("tableName") String tableName,
+            GetByRangeBean queryBean, @HeaderParam(AUTHORIZATION_HEADER) String authHeader) throws AnalyticsException {
+        return getRecords(tableName, queryBean.getTimeFrom(), queryBean.getTimeTo(),
+                          queryBean.getStart(), queryBean.getCount(), queryBean.getFields(), authHeader);
+    }
 
     /**
      * Gets the records which match the primary key values batch.
@@ -577,8 +596,8 @@ public class AnalyticsResource extends AbstractResource {
         }
         AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
-        final AnalyticsDataResponse resp = analyticsDataService.getWithKeyValues(username, tableName, 1, columnKeyValueBean.getColumns(),
-                                                             columnKeyValueBean.getValueBatches());
+        final AnalyticsDataResponse resp = analyticsDataService.getWithKeyValues(username, tableName, 1,
+                columnKeyValueBean.getColumns(), columnKeyValueBean.getValueBatches());
         final List<Iterator<Record>> iterators = Utils.getRecordIterators(resp, analyticsDataService);
         return new StreamingOutput() {
             @Override
@@ -700,7 +719,7 @@ public class AnalyticsResource extends AbstractResource {
                      queryBean.getStart(), queryBean.getCount(), Utils.getSortedFields(queryBean.getSortByFieldBeans()));
             List<String> ids = Utils.getRecordIds(searchResults);
             AnalyticsDataResponse resp = analyticsDataService.get(username,
-                                                                  queryBean.getTableName(), 1, null, ids);
+                                                                  queryBean.getTableName(), 1, queryBean.getFields(), ids);
             Map<String, RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataServiceUtils.listRecords(analyticsDataService,
                                                                                             resp));
             List<RecordBean> sortedRecordBeans = Utils.getSortedRecordBeans(recordBeans, searchResults);
@@ -740,7 +759,7 @@ public class AnalyticsResource extends AbstractResource {
             List<SearchResultEntry> result= analyticsDataService.drillDownSearch(username, request);
             List<String> ids = Utils.getRecordIds(result);
             AnalyticsDataResponse resp = analyticsDataService.get(username,
-                                                                  requestBean.getTableName(), 1, null, ids);
+                                                                  requestBean.getTableName(), 1, requestBean.getFields(), ids);
             Map<String, RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataServiceUtils.listRecords(analyticsDataService,
                                                                                             resp));
             List<RecordBean> sortedRecordBeans = Utils.getSortedRecordBeans(recordBeans, result);

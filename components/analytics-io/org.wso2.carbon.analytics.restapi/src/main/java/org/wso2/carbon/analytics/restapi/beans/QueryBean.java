@@ -20,7 +20,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The Class QueryBean.
@@ -35,7 +34,7 @@ public class QueryBean {
 	
 	/** The columns. */
 	@XmlElement(required = false)
-	private Map<String, ColumnTypeBean> columns;
+	private List<String> fields;
 	
 	/** The query. */
 	@XmlElement(required = false)
@@ -64,8 +63,8 @@ public class QueryBean {
 	 * Gets the columns.
 	 * @return the columns
 	 */
-	public Map<String, ColumnTypeBean> getColumns() {
-		return columns;
+	public List<String> getFields() {
+		return fields;
 	}
 
 	/**
