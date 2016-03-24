@@ -65,6 +65,7 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
     private AnalyticsDataService dataService;
     private String recordStore;
     private boolean mergeFlag;
+    private String incParams;
 
     public CompressedEventAnalyticsRelationProvider() {
         this.dataService = ServiceHolder.getAnalyticsDataService();
@@ -91,7 +92,7 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
         if (isSchemaProvided()) {
             try {
                 return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, 
-                    this.mergeFlag, sqlContext, generateSchema());
+                    this.mergeFlag, sqlContext, generateSchema(), this.incParams);
             } catch (AnalyticsExecutionException e) {
                 String msg = "Error while generating the schema for the table : " + this.tableName + " : " + e.getMessage();
                 log.error(msg, e);
@@ -99,7 +100,7 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
             }
         } else {
             return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, 
-                this.mergeFlag, sqlContext);
+                this.mergeFlag, sqlContext, this.incParams);
         }
     }
     
@@ -119,6 +120,7 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
                 AnalyticsConstants.DEFAULT_PROCESSED_DATA_STORE_NAME);
         this.mergeFlag = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.MERGE_SCHEMA, parameters,
                 "false"));
+        this.incParams = extractValuesFromMap(AnalyticsConstants.INC_PARAMS, parameters, "");
     }
 
     
@@ -304,7 +306,7 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
             throw new RuntimeException(msg, e);
         }
         return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, this.mergeFlag,
-            sqlContext, schema);
+            sqlContext, schema, this.incParams);
     }
 
     private void logDebug(String msg) {

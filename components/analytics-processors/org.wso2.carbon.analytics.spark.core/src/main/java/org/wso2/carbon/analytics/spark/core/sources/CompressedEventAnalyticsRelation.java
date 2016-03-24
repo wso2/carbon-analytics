@@ -58,6 +58,10 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
     private String tableName;
     private boolean schemaMerge;
     private String recordStore;
+    private boolean incEnable;
+    private String incID;
+    private long incWindowSizeMS;
+    private int incBuffer;
     
     public CompressedEventAnalyticsRelation() {
     }
@@ -71,12 +75,13 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
      * @param sqlContext    Spark SQl Context
      */
     public CompressedEventAnalyticsRelation(int tenantId, String recordStore, String tableName,
-            boolean schemaMerge, SQLContext sqlContext) {
+            boolean schemaMerge, SQLContext sqlContext, String incParams) {
         this.tenantId = tenantId;
         this.recordStore = recordStore;
         this.tableName = tableName;
         this.sqlContext = sqlContext;
         this.schemaMerge = schemaMerge;
+        setIncParams(incParams);
 
         try {
             AnalyticsSchema analyticsSchema = ServiceHolder.getAnalyticsDataService().getTableSchema(
@@ -105,13 +110,14 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
      * @param schema        Schema of the Table
      */
     public CompressedEventAnalyticsRelation(int tenantId, String recordStore, String tableName,
-            boolean schemaMerge, SQLContext sqlContext, StructType schema) {
+            boolean schemaMerge, SQLContext sqlContext, StructType schema, String incParams) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.recordStore = recordStore;
         this.sqlContext = sqlContext;
         this.schema = schema;
         this.schemaMerge = schemaMerge;
+        setIncParams(incParams);
     }
 
     @SuppressWarnings("unchecked")
@@ -122,9 +128,24 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
             log.error(msg);
             throw new RuntimeException(msg);
         }
+        long startTime, endTime;
+        if (this.incEnable) {
+            try {
+                startTime = ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(this.tenantId,
+                    this.incID, true);
+                startTime -= startTime % this.incWindowSizeMS;
+                startTime -= this.incBuffer * this.incWindowSizeMS;
+                endTime = System.currentTimeMillis() + 5000;
+            } catch (AnalyticsException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            startTime = Long.MIN_VALUE;
+            endTime = Long.MAX_VALUE;
+        }
         return new CompressedEventAnalyticsRDD(this.tenantId, this.tableName, new ArrayList<>(Arrays.asList(this.schema
-            .fieldNames())), this.schemaMerge, this.sqlContext.sparkContext(),
-            scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<Row> apply(Row.class));
+            .fieldNames())), this.schemaMerge, this.sqlContext.sparkContext(), scala.collection.Seq$.MODULE$.empty(),
+            ClassTag$.MODULE$.<Row> apply(Row.class), startTime, endTime, this.incEnable, this.incID);
     }
 
     @Override
@@ -169,6 +190,36 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
         for (int i = 0; i < data.rdd().partitions().length; i++) {
             data.sqlContext().sparkContext().runJob(data.rdd(), new AnalyticsWritingFunction(tenantId, tableName,
                 data.schema()), CarbonScalaUtils.getNumberSeq(i, i + 1), false, ClassTag$.MODULE$.Unit());
+        }
+    }
+    
+    private void setIncParams(String incParamStr) {
+        if(!incParamStr.isEmpty()) {
+            this.incEnable = true;
+            logDebug("Incremental processing enabled. Setting incremental parameters " + incParamStr);
+            String[] splits = incParamStr.split("\\s*,\\s*");
+            if (splits.length == 2) {
+                this.incID = splits[0];
+                this.incWindowSizeMS = Long.parseLong(splits[1]) * 1000;
+                this.incBuffer = 1;
+            } else if (splits.length == 3) {
+                this.incID = splits[0];
+                this.incWindowSizeMS = Long.parseLong(splits[1]) * 1000;
+                this.incBuffer = Integer.parseInt(splits[2]);
+            } else {
+                String msg = "Error while setting incremental processing parameters : " + incParamStr;
+                log.error(msg);
+                throw new RuntimeException(msg);
+            }
+        } else {
+            logDebug("Incremental processing disabled");
+            this.incEnable = false;
+        }
+    }
+    
+    private void logDebug(String s) {
+        if (log.isDebugEnabled()) {
+            log.debug(s);
         }
     }
 }
