@@ -24,11 +24,9 @@ import com.hazelcast.core.MemberAttributeEvent;
 import com.hazelcast.core.MembershipEvent;
 import com.hazelcast.core.MembershipListener;
 import com.hazelcast.spi.exception.TargetNotMemberException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -107,11 +105,11 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             this.groups.put(groupId, groupEventListener);
             List<Member> groupMembers = this.getGroupMembers(groupId);
             Member myself = this.hz.getCluster().getLocalMember();
-            if (GenericUtils.hzContains(groupMembers, myself)) { //groupMembers.contains(myself)
+            if (groupMembers.contains(myself)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Removing myself from HZ Group Members list : " + myself);
                 }
-                GenericUtils.hzRemove(groupMembers, myself); //groupMembers.remove(myself)
+                groupMembers.remove(myself);
             }
             groupMembers.add(myself);
             if (this.checkLeader(myself, groupId)) {
@@ -218,7 +216,7 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     }
 
     private List<Member> getGroupMembers(String groupId) {
-        return this.hz.getList(this.generateGroupListId(groupId));
+        return new HzDistributedList(this.hz.getMap(this.generateGroupListId(groupId)));
     }
 
     /**
@@ -236,12 +234,12 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         Member currentMember;
         while (memberItr.hasNext()) {
             currentMember = memberItr.next();
-            if (!existingMembers.contains(currentMember)) { //
+            if (!existingMembers.contains(currentMember)) {
                 removeList.add(currentMember);
             }
         }
         for (Member member : removeList) {
-            GenericUtils.hzRemove(groupMembers, member); //groupMembers.remove(member)
+            groupMembers.remove(member);
         }
         if (this.getGroupMembers(groupId).size() == 0) {
             this.resetLeaderInitDoneFlag(groupId);
@@ -336,11 +334,11 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
                 log.debug("Executing Check Group Member Removal : " + groupId + " , " + member);
             }
 		    List<Member> groupMembers = this.getGroupMembers(groupId);
-		    if (GenericUtils.hzContains(groupMembers, member)) { // groupMembers.contains(member)
+		    if (groupMembers.contains(member)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Removing member from HZ Group Members list : " + member);
                 }
-                GenericUtils.hzRemove(groupMembers, member); //groupMembers.remove(member);
+                groupMembers.remove(member);
             }
             if (this.isLeader(groupId)) {
                 log.info("Local Member is already the leader of the Group : " + groupId);

@@ -743,29 +743,6 @@ public class GenericUtils {
                 this.atomicLong.set(value);
             }
         }
-        
-    }
-
-    /**
-     * Hazelcast list contains does not work, so this is a workaround implementation.
-     */
-    public static boolean hzContains(List<? extends Object> list, Object obj) {
-        for (Object objx : list) {
-            if (objx.equals(obj)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean hzRemove(List<? extends Object> list, Object obj) {
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).equals(obj)) {
-                list.remove(i);
-                return true;
-            }
-        }
-        return false;
     }
     
     public static String resolveLocation(String path) {
@@ -779,5 +756,4 @@ public class GenericUtils {
         path = path.replace(AnalyticsDataSourceConstants.CARBON_HOME_VAR, carbonHome);
         return path;
     }
-
 }
