@@ -20,8 +20,6 @@ package org.wso2.carbon.analytics.spark.core.internal;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-import com.hazelcast.core.Member;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.SparkConf;
@@ -37,7 +35,6 @@ import org.apache.spark.sql.jdbc.carbon.AnalyticsJDBCRelationProvider;
 import org.apache.spark.sql.jdbc.carbon.DialectRegister;
 import org.apache.spark.util.Utils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
@@ -62,7 +59,6 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.SparkTableNamesHolder;
 import org.wso2.carbon.analytics.spark.utils.ComputeClasspath;
 import org.wso2.carbon.utils.CarbonUtils;
-
 import scala.None$;
 import scala.Option;
 import scala.Tuple2;
@@ -70,16 +66,15 @@ import scala.Tuple2;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -414,7 +409,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     Class udf = Class.forName(udfClassName);
                     Method[] methods = udf.getDeclaredMethods();
                     for (Method method : methods) {
-                        udfAdaptorBuilder.registerUDF(udf, method, sqlCtx);
+                        try {
+                            udfAdaptorBuilder.registerUDF(udf, method, sqlCtx);
+                        } catch (AnalyticsUDFException e) {
+                            log.error("Error while registering the UDF method: " + method.getName() + ", " + e.getMessage(), e);
+                        }
                     }
                 }
             }
@@ -678,7 +677,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         File tempFile = new File(analyticsSparkConfDir + File.separator + "log4j.properties");
 
         if (tempFile.exists()) {
-            return " -Dlog4j.configuration=file:" + File.separator+ File.separator+ tempFile.getAbsolutePath();
+            return " -Dlog4j.configuration=file:" + File.separator + File.separator + tempFile.getAbsolutePath();
         } else {
             return "";
         }
@@ -750,6 +749,21 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         if (query.endsWith(";")) {
             query = query.substring(0, query.length() - 1);
         }
+
+        // process incremental table commit query
+        String [] splits = query.split("\\s+");
+        if (splits.length == 2 && isIncTableCommitQuery(splits[0])){
+            try {
+                long tempTS = ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp
+                        (tenantId, splits[1], false);
+                ServiceHolder.getIncrementalMetaStore().setLastProcessedTimestamp(tenantId,
+                                                                                  splits[1], tempTS, true);
+                return new AnalyticsQueryResult(new String[0], Collections.<List<Object>>emptyList());
+            } catch (AnalyticsException e) {
+                throw new AnalyticsExecutionException(e.getMessage(), e);
+            }
+        }
+
         query = encodeQueryWithTenantId(tenantId, query);
         if (log.isDebugEnabled()) {
             log.debug("Executing : " + query);
@@ -771,6 +785,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
             }
         }
+    }
+
+    private boolean isIncTableCommitQuery(String str) {
+        return str.equalsIgnoreCase(AnalyticsConstants.INC_TABLE_COMMIT);
     }
 
     private String encodeQueryWithTenantId(int tenantId, String query)

@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
+import org.wso2.carbon.analytics.spark.core.sources.AnalyticsIncrementalMetaStore;
 import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.ntask.common.TaskException;
@@ -69,6 +70,8 @@ public class ServiceHolder {
     private static boolean analyticsSparkContextEnabled = true;
 
     private static boolean analyticsStatsEnabled = false;
+
+    private static AnalyticsIncrementalMetaStore incrementalMetaStore;
 
     public static void setTaskService(TaskService taskService) {
         ServiceHolder.taskService = taskService;
@@ -167,4 +170,14 @@ public class ServiceHolder {
     public static Map<String, CarbonUDF> getCarbonUDFs() {
         return ServiceHolder.carbonUDFs;
     }
+
+    public static AnalyticsIncrementalMetaStore getIncrementalMetaStore() {
+        return incrementalMetaStore;
+    }
+
+    public static void setIncrementalMetaStore(
+            AnalyticsIncrementalMetaStore incrementalMetaStore) {
+        ServiceHolder.incrementalMetaStore = incrementalMetaStore;
+    }
+
 }

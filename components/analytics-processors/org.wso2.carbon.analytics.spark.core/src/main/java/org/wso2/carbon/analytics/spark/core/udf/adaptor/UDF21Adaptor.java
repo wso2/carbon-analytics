@@ -19,10 +19,14 @@
 package org.wso2.carbon.analytics.spark.core.udf.adaptor;
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.spark.sql.api.java.UDF21;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * This class represents custom UDF type 21 adaptor
@@ -30,16 +34,20 @@ import java.lang.reflect.Method;
 public class UDF21Adaptor implements UDF21 {
 
     private static final long serialVersionUID = 7066851982536394192L;
+    private static Log log = LogFactory.getLog(UDF21Adaptor.class);
     private Class<Object> udfClass;
     private String udfMethodName;
     private Class[] parameterTypes;
 
     public UDF21Adaptor(Class<Object> udfClass, String udfMethodName, Class[] parameterTypes)
             throws AnalyticsUDFException {
-        this.udfClass = udfClass;
-        this.udfMethodName = udfMethodName;
-        this.parameterTypes = parameterTypes;
-
+        try {
+            this.udfClass = udfClass;
+            this.udfMethodName = udfMethodName;
+            this.parameterTypes = parameterTypes;
+        } catch (Exception e) {
+            throw new  AnalyticsUDFException("Error while initializing UDF: " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -47,9 +55,19 @@ public class UDF21Adaptor implements UDF21 {
                        Object o8, Object o9, Object o10, Object o11, Object o12, Object o13,
                        Object o14, Object o15, Object o16, Object o17, Object o18, Object o19,
                        Object o20, Object o21) throws Exception {
-        Object udfInstance = udfClass.newInstance();
         Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes);
-        return udfMethod.invoke(udfInstance, o, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14,
-                                o15, o16, o17, o18, o19, o20, o21);
+        try {
+            if (Modifier.isStatic(udfMethod.getModifiers())) {
+                return udfMethod.invoke(null, o, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14,
+                                        o15, o16, o17, o18, o19, o20, o21);
+            } else {
+                Object udfInstance = udfClass.newInstance();
+                return udfMethod.invoke(udfInstance, o, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14,
+                                        o15, o16, o17, o18, o19, o20, o21);
+            }
+        } catch (InvocationTargetException e) {
+            log.error("Error while invoking method: " + udfMethodName + ", " +e.getMessage(), e.getCause());
+            throw new Exception("Error while invoking method: " + udfMethodName + ", " +e.getMessage(), e.getCause());
+        }
     }
 }

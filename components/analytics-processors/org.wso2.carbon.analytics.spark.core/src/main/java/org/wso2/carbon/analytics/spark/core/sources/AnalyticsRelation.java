@@ -52,18 +52,17 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
                                                                InsertableRelation, Serializable {
 
     private static final long serialVersionUID = -7773419083178608517L;
-
     private static final Log log = LogFactory.getLog(AnalyticsRelation.class);
 
     private SQLContext sqlContext;
-
     private StructType schema;
-
     private int tenantId;
-
     private String tableName;
-
     private String recordStore;
+    private boolean incEnable;
+    private String incID;
+    private long incWindowSizeMS;
+    private int incBuffer;
 
     public AnalyticsRelation() {
     }
@@ -78,7 +77,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     }
 
     public AnalyticsRelation(int tenantId, String recordStore, String tableName,
-                             SQLContext sqlContext) {
+                             SQLContext sqlContext, String incParams) {
         this.tenantId = tenantId;
         this.recordStore = recordStore;
         this.tableName = tableName;
@@ -99,15 +98,39 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }
+        setIncParams(incParams);
     }
 
     public AnalyticsRelation(int tenantId, String recordStore, String tableName,
-                             SQLContext sqlContext, StructType schema) {
+                             SQLContext sqlContext, StructType schema, String incParams) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.recordStore = recordStore;
         this.sqlContext = sqlContext;
         this.schema = schema;
+        setIncParams(incParams);
+    }
+
+    private void setIncParams(String incParamStr) {
+        if(!incParamStr.isEmpty()) {
+            this.incEnable = true;
+            logDebug("Incremental processing enabled. Setting incremental parameters " + incParamStr);
+            String[] splits = incParamStr.split("\\s*,\\s*");
+            if (splits.length == 2) {
+                this.incID = splits[0];
+                this.incWindowSizeMS = Long.parseLong(splits[1]) * 1000;
+                this.incBuffer = 1;
+            } else if (splits.length == 3) {
+                this.incBuffer = Integer.parseInt(splits[2]);
+            } else {
+                String msg = "Error while setting incremental processing parameters : " + incParamStr;
+                log.error(msg);
+                throw new RuntimeException(msg);
+            }
+        } else {
+            logDebug("Incremental processing disabled");
+            this.incEnable = false;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -119,10 +142,26 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             log.error(msg);
             throw new RuntimeException(msg);
         }
+        long startTime, endTime;
+        if (this.incEnable) {
+            try {
+                startTime = ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(
+                        this.tenantId, this.incID, true);
+                startTime -= startTime % this.incWindowSizeMS;
+                startTime -= this.incBuffer * this.incWindowSizeMS;
+                endTime = System.currentTimeMillis() + 5000;
+            } catch (AnalyticsException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            startTime = Long.MIN_VALUE;
+            endTime = Long.MAX_VALUE;
+        }
         return new AnalyticsRDD(this.tenantId, this.tableName,
                                 new ArrayList<>(Arrays.asList(this.schema.fieldNames())),
                                 this.sqlContext.sparkContext(), scala.collection.Seq$.MODULE$.empty(),
-                                ClassTag$.MODULE$.<Row>apply(Row.class));
+                                ClassTag$.MODULE$.<Row>apply(Row.class), startTime, endTime, this.incEnable,
+                                this.incID);
     }
 
     private void logDebug(String s) {
@@ -178,6 +217,8 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
                                                     ClassTag$.MODULE$.Unit());
         }
     }
+
+
 
 
 }

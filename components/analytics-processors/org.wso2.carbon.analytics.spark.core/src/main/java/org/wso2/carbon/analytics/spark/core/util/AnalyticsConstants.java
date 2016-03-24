@@ -70,6 +70,7 @@ public class AnalyticsConstants {
     public static final String DEFAULT_CARBON_SCHEDULER_POOL_NAME = "carbon-pool";
 
     //Analytics relation strings
+    public static final String INC_TABLE_COMMIT = "incremental_table_commit";
     public static final String TENANT_ID = "tenantId";
     public static final String TABLE_NAME = "tableName";
     public static final String SCHEMA_STRING = "schema";
@@ -77,6 +78,7 @@ public class AnalyticsConstants {
     public static final String PRIMARY_KEYS = "primaryKeys";
     public static final String RECORD_STORE = "recordStore";
     public static final String MERGE_SCHEMA = "mergeSchema";
+    public static final String INC_PARAMS = "incrementalParams";
     public static final String TIMESTAMP_FIELD = "_timestamp";
     public static final String DEFAULT_PROCESSED_DATA_STORE_NAME = "PROCESSED_DATA_STORE";
     public static final String SPARK_SHORTHAND_STRING = "CarbonAnalytics";

@@ -31,6 +31,7 @@ public class AnalyticsEventSinkConstants {
     public static final String EVENT_META_DATA_TYPE = "meta";
     public static final String EVENT_CORRELATION_DATA_TYPE = "correlation";
     public static final String STREAM_VERSION_KEY = "_version";
+    public static final String PAYLOAD_TIMESTAMP = "_timestamp";
 
     public static final String DEPLOYMENT_DIR_NAME = "eventsink";
     public static final String DEPLOYMENT_FILE_EXT = ".xml";

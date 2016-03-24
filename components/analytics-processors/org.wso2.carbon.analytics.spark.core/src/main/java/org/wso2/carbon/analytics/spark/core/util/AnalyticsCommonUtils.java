@@ -101,7 +101,7 @@ public class AnalyticsCommonUtils {
                 }
             }
         } else {
-            throw new AnalyticsUDFException("Cannot determine the return DataType");
+            throw new AnalyticsUDFException("Cannot determine the return DataType: " + returnType.toString());
         }
         return udfReturnType;
     }

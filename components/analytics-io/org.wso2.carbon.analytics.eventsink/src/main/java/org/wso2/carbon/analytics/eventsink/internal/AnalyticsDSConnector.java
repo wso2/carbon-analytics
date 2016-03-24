@@ -22,7 +22,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -38,10 +37,19 @@ import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionS
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.utils.CarbonUtils;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -136,7 +144,6 @@ public class AnalyticsDSConnector {
     private List<Record> convertEventsToRecord(int tenantId, List<Event> events)
             throws StreamDefinitionStoreException, AnalyticsException {
         List<Record> records = new ArrayList<>(events.size());
-        long timestamp;
         String tableName;
         StreamDefinition streamDefinition;
         AnalyticsSchema analyticsSchema;
@@ -145,21 +152,26 @@ public class AnalyticsDSConnector {
             throw new AnalyticsException("Stream Definition store is not available. dropping Event");
         }
         for (Event event : events) {
+            long timestamp = System.currentTimeMillis();
             streamDefinition = streamDefinitionStore.getStreamDefinition(event.getStreamId(), tenantId);
             tableName = AnalyticsEventSinkUtil.generateAnalyticsTableName(streamDefinition.getName());
             analyticsSchema = ServiceHolder.getAnalyticsDataAPI().getTableSchema(tenantId, tableName);
             Map<String, Object> eventAttributes = new HashMap<>();
             populateCommonAttributes(streamDefinition, analyticsSchema, eventAttributes);
             populateTypedAttributes(analyticsSchema, AnalyticsEventSinkConstants.EVENT_META_DATA_TYPE,
-                    streamDefinition.getMetaData(),
-                    event.getMetaData(), eventAttributes);
+                                    streamDefinition.getMetaData(),
+                                    event.getMetaData(), eventAttributes);
             populateTypedAttributes(analyticsSchema, AnalyticsEventSinkConstants.EVENT_CORRELATION_DATA_TYPE,
-                    streamDefinition.getCorrelationData(),
-                    event.getCorrelationData(), eventAttributes);
-            populateTypedAttributes(analyticsSchema, null,
-                    streamDefinition.getPayloadData(),
-                    event.getPayloadData(), eventAttributes);
-
+                                    streamDefinition.getCorrelationData(),
+                                    event.getCorrelationData(), eventAttributes);
+            Long payloadTimestamp = populateTypedPayloadAttributes(analyticsSchema, null,
+                                                                   streamDefinition.getPayloadData(),
+                                                                   event.getPayloadData(), eventAttributes);
+            if (payloadTimestamp != null) {
+                timestamp = payloadTimestamp;
+            } else if (event.getTimeStamp() != 0L) {
+                timestamp = event.getTimeStamp();
+            }
             if (event.getArbitraryDataMap() != null && !event.getArbitraryDataMap().isEmpty()) {
                 for (String attributeName : event.getArbitraryDataMap().keySet()) {
                     String attributeKey = "_" + attributeName;
@@ -167,12 +179,6 @@ public class AnalyticsDSConnector {
                             event.getArbitraryDataMap().get(attributeName), true));
                 }
             }
-            if (event.getTimeStamp() != 0L) {
-                timestamp = event.getTimeStamp();
-            } else {
-                timestamp = System.currentTimeMillis();
-            }
-
             Record record = new Record(tenantId, tableName, eventAttributes, timestamp);
             if (log.isDebugEnabled()) {
                 log.debug("Record being added: " + record);
@@ -196,6 +202,29 @@ public class AnalyticsDSConnector {
             }
             iteration++;
         }
+    }
+
+    private Long populateTypedPayloadAttributes(AnalyticsSchema schema, String type, List<Attribute> attributes,
+                                                Object[] values, Map<String, Object> eventAttribute)
+            throws AnalyticsException {
+        Long timestamp = null;
+        if (attributes == null) {
+            return null;
+        }
+        int iteration = 0;
+        for (Attribute attribute : attributes) {
+            if (AnalyticsEventSinkConstants.PAYLOAD_TIMESTAMP.equals(attribute.getName())) {
+                timestamp = (long) values[iteration];
+                continue;
+            }
+            String attributeKey = getAttributeKey(type, attribute.getName());
+            Object recordValue = getRecordValue(schema, attributeKey, values[iteration], false);
+            if (recordValue != null) {
+                eventAttribute.put(attributeKey, recordValue);
+            }
+            iteration++;
+        }
+        return timestamp;
     }
 
     private String getAttributeKey(String type, String attributeName) {

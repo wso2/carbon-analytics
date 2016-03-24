@@ -33,7 +33,7 @@ public class COUNTAggregateFunction implements AggregateFunction {
     }
 
     @Override
-    public void process(RecordValuesContext ctx, String[] aggregateFields)
+    public void process(RecordContext ctx, String[] aggregateFields)
             throws AnalyticsException {
             count++;
     }

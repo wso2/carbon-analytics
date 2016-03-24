@@ -68,6 +68,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
     private String recordStore;
     private boolean mergeFlag;
     private StructType schemaStruct;
+    private String incParams;
 
     public AnalyticsRelationProvider() {
         this.dataService = ServiceHolder.getAnalyticsDataService();
@@ -99,10 +100,11 @@ public class AnalyticsRelationProvider implements RelationProvider,
                 log.error(msg, e);
                 throw new RuntimeException(msg, e);
             }
-            return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext
-                    , this.schemaStruct);
+            return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
+                                         this.schemaStruct, this.incParams);
         } else {
-            return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext);
+            return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
+                                         this.incParams);
         }
     }
 
@@ -117,6 +119,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
                                                 AnalyticsConstants.DEFAULT_PROCESSED_DATA_STORE_NAME);
         this.mergeFlag = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.MERGE_SCHEMA,
                                                                    parameters, "true"));
+        this.incParams = extractValuesFromMap(AnalyticsConstants.INC_PARAMS, parameters, "");
     }
 
     private void createTableIfNotExist() throws AnalyticsExecutionException {
@@ -327,7 +330,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
         }
 
         return new AnalyticsRelation(this.tenantId, this.tableName, this.recordStore, sqlContext,
-                                     schema);
+                                     schema, this.incParams);
     }
 
 //    todo: Implement the creatable relation

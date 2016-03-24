@@ -48,6 +48,7 @@
                 <xs:sequence>
                     <xs:element minOccurs="0" name="aggregate" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="alias" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="fields" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
@@ -64,6 +65,11 @@
                     <xs:element minOccurs="0" name="sortType" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="ValuesBatchBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="keyValues" nillable="true" type="ax229:RecordValueEntryBean"/>
+                </xs:sequence>
+            </xs:complexType>
             <xs:complexType name="AnalyticsDrillDownRequestBean">
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="categoryPaths" nillable="true" type="ax229:CategoryPathBean"/>
@@ -73,6 +79,7 @@
                     <xs:element minOccurs="0" name="recordCount" type="xs:int"/>
                     <xs:element minOccurs="0" name="recordStart" type="xs:int"/>
                     <xs:element minOccurs="0" name="scoreFunction" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="sortByFields" nillable="true" type="ax229:SortByFieldBean"/>
                     <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
@@ -123,11 +130,6 @@
                     <xs:element minOccurs="0" name="columnType" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="index" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="scoreParam" type="xs:boolean"/>
-                </xs:sequence>
-            </xs:complexType>
-            <xs:complexType name="ValuesBatchBean">
-                <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="keyValues" nillable="true" type="ax229:RecordValueEntryBean"/>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="StreamDefinitionBean">
@@ -246,17 +248,20 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="isPaginationSupported">
+            <xs:element name="getWithKeyValues">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="recordStoreName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="numPartitionsHint" type="xs:int"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="valuesBatchBeans" nillable="true" type="ax230:ValuesBatchBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="isPaginationSupportedResponse">
+            <xs:element name="getWithKeyValuesResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:RecordBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -361,14 +366,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="createTable">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="recordStoreName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="listRecordStoreNames">
                 <xs:complexType>
                     <xs:sequence/>
@@ -378,6 +375,14 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="createTable">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="recordStoreName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -459,20 +464,17 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getWithKeyValues">
+            <xs:element name="isPaginationSupported">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="numPartitionsHint" type="xs:int"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="valuesBatchBeans" nillable="true" type="ax230:ValuesBatchBean"/>
+                        <xs:element minOccurs="0" name="recordStoreName" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getWithKeyValuesResponse">
+            <xs:element name="isPaginationSupportedResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:RecordBean"/>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -562,20 +564,20 @@
             </xs:element>
         </xs:schema>
     </wsdl:types>
-    <wsdl:message name="isPaginationSupportedRequest">
-        <wsdl:part name="parameters" element="ns:isPaginationSupported"/>
-    </wsdl:message>
-    <wsdl:message name="isPaginationSupportedResponse">
-        <wsdl:part name="parameters" element="ns:isPaginationSupportedResponse"/>
-    </wsdl:message>
-    <wsdl:message name="AnalyticsWebServiceAnalyticsWebServiceException">
-        <wsdl:part name="parameters" element="ns:AnalyticsWebServiceAnalyticsWebServiceException"/>
-    </wsdl:message>
     <wsdl:message name="listTablesRequest">
         <wsdl:part name="parameters" element="ns:listTables"/>
     </wsdl:message>
     <wsdl:message name="listTablesResponse">
         <wsdl:part name="parameters" element="ns:listTablesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="AnalyticsWebServiceAnalyticsWebServiceException">
+        <wsdl:part name="parameters" element="ns:AnalyticsWebServiceAnalyticsWebServiceException"/>
+    </wsdl:message>
+    <wsdl:message name="isPaginationSupportedRequest">
+        <wsdl:part name="parameters" element="ns:isPaginationSupported"/>
+    </wsdl:message>
+    <wsdl:message name="isPaginationSupportedResponse">
+        <wsdl:part name="parameters" element="ns:isPaginationSupportedResponse"/>
     </wsdl:message>
     <wsdl:message name="getTableSchemaRequest">
         <wsdl:part name="parameters" element="ns:getTableSchema"/>
@@ -622,17 +624,17 @@
     <wsdl:message name="getRecordCountResponse">
         <wsdl:part name="parameters" element="ns:getRecordCountResponse"/>
     </wsdl:message>
-    <wsdl:message name="getRecordStoreNameByTableRequest">
-        <wsdl:part name="parameters" element="ns:getRecordStoreNameByTable"/>
-    </wsdl:message>
-    <wsdl:message name="getRecordStoreNameByTableResponse">
-        <wsdl:part name="parameters" element="ns:getRecordStoreNameByTableResponse"/>
-    </wsdl:message>
     <wsdl:message name="getWithKeyValuesRequest">
         <wsdl:part name="parameters" element="ns:getWithKeyValues"/>
     </wsdl:message>
     <wsdl:message name="getWithKeyValuesResponse">
         <wsdl:part name="parameters" element="ns:getWithKeyValuesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getRecordStoreNameByTableRequest">
+        <wsdl:part name="parameters" element="ns:getRecordStoreNameByTable"/>
+    </wsdl:message>
+    <wsdl:message name="getRecordStoreNameByTableResponse">
+        <wsdl:part name="parameters" element="ns:getRecordStoreNameByTableResponse"/>
     </wsdl:message>
     <wsdl:message name="drillDownSearchCountRequest">
         <wsdl:part name="parameters" element="ns:drillDownSearchCount"/>
@@ -719,15 +721,15 @@
         <wsdl:part name="parameters" element="ns:deleteByIds"/>
     </wsdl:message>
     <wsdl:portType name="AnalyticsWebServicePortType">
-        <wsdl:operation name="isPaginationSupported">
-            <wsdl:input message="ns:isPaginationSupportedRequest" wsaw:Action="urn:isPaginationSupported"/>
-            <wsdl:output message="ns:isPaginationSupportedResponse" wsaw:Action="urn:isPaginationSupportedResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:isPaginationSupportedAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
         <wsdl:operation name="listTables">
             <wsdl:input message="ns:listTablesRequest" wsaw:Action="urn:listTables"/>
             <wsdl:output message="ns:listTablesResponse" wsaw:Action="urn:listTablesResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:listTablesAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="isPaginationSupported">
+            <wsdl:input message="ns:isPaginationSupportedRequest" wsaw:Action="urn:isPaginationSupported"/>
+            <wsdl:output message="ns:isPaginationSupportedResponse" wsaw:Action="urn:isPaginationSupportedResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:isPaginationSupportedAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
         <wsdl:operation name="getTableSchema">
             <wsdl:input message="ns:getTableSchemaRequest" wsaw:Action="urn:getTableSchema"/>
@@ -771,15 +773,15 @@
             <wsdl:output message="ns:getRecordCountResponse" wsaw:Action="urn:getRecordCountResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getRecordCountAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
-        <wsdl:operation name="getRecordStoreNameByTable">
-            <wsdl:input message="ns:getRecordStoreNameByTableRequest" wsaw:Action="urn:getRecordStoreNameByTable"/>
-            <wsdl:output message="ns:getRecordStoreNameByTableResponse" wsaw:Action="urn:getRecordStoreNameByTableResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getRecordStoreNameByTableAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
         <wsdl:operation name="getWithKeyValues">
             <wsdl:input message="ns:getWithKeyValuesRequest" wsaw:Action="urn:getWithKeyValues"/>
             <wsdl:output message="ns:getWithKeyValuesResponse" wsaw:Action="urn:getWithKeyValuesResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getWithKeyValuesAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getRecordStoreNameByTable">
+            <wsdl:input message="ns:getRecordStoreNameByTableRequest" wsaw:Action="urn:getRecordStoreNameByTable"/>
+            <wsdl:output message="ns:getRecordStoreNameByTableResponse" wsaw:Action="urn:getRecordStoreNameByTableResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getRecordStoreNameByTableAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
         <wsdl:operation name="drillDownSearchCount">
             <wsdl:input message="ns:drillDownSearchCountRequest" wsaw:Action="urn:drillDownSearchCount"/>
@@ -860,8 +862,8 @@
     </wsdl:portType>
     <wsdl:binding name="AnalyticsWebServiceSoap11Binding" type="ns:AnalyticsWebServicePortType">
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-        <wsdl:operation name="isPaginationSupported">
-            <soap:operation soapAction="urn:isPaginationSupported" style="document"/>
+        <wsdl:operation name="listTables">
+            <soap:operation soapAction="urn:listTables" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -872,8 +874,8 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="listTables">
-            <soap:operation soapAction="urn:listTables" style="document"/>
+        <wsdl:operation name="isPaginationSupported">
+            <soap:operation soapAction="urn:isPaginationSupported" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -983,8 +985,8 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getRecordStoreNameByTable">
-            <soap:operation soapAction="urn:getRecordStoreNameByTable" style="document"/>
+        <wsdl:operation name="getWithKeyValues">
+            <soap:operation soapAction="urn:getWithKeyValues" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -995,8 +997,8 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getWithKeyValues">
-            <soap:operation soapAction="urn:getWithKeyValues" style="document"/>
+        <wsdl:operation name="getRecordStoreNameByTable">
+            <soap:operation soapAction="urn:getRecordStoreNameByTable" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -1190,8 +1192,8 @@
     </wsdl:binding>
     <wsdl:binding name="AnalyticsWebServiceSoap12Binding" type="ns:AnalyticsWebServicePortType">
         <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-        <wsdl:operation name="isPaginationSupported">
-            <soap12:operation soapAction="urn:isPaginationSupported" style="document"/>
+        <wsdl:operation name="listTables">
+            <soap12:operation soapAction="urn:listTables" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1202,8 +1204,8 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="listTables">
-            <soap12:operation soapAction="urn:listTables" style="document"/>
+        <wsdl:operation name="isPaginationSupported">
+            <soap12:operation soapAction="urn:isPaginationSupported" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1313,8 +1315,8 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getRecordStoreNameByTable">
-            <soap12:operation soapAction="urn:getRecordStoreNameByTable" style="document"/>
+        <wsdl:operation name="getWithKeyValues">
+            <soap12:operation soapAction="urn:getWithKeyValues" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1325,8 +1327,8 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getWithKeyValues">
-            <soap12:operation soapAction="urn:getWithKeyValues" style="document"/>
+        <wsdl:operation name="getRecordStoreNameByTable">
+            <soap12:operation soapAction="urn:getRecordStoreNameByTable" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1520,8 +1522,8 @@
     </wsdl:binding>
     <wsdl:binding name="AnalyticsWebServiceHttpBinding" type="ns:AnalyticsWebServicePortType">
         <http:binding verb="POST"/>
-        <wsdl:operation name="isPaginationSupported">
-            <http:operation location="isPaginationSupported"/>
+        <wsdl:operation name="listTables">
+            <http:operation location="listTables"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1529,8 +1531,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="listTables">
-            <http:operation location="listTables"/>
+        <wsdl:operation name="isPaginationSupported">
+            <http:operation location="isPaginationSupported"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1610,8 +1612,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getRecordStoreNameByTable">
-            <http:operation location="getRecordStoreNameByTable"/>
+        <wsdl:operation name="getWithKeyValues">
+            <http:operation location="getWithKeyValues"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1619,8 +1621,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getWithKeyValues">
-            <http:operation location="getWithKeyValues"/>
+        <wsdl:operation name="getRecordStoreNameByTable">
+            <http:operation location="getRecordStoreNameByTable"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>

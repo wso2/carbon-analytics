@@ -6,10 +6,10 @@ import java.util.Map;
 /**
  * This class represents the values of the record being processed in the aggregate Function
  */
-public class RecordValuesContext {
+public class RecordContext {
     private Map<String, Object> values;
 
-    private RecordValuesContext(Map<String, Object> recordValues) {
+    private RecordContext(Map<String, Object> recordValues) {
         if (recordValues == null) {
             this.values = new HashMap<>();
         } else {
@@ -17,8 +17,8 @@ public class RecordValuesContext {
         }
     }
 
-    public static RecordValuesContext create(Map<String, Object> recordValues) {
-        return new RecordValuesContext(recordValues);
+    public static RecordContext create(Map<String, Object> recordValues) {
+        return new RecordContext(recordValues);
     }
 
     public Object getValue(String fieldName) {
