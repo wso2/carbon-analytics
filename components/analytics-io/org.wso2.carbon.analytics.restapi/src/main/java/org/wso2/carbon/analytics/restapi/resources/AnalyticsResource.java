@@ -42,7 +42,6 @@ import org.wso2.carbon.analytics.restapi.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.restapi.beans.ColumnKeyValueBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownRequestBean;
-import org.wso2.carbon.analytics.restapi.beans.GetByRangeBean;
 import org.wso2.carbon.analytics.restapi.beans.QueryBean;
 import org.wso2.carbon.analytics.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.restapi.beans.SubCategoriesBean;
@@ -565,7 +564,7 @@ public class AnalyticsResource extends AbstractResource {
      * @return the records
      * @throws AnalyticsException
      */
-    @POST
+    /*@POST
     @Consumes({ MediaType.APPLICATION_JSON})
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("tables/{tableName}")
@@ -573,7 +572,7 @@ public class AnalyticsResource extends AbstractResource {
             GetByRangeBean queryBean, @HeaderParam(AUTHORIZATION_HEADER) String authHeader) throws AnalyticsException {
         return getRecords(tableName, queryBean.getTimeFrom(), queryBean.getTimeTo(),
                           queryBean.getStart(), queryBean.getCount(), queryBean.getFields(), authHeader);
-    }
+    }*/
 
     /**
      * Gets the records which match the primary key values batch.
