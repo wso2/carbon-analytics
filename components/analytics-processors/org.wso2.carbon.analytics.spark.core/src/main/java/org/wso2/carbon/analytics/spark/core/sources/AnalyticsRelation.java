@@ -34,6 +34,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.rdd.AnalyticsRDD;
 import org.wso2.carbon.analytics.spark.core.util.CarbonScalaUtils;
+
 import scala.reflect.ClassTag$;
 
 import java.io.Serializable;
@@ -121,6 +122,8 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
                 this.incWindowSizeMS = Long.parseLong(splits[1]) * 1000;
                 this.incBuffer = 1;
             } else if (splits.length == 3) {
+                this.incID = splits[0];
+                this.incWindowSizeMS = Long.parseLong(splits[1]) * 1000;
                 this.incBuffer = Integer.parseInt(splits[2]);
             } else {
                 String msg = "Error while setting incremental processing parameters : " + incParamStr;
