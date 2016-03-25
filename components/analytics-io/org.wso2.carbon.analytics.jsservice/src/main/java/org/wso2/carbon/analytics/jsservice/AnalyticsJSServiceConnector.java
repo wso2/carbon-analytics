@@ -49,8 +49,12 @@ import org.wso2.carbon.analytics.jsservice.beans.StreamDefinitionQueryBean;
 import org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean;
 import org.wso2.carbon.analytics.jsservice.exception.JSServiceException;
 import org.wso2.carbon.analytics.jsservice.internal.ServiceHolder;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.core.service.RealmService;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -95,6 +99,31 @@ public class AnalyticsJSServiceConnector {
         }
         return handleResponse(ResponseStatus.SUCCESS,
                               "Table : " + tableName + " exists.");
+    }
+
+    /*This is for tenant specific functionalities. Given the tenant user, start the tenant flow and
+   get the tenant specific stream definition*/
+    public ResponseBean getStreamDefinition(String username, String requestAsString) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        // get super tenant context and get realm service which is an osgi service
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        boolean tenantFlowStarted = false;
+        try {
+            if (realmService != null) {
+                int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+                tenantFlowStarted = Utils.startTenantFlow(tenantId);
+            }
+            return this.getStreamDefinition(requestAsString);
+        } catch (UserStoreException e) {
+            logger.error("Failed to add the stream definition: " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
+                                                         ": " + e.getMessage());
+        } finally {
+            if (tenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
     }
 
     public ResponseBean getStreamDefinition(String requestAsString) {
@@ -643,6 +672,31 @@ public class AnalyticsJSServiceConnector {
         }
     }
 
+    /*This is for tenant specific functionalities. Given the tenant user, start the tenant flow and
+    add the tenant specific stream definition*/
+    public ResponseBean addStreamDefinition(String username, String streamDefAsString) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        // get super tenant context and get realm service which is an osgi service
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        boolean tenantFlowStarted = false;
+        try {
+            if (realmService != null) {
+                int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+                tenantFlowStarted = Utils.startTenantFlow(tenantId);
+            }
+            return this.addStreamDefinition(streamDefAsString);
+        } catch (UserStoreException e) {
+            logger.error("Failed to add the stream definition: " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
+                                                         ": " + e.getMessage());
+        } finally {
+            if (tenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
     public ResponseBean addStreamDefinition(String streamDefAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("invoking addStreamDefinition");
@@ -661,6 +715,31 @@ public class AnalyticsJSServiceConnector {
             logger.error("Failed to add the stream definition: " + e.getMessage(), e);
             return handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
                                                          ": " + e.getMessage());
+        }
+    }
+
+    /*This is for tenant specific functionalities. Given the tenant user, start the tenant flow and
+   publish event*/
+    public ResponseBean publishEvent(String username, String eventAsString) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        // get super tenant context and get realm service which is an osgi service
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        boolean tenantFlowStarted = false;
+        try {
+            if (realmService != null) {
+                int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+                tenantFlowStarted = Utils.startTenantFlow(tenantId);
+            }
+            return this.publishEvent(eventAsString);
+        } catch (UserStoreException e) {
+            logger.error("Failed to add the stream definition: " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
+                                                         ": " + e.getMessage());
+        } finally {
+            if (tenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
         }
     }
 

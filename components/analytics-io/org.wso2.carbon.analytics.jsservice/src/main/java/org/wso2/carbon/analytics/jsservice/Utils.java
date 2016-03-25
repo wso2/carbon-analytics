@@ -643,4 +643,15 @@ public class Utils {
         }
         return sortedRecords;
     }
+
+    public static boolean startTenantFlow(int tenantId) {
+        int currentTenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        if (currentTenantId == org.wso2.carbon.utils.multitenancy.MultitenantConstants.INVALID_TENANT_ID ||
+            (currentTenantId == org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_ID && currentTenantId != tenantId)) {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId, true);
+            return true;
+        }
+        return false;
+    }
 }
