@@ -128,7 +128,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -167,8 +166,6 @@ public class AnalyticsDataIndexer {
     private static final String EMPTY_FACET_VALUE = "EMPTY_FACET_VALUE!";
 
     private static final String DEFAULT_SCORE = "1";
-    
-    public static final String PATH_SEPARATOR = "___####___";
     
     public static final int WORKER_TIMEOUT = 60;
 
@@ -1697,13 +1694,13 @@ public class AnalyticsDataIndexer {
             throws AnalyticsException {
         final AnalyticsDataIndexer indexer = this;
         List<String[]> subCategories;
-        Set<String> finalUniqueCategories;
+        Set<List<String>> finalUniqueCategories;
         try {
             if (this.isClusteringEnabled()) {
                 finalUniqueCategories = new HashSet<>();
-                List<Set<String>> entries = this.executeIndexLookup(
+                List<Set<List<String>>> entries = this.executeIndexLookup(
                         new SearchWithAggregateCall(tenantId, aggregateRequest));
-                for (Set<String> entry : entries) {
+                for (Set<List<String>> entry : entries) {
                     finalUniqueCategories.addAll(entry);
                 }
             } else {
@@ -1719,24 +1716,23 @@ public class AnalyticsDataIndexer {
         }
     }
 
-	public Set<String> getUniqueGroupings(int tenantId, AggregateRequest aggregateRequest)
+	public Set<List<String>> getUniqueGroupings(int tenantId, AggregateRequest aggregateRequest)
             throws AnalyticsIndexException, IOException {
         if (aggregateRequest.getAggregateLevel() >= 0) {
             List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
             if (aggregateRequest.getGroupByField() != null && !aggregateRequest.getGroupByField().isEmpty()) {
                 ExecutorService pool = Executors.newFixedThreadPool(taxonomyShardIds.size());
-                Set<Future<Set<String>>> perShardUniqueCategories = new HashSet<>();
-                Set<String> finalUniqueCategories = new HashSet<>();
+                Set<Future<Set<List<String>>>> perShardUniqueCategories = new HashSet<>();
+                Set<List<String>> finalUniqueCategories = new HashSet<>();
                 for (int i = 0; i < taxonomyShardIds.size(); i++) {
                     String tableId = this.generateTableId(tenantId, aggregateRequest.getTableName());
-                    TaxonomyReader reader = new DirectoryTaxonomyReader(this.lookupTaxonomyIndexWriter(taxonomyShardIds.get(i),
-                                                                                                       tableId));
-                    Callable<Set<String>> callable = new TaxonomyWorker(reader, aggregateRequest);
-                    Future<Set<String>> result = pool.submit(callable);
+                    Callable<Set<List<String>>> callable = new TaxonomyWorker(tenantId, AnalyticsDataIndexer.this,
+                            taxonomyShardIds.get(i), tableId, aggregateRequest);
+                    Future<Set<List<String>>> result = pool.submit(callable);
                     perShardUniqueCategories.add(result);
                 }
                 try {
-                    for (Future<Set<String>> result : perShardUniqueCategories) {
+                    for (Future<Set<List<String>>> result : perShardUniqueCategories) {
                         finalUniqueCategories.addAll(result.get());
                     }
                     return finalUniqueCategories;
@@ -1774,14 +1770,13 @@ public class AnalyticsDataIndexer {
     }
 
     private List<String[]> getUniqueSubCategories(AggregateRequest aggregateRequest,
-                                                  Set<String> uniqueCategories)
+                                                  Set<List<String>> uniqueCategories)
             throws AnalyticsIndexException {
         List<String[]> groupings = new ArrayList<>();
         int totalAggregateLevel = aggregateRequest.getAggregateLevel() + 1;
-        for (String category : uniqueCategories) {
-            String[] path = category.split(PATH_SEPARATOR);
-            if (path.length == totalAggregateLevel) {
-                groupings.add(path);
+        for (List<String> category : uniqueCategories) {
+            if (category.size() == totalAggregateLevel) {
+                groupings.add(category.toArray(new String[category.size()]));
             }
         }
         if (aggregateRequest.getGroupByField() == null || aggregateRequest.getGroupByField().isEmpty()) {
@@ -2065,47 +2060,57 @@ public class AnalyticsDataIndexer {
         }
     }
 
-    private class TaxonomyWorker implements Callable<Set<String>> {
+    private class TaxonomyWorker implements Callable<Set<List<String>>> {
 
-        private TaxonomyReader reader;
-        private AggregateRequest request;
+        private AggregateRequest aggregateRequest;
+        private AnalyticsDataIndexer indexer;
+        private int shardId;
+        private String tableId;
+        private int tenantId;
 
-        public TaxonomyWorker(TaxonomyReader reader, AggregateRequest request) {
-            this.reader = reader;
-            this.request = request;
+        public TaxonomyWorker(int tenantId, AnalyticsDataIndexer  indexer,int shardId, String tableId, AggregateRequest request)
+                throws AnalyticsIndexException, IOException {
+            this.tenantId = tenantId;
+            this.indexer = indexer;
+            this.tableId = tableId;
+            this.shardId = shardId;
+            this.aggregateRequest = request;
         }
 
         @Override
-        public Set<String> call() throws Exception {
-            List<String> parentPath = request.getParentPath();
-            if (parentPath == null) {
-                parentPath = new ArrayList<>();
-            }
-            Set<String> perShardCategorySet = new TreeSet<>();
-            String[] path = parentPath.toArray(new String[parentPath.size()]);
-            int ordinal = reader.getOrdinal(request.getGroupByField(), path);
-            this.addAllCategoriesToSet(reader, ordinal, null, 1, perShardCategorySet);
+        public Set<List<String>> call() throws Exception {
+
+            Set<List<String>> perShardCategorySet = new HashSet<>();
+            int aggregateLevel = aggregateRequest.getAggregateLevel();
+            this.addAllCategoriesToSet(null, aggregateLevel, perShardCategorySet);
             return perShardCategorySet;
         }
 
-        private void addAllCategoriesToSet(TaxonomyReader r, int ord, String parent, int depth,
-                                           Set<String> uniqueGroups) throws IOException {
-            TaxonomyReader.ChildrenIterator it = r.getChildren(ord);
-            int child;
-            while ((child = it.next()) != TaxonomyReader.INVALID_ORDINAL) {
-                String newParent;
+        private void addAllCategoriesToSet(String[] parent, int aggregateLevel, Set<List<String>> uniqueGroups)
+                throws IOException, AnalyticsException {
+            TaxonomyReader taxonomyReader = new DirectoryTaxonomyReader(indexer.lookupTaxonomyIndexWriter(shardId, tableId));
+            IndexReader indexReader = DirectoryReader.open(indexer.lookupIndexWriter(shardId, tableId), true);
+            CategoryDrillDownRequest request = new CategoryDrillDownRequest();
+            request.setFieldName(aggregateRequest.getGroupByField());
+            request.setPath(parent);
+            request.setTableName(aggregateRequest.getTableName());
+            request.setQuery(aggregateRequest.getQuery());
+            List<CategorySearchResultEntry> resultEntries = indexer.drilldowncategories(tenantId, indexReader, taxonomyReader, request);
+
+            for (CategorySearchResultEntry child : resultEntries) {
+                List<String> newParent = new ArrayList<>();
                 if (parent != null) {
-                    newParent = parent + PATH_SEPARATOR + r.getPath(child).components[depth];
+                    newParent.add(child.getCategoryValue());
                 } else {
-                    newParent = r.getPath(child).components[depth];
+                    newParent.add(child.getCategoryValue());
                 }
                 uniqueGroups.add(newParent);
-                addAllCategoriesToSet(r, child, newParent, depth + 1, uniqueGroups);
+                if (aggregateLevel > 0) {
+                    addAllCategoriesToSet(newParent.toArray(new String[newParent.size()]), aggregateLevel-1, uniqueGroups);
+                }
             }
         }
-        
     }
-    
     /**
      * Base class for all index operation lookup calls;
      */
@@ -2333,7 +2338,7 @@ public class AnalyticsDataIndexer {
         }
     }
 
-    public static class SearchWithAggregateCall extends IndexLookupOperationCall<Set<String>> {
+    public static class SearchWithAggregateCall extends IndexLookupOperationCall<Set<List<String>>> {
 
         private static final long serialVersionUID = -5074344695392737981L;
         private int tenantId;
@@ -2346,12 +2351,12 @@ public class AnalyticsDataIndexer {
         }
 
         @Override
-        public IndexLookupOperationCall<Set<String>> copy() {
+        public IndexLookupOperationCall<Set<List<String>>> copy() {
             return new SearchWithAggregateCall(tenantId, request);
         }
 
         @Override
-        public Set<String> call() throws Exception {
+        public Set<List<String>> call() throws Exception {
             AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
             if (ads == null) {
                 throw new AnalyticsException("The Analytics data service implementation is not registered");
