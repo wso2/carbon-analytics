@@ -43,6 +43,7 @@
         <module>components/event-processor-manager</module>
         <module>components/event-receiver</module>
         <module>components/event-publisher</module>
+        <module>components/execution-manager</module>
         <module>features/event-stream</module>
         <module>features/data-bridge</module>
         <module>features/analytics-dashboard</module>
@@ -52,6 +53,7 @@
         <module>features/event-receiver</module>
         <module>features/event-publisher</module>
         <module>features/event-processor-manager</module>
+        <module>features/execution-manager</module>
         <module>features/spark-common</module>
     </modules>
 
@@ -169,6 +171,11 @@
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.tomcat.ext</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.registry.core</artifactId>
                 <version>${carbon.kernel.version}</version>
             </dependency>
             <!--carbon-kernel dependencies stop-->
@@ -357,6 +364,26 @@
             <!--third party dependencies stop-->
 
             <!--carbon analytics common dependencies start-->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.execution.manager.admin</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.execution.manager.core</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.execution.manager.ui</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.execution.manager.stub</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.stream.admin</artifactId>
@@ -776,6 +803,18 @@
             <!-- spark commons dependencies stop -->
 
             <!--features start-->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.execution.manager.server.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.execution.manager.ui.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.stream.server.feature</artifactId>
