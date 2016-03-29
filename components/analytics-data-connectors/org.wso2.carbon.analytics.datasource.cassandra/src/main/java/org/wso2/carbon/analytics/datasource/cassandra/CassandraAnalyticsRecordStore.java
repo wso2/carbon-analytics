@@ -143,7 +143,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         for (Host host : hostTokensMap.keySet()) {
             String ip = host.getAddress().getHostAddress();
             List<CassandraTokenRange> hostTokens = hostTokensMap.get(host);
-            int partitionSize = (int) Math.floor(((hostTokens).size() + partitionsPerHost - 1) / partitionsPerHost);
+            int partitionSize = (int) Math.ceil(hostTokens.size() / (double) partitionsPerHost);
             for (List<CassandraTokenRange> hostPartitionTokens : Lists.partition(hostTokens, partitionSize)) {
                 result.add(new TokenRangeRecordGroup(tenantId, tableName, columns,
                         new ArrayList<CassandraTokenRange>(hostPartitionTokens), ip, count));
