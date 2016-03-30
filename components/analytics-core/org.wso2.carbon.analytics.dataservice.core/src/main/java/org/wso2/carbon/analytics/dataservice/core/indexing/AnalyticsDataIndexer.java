@@ -1693,6 +1693,7 @@ public class AnalyticsDataIndexer {
             final AggregateRequest aggregateRequest)
             throws AnalyticsException {
         final AnalyticsDataIndexer indexer = this;
+        AnalyticsIterator<Record> iterator;
         List<String[]> subCategories;
         Set<List<String>> finalUniqueCategories;
         try {
@@ -1707,8 +1708,8 @@ public class AnalyticsDataIndexer {
                 finalUniqueCategories = getUniqueGroupings(tenantId, aggregateRequest);
             }
             subCategories =  getUniqueSubCategories(aggregateRequest, finalUniqueCategories);
-            AnalyticsIterator<Record> iterator = new AggregateRecordIterator(tenantId, subCategories,
-                                                                             aggregateRequest, indexer);
+            iterator = new StreamingAggregateRecordIterator(tenantId, subCategories, aggregateRequest, indexer);
+        //    iterator = this.getNonStreamingAggregateRecords(tenantId, aggregateRequest, subCategories);
             return iterator;
         } catch (IOException e) {
             log.error("Error occured while performing aggregation, " + e.getMessage(), e);
@@ -1716,7 +1717,57 @@ public class AnalyticsDataIndexer {
         }
     }
 
-	public Set<List<String>> getUniqueGroupings(int tenantId, AggregateRequest aggregateRequest)
+    private AnalyticsIterator<Record> getNonStreamingAggregateRecords(int tenantId, AggregateRequest aggregateRequest,
+                                                 List<String[]> subCategories)
+            throws AnalyticsException {
+        Map<String, String[]> recordIdsPerGroup = new HashMap<>();
+        List<String> allMatchingIds = new ArrayList<>();
+        for (String[] category : subCategories) {
+            List<SearchResultEntry> resultEntries = this.getSearchResultEntries(tenantId, category, aggregateRequest);
+            List<String> ids = getRecordIds(resultEntries);
+            allMatchingIds.addAll(ids);
+            if (category != null && category.length != 0) {
+                for (String id : ids) {
+                    recordIdsPerGroup.put(id, category);
+                }
+            }
+        }
+        return getNonStreamingAggregatesIterator(tenantId, aggregateRequest, recordIdsPerGroup, allMatchingIds);
+    }
+
+    private AnalyticsIterator<Record> getNonStreamingAggregatesIterator(int tenantId, AggregateRequest aggregateRequest,
+                                                   Map<String, String[]> recordIdsPerGroup,
+                                                   List<String> allMatchingIds)
+            throws AnalyticsException {
+        List<Record> aggregatedRecords = new ArrayList<>();
+        AnalyticsDataResponse response = this.getAnalyticsDataService().get(tenantId, aggregateRequest.getTableName(),
+                1, null, allMatchingIds);
+        Iterator<Record> recordIterator = AnalyticsDataServiceUtils.responseToIterator(this.getAnalyticsDataService(), response);
+
+        Map<String[], List<Record>> recordsPerGroup = new HashMap<>();
+        if (aggregateRequest.getGroupByField() != null && !aggregateRequest.getGroupByField().isEmpty()) {
+            while (recordIterator.hasNext()) {
+                Record record = recordIterator.next();
+                String id = record.getId();
+                String[] group = recordIdsPerGroup.get(id);
+                List<Record> records = recordsPerGroup.get(group);
+                if (records == null) {
+                    records = new ArrayList<>();
+                }
+                records.add(record);
+                recordsPerGroup.put(group, records);
+            }
+        } else {
+            recordsPerGroup.put(new String[]{}, AnalyticsDataServiceUtils.listRecords(this.getAnalyticsDataService(), response));
+        }
+        for (Entry<String[], List<Record>> entry : recordsPerGroup.entrySet()) {
+            aggregatedRecords.add(this.aggregatePerGrouping(tenantId, entry.getKey(),entry.getValue().iterator(),
+                    entry.getValue().size(), aggregateRequest ));
+        }
+        return new NonStreamingAggregateRecordIterator(aggregatedRecords);
+    }
+
+    public Set<List<String>> getUniqueGroupings(int tenantId, AggregateRequest aggregateRequest)
             throws AnalyticsIndexException, IOException {
         if (aggregateRequest.getAggregateLevel() >= 0) {
             List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
@@ -1773,46 +1824,34 @@ public class AnalyticsDataIndexer {
                                                   Set<List<String>> uniqueCategories)
             throws AnalyticsIndexException {
         List<String[]> groupings = new ArrayList<>();
-        int totalAggregateLevel = aggregateRequest.getAggregateLevel() + 1;
-        for (List<String> category : uniqueCategories) {
-            if (category.size() == totalAggregateLevel) {
-                groupings.add(category.toArray(new String[category.size()]));
-            }
-        }
         if (aggregateRequest.getGroupByField() == null || aggregateRequest.getGroupByField().isEmpty()) {
-            // for sure, uniqueCategories is empty
+            // for sure, uniqueCategories is empty if groupByField is not present
             // and groupings is empty too. adding a dummy String array to aggregate all the records without facet field.
             groupings.add(new String[]{});
+        } else {
+            for (List<String> category : uniqueCategories) {
+                groupings.add(category.toArray(new String[category.size()]));
+            }
         }
         return groupings;
     }
 
-    private Record aggregatePerGrouping(int tenantId, String[] path,
+    private Record aggregatePerGrouping(int tenantId, String[] path, Iterator<Record> iterator, int actualNoOfRecords,
                                         AggregateRequest aggregateRequest)
             throws AnalyticsException {
         Map<String, AggregateFunction> perAliasAggregateFunction = initPerAliasAggregateFunctions(aggregateRequest);
-        AnalyticsDataResponse analyticsDataResponse = null;
         Record aggregatedRecord = null;
-        List<SearchResultEntry> searchResultEntries = getSearchResultEntries(tenantId, path, aggregateRequest);
-        if (!searchResultEntries.isEmpty()) {
-            List<String> recordIds = getRecordIds(searchResultEntries);
-            int actualNoOfRecords = recordIds.size();
-            analyticsDataResponse = this.indexerInfo.getAnalyticsDataService().get(tenantId, aggregateRequest.getTableName(),
-                                                                                   1, null, recordIds);
-            Iterator<Record> iterator = AnalyticsDataServiceUtils.responseToIterator(this.indexerInfo.getAnalyticsDataService(),
-                                                                                     analyticsDataResponse);
-            while (iterator.hasNext()) {
-                Record record = iterator.next();
-                for (AggregateField field : aggregateRequest.getFields()) {
-                    AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
-                    RecordContext recordValues = RecordContext.create(record.getValues());
-                    function.process(recordValues, field.getAggregateVariables());
-                }
+        while (iterator.hasNext()) {
+            Record record = iterator.next();
+            for (AggregateField field : aggregateRequest.getFields()) {
+                AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
+                RecordContext recordValues = RecordContext.create(record.getValues());
+                function.process(recordValues, field.getAggregateVariables());
             }
-            Map<String, Object> aggregatedValues = generateAggregateRecordValues(path, actualNoOfRecords, aggregateRequest,
-                                                                                 perAliasAggregateFunction);
-            aggregatedRecord = new Record(tenantId, aggregateRequest.getTableName(), aggregatedValues);
         }
+        Map<String, Object> aggregatedValues = generateAggregateRecordValues(path, actualNoOfRecords, aggregateRequest,
+                                                                             perAliasAggregateFunction);
+        aggregatedRecord = new Record(tenantId, aggregateRequest.getTableName(), aggregatedValues);
         return aggregatedRecord;
     }
 
@@ -1844,7 +1883,7 @@ public class AnalyticsDataIndexer {
         return searchResultEntries;
     }
 
-    private Map<String, Object> generateAggregateRecordValues(String[] path, int noOfRecords,
+    private Map<String, Object> generateAggregateRecordValues(String[] path, int actualNoOfRecords,
                                                               AggregateRequest aggregateRequest,
                                                               Map<String, AggregateFunction> perAliasAggregateFunction)
             throws AnalyticsException {
@@ -1863,7 +1902,7 @@ public class AnalyticsDataIndexer {
                                  path);
         }
         aggregatedValues.put(LUCENE_QUERY_FOR_AGGREGATION, luceneQuery);
-        aggregatedValues.put(NO_OF_RECORDS, noOfRecords);
+        aggregatedValues.put(NO_OF_RECORDS, actualNoOfRecords);
         return aggregatedValues;
     }
 
@@ -1906,17 +1945,18 @@ public class AnalyticsDataIndexer {
         }
     }
 
-    private static class AggregateRecordIterator implements AnalyticsIterator<Record> {
+    private static class StreamingAggregateRecordIterator implements AnalyticsIterator<Record> {
 
-        private static Log logger = LogFactory.getLog(AggregateRecordIterator.class);
+        private static Log logger = LogFactory.getLog(StreamingAggregateRecordIterator.class);
         private AggregateRequest request;
         private List<String[]> groupings;
         private int tenantId;
         private String[] currentGrouping;
         private AnalyticsDataIndexer indexer;
         private Record currentRecord;
-        public AggregateRecordIterator(int tenantId, List<String[]> uniqueGroupings,
-                                       AggregateRequest request, AnalyticsDataIndexer indexer) {
+        public StreamingAggregateRecordIterator(int tenantId, List<String[]> uniqueGroupings,
+                                                AggregateRequest request,
+                                                AnalyticsDataIndexer indexer) {
             this.request = request;
             this.tenantId = tenantId;
             this.groupings = uniqueGroupings;
@@ -1939,8 +1979,7 @@ public class AnalyticsDataIndexer {
                     if (currentRecord != null) {
                         return true;
                     } else {
-                        currentRecord = indexer.aggregatePerGrouping(tenantId, currentGrouping,
-                                                                     request);
+                        currentRecord = getAggregatedRecord();
                     }
                 } catch (AnalyticsException e) {
                     logger.error("Failed to create aggregated record: " + e.getMessage(), e);
@@ -1958,6 +1997,23 @@ public class AnalyticsDataIndexer {
             }
         }
 
+        private Record getAggregatedRecord() throws AnalyticsException {
+            List<SearchResultEntry> searchResultEntries = indexer.getSearchResultEntries(tenantId,
+                currentGrouping, request);
+            if (!searchResultEntries.isEmpty()) {
+                List<String> recordIds = getRecordIds(searchResultEntries);
+                int noOfRecords = recordIds.size();
+                AnalyticsDataResponse analyticsDataResponse =
+                        indexer.getAnalyticsIndexerInfo().getAnalyticsDataService().get(tenantId, request.getTableName(),
+                                                                                        1, null, recordIds);
+                Iterator<Record> iterator = AnalyticsDataServiceUtils.responseToIterator(indexer.getAnalyticsIndexerInfo()
+                        .getAnalyticsDataService(), analyticsDataResponse);
+                return indexer.aggregatePerGrouping(tenantId, currentGrouping, iterator, noOfRecords, request);
+            } else {
+                return null;
+            }
+        }
+
         @Override
         public synchronized Record next() {
             if (hasNext()) {
@@ -1972,6 +2028,47 @@ public class AnalyticsDataIndexer {
         @Override
         public void remove() {
             //This will not work in this iterator
+        }
+    }
+
+    private class NonStreamingAggregateRecordIterator implements AnalyticsIterator<Record> {
+
+        private List<Record> records;
+        private Iterator<Record> iterator;
+
+        public NonStreamingAggregateRecordIterator(List<Record> records) {
+            this.records = records;
+        }
+
+        @Override
+        public void close() throws IOException {
+            // ignored
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (records == null || records.isEmpty()) {
+                return false;
+            } else {
+                if (iterator == null) {
+                    iterator = records.iterator();
+                }
+                return iterator.hasNext();
+            }
+        }
+
+        @Override
+        public Record next() {
+            if (this.hasNext()) {
+                return iterator.next();
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public void remove() {
+            //ignored
         }
     }
 
@@ -2082,11 +2179,16 @@ public class AnalyticsDataIndexer {
 
             Set<List<String>> perShardCategorySet = new HashSet<>();
             int aggregateLevel = aggregateRequest.getAggregateLevel();
-            this.addAllCategoriesToSet(null, aggregateLevel, perShardCategorySet);
+            List<String> parentPath = aggregateRequest.getParentPath();
+            if (parentPath != null && !parentPath.isEmpty()) {
+                this.addAllCategoriesToSet(parentPath.toArray(new String[parentPath.size()]), aggregateLevel, perShardCategorySet);
+            } else {
+                this.addAllCategoriesToSet(null, aggregateLevel, perShardCategorySet);
+            }
             return perShardCategorySet;
         }
 
-        private void addAllCategoriesToSet(String[] parent, int aggregateLevel, Set<List<String>> uniqueGroups)
+        private void addAllCategoriesToSet(String[] parent, int localAggregateLevel, Set<List<String>> uniqueGroups)
                 throws IOException, AnalyticsException {
             TaxonomyReader taxonomyReader = new DirectoryTaxonomyReader(indexer.lookupTaxonomyIndexWriter(shardId, tableId));
             IndexReader indexReader = DirectoryReader.open(indexer.lookupIndexWriter(shardId, tableId), true);
@@ -2099,14 +2201,16 @@ public class AnalyticsDataIndexer {
 
             for (CategorySearchResultEntry child : resultEntries) {
                 List<String> newParent = new ArrayList<>();
-                if (parent != null) {
+                if (parent != null && parent.length != 0) {
+                    newParent.addAll(Arrays.asList(parent));
                     newParent.add(child.getCategoryValue());
                 } else {
                     newParent.add(child.getCategoryValue());
                 }
-                uniqueGroups.add(newParent);
-                if (aggregateLevel > 0) {
-                    addAllCategoriesToSet(newParent.toArray(new String[newParent.size()]), aggregateLevel-1, uniqueGroups);
+                if (localAggregateLevel > 0) {
+                    addAllCategoriesToSet(newParent.toArray(new String[newParent.size()]), localAggregateLevel-1, uniqueGroups);
+                } else if (localAggregateLevel == 0) {
+                    uniqueGroups.add(newParent);
                 }
             }
         }
