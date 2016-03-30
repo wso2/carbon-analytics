@@ -267,11 +267,6 @@ fi
 # ----- Execute The Requested Command -----------------------------------------
 cd "$CARBON_HOME"
 
-TMP_DIR=$CARBON_HOME/tmp
-if [ -d "$TMP_DIR" ]; then
-rm -rf "$TMP_DIR"
-fi
-
 START_EXIT_STATUS=121
 status=$START_EXIT_STATUS
 
