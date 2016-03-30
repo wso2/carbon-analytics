@@ -40,7 +40,7 @@ public class HzDistributedList implements List {
         int lastIndex = -1;
         for (Object key : this.hzMap.keySet()) {
             String tempKey = key.toString();
-            int index = Integer.parseInt(tempKey.substring(tempKey.lastIndexOf(HAZELCAST_LIST_KEY) + 1));
+            int index = Integer.parseInt(tempKey.substring(HAZELCAST_LIST_KEY.length()));
             if (index > lastIndex) {
                 lastIndex = index;
             }
@@ -171,7 +171,9 @@ public class HzDistributedList implements List {
             int lastItem = 0;
             for (int i = index; i <= getLastIndex(); i++) {
                 Object value = this.hzMap.get(HAZELCAST_LIST_KEY + String.valueOf(i + 1));
-                this.hzMap.put(HAZELCAST_LIST_KEY + String.valueOf(i), value);
+                if (value != null) {
+                    this.hzMap.put(HAZELCAST_LIST_KEY + String.valueOf(i), value);
+                }
                 lastItem = i;
             }
             this.hzMap.remove(HAZELCAST_LIST_KEY + String.valueOf(lastItem));
