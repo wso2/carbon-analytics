@@ -148,7 +148,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
 
         private String incID;
 
-        private long incMaxTS = Integer.MIN_VALUE;
+        private long incMaxTS = Long.MIN_VALUE;
 
         public RowRecordIteratorAdaptor(Iterator<Record> recordItr, int tenantId,
                                         boolean incEnable, String incID) {
