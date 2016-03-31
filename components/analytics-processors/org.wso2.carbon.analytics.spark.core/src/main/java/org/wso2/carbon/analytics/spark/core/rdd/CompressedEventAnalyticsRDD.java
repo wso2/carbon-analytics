@@ -88,7 +88,6 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
      * 
      * @param tenantId      Tenant ID
      * @param tableName     Name of the associated table
-     * @param allColumns       List of allColumns to include in the rdd as fields
      * @param mergeSchema   Flag to merge the existing schema and the defined schema
      * @param sc            Spark Context
      * @param deps          Scala Sequence
@@ -186,7 +185,7 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
         private int tenantId;
         private boolean incEnable;
         private String incID;
-        private long incMaxTS = Integer.MIN_VALUE;
+        private long incMaxTS = Long.MIN_VALUE;
         private int timestampIndex;
 
         public RowRecordIteratorAdaptor(Iterator<Record> recordItr, int tenantId, boolean incEnable, String incID) {
@@ -284,8 +283,7 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
         /**
          * Get the values of each field of an event, as an Array.
          * 
-         * @param messageFlowId ID of the message flow
-         * @param event         Current event 
+         * @param event         Current event
          * @param payloadsMap   Payloads Map
          * @param eventIndex    Index of the current event
          * @return              Array of values of the fields in the event
