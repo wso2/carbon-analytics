@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.jsservice;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
@@ -41,6 +42,7 @@ import org.wso2.carbon.analytics.jsservice.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.ColumnKeyValueBean;
 import org.wso2.carbon.analytics.jsservice.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.EventBean;
+import org.wso2.carbon.analytics.jsservice.beans.IdsWithColumnsBean;
 import org.wso2.carbon.analytics.jsservice.beans.QueryBean;
 import org.wso2.carbon.analytics.jsservice.beans.RecordBean;
 import org.wso2.carbon.analytics.jsservice.beans.ResponseBean;
@@ -316,14 +318,28 @@ public class AnalyticsJSServiceConnector {
 
     public ResponseBean getRecordsByIds(String username, String tableName, String idsAsString) {
         if (idsAsString != null && !idsAsString.isEmpty()) {
+            IdsWithColumnsBean bean = new IdsWithColumnsBean();
             try {
-                Type idsType = new TypeToken<List<String>>() {
-                }.getType();
-                List<String> ids = gson.fromJson(idsAsString, idsType);
+                try {
+                    Type idsType = new TypeToken<List<String>>() {
+                    }.getType();
+                    List<String> ids = gson.fromJson(idsAsString, idsType);
+                    if (ids != null && !ids.isEmpty()) {
+                        bean.setIds(ids);
+                    }
+                } catch (JsonSyntaxException e) {
+                    bean = gson.fromJson(idsAsString, IdsWithColumnsBean.class);
+                    if (bean.getColumns().isEmpty()) {
+                        bean.setColumns(null);
+                    }
+                    if (bean.getIds().isEmpty()) {
+                        bean.setIds(null);
+                    }
+                }
                 if (logger.isDebugEnabled()) {
                     logger.debug("Invoking getRecordsByIds for tableName: " + tableName);
                 }
-                AnalyticsDataResponse response = analyticsDataAPI.get(username, tableName, 1, null, ids);
+                AnalyticsDataResponse response = analyticsDataAPI.get(username, tableName, 1, bean.getColumns(), bean.getIds());
                 List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, response);
                 return handleResponse(ResponseStatus.SUCCESS, gson.toJson(Utils.getRecordBeans(records)));
             } catch (Exception e) {
@@ -363,7 +379,7 @@ public class AnalyticsJSServiceConnector {
                                                                             queryBean.getStart(),
                                                                             queryBean.getCount(),
                                                                             Utils.getSortedFields(queryBean.getSortBy()));
-                List<RecordBean> recordBeans = getRecordBeans(username, tableName, searchResults);
+                List<RecordBean> recordBeans = getRecordBeans(username, tableName, queryBean.getColumns(), searchResults);
                 if (logger.isDebugEnabled()) {
                     for (RecordBean record : recordBeans) {
                         logger.debug("Search Result -- Record Id: " + record.getId() + " values :" +
@@ -612,7 +628,7 @@ public class AnalyticsJSServiceConnector {
                         Utils.createDrillDownSearchRequest(tableName, queryBean);
                 List<SearchResultEntry> searchResults =
                         analyticsDataAPI.drillDownSearch(username, request);
-                List<RecordBean> recordBeans = getRecordBeans(username, tableName, searchResults);
+                List<RecordBean> recordBeans = getRecordBeans(username, tableName, queryBean.getColumns(), searchResults);
                 if (logger.isDebugEnabled()) {
                     for (RecordBean record : recordBeans) {
                         logger.debug("Drilldown Search Result -- Record Id: " + record.getId() + " values :" +
@@ -633,11 +649,12 @@ public class AnalyticsJSServiceConnector {
         }
     }
 
-    private List<RecordBean> getRecordBeans(String username, String tableName,
+    private List<RecordBean> getRecordBeans(String username, String tableName, List<String> columns,
                                             List<SearchResultEntry> searchResults)
             throws AnalyticsException {
         List<String> ids = Utils.getIds(searchResults);
-        AnalyticsDataResponse response = analyticsDataAPI.get(username, tableName, 1, null, ids);
+        List<String> requiredColumns = columns.isEmpty() ? null : columns;
+        AnalyticsDataResponse response = analyticsDataAPI.get(username, tableName, 1, requiredColumns, ids);
         List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, response);
         Map<String, RecordBean> recordBeanMap = Utils.getRecordBeanKeyedWithIds(records);
         return Utils.getSortedRecordBeans(recordBeanMap, searchResults);

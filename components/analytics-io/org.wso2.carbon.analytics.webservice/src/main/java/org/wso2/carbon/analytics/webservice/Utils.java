@@ -88,12 +88,11 @@ public class Utils {
      * @param records the records
      * @return the Map of recordBeans with id as key and recordbean as value
      */
-    public static Map<String, RecordBean> createRecordBeansKeyedWithIds(List<Record> records) {
+    public static Map<String, RecordBean> createRecordBeansKeyedWithIds(RecordBean[] records) {
         Map<String, RecordBean> recordBeans = new HashMap<>();
         if (records != null) {
-            for (Record record : records) {
-                RecordBean recordBean = createRecordBean(record);
-                recordBeans.put(recordBean.getId(), recordBean);
+            for (RecordBean record : records) {
+                recordBeans.put(record.getId(), record);
             }
         }
         return recordBeans;
@@ -147,14 +146,14 @@ public class Utils {
      * @param searchResults the search results
      * @return the record ids from search results
      */
-    public static List<String> getRecordIds(List<SearchResultEntry> searchResults) {
+    public static String[] getRecordIds(List<SearchResultEntry> searchResults) {
         List<String> ids = new ArrayList<>();
         if (searchResults != null) {
             for (SearchResultEntry searchResult : searchResults) {
                 ids.add(searchResult.getId());
             }
         }
-        return ids;
+        return ids.toArray(new String[ids.size()]);
     }
 
     /**

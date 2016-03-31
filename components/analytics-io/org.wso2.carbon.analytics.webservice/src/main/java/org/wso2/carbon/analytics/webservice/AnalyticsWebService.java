@@ -476,22 +476,23 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @param query     The search query
      * @param start     The start location of the result, 0 based
      * @param count     The maximum number of result entries to be returned
+     * @param columns   The columns needed from each record
      * @param sortByFields The fields by which the records needs to be sorted
      * @return An arrays of {@link RecordBean}s
      * @throws AnalyticsWebServiceException
      */
-    public RecordBean[] searchWithSorting(String tableName, String query, int start, int count, SortByFieldBean[] sortByFields)
+    public RecordBean[] searchWithSorting(String tableName, String query, int start, int count, String[] columns,
+                                          SortByFieldBean[] sortByFields)
             throws AnalyticsWebServiceException {
         try {
             List<SearchResultEntry> searchResults = analyticsDataAPI.search(getUsername(), tableName, query,
-                                                                            start, count, Utils.getSortByFields(sortByFields));
-            List<String> recordIds = Utils.getRecordIds(searchResults);
-            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(),
-                                                                            tableName, DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
-            Map<String, RecordBean> recordBeanMap = Utils.createRecordBeansKeyedWithIds(records);
-            List<RecordBean> recordBeans = Utils.getSortedRecordBeans(recordBeanMap, searchResults);
-            RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
-            return recordBeans.toArray(resultRecordBeans);
+                    start, count, Utils.getSortByFields(sortByFields));
+            String[] recordIds = Utils.getRecordIds(searchResults);
+            RecordBean[] recordBeans = getById(tableName, 1, columns, recordIds);
+            Map<String, RecordBean> recordBeanMap = Utils.createRecordBeansKeyedWithIds(recordBeans);
+            List<RecordBean> sortedRecordBeans = Utils.getSortedRecordBeans(recordBeanMap, searchResults);
+            RecordBean[] resultRecordBeans = new RecordBean[sortedRecordBeans.size()];
+            return sortedRecordBeans.toArray(resultRecordBeans);
         } catch (Exception e) {
             logger.error("Unable to get search result for table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get search result from table[" + tableName + "] due to " + e
@@ -511,21 +512,7 @@ public class AnalyticsWebService extends AbstractAdmin {
      */
     public RecordBean[] search(String tableName, String query, int start, int count)
             throws AnalyticsWebServiceException {
-        try {
-            List<SearchResultEntry> searchResults = analyticsDataAPI.search(getUsername(), tableName, query,
-                                                                            start, count, null);
-            List<String> recordIds = Utils.getRecordIds(searchResults);
-            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(),
-                                                                                                                tableName, DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
-            Map<String, RecordBean> recordBeanMap = Utils.createRecordBeansKeyedWithIds(records);
-            List<RecordBean> recordBeans = Utils.getSortedRecordBeans(recordBeanMap, searchResults);
-            RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
-            return recordBeans.toArray(resultRecordBeans);
-        } catch (Exception e) {
-            logger.error("Unable to get search result for table[" + tableName + "] due to " + e.getMessage(), e);
-            throw new AnalyticsWebServiceException("Unable to get search result from table[" + tableName + "] due to " + e
-                    .getMessage(), e);
-        }
+        return searchWithSorting(tableName, query, start, count, null, null);
     }
 
     /**
@@ -699,15 +686,13 @@ public class AnalyticsWebService extends AbstractAdmin {
             throws AnalyticsWebServiceException {
         try {
             List<SearchResultEntry> searchResults = analyticsDataAPI.drillDownSearch(getUsername(),
-                                                                                     getAnalyticsDrillDownRequest(drillDownRequest));
-            List<String> recordIds = Utils.getRecordIds(searchResults);
-            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI,
-                                                                         analyticsDataAPI.get(getUsername(), drillDownRequest.getTableName(),
-                                                                                              DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
-            Map<String, RecordBean> recordBeanMap = Utils.createRecordBeansKeyedWithIds(records);
-            List<RecordBean> recordBeans = Utils.getSortedRecordBeans(recordBeanMap, searchResults);
-            RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
-            return recordBeans.toArray(resultRecordBeans);
+                    getAnalyticsDrillDownRequest(drillDownRequest));
+            String[] recordIds = Utils.getRecordIds(searchResults);
+            RecordBean[] recordBeans = getById(drillDownRequest.getTableName(), 1, drillDownRequest.getColumns(), recordIds);
+            Map<String, RecordBean> recordBeanMap = Utils.createRecordBeansKeyedWithIds(recordBeans);
+            List<RecordBean> sortedRecordBeans = Utils.getSortedRecordBeans(recordBeanMap, searchResults);
+            RecordBean[] resultRecordBeans = new RecordBean[sortedRecordBeans.size()];
+            return sortedRecordBeans.toArray(resultRecordBeans);
         } catch (Exception e) {
             logger.error("Unable to get drill down information due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get drill down information due to " + e.getMessage(), e);

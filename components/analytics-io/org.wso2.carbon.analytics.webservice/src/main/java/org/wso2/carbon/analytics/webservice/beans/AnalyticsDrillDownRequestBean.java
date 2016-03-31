@@ -36,6 +36,7 @@ public class AnalyticsDrillDownRequestBean implements Serializable {
     private int recordCount;
     private int recordStart;
     private SortByFieldBean[] sortByFields;
+    private String[] columns;
 
     public AnalyticsDrillDownRequestBean() {
     }
@@ -110,5 +111,13 @@ public class AnalyticsDrillDownRequestBean implements Serializable {
 
     public void setSortByFields(SortByFieldBean[] sortByFields) {
         this.sortByFields = sortByFields;
+    }
+
+    public String[] getColumns() {
+        return columns;
+    }
+
+    public void setColumns(String[] columns) {
+        this.columns = columns;
     }
 }
