@@ -1236,7 +1236,7 @@
         <!-- Carbon metrics version -->
         <carbon.metrics.version>1.2.0</carbon.metrics.version>
 
-        <orbit.version.json>2.0.0.wso2v1</orbit.version.json>
+        <orbit.version.json>3.0.0.wso2v1</orbit.version.json>
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
         <tomcat.websocket.version>7.0.54</tomcat.websocket.version>
         <orbit.version.axiom>1.2.11.wso2v10</orbit.version.axiom>
