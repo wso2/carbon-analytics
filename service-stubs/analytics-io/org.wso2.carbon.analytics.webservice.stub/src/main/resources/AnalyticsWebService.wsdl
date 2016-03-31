@@ -33,6 +33,13 @@
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="path" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="SortByFieldBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="reversed" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="sortType" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
             <xs:complexType name="AnalyticsAggregateRequest">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="aggregateLevel" type="xs:int"/>
@@ -58,21 +65,10 @@
                     <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
-            <xs:complexType name="SortByFieldBean">
-                <xs:sequence>
-                    <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="reversed" type="xs:boolean"/>
-                    <xs:element minOccurs="0" name="sortType" nillable="true" type="xs:string"/>
-                </xs:sequence>
-            </xs:complexType>
-            <xs:complexType name="ValuesBatchBean">
-                <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="keyValues" nillable="true" type="ax229:RecordValueEntryBean"/>
-                </xs:sequence>
-            </xs:complexType>
             <xs:complexType name="AnalyticsDrillDownRequestBean">
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="categoryPaths" nillable="true" type="ax229:CategoryPathBean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="query" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="rangeField" nillable="true" type="xs:string"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="ranges" nillable="true" type="ax229:AnalyticsDrillDownRangeBean"/>
@@ -97,6 +93,25 @@
                     <xs:element minOccurs="0" name="to" type="xs:double"/>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="AnalyticsSchemaBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="ax229:SchemaColumnBean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="primaryKeys" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SchemaColumnBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="columnName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="columnType" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="index" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="scoreParam" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ValuesBatchBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="keyValues" nillable="true" type="ax229:RecordValueEntryBean"/>
+                </xs:sequence>
+            </xs:complexType>
             <xs:complexType name="CategoryDrillDownRequestBean">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"/>
@@ -116,20 +131,6 @@
                 <xs:sequence>
                     <xs:element minOccurs="0" name="categoryName" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="score" type="xs:double"/>
-                </xs:sequence>
-            </xs:complexType>
-            <xs:complexType name="AnalyticsSchemaBean">
-                <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="ax229:SchemaColumnBean"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="primaryKeys" nillable="true" type="xs:string"/>
-                </xs:sequence>
-            </xs:complexType>
-            <xs:complexType name="SchemaColumnBean">
-                <xs:sequence>
-                    <xs:element minOccurs="0" name="columnName" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="columnType" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="index" type="xs:boolean"/>
-                    <xs:element minOccurs="0" name="scoreParam" type="xs:boolean"/>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="StreamDefinitionBean">
@@ -200,20 +201,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="searchMultiTablesWithAggregates">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="requests" nillable="true" type="ax230:AnalyticsAggregateRequest"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="searchMultiTablesWithAggregatesResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:AggregateResponse"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="deleteByIds">
                 <xs:complexType>
                     <xs:sequence>
@@ -229,6 +216,7 @@
                         <xs:element minOccurs="0" name="query" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="start" type="xs:int"/>
                         <xs:element minOccurs="0" name="count" type="xs:int"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"/>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="sortByFields" nillable="true" type="ax230:SortByFieldBean"/>
                     </xs:sequence>
                 </xs:complexType>
@@ -248,20 +236,31 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getWithKeyValues">
+            <xs:element name="searchMultiTablesWithAggregates">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="numPartitionsHint" type="xs:int"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="valuesBatchBeans" nillable="true" type="ax230:ValuesBatchBean"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="requests" nillable="true" type="ax230:AnalyticsAggregateRequest"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getWithKeyValuesResponse">
+            <xs:element name="searchMultiTablesWithAggregatesResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:RecordBean"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:AggregateResponse"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isPaginationSupported">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="recordStoreName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isPaginationSupportedResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -305,64 +304,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:RecordBean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="drillDownSearchCount">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="drillDownRequest" nillable="true" type="ax230:AnalyticsDrillDownRequestBean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="drillDownSearchCountResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:double"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="drillDownCategories">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="drillDownRequest" nillable="true" type="ax230:CategoryDrillDownRequestBean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="drillDownCategoriesResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax230:SubCategoriesBean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="searchWithAggregates">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="request" nillable="true" type="ax230:AnalyticsAggregateRequest"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="searchWithAggregatesResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:RecordBean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="reIndex">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="startTime" type="xs:long"/>
-                        <xs:element minOccurs="0" name="endTime" type="xs:long"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="waitForIndexing">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="maxWait" type="xs:long"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -464,17 +405,78 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="isPaginationSupported">
+            <xs:element name="getWithKeyValues">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="recordStoreName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="numPartitionsHint" type="xs:int"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="valuesBatchBeans" nillable="true" type="ax230:ValuesBatchBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="isPaginationSupportedResponse">
+            <xs:element name="getWithKeyValuesResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:RecordBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="drillDownSearchCount">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="drillDownRequest" nillable="true" type="ax230:AnalyticsDrillDownRequestBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="drillDownSearchCountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:double"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="drillDownCategories">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="drillDownRequest" nillable="true" type="ax230:CategoryDrillDownRequestBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="drillDownCategoriesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax230:SubCategoriesBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="searchWithAggregates">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="ax230:AnalyticsAggregateRequest"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="searchWithAggregatesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:RecordBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="reIndex">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="startTime" type="xs:long"/>
+                        <xs:element minOccurs="0" name="endTime" type="xs:long"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="waitForIndexing">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="maxWait" type="xs:long"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -564,20 +566,20 @@
             </xs:element>
         </xs:schema>
     </wsdl:types>
-    <wsdl:message name="listTablesRequest">
-        <wsdl:part name="parameters" element="ns:listTables"/>
-    </wsdl:message>
-    <wsdl:message name="listTablesResponse">
-        <wsdl:part name="parameters" element="ns:listTablesResponse"/>
-    </wsdl:message>
-    <wsdl:message name="AnalyticsWebServiceAnalyticsWebServiceException">
-        <wsdl:part name="parameters" element="ns:AnalyticsWebServiceAnalyticsWebServiceException"/>
-    </wsdl:message>
     <wsdl:message name="isPaginationSupportedRequest">
         <wsdl:part name="parameters" element="ns:isPaginationSupported"/>
     </wsdl:message>
     <wsdl:message name="isPaginationSupportedResponse">
         <wsdl:part name="parameters" element="ns:isPaginationSupportedResponse"/>
+    </wsdl:message>
+    <wsdl:message name="AnalyticsWebServiceAnalyticsWebServiceException">
+        <wsdl:part name="parameters" element="ns:AnalyticsWebServiceAnalyticsWebServiceException"/>
+    </wsdl:message>
+    <wsdl:message name="listTablesRequest">
+        <wsdl:part name="parameters" element="ns:listTables"/>
+    </wsdl:message>
+    <wsdl:message name="listTablesResponse">
+        <wsdl:part name="parameters" element="ns:listTablesResponse"/>
     </wsdl:message>
     <wsdl:message name="getTableSchemaRequest">
         <wsdl:part name="parameters" element="ns:getTableSchema"/>
@@ -624,17 +626,17 @@
     <wsdl:message name="getRecordCountResponse">
         <wsdl:part name="parameters" element="ns:getRecordCountResponse"/>
     </wsdl:message>
-    <wsdl:message name="getWithKeyValuesRequest">
-        <wsdl:part name="parameters" element="ns:getWithKeyValues"/>
-    </wsdl:message>
-    <wsdl:message name="getWithKeyValuesResponse">
-        <wsdl:part name="parameters" element="ns:getWithKeyValuesResponse"/>
-    </wsdl:message>
     <wsdl:message name="getRecordStoreNameByTableRequest">
         <wsdl:part name="parameters" element="ns:getRecordStoreNameByTable"/>
     </wsdl:message>
     <wsdl:message name="getRecordStoreNameByTableResponse">
         <wsdl:part name="parameters" element="ns:getRecordStoreNameByTableResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getWithKeyValuesRequest">
+        <wsdl:part name="parameters" element="ns:getWithKeyValues"/>
+    </wsdl:message>
+    <wsdl:message name="getWithKeyValuesResponse">
+        <wsdl:part name="parameters" element="ns:getWithKeyValuesResponse"/>
     </wsdl:message>
     <wsdl:message name="drillDownSearchCountRequest">
         <wsdl:part name="parameters" element="ns:drillDownSearchCount"/>
@@ -721,15 +723,15 @@
         <wsdl:part name="parameters" element="ns:deleteByIds"/>
     </wsdl:message>
     <wsdl:portType name="AnalyticsWebServicePortType">
-        <wsdl:operation name="listTables">
-            <wsdl:input message="ns:listTablesRequest" wsaw:Action="urn:listTables"/>
-            <wsdl:output message="ns:listTablesResponse" wsaw:Action="urn:listTablesResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:listTablesAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
         <wsdl:operation name="isPaginationSupported">
             <wsdl:input message="ns:isPaginationSupportedRequest" wsaw:Action="urn:isPaginationSupported"/>
             <wsdl:output message="ns:isPaginationSupportedResponse" wsaw:Action="urn:isPaginationSupportedResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:isPaginationSupportedAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="listTables">
+            <wsdl:input message="ns:listTablesRequest" wsaw:Action="urn:listTables"/>
+            <wsdl:output message="ns:listTablesResponse" wsaw:Action="urn:listTablesResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:listTablesAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
         <wsdl:operation name="getTableSchema">
             <wsdl:input message="ns:getTableSchemaRequest" wsaw:Action="urn:getTableSchema"/>
@@ -773,15 +775,15 @@
             <wsdl:output message="ns:getRecordCountResponse" wsaw:Action="urn:getRecordCountResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getRecordCountAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
-        <wsdl:operation name="getWithKeyValues">
-            <wsdl:input message="ns:getWithKeyValuesRequest" wsaw:Action="urn:getWithKeyValues"/>
-            <wsdl:output message="ns:getWithKeyValuesResponse" wsaw:Action="urn:getWithKeyValuesResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getWithKeyValuesAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
         <wsdl:operation name="getRecordStoreNameByTable">
             <wsdl:input message="ns:getRecordStoreNameByTableRequest" wsaw:Action="urn:getRecordStoreNameByTable"/>
             <wsdl:output message="ns:getRecordStoreNameByTableResponse" wsaw:Action="urn:getRecordStoreNameByTableResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getRecordStoreNameByTableAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getWithKeyValues">
+            <wsdl:input message="ns:getWithKeyValuesRequest" wsaw:Action="urn:getWithKeyValues"/>
+            <wsdl:output message="ns:getWithKeyValuesResponse" wsaw:Action="urn:getWithKeyValuesResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getWithKeyValuesAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
         <wsdl:operation name="drillDownSearchCount">
             <wsdl:input message="ns:drillDownSearchCountRequest" wsaw:Action="urn:drillDownSearchCount"/>
@@ -862,8 +864,8 @@
     </wsdl:portType>
     <wsdl:binding name="AnalyticsWebServiceSoap11Binding" type="ns:AnalyticsWebServicePortType">
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-        <wsdl:operation name="listTables">
-            <soap:operation soapAction="urn:listTables" style="document"/>
+        <wsdl:operation name="isPaginationSupported">
+            <soap:operation soapAction="urn:isPaginationSupported" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -874,8 +876,8 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="isPaginationSupported">
-            <soap:operation soapAction="urn:isPaginationSupported" style="document"/>
+        <wsdl:operation name="listTables">
+            <soap:operation soapAction="urn:listTables" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -985,8 +987,8 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getWithKeyValues">
-            <soap:operation soapAction="urn:getWithKeyValues" style="document"/>
+        <wsdl:operation name="getRecordStoreNameByTable">
+            <soap:operation soapAction="urn:getRecordStoreNameByTable" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -997,8 +999,8 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getRecordStoreNameByTable">
-            <soap:operation soapAction="urn:getRecordStoreNameByTable" style="document"/>
+        <wsdl:operation name="getWithKeyValues">
+            <soap:operation soapAction="urn:getWithKeyValues" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -1192,8 +1194,8 @@
     </wsdl:binding>
     <wsdl:binding name="AnalyticsWebServiceSoap12Binding" type="ns:AnalyticsWebServicePortType">
         <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-        <wsdl:operation name="listTables">
-            <soap12:operation soapAction="urn:listTables" style="document"/>
+        <wsdl:operation name="isPaginationSupported">
+            <soap12:operation soapAction="urn:isPaginationSupported" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1204,8 +1206,8 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="isPaginationSupported">
-            <soap12:operation soapAction="urn:isPaginationSupported" style="document"/>
+        <wsdl:operation name="listTables">
+            <soap12:operation soapAction="urn:listTables" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1315,8 +1317,8 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getWithKeyValues">
-            <soap12:operation soapAction="urn:getWithKeyValues" style="document"/>
+        <wsdl:operation name="getRecordStoreNameByTable">
+            <soap12:operation soapAction="urn:getRecordStoreNameByTable" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1327,8 +1329,8 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getRecordStoreNameByTable">
-            <soap12:operation soapAction="urn:getRecordStoreNameByTable" style="document"/>
+        <wsdl:operation name="getWithKeyValues">
+            <soap12:operation soapAction="urn:getWithKeyValues" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1522,8 +1524,8 @@
     </wsdl:binding>
     <wsdl:binding name="AnalyticsWebServiceHttpBinding" type="ns:AnalyticsWebServicePortType">
         <http:binding verb="POST"/>
-        <wsdl:operation name="listTables">
-            <http:operation location="listTables"/>
+        <wsdl:operation name="isPaginationSupported">
+            <http:operation location="isPaginationSupported"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1531,8 +1533,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="isPaginationSupported">
-            <http:operation location="isPaginationSupported"/>
+        <wsdl:operation name="listTables">
+            <http:operation location="listTables"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1612,8 +1614,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getWithKeyValues">
-            <http:operation location="getWithKeyValues"/>
+        <wsdl:operation name="getRecordStoreNameByTable">
+            <http:operation location="getRecordStoreNameByTable"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1621,8 +1623,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getRecordStoreNameByTable">
-            <http:operation location="getRecordStoreNameByTable"/>
+        <wsdl:operation name="getWithKeyValues">
+            <http:operation location="getWithKeyValues"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>

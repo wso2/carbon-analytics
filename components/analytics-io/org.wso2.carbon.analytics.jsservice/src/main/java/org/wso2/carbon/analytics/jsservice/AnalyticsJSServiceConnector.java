@@ -653,7 +653,7 @@ public class AnalyticsJSServiceConnector {
                                             List<SearchResultEntry> searchResults)
             throws AnalyticsException {
         List<String> ids = Utils.getIds(searchResults);
-        List<String> requiredColumns = columns.isEmpty() ? null : columns;
+        List<String> requiredColumns = (columns == null) || columns.isEmpty() ? null : columns;
         AnalyticsDataResponse response = analyticsDataAPI.get(username, tableName, 1, requiredColumns, ids);
         List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, response);
         Map<String, RecordBean> recordBeanMap = Utils.getRecordBeanKeyedWithIds(records);
