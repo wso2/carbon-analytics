@@ -449,7 +449,7 @@ public class AnalyticsResource extends AbstractResource {
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
 	                           @PathParam("start") int recordsFrom, @PathParam("count") int count,
-                               List<String> columns,
+                               @PathParam("columns") List<String> columns,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                          throws AnalyticsException {
 		if (logger.isDebugEnabled()) {
@@ -457,27 +457,26 @@ public class AnalyticsResource extends AbstractResource {
 		}
         AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
-        final AnalyticsDataResponse resp = analyticsDataService.get(username, tableName, 1, columns, timeFrom,
+        List<String> columnList = (columns == null || columns.isEmpty()) ? null : columns;
+        final AnalyticsDataResponse resp = analyticsDataService.get(username, tableName, 1, columnList, timeFrom,
                 timeTo, recordsFrom, count);
 
-        final List<Iterator<Record>> iterators = Utils.getRecordIterators(resp, analyticsDataService);
+        final Iterator<Record> iterator = AnalyticsDataServiceUtils.responseToIterator(analyticsDataService, resp);
         return new StreamingOutput() {
             @Override
             public void write(OutputStream outputStream)
                     throws IOException, WebApplicationException {
                 Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
                 recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
-                for (Iterator<Record> iterator : iterators) {
-                    while (iterator.hasNext()) {
-                        RecordBean recordBean = Utils.createRecordBean(iterator.next());
-                        recordWriter.write(gson.toJson(recordBean));
-                        if (iterator.hasNext()) {
-                            recordWriter.write(STR_JSON_COMMA);
-                        }
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Retrieved -- Record Id: " + recordBean.getId() + " values :" +
-                                         recordBean.toString());
-                        }
+                while (iterator.hasNext()) {
+                    RecordBean recordBean = Utils.createRecordBean(iterator.next());
+                    recordWriter.write(gson.toJson(recordBean));
+                    if (iterator.hasNext()) {
+                        recordWriter.write(STR_JSON_COMMA);
+                    }
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Retrieved -- Record Id: " + recordBean.getId() + " values :" +
+                                     recordBean.toString());
                     }
                 }
                 recordWriter.write(STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET);
@@ -499,10 +498,11 @@ public class AnalyticsResource extends AbstractResource {
 	@Path("tables/{tableName}/{from}/{to}/{start}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
+                               @PathParam("columns") List<String> columns,
 	                           @PathParam("start") int start,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                         throws AnalyticsException {
-		return getRecords(tableName, timeFrom, timeTo, start, DEFAULT_INFINITY_INDEX, null, authHeader);
+		return getRecords(tableName, timeFrom, timeTo, start, DEFAULT_INFINITY_INDEX, columns, authHeader);
 	}
 
 	/**
@@ -518,10 +518,11 @@ public class AnalyticsResource extends AbstractResource {
 	@Path("tables/{tableName}/{from}/{to}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
+                               @PathParam("columns") List<String> columns,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                  throws AnalyticsException {
 		return getRecords(tableName, timeFrom, timeTo, DEFAULT_START_INDEX,
-                          DEFAULT_INFINITY_INDEX, null, authHeader);
+                          DEFAULT_INFINITY_INDEX, columns, authHeader);
 	}
 
 	/**
@@ -535,11 +536,11 @@ public class AnalyticsResource extends AbstractResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/{from}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
-	                           @PathParam("from") long timeFrom,
+	                           @PathParam("from") long timeFrom, @PathParam("columns") List<String> columns,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                            throws AnalyticsException {
 		return getRecords(tableName, timeFrom, DEFAULT_TO_TIME, DEFAULT_START_INDEX,
-		                  DEFAULT_INFINITY_INDEX, null, authHeader);
+		                  DEFAULT_INFINITY_INDEX, columns, authHeader);
 	}
 
 	/**
@@ -552,10 +553,11 @@ public class AnalyticsResource extends AbstractResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
+                                      @PathParam("columns") List<String> columns,
                                       @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                                    throws AnalyticsException {
 		return getRecords(tableName, DEFAULT_FROM_TIME, DEFAULT_TO_TIME,
-		                  DEFAULT_START_INDEX, DEFAULT_INFINITY_INDEX, null, authHeader);
+		                  DEFAULT_START_INDEX, DEFAULT_INFINITY_INDEX, columns, authHeader);
 	}
 
     /**
@@ -595,16 +597,17 @@ public class AnalyticsResource extends AbstractResource {
         }
         AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
-        final AnalyticsDataResponse resp = analyticsDataService.getWithKeyValues(username, tableName, 1,
-                columnKeyValueBean.getColumns(), columnKeyValueBean.getValueBatches());
-        final List<Iterator<Record>> iterators = Utils.getRecordIterators(resp, analyticsDataService);
+        List<String> columns = (columnKeyValueBean.getColumns() == null || columnKeyValueBean.getColumns().isEmpty())
+                ? null : columnKeyValueBean.getColumns();
+        final AnalyticsDataResponse resp = analyticsDataService.getWithKeyValues(username, tableName, 1, columns,
+                columnKeyValueBean.getValueBatches());
+        final Iterator<Record> iterator = AnalyticsDataServiceUtils.responseToIterator(analyticsDataService, resp);
         return new StreamingOutput() {
             @Override
             public void write(OutputStream outputStream)
                     throws IOException, WebApplicationException {
                 Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
                 recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
-                for (Iterator<Record> iterator : iterators) {
                     while (iterator.hasNext()) {
                         RecordBean recordBean = Utils.createRecordBean(iterator.next());
                         recordWriter.write(gson.toJson(recordBean));
@@ -616,7 +619,6 @@ public class AnalyticsResource extends AbstractResource {
                                          recordBean.toString());
                         }
                     }
-                }
                 recordWriter.write(STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET);
                 recordWriter.flush();
             }
@@ -717,8 +719,9 @@ public class AnalyticsResource extends AbstractResource {
                      queryBean.getTableName(), queryBean.getQuery(),
                      queryBean.getStart(), queryBean.getCount(), Utils.getSortedFields(queryBean.getSortByFieldBeans()));
             List<String> ids = Utils.getRecordIds(searchResults);
+            List<String> columns = (queryBean.getFields() == null || queryBean.getFields().isEmpty()) ? null : queryBean.getFields();
             AnalyticsDataResponse resp = analyticsDataService.get(username,
-                                                                  queryBean.getTableName(), 1, queryBean.getFields(), ids);
+                                                                  queryBean.getTableName(), 1, columns, ids);
             Map<String, RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataServiceUtils.listRecords(analyticsDataService,
                                                                                             resp));
             List<RecordBean> sortedRecordBeans = Utils.getSortedRecordBeans(recordBeans, searchResults);
@@ -757,8 +760,9 @@ public class AnalyticsResource extends AbstractResource {
             AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean);
             List<SearchResultEntry> result= analyticsDataService.drillDownSearch(username, request);
             List<String> ids = Utils.getRecordIds(result);
+            List<String> columns = requestBean.getFields() == null || requestBean.getFields().isEmpty() ? null : requestBean.getFields();
             AnalyticsDataResponse resp = analyticsDataService.get(username,
-                                                                  requestBean.getTableName(), 1, requestBean.getFields(), ids);
+                                                                  requestBean.getTableName(), 1, columns, ids);
             Map<String, RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataServiceUtils.listRecords(analyticsDataService,
                                                                                             resp));
             List<RecordBean> sortedRecordBeans = Utils.getSortedRecordBeans(recordBeans, result);

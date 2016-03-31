@@ -19,7 +19,6 @@ package org.wso2.carbon.analytics.restapi;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateField;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
@@ -30,11 +29,9 @@ import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.core.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.restapi.beans.AggregateFieldBean;
 import org.wso2.carbon.analytics.restapi.beans.AggregateRequestBean;
@@ -55,7 +52,6 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -205,24 +201,6 @@ public class Utils {
     }
 
     /**
-     * Returns the list of iterators given the {@link AnalyticsDataResponse} as a parameter
-     *
-     * @param resp The analytics data response
-     * @param analyticsDataService the AnalyticsDataService instance
-     * @return list of Iterators of Records
-     * @throws AnalyticsException
-     */
-    public static List<Iterator<Record>> getRecordIterators(AnalyticsDataResponse resp,
-                                                            SecureAnalyticsDataService analyticsDataService)
-            throws AnalyticsException {
-        List<Iterator<Record>> iterators = new ArrayList<>();
-        for (RecordGroup recordGroup : resp.getRecordGroups()) {
-            iterators.add(analyticsDataService.readRecords(resp.getRecordStoreName(), recordGroup));
-        }
-        return iterators;
-    }
-
-    /**
      * Create a Analytics schema from a bean class
      *
      * @param analyticsSchemaBean bean table schema to be converted to Analytics Schema.
@@ -334,7 +312,7 @@ public class Utils {
                 path = new String[]{};
             }
             categoryPaths.put(drillDownPathBean.getFieldName(),
-                              new ArrayList<String>(Arrays.asList(path)));
+                              new ArrayList<>(Arrays.asList(path)));
         }
         return categoryPaths;
     }

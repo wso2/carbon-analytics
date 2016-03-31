@@ -335,7 +335,7 @@ public class AnalyticsWebService extends AbstractAdmin {
 
         try {
             List<String> columnList = null;
-            if (columns != null && columns.length != 0) {
+            if (columns != null && columns.length != 0 && columns[0] != null) {
                 columnList = new ArrayList<>(Arrays.asList(columns));
             }
             int originalFrom = recordsFrom;
@@ -384,7 +384,7 @@ public class AnalyticsWebService extends AbstractAdmin {
 
         try {
             List<String> columnList = null;
-            if (columns != null && columns.length != 0) {
+            if (columns != null && columns.length != 0 && columns[0] != null) {
                 columnList = Arrays.asList(columns);
             }
             List<Map<String, Object>> valuesBatch = Utils.getValuesBatch(valuesBatchBeans,
@@ -416,14 +416,15 @@ public class AnalyticsWebService extends AbstractAdmin {
             throws AnalyticsWebServiceException {
         try {
             List<String> columnList = null;
-            if (columns != null) {
-                columnList = Arrays.asList(columns);
+            if (columns != null && columns.length != 0 && columns[0] != null) {
+                columnList = new ArrayList<>(Arrays.asList(columns));
             }
             List<String> idList = null;
             if (ids != null) {
                 idList = Arrays.asList(ids);
+            } else {
+                throw new AnalyticsException("Ids cannot be empty!");
             }
-
             List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(),
                                                      tableName, numPartitionsHint, columnList, idList));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);

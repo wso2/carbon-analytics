@@ -250,12 +250,10 @@ public class AnalyticsJSServiceConnector {
             int start = validateNumericValue("start", recordsFrom).intValue();
             int recordCount = validateNumericValue("count", count).intValue();
             AnalyticsDataResponse response;
-            List<String> columnList = null;
-            if (columns != null) {
-                Type columnType = new TypeToken<ArrayList<String>>() {
-                }.getType();
-                columnList = gson.fromJson(columns, columnType);
-            }
+            Type columnType = new TypeToken<ArrayList<String>>() {
+            }.getType();
+            List<String> columnList = gson.fromJson(columns, columnType);
+            columnList = (columnList == null || columnList.isEmpty()) ? null : columnList;
             response = analyticsDataAPI.get(username, tableName, 1, columnList,
                                                                               from, to, start, recordCount);
             List<Record> records;
@@ -325,15 +323,17 @@ public class AnalyticsJSServiceConnector {
                     }.getType();
                     List<String> ids = gson.fromJson(idsAsString, idsType);
                     if (ids != null && !ids.isEmpty()) {
-                        bean.setIds(ids);
+                        bean.setIds(new ArrayList<String>(ids));
+                    } else {
+                        bean.setIds(new ArrayList<String>(0));
                     }
                 } catch (JsonSyntaxException e) {
                     bean = gson.fromJson(idsAsString, IdsWithColumnsBean.class);
-                    if (bean.getColumns().isEmpty()) {
+                    if (bean.getColumns() == null || bean.getColumns().isEmpty()) {
                         bean.setColumns(null);
                     }
-                    if (bean.getIds().isEmpty()) {
-                        bean.setIds(null);
+                    if (bean.getIds() == null || bean.getIds().isEmpty()) {
+                        bean.setIds(new ArrayList<String>(0));
                     }
                 }
                 if (logger.isDebugEnabled()) {
@@ -544,10 +544,10 @@ public class AnalyticsJSServiceConnector {
             } catch (Exception e) {
                 logger.error("Failed to set the table schema for table: " + tableName + " : " + e.getMessage(), e);
                 return gson.toJson(handleResponse(ResponseStatus.FAILED, " Failed to set table schema for table: " +
-                                                  tableName + ": " + e.getMessage()));
+                                                                         tableName + ": " + e.getMessage()));
             }
         } else {
-            return gson.toJson(handleResponse(ResponseStatus.FAILED,"Table schema is not provided"));
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Table schema is not provided"));
         }
     }
 
@@ -653,7 +653,7 @@ public class AnalyticsJSServiceConnector {
                                             List<SearchResultEntry> searchResults)
             throws AnalyticsException {
         List<String> ids = Utils.getIds(searchResults);
-        List<String> requiredColumns = (columns == null) || columns.isEmpty() ? null : columns;
+        List<String> requiredColumns = (columns == null || columns.isEmpty()) ? null : columns;
         AnalyticsDataResponse response = analyticsDataAPI.get(username, tableName, 1, requiredColumns, ids);
         List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, response);
         Map<String, RecordBean> recordBeanMap = Utils.getRecordBeanKeyedWithIds(records);
