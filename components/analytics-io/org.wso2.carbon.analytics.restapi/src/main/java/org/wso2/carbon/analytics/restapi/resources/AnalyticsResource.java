@@ -74,6 +74,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -449,7 +451,7 @@ public class AnalyticsResource extends AbstractResource {
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
 	                           @PathParam("start") int recordsFrom, @PathParam("count") int count,
-                               @PathParam("columns") List<String> columns,
+                               @QueryParam("columns") List<String> columns,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                          throws AnalyticsException {
 		if (logger.isDebugEnabled()) {
@@ -457,10 +459,17 @@ public class AnalyticsResource extends AbstractResource {
 		}
         AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
-        List<String> columnList = (columns == null || columns.isEmpty()) ? null : columns;
+        List<String> columnList = new ArrayList<>();
+        if (columns != null) {
+            for (String column : columns) {
+                columnList.addAll(Arrays.asList(column.split(Constants.COLUMN_SEPARATOR)));
+            }
+            if (columnList.isEmpty()) {
+                columnList = null;
+            }
+        }
         final AnalyticsDataResponse resp = analyticsDataService.get(username, tableName, 1, columnList, timeFrom,
                 timeTo, recordsFrom, count);
-
         final Iterator<Record> iterator = AnalyticsDataServiceUtils.responseToIterator(analyticsDataService, resp);
         return new StreamingOutput() {
             @Override
@@ -498,7 +507,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Path("tables/{tableName}/{from}/{to}/{start}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
-                               @PathParam("columns") List<String> columns,
+                               @QueryParam("columns") List<String> columns,
 	                           @PathParam("start") int start,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                         throws AnalyticsException {
@@ -518,7 +527,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Path("tables/{tableName}/{from}/{to}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
-                               @PathParam("columns") List<String> columns,
+                               @QueryParam("columns") List<String> columns,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                  throws AnalyticsException {
 		return getRecords(tableName, timeFrom, timeTo, DEFAULT_START_INDEX,
@@ -536,7 +545,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/{from}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
-	                           @PathParam("from") long timeFrom, @PathParam("columns") List<String> columns,
+	                           @PathParam("from") long timeFrom, @QueryParam("columns") List<String> columns,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                            throws AnalyticsException {
 		return getRecords(tableName, timeFrom, DEFAULT_TO_TIME, DEFAULT_START_INDEX,
@@ -553,7 +562,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
-                                      @PathParam("columns") List<String> columns,
+                                      @QueryParam("columns") List<String> columns,
                                       @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                                    throws AnalyticsException {
 		return getRecords(tableName, DEFAULT_FROM_TIME, DEFAULT_TO_TIME,

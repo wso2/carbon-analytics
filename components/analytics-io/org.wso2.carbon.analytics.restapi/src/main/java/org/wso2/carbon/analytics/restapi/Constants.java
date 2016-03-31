@@ -22,9 +22,9 @@ public class Constants {
 
 	public static final long MILLISECONDSPERSECOND = 1000;
     public static final String BASIC_AUTH_HEADER = "Basic";
+    public static final String COLUMN_SEPARATOR = ",";
 
-
-	/**
+    /**
 	 * Instantiates a new constants.
 	 */
 	private Constants() {
