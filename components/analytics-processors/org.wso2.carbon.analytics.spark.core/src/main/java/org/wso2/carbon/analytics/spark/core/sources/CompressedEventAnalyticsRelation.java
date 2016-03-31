@@ -41,6 +41,7 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.rdd.CompressedEventAnalyticsRDD;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.CarbonScalaUtils;
 
 import scala.reflect.ClassTag$;
@@ -133,9 +134,12 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
             try {
                 startTime = ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(this.tenantId,
                     this.incID, true);
-                startTime -= startTime % this.incWindowSizeMS;
-                startTime -= this.incBuffer * this.incWindowSizeMS;
-                endTime = System.currentTimeMillis() + 5000;
+                if (startTime > 0) {
+                    startTime -= startTime % this.incWindowSizeMS;
+                    startTime -= this.incBuffer * this.incWindowSizeMS;
+                }
+
+                endTime = System.currentTimeMillis() + AnalyticsConstants.INC_END_TIME_BUFFER_MS;
             } catch (AnalyticsException e) {
                 throw new RuntimeException(e);
             }

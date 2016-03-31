@@ -85,6 +85,8 @@ public class AnalyticsConstants {
     public static final String SPARK_JDBC_SHORTHAND_STRING = "CarbonJDBC";
     public static final String TENANT_ID_AND_TABLES_MAP = "tenantIdTablesMap";
     public static final int MAX_RECORDS = 1000;
+    public static final int INC_END_TIME_BUFFER_MS = 5000;
+
 
     //Carbon Spark properties strings
     public static final String CARBON_SPARK_MASTER_COUNT = "carbon.spark.master.count";
