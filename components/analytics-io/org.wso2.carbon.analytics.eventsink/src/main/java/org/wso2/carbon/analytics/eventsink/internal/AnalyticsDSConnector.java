@@ -19,7 +19,7 @@ package org.wso2.carbon.analytics.eventsink.internal;
 
 import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
