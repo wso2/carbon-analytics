@@ -1247,7 +1247,7 @@
         <neethi.osgi.version>2.0.4.wso2v4</neethi.osgi.version>
         <neethi.osgi.version.range>[2.0.4.wso2v4, 3.1.0)</neethi.osgi.version.range>
         <rampart.wso2.version>1.6.1.wso2v14</rampart.wso2.version>
-        <libthrift.wso2.version>0.8.0.wso2v1</libthrift.wso2.version>
+        <libthrift.wso2.version>0.9.2.wso2v1</libthrift.wso2.version>
         <libthrift.wso2.version.hector>0.7.0.wso2v2</libthrift.wso2.version.hector>
         <orbit.version.commons.lang>2.6.0.wso2v1</orbit.version.commons.lang>
         <gson.version>2.5</gson.version>
@@ -1327,7 +1327,7 @@
         <wsdl4j.wso2.version>1.6.2.wso2v2</wsdl4j.wso2.version>
         <org.smslib.version>3.4.5</org.smslib.version>
 
-	<libthrift.wso2.imp.pkg.version.range>[0.8.0.wso2v1, 0.9.0)</libthrift.wso2.imp.pkg.version.range>
+	<libthrift.wso2.imp.pkg.version.range>[0.9.2.wso2v1, 1.0.0)</libthrift.wso2.imp.pkg.version.range>
     </properties>
 
 </project>
