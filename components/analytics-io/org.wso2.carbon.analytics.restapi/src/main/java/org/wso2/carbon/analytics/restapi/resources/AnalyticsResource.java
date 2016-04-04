@@ -451,7 +451,7 @@ public class AnalyticsResource extends AbstractResource {
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
 	                           @PathParam("start") int recordsFrom, @PathParam("count") int count,
-                               @QueryParam("fields") List<String> columns,
+                               @QueryParam("columns") List<String> columns,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                          throws AnalyticsException {
 		if (logger.isDebugEnabled()) {
@@ -507,7 +507,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Path("tables/{tableName}/{from}/{to}/{start}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
-                               @QueryParam("fields") List<String> columns,
+                               @QueryParam("columns") List<String> columns,
 	                           @PathParam("start") int start,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                         throws AnalyticsException {
@@ -527,7 +527,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Path("tables/{tableName}/{from}/{to}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
-                               @QueryParam("fields") List<String> columns,
+                               @QueryParam("columns") List<String> columns,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                  throws AnalyticsException {
 		return getRecords(tableName, timeFrom, timeTo, DEFAULT_START_INDEX,
@@ -545,7 +545,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/{from}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
-	                           @PathParam("from") long timeFrom, @QueryParam("fields") List<String> columns,
+	                           @PathParam("from") long timeFrom, @QueryParam("columns") List<String> columns,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                            throws AnalyticsException {
 		return getRecords(tableName, timeFrom, DEFAULT_TO_TIME, DEFAULT_START_INDEX,
@@ -562,7 +562,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
-                                      @QueryParam("fields") List<String> columns,
+                                      @QueryParam("columns") List<String> columns,
                                       @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                                    throws AnalyticsException {
 		return getRecords(tableName, DEFAULT_FROM_TIME, DEFAULT_TO_TIME,
@@ -728,7 +728,7 @@ public class AnalyticsResource extends AbstractResource {
                      queryBean.getTableName(), queryBean.getQuery(),
                      queryBean.getStart(), queryBean.getCount(), Utils.getSortedFields(queryBean.getSortByFieldBeans()));
             List<String> ids = Utils.getRecordIds(searchResults);
-            List<String> columns = (queryBean.getFields() == null || queryBean.getFields().isEmpty()) ? null : queryBean.getFields();
+            List<String> columns = (queryBean.getColumns() == null || queryBean.getColumns().isEmpty()) ? null : queryBean.getColumns();
             AnalyticsDataResponse resp = analyticsDataService.get(username,
                                                                   queryBean.getTableName(), 1, columns, ids);
             Map<String, RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataServiceUtils.listRecords(analyticsDataService,
@@ -769,7 +769,7 @@ public class AnalyticsResource extends AbstractResource {
             AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean);
             List<SearchResultEntry> result= analyticsDataService.drillDownSearch(username, request);
             List<String> ids = Utils.getRecordIds(result);
-            List<String> columns = requestBean.getFields() == null || requestBean.getFields().isEmpty() ? null : requestBean.getFields();
+            List<String> columns = requestBean.getColumns() == null || requestBean.getColumns().isEmpty() ? null : requestBean.getColumns();
             AnalyticsDataResponse resp = analyticsDataService.get(username,
                                                                   requestBean.getTableName(), 1, columns, ids);
             Map<String, RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataServiceUtils.listRecords(analyticsDataService,

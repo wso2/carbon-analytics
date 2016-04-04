@@ -34,7 +34,7 @@ public class QueryBean {
 	
 	/** The columns. */
 	@XmlElement(required = false)
-	private List<String> fields;
+	private List<String> columns;
 	
 	/** The query. */
 	@XmlElement(required = false)
@@ -63,8 +63,8 @@ public class QueryBean {
 	 * Gets the columns.
 	 * @return the columns
 	 */
-	public List<String> getFields() {
-		return fields;
+	public List<String> getColumns() {
+		return columns;
 	}
 
 	/**
