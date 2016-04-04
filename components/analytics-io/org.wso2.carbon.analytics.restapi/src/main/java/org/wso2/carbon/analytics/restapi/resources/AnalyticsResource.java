@@ -451,7 +451,7 @@ public class AnalyticsResource extends AbstractResource {
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
 	                           @PathParam("start") int recordsFrom, @PathParam("count") int count,
-                               @QueryParam("columns") List<String> columns,
+                               @QueryParam("fields") List<String> columns,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                          throws AnalyticsException {
 		if (logger.isDebugEnabled()) {
@@ -507,7 +507,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Path("tables/{tableName}/{from}/{to}/{start}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
-                               @QueryParam("columns") List<String> columns,
+                               @QueryParam("fields") List<String> columns,
 	                           @PathParam("start") int start,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                         throws AnalyticsException {
@@ -527,7 +527,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Path("tables/{tableName}/{from}/{to}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
-                               @QueryParam("columns") List<String> columns,
+                               @QueryParam("fields") List<String> columns,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                  throws AnalyticsException {
 		return getRecords(tableName, timeFrom, timeTo, DEFAULT_START_INDEX,
@@ -545,7 +545,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/{from}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
-	                           @PathParam("from") long timeFrom, @QueryParam("columns") List<String> columns,
+	                           @PathParam("from") long timeFrom, @QueryParam("fields") List<String> columns,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                            throws AnalyticsException {
 		return getRecords(tableName, timeFrom, DEFAULT_TO_TIME, DEFAULT_START_INDEX,
@@ -562,7 +562,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
-                                      @QueryParam("columns") List<String> columns,
+                                      @QueryParam("fields") List<String> columns,
                                       @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                                    throws AnalyticsException {
 		return getRecords(tableName, DEFAULT_FROM_TIME, DEFAULT_TO_TIME,
