@@ -37,6 +37,7 @@
         <module>org.wso2.carbon.analytics.spark.ui</module>
         <module>org.wso2.carbon.analytics.spark.event</module>
         <module>org.wso2.carbon.analytics.spark.utils</module>
+        <module>org.wso2.carbon.analytics.spark.template.deployer</module>
     </modules>
 
 </project>
