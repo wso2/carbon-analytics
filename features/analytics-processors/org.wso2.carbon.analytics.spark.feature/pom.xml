@@ -48,6 +48,11 @@
             <artifactId>org.wso2.carbon.analytics.spark.event.feature</artifactId>
             <type>zip</type>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.spark.template.deployer.feature</artifactId>
+            <type>zip</type>
+        </dependency>
     </dependencies>
 
     <build>
@@ -78,6 +83,9 @@
                                 </includedFeatureDef>
                                 <includedFeatureDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.event.feature:${carbon.analytics.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.template.deployer.feature:${carbon.analytics.version}
                                 </includedFeatureDef>
                             </includedFeatures>
                         </configuration>
