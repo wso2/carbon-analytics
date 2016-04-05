@@ -271,14 +271,15 @@ public class Utils {
         return drillDownRequest;
     }
 
-    public static SubCategoriesBean createSubCategoriesBean(SubCategories categories) {
+    public static SubCategoriesBean createSubCategoriesBean(SubCategories subCategories) {
         SubCategoriesBean bean = new SubCategoriesBean();
-        bean.setCategoryPath(categories.getPath());
-        Map<String, Double> subCategories = new LinkedHashMap<>();
-        for (CategorySearchResultEntry entry : categories.getCategories()) {
-            subCategories.put(entry.getCategoryValue(), entry.getScore());
+        bean.setCategoryPath(subCategories.getPath());
+        Map<String, Double> categories = new LinkedHashMap<>();
+        for (CategorySearchResultEntry entry : subCategories.getCategories()) {
+            categories.put(entry.getCategoryValue(), entry.getScore());
         }
-        bean.setCategories(subCategories);
+        bean.setCategories(categories);
+        bean.setCategoryCount(subCategories.getCategoryCount());
         return bean;
     }
 

@@ -861,7 +861,7 @@ public class AnalyticsDataIndexer {
         if (path == null) {
             path = new String[] {};
         }
-        return new SubCategories(path, mergedResult, categoryCount);
+        return new SubCategories(path, mergedResult, resultEntries.size());
     }
 
     /**
@@ -941,7 +941,6 @@ public class AnalyticsDataIndexer {
             throws AnalyticsIndexException {
         List<CategorySearchResultEntry> searchResults = new ArrayList<>();
         try {
-            int noOfCategories = drillDownRequest.getStart() + drillDownRequest.getCount();
             IndexSearcher indexSearcher = new IndexSearcher(indexReader);
             FacetsCollector facetsCollector = new FacetsCollector(true);
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
@@ -963,7 +962,7 @@ public class AnalyticsDataIndexer {
                                                                     indices);
             Facets facets = new TaxonomyFacetSumValueSource(taxonomyReader, config, facetsCollector,
                                             valueSource);
-            return getCategoryDrillDownResponse(drillDownRequest, searchResults, noOfCategories, path, facets);
+            return getCategoryDrillDownResponse(drillDownRequest, searchResults, path, facets);
         } catch (IndexNotFoundException ignore) {
             return new CategoryDrillDownResponse(new ArrayList<CategorySearchResultEntry>(0), 0);
         } catch (IOException e) {
@@ -977,12 +976,9 @@ public class AnalyticsDataIndexer {
 
     private CategoryDrillDownResponse getCategoryDrillDownResponse(
             CategoryDrillDownRequest drillDownRequest,
-            List<CategorySearchResultEntry> searchResults, int noOfCategories, String[] path,
+            List<CategorySearchResultEntry> searchResults, String[] path,
             Facets facets) throws IOException {
-        if (noOfCategories == 0) {
-            noOfCategories = Integer.MAX_VALUE;
-        }
-        FacetResult facetResult = facets.getTopChildren(noOfCategories, drillDownRequest.getFieldName(),
+        FacetResult facetResult = facets.getTopChildren(Integer.MAX_VALUE, drillDownRequest.getFieldName(),
                                                         path);
         CategoryDrillDownResponse response;
         if (facetResult != null) {
@@ -990,7 +986,7 @@ public class AnalyticsDataIndexer {
             for (LabelAndValue category : categories) {
                 searchResults.add(new CategorySearchResultEntry(category.label, category.value.doubleValue()));
             }
-            response = new CategoryDrillDownResponse(searchResults, facetResult.childCount);
+            response = new CategoryDrillDownResponse(searchResults, categories.length);
         } else {
             response = new CategoryDrillDownResponse(new ArrayList<CategorySearchResultEntry>(0), 0);
         }
