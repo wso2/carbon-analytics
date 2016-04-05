@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsIncrementalMetaStore;
 import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
@@ -58,7 +59,7 @@ public class ServiceHolder {
     private static RegistryService registryService;
 
     private static TenantRegistryLoader tenantRegistryLoader;
-    
+
     private static SparkAnalyticsExecutor analyticskExecutor;
 
     private static Map<String, CarbonUDF> carbonUDFs = new HashMap();
@@ -100,7 +101,8 @@ public class ServiceHolder {
         return analyticsProcessorService;
     }
 
-    public static void setAnalyticsProcessorService(AnalyticsProcessorService analyticsProcessorService) {
+    public static void setAnalyticsProcessorService(
+            AnalyticsProcessorService analyticsProcessorService) {
         ServiceHolder.analyticsProcessorService = analyticsProcessorService;
     }
 
@@ -120,7 +122,7 @@ public class ServiceHolder {
             return ServiceHolder.registryService.getConfigSystemRegistry(tenantId);
         }
     }
-    
+
     public static SparkAnalyticsExecutor getAnalyticskExecutor() {
         return analyticskExecutor;
     }
@@ -164,20 +166,25 @@ public class ServiceHolder {
     public static void addCarbonUDFs(CarbonUDF carbonUDF) {
         ServiceHolder.carbonUDFs.put(carbonUDF.getClass().getName(), carbonUDF);
     }
+
     public static void removeCarbonUDFs() {
         ServiceHolder.carbonUDFs = null;
     }
+
     public static Map<String, CarbonUDF> getCarbonUDFs() {
         return ServiceHolder.carbonUDFs;
     }
 
     public static AnalyticsIncrementalMetaStore getIncrementalMetaStore() {
+        if (incrementalMetaStore == null) {
+            try {
+                incrementalMetaStore = new AnalyticsIncrementalMetaStore();
+            } catch (AnalyticsException e) {
+                throw new RuntimeException("Error in creating analytics incremental metastore: "
+                                           + e.getMessage(), e);
+            }
+        }
         return incrementalMetaStore;
-    }
-
-    public static void setIncrementalMetaStore(
-            AnalyticsIncrementalMetaStore incrementalMetaStore) {
-        ServiceHolder.incrementalMetaStore = incrementalMetaStore;
     }
 
 }
