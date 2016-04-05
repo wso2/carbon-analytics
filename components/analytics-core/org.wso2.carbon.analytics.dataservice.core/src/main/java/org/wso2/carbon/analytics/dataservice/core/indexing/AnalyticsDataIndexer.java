@@ -841,27 +841,25 @@ public class AnalyticsDataIndexer {
         if (drillDownRequest.getStart() < 0 || drillDownRequest.getCount() < 0) {
             throw new AnalyticsIndexException("starting index of the category list and page size of the category list cannot be less than zero");
         }
-        int categoryCount = 0;
         List<CategorySearchResultEntry> resultEntries = new ArrayList<>();
         if (this.isClusteringEnabled()) {
             List<CategoryDrillDownResponse> categoriesPerNodes =
                     this.executeIndexLookup(new DrillDownCategoriesCall(tenantId, drillDownRequest));
             for (CategoryDrillDownResponse categoriesPerNode : categoriesPerNodes) {
                 resultEntries.addAll(categoriesPerNode.getCategories());
-                categoryCount += categoriesPerNode.getCategoryCount();
             }
         } else {
             CategoryDrillDownResponse response = this.getDrillDownCategories(tenantId, drillDownRequest);
             resultEntries.addAll(response.getCategories());
-            categoryCount += response.getCategoryCount();
         }
-        List<CategorySearchResultEntry> mergedResult = this.mergeCategoryResults(resultEntries, drillDownRequest.getStart(),
-                drillDownRequest.getCount());
+        List<CategorySearchResultEntry> mergedResult = this.mergeCategoryResults(resultEntries);
         String[] path = drillDownRequest.getPath();
         if (path == null) {
             path = new String[] {};
         }
-        return new SubCategories(path, mergedResult, resultEntries.size());
+        List<CategorySearchResultEntry> paginatedCategories = this.getPaginatedCategoryResultsEntries(mergedResult,
+                drillDownRequest.getStart(), drillDownRequest.getCount());
+        return new SubCategories(path, paginatedCategories, mergedResult.size());
     }
 
     /**
@@ -870,7 +868,7 @@ public class AnalyticsDataIndexer {
      * @return De-dupped List ofcategories
      */
     private List<CategorySearchResultEntry> mergeCategoryResults(List<CategorySearchResultEntry>
-                                                                         searchResults, int start, int count) {
+                                                                         searchResults) {
         Map<String, Double> mergedResults = new LinkedHashMap<>();
         List<CategorySearchResultEntry> finalResult = new ArrayList<>();
         for (CategorySearchResultEntry perShardResults : searchResults) {
@@ -887,7 +885,7 @@ public class AnalyticsDataIndexer {
         }
         Collections.sort(finalResult);
         Collections.reverse(finalResult);
-        return getPaginatedCategoryResultsEntries(finalResult, start, count);
+        return finalResult;
     }
 
     private List<CategorySearchResultEntry> getPaginatedCategoryResultsEntries(List<CategorySearchResultEntry> resultEntries, int start, int count) {
