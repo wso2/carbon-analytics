@@ -83,7 +83,6 @@ public class AnalyticsComponent {
             AnalyticsProcessorService analyticsProcessorService = new CarbonAnalyticsProcessorService();
             bundleContext.registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
             ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
-            ServiceHolder.setIncrementalMetaStore(new AnalyticsIncrementalMetaStore());
             // Registering server startup observer
             SparkScriptCAppDeployer sparkScriptCAppDeployer = new SparkScriptCAppDeployer();
             bundleContext.registerService(
