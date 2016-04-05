@@ -30,6 +30,7 @@ import java.util.Map;
 public class SubCategoriesBean {
 
     private String[] categoryPath;
+    private int categoryCount;
     private Map<String, Double> categories;
 
     /**
@@ -41,6 +42,13 @@ public class SubCategoriesBean {
     public SubCategoriesBean(String[] path,
                              Map<String, Double> categories) {
         this.categoryPath = path;
+        this.categories = categories;
+    }
+
+    public SubCategoriesBean(String[] categoryPath, int categoryCount,
+                             Map<String, Double> categories) {
+        this.categoryPath = categoryPath;
+        this.categoryCount = categoryCount;
         this.categories = categories;
     }
 
@@ -58,5 +66,13 @@ public class SubCategoriesBean {
 
     public Map<String, Double> getCategories() {
         return categories;
+    }
+
+    public int getCategoryCount() {
+        return categoryCount;
+    }
+
+    public void setCategoryCount(int categoryCount) {
+        this.categoryCount = categoryCount;
     }
 }

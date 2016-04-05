@@ -871,6 +871,7 @@ public class AnalyticsDataIndexer {
      */
     private List<CategorySearchResultEntry> mergeCategoryResults(List<CategorySearchResultEntry>
                                                                          searchResults, int start, int count) {
+        int categoryCount = start + count;
         Map<String, Double> mergedResults = new LinkedHashMap<>();
         List<CategorySearchResultEntry> finalResult = new ArrayList<>();
         for (CategorySearchResultEntry perShardResults : searchResults) {
@@ -887,7 +888,12 @@ public class AnalyticsDataIndexer {
         }
         Collections.sort(finalResult);
         Collections.reverse(finalResult);
-        int categoryCount = (count == 0 ? Integer.MAX_VALUE : count);
+        if (categoryCount == 0 || categoryCount > finalResult.size()) {
+            categoryCount = finalResult.size();
+        }
+        if (start >= finalResult.size()-1) {
+            return new ArrayList<>(0);
+        }
         finalResult = finalResult.subList(start, categoryCount);
         return finalResult;
     }
@@ -978,14 +984,15 @@ public class AnalyticsDataIndexer {
         }
         FacetResult facetResult = facets.getTopChildren(noOfCategories, drillDownRequest.getFieldName(),
                                                         path);
-        CategoryDrillDownResponse response = new CategoryDrillDownResponse();
+        CategoryDrillDownResponse response;
         if (facetResult != null) {
             LabelAndValue[] categories = facetResult.labelValues;
             for (LabelAndValue category : categories) {
                 searchResults.add(new CategorySearchResultEntry(category.label, category.value.doubleValue()));
             }
-            response.setCategories(searchResults);
-            response.setCategoryCount(facetResult.childCount);
+            response = new CategoryDrillDownResponse(searchResults, facetResult.childCount);
+        } else {
+            response = new CategoryDrillDownResponse(new ArrayList<CategorySearchResultEntry>(0), 0);
         }
         return response;
     }

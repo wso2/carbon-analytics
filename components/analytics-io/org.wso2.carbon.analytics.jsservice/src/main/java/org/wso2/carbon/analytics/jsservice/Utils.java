@@ -228,6 +228,8 @@ public class Utils {
         }
         request.setFieldName(queryBean.getFieldName());
         request.setQuery(queryBean.getQuery());
+        request.setStart(queryBean.getStart());
+        request.setCount(queryBean.getCount());
         return request;
     }
 
@@ -276,6 +278,7 @@ public class Utils {
                 new SubCategoriesBean();
         bean.setCategories(getCategories(searchResults.getCategories()));
         bean.setCategoryPath(searchResults.getPath());
+        bean.setCategoryCount(searchResults.getCategoryCount());
         return bean;
     }
 
