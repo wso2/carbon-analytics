@@ -871,7 +871,6 @@ public class AnalyticsDataIndexer {
      */
     private List<CategorySearchResultEntry> mergeCategoryResults(List<CategorySearchResultEntry>
                                                                          searchResults, int start, int count) {
-        int categoryCount = start + count;
         Map<String, Double> mergedResults = new LinkedHashMap<>();
         List<CategorySearchResultEntry> finalResult = new ArrayList<>();
         for (CategorySearchResultEntry perShardResults : searchResults) {
@@ -888,13 +887,18 @@ public class AnalyticsDataIndexer {
         }
         Collections.sort(finalResult);
         Collections.reverse(finalResult);
-        if (categoryCount == 0 || categoryCount > finalResult.size()) {
-            categoryCount = finalResult.size();
+        return getPaginatedCategoryResultsEntries(finalResult, start, count);
+    }
+
+    private List<CategorySearchResultEntry> getPaginatedCategoryResultsEntries(List<CategorySearchResultEntry> resultEntries, int start, int count) {
+        int categoryCount = start + count;
+        if (categoryCount == 0 || categoryCount > resultEntries.size()) {
+            categoryCount = resultEntries.size();
         }
-        if (start >= finalResult.size()-1) {
+        if (start >= resultEntries.size()-1) {
             return new ArrayList<>(0);
         }
-        finalResult = finalResult.subList(start, categoryCount);
+        List <CategorySearchResultEntry> finalResult = resultEntries.subList(start, categoryCount);
         return finalResult;
     }
 
