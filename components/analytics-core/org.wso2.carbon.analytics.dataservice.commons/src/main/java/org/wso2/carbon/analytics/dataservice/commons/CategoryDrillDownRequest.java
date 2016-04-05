@@ -30,6 +30,8 @@ public class CategoryDrillDownRequest implements Serializable {
     private String[] path;
     private String query;
     private String scoreFunction;
+    private int start;
+    private int count;
 
     public CategoryDrillDownRequest() { }
     
@@ -71,5 +73,21 @@ public class CategoryDrillDownRequest implements Serializable {
 
     public void setScoreFunction(String scoreFunction) {
         this.scoreFunction = scoreFunction;
+    }
+
+    public int getStart() {
+        return start;
+    }
+
+    public void setStart(int start) {
+        this.start = start;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 }

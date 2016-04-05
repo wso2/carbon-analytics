@@ -80,6 +80,7 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownResponse;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
@@ -837,23 +838,30 @@ public class AnalyticsDataIndexer {
 
     public SubCategories drilldownCategories(int tenantId, CategoryDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        List<CategorySearchResultEntry> searchResults;
+        if (drillDownRequest.getStart() < 0 || drillDownRequest.getCount() < 0) {
+            throw new AnalyticsIndexException("starting index of the category list and page size of the category list cannot be less than zero");
+        }
+        int categoryCount = 0;
+        List<CategorySearchResultEntry> resultEntries = new ArrayList<>();
         if (this.isClusteringEnabled()) {
-            searchResults = new ArrayList<>();
-            List<List<CategorySearchResultEntry>> categoriesPerNodes =
+            List<CategoryDrillDownResponse> categoriesPerNodes =
                     this.executeIndexLookup(new DrillDownCategoriesCall(tenantId, drillDownRequest));
-            for (List<CategorySearchResultEntry> categoriesPerNode : categoriesPerNodes) {
-                searchResults.addAll(categoriesPerNode);
+            for (CategoryDrillDownResponse categoriesPerNode : categoriesPerNodes) {
+                resultEntries.addAll(categoriesPerNode.getCategories());
+                categoryCount += categoriesPerNode.getCategoryCount();
             }
         } else {
-            searchResults = this.getDrillDownCategories(tenantId, drillDownRequest);
+            CategoryDrillDownResponse response = this.getDrillDownCategories(tenantId, drillDownRequest);
+            resultEntries.addAll(response.getCategories());
+            categoryCount += response.getCategoryCount();
         }
-        List<CategorySearchResultEntry> mergedResult = this.mergeCategoryResults(searchResults);
+        List<CategorySearchResultEntry> mergedResult = this.mergeCategoryResults(resultEntries, drillDownRequest.getStart(),
+                drillDownRequest.getCount());
         String[] path = drillDownRequest.getPath();
         if (path == null) {
             path = new String[] {};
         }
-        return new SubCategories(path, mergedResult);
+        return new SubCategories(path, mergedResult, categoryCount);
     }
 
     /**
@@ -862,7 +870,7 @@ public class AnalyticsDataIndexer {
      * @return De-dupped List ofcategories
      */
     private List<CategorySearchResultEntry> mergeCategoryResults(List<CategorySearchResultEntry>
-                                                                         searchResults) {
+                                                                         searchResults, int start, int count) {
         Map<String, Double> mergedResults = new LinkedHashMap<>();
         List<CategorySearchResultEntry> finalResult = new ArrayList<>();
         for (CategorySearchResultEntry perShardResults : searchResults) {
@@ -879,6 +887,8 @@ public class AnalyticsDataIndexer {
         }
         Collections.sort(finalResult);
         Collections.reverse(finalResult);
+        int categoryCount = (count == 0 ? Integer.MAX_VALUE : count);
+        finalResult = finalResult.subList(start, categoryCount);
         return finalResult;
     }
 
@@ -919,12 +929,13 @@ public class AnalyticsDataIndexer {
         }
     }
 
-    private List<CategorySearchResultEntry> drilldowncategories(int tenantId, IndexReader indexReader,
+    private CategoryDrillDownResponse drilldowncategories(int tenantId, IndexReader indexReader,
                                                                 TaxonomyReader taxonomyReader,
                                                                 CategoryDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
         List<CategorySearchResultEntry> searchResults = new ArrayList<>();
         try {
+            int noOfCategories = drillDownRequest.getStart() + drillDownRequest.getCount();
             IndexSearcher indexSearcher = new IndexSearcher(indexReader);
             FacetsCollector facetsCollector = new FacetsCollector(true);
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
@@ -946,17 +957,9 @@ public class AnalyticsDataIndexer {
                                                                     indices);
             Facets facets = new TaxonomyFacetSumValueSource(taxonomyReader, config, facetsCollector,
                                             valueSource);
-            FacetResult facetResult = facets.getTopChildren(Integer.MAX_VALUE, drillDownRequest.getFieldName(),
-                                                            path);
-            if (facetResult != null) {
-                LabelAndValue[] categories = facetResult.labelValues;
-                for (LabelAndValue category : categories) {
-                    searchResults.add(new CategorySearchResultEntry(category.label, category.value.doubleValue()));
-                }
-            }
-            return searchResults;
+            return getCategoryDrillDownResponse(drillDownRequest, searchResults, noOfCategories, path, facets);
         } catch (IndexNotFoundException ignore) {
-            return new ArrayList<>();
+            return new CategoryDrillDownResponse(new ArrayList<CategorySearchResultEntry>(0), 0);
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error while performing drilldownCategories: " + e.getMessage(), e);
         } catch (org.apache.lucene.queryparser.classic.ParseException e) {
@@ -964,6 +967,27 @@ public class AnalyticsDataIndexer {
         } finally {
             this.closeTaxonomyIndexReaders(indexReader, taxonomyReader);
         }
+    }
+
+    private CategoryDrillDownResponse getCategoryDrillDownResponse(
+            CategoryDrillDownRequest drillDownRequest,
+            List<CategorySearchResultEntry> searchResults, int noOfCategories, String[] path,
+            Facets facets) throws IOException {
+        if (noOfCategories == 0) {
+            noOfCategories = Integer.MAX_VALUE;
+        }
+        FacetResult facetResult = facets.getTopChildren(noOfCategories, drillDownRequest.getFieldName(),
+                                                        path);
+        CategoryDrillDownResponse response = new CategoryDrillDownResponse();
+        if (facetResult != null) {
+            LabelAndValue[] categories = facetResult.labelValues;
+            for (LabelAndValue category : categories) {
+                searchResults.add(new CategorySearchResultEntry(category.label, category.value.doubleValue()));
+            }
+            response.setCategories(searchResults);
+            response.setCategoryCount(facetResult.childCount);
+        }
+        return response;
     }
 
     private double getDrillDownRecordCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
@@ -1185,14 +1209,25 @@ public class AnalyticsDataIndexer {
         return new ArrayList<>(resultFacetList.subList(startIndex, endIndex));
     }
 
-    public List<CategorySearchResultEntry> getDrillDownCategories(int tenantId,
+    public CategoryDrillDownResponse getDrillDownCategories(int tenantId,
                    CategoryDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
         List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
-        List<CategorySearchResultEntry> categoriesPerShard = new ArrayList<>();
+        return getCategoryDrillDownResponse(tenantId, drillDownRequest, taxonomyShardIds);
+    }
+
+    private CategoryDrillDownResponse getCategoryDrillDownResponse(int tenantId,
+                                                                   CategoryDrillDownRequest drillDownRequest,
+                                                                   List<Integer> taxonomyShardIds)
+            throws AnalyticsIndexException {
+        List<CategorySearchResultEntry> perNodeCategoryReslutEntries = new ArrayList<>();
+        int categoryCount = 0;
         for (int shardId : taxonomyShardIds) {
-            categoriesPerShard.addAll(this.drillDownCategoriesPerShard(tenantId, shardId, drillDownRequest));
+            CategoryDrillDownResponse response = this.drillDownCategoriesPerShard(tenantId, shardId, drillDownRequest);
+            perNodeCategoryReslutEntries.addAll(response.getCategories());
+            categoryCount += response.getCategoryCount();
         }
-        return categoriesPerShard;
+
+        return new CategoryDrillDownResponse(perNodeCategoryReslutEntries, categoryCount);
     }
 
     public double getDrillDownRecordCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
@@ -1238,7 +1273,7 @@ public class AnalyticsDataIndexer {
         }
     }
 
-    private List<CategorySearchResultEntry> drillDownCategoriesPerShard(final int tenantId, final int shardId,
+    private CategoryDrillDownResponse drillDownCategoriesPerShard(final int tenantId, final int shardId,
                                                              final CategoryDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
         try {
@@ -2197,9 +2232,9 @@ public class AnalyticsDataIndexer {
             request.setPath(parent);
             request.setTableName(aggregateRequest.getTableName());
             request.setQuery(aggregateRequest.getQuery());
-            List<CategorySearchResultEntry> resultEntries = indexer.drilldowncategories(tenantId, indexReader, taxonomyReader, request);
+            CategoryDrillDownResponse resultEntries = indexer.drilldowncategories(tenantId, indexReader, taxonomyReader, request);
 
-            for (CategorySearchResultEntry child : resultEntries) {
+            for (CategorySearchResultEntry child : resultEntries.getCategories()) {
                 List<String> newParent = new ArrayList<>();
                 if (parent != null && parent.length != 0) {
                     newParent.addAll(Arrays.asList(parent));
@@ -2379,7 +2414,7 @@ public class AnalyticsDataIndexer {
         }
     }
 
-    public static class DrillDownCategoriesCall extends IndexLookupOperationCall<List<CategorySearchResultEntry>> {
+    public static class DrillDownCategoriesCall extends IndexLookupOperationCall<CategoryDrillDownResponse> {
 
 
         private static final long serialVersionUID = -2277888731238692285L;
@@ -2393,12 +2428,12 @@ public class AnalyticsDataIndexer {
         }
 
         @Override
-        public IndexLookupOperationCall<List<CategorySearchResultEntry>> copy() {
+        public IndexLookupOperationCall<CategoryDrillDownResponse> copy() {
             return new DrillDownCategoriesCall(tenantId, request);
         }
 
         @Override
-        public List<CategorySearchResultEntry> call() throws Exception {
+        public CategoryDrillDownResponse call() throws Exception {
             AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
             if (ads == null) {
                 throw new AnalyticsException("The Analytics data service implementation is not registered");
@@ -2407,7 +2442,7 @@ public class AnalyticsDataIndexer {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
                 return adsImpl.getIndexer().getDrillDownCategories(tenantId, request);
             }
-            return new ArrayList<>();
+            return new CategoryDrillDownResponse(new ArrayList<CategorySearchResultEntry>(0), 0);
         }
     }
 

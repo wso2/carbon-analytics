@@ -266,6 +266,8 @@ public class Utils {
         if (path != null) {
             drillDownRequest.setPath(path.toArray(new String[path.size()]));
         }
+        drillDownRequest.setStart(bean.getStart());
+        drillDownRequest.setCount(bean.getCount());
         return drillDownRequest;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,38 +20,22 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * This class Contains Sub-categories of a given facet field/column. "path" represents the hierarchical
- * path to the categories and "categories" contains the list of categories with their scores.
+ * This class represents the class which contains the list of CategorySearchResultEntry and the total matching category count
  */
+public class CategoryDrillDownResponse implements Serializable {
 
-public class SubCategories implements Serializable {
-
-    private static final long serialVersionUID = -4760813079030890572L;
-    private String[] path;
+    private static final long serialVersionUID = 7400389388825590624L;
     private List<CategorySearchResultEntry> categories;
     private int categoryCount;
 
-    public SubCategories() { }
-    
-    public SubCategories(String[] path,
-                         List<CategorySearchResultEntry> categories) {
-        this.path = path;
-        this.categories = categories;
+    public CategoryDrillDownResponse() {
+
     }
 
-    public SubCategories(String[] path,
-                         List<CategorySearchResultEntry> categories, int categoryCount) {
-        this.path = path;
+    public CategoryDrillDownResponse(
+            List<CategorySearchResultEntry> categories, int categoryCount) {
         this.categories = categories;
         this.categoryCount = categoryCount;
-    }
-
-    public String[] getPath() {
-        return path;
-    }
-
-    public void setPath(String[] path) {
-        this.path = path;
     }
 
     public List<CategorySearchResultEntry> getCategories() {
