@@ -26,16 +26,14 @@ public class CategoryDrillDownResponse implements Serializable {
 
     private static final long serialVersionUID = 7400389388825590624L;
     private List<CategorySearchResultEntry> categories;
-    private int categoryCount;
 
     public CategoryDrillDownResponse() {
 
     }
 
     public CategoryDrillDownResponse(
-            List<CategorySearchResultEntry> categories, int categoryCount) {
+            List<CategorySearchResultEntry> categories) {
         this.categories = categories;
-        this.categoryCount = categoryCount;
     }
 
     public List<CategorySearchResultEntry> getCategories() {
@@ -44,13 +42,5 @@ public class CategoryDrillDownResponse implements Serializable {
 
     public void setCategories(List<CategorySearchResultEntry> categories) {
         this.categories = categories;
-    }
-
-    public int getCategoryCount() {
-        return categoryCount;
-    }
-
-    public void setCategoryCount(int categoryCount) {
-        this.categoryCount = categoryCount;
     }
 }

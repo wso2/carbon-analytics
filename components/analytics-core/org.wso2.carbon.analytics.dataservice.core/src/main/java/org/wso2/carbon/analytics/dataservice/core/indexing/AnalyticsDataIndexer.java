@@ -966,7 +966,7 @@ public class AnalyticsDataIndexer {
                                             valueSource);
             return getCategoryDrillDownResponse(drillDownRequest, searchResults, path, facets);
         } catch (IndexNotFoundException ignore) {
-            return new CategoryDrillDownResponse(new ArrayList<CategorySearchResultEntry>(0), 0);
+            return new CategoryDrillDownResponse(new ArrayList<CategorySearchResultEntry>(0));
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error while performing drilldownCategories: " + e.getMessage(), e);
         } catch (org.apache.lucene.queryparser.classic.ParseException e) {
@@ -988,9 +988,9 @@ public class AnalyticsDataIndexer {
             for (LabelAndValue category : categories) {
                 searchResults.add(new CategorySearchResultEntry(category.label, category.value.doubleValue()));
             }
-            response = new CategoryDrillDownResponse(searchResults, categories.length);
+            response = new CategoryDrillDownResponse(searchResults);
         } else {
-            response = new CategoryDrillDownResponse(new ArrayList<CategorySearchResultEntry>(0), 0);
+            response = new CategoryDrillDownResponse(new ArrayList<CategorySearchResultEntry>(0));
         }
         return response;
     }
@@ -1225,14 +1225,12 @@ public class AnalyticsDataIndexer {
                                                                    List<Integer> taxonomyShardIds)
             throws AnalyticsIndexException {
         List<CategorySearchResultEntry> perNodeCategoryReslutEntries = new ArrayList<>();
-        int categoryCount = 0;
         for (int shardId : taxonomyShardIds) {
             CategoryDrillDownResponse response = this.drillDownCategoriesPerShard(tenantId, shardId, drillDownRequest);
             perNodeCategoryReslutEntries.addAll(response.getCategories());
-            categoryCount += response.getCategoryCount();
         }
 
-        return new CategoryDrillDownResponse(perNodeCategoryReslutEntries, categoryCount);
+        return new CategoryDrillDownResponse(perNodeCategoryReslutEntries);
     }
 
     public double getDrillDownRecordCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
@@ -1732,7 +1730,6 @@ public class AnalyticsDataIndexer {
     public AnalyticsIterator<Record> searchWithAggregates(final int tenantId, 
             final AggregateRequest aggregateRequest)
             throws AnalyticsException {
-        final AnalyticsDataIndexer indexer = this;
         AnalyticsIterator<Record> iterator;
         List<String[]> subCategories;
         Set<List<String>> finalUniqueCategories;
@@ -1748,8 +1745,8 @@ public class AnalyticsDataIndexer {
                 finalUniqueCategories = getUniqueGroupings(tenantId, aggregateRequest);
             }
             subCategories =  getUniqueSubCategories(aggregateRequest, finalUniqueCategories);
-            iterator = new StreamingAggregateRecordIterator(tenantId, subCategories, aggregateRequest, indexer);
-        //    iterator = this.getNonStreamingAggregateRecords(tenantId, aggregateRequest, subCategories);
+        //    iterator = new StreamingAggregateRecordIterator(tenantId, subCategories, aggregateRequest, indexer);
+            iterator = this.getNonStreamingAggregateRecords(tenantId, aggregateRequest, subCategories);
             return iterator;
         } catch (IOException e) {
             log.error("Error occured while performing aggregation, " + e.getMessage(), e);
@@ -1985,7 +1982,7 @@ public class AnalyticsDataIndexer {
         }
     }
 
-    private static class StreamingAggregateRecordIterator implements AnalyticsIterator<Record> {
+    /*private static class StreamingAggregateRecordIterator implements AnalyticsIterator<Record> {
 
         private static Log logger = LogFactory.getLog(StreamingAggregateRecordIterator.class);
         private AggregateRequest request;
@@ -2069,7 +2066,7 @@ public class AnalyticsDataIndexer {
         public void remove() {
             //This will not work in this iterator
         }
-    }
+    }*/
 
     private class NonStreamingAggregateRecordIterator implements AnalyticsIterator<Record> {
 
@@ -2447,7 +2444,7 @@ public class AnalyticsDataIndexer {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
                 return adsImpl.getIndexer().getDrillDownCategories(tenantId, request);
             }
-            return new CategoryDrillDownResponse(new ArrayList<CategorySearchResultEntry>(0), 0);
+            return new CategoryDrillDownResponse(new ArrayList<CategorySearchResultEntry>(0));
         }
     }
 
