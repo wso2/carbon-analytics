@@ -893,7 +893,7 @@ public class AnalyticsDataIndexer {
         if (categoryCount == 0 || categoryCount > resultEntries.size()) {
             categoryCount = resultEntries.size();
         }
-        if (start >= resultEntries.size()-1) {
+        if (start > resultEntries.size()-1) {
             return new ArrayList<>(0);
         }
         List <CategorySearchResultEntry> finalResult = resultEntries.subList(start, categoryCount);
