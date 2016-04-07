@@ -6,7 +6,6 @@
       <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
       <properties>
             <property name="datasource">WSO2_ANALYTICS_RS_DB</property>
-            <property name="category">large_dataset_optimized</property>
       </properties>
    </analytics-record-store>
    <!-- The data indexing analyzer implementation -->
