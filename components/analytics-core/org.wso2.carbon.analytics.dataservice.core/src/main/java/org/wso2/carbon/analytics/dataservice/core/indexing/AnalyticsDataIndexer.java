@@ -896,7 +896,7 @@ public class AnalyticsDataIndexer {
         if (start > resultEntries.size()-1) {
             return new ArrayList<>(0);
         }
-        List <CategorySearchResultEntry> finalResult = resultEntries.subList(start, categoryCount);
+        List <CategorySearchResultEntry> finalResult = new ArrayList<>(resultEntries.subList(start, categoryCount));
         return finalResult;
     }
 
