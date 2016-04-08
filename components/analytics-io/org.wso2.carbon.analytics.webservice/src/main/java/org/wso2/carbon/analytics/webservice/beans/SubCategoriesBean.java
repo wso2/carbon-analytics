@@ -29,6 +29,7 @@ public class SubCategoriesBean implements Serializable {
     private static final long serialVersionUID = -7343594197193560975L;
     private String[] path;
     private CategorySearchResultEntryBean[] categories;
+    private int categoryCount;
 
     public SubCategoriesBean() {
     }
@@ -47,5 +48,13 @@ public class SubCategoriesBean implements Serializable {
 
     public void setCategories(CategorySearchResultEntryBean[] categories) {
         this.categories = categories;
+    }
+
+    public int getCategoryCount() {
+        return categoryCount;
+    }
+
+    public void setCategoryCount(int categoryCount) {
+        this.categoryCount = categoryCount;
     }
 }

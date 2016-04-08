@@ -673,6 +673,8 @@ public class AnalyticsWebService extends AbstractAdmin {
         categoryDrillDownRequest.setPath(drillDownRequest.getPath());
         categoryDrillDownRequest.setQuery(drillDownRequest.getQuery());
         categoryDrillDownRequest.setScoreFunction(drillDownRequest.getScoreFunction());
+        categoryDrillDownRequest.setStart(drillDownRequest.getStart());
+        categoryDrillDownRequest.setCount(drillDownRequest.getCount());
         return categoryDrillDownRequest;
     }
 
