@@ -483,6 +483,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         if (log.isDebugEnabled()) {
             log.debug("Replication Factor: " + this.indexer.getReplicationFactor());
         }
+        /* the current node will always allocate shards, if the shard copy count is not met by others */
         for (int i = 0; i < this.indexer.getShardCount(); i++) {
             if (this.globalShardAllocationConfig.getNodeIdsForShard(i).size() < shardCopyCount) {
                 result.add(i);
@@ -972,7 +973,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
                 }
             }
             if (log.isDebugEnabled()) {
-                log.debug("Staging Data Index Worker Existing [" + this.shardIndex + "]");
+                log.debug("Staging Data Index Worker Exiting [" + this.shardIndex + "]");
             }
         }
         
