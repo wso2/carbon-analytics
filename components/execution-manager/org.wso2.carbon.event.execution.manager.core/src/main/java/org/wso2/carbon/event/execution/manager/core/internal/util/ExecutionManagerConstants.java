@@ -28,9 +28,9 @@ public class ExecutionManagerConstants {
     public static final String TEMPLATE_DOMAIN_PATH = CarbonUtils.getCarbonConfigDirPath()
             + File.separator + "execution-manager" + File.separator + "domain-template";
 
-    public static final String TEMPLATE_CONFIG_PATH = File.separator + "repository"
-            + File.separator + "components" + File.separator
-            + "org.wso2.carbon.event.execution.manager.core" + File.separator + "template-config";
+    public static final String TEMPLATE_CONFIG_PATH = "/" + "repository"
+            + "/" + "components" + "/"
+            + "org.wso2.carbon.event.execution.manager.core" + "/" + "template-config";
 
     public static final String CONFIG_NAME_SEPARATOR = "-";
 

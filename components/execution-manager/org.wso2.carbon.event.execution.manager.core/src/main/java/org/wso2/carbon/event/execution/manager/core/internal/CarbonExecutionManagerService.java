@@ -34,7 +34,6 @@ import org.wso2.carbon.registry.core.Resource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import java.io.File;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,9 +72,9 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
             Resource resource = registry.newResource();
             resource.setContent(fileContent.toString());
             String resourceCollectionPath = ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
-                    + File.separator + configuration.getFrom();
+                    + "/" + configuration.getFrom();
 
-            String resourcePath = resourceCollectionPath + File.separator
+            String resourcePath = resourceCollectionPath + "/"
                     + configuration.getName() + ExecutionManagerConstants.CONFIG_FILE_EXTENSION;
 
             //Collection directory will be created if it is not exist in the registry
@@ -111,7 +110,7 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
         Collection<TemplateConfiguration> templateConfigurations = new ArrayList<TemplateConfiguration>();
 
         String domainFilePath = ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
-                + File.separator + domainName;
+                + "/" + domainName;
         try {
             Registry registry = ExecutionManagerValueHolder.getRegistryService()
                     .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
@@ -152,8 +151,8 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
     @Override
     public TemplateConfiguration getConfiguration(String domainName, String configName) {
         return ExecutionManagerHelper.getConfiguration(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
-                + File.separator + domainName
-                + File.separator + configName
+                + "/" + domainName
+                + "/" + configName
                 + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
     }
 
@@ -168,15 +167,15 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
         try {
             // need to distinguish the type to delegate to the pluggable deployer.
             templateConfig = ExecutionManagerHelper.getConfiguration(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
-                    + File.separator + domainName
-                    + File.separator + configName
+                    + "/" + domainName
+                    + "/" + configName
                     + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
 
             Registry registry = ExecutionManagerValueHolder.getRegistryService()
                     .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
 
-            registry.delete(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH + File.separator
-                    + domainName + File.separator + configName + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
+            registry.delete(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH + "/"
+                    + domainName + "/" + configName + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
         } catch (RegistryException e) {
             log.error("Configuration exception when deleting registry configuration file "
                     + configName + " of Domain " + domainName, e);
