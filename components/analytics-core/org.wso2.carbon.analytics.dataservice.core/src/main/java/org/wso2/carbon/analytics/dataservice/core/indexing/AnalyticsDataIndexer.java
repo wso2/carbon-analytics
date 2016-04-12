@@ -436,7 +436,7 @@ public class AnalyticsDataIndexer {
                 toIndex = result.size();
             }
             if (start < result.size()) {
-                result = result.subList(start, toIndex);
+                result = new ArrayList<>(result.subList(start, toIndex));
             } else {
                 result = new ArrayList<>(0);
             }
