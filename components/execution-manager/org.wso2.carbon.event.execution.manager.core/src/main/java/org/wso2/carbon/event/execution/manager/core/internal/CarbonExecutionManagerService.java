@@ -29,6 +29,7 @@ import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateDomain;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.core.Registry;
+import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 
 import javax.xml.bind.JAXBContext;
@@ -167,15 +168,15 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
         try {
             // need to distinguish the type to delegate to the pluggable deployer.
             templateConfig = ExecutionManagerHelper.getConfiguration(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
-                    + "/" + domainName
-                    + "/" + configName
+                    + RegistryConstants.PATH_SEPARATOR + domainName
+                    + RegistryConstants.PATH_SEPARATOR + configName
                     + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
 
             Registry registry = ExecutionManagerValueHolder.getRegistryService()
                     .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
 
-            registry.delete(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH + "/"
-                    + domainName + "/" + configName + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
+            registry.delete(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH + RegistryConstants.PATH_SEPARATOR
+                    + domainName + RegistryConstants.PATH_SEPARATOR + configName + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
         } catch (RegistryException e) {
             log.error("Configuration exception when deleting registry configuration file "
                     + configName + " of Domain " + domainName, e);
