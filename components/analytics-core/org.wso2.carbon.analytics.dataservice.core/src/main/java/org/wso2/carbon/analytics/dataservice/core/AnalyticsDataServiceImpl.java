@@ -67,7 +67,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -103,10 +102,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     private static final String TABLE_INFO_TABLE_NAME = "__TABLE_INFO__";
     
+    private static final String TENANT_INFO_TABLE_NAME = "__TENANT_INFO__";
+    
     private static final String TENANT_TABLE_MAPPING_TABLE_PREFIX = "__TENANT_MAPPING";
     
     private static final String TABLE_INFO_DATA_COLUMN = "TABLE_INFO_DATA";
-
+    
     private int recordsBatchSize;
 
     private Map<String, AnalyticsRecordStore> analyticsRecordStores;
@@ -171,31 +172,21 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     private void initIndexedTableStore() throws AnalyticsException {
         this.indexedTableStore = new AnalyticsIndexedTableStore();
-        AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
-        Iterator<Record> records;
         try {
-            records = GenericUtils.recordGroupsToIterator(ars, ars.get(TABLE_INFO_TENANT_ID, TABLE_INFO_TABLE_NAME, 1, 
-                    null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
-            Record record;
-            while (records.hasNext()) {
-                record = records.next();
-                byte[] data = (byte[]) record.getValue(TABLE_INFO_DATA_COLUMN);
-                if (data == null) {
-                    throw new AnalyticsException("Corrupted table info for tenant id: " + 
-                            record.getTenantId() + " table: " + record.getTableName());
-                }
-                AnalyticsTableInfo tableInfo = (AnalyticsTableInfo) GenericUtils.deserializeObject(data);
-                if (this.isTableIndexed(tableInfo)) {
-                    this.indexedTableStore.addIndexedTable(tableInfo.getTenantId(), tableInfo.getTableName());
+            for (int tenantId : this.readTenantIds()) {
+                for (String tableName : this.listTables(tenantId)) {                    
+                    if (this.isTableIndexed(this.getTableSchema(tenantId, tableName))) {
+                        this.indexedTableStore.addIndexedTable(tenantId, tableName);
+                    }
                 }
             }
-        } catch (AnalyticsTableNotAvailableException ignore) {
-            /* ignore */
+        } catch (AnalyticsException e) {
+            throw new AnalyticsException("Error in initializing indexed table store: " + e.getMessage(), e);
         }
     }
     
-    private boolean isTableIndexed(AnalyticsTableInfo tableInfo) {
-        return tableInfo.getSchema().getIndexedColumns().size() > 0;
+    private boolean isTableIndexed(AnalyticsSchema schema) {
+        return schema.getIndexedColumns().size() > 0;
     }
 
     private void initDataPurging(AnalyticsDataServiceConfiguration config) {
@@ -359,8 +350,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (tableInfo == null || !tableInfo.getRecordStoreName().equals(recordStoreName)) {
             tableInfo = new AnalyticsTableInfo(tenantId, tableName, recordStoreName, new AnalyticsSchema());
         }
+        this.writeTenantId(tenantId);
         this.writeTableInfo(tenantId, tableName, tableInfo);
-        this.writeToTenantTableMapping(tenantId, tableName);
         this.invalidateAnalyticsTableInfo(tenantId, tableName);
     }
     
@@ -371,28 +362,127 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             return TENANT_TABLE_MAPPING_TABLE_PREFIX + "_" + tenantId;
         }
     }
-    
-    private void writeToTenantTableMapping(int tenantId, String tableName) throws AnalyticsException {
+
+    @Override
+    public List<String> listTables(int tenantId) throws AnalyticsException {
         String targetTableName = this.generateTenantTableMappingTableName(tenantId);
-        Record record = new Record(tableName, TABLE_INFO_TENANT_ID, targetTableName, new HashMap<String, Object>(0));
-        List<Record> records = new ArrayList<Record>(1);
-        records.add(record);
         try {
-            this.getPrimaryAnalyticsRecordStore().put(records);
+            List<Record> records = GenericUtils.listRecords(this.getPrimaryAnalyticsRecordStore(), 
+                    this.getPrimaryAnalyticsRecordStore().get(TABLE_INFO_TENANT_ID, 
+                            targetTableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+            List<String> result = new ArrayList<String>();
+            for (Record record : records) {
+                result.add(record.getId());
+            }
+            return result;
         } catch (AnalyticsTableNotAvailableException e) {
-            this.getPrimaryAnalyticsRecordStore().createTable(TABLE_INFO_TENANT_ID, targetTableName);
-            this.getPrimaryAnalyticsRecordStore().put(records);
+            return new ArrayList<String>(0);
+        }
+    }
+
+    private AnalyticsTableInfo readTableInfo(int tenantId, 
+            String tableName) throws AnalyticsTableNotAvailableException, AnalyticsException {
+        String targetTableName = this.generateTenantTableMappingTableName(tenantId);
+        AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
+        List<String> ids = new ArrayList<String>();
+        ids.add(tableName);
+        List<Record> records;
+        try {
+            records = GenericUtils.listRecords(ars, ars.get(TABLE_INFO_TENANT_ID, targetTableName, 1, null, ids));            
+        } catch (AnalyticsTableNotAvailableException e) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        }
+        if (records.size() == 0) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        } else {
+            byte[] data = (byte[]) records.get(0).getValue(TABLE_INFO_DATA_COLUMN);
+            if (data == null) {
+                throw new AnalyticsException("Corrupted table info for tenant id: " + tenantId + " table: " + tableName);
+            }
+            return (AnalyticsTableInfo) GenericUtils.deserializeObject(data);
         }
     }
     
-    private void deleteTenantTableMapping(int tenantId, String tableName) throws AnalyticsException {
-        String targetTableName = this.generateTenantTableMappingTableName(tenantId);
-        List<String> ids = new ArrayList<String>(1);
-        ids.add(tableName);
+    private List<Integer> readTenantIds() throws AnalyticsException {
+        AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
+        List<Record> records;
         try {
-            this.getPrimaryAnalyticsRecordStore().delete(TABLE_INFO_TENANT_ID, targetTableName, ids);
-        } catch (AnalyticsTableNotAvailableException ignore) {
-            /* ignore */
+            records = GenericUtils.listRecords(ars, ars.get(TABLE_INFO_TENANT_ID, TENANT_INFO_TABLE_NAME, 1, 
+                    null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        } catch (AnalyticsTableNotAvailableException e) {
+            return new ArrayList<>(0);
+        }
+        List<Integer> result = new ArrayList<>();
+        for (Record record : records) {
+            try {
+                result.add(Integer.parseInt(record.getId()));
+            } catch (NumberFormatException e) {
+                throw new AnalyticsException("Corrupted data in global tenant id list: " + record.getId(), e);
+            }
+        }
+        return result;
+    }
+    
+    private void writeTenantId(int tenantId) throws AnalyticsException {
+        AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
+        List<Record> records = new ArrayList<Record>(1);
+        records.add(new Record(String.valueOf(tenantId), TABLE_INFO_TENANT_ID, TENANT_INFO_TABLE_NAME, 
+                new HashMap<String, Object>(0)));
+        try {
+            ars.put(records);
+        } catch (AnalyticsTableNotAvailableException e) {
+            ars.createTable(TABLE_INFO_TENANT_ID, TENANT_INFO_TABLE_NAME);
+            ars.put(records);
+        }
+    }
+
+    private void writeTableInfo(int tenantId, 
+            String tableName, AnalyticsTableInfo tableInfo) throws AnalyticsException {
+        String targetTableName = this.generateTenantTableMappingTableName(tenantId);
+        AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
+        Map<String, Object> values = new HashMap<String, Object>(1);
+        values.put(TABLE_INFO_DATA_COLUMN, GenericUtils.serializeObject(tableInfo));
+        Record record = new Record(tableName, TABLE_INFO_TENANT_ID, targetTableName, values);
+        List<Record> records = new ArrayList<Record>(1);
+        records.add(record);
+        try {
+            ars.put(records);
+        } catch (AnalyticsTableNotAvailableException e) {
+            ars.createTable(TABLE_INFO_TENANT_ID, targetTableName);
+            ars.put(records);
+        }
+    }
+    
+    /**
+     * This method is used to convert DAS v3.x type table metadata to DAS v3.1+ metadata.
+     * This is required in implementing reading tenant data from super-tenant, which requires
+     * to read in all the tenant ids and their tables, so for this requirement, the table metadata
+     * structure has been modified to cater that.
+     */
+    public void convertTableInfoFromv30Tov31() throws AnalyticsException {
+        AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
+        List<Record> records;
+        try {
+            records = GenericUtils.listRecords(ars, ars.get(TABLE_INFO_TENANT_ID, TABLE_INFO_TABLE_NAME, 1, null, 
+                    Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));            
+        } catch (AnalyticsTableNotAvailableException e) {
+            throw new AnalyticsException("Table info data does not exist");
+        }
+        for (Record record : records) {
+            byte[] data = (byte[]) records.get(0).getValue(TABLE_INFO_DATA_COLUMN);
+            if (data == null) {
+                System.out.println("Corrupted analytics table info with table identity: " + record.getId());
+            }
+            AnalyticsTableInfo tableInfo;
+            try {
+                tableInfo = (AnalyticsTableInfo) GenericUtils.deserializeObject(data);
+            } catch (Exception e) {
+                System.out.println("Corrupted analytics table info with table identity: " + record.getId());
+                continue;
+            }
+            this.writeTenantId(tableInfo.getTenantId());
+            this.writeTableInfo(tableInfo.getTenantId(), tableInfo.getTableName(), tableInfo);
+            System.out.println("Table [" + tableInfo.getTenantId() + "][" + tableInfo.getTableName() + "] converted.");
         }
     }
 
@@ -443,7 +533,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private void refreshIndexedTableStoreEntry(int tenantId, String tableName) {
         try {
             AnalyticsTableInfo tableInfo = this.readTableInfo(tenantId, tableName);
-            if (this.isTableIndexed(tableInfo)) {
+            if (this.isTableIndexed(tableInfo.getSchema())) {
                 this.indexedTableStore.addIndexedTable(tenantId, tableName);
             }
         } catch (AnalyticsTableNotAvailableException e) {
@@ -536,28 +626,10 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (arsName == null) {
             return;
         }
-        this.deleteTenantTableMapping(tenantId, tableName);
         this.deleteTableInfo(tenantId, tableName);
         this.checkAndInvalidateTableInfo(tenantId, tableName);
         this.getAnalyticsRecordStore(arsName).deleteTable(tenantId, tableName);
         this.clearIndices(tenantId, tableName);
-    }
-
-    @Override
-    public List<String> listTables(int tenantId) throws AnalyticsException {
-        String targetTableName = this.generateTenantTableMappingTableName(tenantId);
-        try {
-            List<Record> records = GenericUtils.listRecords(this.getPrimaryAnalyticsRecordStore(), 
-                    this.getPrimaryAnalyticsRecordStore().get(TABLE_INFO_TENANT_ID, 
-                            targetTableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
-            List<String> result = new ArrayList<String>();
-            for (Record record : records) {
-                result.add(record.getId());
-            }
-            return result;
-        } catch (AnalyticsTableNotAvailableException e) {
-            return new ArrayList<String>(0);
-        }
     }
 
     @Override
@@ -583,53 +655,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         }
     }
     
-    private AnalyticsTableInfo readTableInfo(int tenantId, 
-            String tableName) throws AnalyticsTableNotAvailableException, AnalyticsException {
-        AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
-        List<String> ids = new ArrayList<String>();
-        ids.add(GenericUtils.calculateTableIdentity(tenantId, tableName));
-        List<Record> records;
-        try {
-            records = GenericUtils.listRecords(ars, ars.get(TABLE_INFO_TENANT_ID, TABLE_INFO_TABLE_NAME, 1, null, ids));            
-        } catch (AnalyticsTableNotAvailableException e) {
-            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
-        }
-        if (records.size() == 0) {
-            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
-        } else {
-            byte[] data = (byte[]) records.get(0).getValue(TABLE_INFO_DATA_COLUMN);
-            if (data == null) {
-                throw new AnalyticsException("Corrupted table info for tenant id: " + tenantId + " table: " + tableName);
-            }
-            return (AnalyticsTableInfo) GenericUtils.deserializeObject(data);
-        }
-    }
-    
     private void deleteTableInfo(int tenantId, String tableName) throws AnalyticsException {
-        AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
+        String targetTableName = this.generateTenantTableMappingTableName(tenantId);
         List<String> ids = new ArrayList<String>(1);
-        ids.add(GenericUtils.calculateTableIdentity(tenantId, tableName));
+        ids.add(tableName);
         try {
-            ars.delete(TABLE_INFO_TENANT_ID, TABLE_INFO_TABLE_NAME, ids);
+            this.getPrimaryAnalyticsRecordStore().delete(TABLE_INFO_TENANT_ID, targetTableName, ids);
         } catch (AnalyticsTableNotAvailableException ignore) {
             /* ignore */
-        }
-    }
-    
-    private void writeTableInfo(int tenantId, 
-            String tableName, AnalyticsTableInfo tableInfo) throws AnalyticsException {
-        AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
-        Map<String, Object> values = new HashMap<String, Object>();
-        values.put(TABLE_INFO_DATA_COLUMN, GenericUtils.serializeObject(tableInfo));
-        Record record = new Record(GenericUtils.calculateTableIdentity(tenantId, tableName), 
-                TABLE_INFO_TENANT_ID, TABLE_INFO_TABLE_NAME, values);
-        List<Record> records = new ArrayList<Record>();
-        records.add(record);
-        try {
-            ars.put(records);
-        } catch (AnalyticsTableNotAvailableException e) {
-            ars.createTable(TABLE_INFO_TENANT_ID, TABLE_INFO_TABLE_NAME);
-            ars.put(records);
         }
     }
     
@@ -718,7 +751,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         String tableName = firstRecord.getTableName();
         String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
         this.getAnalyticsRecordStore(arsName).put(recordsBatch);
-        if (this.isTableIndexed(this.lookupTableInfo(tenantId, tableName))) {
+        if (this.isTableIndexed(this.lookupTableInfo(tenantId, tableName).getSchema())) {
             this.getIndexer().put(recordsBatch);
         }
     }
@@ -934,7 +967,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public void reIndex(int tenantId, String tableName, long startTime, long endTime)
             throws AnalyticsException {
         String table = GenericUtils.normalizeTableName(tableName);
-        if (this.isTableIndexed(this.lookupTableInfo(tenantId, table))) {
+        if (this.isTableIndexed(this.getTableSchema(tenantId, table))) {
             this.getIndexer().reIndex(tenantId, table, startTime, endTime);
         }
     }
