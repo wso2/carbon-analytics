@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.analytics.dataservice.core.clustering;
@@ -28,11 +30,11 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * This is a custom List implementation to support distributed Lists in Hazelcast cluster.
  */
-public class HzDistributedList implements List {
+public class HzDistributedList<E> implements List<E> {
     private static String HAZELCAST_LIST_KEY = "DAS_HAZELCAST_LIST_KEY";
-    private volatile ConcurrentMap<Object, Object> hzMap;
+    private final ConcurrentMap<Object, E> hzMap;
 
-    public HzDistributedList(ConcurrentMap<Object, Object> map) {
+    public HzDistributedList(ConcurrentMap<Object, E> map) {
         this.hzMap = map;
     }
 
@@ -58,16 +60,19 @@ public class HzDistributedList implements List {
         return hzMap.isEmpty();
     }
 
+    @SuppressWarnings({"unchecked", "NullableProblems", "SuspiciousMethodCalls"})
     @Override
     public boolean contains(Object o) {
         return hzMap.containsValue(o);
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
-    public Iterator iterator() {
-        return new HzDistributedListIterator();
+    public Iterator<E> iterator() {
+        return new HzDistributedListIterator<>();
     }
 
+    @SuppressWarnings({"unchecked", "NullableProblems"})
     @Override
     public Object[] toArray() {
         synchronized (hzMap) {
@@ -80,7 +85,7 @@ public class HzDistributedList implements List {
     }
 
     @Override
-    public boolean add(Object o) {
+    public boolean add(E o) {
         synchronized (hzMap) {
             int lastIndex = getLastIndex() + 1;
             this.hzMap.put(HAZELCAST_LIST_KEY + String.valueOf(lastIndex), o);
@@ -101,13 +106,15 @@ public class HzDistributedList implements List {
         }
     }
 
+    @SuppressWarnings({"unchecked", "NullableProblems"})
     @Override
-    public boolean addAll(Collection c) {
+    public boolean addAll(Collection<? extends E> c) {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
     }
 
+    @SuppressWarnings({"unchecked", "NullableProblems"})
     @Override
-    public boolean addAll(int index, Collection c) {
+    public boolean addAll(int index, Collection<? extends E> c) {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
     }
 
@@ -116,26 +123,30 @@ public class HzDistributedList implements List {
         this.hzMap.clear();
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
-    public boolean retainAll(Collection c) {
+    public boolean retainAll(Collection<?> c) {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
-    public boolean removeAll(Collection c) {
+    public boolean removeAll(Collection<?> c) {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
     }
 
+    @SuppressWarnings({"unchecked", "NullableProblems"})
     @Override
-    public boolean containsAll(Collection c) {
+    public boolean containsAll(Collection<?> c) {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
     }
 
+    @SuppressWarnings({"unchecked", "NullableProblems", "SuspiciousSystemArraycopy"})
     @Override
-    public Object[] toArray(Object[] a) {
+    public <T> T[] toArray(T[] a) {
         // Make a new array of a's runtime type, but my contents:
         if (a.length < hzMap.size()) {
-            return (Object[]) Arrays.copyOf(toArray(), hzMap.size(), a.getClass());
+            return (T[]) Arrays.copyOf(toArray(), hzMap.size(), a.getClass());
         }
         System.arraycopy(toArray(), 0, a, 0, hzMap.size());
         if (a.length > hzMap.size()) {
@@ -144,19 +155,19 @@ public class HzDistributedList implements List {
         return a;
     }
 
-    public Object get(int id) {
+    public E get(int id) {
         return this.hzMap.get(HAZELCAST_LIST_KEY + String.valueOf(id));
     }
 
     @Override
-    public Object set(int index, Object element) {
-        Object previousObject = this.get(index);
+    public E set(int index, E element) {
+        E previousObject = this.get(index);
         this.hzMap.put(HAZELCAST_LIST_KEY + String.valueOf(index), element);
         return previousObject;
     }
 
     @Override
-    public void add(int index, Object element) {
+    public void add(int index, E element) {
         for (int i = getLastIndex(); i <= index; i--) {
             this.hzMap.put(HAZELCAST_LIST_KEY + String.valueOf(i), this.hzMap.get(HAZELCAST_LIST_KEY + String.valueOf(i - 1)));
         }
@@ -164,13 +175,13 @@ public class HzDistributedList implements List {
     }
 
     @Override
-    public Object remove(int index) {
+    public E remove(int index) {
         synchronized (hzMap) {
-            Object removingObject;
+            E removingObject;
             removingObject = this.get(index);
             int lastItem = 0;
             for (int i = index; i <= getLastIndex(); i++) {
-                Object value = this.hzMap.get(HAZELCAST_LIST_KEY + String.valueOf(i + 1));
+                E value = this.hzMap.get(HAZELCAST_LIST_KEY + String.valueOf(i + 1));
                 if (value != null) {
                     this.hzMap.put(HAZELCAST_LIST_KEY + String.valueOf(i), value);
                 }
@@ -217,18 +228,21 @@ public class HzDistributedList implements List {
         return -1;
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
-    public ListIterator listIterator() {
+    public ListIterator<E> listIterator() {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
-    public ListIterator listIterator(int index) {
+    public ListIterator<E> listIterator(int index) {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
-    public List subList(int fromIndex, int toIndex) {
+    public List<E> subList(int fromIndex, int toIndex) {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
     }
 
@@ -240,7 +254,7 @@ public class HzDistributedList implements List {
     /**
      * Iterator implementation.
      */
-    private class HzDistributedListIterator implements Iterator<Object> {
+    private class HzDistributedListIterator<T> implements Iterator<T> {
         int position;       // index of next element to return
 
         public boolean hasNext() {
@@ -248,12 +262,12 @@ public class HzDistributedList implements List {
         }
 
         @SuppressWarnings("unchecked")
-        public Object next() {
+        public T next() {
             synchronized (hzMap) {
                 if (position >= size()) {
                     throw new NoSuchElementException();
                 }
-                Object temp = hzMap.get(HAZELCAST_LIST_KEY + String.valueOf(position));
+                T temp = (T) hzMap.get(HAZELCAST_LIST_KEY + String.valueOf(position));
                 position++;
                 return temp;
             }

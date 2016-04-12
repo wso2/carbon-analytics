@@ -483,6 +483,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         if (log.isDebugEnabled()) {
             log.debug("Replication Factor: " + this.indexer.getReplicationFactor());
         }
+        /* the current node will always allocate shards, if the shard copy count is not met by others */
         for (int i = 0; i < this.indexer.getShardCount(); i++) {
             if (this.globalShardAllocationConfig.getNodeIdsForShard(i).size() < shardCopyCount) {
                 result.add(i);
@@ -931,6 +932,10 @@ public class IndexNodeCoordinator implements GroupEventListener {
         return ids;
     }
     
+    /**
+     * This class consumes the index staging data that is been put by data publishers like the Spark analytics tables,
+     * which does not have direct visibility to indexing nodes.
+     */
     private class StagingDataIndexWorker implements Runnable {
 
         private static final int STAGING_INDEXER_WORKER_SLEEP = 5000;
@@ -961,10 +966,14 @@ public class IndexNodeCoordinator implements GroupEventListener {
                     }
                 }  catch (AnalyticsInterruptException e) {
                     // This exception can be thrown from data queues, if the shutdown hook is triggered
+                    log.debug("Staging Data Index Worker Interuppted [" + this.shardIndex + "]: " + e.getMessage(), e);
                     return;
                 } catch (Throwable e) {
                     log.error("Error in processing staging index data: " + e.getMessage(), e);
                 }
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Staging Data Index Worker Exiting [" + this.shardIndex + "]");
             }
         }
         
