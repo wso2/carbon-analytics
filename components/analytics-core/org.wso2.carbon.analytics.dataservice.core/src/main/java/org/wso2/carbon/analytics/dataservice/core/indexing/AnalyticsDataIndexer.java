@@ -421,8 +421,9 @@ public class AnalyticsDataIndexer {
             final int start, final int count, List<SortByField> sortByFields) throws AnalyticsException {
         List<SearchResultEntry> result;
         if (this.isClusteringEnabled()) {
+            //get all the records from 0th to the "start + count" th record from all the nodes, then sort, reverse and paginate
             List<List<SearchResultEntry>> entries = this.executeIndexLookup(new SearchCall(tenantId,
-                    tableName, query, start, count, sortByFields));
+                    tableName, query, 0, start + count, sortByFields));
             result = new ArrayList<>();
             for (List<SearchResultEntry> entry : entries) {
                 result.addAll(entry);
