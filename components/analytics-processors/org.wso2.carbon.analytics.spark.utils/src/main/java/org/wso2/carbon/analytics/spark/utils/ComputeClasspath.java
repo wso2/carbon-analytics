@@ -333,7 +333,7 @@ public class ComputeClasspath {
 
     private static boolean fileExists(String path) {
         File tempFile = new File(path);
-        return tempFile.exists() && !tempFile.isDirectory();
+        return tempFile.exists() && !tempFile.isDirectory() && tempFile.isAbsolute();
     }
 
     private static boolean isDirectory(String path) {
