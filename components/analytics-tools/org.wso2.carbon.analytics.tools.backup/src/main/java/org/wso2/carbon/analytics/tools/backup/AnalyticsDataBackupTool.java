@@ -26,12 +26,13 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse.Entry;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.base.MultitenantConstants;
@@ -63,6 +64,7 @@ public class AnalyticsDataBackupTool {
     private static final String PURGETABLE = "table";
     private static final String BATCH_SIZE = "batchSize";
     private static final String REINDEX_EVENTS = "reindexEvents";
+    private static final String MIGRATE_TABLE_SCHEMA_V30TO31 = "migrateTableSchemaV30To31";
     private static final String PURGE_DATA = "purge";
     private static final String DELETE_TABLE = "deleteTables";
     private static final String RESTORE_RECORD_STORE = "restoreRecordStore";
@@ -81,6 +83,7 @@ public class AnalyticsDataBackupTool {
         options.addOption(new Option(BACKUP_RECORD_STORE, false, "backup analytics data"));
         options.addOption(new Option(RESTORE_RECORD_STORE, false, "restores analytics data"));
         options.addOption(new Option(REINDEX_EVENTS, false, "re-indexes records in the given table data"));
+        options.addOption(new Option(MIGRATE_TABLE_SCHEMA_V30TO31, false, "migrate v3.x analytics tables to v3.1+"));
         options.addOption(new Option(ENABLE_INDEXING, false, "enables indexing while restoring"));
         options.addOption(new Option(PURGE_DATA, false, "Purges Data for a given time range"));
         options.addOption(new Option(DELETE_TABLE, false, "Deletes given tables"));
@@ -109,7 +112,7 @@ public class AnalyticsDataBackupTool {
         Options options = populateOptions();
         CommandLineParser parser = new BasicParser();
         CommandLine line = parser.parse(options, args);
-        if (args.length < 2) {
+        if (args.length < 1) {
             new HelpFormatter().printHelp("analytics-backup.sh|cmd", options);
             System.exit(1);
         }
@@ -181,6 +184,8 @@ public class AnalyticsDataBackupTool {
                 System.out.printf("Reindexing data for the table: " + specificTables[i]);
                 reindexData(service, tenantId, specificTables[i]);
             }
+        } else if (line.hasOption(MIGRATE_TABLE_SCHEMA_V30TO31)) {
+            migrateTablesV30ToV31(service);
         }
     }
 
@@ -312,8 +317,8 @@ public class AnalyticsDataBackupTool {
             AnalyticsDataResponse resp = service.get(tenantId, table, 1, null, timeFrom, timeTo, 0, -1);
             Iterator<Record> recordItr;
             int count = 0;
-            for (RecordGroup rg : resp.getRecordGroups()) {
-                recordItr = service.readRecords(resp.getRecordStoreName(), rg);
+            for (Entry entry : resp.getEntries()) {
+                recordItr = service.readRecords(entry.getRecordStoreName(), entry.getRecordGroup());
                 List<Record> records;
                 while (recordItr.hasNext()) {
                     if (count % 5000 == 0) {
@@ -417,15 +422,14 @@ public class AnalyticsDataBackupTool {
             throws AnalyticsException {
         AnalyticsDataResponse analyticsDataResponse = dataService
                 .get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
-        RecordGroup[] recordGroups = analyticsDataResponse.getRecordGroups();
-        String recordStoreName = analyticsDataResponse.getRecordStoreName();
+        List<Entry> entries = analyticsDataResponse.getEntries();
         List<Record> recordList = new ArrayList<>();
         dataService.clearIndexData(tenantId, tableName);
         int j = 1;
         //iterating the record groups
-        for (int i = 0; i < recordGroups.length; i++) {
+        for (int i = 0; i < entries.size(); i++) {
             AnalyticsIterator<Record> recordAnalyticsIterator = dataService
-                    .readRecords(recordStoreName, recordGroups[i]);
+                    .readRecords(entries.get(i).getRecordStoreName(), entries.get(i).getRecordGroup());
             //iterating each record in the record group
             while (recordAnalyticsIterator.hasNext()) {
                 recordList.add(recordAnalyticsIterator.next());
@@ -438,8 +442,17 @@ public class AnalyticsDataBackupTool {
             }
         }
         //write the remaining records in the records list
-        if (!recordList.isEmpty())
+        if (!recordList.isEmpty()) {
             dataService.put(recordList);
+        }
+    }
+    
+    private static void migrateTablesV30ToV31(AnalyticsDataService dataService) throws AnalyticsException {
+        System.out.println("Starting Analytics Table Migration from v3.x to v3.1+");
+        AnalyticsDataServiceImpl ads = ((AnalyticsDataServiceImpl) dataService);
+        ads.setInitIndexedTableStore(false);
+        ads.convertTableInfoFromv30Tov31();
+        System.out.println("Analytics Table Migration done.");
     }
 
     /**

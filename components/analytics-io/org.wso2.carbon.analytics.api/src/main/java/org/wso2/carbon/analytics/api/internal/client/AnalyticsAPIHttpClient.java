@@ -61,7 +61,6 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
-import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
 import org.wso2.carbon.base.ServerConfiguration;
 
 import javax.servlet.http.HttpServletResponse;
@@ -891,14 +890,7 @@ public class AnalyticsAPIHttpClient {
                 Object analyticsDataResponseObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (analyticsDataResponseObj != null && analyticsDataResponseObj instanceof AnalyticsDataResponse) {
-                    AnalyticsDataResponse analyticsDataResponse = (AnalyticsDataResponse) analyticsDataResponseObj;
-                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]) {
-                        return analyticsDataResponse;
-                    } else {
-                        throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
-                                "the record group", tableName, "Analytics Data Response object consist of" +
-                                " array of remote record group", analyticsDataResponseObj));
-                    }
+                    return (AnalyticsDataResponse) analyticsDataResponseObj;                    
                 } else {
                     throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
                             "the record group", tableName, "Analytics Data Response object", analyticsDataResponseObj));
@@ -943,14 +935,7 @@ public class AnalyticsAPIHttpClient {
                 Object analyticsDataResponseObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (analyticsDataResponseObj != null && analyticsDataResponseObj instanceof AnalyticsDataResponse) {
-                    AnalyticsDataResponse analyticsDataResponse = (AnalyticsDataResponse) analyticsDataResponseObj;
-                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]) {
-                        return analyticsDataResponse;
-                    } else {
-                        throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
-                                "with key values", tableName, "Analytics Data Response object consist of" +
-                                " array of remote record group", analyticsDataResponseObj));
-                    }
+                    return (AnalyticsDataResponse) analyticsDataResponseObj;                    
                 } else {
                     throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
                             "with key value", tableName, "Analytics Data Response object", analyticsDataResponseObj));
@@ -1075,14 +1060,7 @@ public class AnalyticsAPIHttpClient {
                 Object analyticsDataResponseObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (analyticsDataResponseObj != null && analyticsDataResponseObj instanceof AnalyticsDataResponse) {
-                    AnalyticsDataResponse analyticsDataResponse = (AnalyticsDataResponse) analyticsDataResponseObj;
-                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]) {
-                        return analyticsDataResponse;
-                    } else {
-                        throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
-                                "the record group", tableName, "Analytics Data Response object consist of" +
-                                " array of remote record group", analyticsDataResponseObj));
-                    }
+                    return (AnalyticsDataResponse) analyticsDataResponseObj;                    
                 } else {
                     throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
                             "the record group", tableName, "Analytics Data Response object", analyticsDataResponseObj));
@@ -1404,6 +1382,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<AnalyticsIterator<Record>> searchWithAggregates(int tenantId, String username,
                                                           AggregateRequest[] aggregateRequests,
                                                           boolean securityEnabled) {

@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.analytics.spark.core.rdd;
 
 import static scala.collection.JavaConversions.asScalaIterator;
@@ -52,8 +51,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse.Entry;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsPartition;
@@ -160,10 +159,10 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        RecordGroup[] rgs = resp.getRecordGroups();
-        Partition[] result = new Partition[rgs.length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = new AnalyticsPartition(resp.getRecordStoreName(), rgs[i], i);
+        List<Entry> entries = resp.getEntries();
+        Partition[] result = new Partition[entries.size()];
+        for (int i = 0; i < entries.size(); i++) {
+            result[i] = new AnalyticsPartition(entries.get(i).getRecordStoreName(), entries.get(i).getRecordGroup(), i);
         }
         return result;
     }

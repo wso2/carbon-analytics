@@ -29,13 +29,13 @@ import org.wso2.carbon.analytics.activitydashboard.commons.Query;
 import org.wso2.carbon.analytics.activitydashboard.commons.SearchExpressionTree;
 import org.wso2.carbon.analytics.activitydashboard.admin.internal.ServiceHolder;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse.Entry;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.core.AbstractAdmin;
@@ -177,10 +177,10 @@ public class ActivityDashboardAdminService extends AbstractAdmin {
         try {
             AnalyticsDataResponse resp = ServiceHolder.getAnalyticsDataAPI().get(userName, id.getTableName(),
                     1, null, recordIds);
-            RecordGroup[] recordGroups = resp.getRecordGroups();
-            if (recordGroups.length == 1) {
+            List<Entry> entries = resp.getEntries();
+            if (entries.size() == 1) {
                 Iterator<Record> recordIterator = ServiceHolder.getAnalyticsDataAPI().readRecords(
-                        resp.getRecordStoreName(), recordGroups[0]);
+                        entries.get(0).getRecordStoreName(), entries.get(0).getRecordGroup());
                 if (recordIterator.hasNext()) {
                     Record record = recordIterator.next();
                     return getRecordBean(record);
@@ -189,7 +189,7 @@ public class ActivityDashboardAdminService extends AbstractAdmin {
                             + id.getRecordId() + ", at table : " + id.getTableName());
                 }
             } else {
-                throw new ActivityDashboardException("Invalid size : " + recordGroups.length +
+                throw new ActivityDashboardException("Invalid size : " + entries.size() +
                         " of record groups found for the record id : "
                         + id.getRecordId() + ", at table : " + id.getTableName());
             }

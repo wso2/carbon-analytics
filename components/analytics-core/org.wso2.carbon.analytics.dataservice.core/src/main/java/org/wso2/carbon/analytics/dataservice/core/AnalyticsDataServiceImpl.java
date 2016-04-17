@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse.Entry;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
@@ -120,6 +121,13 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         
     private AnalyticsIndexedTableStore indexedTableStore;
     
+    private static ThreadLocal<Boolean> initIndexedTableStore = new ThreadLocal<Boolean>() {
+        @Override
+        public Boolean initialValue() {
+            return true;
+        }
+    };
+    
     public AnalyticsDataServiceImpl() throws AnalyticsException {
         AnalyticsDataServiceConfiguration config = this.loadAnalyticsDataServiceConfig();
         Analyzer luceneAnalyzer;
@@ -170,7 +178,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         return value;
     }
     
+    public static void setInitIndexedTableStore(boolean init) {
+        initIndexedTableStore.set(init);
+    }
+    
     private void initIndexedTableStore() throws AnalyticsException {
+        if (!initIndexedTableStore.get()) {
+            return;
+        }
         this.indexedTableStore = new AnalyticsIndexedTableStore();
         try {
             for (int tenantId : this.readTenantIds()) {
@@ -756,8 +771,55 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         }
     }
     
+    private boolean isGlobalTenantTableLookup(int tenantId) {
+        return tenantId == Constants.GLOBAL_TENANT_TABLE_LOOKUP_TENANT_ID;
+    }
+    
     @Override
     public AnalyticsDataResponse get(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
+            long timeFrom, long timeTo, int recordsFrom, 
+            int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        if (this.isGlobalTenantTableLookup(tenantId)) {
+            if (recordsFrom != 0 && recordsCount != Integer.MAX_VALUE) {
+                throw new AnalyticsException("Global analytics data lookup cannot be done on a dataset subset, "
+                        + "recordsFrom: " + recordsFrom + " recordsCount: " + recordsCount);
+            }
+            return this.getByGlobalLookup(tableName, numPartitionsHint, columns, timeFrom, timeTo);
+        } else {
+            return this.getByRange(tenantId, tableName, numPartitionsHint, columns, timeFrom, timeTo, 
+                    recordsFrom, recordsCount);
+        }
+    }
+    
+    private AnalyticsDataResponse getByGlobalLookup(String tableName, int numPartitionsHint, List<String> columns,
+            long timeFrom, long timeTo) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        List<Entry> responseEntries = new ArrayList<>();
+        List<Integer> tenants = this.readTenantIds();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Global Data Lookup, Tenant Count: " + tenants.size());
+        }
+        if (tenants.isEmpty()) {
+            throw new AnalyticsTableNotAvailableException(Constants.GLOBAL_TENANT_TABLE_LOOKUP_TENANT_ID, tableName);
+        }
+        /* here, the assumption is, most of the tenants will have the target table we are looking for,
+         * to have a good distribution of partitions */
+        numPartitionsHint = (int) Math.ceil(numPartitionsHint / (double) tenants.size());
+        for (int tenantId : tenants) {
+            try {
+                responseEntries.addAll(this.getByRange(tenantId, tableName, 
+                        numPartitionsHint, columns, timeFrom, timeTo, 0, Integer.MAX_VALUE).getEntries());
+            } catch (AnalyticsTableNotAvailableException ignore) { /* ignore */ }
+        }
+        if (responseEntries.isEmpty()) {
+            throw new AnalyticsTableNotAvailableException(Constants.GLOBAL_TENANT_TABLE_LOOKUP_TENANT_ID, tableName);
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Global Data Lookup, Response Entries Count: " + responseEntries.size());
+        }
+        return new AnalyticsDataResponse(responseEntries);
+    }
+    
+    private AnalyticsDataResponse getByRange(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
             long timeFrom, long timeTo, int recordsFrom, 
             int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
         tableName = GenericUtils.normalizeTableName(tableName);
@@ -778,7 +840,16 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             rgs = this.getAnalyticsRecordStore(arsName).get(tenantId, tableName, numPartitionsHint, columns, timeFrom, 
                     timeTo, recordsFrom, recordsCount);            
         }
-        return new AnalyticsDataResponse(arsName, rgs);
+        return new AnalyticsDataResponse(this.createResponseEntriesFromSingleRecordStore(arsName, rgs));
+    }
+    
+    private List<Entry> createResponseEntriesFromSingleRecordStore(String arsName, 
+            RecordGroup[] rgs) {
+        List<Entry> entries = new ArrayList<>(rgs.length);
+        for (RecordGroup rg : rgs) {
+            entries.add(new Entry(arsName, rg));
+        }
+        return entries;
     }
     
     private List<Long[]> splitTimestampRangeForPartitions(long timeFrom, long timeTo, int numPartitionsHint) {
@@ -837,7 +908,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
         RecordGroup[] rgs = new RecordGroup[recordGroups.size()];
         rgs = recordGroups.toArray(rgs);
-        return new AnalyticsDataResponse(arsName, rgs);
+        return new AnalyticsDataResponse(this.createResponseEntriesFromSingleRecordStore(arsName, rgs));
     }
     
     @Override
@@ -859,17 +930,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
         tableName = GenericUtils.normalizeTableName(tableName);
-        String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
-        if (arsName == null) {
-            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
-        }
-        AnalyticsRecordStore ars = this.getAnalyticsRecordStore(arsName);
         /* this is done to make sure, raw record data as well as the index data are also deleted,
          * even if the table is not indexed now, it could have been indexed earlier, so delete operation
          * must be done in the indexer as well */
         while (true) {
-            List<Record> recordBatch = GenericUtils.listRecords(ars, this.get(tenantId, tableName, 
-                    1, null, timeFrom, timeTo, 0, DELETE_BATCH_SIZE).getRecordGroups());
+            List<Record> recordBatch = AnalyticsDataServiceUtils.listRecords(this, this.get(tenantId, tableName, 1,
+                    null, timeFrom, timeTo, 0, DELETE_BATCH_SIZE));
             if (recordBatch.size() == 0) {
                 break;
             }

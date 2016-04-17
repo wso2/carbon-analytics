@@ -20,10 +20,10 @@ package org.wso2.carbon.analytics.dataservice.core;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse.Entry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 import java.util.ArrayList;
@@ -45,8 +45,8 @@ public class AnalyticsDataServiceUtils {
     public static List<Record> listRecords(AnalyticsDataService ads,
                                            AnalyticsDataResponse response) throws AnalyticsException {
         List<Record> result = new ArrayList<Record>();
-        for (RecordGroup rg : response.getRecordGroups()) {
-            result.addAll(IteratorUtils.toList(ads.readRecords(response.getRecordStoreName(), rg)));
+        for (Entry entry : response.getEntries()) {
+            result.addAll(IteratorUtils.toList(ads.readRecords(entry.getRecordStoreName(), entry.getRecordGroup())));
         }
         return result;
     }
@@ -128,10 +128,8 @@ public class AnalyticsDataServiceUtils {
      * This class exposes an {@link AnalyticsDataResponse} as a record iterator.
      */
     public static class ResponseIterator implements Iterator<Record> {
-
-        private String recordStoreName;
-
-        private RecordGroup[] rgs;
+        
+        private Entry[] entries;
 
         private Iterator<Record> itr;
         
@@ -142,8 +140,7 @@ public class AnalyticsDataServiceUtils {
         public ResponseIterator(AnalyticsDataService service, AnalyticsDataResponse response)
                 throws AnalyticsException {
             this.service = service;
-            this.recordStoreName = response.getRecordStoreName();
-            this.rgs = response.getRecordGroups();
+            this.entries = response.getEntries().toArray(new Entry[0]);
         }
 
         @Override
@@ -157,10 +154,11 @@ public class AnalyticsDataServiceUtils {
             if (result) {
                 return true;
             } else {
-                if (this.rgs.length > this.index + 1) {
+                if (this.entries.length > this.index + 1) {
                     try {
                         this.index++;
-                        this.itr = this.service.readRecords(this.recordStoreName, this.rgs[index]);
+                        this.itr = this.service.readRecords(this.entries[index].getRecordStoreName(), 
+                                this.entries[index].getRecordGroup());
                     } catch (AnalyticsException e) {
                         throw new IllegalStateException("Error in traversing record group: " + e.getMessage(), e);
                     }

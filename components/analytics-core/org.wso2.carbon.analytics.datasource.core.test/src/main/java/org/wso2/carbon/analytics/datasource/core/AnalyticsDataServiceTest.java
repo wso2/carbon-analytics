@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
@@ -305,6 +306,46 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     }
     
     @Test (enabled = true, dependsOnMethods = "testMultipleDataRecordAddRetieveWithTimestampRange")
+    public void testMultitenantDataAddGlobalDataRetrieve() throws AnalyticsException {
+        Set<Record> outRecords = new HashSet<>();
+        this.service.deleteTable(1, "T1");
+        this.service.deleteTable(2, "T1");
+        this.service.deleteTable(3, "T1");
+        this.service.deleteTable(1, "T2");
+        this.service.deleteTable(MultitenantConstants.SUPER_TENANT_ID, "T1");
+        this.service.createTable(1, "T1");
+        this.service.createTable(2, "T1");
+        this.service.createTable(3, "T1");
+        this.service.createTable(1, "T2");
+        this.service.createTable(MultitenantConstants.SUPER_TENANT_ID, "T1");
+        long time = System.currentTimeMillis();
+        int timeOffset = 10;
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "T1", 1, 100, time, timeOffset);
+        this.service.put(records);
+        outRecords.addAll(records);
+        records = AnalyticsRecordStoreTest.generateRecords(2, "T1", 1, 50, time, timeOffset);
+        this.service.put(records);
+        outRecords.addAll(records);
+        records = AnalyticsRecordStoreTest.generateRecords(3, "T1", 1, 20, time, timeOffset);
+        this.service.put(records);
+        outRecords.addAll(records);
+        records = AnalyticsRecordStoreTest.generateRecords(MultitenantConstants.SUPER_TENANT_ID, "T1", 1, 10, time, timeOffset);
+        this.service.put(records);
+        outRecords.addAll(records);
+        records = AnalyticsRecordStoreTest.generateRecords(1, "T2", 1, 5, time, timeOffset);
+        this.service.put(records);        
+        List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
+                this.service.get(Constants.GLOBAL_TENANT_TABLE_LOOKUP_TENANT_ID, "T1", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(recordsIn.size(), 180);
+        Assert.assertEquals(outRecords, new HashSet<>(recordsIn));
+        this.service.deleteTable(1, "T1");
+        this.service.deleteTable(2, "T1");
+        this.service.deleteTable(3, "T1");
+        this.service.deleteTable(1, "T2");
+        this.service.deleteTable(MultitenantConstants.SUPER_TENANT_ID, "T1");
+    }
+    
+    @Test (enabled = true, dependsOnMethods = "testMultitenantDataAddGlobalDataRetrieve")
     public void testIndexedDataAddRetrieve() throws AnalyticsException {
         this.indexDataAddRetrieve(5, "TX", 1);
         this.indexDataAddRetrieve(5, "TX", 10);

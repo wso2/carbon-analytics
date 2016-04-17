@@ -20,8 +20,10 @@ package org.wso2.carbon.analytics.servlet;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse.Entry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
@@ -37,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -109,21 +112,29 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 analyticsDataResponse = ServiceHolder.getSecureAnalyticsDataService().get(userName, tableName,
                         partitionHint, list, timeFrom, timeTo, recordFrom, recordsCount);
             }
-            RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[analyticsDataResponse.getRecordGroups().length];
-            for (int i = 0; i < analyticsDataResponse.getRecordGroups().length; i++) {
-                remoteRecordGroup[i] = new RemoteRecordGroup();
-                remoteRecordGroup[i].setBinaryRecordGroup(GenericUtils.serializeObject(analyticsDataResponse.
-                        getRecordGroups()[i]));
-                remoteRecordGroup[i].setLocations(analyticsDataResponse.getRecordGroups()[i].getLocations());
-            }
             resp.setStatus(HttpServletResponse.SC_OK);
-            GenericUtils.serializeObject(new AnalyticsDataResponse(analyticsDataResponse.getRecordStoreName(),
-                    remoteRecordGroup), resp.getOutputStream());
+            GenericUtils.serializeObject(this.localToRemoteAnalyticsDataResponse(analyticsDataResponse), 
+                    resp.getOutputStream());
         } catch (AnalyticsException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
-
+    
+    private RecordGroup localToRemoteRecordGroup(RecordGroup rg) throws AnalyticsException {
+        RemoteRecordGroup result = new RemoteRecordGroup();
+        result.setBinaryRecordGroup(GenericUtils.serializeObject(rg));
+        result.setLocations(rg.getLocations());
+        return result;
+    }
+    
+    private AnalyticsDataResponse localToRemoteAnalyticsDataResponse(AnalyticsDataResponse resp) throws AnalyticsException {
+        List<Entry> localEntries = resp.getEntries();
+        List<Entry> remoteEntries = new ArrayList<>(localEntries.size());
+        for (Entry entry : localEntries) {
+            remoteEntries.add(new Entry(entry.getRecordStoreName(), this.localToRemoteRecordGroup(entry.getRecordGroup())));
+        }
+        return new AnalyticsDataResponse(remoteEntries);
+    }
 
     private void doIdsRecordGroup(boolean securityEnabled, HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
@@ -148,16 +159,9 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 analyticsDataResponse = ServiceHolder.getSecureAnalyticsDataService().get(userName, tableName,
                         partitionHint, columns, ids);
             }
-            RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[analyticsDataResponse.getRecordGroups().length];
-            for (int i = 0; i < analyticsDataResponse.getRecordGroups().length; i++) {
-                remoteRecordGroup[i] = new RemoteRecordGroup();
-                remoteRecordGroup[i].setBinaryRecordGroup(GenericUtils.serializeObject(analyticsDataResponse.
-                        getRecordGroups()[i]));
-                remoteRecordGroup[i].setLocations(analyticsDataResponse.getRecordGroups()[i].getLocations());
-            }
             resp.setStatus(HttpServletResponse.SC_OK);
-            GenericUtils.serializeObject(new AnalyticsDataResponse(analyticsDataResponse.getRecordStoreName(),
-                    remoteRecordGroup), resp.getOutputStream());
+            GenericUtils.serializeObject(this.localToRemoteAnalyticsDataResponse(analyticsDataResponse), 
+                    resp.getOutputStream());
         } catch (AnalyticsException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
@@ -189,16 +193,9 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 analyticsDataResponse = ServiceHolder.getSecureAnalyticsDataService().getWithKeyValues(userName, tableName,
                         partitionHint, columns, valuesBatch);
             }
-            RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[analyticsDataResponse.getRecordGroups().length];
-            for (int i = 0; i < analyticsDataResponse.getRecordGroups().length; i++) {
-                remoteRecordGroup[i] = new RemoteRecordGroup();
-                remoteRecordGroup[i].setBinaryRecordGroup(GenericUtils.serializeObject(analyticsDataResponse.
-                        getRecordGroups()[i]));
-                remoteRecordGroup[i].setLocations(analyticsDataResponse.getRecordGroups()[i].getLocations());
-            }
             resp.setStatus(HttpServletResponse.SC_OK);
-            GenericUtils.serializeObject(new AnalyticsDataResponse(analyticsDataResponse.getRecordStoreName(),
-                    remoteRecordGroup), resp.getOutputStream());
+            GenericUtils.serializeObject(this.localToRemoteAnalyticsDataResponse(analyticsDataResponse),
+                    resp.getOutputStream());
         } catch (AnalyticsException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }

@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.analytics.spark.core.rdd;
 
 import org.apache.commons.logging.Log;
@@ -29,8 +28,8 @@ import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse.Entry;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsPartition;
@@ -118,10 +117,10 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        RecordGroup[] rgs = resp.getRecordGroups();
-        Partition[] result = new Partition[rgs.length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = new AnalyticsPartition(resp.getRecordStoreName(), rgs[i], i);
+        List<Entry> entries = resp.getEntries();
+        Partition[] result = new Partition[entries.size()];
+        for (int i = 0; i < entries.size(); i++) {
+            result[i] = new AnalyticsPartition(entries.get(i).getRecordStoreName(), entries.get(i).getRecordGroup(), i);
         }
         return result;
     }
@@ -201,6 +200,8 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
             for (int i = 0; i < columns.size(); i++) {
                 if (columns.get(i).equals(AnalyticsConstants.TIMESTAMP_FIELD)) {
                     rowVals[i] = record.getTimestamp();
+                } else if (columns.get(i).equals(AnalyticsConstants.TENANT_ID_FIELD)) {
+                    rowVals[i] = record.getTenantId();
                 } else {
                     rowVals[i] = recordVals.get(columns.get(i));
                 }

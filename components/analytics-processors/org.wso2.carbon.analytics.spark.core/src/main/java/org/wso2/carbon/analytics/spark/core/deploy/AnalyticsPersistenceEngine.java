@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.analytics.spark.core.deploy;
 
 import akka.serialization.Serialization;
@@ -26,8 +25,8 @@ import org.apache.spark.deploy.master.PersistenceEngine;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse.Entry;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import scala.collection.JavaConversions;
@@ -97,6 +96,7 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> Seq<T> read(String prefix, ClassTag<T> evidence$1) {
         Class<T> clazz = (Class<T>) evidence$1.runtimeClass();
@@ -107,8 +107,8 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
             if (ads.tableExists(SPARK_TENANT, SPARK_META_TABLE)) { //todo: use AnalyticsDataServiceUtils.listRecords method
                 AnalyticsDataResponse results = ads.get(SPARK_TENANT, SPARK_META_TABLE, 1, null,
                                                         Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
-                for (RecordGroup recordGroup : results.getRecordGroups()) {
-                    Iterator<Record> iterator = ads.readRecords(results.getRecordStoreName(), recordGroup);
+                for (Entry entry : results.getEntries()) {
+                    Iterator<Record> iterator = ads.readRecords(entry.getRecordStoreName(), entry.getRecordGroup());
                     //todo: (later) separate the prefixes in different tables
                     while (iterator.hasNext()) {
                         Record record = iterator.next();

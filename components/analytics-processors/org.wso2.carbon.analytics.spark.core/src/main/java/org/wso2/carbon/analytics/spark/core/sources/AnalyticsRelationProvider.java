@@ -67,6 +67,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
     private AnalyticsDataService dataService;
     private String recordStore;
     private boolean mergeFlag;
+    private boolean globalTenantRead;
     private StructType schemaStruct;
     private String incParams;
 
@@ -101,10 +102,10 @@ public class AnalyticsRelationProvider implements RelationProvider,
                 throw new RuntimeException(msg, e);
             }
             return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
-                                         this.schemaStruct, this.incParams);
+                                         this.schemaStruct, this.incParams, this.globalTenantRead);
         } else {
             return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
-                                         this.incParams);
+                                         this.incParams, this.globalTenantRead);
         }
     }
 
@@ -118,7 +119,9 @@ public class AnalyticsRelationProvider implements RelationProvider,
         this.recordStore = extractValuesFromMap(AnalyticsConstants.RECORD_STORE, parameters,
                                                 AnalyticsConstants.DEFAULT_PROCESSED_DATA_STORE_NAME);
         this.mergeFlag = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.MERGE_SCHEMA,
-                                                                   parameters, "true"));
+                                                                   parameters, String.valueOf(true)));
+        this.globalTenantRead = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.GLOBAL_TENANT_READ,
+                parameters, String.valueOf(false)));
         this.incParams = extractValuesFromMap(AnalyticsConstants.INC_PARAMS, parameters, "");
     }
 
@@ -330,7 +333,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
         }
 
         return new AnalyticsRelation(this.tenantId, this.tableName, this.recordStore, sqlContext,
-                                     schema, this.incParams);
+                                     schema, this.incParams, this.globalTenantRead);
     }
 
 //    todo: Implement the creatable relation

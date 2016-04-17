@@ -29,12 +29,14 @@ import org.apache.spark.sql.sources.InsertableRelation;
 import org.apache.spark.sql.sources.TableScan;
 import org.apache.spark.sql.types.StructType;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.rdd.AnalyticsRDD;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.CarbonScalaUtils;
+import org.wso2.carbon.base.MultitenantConstants;
 
 import scala.reflect.ClassTag$;
 
@@ -65,6 +67,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     private String incID;
     private long incWindowSizeMS;
     private int incBuffer;
+    private boolean globalTenantRead;
 
     public AnalyticsRelation() {
     }
@@ -79,7 +82,8 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     }
 
     public AnalyticsRelation(int tenantId, String recordStore, String tableName,
-                             SQLContext sqlContext, String incParams) {
+                             SQLContext sqlContext, String incParams,
+                             boolean globalTenantRead) {
         this.tenantId = tenantId;
         this.recordStore = recordStore;
         this.tableName = tableName;
@@ -101,16 +105,19 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             throw new RuntimeException(msg, e);
         }
         setIncParams(incParams);
+        this.globalTenantRead = globalTenantRead;
     }
 
     public AnalyticsRelation(int tenantId, String recordStore, String tableName,
-                             SQLContext sqlContext, StructType schema, String incParams) {
+                             SQLContext sqlContext, StructType schema, String incParams,
+                             boolean globalTenantRead) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.recordStore = recordStore;
         this.sqlContext = sqlContext;
         this.schema = schema;
         setIncParams(incParams);
+        this.globalTenantRead = globalTenantRead;
     }
 
     private void setIncParams(String incParamStr) {
@@ -164,7 +171,17 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             startTime = Long.MIN_VALUE;
             endTime = Long.MAX_VALUE;
         }
-        return new AnalyticsRDD(this.tenantId, this.tableName,
+        int targetTenantId;
+        if (this.globalTenantRead) {
+            if (this.tenantId == MultitenantConstants.SUPER_TENANT_ID) {
+                targetTenantId = Constants.GLOBAL_TENANT_TABLE_LOOKUP_TENANT_ID;
+            } else {
+                throw new RuntimeException("Global tenant read can only be done by the super tenant");
+            }
+        } else {
+            targetTenantId = this.tenantId;
+        }
+        return new AnalyticsRDD(targetTenantId, this.tableName,
                                 new ArrayList<>(Arrays.asList(this.schema.fieldNames())),
                                 this.sqlContext.sparkContext(), scala.collection.Seq$.MODULE$.empty(),
                                 ClassTag$.MODULE$.<Row>apply(Row.class), startTime, endTime, this.incEnable,
