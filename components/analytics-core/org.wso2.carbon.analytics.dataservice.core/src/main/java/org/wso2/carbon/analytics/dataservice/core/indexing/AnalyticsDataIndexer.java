@@ -579,6 +579,8 @@ public class AnalyticsDataIndexer {
                 case DOUBLE:
                     type = SortField.Type.DOUBLE;
                     break;
+                case FACET:
+                    type = SortField.Type.STRING;
                 default:
                     throw new AnalyticsIndexException("Error while determining the type of the column: " +
                             fieldName + ", " + columnDefinition.getType().toString() + " not supported");

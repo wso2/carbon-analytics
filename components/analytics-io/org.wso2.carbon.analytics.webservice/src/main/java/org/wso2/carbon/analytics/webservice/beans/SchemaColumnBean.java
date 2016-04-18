@@ -27,6 +27,7 @@ public class SchemaColumnBean implements Serializable {
     private String columnType;
     private boolean isIndex;
     private boolean isScoreParam;
+    private boolean isFacet;
 
     public SchemaColumnBean() {
     }
@@ -62,5 +63,13 @@ public class SchemaColumnBean implements Serializable {
 
     public void setScoreParam(boolean isScoreParam) {
         this.isScoreParam = isScoreParam;
+    }
+
+    public boolean isFacet() {
+        return isFacet;
+    }
+
+    public void setFacet(boolean isFacet) {
+        this.isFacet = isFacet;
     }
 }

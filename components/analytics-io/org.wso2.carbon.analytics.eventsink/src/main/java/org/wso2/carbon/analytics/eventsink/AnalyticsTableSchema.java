@@ -44,6 +44,7 @@ public class AnalyticsTableSchema {
         private AnalyticsSchema.ColumnType type;
         private boolean scoreParam = false;
         private boolean indexed = false;
+        private boolean isFacet = false;
         private boolean primaryKey = false;
 
         @XmlElement(name = "Name")
@@ -80,6 +81,14 @@ public class AnalyticsTableSchema {
 
         public void setIndexed(boolean indexed) {
             this.indexed = indexed;
+        }
+
+        public boolean isFacet() {
+            return isFacet;
+        }
+
+        public void setFacet(boolean isFacet) {
+            this.isFacet = isFacet;
         }
 
         @XmlElement(name = "IsPrimaryKey")

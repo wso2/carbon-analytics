@@ -176,6 +176,7 @@ public class RecordSortUtils {
                 break;
             case FACET:
                 compareInt = ((String) value1).compareTo(((String) value2));
+                break;
             default:
                 throw new AnalyticsException("Cannot sort values of type: " + type);
         }

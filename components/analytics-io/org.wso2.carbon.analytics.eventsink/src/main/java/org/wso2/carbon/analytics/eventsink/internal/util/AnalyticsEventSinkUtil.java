@@ -57,6 +57,7 @@ public class AnalyticsEventSinkUtil {
                 columnDefinition.setIndexed(schemaColumn.isIndexed());
                 columnDefinition.setScoreParam(schemaColumn.isScoreParam());
                 columnDefinition.setType(schemaColumn.getType());
+                columnDefinition.setFacet(schemaColumn.isFacet());
                 schemaColumns.add(columnDefinition);
             }
         }

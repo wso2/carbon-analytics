@@ -360,6 +360,7 @@ public class Utils {
         columnDefinition.setName(name);
         columnDefinition.setIndexed(columnDefinitionBean.isIndex());
         columnDefinition.setScoreParam(columnDefinitionBean.isScoreParam());
+        columnDefinition.setFacet(columnDefinitionBean.isFacet());
         return columnDefinition;
     }
 
@@ -401,6 +402,7 @@ public class Utils {
         }
         bean.setIndex(columnDefinition.isIndexed());
         bean.setScoreParam(columnDefinition.isScoreParam());
+        bean.setFacet(columnDefinition.isFacet());
         return bean;
     }
 

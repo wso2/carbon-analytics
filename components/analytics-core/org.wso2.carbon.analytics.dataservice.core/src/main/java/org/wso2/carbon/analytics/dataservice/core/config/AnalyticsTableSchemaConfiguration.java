@@ -46,10 +46,11 @@ public class AnalyticsTableSchemaConfiguration {
         if (columnDefinitions != null) {
             for (AnalyticsColumnDefinition schemaColumn : columnDefinitions) {
                 ColumnDefinition columnDefinition = new ColumnDefinition();
-                columnDefinition.setName(schemaColumn.columnName);
-                columnDefinition.setIndexed(schemaColumn.indexed);
-                columnDefinition.setScoreParam(schemaColumn.scoreParam);
-                columnDefinition.setType(schemaColumn.type);
+                columnDefinition.setName(schemaColumn.getColumnName());
+                columnDefinition.setIndexed(schemaColumn.isIndexed());
+                columnDefinition.setScoreParam(schemaColumn.isScoreParam());
+                columnDefinition.setType(schemaColumn.getType());
+                columnDefinition.setFacet(schemaColumn.isFacet());
                 schemaColumns.add(columnDefinition);
             }
         }
@@ -78,6 +79,7 @@ public class AnalyticsTableSchemaConfiguration {
         private boolean scoreParam = false;
         private boolean indexed = false;
         private boolean primaryKey = false;
+        private boolean isFacet = false;
 
         @XmlElement(name = "Name")
         public String getColumnName() {
@@ -122,6 +124,15 @@ public class AnalyticsTableSchemaConfiguration {
 
         public void setPrimaryKey(boolean primaryKey) {
             this.primaryKey = primaryKey;
+        }
+
+        @XmlElement(name = "IsFacet")
+        public boolean isFacet() {
+            return isFacet;
+        }
+
+        public void setFacet(boolean isFacet) {
+            this.isFacet = isFacet;
         }
     }
 }

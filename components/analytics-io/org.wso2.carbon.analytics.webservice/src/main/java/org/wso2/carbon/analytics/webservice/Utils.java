@@ -536,7 +536,7 @@ public class Utils {
         if (columnBeans != null) {
             for (SchemaColumnBean columnBean : columnBeans) {
                 ColumnDefinition columnDefinition = new ColumnDefinition(columnBean.getColumnName(),
-                    getColumnType(columnBean.getColumnType()), columnBean.isIndex(), columnBean.isScoreParam());
+                    getColumnType(columnBean.getColumnType()), columnBean.isIndex(), columnBean.isScoreParam(), columnBean.isFacet());
                 columnDefinitions.add(columnDefinition);
             }
         }

@@ -34,6 +34,8 @@ public class ColumnDefinition implements Serializable {
     private boolean indexed;
 
     private boolean scoreParam;
+
+    private boolean isFacet;
     
     public ColumnDefinition() { }
     
@@ -42,9 +44,14 @@ public class ColumnDefinition implements Serializable {
     }
     
     public ColumnDefinition(String name, ColumnType type, boolean indexed, boolean scoreParam) {
+        this(name, type, indexed, scoreParam, false);
+    }
+
+    public ColumnDefinition(String name, ColumnType type, boolean indexed, boolean scoreParam, boolean isFacet) {
         this.name = name;
+        this.isFacet = isFacet;
         this.type = type;
-        this.indexed = type == ColumnType.FACET || indexed;
+        this.indexed = type == ColumnType.FACET || indexed || isFacet;
         this.scoreParam = scoreParam;
     }
 
@@ -86,10 +93,18 @@ public class ColumnDefinition implements Serializable {
         this.scoreParam = scoreParam;
     }
 
+    public boolean isFacet() {
+        return isFacet;
+    }
+
+    public void setFacet(boolean isFacet) {
+        this.isFacet = isFacet;
+    }
+
     @Override
     public int hashCode() {
         return (this.getName() + ":" + this.getType().name() + ":" + this.isIndexed() + ":" +
-               this.isScoreParam()).hashCode();
+               this.isScoreParam() + ":" + this.isFacet()).hashCode();
     }
 
     public boolean equals(Object obj) {
@@ -98,7 +113,7 @@ public class ColumnDefinition implements Serializable {
         }
         ColumnDefinition rhs = (ColumnDefinition) obj;
         return this.getName().equals(rhs.getName()) && this.getType().equals(rhs.getType()) &&
-               this.isIndexed() == rhs.isIndexed() && this.isScoreParam() == rhs.isScoreParam();
+               this.isIndexed() == rhs.isIndexed() && this.isScoreParam() == rhs.isScoreParam() &&
+               this.isFacet() == rhs.isFacet();
     }
-
 }

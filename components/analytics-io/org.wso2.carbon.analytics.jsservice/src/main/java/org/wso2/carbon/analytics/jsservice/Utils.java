@@ -108,7 +108,7 @@ public class Utils {
     /**
      * Create a Analytics schema from a bean class
      *
-     * @param analyticsSchemaBean bean table schema to be converted to Analytics Schema.
+     * @param schemaBean bean table schema to be converted to Analytics Schema.
      * @return Analytics schema
      */
 
@@ -121,7 +121,8 @@ public class Utils {
                 ColumnDefinition columnDefinition = new ColumnDefinition(columnBean.getKey(),
                                                                          getColumnType(columnBean.getValue().getType()),
                                                                          columnBean.getValue().isIndex(),
-                                                                         columnBean.getValue().isScoreParam());
+                                                                         columnBean.getValue().isScoreParam(),
+                                                                         columnBean.getValue().isFacet());
                 columnDefinitions.add(columnDefinition);
             }
         }
@@ -165,7 +166,8 @@ public class Utils {
                 columnDefinitions.put(columnBean.getKey(),
                                       getColumnTypeBean(columnBean.getValue().getType(),
                                                         columnBean.getValue().isIndexed(),
-                                                        columnBean.getValue().isScoreParam()));
+                                                        columnBean.getValue().isScoreParam(),
+                                                        columnBean.getValue().isFacet()));
             }
         }
         if (analyticsSchema.getPrimaryKeys() != null) {
@@ -181,7 +183,7 @@ public class Utils {
      * @return ColumnTypeBean instance
      */
     private static ColumnDefinitionBean getColumnTypeBean(AnalyticsSchema.ColumnType columnType, boolean isIndexed,
-                                                          boolean isScoreParam) {
+                                                          boolean isScoreParam, boolean isFacet) {
         ColumnDefinitionBean bean = new ColumnDefinitionBean();
         switch (columnType) {
             case STRING:
@@ -214,6 +216,7 @@ public class Utils {
 
         bean.setIndex(isIndexed);
         bean.setScoreParam(isScoreParam);
+        bean.setFacet(isFacet);
         return bean;
     }
 

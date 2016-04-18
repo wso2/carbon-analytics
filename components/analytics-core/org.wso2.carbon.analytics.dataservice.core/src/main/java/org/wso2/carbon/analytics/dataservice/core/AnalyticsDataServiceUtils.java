@@ -40,6 +40,7 @@ import java.util.Set;
 public class AnalyticsDataServiceUtils {
     
     public static final String OPTION_SCORE_PARAM = "-sp";
+    public static final String OPTION_IS_FACET = "-f";
 
     @SuppressWarnings("unchecked")
     public static List<Record> listRecords(AnalyticsDataService ads,
@@ -77,6 +78,9 @@ public class AnalyticsDataServiceUtils {
                 if (column.isScoreParam()) {
                     targetColumn.setScoreParam(true);
                 }
+                if (column.isFacet()) {
+                    targetColumn.setFacet(true);
+                }
             }
         }
         for (String index : indices) {
@@ -99,15 +103,18 @@ public class AnalyticsDataServiceUtils {
             if (options.contains(OPTION_SCORE_PARAM)) {
                 column.setScoreParam(true);
             }
+            if (options.contains(OPTION_IS_FACET)) {
+                column.setFacet(true);
+            }
         }
     }
     
-    public static List<String> tokenizeAndTrimToList(String value, String delimeter) {
+    public static List<String> tokenizeAndTrimToList(String value, String delimiter) {
         if (value == null) {
             return new ArrayList<String>(0);
         }
         value = value.trim();
-        String[] tokens = value.split(delimeter);
+        String[] tokens = value.split(delimiter);
         String token;
         List<String> result = new ArrayList<String>(tokens.length);
         for (int i = 0; i < tokens.length; i++) {

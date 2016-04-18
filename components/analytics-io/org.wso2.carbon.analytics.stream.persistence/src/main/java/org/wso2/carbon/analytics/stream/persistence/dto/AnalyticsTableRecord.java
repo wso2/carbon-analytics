@@ -32,6 +32,7 @@ public class AnalyticsTableRecord implements Serializable {
     private boolean indexed;
     private boolean primaryKey;
     private boolean persist;
+    private boolean isFacet;
 
     public AnalyticsTableRecord() {
     }
@@ -82,5 +83,13 @@ public class AnalyticsTableRecord implements Serializable {
 
     public void setPersist(boolean persist) {
         this.persist = persist;
+    }
+
+    public boolean isFacet() {
+        return isFacet;
+    }
+
+    public void setFacet(boolean isFacet) {
+        this.isFacet = isFacet;
     }
 }
