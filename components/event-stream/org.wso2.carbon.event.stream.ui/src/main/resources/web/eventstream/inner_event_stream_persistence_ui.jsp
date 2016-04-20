@@ -86,6 +86,7 @@
                             <th><fmt:message key="attribute.primay"/></th>
                             <th><fmt:message key="attribute.index"/></th>
                             <th><fmt:message key="attribute.scoreParam"/></th>
+                            <th><fmt:message key="attribute.facet"/></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -110,6 +111,7 @@
                             <th><fmt:message key="attribute.primay"/></th>
                             <th><fmt:message key="attribute.index"/></th>
                             <th><fmt:message key="attribute.scoreParam"/></th>
+                            <th><fmt:message key="attribute.facet"/></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -135,6 +137,7 @@
                             <th><fmt:message key="attribute.primay"/></th>
                             <th><fmt:message key="attribute.index"/></th>
                             <th><fmt:message key="attribute.scoreParam"/></th>
+                            <th><fmt:message key="attribute.facet"/></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -160,6 +163,7 @@
                             <th><fmt:message key="attribute.primay"/></th>
                             <th><fmt:message key="attribute.index"/></th>
                             <th><fmt:message key="attribute.scoreParam"/></th>
+                            <th><fmt:message key="attribute.facet"/></th>
                             <th><fmt:message key="actions"/></th>
                         </tr>
                         </thead>
@@ -176,7 +180,6 @@
                                 <select id="outputArbitraryDataPropType" onchange="changeScoreParam(this)">
                                     <option value="INTEGER">INTEGER</option>
                                     <option value="STRING">STRING</option>
-                                    <option value="FACET">FACET</option>
                                     <option value="LONG">LONG</option>
                                     <option value="BOOLEAN">BOOLEAN</option>
                                     <option value="FLOAT">FLOAT</option>
@@ -191,6 +194,9 @@
                             </td>
                             <td class="col-small"><fmt:message key="attribute.scoreParam"/> : <input type="checkbox"
                                                                                                      id="eventPersistScoreParamCheckbox"/>
+                            </td>
+                            <td class="col-small"><fmt:message key="attribute.facet"/> : <input type="checkbox"
+                                                                                                     id="eventPersistIsFacetCheckbox"/>
                             </td>
                             <td><input type="button" class="button" value="<fmt:message key="add"/>"
                                        onclick="addArbitraryAttribute()"/>

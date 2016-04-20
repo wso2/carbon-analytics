@@ -144,6 +144,7 @@ public class EventStreamUIUtils {
             analyticsTableColumn.setPrimaryKey(Boolean.parseBoolean(propertyConfiguration[2]));
             analyticsTableColumn.setIndexed(Boolean.parseBoolean(propertyConfiguration[3]));
             analyticsTableColumn.setScoreParam(Boolean.parseBoolean(propertyConfiguration[4]));
+            analyticsTableColumn.setFacet(Boolean.parseBoolean(propertyConfiguration[5]));
             analyticsTableColumns.add(analyticsTableColumn);
         }
         return analyticsTableColumns;
@@ -160,6 +161,7 @@ public class EventStreamUIUtils {
             analyticsTableColumn.setPrimaryKey(Boolean.parseBoolean(propertyConfiguration[3]));
             analyticsTableColumn.setIndexed(Boolean.parseBoolean(propertyConfiguration[4]));
             analyticsTableColumn.setScoreParam(Boolean.parseBoolean(propertyConfiguration[5]));
+            analyticsTableColumn.setFacet(Boolean.parseBoolean(propertyConfiguration[6]));
             analyticsTableColumns.add(analyticsTableColumn);
         }
         return analyticsTableColumns;

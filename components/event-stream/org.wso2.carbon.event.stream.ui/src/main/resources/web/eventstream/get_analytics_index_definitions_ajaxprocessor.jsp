@@ -44,6 +44,8 @@
                         column.setPrimaryKey(analyticsTableColumn.getPrimaryKey());
                         column.setIndexed(analyticsTableColumn.getIndexed());
                         column.setScoreParam(analyticsTableColumn.getScoreParam());
+                        column.setFacet(analyticsTableColumn.getFacet());
+
                         tableColumns[i++] = column;
                     }
                     table.setAnalyticsTableRecords(tableColumns);
