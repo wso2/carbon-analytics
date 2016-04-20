@@ -151,7 +151,7 @@ public class AnalyticsCommonUtils {
             case AnalyticsConstants.BINARY_TYPE:
                 return AnalyticsSchema.ColumnType.BINARY;
             case AnalyticsConstants.FACET_TYPE:
-                return AnalyticsSchema.ColumnType.FACET;
+                return AnalyticsSchema.ColumnType.STRING;
             default:
                 log.error("Invalid ColumnType: " + strType);
                 throw new RuntimeException("Invalid ColumnType: " + strType);

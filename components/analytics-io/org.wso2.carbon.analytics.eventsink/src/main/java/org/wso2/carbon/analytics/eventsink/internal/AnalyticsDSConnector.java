@@ -19,7 +19,6 @@ package org.wso2.carbon.analytics.eventsink.internal;
 
 import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -248,13 +247,6 @@ public class AnalyticsDSConnector {
             if (fieldValue instanceof String) {
                 String fieldStrValue = (String) fieldValue;
                 switch (columnDefinition.getType()) {
-                    case FACET:
-                        //converting the json array to comma separated String
-                        try {
-                            return StringUtils.join(gson.fromJson(fieldStrValue, List.class), ',');
-                        } catch (Exception e) {
-                            return fieldStrValue;
-                        }
                     case STRING:
                         return fieldStrValue;
                     case BINARY:

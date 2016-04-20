@@ -127,6 +127,7 @@
                 <xs:sequence>
                     <xs:element minOccurs="0" name="columnName" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="columnType" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="facet" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="index" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="scoreParam" type="xs:boolean"/>
                 </xs:sequence>

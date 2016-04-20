@@ -579,8 +579,6 @@ public class AnalyticsDataIndexer {
                 case DOUBLE:
                     type = SortField.Type.DOUBLE;
                     break;
-                case FACET:
-                    type = SortField.Type.STRING;
                 default:
                     throw new AnalyticsIndexException("Error while determining the type of the column: " +
                             fieldName + ", " + columnDefinition.getType().toString() + " not supported");
@@ -594,8 +592,7 @@ public class AnalyticsDataIndexer {
         Analyzer perFieldAnalyzerWrapper;
         Map<String, Analyzer> analyzersPerField = new HashMap<>();
         for (Map.Entry<String, ColumnDefinition> index : indices.entrySet()) {
-            if (index.getValue().getType() == AnalyticsSchema.ColumnType.STRING ||
-                    index.getValue().getType() == AnalyticsSchema.ColumnType.FACET) {
+            if (index.getValue().getType() == AnalyticsSchema.ColumnType.STRING) {
                 analyzersPerField.put(Constants.NON_TOKENIZED_FIELD_PREFIX + index.getKey(), new KeywordAnalyzer());
             }
         }
@@ -1098,7 +1095,7 @@ public class AnalyticsDataIndexer {
     private FacetsConfig getFacetsConfigurations(Map<String, ColumnDefinition> indices) {
         FacetsConfig config = new FacetsConfig();
         for (Map.Entry<String, ColumnDefinition> entry : indices.entrySet()) {
-            if (entry.getValue().getType().equals(AnalyticsSchema.ColumnType.FACET)) {
+            if (entry.getValue().isFacet()) {
                 String indexField = entry.getKey();
                 config.setHierarchical(indexField, true);
                 config.setMultiValued(indexField, true);
@@ -1137,6 +1134,7 @@ public class AnalyticsDataIndexer {
                                        Expression funcExpression) throws AnalyticsIndexException {
         SimpleBindings bindings = new SimpleBindings();
         bindings.add(new SortField(INDEX_INTERNAL_SCORE_FIELD, SortField.Type.SCORE));
+        bindings.add(new SortField(INDEX_INTERNAL_TIMESTAMP_FIELD, SortField.Type.LONG));
         for (Map.Entry<String, ColumnDefinition> entry : scoreParams.entrySet()) {
             if (entry.getValue().isScoreParam()) {
                 switch (entry.getValue().getType()) {
@@ -1489,17 +1487,16 @@ public class AnalyticsDataIndexer {
         return fieldType;
     }
 
-    private void checkAndAddTaxonomyDocEntries(Document doc, AnalyticsSchema.ColumnType type,
+    private void checkAndAddTaxonomyDocEntries(Document doc,
                                                    String name, Object obj,
                                                    FacetsConfig facetsConfig)
             throws AnalyticsIndexException {
         if (obj == null) {
             doc.add(new StringField(name, NULL_INDEX_VALUE, Store.NO));
-        }
-        if (obj instanceof String && type == AnalyticsSchema.ColumnType.FACET) {
+        } else {
             facetsConfig.setMultiValued(name, true);
             facetsConfig.setHierarchical(name, true);
-            String values = (String) obj;
+            String values = obj.toString();
             if (values.isEmpty()) {
                 values = EMPTY_FACET_VALUE;
             }
@@ -1525,7 +1522,9 @@ public class AnalyticsDataIndexer {
         for (Map.Entry<String, ColumnDefinition> entry : columns.entrySet()) {
             name = entry.getKey();
             this.checkAndAddDocEntry(doc, entry.getValue().getType(), name, record.getValue(name));
-            this.checkAndAddTaxonomyDocEntries(doc, entry.getValue().getType(), name, record.getValue(name), config);
+            if (entry.getValue().isFacet()) {
+                this.checkAndAddTaxonomyDocEntries(doc, name, record.getValue(name), config);
+            }
         }
         return config.build(taxonomyWriter, doc);
     }

@@ -512,7 +512,7 @@ public class MessageConsoleConnector {
             AnalyticsSchemaBean tableSchema = analyticsWebServiceStub.getTableSchema(table);
             if (tableSchema != null && tableSchema.getColumns() != null) {
                 for (SchemaColumnBean schemaColumnBean : tableSchema.getColumns()) {
-                    if ("FACET".equalsIgnoreCase(schemaColumnBean.getColumnType())) {
+                    if (schemaColumnBean.getFacet()) {
                         facetNameList.add(schemaColumnBean.getColumnName());
                     }
                 }

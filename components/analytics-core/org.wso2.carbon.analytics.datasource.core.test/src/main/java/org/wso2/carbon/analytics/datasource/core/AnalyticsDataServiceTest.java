@@ -108,7 +108,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.add(new ColumnDefinition("C5", ColumnType.FLOAT, true, false));
         columns.add(new ColumnDefinition("C6", ColumnType.DOUBLE, true, false));
         columns.add(new ColumnDefinition("C7", ColumnType.BINARY, true, false));
-        columns.add(new ColumnDefinition("C8", ColumnType.FACET, true, false));
+        columns.add(new ColumnDefinition("C8", ColumnType.STRING, true, false, true));
         AnalyticsSchema schema = new AnalyticsSchema(columns, null);
         this.service.setTableSchema(tenantId, "T1", schema);
         AnalyticsSchema schemaIn = this.service.getTableSchema(tenantId, "T1");
@@ -721,7 +721,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.add(new ColumnDefinition("tenant", ColumnType.INTEGER, true, false));
         columns.add(new ColumnDefinition("ip", ColumnType.STRING, true, false));
         columns.add(new ColumnDefinition("log", ColumnType.STRING, true, false));
-        columns.add(new ColumnDefinition("location", ColumnType.FACET, true, false));
+        columns.add(new ColumnDefinition("location", ColumnType.STRING, true, false, true));
         this.service.createTable(tenantId, tableName);
         this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
 
@@ -766,7 +766,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.add(new ColumnDefinition("tenant", ColumnType.INTEGER, true, false));
         columns.add(new ColumnDefinition("ip", ColumnType.STRING, true, false));
         columns.add(new ColumnDefinition("log", ColumnType.STRING, true, false));
-        columns.add(new ColumnDefinition("location", ColumnType.FACET, true, false));
+        columns.add(new ColumnDefinition("location", ColumnType.STRING, true, false, true));
 
         for (String tableName : tableNames) {
             this.cleanupTable(tenantId, tableName);
@@ -924,7 +924,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.add(new ColumnDefinition("tenant", ColumnType.INTEGER, true, false));
         columns.add(new ColumnDefinition("ip", ColumnType.STRING, true, false));
         columns.add(new ColumnDefinition("log", ColumnType.STRING, true, false));
-        columns.add(new ColumnDefinition("location", ColumnType.FACET, true, false));
+        columns.add(new ColumnDefinition("location", ColumnType.STRING, true, false, true));
         this.service.createTable(tenantId, tableName);
         this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
 
@@ -973,7 +973,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.add(new ColumnDefinition("tenant", ColumnType.INTEGER, true, false));
         columns.add(new ColumnDefinition("ip", ColumnType.STRING, true, false));
         columns.add(new ColumnDefinition("log", ColumnType.STRING, true, false));
-        columns.add(new ColumnDefinition("location", ColumnType.FACET, true, false));
+        columns.add(new ColumnDefinition("location", ColumnType.STRING, true, false, true));
         for (String tableName : tableNames) {
             this.cleanupTable(tenantId, tableName);
             this.service.createTable(tenantId, tableName);

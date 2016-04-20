@@ -82,7 +82,7 @@ public class AnalyticsTableSchema {
         public void setIndexed(boolean indexed) {
             this.indexed = indexed;
         }
-
+        @XmlElement(name = "IsFacet")
         public boolean isFacet() {
             return isFacet;
         }

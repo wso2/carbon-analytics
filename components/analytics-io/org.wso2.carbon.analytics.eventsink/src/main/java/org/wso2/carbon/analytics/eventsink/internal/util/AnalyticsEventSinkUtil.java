@@ -108,6 +108,7 @@ public class AnalyticsEventSinkUtil {
             analyticsColumn.setIndexed(column.getValue().isIndexed());
             analyticsColumn.setScoreParam(column.getValue().isScoreParam());
             analyticsColumn.setType(column.getValue().getType());
+            analyticsColumn.setFacet(column.getValue().isFacet());
             if (schema.getPrimaryKeys().contains(column.getKey())) {
                 analyticsColumn.setPrimaryKey(true);
             }
@@ -145,6 +146,7 @@ public class AnalyticsEventSinkUtil {
             column.setPrimaryKey(originalCol.isPrimaryKey());
             column.setScoreParam(originalCol.isScoreParam());
             column.setType(originalCol.getType());
+            column.setFacet(originalCol.isFacet());
             columns.add(column);
         }
         copySchema.setColumns(columns);

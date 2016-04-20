@@ -51,7 +51,7 @@ public class ColumnDefinition implements Serializable {
         this.name = name;
         this.isFacet = isFacet;
         this.type = type;
-        this.indexed = type == ColumnType.FACET || indexed || isFacet;
+        this.indexed = indexed || isFacet;
         this.scoreParam = scoreParam;
     }
 
@@ -76,11 +76,10 @@ public class ColumnDefinition implements Serializable {
     }
 
     public void setIndexed(boolean indexed) {
-        if (this.type != null) {
-            if (this.type == ColumnType.FACET) {
-                this.indexed = true;
-                return;
-            }
+
+        if (this.isFacet()) {
+            this.indexed = true;
+            return;
         }
         this.indexed = indexed;
     }

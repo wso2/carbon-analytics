@@ -351,16 +351,18 @@ public class Utils {
             case BINARY:
                 columnDefinition.setType(AnalyticsSchema.ColumnType.BINARY);
                 break;
-            case FACET:
-                columnDefinition.setType(AnalyticsSchema.ColumnType.FACET);
-                break;
             default:
                 columnDefinition.setType(AnalyticsSchema.ColumnType.STRING);
         }
         columnDefinition.setName(name);
         columnDefinition.setIndexed(columnDefinitionBean.isIndex());
         columnDefinition.setScoreParam(columnDefinitionBean.isScoreParam());
-        columnDefinition.setFacet(columnDefinitionBean.isFacet());
+        //This is to be backward compatible with DAS 3.0.0/3.0.1
+        if (columnDefinitionBean.getType() == ColumnTypeBean.FACET) {
+            columnDefinition.setFacet(true);
+        } else {
+            columnDefinition.setFacet(columnDefinitionBean.isFacet());
+        }
         return columnDefinition;
     }
 
@@ -393,9 +395,6 @@ public class Utils {
                 break;
             case BINARY:
                 bean.setType(ColumnTypeBean.BINARY);
-                break;
-            case FACET:
-                bean.setType(ColumnTypeBean.FACET);
                 break;
             default:
                 bean.setType(ColumnTypeBean.STRING);

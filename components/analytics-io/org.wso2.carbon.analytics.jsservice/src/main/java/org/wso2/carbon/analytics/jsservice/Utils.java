@@ -145,8 +145,6 @@ public class Utils {
                 return AnalyticsSchema.ColumnType.BOOLEAN;
             case BINARY:
                 return AnalyticsSchema.ColumnType.BINARY;
-            case FACET:
-                return AnalyticsSchema.ColumnType.FACET;
             default:
                 return AnalyticsSchema.ColumnType.STRING;
         }
@@ -206,9 +204,6 @@ public class Utils {
                 break;
             case BINARY:
                 bean.setType(ColumnTypeBean.BINARY);
-                break;
-            case FACET:
-                bean.setType(ColumnTypeBean.FACET);
                 break;
             default:
                 bean.setType(ColumnTypeBean.STRING);

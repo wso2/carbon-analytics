@@ -174,9 +174,6 @@ public class RecordSortUtils {
             case BOOLEAN:
                 compareInt = Boolean.compare((Boolean) value1, (Boolean) value2);
                 break;
-            case FACET:
-                compareInt = ((String) value1).compareTo(((String) value2));
-                break;
             default:
                 throw new AnalyticsException("Cannot sort values of type: " + type);
         }

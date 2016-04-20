@@ -238,11 +238,11 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
         columnDefinition.setType(getColumnType(analyticsTableRecord.getColumnType()));
         if ("FACET".equals(analyticsTableRecord.getColumnType()) || analyticsTableRecord.isFacet()) {
             columnDefinition.setIndexed(true);
+            columnDefinition.setFacet(true);
         } else {
             columnDefinition.setIndexed(analyticsTableRecord.isIndexed());
         }
         columnDefinition.setScoreParam(analyticsTableRecord.isScoreParam());
-        columnDefinition.setFacet(analyticsTableRecord.isFacet());
         return columnDefinition;
     }
 
@@ -264,8 +264,6 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                 return AnalyticsSchema.ColumnType.FLOAT;
             case "DOUBLE":
                 return AnalyticsSchema.ColumnType.DOUBLE;
-            case "FACET":
-                return AnalyticsSchema.ColumnType.FACET;
             default:
                 return AnalyticsSchema.ColumnType.STRING;
         }

@@ -174,6 +174,7 @@ public class Utils {
                 bean.setColumnType(getColumnTypeBean(columnTypeEntry.getValue()));
                 bean.setScoreParam(columnTypeEntry.getValue().isScoreParam());
                 bean.setIndex(columnTypeEntry.getValue().isIndexed());
+                bean.setFacet(columnTypeEntry.getValue().isFacet());
                 columnBeans.add(bean);
             }
         }
@@ -207,8 +208,6 @@ public class Utils {
                 return RecordValueEntryBean.BOOLEAN;
             case BINARY:
                 return RecordValueEntryBean.BINARY;
-            case FACET:
-                return RecordValueEntryBean.FACET;
             default:
                 return RecordValueEntryBean.STRING;
         }
@@ -498,9 +497,6 @@ public class Utils {
             throws AnalyticsWebServiceException {
         Object value;
         switch (type) {
-            case FACET:
-                value = recordValueEntryBean.getAnalyticsCategoryPathBeanValue().getPath();
-                break;
             case FLOAT:
                 value = new BigDecimal(recordValueEntryBean.toString()).floatValue();
                 break;
@@ -559,8 +555,6 @@ public class Utils {
                 return AnalyticsSchema.ColumnType.BOOLEAN;
             case RecordValueEntryBean.BINARY:
                 return AnalyticsSchema.ColumnType.BINARY;
-            case RecordValueEntryBean.FACET:
-                return AnalyticsSchema.ColumnType.FACET;
             default:
                 return AnalyticsSchema.ColumnType.STRING;
         }
