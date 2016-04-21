@@ -23,13 +23,15 @@
    <analytics-record-store name="EVENT_STORE">
       <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
       <properties>
-            <property name="datasource">WSO2_ANALYTICS_EVENT_STORE_DB</property>
+         <property name="datasource">WSO2_ANALYTICS_EVENT_STORE_DB</property>
+         <property name="category">write_read_optimized</property>
       </properties>
    </analytics-record-store>
-   <analytics-record-store name = "PROCESSED_DATA_STORE">
+   <analytics-record-store name="PROCESSED_DATA_STORE">
       <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
       <properties>
-            <property name="datasource">WSO2_ANALYTICS_PROCESSED_DATA_STORE_DB</property>
+         <property name="datasource">WSO2_ANALYTICS_PROCESSED_DATA_STORE_DB</property>
+         <property name="category">write_read_optimized</property>
       </properties>
    </analytics-record-store>
    <!-- The data indexing analyzer implementation -->
