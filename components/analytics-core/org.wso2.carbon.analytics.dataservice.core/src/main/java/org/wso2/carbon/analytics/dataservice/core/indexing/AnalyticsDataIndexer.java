@@ -1436,7 +1436,7 @@ public class AnalyticsDataIndexer {
         case STRING:
             doc.add(new TextField(name, obj.toString(), Store.NO));
             //SortedDocValuesField is to sort STRINGs and search without tokenizing
-            doc.add(new SortedDocValuesField("_" + name,
+            doc.add(new SortedDocValuesField(Constants.NON_TOKENIZED_FIELD_PREFIX + name,
                     new BytesRef(this.trimNonTokenizedIndexStringField(obj.toString()).getBytes())));
             break;
         case INTEGER:
