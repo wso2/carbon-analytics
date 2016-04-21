@@ -27,12 +27,12 @@ import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.expressions.Expression;
@@ -536,18 +536,14 @@ public class AnalyticsDataIndexer {
         for (SortByField sortByField : sortByFields) {
             SortField sortField;
             String fieldName = sortByField.getFieldName();
-            String indexedFieldName = fieldName; // fieldName in the datatable can be changed from the fieldname in the index
             ColumnDefinition columnDefinition = indices.get(fieldName);
-            if (columnDefinition != null && columnDefinition.getType() == AnalyticsSchema.ColumnType.STRING) {
-                indexedFieldName = Constants.NON_TOKENIZED_FIELD_PREFIX + fieldName;
-            }
             switch (sortByField.getSort()) {
                 case ASC: {
-                    sortField = new SortField(indexedFieldName, getSortFieldType(fieldName, indices));
+                    sortField = new SortField(fieldName, getSortFieldType(fieldName, indices));
                     break;
                 }
                 case DESC: {
-                    sortField = new SortField(indexedFieldName, getSortFieldType(fieldName, indices), true);
+                    sortField = new SortField(fieldName, getSortFieldType(fieldName, indices), true);
                     break;
                 }
                 default:
@@ -567,8 +563,6 @@ public class AnalyticsDataIndexer {
         if (columnDefinition == null) {
             if (fieldName != null && fieldName.equals(INDEX_INTERNAL_TIMESTAMP_FIELD)) {
                 type = SortField.Type.LONG;
-            } else if (fieldName != null && fieldName.equals(INDEX_ID_INTERNAL_FIELD)) {
-                type = SortField.Type.STRING;
             } else {
                 throw new AnalyticsIndexException("Cannot find index information for field: " + fieldName);
             }
@@ -1440,11 +1434,10 @@ public class AnalyticsDataIndexer {
         }
         switch (type) {
         case STRING:
-            FieldType sortableStringFieldType = getLuceneSortableStringFieldType(false);
             doc.add(new TextField(name, obj.toString(), Store.NO));
-            doc.add(new Field(Constants.NON_TOKENIZED_FIELD_PREFIX + name,
-                    new BytesRef(this.trimNonTokenizedIndexStringField(obj.toString()).getBytes()), sortableStringFieldType));
-
+            //SortedDocValuesField is to sort STRINGs and search without tokenizing
+            doc.add(new SortedDocValuesField("_" + name,
+                    new BytesRef(this.trimNonTokenizedIndexStringField(obj.toString()).getBytes())));
             break;
         case INTEGER:
             numericFieldType = getLuceneNumericFieldType(FieldType.NumericType.INT);
@@ -1501,19 +1494,6 @@ public class AnalyticsDataIndexer {
         return fieldType;
     }
 
-    private FieldType getLuceneSortableStringFieldType(boolean setStored) {
-        FieldType fieldType = new FieldType();
-        fieldType.setOmitNorms(true);
-        fieldType.setIndexOptions(IndexOptions.DOCS);
-        fieldType.setDocValuesType(DocValuesType.SORTED);
-        fieldType.setTokenized(false);
-        if (setStored) {
-            fieldType.setStored(true);
-        }
-        fieldType.freeze();
-        return fieldType;
-    }
-
     private void checkAndAddTaxonomyDocEntries(Document doc,
                                                    String name, Object obj,
                                                    FacetsConfig facetsConfig)
@@ -1523,16 +1503,11 @@ public class AnalyticsDataIndexer {
         } else {
             facetsConfig.setMultiValued(name, true);
             facetsConfig.setHierarchical(name, true);
-            FieldType fieldType = getLuceneSortableStringFieldType(false);
             String values = obj.toString();
             if (values.isEmpty()) {
                 values = EMPTY_FACET_VALUE;
             }
             doc.add(new FacetField(name, values.split(",")));
-            doc.add(new TextField(name, obj.toString(), Store.NO));
-            doc.add(new Field(Constants.NON_TOKENIZED_FIELD_PREFIX + name,
-                    new BytesRef(this.trimNonTokenizedIndexStringField(obj.toString()).getBytes()), fieldType));
-
         }
     }
 
@@ -1541,9 +1516,9 @@ public class AnalyticsDataIndexer {
         Document doc = new Document();
         FacetsConfig config = new FacetsConfig();
         FieldType numericFieldType = getLuceneNumericFieldType(FieldType.NumericType.LONG);
-        FieldType stringFieldType = getLuceneSortableStringFieldType(true);
-        numericFieldType.setNumericType(FieldType.NumericType.LONG);
-        doc.add(new Field(INDEX_ID_INTERNAL_FIELD, new BytesRef(record.getId().getBytes()), stringFieldType));
+        doc.add(new StringField(INDEX_ID_INTERNAL_FIELD, record.getId(), Store.YES));
+        doc.add(new SortedDocValuesField(INDEX_ID_INTERNAL_FIELD,
+                                         new BytesRef(record.getId().getBytes())));
         doc.add(new LongField(INDEX_INTERNAL_TIMESTAMP_FIELD, record.getTimestamp(), numericFieldType));
         /* make the best effort to store in the given timestamp, or else, 
          * fall back to a compatible format, or else, lastly, string */
