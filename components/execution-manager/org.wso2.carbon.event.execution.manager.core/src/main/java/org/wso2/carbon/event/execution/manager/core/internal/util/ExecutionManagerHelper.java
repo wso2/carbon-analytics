@@ -204,9 +204,11 @@ public class ExecutionManagerHelper {
         String updatedScript = script;
 
         //Execution script parameters will be replaced with given configuration parameters
-        for (Parameter parameter : config.getParameters()) {
-            updatedScript = updatedScript.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
-                    + parameter.getName(), parameter.getValue());
+        if (config.getParameters() != null) {
+            for (Parameter parameter : config.getParameters()) {
+                updatedScript = updatedScript.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
+                        + parameter.getName(), parameter.getValue());
+            }
         }
 
         return updatedScript;
