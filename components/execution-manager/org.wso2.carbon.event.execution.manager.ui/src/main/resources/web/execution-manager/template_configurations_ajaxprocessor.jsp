@@ -226,10 +226,14 @@
 
 
             <%
-                int indexParam = 0;
+              int indexParam = 0;
 
+              if (currentTemplate.getParameterDTOs() != null) {
                 for (ParameterDTO parameter : currentTemplate.getParameterDTOs()) {
 
+                    if (parameter == null) {
+                        continue;
+                    }
                     if (!isExistingConfig) {
                         parameterValue = parameter.getDefaultValue().trim();
                     } else if (configurationDTO.getParameterDTOs() != null) {
@@ -302,6 +306,7 @@
 
                     }
                 }
+              }
             %>
 
             <br class="c-both"/>
@@ -337,9 +342,12 @@ if (isExistingConfig && (configurationDTO.getExecutionParameters() != null)) {
                </div>
 
 <%
- executionParamString =  "document.getElementById('"
+    executionParamString =  "document.getElementById('"
                                 + "cronExpressionValue" + "').value";
 
+    if (parameterString.length() < 1) {
+        parameterString = "''";
+    }
 }
 %>
 

@@ -20,6 +20,7 @@
   --%>
 
 <%
+
     String domainName = request.getParameter("domainName");
     String configuration = request.getParameter("configurationName");
     String saveType = request.getParameter("saveType");
@@ -44,16 +45,21 @@
             templateConfigurationDTO.setDescription(description);
             templateConfigurationDTO.setType(templateType);
 
-            String[] parameterStrings = parametersJson.split(",");
-            parameters = new ParameterDTOE[parameterStrings.length];
-            int index = 0;
+            if (parametersJson.length() < 1) {
+               parameters = new ParameterDTOE[0];
 
-            for (String parameterString : parameterStrings) {
-                ParameterDTOE parameterDTO = new ParameterDTOE();
-                parameterDTO.setName(parameterString.split(valueSeparator)[0]);
-                parameterDTO.setValue(parameterString.split(valueSeparator)[1]);
-                parameters[index] = parameterDTO;
-                index++;
+            } else {
+                String[] parameterStrings = parametersJson.split(",");
+                parameters = new ParameterDTOE[parameterStrings.length];
+                int index = 0;
+
+                for (String parameterString : parameterStrings) {
+                    ParameterDTOE parameterDTO = new ParameterDTOE();
+                    parameterDTO.setName(parameterString.split(valueSeparator)[0]);
+                    parameterDTO.setValue(parameterString.split(valueSeparator)[1]);
+                    parameters[index] = parameterDTO;
+                    index++;
+                }
             }
 
             templateConfigurationDTO.setParameterDTOs(parameters);
