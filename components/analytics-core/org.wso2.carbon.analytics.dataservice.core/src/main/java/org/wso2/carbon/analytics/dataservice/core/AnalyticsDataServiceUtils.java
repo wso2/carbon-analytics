@@ -41,6 +41,7 @@ public class AnalyticsDataServiceUtils {
     
     public static final String OPTION_SCORE_PARAM = "-sp";
     public static final String OPTION_IS_FACET = "-f";
+    public static final String OPTION_IS_INDEXED = "-i";
 
     @SuppressWarnings("unchecked")
     public static List<Record> listRecords(AnalyticsDataService ads,

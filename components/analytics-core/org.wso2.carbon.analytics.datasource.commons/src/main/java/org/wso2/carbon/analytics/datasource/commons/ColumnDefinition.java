@@ -49,8 +49,13 @@ public class ColumnDefinition implements Serializable {
 
     public ColumnDefinition(String name, ColumnType type, boolean indexed, boolean scoreParam, boolean isFacet) {
         this.name = name;
-        this.isFacet = isFacet;
-        this.type = type;
+        if (type != ColumnType.FACET) {
+            this.type = type;
+            this.isFacet = isFacet;
+        } else { //This is to make backward compatible with DAS 3.0.0 and DAS 3.0.1, see DAS-402
+            this.type = ColumnType.STRING;
+            this.isFacet = true;
+        }
         this.indexed = indexed || isFacet;
         this.scoreParam = scoreParam;
     }
@@ -68,6 +73,10 @@ public class ColumnDefinition implements Serializable {
     }
 
     public void setType(AnalyticsSchema.ColumnType type) {
+        if (type == ColumnType.FACET) {
+            this.type = ColumnType.STRING;
+            this.isFacet = true;
+        }
         this.type = type;
     }
 
@@ -77,7 +86,7 @@ public class ColumnDefinition implements Serializable {
 
     public void setIndexed(boolean indexed) {
 
-        if (this.isFacet()) {
+        if (this.isFacet()) { //This is to make backward compatible with DAS 3.0.0 and DAS 3.0.1, see DAS-402
             this.indexed = true;
             return;
         }

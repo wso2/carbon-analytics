@@ -90,6 +90,7 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                             analyticsTableRecord.setColumnType(columnDefinitionEntry.getValue().getType().name());
                             analyticsTableRecord.setIndexed(columnDefinitionEntry.getValue().isIndexed());
                             analyticsTableRecord.setPrimaryKey(primaryKeys.contains(columnDefinitionEntry.getKey()));
+                            analyticsTableRecord.setFacet(columnDefinitionEntry.getValue().isFacet());
                             analyticsTableRecord.setScoreParam(columnDefinitionEntry.getValue().isScoreParam());
                             tableColumns[i++] = analyticsTableRecord;
                         }
@@ -235,13 +236,14 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
     private ColumnDefinition getColumnDefinition(AnalyticsTableRecord analyticsTableRecord) {
         ColumnDefinition columnDefinition = new ColumnDefinition();
         columnDefinition.setName(analyticsTableRecord.getColumnName());
-        columnDefinition.setType(getColumnType(analyticsTableRecord.getColumnType()));
-        if ("FACET".equals(analyticsTableRecord.getColumnType()) || analyticsTableRecord.isFacet()) {
-            columnDefinition.setIndexed(true);
+        if ("FACET".equals(analyticsTableRecord.getColumnType())) {
             columnDefinition.setFacet(true);
+            columnDefinition.setType(AnalyticsSchema.ColumnType.STRING);
         } else {
-            columnDefinition.setIndexed(analyticsTableRecord.isIndexed());
+            columnDefinition.setFacet(analyticsTableRecord.isFacet());
+            columnDefinition.setType(getColumnType(analyticsTableRecord.getColumnType()));
         }
+        columnDefinition.setIndexed(analyticsTableRecord.isIndexed());
         columnDefinition.setScoreParam(analyticsTableRecord.isScoreParam());
         return columnDefinition;
     }

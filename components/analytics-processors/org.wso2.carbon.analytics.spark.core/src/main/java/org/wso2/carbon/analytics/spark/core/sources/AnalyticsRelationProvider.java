@@ -44,7 +44,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.isEmptyAnalyticsSchema;
 import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.structTypeFromAnalyticsSchema;
@@ -248,14 +250,35 @@ public class AnalyticsRelationProvider implements RelationProvider,
                         resList.add(new ColumnDefinition(tokens[0], type));
                         break;
                     case 3:
-                        if (tokens[2].equalsIgnoreCase("-i")) { // if indexed
-                            resList.add(new ColumnDefinition(tokens[0], type, true, false));
-                        } else if (tokens[2].equalsIgnoreCase("-sp")) { // if score param
+                        if (tokens[2].equalsIgnoreCase(AnalyticsDataServiceUtils.OPTION_IS_INDEXED)) { // if indexed
+                            //This is to be backward compatible with DAS 3.0.1 and DAS 3.0.0, DAS-402
+                            if (tokens[1].toLowerCase().equalsIgnoreCase(AnalyticsConstants.FACET_TYPE)) {
+                                resList.add(new ColumnDefinition(tokens[0], type, true, false, true));
+                            } else {
+                                resList.add(new ColumnDefinition(tokens[0], type, true, false));
+                            }
+                        } else if (tokens[2].equalsIgnoreCase(AnalyticsDataServiceUtils.OPTION_SCORE_PARAM)) { // if score param
                             if (AnalyticsCommonUtils.isNumericType(type)) { // if score param && numeric type
                                 resList.add(new ColumnDefinition(tokens[0], type, true, true));
                             } else {
                                 throw new AnalyticsExecutionException("Score-param assigned to a non-numeric ColumnType");
                             }
+                        } else if (tokens[2].equalsIgnoreCase(AnalyticsDataServiceUtils.OPTION_IS_FACET)) { // if facet,
+                            resList.add(new ColumnDefinition(tokens[0], type, true, false, true));
+
+                        } else {
+                            throw new AnalyticsExecutionException("Invalid option for ColumnType");
+                        }
+                        break;
+                    case 4:
+                        Set<String> indexOptions = new HashSet<>(2);
+                        indexOptions.addAll(Arrays.asList(tokens[2], tokens[3]));
+                        if (indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_FACET) && // if score param and facet
+                                indexOptions.contains(AnalyticsDataServiceUtils.OPTION_SCORE_PARAM)) {
+                            resList.add(new ColumnDefinition(tokens[0], type, true, true, true));
+                        } else if (indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_FACET) &&  //if facet and index
+                                   indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_INDEXED)) {
+                            resList.add(new ColumnDefinition(tokens[0], type, true, false, true));
                         } else {
                             throw new AnalyticsExecutionException("Invalid option for ColumnType");
                         }

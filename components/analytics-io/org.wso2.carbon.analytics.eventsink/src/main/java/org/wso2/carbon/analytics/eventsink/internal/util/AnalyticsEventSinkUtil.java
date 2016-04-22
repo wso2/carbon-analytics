@@ -56,8 +56,14 @@ public class AnalyticsEventSinkUtil {
                 columnDefinition.setName(schemaColumn.getColumnName());
                 columnDefinition.setIndexed(schemaColumn.isIndexed());
                 columnDefinition.setScoreParam(schemaColumn.isScoreParam());
-                columnDefinition.setType(schemaColumn.getType());
-                columnDefinition.setFacet(schemaColumn.isFacet());
+                //This is to make backward compatible with DAS 3.0.0 and DAS 3.0.1, see DAS-402
+                if (schemaColumn.getType() == AnalyticsSchema.ColumnType.FACET) {
+                    columnDefinition.setType(AnalyticsSchema.ColumnType.STRING);
+                    columnDefinition.setFacet(true);
+                } else {
+                    columnDefinition.setType(schemaColumn.getType());
+                    columnDefinition.setFacet(schemaColumn.isFacet());
+                }
                 schemaColumns.add(columnDefinition);
             }
         }
@@ -145,8 +151,14 @@ public class AnalyticsEventSinkUtil {
             column.setIndexed(originalCol.isIndexed());
             column.setPrimaryKey(originalCol.isPrimaryKey());
             column.setScoreParam(originalCol.isScoreParam());
-            column.setType(originalCol.getType());
-            column.setFacet(originalCol.isFacet());
+            //This is to make backward compatible with DAS 3.0.0 and DAS 3.0.1, see DAS-402
+            if (originalCol.getType() == AnalyticsSchema.ColumnType.FACET) {
+                column.setType(AnalyticsSchema.ColumnType.STRING);
+                column.setFacet(true);
+            } else {
+                column.setType(originalCol.getType());
+                column.setFacet(originalCol.isFacet());
+            }
             columns.add(column);
         }
         copySchema.setColumns(columns);

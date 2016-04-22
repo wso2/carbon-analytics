@@ -533,6 +533,10 @@ public class Utils {
             for (SchemaColumnBean columnBean : columnBeans) {
                 ColumnDefinition columnDefinition = new ColumnDefinition(columnBean.getColumnName(),
                     getColumnType(columnBean.getColumnType()), columnBean.isIndex(), columnBean.isScoreParam(), columnBean.isFacet());
+                //To make backward compatible with DAS 3.0.0 and DAS 3.0.1, see DAS-402
+                if (columnBean.getColumnType().equalsIgnoreCase(RecordValueEntryBean.FACET)) {
+                    columnDefinition.setFacet(true);
+                }
                 columnDefinitions.add(columnDefinition);
             }
         }

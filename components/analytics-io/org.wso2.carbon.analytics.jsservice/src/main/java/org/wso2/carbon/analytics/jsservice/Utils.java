@@ -123,6 +123,10 @@ public class Utils {
                                                                          columnBean.getValue().isIndex(),
                                                                          columnBean.getValue().isScoreParam(),
                                                                          columnBean.getValue().isFacet());
+                //To make backward compatible with DAS 3.0.0 and DAS 3.0.1, see DAS-402
+                if (columnBean.getValue().getType() == ColumnTypeBean.FACET) {
+                    columnDefinition.setFacet(true);
+                }
                 columnDefinitions.add(columnDefinition);
             }
         }

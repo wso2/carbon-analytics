@@ -1436,8 +1436,9 @@ public class AnalyticsDataIndexer {
         case STRING:
             doc.add(new TextField(name, obj.toString(), Store.NO));
             //SortedDocValuesField is to sort STRINGs and search without tokenizing
-            doc.add(new SortedDocValuesField(Constants.NON_TOKENIZED_FIELD_PREFIX + name,
-                    new BytesRef(this.trimNonTokenizedIndexStringField(obj.toString()).getBytes())));
+            doc.add(new SortedDocValuesField(name, new BytesRef(this.trimNonTokenizedIndexStringField(obj.toString()).getBytes())));
+            doc.add(new StringField(Constants.NON_TOKENIZED_FIELD_PREFIX + name,
+                                    this.trimNonTokenizedIndexStringField(obj.toString()), Store.NO));
             break;
         case INTEGER:
             numericFieldType = getLuceneNumericFieldType(FieldType.NumericType.INT);
@@ -1517,8 +1518,6 @@ public class AnalyticsDataIndexer {
         FacetsConfig config = new FacetsConfig();
         FieldType numericFieldType = getLuceneNumericFieldType(FieldType.NumericType.LONG);
         doc.add(new StringField(INDEX_ID_INTERNAL_FIELD, record.getId(), Store.YES));
-        doc.add(new SortedDocValuesField(INDEX_ID_INTERNAL_FIELD,
-                                         new BytesRef(record.getId().getBytes())));
         doc.add(new LongField(INDEX_INTERNAL_TIMESTAMP_FIELD, record.getTimestamp(), numericFieldType));
         /* make the best effort to store in the given timestamp, or else, 
          * fall back to a compatible format, or else, lastly, string */
