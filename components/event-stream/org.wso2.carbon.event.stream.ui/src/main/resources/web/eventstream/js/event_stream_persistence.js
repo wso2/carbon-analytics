@@ -47,17 +47,13 @@ function populateAnalyticsTable(analyticsTable, columnInformation, type) {
         var typeCell = row.insertCell(cellNo++);
         YAHOO.util.Dom.addClass(typeCell, "property-names");
         var selectElement = document.createElement('select');
-        if (column1 == 'string') {
-            selectElement.options[0] = new Option('STRING', 'string');
-        } else {
-            selectElement.options[0] = new Option('STRING', 'string');
-            selectElement.options[1] = new Option('INTEGER', 'int');
-            selectElement.options[2] = new Option('LONG', 'long');
-            selectElement.options[3] = new Option('BOOLEAN', 'bool');
-            selectElement.options[4] = new Option('FLOAT', 'float');
-            selectElement.options[5] = new Option('DOUBLE', 'double');
-            selectElement.disabled = true;
-        }
+        selectElement.options[0] = new Option('STRING', 'string');
+        selectElement.options[1] = new Option('INTEGER', 'int');
+        selectElement.options[2] = new Option('LONG', 'long');
+        selectElement.options[3] = new Option('BOOLEAN', 'bool');
+        selectElement.options[4] = new Option('FLOAT', 'float');
+        selectElement.options[5] = new Option('DOUBLE', 'double');
+        selectElement.disabled = true;
         selectElement.value = column1;
         typeCell.appendChild(selectElement);
 
