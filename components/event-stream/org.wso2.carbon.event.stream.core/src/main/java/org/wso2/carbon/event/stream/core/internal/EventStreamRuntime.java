@@ -36,30 +36,7 @@ public class EventStreamRuntime {
     private Map<Integer, Map<String, EventJunction>> tenantSpecificEventJunctions =
             new HashMap<Integer, Map<String, EventJunction>>();
 
-    public void loadEventStream(String streamId)
-            throws EventStreamConfigurationException {
-
-        StreamDefinition streamDefinition = EventStreamServiceValueHolder.getCarbonEventStreamService().getStreamDefinition(
-                DataBridgeCommonsUtils.getStreamNameFromStreamId(streamId),
-                DataBridgeCommonsUtils.getStreamVersionFromStreamId(streamId));
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        if (streamDefinition != null) {
-            Map<String, EventJunction> eventJunctionMap = tenantSpecificEventJunctions.get(tenantId);
-            if (eventJunctionMap == null) {
-                eventJunctionMap = new ConcurrentHashMap<String, EventJunction>();
-                tenantSpecificEventJunctions.put(tenantId, eventJunctionMap);
-            }
-            EventJunction junction = new EventJunction(streamDefinition);
-            eventJunctionMap.put(streamDefinition.getStreamId(), junction);
-
-            for (EventStreamListener eventStreamListener : EventStreamServiceValueHolder.getEventStreamListenerList()) {
-                eventStreamListener.addedEventStream(tenantId, streamDefinition.getName(),
-                        streamDefinition.getVersion());
-            }
-        }
-    }
-
-    public void unloadEventStream(String streamId)
+    public void deleteStreamJunction(String streamId)
             throws EventStreamConfigurationException {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         StreamDefinition streamDefinition = EventStreamServiceValueHolder.getCarbonEventStreamService().getStreamDefinition(
@@ -70,10 +47,6 @@ public class EventStreamRuntime {
             Map<String, EventJunction> eventJunctionMap = tenantSpecificEventJunctions.get(tenantId);
             if (eventJunctionMap != null) {
                 eventJunctionMap.remove(streamId);
-            }
-
-            for (EventStreamListener eventStreamListener : EventStreamServiceValueHolder.getEventStreamListenerList()) {
-                eventStreamListener.removedEventStream(tenantId, DataBridgeCommonsUtils.getStreamNameFromStreamId(streamId), DataBridgeCommonsUtils.getStreamVersionFromStreamId(streamId));
             }
         }
 
