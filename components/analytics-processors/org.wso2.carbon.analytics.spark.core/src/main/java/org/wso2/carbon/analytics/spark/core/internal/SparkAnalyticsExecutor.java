@@ -623,19 +623,15 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         String agentConfPath = carbonHome + File.separator + "repository" + File.separator +
                                "conf" + File.separator + "data-bridge" + File.separator + "data-agent-config.xml";
 
-        String jvmOpts = conf.get("spark.executor.extraJavaOptions", "") + " -Dwso2_custom_conf_dir=" + carbonConfDir
+        String jvmOpts = " -Dwso2_custom_conf_dir=" + carbonConfDir
+                         + " -Dcarbon.home=" + carbonHome
                          + " -Djavax.net.ssl.trustStore=" + System.getProperty("javax.net.ssl.trustStore")
                          + " -Djavax.net.ssl.trustStorePassword=" + System.getProperty("javax.net.ssl.trustStorePassword")
                          + " -DAgent.Config.Path=" + agentConfPath
                          + getLog4jPropertiesJvmOpt(analyticsSparkConfDir);
-        conf.set("spark.executor.extraJavaOptions", jvmOpts);
+        conf.set("spark.executor.extraJavaOptions", conf.get("spark.executor.extraJavaOptions", "") + jvmOpts);
 
-        jvmOpts = conf.get("spark.driver.extraJavaOptions", "") + " -Dwso2_custom_conf_dir=" + carbonConfDir
-                  + " -Djavax.net.ssl.trustStore=" + System.getProperty("javax.net.ssl.trustStore")
-                  + " -Djavax.net.ssl.trustStorePassword=" + System.getProperty("javax.net.ssl.trustStorePassword")
-                  + " -DAgent.Config.Path=" + agentConfPath
-                  + getLog4jPropertiesJvmOpt(analyticsSparkConfDir);
-        conf.set("spark.driver.extraJavaOptions", jvmOpts);
+        conf.set("spark.driver.extraJavaOptions", conf.get("spark.driver.extraJavaOptions", "") +  jvmOpts);
 
         //setting the default limit for the spark query results
         conf.setIfMissing("carbon.spark.results.limit", "1000");
@@ -717,6 +713,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     public int getNumPartitionsHint() throws AnalyticsException {
+        // todo: return the number of executors
         /* all workers will not have the same CPU count, this is just an approximation */
         int workerCount = this.getWorkerCount();
 
