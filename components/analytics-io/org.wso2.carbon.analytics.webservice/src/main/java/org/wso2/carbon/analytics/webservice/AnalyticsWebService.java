@@ -55,6 +55,7 @@ import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,6 +124,23 @@ public class AnalyticsWebService extends AbstractAdmin {
         } catch (Exception e) {
             logger.error("unable to get the stream definition: " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("unable to get the stream definition: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * This method can use to remove existing stream definition from system using the Event stream publisher.
+     *
+     * @param name    The name of the stream.
+     * @param version The version of the stream
+     * @throws AnalyticsWebServiceException
+     */
+    public void removeStreamDefinition(String name, String version) throws AnalyticsWebServiceException {
+        try {
+            eventStreamService.removeEventStreamDefinition(name, version);
+        } catch (EventStreamConfigurationException e) {
+            logger.error("Unable to remove stream definition: [" + name + ":" + version + "]" + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("Unable to remove stream definition: [" + name + ":" + version + "], " +
+                    e.getMessage(), e);
         }
     }
 

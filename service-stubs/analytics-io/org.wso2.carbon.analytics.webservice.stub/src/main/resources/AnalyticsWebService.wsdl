@@ -1,4 +1,5 @@
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://webservice.analytics.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax231="http://exception.commons.databridge.carbon.wso2.org/xsd" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:ax229="http://beans.webservice.analytics.carbon.wso2.org/xsd" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ax227="http://exception.webservice.analytics.carbon.wso2.org/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://webservice.analytics.carbon.wso2.org">
+
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://webservice.analytics.carbon.wso2.org" xmlns:ax231="http://exception.commons.databridge.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax229="http://beans.webservice.analytics.carbon.wso2.org/xsd" xmlns:ax227="http://exception.webservice.analytics.carbon.wso2.org/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://webservice.analytics.carbon.wso2.org">
     <wsdl:documentation>AnalyticsWebService</wsdl:documentation>
     <wsdl:types>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://exception.webservice.analytics.carbon.wso2.org/xsd">
@@ -7,31 +8,6 @@
             </xs:complexType>
         </xs:schema>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://beans.webservice.analytics.carbon.wso2.org/xsd">
-            <xs:complexType name="AnalyticsAggregateRequest">
-                <xs:sequence>
-                    <xs:element minOccurs="0" name="aggregateLevel" type="xs:int"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="fields" nillable="true" type="ax229:AnalyticsAggregateField"/>
-                    <xs:element minOccurs="0" name="groupByField" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="noOfRecords" type="xs:int"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="parentPath" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="query" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                </xs:sequence>
-            </xs:complexType>
-            <xs:complexType name="AnalyticsAggregateField">
-                <xs:sequence>
-                    <xs:element minOccurs="0" name="aggregate" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="alias" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="fields" nillable="true" type="xs:string"/>
-                </xs:sequence>
-            </xs:complexType>
-            <xs:complexType name="AggregateResponse">
-                <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="recordBeans" nillable="true" type="ax229:RecordBean"/>
-                    <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                </xs:sequence>
-            </xs:complexType>
             <xs:complexType name="RecordBean">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="id" nillable="true" type="xs:string"/>
@@ -58,11 +34,41 @@
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="path" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="AnalyticsAggregateRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="aggregateLevel" type="xs:int"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="fields" nillable="true" type="ax229:AnalyticsAggregateField"/>
+                    <xs:element minOccurs="0" name="groupByField" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="noOfRecords" type="xs:int"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="parentPath" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="query" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="AnalyticsAggregateField">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="aggregate" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="alias" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="fields" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="AggregateResponse">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="recordBeans" nillable="true" type="ax229:RecordBean"/>
+                    <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
             <xs:complexType name="SortByFieldBean">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="reversed" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="sortType" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ValuesBatchBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="keyValues" nillable="true" type="ax229:RecordValueEntryBean"/>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="AnalyticsDrillDownRequestBean">
@@ -132,11 +138,6 @@
                     <xs:element minOccurs="0" name="scoreParam" type="xs:boolean"/>
                 </xs:sequence>
             </xs:complexType>
-            <xs:complexType name="ValuesBatchBean">
-                <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="keyValues" nillable="true" type="ax229:RecordValueEntryBean"/>
-                </xs:sequence>
-            </xs:complexType>
             <xs:complexType name="StreamDefinitionBean">
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationData" nillable="true" type="ax229:StreamDefAttributeBean"/>
@@ -174,28 +175,14 @@
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>
-        <xs:schema xmlns:ax232="http://exception.commons.databridge.carbon.wso2.org/xsd" xmlns:ax230="http://beans.webservice.analytics.carbon.wso2.org/xsd" xmlns:ax228="http://exception.webservice.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://webservice.analytics.carbon.wso2.org">
+        <xs:schema xmlns:ax232="http://exception.commons.databridge.carbon.wso2.org/xsd" xmlns:ax228="http://exception.webservice.analytics.carbon.wso2.org/xsd" xmlns:ax230="http://beans.webservice.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://webservice.analytics.carbon.wso2.org">
             <xs:import namespace="http://exception.webservice.analytics.carbon.wso2.org/xsd"/>
             <xs:import namespace="http://beans.webservice.analytics.carbon.wso2.org/xsd"/>
             <xs:import namespace="http://exception.commons.databridge.carbon.wso2.org/xsd"/>
             <xs:element name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="AnalyticsWebServiceException" nillable="true" type="ax227:AnalyticsWebServiceException"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="searchMultiTablesWithAggregates">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="requests" nillable="true" type="ax230:AnalyticsAggregateRequest"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="searchMultiTablesWithAggregatesResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:AggregateResponse"/>
+                        <xs:element minOccurs="0" name="AnalyticsWebServiceException" nillable="true" type="ax228:AnalyticsWebServiceException"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -216,6 +203,20 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:RecordBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="searchMultiTablesWithAggregates">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="requests" nillable="true" type="ax230:AnalyticsAggregateRequest"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="searchMultiTablesWithAggregatesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:AggregateResponse"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -251,6 +252,65 @@
                     <xs:sequence>
                         <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="maxWait" type="xs:long"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="tableExists">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="tableExistsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listTables">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listTablesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRecordCount">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="timeFrom" type="xs:long"/>
+                        <xs:element minOccurs="0" name="timeTo" type="xs:long"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRecordCountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:long"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getWithKeyValues">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="numPartitionsHint" type="xs:int"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="valuesBatchBeans" nillable="true" type="ax230:ValuesBatchBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getWithKeyValuesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:RecordBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -425,65 +485,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="tableExists">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="tableExistsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="listTables">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="listTablesResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getRecordCount">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="timeFrom" type="xs:long"/>
-                        <xs:element minOccurs="0" name="timeTo" type="xs:long"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getRecordCountResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:long"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getWithKeyValues">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="numPartitionsHint" type="xs:int"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="valuesBatchBeans" nillable="true" type="ax230:ValuesBatchBean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getWithKeyValuesResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:RecordBean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="clearIndices">
                 <xs:complexType>
                     <xs:sequence>
@@ -524,6 +525,14 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeStreamDefinition">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -570,47 +579,11 @@
             </xs:element>
         </xs:schema>
     </wsdl:types>
-    <wsdl:message name="isPaginationSupportedRequest">
-        <wsdl:part name="parameters" element="ns:isPaginationSupported"/>
-    </wsdl:message>
-    <wsdl:message name="isPaginationSupportedResponse">
-        <wsdl:part name="parameters" element="ns:isPaginationSupportedResponse"/>
-    </wsdl:message>
-    <wsdl:message name="AnalyticsWebServiceAnalyticsWebServiceException">
-        <wsdl:part name="parameters" element="ns:AnalyticsWebServiceAnalyticsWebServiceException"/>
-    </wsdl:message>
-    <wsdl:message name="listTablesRequest">
-        <wsdl:part name="parameters" element="ns:listTables"/>
-    </wsdl:message>
-    <wsdl:message name="listTablesResponse">
-        <wsdl:part name="parameters" element="ns:listTablesResponse"/>
-    </wsdl:message>
-    <wsdl:message name="getTableSchemaRequest">
-        <wsdl:part name="parameters" element="ns:getTableSchema"/>
-    </wsdl:message>
-    <wsdl:message name="getTableSchemaResponse">
-        <wsdl:part name="parameters" element="ns:getTableSchemaResponse"/>
-    </wsdl:message>
     <wsdl:message name="createTableRequest">
         <wsdl:part name="parameters" element="ns:createTable"/>
     </wsdl:message>
-    <wsdl:message name="reIndexRequest">
-        <wsdl:part name="parameters" element="ns:reIndex"/>
-    </wsdl:message>
-    <wsdl:message name="searchCountRequest">
-        <wsdl:part name="parameters" element="ns:searchCount"/>
-    </wsdl:message>
-    <wsdl:message name="searchCountResponse">
-        <wsdl:part name="parameters" element="ns:searchCountResponse"/>
-    </wsdl:message>
-    <wsdl:message name="waitForIndexingForTableRequest">
-        <wsdl:part name="parameters" element="ns:waitForIndexingForTable"/>
-    </wsdl:message>
-    <wsdl:message name="tableExistsRequest">
-        <wsdl:part name="parameters" element="ns:tableExists"/>
-    </wsdl:message>
-    <wsdl:message name="tableExistsResponse">
-        <wsdl:part name="parameters" element="ns:tableExistsResponse"/>
+    <wsdl:message name="AnalyticsWebServiceAnalyticsWebServiceException">
+        <wsdl:part name="parameters" element="ns:AnalyticsWebServiceAnalyticsWebServiceException"/>
     </wsdl:message>
     <wsdl:message name="listRecordStoreNamesRequest">
         <wsdl:part name="parameters" element="ns:listRecordStoreNames"/>
@@ -618,11 +591,53 @@
     <wsdl:message name="listRecordStoreNamesResponse">
         <wsdl:part name="parameters" element="ns:listRecordStoreNamesResponse"/>
     </wsdl:message>
-    <wsdl:message name="searchRequest">
-        <wsdl:part name="parameters" element="ns:search"/>
+    <wsdl:message name="listTablesRequest">
+        <wsdl:part name="parameters" element="ns:listTables"/>
     </wsdl:message>
-    <wsdl:message name="searchResponse">
-        <wsdl:part name="parameters" element="ns:searchResponse"/>
+    <wsdl:message name="listTablesResponse">
+        <wsdl:part name="parameters" element="ns:listTablesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="searchWithSortingRequest">
+        <wsdl:part name="parameters" element="ns:searchWithSorting"/>
+    </wsdl:message>
+    <wsdl:message name="searchWithSortingResponse">
+        <wsdl:part name="parameters" element="ns:searchWithSortingResponse"/>
+    </wsdl:message>
+    <wsdl:message name="searchCountRequest">
+        <wsdl:part name="parameters" element="ns:searchCount"/>
+    </wsdl:message>
+    <wsdl:message name="searchCountResponse">
+        <wsdl:part name="parameters" element="ns:searchCountResponse"/>
+    </wsdl:message>
+    <wsdl:message name="deleteByIdsRequest">
+        <wsdl:part name="parameters" element="ns:deleteByIds"/>
+    </wsdl:message>
+    <wsdl:message name="drillDownCategoriesRequest">
+        <wsdl:part name="parameters" element="ns:drillDownCategories"/>
+    </wsdl:message>
+    <wsdl:message name="drillDownCategoriesResponse">
+        <wsdl:part name="parameters" element="ns:drillDownCategoriesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getByRangeRequest">
+        <wsdl:part name="parameters" element="ns:getByRange"/>
+    </wsdl:message>
+    <wsdl:message name="getByRangeResponse">
+        <wsdl:part name="parameters" element="ns:getByRangeResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getTableSchemaRequest">
+        <wsdl:part name="parameters" element="ns:getTableSchema"/>
+    </wsdl:message>
+    <wsdl:message name="getTableSchemaResponse">
+        <wsdl:part name="parameters" element="ns:getTableSchemaResponse"/>
+    </wsdl:message>
+    <wsdl:message name="searchWithAggregatesRequest">
+        <wsdl:part name="parameters" element="ns:searchWithAggregates"/>
+    </wsdl:message>
+    <wsdl:message name="searchWithAggregatesResponse">
+        <wsdl:part name="parameters" element="ns:searchWithAggregatesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="setTableSchemaRequest">
+        <wsdl:part name="parameters" element="ns:setTableSchema"/>
     </wsdl:message>
     <wsdl:message name="getRecordCountRequest">
         <wsdl:part name="parameters" element="ns:getRecordCount"/>
@@ -630,17 +645,62 @@
     <wsdl:message name="getRecordCountResponse">
         <wsdl:part name="parameters" element="ns:getRecordCountResponse"/>
     </wsdl:message>
-    <wsdl:message name="getRecordStoreNameByTableRequest">
-        <wsdl:part name="parameters" element="ns:getRecordStoreNameByTable"/>
+    <wsdl:message name="getByIdRequest">
+        <wsdl:part name="parameters" element="ns:getById"/>
     </wsdl:message>
-    <wsdl:message name="getRecordStoreNameByTableResponse">
-        <wsdl:part name="parameters" element="ns:getRecordStoreNameByTableResponse"/>
+    <wsdl:message name="getByIdResponse">
+        <wsdl:part name="parameters" element="ns:getByIdResponse"/>
     </wsdl:message>
-    <wsdl:message name="getWithKeyValuesRequest">
-        <wsdl:part name="parameters" element="ns:getWithKeyValues"/>
+    <wsdl:message name="searchMultiTablesWithAggregatesRequest">
+        <wsdl:part name="parameters" element="ns:searchMultiTablesWithAggregates"/>
     </wsdl:message>
-    <wsdl:message name="getWithKeyValuesResponse">
-        <wsdl:part name="parameters" element="ns:getWithKeyValuesResponse"/>
+    <wsdl:message name="searchMultiTablesWithAggregatesResponse">
+        <wsdl:part name="parameters" element="ns:searchMultiTablesWithAggregatesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="drillDownSearchRequest">
+        <wsdl:part name="parameters" element="ns:drillDownSearch"/>
+    </wsdl:message>
+    <wsdl:message name="drillDownSearchResponse">
+        <wsdl:part name="parameters" element="ns:drillDownSearchResponse"/>
+    </wsdl:message>
+    <wsdl:message name="searchRequest">
+        <wsdl:part name="parameters" element="ns:search"/>
+    </wsdl:message>
+    <wsdl:message name="searchResponse">
+        <wsdl:part name="parameters" element="ns:searchResponse"/>
+    </wsdl:message>
+    <wsdl:message name="isPaginationSupportedRequest">
+        <wsdl:part name="parameters" element="ns:isPaginationSupported"/>
+    </wsdl:message>
+    <wsdl:message name="isPaginationSupportedResponse">
+        <wsdl:part name="parameters" element="ns:isPaginationSupportedResponse"/>
+    </wsdl:message>
+    <wsdl:message name="tableExistsRequest">
+        <wsdl:part name="parameters" element="ns:tableExists"/>
+    </wsdl:message>
+    <wsdl:message name="tableExistsResponse">
+        <wsdl:part name="parameters" element="ns:tableExistsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addStreamDefinitionRequest">
+        <wsdl:part name="parameters" element="ns:addStreamDefinition"/>
+    </wsdl:message>
+    <wsdl:message name="addStreamDefinitionResponse">
+        <wsdl:part name="parameters" element="ns:addStreamDefinitionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="AnalyticsWebServiceMalformedStreamDefinitionException">
+        <wsdl:part name="parameters" element="ns:AnalyticsWebServiceMalformedStreamDefinitionException"/>
+    </wsdl:message>
+    <wsdl:message name="waitForIndexingRequest">
+        <wsdl:part name="parameters" element="ns:waitForIndexing"/>
+    </wsdl:message>
+    <wsdl:message name="clearIndicesRequest">
+        <wsdl:part name="parameters" element="ns:clearIndices"/>
+    </wsdl:message>
+    <wsdl:message name="publishEventRequest">
+        <wsdl:part name="parameters" element="ns:publishEvent"/>
+    </wsdl:message>
+    <wsdl:message name="removeStreamDefinitionRequest">
+        <wsdl:part name="parameters" element="ns:removeStreamDefinition"/>
     </wsdl:message>
     <wsdl:message name="drillDownSearchCountRequest">
         <wsdl:part name="parameters" element="ns:drillDownSearchCount"/>
@@ -654,35 +714,14 @@
     <wsdl:message name="getStreamDefinitionResponse">
         <wsdl:part name="parameters" element="ns:getStreamDefinitionResponse"/>
     </wsdl:message>
-    <wsdl:message name="addStreamDefinitionRequest">
-        <wsdl:part name="parameters" element="ns:addStreamDefinition"/>
+    <wsdl:message name="reIndexRequest">
+        <wsdl:part name="parameters" element="ns:reIndex"/>
     </wsdl:message>
-    <wsdl:message name="addStreamDefinitionResponse">
-        <wsdl:part name="parameters" element="ns:addStreamDefinitionResponse"/>
+    <wsdl:message name="getRecordStoreNameByTableRequest">
+        <wsdl:part name="parameters" element="ns:getRecordStoreNameByTable"/>
     </wsdl:message>
-    <wsdl:message name="AnalyticsWebServiceMalformedStreamDefinitionException">
-        <wsdl:part name="parameters" element="ns:AnalyticsWebServiceMalformedStreamDefinitionException"/>
-    </wsdl:message>
-    <wsdl:message name="searchWithAggregatesRequest">
-        <wsdl:part name="parameters" element="ns:searchWithAggregates"/>
-    </wsdl:message>
-    <wsdl:message name="searchWithAggregatesResponse">
-        <wsdl:part name="parameters" element="ns:searchWithAggregatesResponse"/>
-    </wsdl:message>
-    <wsdl:message name="waitForIndexingRequest">
-        <wsdl:part name="parameters" element="ns:waitForIndexing"/>
-    </wsdl:message>
-    <wsdl:message name="getByRangeRequest">
-        <wsdl:part name="parameters" element="ns:getByRange"/>
-    </wsdl:message>
-    <wsdl:message name="getByRangeResponse">
-        <wsdl:part name="parameters" element="ns:getByRangeResponse"/>
-    </wsdl:message>
-    <wsdl:message name="searchMultiTablesWithAggregatesRequest">
-        <wsdl:part name="parameters" element="ns:searchMultiTablesWithAggregates"/>
-    </wsdl:message>
-    <wsdl:message name="searchMultiTablesWithAggregatesResponse">
-        <wsdl:part name="parameters" element="ns:searchMultiTablesWithAggregatesResponse"/>
+    <wsdl:message name="getRecordStoreNameByTableResponse">
+        <wsdl:part name="parameters" element="ns:getRecordStoreNameByTableResponse"/>
     </wsdl:message>
     <wsdl:message name="isRecordCountSupportedRequest">
         <wsdl:part name="parameters" element="ns:isRecordCountSupported"/>
@@ -690,104 +729,124 @@
     <wsdl:message name="isRecordCountSupportedResponse">
         <wsdl:part name="parameters" element="ns:isRecordCountSupportedResponse"/>
     </wsdl:message>
-    <wsdl:message name="searchWithSortingRequest">
-        <wsdl:part name="parameters" element="ns:searchWithSorting"/>
+    <wsdl:message name="getWithKeyValuesRequest">
+        <wsdl:part name="parameters" element="ns:getWithKeyValues"/>
     </wsdl:message>
-    <wsdl:message name="searchWithSortingResponse">
-        <wsdl:part name="parameters" element="ns:searchWithSortingResponse"/>
+    <wsdl:message name="getWithKeyValuesResponse">
+        <wsdl:part name="parameters" element="ns:getWithKeyValuesResponse"/>
     </wsdl:message>
-    <wsdl:message name="drillDownSearchRequest">
-        <wsdl:part name="parameters" element="ns:drillDownSearch"/>
-    </wsdl:message>
-    <wsdl:message name="drillDownSearchResponse">
-        <wsdl:part name="parameters" element="ns:drillDownSearchResponse"/>
-    </wsdl:message>
-    <wsdl:message name="drillDownCategoriesRequest">
-        <wsdl:part name="parameters" element="ns:drillDownCategories"/>
-    </wsdl:message>
-    <wsdl:message name="drillDownCategoriesResponse">
-        <wsdl:part name="parameters" element="ns:drillDownCategoriesResponse"/>
-    </wsdl:message>
-    <wsdl:message name="setTableSchemaRequest">
-        <wsdl:part name="parameters" element="ns:setTableSchema"/>
-    </wsdl:message>
-    <wsdl:message name="clearIndicesRequest">
-        <wsdl:part name="parameters" element="ns:clearIndices"/>
-    </wsdl:message>
-    <wsdl:message name="getByIdRequest">
-        <wsdl:part name="parameters" element="ns:getById"/>
-    </wsdl:message>
-    <wsdl:message name="getByIdResponse">
-        <wsdl:part name="parameters" element="ns:getByIdResponse"/>
-    </wsdl:message>
-    <wsdl:message name="publishEventRequest">
-        <wsdl:part name="parameters" element="ns:publishEvent"/>
-    </wsdl:message>
-    <wsdl:message name="deleteByIdsRequest">
-        <wsdl:part name="parameters" element="ns:deleteByIds"/>
+    <wsdl:message name="waitForIndexingForTableRequest">
+        <wsdl:part name="parameters" element="ns:waitForIndexingForTable"/>
     </wsdl:message>
     <wsdl:portType name="AnalyticsWebServicePortType">
-        <wsdl:operation name="isPaginationSupported">
-            <wsdl:input message="ns:isPaginationSupportedRequest" wsaw:Action="urn:isPaginationSupported"/>
-            <wsdl:output message="ns:isPaginationSupportedResponse" wsaw:Action="urn:isPaginationSupportedResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:isPaginationSupportedAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="listTables">
-            <wsdl:input message="ns:listTablesRequest" wsaw:Action="urn:listTables"/>
-            <wsdl:output message="ns:listTablesResponse" wsaw:Action="urn:listTablesResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:listTablesAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="getTableSchema">
-            <wsdl:input message="ns:getTableSchemaRequest" wsaw:Action="urn:getTableSchema"/>
-            <wsdl:output message="ns:getTableSchemaResponse" wsaw:Action="urn:getTableSchemaResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getTableSchemaAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
         <wsdl:operation name="createTable">
             <wsdl:input message="ns:createTableRequest" wsaw:Action="urn:createTable"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:createTableAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="reIndex">
-            <wsdl:input message="ns:reIndexRequest" wsaw:Action="urn:reIndex"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:reIndexAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="searchCount">
-            <wsdl:input message="ns:searchCountRequest" wsaw:Action="urn:searchCount"/>
-            <wsdl:output message="ns:searchCountResponse" wsaw:Action="urn:searchCountResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:searchCountAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="waitForIndexingForTable">
-            <wsdl:input message="ns:waitForIndexingForTableRequest" wsaw:Action="urn:waitForIndexingForTable"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:waitForIndexingForTableAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="tableExists">
-            <wsdl:input message="ns:tableExistsRequest" wsaw:Action="urn:tableExists"/>
-            <wsdl:output message="ns:tableExistsResponse" wsaw:Action="urn:tableExistsResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:tableExistsAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
         <wsdl:operation name="listRecordStoreNames">
             <wsdl:input message="ns:listRecordStoreNamesRequest" wsaw:Action="urn:listRecordStoreNames"/>
             <wsdl:output message="ns:listRecordStoreNamesResponse" wsaw:Action="urn:listRecordStoreNamesResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:listRecordStoreNamesAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
-        <wsdl:operation name="search">
-            <wsdl:input message="ns:searchRequest" wsaw:Action="urn:search"/>
-            <wsdl:output message="ns:searchResponse" wsaw:Action="urn:searchResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:searchAnalyticsWebServiceAnalyticsWebServiceException"/>
+        <wsdl:operation name="listTables">
+            <wsdl:input message="ns:listTablesRequest" wsaw:Action="urn:listTables"/>
+            <wsdl:output message="ns:listTablesResponse" wsaw:Action="urn:listTablesResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:listTablesAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="searchWithSorting">
+            <wsdl:input message="ns:searchWithSortingRequest" wsaw:Action="urn:searchWithSorting"/>
+            <wsdl:output message="ns:searchWithSortingResponse" wsaw:Action="urn:searchWithSortingResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:searchWithSortingAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="searchCount">
+            <wsdl:input message="ns:searchCountRequest" wsaw:Action="urn:searchCount"/>
+            <wsdl:output message="ns:searchCountResponse" wsaw:Action="urn:searchCountResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:searchCountAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteByIds">
+            <wsdl:input message="ns:deleteByIdsRequest" wsaw:Action="urn:deleteByIds"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:deleteByIdsAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="drillDownCategories">
+            <wsdl:input message="ns:drillDownCategoriesRequest" wsaw:Action="urn:drillDownCategories"/>
+            <wsdl:output message="ns:drillDownCategoriesResponse" wsaw:Action="urn:drillDownCategoriesResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:drillDownCategoriesAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getByRange">
+            <wsdl:input message="ns:getByRangeRequest" wsaw:Action="urn:getByRange"/>
+            <wsdl:output message="ns:getByRangeResponse" wsaw:Action="urn:getByRangeResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getByRangeAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getTableSchema">
+            <wsdl:input message="ns:getTableSchemaRequest" wsaw:Action="urn:getTableSchema"/>
+            <wsdl:output message="ns:getTableSchemaResponse" wsaw:Action="urn:getTableSchemaResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getTableSchemaAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="searchWithAggregates">
+            <wsdl:input message="ns:searchWithAggregatesRequest" wsaw:Action="urn:searchWithAggregates"/>
+            <wsdl:output message="ns:searchWithAggregatesResponse" wsaw:Action="urn:searchWithAggregatesResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:searchWithAggregatesAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="setTableSchema">
+            <wsdl:input message="ns:setTableSchemaRequest" wsaw:Action="urn:setTableSchema"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:setTableSchemaAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
         <wsdl:operation name="getRecordCount">
             <wsdl:input message="ns:getRecordCountRequest" wsaw:Action="urn:getRecordCount"/>
             <wsdl:output message="ns:getRecordCountResponse" wsaw:Action="urn:getRecordCountResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getRecordCountAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
-        <wsdl:operation name="getRecordStoreNameByTable">
-            <wsdl:input message="ns:getRecordStoreNameByTableRequest" wsaw:Action="urn:getRecordStoreNameByTable"/>
-            <wsdl:output message="ns:getRecordStoreNameByTableResponse" wsaw:Action="urn:getRecordStoreNameByTableResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getRecordStoreNameByTableAnalyticsWebServiceAnalyticsWebServiceException"/>
+        <wsdl:operation name="getById">
+            <wsdl:input message="ns:getByIdRequest" wsaw:Action="urn:getById"/>
+            <wsdl:output message="ns:getByIdResponse" wsaw:Action="urn:getByIdResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getByIdAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
-        <wsdl:operation name="getWithKeyValues">
-            <wsdl:input message="ns:getWithKeyValuesRequest" wsaw:Action="urn:getWithKeyValues"/>
-            <wsdl:output message="ns:getWithKeyValuesResponse" wsaw:Action="urn:getWithKeyValuesResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getWithKeyValuesAnalyticsWebServiceAnalyticsWebServiceException"/>
+        <wsdl:operation name="searchMultiTablesWithAggregates">
+            <wsdl:input message="ns:searchMultiTablesWithAggregatesRequest" wsaw:Action="urn:searchMultiTablesWithAggregates"/>
+            <wsdl:output message="ns:searchMultiTablesWithAggregatesResponse" wsaw:Action="urn:searchMultiTablesWithAggregatesResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:searchMultiTablesWithAggregatesAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="drillDownSearch">
+            <wsdl:input message="ns:drillDownSearchRequest" wsaw:Action="urn:drillDownSearch"/>
+            <wsdl:output message="ns:drillDownSearchResponse" wsaw:Action="urn:drillDownSearchResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:drillDownSearchAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <wsdl:input message="ns:searchRequest" wsaw:Action="urn:search"/>
+            <wsdl:output message="ns:searchResponse" wsaw:Action="urn:searchResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:searchAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="isPaginationSupported">
+            <wsdl:input message="ns:isPaginationSupportedRequest" wsaw:Action="urn:isPaginationSupported"/>
+            <wsdl:output message="ns:isPaginationSupportedResponse" wsaw:Action="urn:isPaginationSupportedResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:isPaginationSupportedAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="tableExists">
+            <wsdl:input message="ns:tableExistsRequest" wsaw:Action="urn:tableExists"/>
+            <wsdl:output message="ns:tableExistsResponse" wsaw:Action="urn:tableExistsResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:tableExistsAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addStreamDefinition">
+            <wsdl:input message="ns:addStreamDefinitionRequest" wsaw:Action="urn:addStreamDefinition"/>
+            <wsdl:output message="ns:addStreamDefinitionResponse" wsaw:Action="urn:addStreamDefinitionResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:addStreamDefinitionAnalyticsWebServiceAnalyticsWebServiceException"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceMalformedStreamDefinitionException" name="AnalyticsWebServiceMalformedStreamDefinitionException" wsaw:Action="urn:addStreamDefinitionAnalyticsWebServiceMalformedStreamDefinitionException"/>
+        </wsdl:operation>
+        <wsdl:operation name="waitForIndexing">
+            <wsdl:input message="ns:waitForIndexingRequest" wsaw:Action="urn:waitForIndexing"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:waitForIndexingAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="clearIndices">
+            <wsdl:input message="ns:clearIndicesRequest" wsaw:Action="urn:clearIndices"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:clearIndicesAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="publishEvent">
+            <wsdl:input message="ns:publishEventRequest" wsaw:Action="urn:publishEvent"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:publishEventAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="removeStreamDefinition">
+            <wsdl:input message="ns:removeStreamDefinitionRequest" wsaw:Action="urn:removeStreamDefinition"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:removeStreamDefinitionAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
         <wsdl:operation name="drillDownSearchCount">
             <wsdl:input message="ns:drillDownSearchCountRequest" wsaw:Action="urn:drillDownSearchCount"/>
@@ -799,77 +858,55 @@
             <wsdl:output message="ns:getStreamDefinitionResponse" wsaw:Action="urn:getStreamDefinitionResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getStreamDefinitionAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
-        <wsdl:operation name="addStreamDefinition">
-            <wsdl:input message="ns:addStreamDefinitionRequest" wsaw:Action="urn:addStreamDefinition"/>
-            <wsdl:output message="ns:addStreamDefinitionResponse" wsaw:Action="urn:addStreamDefinitionResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:addStreamDefinitionAnalyticsWebServiceAnalyticsWebServiceException"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceMalformedStreamDefinitionException" name="AnalyticsWebServiceMalformedStreamDefinitionException" wsaw:Action="urn:addStreamDefinitionAnalyticsWebServiceMalformedStreamDefinitionException"/>
+        <wsdl:operation name="reIndex">
+            <wsdl:input message="ns:reIndexRequest" wsaw:Action="urn:reIndex"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:reIndexAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
-        <wsdl:operation name="searchWithAggregates">
-            <wsdl:input message="ns:searchWithAggregatesRequest" wsaw:Action="urn:searchWithAggregates"/>
-            <wsdl:output message="ns:searchWithAggregatesResponse" wsaw:Action="urn:searchWithAggregatesResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:searchWithAggregatesAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="waitForIndexing">
-            <wsdl:input message="ns:waitForIndexingRequest" wsaw:Action="urn:waitForIndexing"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:waitForIndexingAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="getByRange">
-            <wsdl:input message="ns:getByRangeRequest" wsaw:Action="urn:getByRange"/>
-            <wsdl:output message="ns:getByRangeResponse" wsaw:Action="urn:getByRangeResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getByRangeAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="searchMultiTablesWithAggregates">
-            <wsdl:input message="ns:searchMultiTablesWithAggregatesRequest" wsaw:Action="urn:searchMultiTablesWithAggregates"/>
-            <wsdl:output message="ns:searchMultiTablesWithAggregatesResponse" wsaw:Action="urn:searchMultiTablesWithAggregatesResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:searchMultiTablesWithAggregatesAnalyticsWebServiceAnalyticsWebServiceException"/>
+        <wsdl:operation name="getRecordStoreNameByTable">
+            <wsdl:input message="ns:getRecordStoreNameByTableRequest" wsaw:Action="urn:getRecordStoreNameByTable"/>
+            <wsdl:output message="ns:getRecordStoreNameByTableResponse" wsaw:Action="urn:getRecordStoreNameByTableResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getRecordStoreNameByTableAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
         <wsdl:operation name="isRecordCountSupported">
             <wsdl:input message="ns:isRecordCountSupportedRequest" wsaw:Action="urn:isRecordCountSupported"/>
             <wsdl:output message="ns:isRecordCountSupportedResponse" wsaw:Action="urn:isRecordCountSupportedResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:isRecordCountSupportedAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
-        <wsdl:operation name="searchWithSorting">
-            <wsdl:input message="ns:searchWithSortingRequest" wsaw:Action="urn:searchWithSorting"/>
-            <wsdl:output message="ns:searchWithSortingResponse" wsaw:Action="urn:searchWithSortingResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:searchWithSortingAnalyticsWebServiceAnalyticsWebServiceException"/>
+        <wsdl:operation name="getWithKeyValues">
+            <wsdl:input message="ns:getWithKeyValuesRequest" wsaw:Action="urn:getWithKeyValues"/>
+            <wsdl:output message="ns:getWithKeyValuesResponse" wsaw:Action="urn:getWithKeyValuesResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getWithKeyValuesAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
-        <wsdl:operation name="drillDownSearch">
-            <wsdl:input message="ns:drillDownSearchRequest" wsaw:Action="urn:drillDownSearch"/>
-            <wsdl:output message="ns:drillDownSearchResponse" wsaw:Action="urn:drillDownSearchResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:drillDownSearchAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="drillDownCategories">
-            <wsdl:input message="ns:drillDownCategoriesRequest" wsaw:Action="urn:drillDownCategories"/>
-            <wsdl:output message="ns:drillDownCategoriesResponse" wsaw:Action="urn:drillDownCategoriesResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:drillDownCategoriesAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="setTableSchema">
-            <wsdl:input message="ns:setTableSchemaRequest" wsaw:Action="urn:setTableSchema"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:setTableSchemaAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="clearIndices">
-            <wsdl:input message="ns:clearIndicesRequest" wsaw:Action="urn:clearIndices"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:clearIndicesAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="getById">
-            <wsdl:input message="ns:getByIdRequest" wsaw:Action="urn:getById"/>
-            <wsdl:output message="ns:getByIdResponse" wsaw:Action="urn:getByIdResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getByIdAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="publishEvent">
-            <wsdl:input message="ns:publishEventRequest" wsaw:Action="urn:publishEvent"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:publishEventAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="deleteByIds">
-            <wsdl:input message="ns:deleteByIdsRequest" wsaw:Action="urn:deleteByIds"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:deleteByIdsAnalyticsWebServiceAnalyticsWebServiceException"/>
+        <wsdl:operation name="waitForIndexingForTable">
+            <wsdl:input message="ns:waitForIndexingForTableRequest" wsaw:Action="urn:waitForIndexingForTable"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:waitForIndexingForTableAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="AnalyticsWebServiceSoap11Binding" type="ns:AnalyticsWebServicePortType">
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-        <wsdl:operation name="isPaginationSupported">
-            <soap:operation soapAction="urn:isPaginationSupported" style="document"/>
+        <wsdl:operation name="createTable">
+            <soap:operation soapAction="urn:createTable" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="listRecordStoreNames">
+            <soap:operation soapAction="urn:listRecordStoreNames" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="searchWithSorting">
+            <soap:operation soapAction="urn:searchWithSorting" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -892,36 +929,6 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getTableSchema">
-            <soap:operation soapAction="urn:getTableSchema" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="createTable">
-            <soap:operation soapAction="urn:createTable" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="reIndex">
-            <soap:operation soapAction="urn:reIndex" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="searchCount">
             <soap:operation soapAction="urn:searchCount" style="document"/>
             <wsdl:input>
@@ -934,8 +941,8 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="waitForIndexingForTable">
-            <soap:operation soapAction="urn:waitForIndexingForTable" style="document"/>
+        <wsdl:operation name="deleteByIds">
+            <soap:operation soapAction="urn:deleteByIds" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -943,20 +950,8 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="tableExists">
-            <soap:operation soapAction="urn:tableExists" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="listRecordStoreNames">
-            <soap:operation soapAction="urn:listRecordStoreNames" style="document"/>
+        <wsdl:operation name="drillDownCategories">
+            <soap:operation soapAction="urn:drillDownCategories" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -967,8 +962,32 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="search">
-            <soap:operation soapAction="urn:search" style="document"/>
+        <wsdl:operation name="getByRange">
+            <soap:operation soapAction="urn:getByRange" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getTableSchema">
+            <soap:operation soapAction="urn:getTableSchema" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="searchWithAggregates">
+            <soap:operation soapAction="urn:searchWithAggregates" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -991,8 +1010,17 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getRecordStoreNameByTable">
-            <soap:operation soapAction="urn:getRecordStoreNameByTable" style="document"/>
+        <wsdl:operation name="setTableSchema">
+            <soap:operation soapAction="urn:setTableSchema" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getById">
+            <soap:operation soapAction="urn:getById" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -1003,8 +1031,8 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getWithKeyValues">
-            <soap:operation soapAction="urn:getWithKeyValues" style="document"/>
+        <wsdl:operation name="searchMultiTablesWithAggregates">
+            <soap:operation soapAction="urn:searchMultiTablesWithAggregates" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -1015,8 +1043,8 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="drillDownSearchCount">
-            <soap:operation soapAction="urn:drillDownSearchCount" style="document"/>
+        <wsdl:operation name="drillDownSearch">
+            <soap:operation soapAction="urn:drillDownSearch" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -1027,8 +1055,32 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getStreamDefinition">
-            <soap:operation soapAction="urn:getStreamDefinition" style="document"/>
+        <wsdl:operation name="search">
+            <soap:operation soapAction="urn:search" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="tableExists">
+            <soap:operation soapAction="urn:tableExists" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isPaginationSupported">
+            <soap:operation soapAction="urn:isPaginationSupported" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -1054,18 +1106,6 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceMalformedStreamDefinitionException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="searchWithAggregates">
-            <soap:operation soapAction="urn:searchWithAggregates" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="waitForIndexing">
             <soap:operation soapAction="urn:waitForIndexing" style="document"/>
             <wsdl:input>
@@ -1075,8 +1115,17 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getByRange">
-            <soap:operation soapAction="urn:getByRange" style="document"/>
+        <wsdl:operation name="clearIndices">
+            <soap:operation soapAction="urn:clearIndices" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="drillDownSearchCount">
+            <soap:operation soapAction="urn:drillDownSearchCount" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -1087,8 +1136,47 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="searchMultiTablesWithAggregates">
-            <soap:operation soapAction="urn:searchMultiTablesWithAggregates" style="document"/>
+        <wsdl:operation name="removeStreamDefinition">
+            <soap:operation soapAction="urn:removeStreamDefinition" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="publishEvent">
+            <soap:operation soapAction="urn:publishEvent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getStreamDefinition">
+            <soap:operation soapAction="urn:getStreamDefinition" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="reIndex">
+            <soap:operation soapAction="urn:reIndex" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getRecordStoreNameByTable">
+            <soap:operation soapAction="urn:getRecordStoreNameByTable" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -1111,86 +1199,23 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="searchWithSorting">
-            <soap:operation soapAction="urn:searchWithSorting" style="document"/>
+        <wsdl:operation name="waitForIndexingForTable">
+            <soap:operation soapAction="urn:waitForIndexingForTable" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getWithKeyValues">
+            <soap:operation soapAction="urn:getWithKeyValues" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
                 <soap:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="drillDownSearch">
-            <soap:operation soapAction="urn:drillDownSearch" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="drillDownCategories">
-            <soap:operation soapAction="urn:drillDownCategories" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="setTableSchema">
-            <soap:operation soapAction="urn:setTableSchema" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="clearIndices">
-            <soap:operation soapAction="urn:clearIndices" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="getById">
-            <soap:operation soapAction="urn:getById" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="publishEvent">
-            <soap:operation soapAction="urn:publishEvent" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="deleteByIds">
-            <soap:operation soapAction="urn:deleteByIds" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
             <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
@@ -1198,8 +1223,29 @@
     </wsdl:binding>
     <wsdl:binding name="AnalyticsWebServiceSoap12Binding" type="ns:AnalyticsWebServicePortType">
         <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-        <wsdl:operation name="isPaginationSupported">
-            <soap12:operation soapAction="urn:isPaginationSupported" style="document"/>
+        <wsdl:operation name="createTable">
+            <soap12:operation soapAction="urn:createTable" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="listRecordStoreNames">
+            <soap12:operation soapAction="urn:listRecordStoreNames" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="searchWithSorting">
+            <soap12:operation soapAction="urn:searchWithSorting" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1222,36 +1268,6 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getTableSchema">
-            <soap12:operation soapAction="urn:getTableSchema" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="createTable">
-            <soap12:operation soapAction="urn:createTable" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="reIndex">
-            <soap12:operation soapAction="urn:reIndex" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="searchCount">
             <soap12:operation soapAction="urn:searchCount" style="document"/>
             <wsdl:input>
@@ -1264,8 +1280,8 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="waitForIndexingForTable">
-            <soap12:operation soapAction="urn:waitForIndexingForTable" style="document"/>
+        <wsdl:operation name="deleteByIds">
+            <soap12:operation soapAction="urn:deleteByIds" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1273,20 +1289,8 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="tableExists">
-            <soap12:operation soapAction="urn:tableExists" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="listRecordStoreNames">
-            <soap12:operation soapAction="urn:listRecordStoreNames" style="document"/>
+        <wsdl:operation name="drillDownCategories">
+            <soap12:operation soapAction="urn:drillDownCategories" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1297,8 +1301,32 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="search">
-            <soap12:operation soapAction="urn:search" style="document"/>
+        <wsdl:operation name="getByRange">
+            <soap12:operation soapAction="urn:getByRange" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getTableSchema">
+            <soap12:operation soapAction="urn:getTableSchema" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="searchWithAggregates">
+            <soap12:operation soapAction="urn:searchWithAggregates" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1321,8 +1349,17 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getRecordStoreNameByTable">
-            <soap12:operation soapAction="urn:getRecordStoreNameByTable" style="document"/>
+        <wsdl:operation name="setTableSchema">
+            <soap12:operation soapAction="urn:setTableSchema" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getById">
+            <soap12:operation soapAction="urn:getById" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1333,8 +1370,8 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getWithKeyValues">
-            <soap12:operation soapAction="urn:getWithKeyValues" style="document"/>
+        <wsdl:operation name="searchMultiTablesWithAggregates">
+            <soap12:operation soapAction="urn:searchMultiTablesWithAggregates" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1345,8 +1382,8 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="drillDownSearchCount">
-            <soap12:operation soapAction="urn:drillDownSearchCount" style="document"/>
+        <wsdl:operation name="drillDownSearch">
+            <soap12:operation soapAction="urn:drillDownSearch" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1357,8 +1394,32 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getStreamDefinition">
-            <soap12:operation soapAction="urn:getStreamDefinition" style="document"/>
+        <wsdl:operation name="search">
+            <soap12:operation soapAction="urn:search" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="tableExists">
+            <soap12:operation soapAction="urn:tableExists" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isPaginationSupported">
+            <soap12:operation soapAction="urn:isPaginationSupported" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1384,18 +1445,6 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceMalformedStreamDefinitionException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="searchWithAggregates">
-            <soap12:operation soapAction="urn:searchWithAggregates" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="waitForIndexing">
             <soap12:operation soapAction="urn:waitForIndexing" style="document"/>
             <wsdl:input>
@@ -1405,8 +1454,17 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getByRange">
-            <soap12:operation soapAction="urn:getByRange" style="document"/>
+        <wsdl:operation name="clearIndices">
+            <soap12:operation soapAction="urn:clearIndices" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="drillDownSearchCount">
+            <soap12:operation soapAction="urn:drillDownSearchCount" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1417,8 +1475,47 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="searchMultiTablesWithAggregates">
-            <soap12:operation soapAction="urn:searchMultiTablesWithAggregates" style="document"/>
+        <wsdl:operation name="removeStreamDefinition">
+            <soap12:operation soapAction="urn:removeStreamDefinition" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="publishEvent">
+            <soap12:operation soapAction="urn:publishEvent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getStreamDefinition">
+            <soap12:operation soapAction="urn:getStreamDefinition" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="reIndex">
+            <soap12:operation soapAction="urn:reIndex" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getRecordStoreNameByTable">
+            <soap12:operation soapAction="urn:getRecordStoreNameByTable" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1441,86 +1538,23 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="searchWithSorting">
-            <soap12:operation soapAction="urn:searchWithSorting" style="document"/>
+        <wsdl:operation name="waitForIndexingForTable">
+            <soap12:operation soapAction="urn:waitForIndexingForTable" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getWithKeyValues">
+            <soap12:operation soapAction="urn:getWithKeyValues" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
                 <soap12:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="drillDownSearch">
-            <soap12:operation soapAction="urn:drillDownSearch" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="drillDownCategories">
-            <soap12:operation soapAction="urn:drillDownCategories" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="setTableSchema">
-            <soap12:operation soapAction="urn:setTableSchema" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="clearIndices">
-            <soap12:operation soapAction="urn:clearIndices" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="getById">
-            <soap12:operation soapAction="urn:getById" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="publishEvent">
-            <soap12:operation soapAction="urn:publishEvent" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="deleteByIds">
-            <soap12:operation soapAction="urn:deleteByIds" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
             <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
@@ -1528,176 +1562,14 @@
     </wsdl:binding>
     <wsdl:binding name="AnalyticsWebServiceHttpBinding" type="ns:AnalyticsWebServicePortType">
         <http:binding verb="POST"/>
-        <wsdl:operation name="isPaginationSupported">
-            <http:operation location="isPaginationSupported"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="listTables">
-            <http:operation location="listTables"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getTableSchema">
-            <http:operation location="getTableSchema"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
         <wsdl:operation name="createTable">
             <http:operation location="createTable"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
         </wsdl:operation>
-        <wsdl:operation name="reIndex">
-            <http:operation location="reIndex"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="searchCount">
-            <http:operation location="searchCount"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="waitForIndexingForTable">
-            <http:operation location="waitForIndexingForTable"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="tableExists">
-            <http:operation location="tableExists"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
         <wsdl:operation name="listRecordStoreNames">
             <http:operation location="listRecordStoreNames"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="search">
-            <http:operation location="search"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getRecordCount">
-            <http:operation location="getRecordCount"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getRecordStoreNameByTable">
-            <http:operation location="getRecordStoreNameByTable"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getWithKeyValues">
-            <http:operation location="getWithKeyValues"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="drillDownSearchCount">
-            <http:operation location="drillDownSearchCount"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getStreamDefinition">
-            <http:operation location="getStreamDefinition"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="addStreamDefinition">
-            <http:operation location="addStreamDefinition"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="searchWithAggregates">
-            <http:operation location="searchWithAggregates"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="waitForIndexing">
-            <http:operation location="waitForIndexing"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="getByRange">
-            <http:operation location="getByRange"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="searchMultiTablesWithAggregates">
-            <http:operation location="searchMultiTablesWithAggregates"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="isRecordCountSupported">
-            <http:operation location="isRecordCountSupported"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1714,8 +1586,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="drillDownSearch">
-            <http:operation location="drillDownSearch"/>
+        <wsdl:operation name="listTables">
+            <http:operation location="listTables"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1723,8 +1595,59 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="searchCount">
+            <http:operation location="searchCount"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteByIds">
+            <http:operation location="deleteByIds"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
         <wsdl:operation name="drillDownCategories">
             <http:operation location="drillDownCategories"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getByRange">
+            <http:operation location="getByRange"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTableSchema">
+            <http:operation location="getTableSchema"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="searchWithAggregates">
+            <http:operation location="searchWithAggregates"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRecordCount">
+            <http:operation location="getRecordCount"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1738,12 +1661,6 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
         </wsdl:operation>
-        <wsdl:operation name="clearIndices">
-            <http:operation location="clearIndices"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
         <wsdl:operation name="getById">
             <http:operation location="getById"/>
             <wsdl:input>
@@ -1753,28 +1670,151 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="searchMultiTablesWithAggregates">
+            <http:operation location="searchMultiTablesWithAggregates"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="drillDownSearch">
+            <http:operation location="drillDownSearch"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <http:operation location="search"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="tableExists">
+            <http:operation location="tableExists"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isPaginationSupported">
+            <http:operation location="isPaginationSupported"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addStreamDefinition">
+            <http:operation location="addStreamDefinition"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="waitForIndexing">
+            <http:operation location="waitForIndexing"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="clearIndices">
+            <http:operation location="clearIndices"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="drillDownSearchCount">
+            <http:operation location="drillDownSearchCount"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="removeStreamDefinition">
+            <http:operation location="removeStreamDefinition"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
         <wsdl:operation name="publishEvent">
             <http:operation location="publishEvent"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
         </wsdl:operation>
-        <wsdl:operation name="deleteByIds">
-            <http:operation location="deleteByIds"/>
+        <wsdl:operation name="getStreamDefinition">
+            <http:operation location="getStreamDefinition"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="reIndex">
+            <http:operation location="reIndex"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
         </wsdl:operation>
+        <wsdl:operation name="getRecordStoreNameByTable">
+            <http:operation location="getRecordStoreNameByTable"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isRecordCountSupported">
+            <http:operation location="isRecordCountSupported"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="waitForIndexingForTable">
+            <http:operation location="waitForIndexingForTable"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getWithKeyValues">
+            <http:operation location="getWithKeyValues"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="AnalyticsWebService">
         <wsdl:port name="AnalyticsWebServiceHttpsSoap11Endpoint" binding="ns:AnalyticsWebServiceSoap11Binding">
-            <soap:address location="https://10.100.5.97:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsSoap11Endpoint/"/>
+            <soap:address location="https://10.100.0.225:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsSoap11Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="AnalyticsWebServiceHttpsSoap12Endpoint" binding="ns:AnalyticsWebServiceSoap12Binding">
-            <soap12:address location="https://10.100.5.97:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsSoap12Endpoint/"/>
+            <soap12:address location="https://10.100.0.225:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsSoap12Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="AnalyticsWebServiceHttpsEndpoint" binding="ns:AnalyticsWebServiceHttpBinding">
-            <http:address location="https://10.100.5.97:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsEndpoint/"/>
+            <http:address location="https://10.100.0.225:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsEndpoint/"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

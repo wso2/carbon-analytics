@@ -262,6 +262,7 @@
                     <include>spark-defaults.conf</include>
                     <include>spark-udf-config.xml</include>
                     <include>external-spark-classpath.conf</include>
+                    <include>carbon-spark-classpath.conf</include>
                     <include>fairscheduler.xml</include>
                     <include>log4j.properties.template</include>
                     <!-- moved to product-das DAS-110 -->
