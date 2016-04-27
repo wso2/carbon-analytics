@@ -72,7 +72,7 @@
                             org.wso2.carbon.analytics.common.jmx.agent.*
                         </Export-Package>
                         <Import-Package>
-                            org.wso2.carbon.ntask.core.*;version="${carbon.commons.version}",
+                            org.wso2.carbon.ntask.core.*;version="${carbon.commons.imp.pkg.version}",
                             org.wso2.carbon.event.stream.core.*;version="${carbon.analytics.common.version}",
                             org.wso2.carbon.databridge.commons.*;version="${carbon.analytics.common.version}",
                             *;resolution:=optional
