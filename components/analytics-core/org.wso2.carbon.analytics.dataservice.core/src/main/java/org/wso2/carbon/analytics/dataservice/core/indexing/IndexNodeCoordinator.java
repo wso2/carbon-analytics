@@ -110,7 +110,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
 
     public static boolean checkIfIndexingNode() {
-        String indexDisableProp =  System.getProperty(Constants.DISABLE_INDEXING_ENV_PROP);
+        String indexDisableProp = System.getProperty(Constants.DISABLE_INDEXING_ENV_PROP);
         return !(indexDisableProp != null && Boolean.parseBoolean(indexDisableProp));
     }
 
@@ -403,7 +403,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
         }
     }
 
-    private void processRemoteRecordDelete(String nodeId, int tenantId, String tableName, List<String> ids) throws AnalyticsException {
+    private void processRemoteRecordDelete(String nodeId, int tenantId, String tableName, List<String> ids)
+            throws AnalyticsException {
         Object member = null;
         try {
             member = this.shardMemberMap.getMemberFromNodeId(nodeId);
@@ -427,7 +428,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.stagingIndexDataStore.put(nodeId, records);
     }
 
-    private void addToStaging(String nodeId, int tenantId, String tableName, List<String> ids) throws AnalyticsException {
+    private void addToStaging(String nodeId, int tenantId, String tableName, List<String> ids)
+            throws AnalyticsException {
         this.stagingIndexDataStore.delete(nodeId, tenantId, tableName, ids);
     }
 
@@ -546,6 +548,13 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
 
     private void populateMyNodeId() throws AnalyticsException {
+
+        String sparkJvm = System.getProperty(Constants.SPARK_EXECUTOR_JVM_OPT);
+        if (sparkJvm != null && Boolean.parseBoolean(sparkJvm)) {
+            log.info("This is not a carbon JVM. Hence node ID will not be set");
+            return;
+        }
+
         if (this.myNodeId == null) {
             boolean create = false;
             try {
@@ -830,7 +839,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
 
         private Object member;
 
-        public LocalShardAddressInfo() { }
+        public LocalShardAddressInfo() {
+        }
 
         public LocalShardAddressInfo(String nodeId, Object member) {
             this.nodeId = nodeId;
@@ -972,7 +982,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
                             break;
                         }
                     }
-                }  catch (AnalyticsInterruptException e) {
+                } catch (AnalyticsInterruptException e) {
                     // This exception can be thrown from data queues, if the shutdown hook is triggered
                     log.debug("Staging Data Index Worker Interuppted [" + this.shardIndex + "]: " + e.getMessage(), e);
                     return;

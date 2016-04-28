@@ -625,13 +625,17 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         String jvmOpts = " -Dwso2_custom_conf_dir=" + carbonConfDir
                          + " -Dcarbon.home=" + carbonHome
+                         + " -Dcarbon.spark.executor.jvm=true"
+                         + " -DdisableIndexing=true"
+                         + " -DdisableDataPurging=true"
+                         + " -DdisableEventSink=true"
                          + " -Djavax.net.ssl.trustStore=" + System.getProperty("javax.net.ssl.trustStore")
                          + " -Djavax.net.ssl.trustStorePassword=" + System.getProperty("javax.net.ssl.trustStorePassword")
                          + " -DAgent.Config.Path=" + agentConfPath
                          + getLog4jPropertiesJvmOpt(analyticsSparkConfDir);
         conf.set("spark.executor.extraJavaOptions", conf.get("spark.executor.extraJavaOptions", "") + jvmOpts);
 
-        conf.set("spark.driver.extraJavaOptions", conf.get("spark.driver.extraJavaOptions", "") +  jvmOpts);
+//        conf.set("spark.driver.extraJavaOptions", conf.get("spark.driver.extraJavaOptions", "") +  jvmOpts);
 
         //setting the default limit for the spark query results
         conf.setIfMissing("carbon.spark.results.limit", "1000");
