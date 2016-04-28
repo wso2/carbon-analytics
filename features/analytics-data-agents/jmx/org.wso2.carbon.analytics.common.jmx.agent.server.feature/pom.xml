@@ -77,7 +77,7 @@
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>
-                                    org.wso2.carbon.ntask.core:compatible:${carbon.commons.version}
+                                    org.wso2.carbon.ntask.core:${carbon.commons.version}
                                 </importFeatureDef>
                                 <importFeatureDef>
                                     org.wso2.carbon.event.stream.server:${carbon.analytics.common.version}
