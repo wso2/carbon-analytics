@@ -55,6 +55,9 @@
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.commons</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.servlet</bundleDef>
                             </bundles>
+                            <importBundles>
+                                <importBundleDef>org.wso2.carbon.commons:org.wso2.carbon.identity.authentication:compatible:${carbon.commons.version}</importBundleDef>
+                            </importBundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.analytics.core.server:${carbon.analytics.version}</importFeatureDef>
