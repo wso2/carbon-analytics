@@ -64,7 +64,7 @@ public class Constants {
     public static final String DISABLE_INDEXING_ENV_PROP = "disableIndexing";
     public static final String ANALYTICS_INDEXING_GROUP = "__ANALYTICS_INDEXING_GROUP__";
 
-    public static final String SPARK_EXECUTOR_JVM_OPT = "carbon.spark.executor.jvm";
+    public static final String DISABLE_LOCAL_INDEX_QUEUE_OPTION = "disableLocalIndexQueue";
     
     public static final String DEFAULT_INDEX_STORE_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator + "repository"
             + File.separator + "data" + File.separator + "index_data" + File.separator;

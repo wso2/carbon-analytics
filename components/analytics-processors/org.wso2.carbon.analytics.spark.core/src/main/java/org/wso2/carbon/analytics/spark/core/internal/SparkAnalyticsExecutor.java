@@ -35,6 +35,7 @@ import org.apache.spark.sql.jdbc.carbon.AnalyticsJDBCRelationProvider;
 import org.apache.spark.sql.jdbc.carbon.DialectRegister;
 import org.apache.spark.util.Utils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
@@ -625,7 +626,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         String jvmOpts = " -Dwso2_custom_conf_dir=" + carbonConfDir
                          + " -Dcarbon.home=" + carbonHome
-                         + " -Dcarbon.spark.executor.jvm=true"
+                         + " -D" + Constants.DISABLE_LOCAL_INDEX_QUEUE_OPTION + "=true"
                          + " -DdisableIndexing=true"
                          + " -DdisableDataPurging=true"
                          + " -DdisableEventSink=true"
@@ -633,9 +634,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                          + " -Djavax.net.ssl.trustStorePassword=" + System.getProperty("javax.net.ssl.trustStorePassword")
                          + " -DAgent.Config.Path=" + agentConfPath
                          + getLog4jPropertiesJvmOpt(analyticsSparkConfDir);
-        conf.set("spark.executor.extraJavaOptions", conf.get("spark.executor.extraJavaOptions", "") + jvmOpts);
 
-//        conf.set("spark.driver.extraJavaOptions", conf.get("spark.driver.extraJavaOptions", "") +  jvmOpts);
+        conf.set("spark.executor.extraJavaOptions", conf.get("spark.executor.extraJavaOptions", "") + jvmOpts);
+        conf.set("spark.driver.extraJavaOptions", conf.get("spark.driver.extraJavaOptions", "") +  jvmOpts);
 
         //setting the default limit for the spark query results
         conf.setIfMissing("carbon.spark.results.limit", "1000");
@@ -690,25 +691,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             return defaultVal;
         }
     }
-
-//    private void validateSparkScriptPathPermission() {
-//        Set<PosixFilePermission> perms = new HashSet<>();
-//        //add owners permission
-//        perms.add(PosixFilePermission.OWNER_READ);
-//        perms.add(PosixFilePermission.OWNER_WRITE);
-//        perms.add(PosixFilePermission.OWNER_EXECUTE);
-//        //add group permissions
-//        perms.add(PosixFilePermission.GROUP_READ);
-//        perms.add(PosixFilePermission.GROUP_WRITE);
-//        perms.add(PosixFilePermission.GROUP_EXECUTE);
-//        try {
-//            Files.setPosixFilePermissions(Paths.get(CarbonUtils.getCarbonHome() + File.separator +
-//                                                    AnalyticsConstants.SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH), perms);
-//        } catch (IOException e) {
-//            log.warn("Error while checking the permission for " + AnalyticsConstants.SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH
-//                     + ". " + e.getMessage());
-//        }
-//    }
 
     public void stop() {
         if (this.sqlCtx != null) {

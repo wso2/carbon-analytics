@@ -96,6 +96,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
 
     private RemoteMemberIndexCommunicator remoteCommunicator;
 
+    private boolean disableLocalIndexQueue = false;
+
     /* this executor is specifically used, rather than a single thread executor, so there won't be a thread always live, mostly unused */
     private ExecutorService localShardProcessExecutor = new ThreadPoolExecutor(0, 1, 0L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
@@ -107,6 +109,9 @@ public class IndexNodeCoordinator implements GroupEventListener {
                                                            this.globalShardAllocationConfig);
         this.stagingIndexDataStore = new StagingIndexDataStore(this.indexer);
         this.remoteCommunicator = new RemoteMemberIndexCommunicator();
+
+        String disableLocalIndexQueueProp = System.getProperty(Constants.DISABLE_LOCAL_INDEX_QUEUE_OPTION);
+        this.disableLocalIndexQueue = disableLocalIndexQueueProp != null && Boolean.parseBoolean(disableLocalIndexQueueProp);
     }
 
     public static boolean checkIfIndexingNode() {
@@ -322,7 +327,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         for (Map.Entry<Integer, List<String>> entry : shardedIds.entrySet()) {
             Set<String> nodeIds = this.shardMemberMap.getNodeIdsForShard(entry.getKey());
             for (String nodeId : nodeIds) {
-                if (this.myNodeId.equals(nodeId)) {
+                if (this.myNodeId.equals(nodeId) && !disableLocalIndexQueue ) {
                     localIds.addAll(entry.getValue());
                 } else {
                     Object memberNode = this.shardMemberMap.getMemberFromNodeId(nodeId);
@@ -352,7 +357,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         for (Map.Entry<Integer, List<Record>> entry : shardedRecords.entrySet()) {
             Set<String> nodeIds = this.shardMemberMap.getNodeIdsForShard(entry.getKey());
             for (String nodeId : nodeIds) {
-                if (nodeId.equals(this.myNodeId)) {
+                if (nodeId.equals(this.myNodeId) && !disableLocalIndexQueue) {
                     localRecords.addAll(entry.getValue());
                 } else {
                     Object memberNode = this.shardMemberMap.getMemberFromNodeId(nodeId);
@@ -548,13 +553,6 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
 
     private void populateMyNodeId() throws AnalyticsException {
-
-        String sparkJvm = System.getProperty(Constants.SPARK_EXECUTOR_JVM_OPT);
-        if (sparkJvm != null && Boolean.parseBoolean(sparkJvm)) {
-            log.info("This is not a carbon JVM. Hence node ID will not be set");
-            return;
-        }
-
         if (this.myNodeId == null) {
             boolean create = false;
             try {
