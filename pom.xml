@@ -1231,7 +1231,7 @@
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
         <!--CEP versions-->
-        <siddhi.version>3.0.6-SNAPSHOT</siddhi.version>
+        <siddhi.version>3.0.6-alpha</siddhi.version>
 
         <!-- Carbon metrics version -->
         <carbon.metrics.version>1.2.0</carbon.metrics.version>
