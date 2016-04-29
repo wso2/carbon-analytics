@@ -72,7 +72,7 @@
                                     org.wso2.carbon.analytics.core:${carbon.analytics.version}
                                 </importFeatureDef>
                                 <importFeatureDef>
-                                    org.wso2.carbon.ntask.core:${carbon.commons.version}
+                                    org.wso2.carbon.ntask.core:compatible:${carbon.commons.version}
                                 </importFeatureDef>
                             </importFeatures>
                         </configuration>
