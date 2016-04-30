@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.spark.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -67,8 +68,11 @@ public class ComputeClasspath {
                addJarsFromEndorsedLib("", carbonHome, SEP) + addJarsFromConfig("", carbonHome, SEP);
     }
 
-    private static Set<String> getCarbonJars(String carbonHome) throws IOException {
+    private static Set<String> getCarbonJars(String carbonHome) {
         Set<String> result = new HashSet<>();
+
+        // Add the default list of jars
+        Collections.addAll(result, populateDefaultJarsList());
 
         // Read from the file
         File jarsFile = new File(carbonHome + File.separator + "repository" + File.separator + "conf"
@@ -89,6 +93,8 @@ public class ComputeClasspath {
                 }
                 result.add(line);
             }
+        } catch (IOException e) {
+            // ignore
         } finally {
             try {
                 assert reader != null;
@@ -97,9 +103,6 @@ public class ComputeClasspath {
                 // throw e;
             }
         }
-
-        // Add the default list of jars
-        Collections.addAll(result, populateDefaultJarsList());
 
         return result;
     }
