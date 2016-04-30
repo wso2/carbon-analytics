@@ -23,8 +23,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * this class creates the spark classpath by looking at the plugins folder
@@ -60,18 +61,19 @@ public class ComputeClasspath {
                     "CarbonHome specified, does not exists :" + carbonHome);
         }
 
-        List<String> requiredJars = getCarbonJars(carbonHome);
+        Set<String> requiredJars = getCarbonJars(carbonHome);
         String cp = createInitialSparkClasspath(sparkClasspath, carbonHome, requiredJars, SEP, excludeJars);
         return cp + addJarsFromDropins("", carbonHome, SEP) + addJarsFromLib("", carbonHome, SEP) +
                addJarsFromEndorsedLib("", carbonHome, SEP) + addJarsFromConfig("", carbonHome, SEP);
     }
 
-    private static List<String> getCarbonJars(String carbonHome) throws IOException {
+    private static Set<String> getCarbonJars(String carbonHome) throws IOException {
+        Set<String> result = new HashSet<>();
+
+        // Read from the file
         File jarsFile = new File(carbonHome + File.separator + "repository" + File.separator + "conf"
                                  + File.separator + "analytics" + File.separator + "spark"
                                  + File.separator + "carbon-spark-classpath.conf");
-
-        List<String> result = new ArrayList<>();
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(jarsFile));
@@ -95,6 +97,10 @@ public class ComputeClasspath {
                 // throw e;
             }
         }
+
+        // Add the default list of jars
+        Collections.addAll(result, populateDefaultJarsList());
+
         return result;
     }
 
@@ -190,7 +196,7 @@ public class ComputeClasspath {
     }
 
     private static String createInitialSparkClasspath(String sparkClasspath, String carbonHome,
-                                                      List<String> requiredJars, String separator,
+                                                      Set<String> requiredJars, String separator,
                                                       String[] excludeJars) {
         File pluginsDir = new File(carbonHome + File.separator + "repository" + File.separator
                                    + "components" + File.separator + "plugins");
@@ -224,5 +230,197 @@ public class ComputeClasspath {
             }
         }
         return false;
+    }
+
+    private static String[] populateDefaultJarsList() {
+        return new String[]{
+                "apache-zookeeper",
+                "axiom",
+                "axis2",
+                "axis2-json",
+                "cassandra-thrift",
+                "chill",
+                "com.datastax.driver.core",
+                "com.fasterxml.jackson.core.jackson-annotations",
+                "com.fasterxml.jackson.core.jackson-core",
+                "com.fasterxml.jackson.core.jackson-databind",
+                "com.fasterxml.jackson.module.jackson.module.scala",
+                "com.google.gson",
+                "com.google.guava",
+                "com.google.protobuf",
+                "com.jayway.jsonpath.json-path",
+                "com.ning.compress-lzf",
+                "com.sun.jersey.jersey-core",
+                "com.sun.jersey.jersey-server",
+                "commons-cli",
+                "commons-codec",
+                "commons-collections",
+                "commons-configuration",
+                "commons-httpclient",
+                "commons-io",
+                "commons-lang",
+                "config",
+                "h2-database-engine",
+                "hadoop-client",
+                "hazelcast",
+                "hbase-client",
+                "hector-core",
+                "htrace-core",
+                "htrace-core-apache",
+                "httpclient",
+                "httpcore",
+                "io.dropwizard.metrics.core",
+                "io.dropwizard.metrics.graphite",
+                "io.dropwizard.metrics.json",
+                "io.dropwizard.metrics.jvm",
+                "javax.cache.wso2",
+                "javax.servlet.jsp-api",
+                "jaxb",
+                "jdbc-pool",
+                "jdom",
+                "jettison",
+                "json",
+                "json-simple",
+                "json4s-jackson",
+                "kryo",
+                "libthrift",
+                "lucene",
+                "mesos",
+                "minlog",
+                "net.minidev.json-smart",
+                "netty-all",
+                "objenesis",
+                "org.apache.commons.lang3",
+                "org.apache.commons.math3",
+                "org.jboss.netty",
+                "org.roaringbitmap.RoaringBitmap",
+                "org.scala-lang.scala-library",
+                "org.scala-lang.scala-reflect",
+                "org.spark-project.protobuf.java",
+                "org.spark.project.akka.actor",
+                "org.spark.project.akka.remote",
+                "org.spark.project.akka.slf4j",
+                "org.wso2.carbon.analytics.api",
+                "org.wso2.carbon.analytics.dataservice.commons",
+                "org.wso2.carbon.analytics.dataservice.core",
+                "org.wso2.carbon.analytics.datasource.cassandra",
+                "org.wso2.carbon.analytics.datasource.commons",
+                "org.wso2.carbon.analytics.datasource.core",
+                "org.wso2.carbon.analytics.datasource.hbase",
+                "org.wso2.carbon.analytics.datasource.rdbms",
+                "org.wso2.carbon.analytics.eventsink",
+                "org.wso2.carbon.analytics.eventtable",
+                "org.wso2.carbon.analytics.io.commons",
+                "org.wso2.carbon.analytics.spark.core",
+                "org.wso2.carbon.analytics.spark.event",
+                "org.wso2.carbon.analytics.stream.persistence",
+                "org.wso2.carbon.base",
+                "org.wso2.carbon.cluster.mgt.core",
+                "org.wso2.carbon.identity.user.store.configuration",
+                "org.wso2.carbon.identity.user.store.configuration.deployer",
+                "org.wso2.carbon.user.api",
+                "org.wso2.carbon.user.core",
+                "org.wso2.carbon.user.mgt",
+                "org.wso2.carbon.user.mgt.common",
+                "org.wso2.carbon.core",
+                "org.wso2.carbon.core.common",
+                "org.wso2.carbon.core.services",
+                "org.wso2.carbon.databridge.agent",
+                "org.wso2.carbon.databridge.commons",
+                "org.wso2.carbon.databridge.commons.binary",
+                "org.wso2.carbon.databridge.commons.thrift",
+                "org.wso2.carbon.databridge.core",
+                "org.wso2.carbon.databridge.receiver.binary",
+                "org.wso2.carbon.databridge.receiver.thrift",
+                "org.wso2.carbon.databridge.streamdefn.filesystem",
+                "org.wso2.carbon.datasource.reader.cassandra",
+                "org.wso2.carbon.datasource.reader.hadoop",
+                "org.wso2.carbon.deployment.synchronizer",
+                "org.wso2.carbon.deployment.synchronizer.subversion",
+                "org.wso2.carbon.email.verification",
+                "org.wso2.carbon.event.admin",
+                "org.wso2.carbon.event.application.deployer",
+                "org.wso2.carbon.event.client",
+                "org.wso2.carbon.event.common",
+                "org.wso2.carbon.event.core",
+                "org.wso2.carbon.event.flow",
+                "org.wso2.carbon.event.input.adapter.core",
+                "org.wso2.carbon.event.input.adapter.email",
+                "org.wso2.carbon.event.input.adapter.filetail",
+                "org.wso2.carbon.event.input.adapter.http",
+                "org.wso2.carbon.event.input.adapter.jms",
+                "org.wso2.carbon.event.input.adapter.kafka",
+                "org.wso2.carbon.event.input.adapter.mqtt",
+                "org.wso2.carbon.event.input.adapter.soap",
+                "org.wso2.carbon.event.input.adapter.websocket",
+                "org.wso2.carbon.event.input.adapter.websocket.local",
+                "org.wso2.carbon.event.input.adapter.wso2event",
+                "org.wso2.carbon.event.output.adapter.cassandra",
+                "org.wso2.carbon.event.output.adapter.core",
+                "org.wso2.carbon.event.output.adapter.email",
+                "org.wso2.carbon.event.output.adapter.http",
+                "org.wso2.carbon.event.output.adapter.jms",
+                "org.wso2.carbon.event.output.adapter.kafka",
+                "org.wso2.carbon.event.output.adapter.logger",
+                "org.wso2.carbon.event.output.adapter.mqtt",
+                "org.wso2.carbon.event.output.adapter.rdbms",
+                "org.wso2.carbon.event.output.adapter.sms",
+                "org.wso2.carbon.event.output.adapter.soap",
+                "org.wso2.carbon.event.output.adapter.websocket",
+                "org.wso2.carbon.event.output.adapter.websocket.local",
+                "org.wso2.carbon.event.output.adapter.wso2event",
+                "org.wso2.carbon.event.processor.common",
+                "org.wso2.carbon.event.processor.core",
+                "org.wso2.carbon.event.processor.manager.commons",
+                "org.wso2.carbon.event.processor.manager.core",
+                "org.wso2.carbon.event.publisher.core",
+                "org.wso2.carbon.event.receiver.core",
+                "org.wso2.carbon.event.simulator.core",
+                "org.wso2.carbon.event.statistics",
+                "org.wso2.carbon.event.stream.core",
+                "org.wso2.carbon.event.tracer",
+                "org.wso2.carbon.logging",
+                "org.wso2.carbon.ndatasource.common",
+                "org.wso2.carbon.ndatasource.core",
+                "org.wso2.carbon.ndatasource.datasources",
+                "org.wso2.carbon.ndatasource.rdbms",
+                "org.wso2.carbon.ntask.common",
+                "org.wso2.carbon.ntask.core",
+                "org.wso2.carbon.ntask.solutions",
+                "org.wso2.carbon.registry.api",
+                "org.wso2.carbon.registry.common",
+                "org.wso2.carbon.registry.core",
+                "org.wso2.carbon.registry.properties",
+                "org.wso2.carbon.registry.resource",
+                "org.wso2.carbon.registry.search",
+                "org.wso2.carbon.registry.server",
+                "org.wso2.carbon.utils",
+                "org.wso2.orbit.asm4.asm4-all",
+                "org.xerial.snappy.snappy-java",
+                "paranamer",
+                "perf4j",
+                "poi",
+                "protobuf-java-fragment",
+                "quartz",
+                "slf4j",
+                "solr",
+                "spark-core",
+                "spark-sql",
+                "spark-streaming",
+                "stream",
+                "tomcat",
+                "tomcat-catalina-ha",
+                "tomcat-el-api",
+                "tomcat-jsp-api",
+                "tomcat-servlet-api",
+                "uncommons-maths",
+                "wss4j",
+                "xmlbeans",
+                "XmlSchema",
+                "commons-pool",
+                "disruptor",
+                "org.eclipse.osgi",
+                "bigqueue"
+        };
     }
 }
