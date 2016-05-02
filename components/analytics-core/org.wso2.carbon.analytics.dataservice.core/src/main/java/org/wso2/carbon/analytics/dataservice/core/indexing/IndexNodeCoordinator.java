@@ -96,7 +96,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
 
     private RemoteMemberIndexCommunicator remoteCommunicator;
 
-    private boolean disableLocalIndexQueue = false;
+    private boolean indexingNode = false;
 
     /* this executor is specifically used, rather than a single thread executor, so there won't be a thread always live, mostly unused */
     private ExecutorService localShardProcessExecutor = new ThreadPoolExecutor(0, 1, 0L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
@@ -110,8 +110,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.stagingIndexDataStore = new StagingIndexDataStore(this.indexer);
         this.remoteCommunicator = new RemoteMemberIndexCommunicator();
 
-        String disableLocalIndexQueueProp = System.getProperty(Constants.DISABLE_LOCAL_INDEX_QUEUE_OPTION);
-        this.disableLocalIndexQueue = disableLocalIndexQueueProp != null && Boolean.parseBoolean(disableLocalIndexQueueProp);
+        this.indexingNode = checkIfIndexingNode();
     }
 
     public static boolean checkIfIndexingNode() {
@@ -224,10 +223,10 @@ public class IndexNodeCoordinator implements GroupEventListener {
 
     public void init() throws AnalyticsException {
         this.populateMyNodeId();
-        boolean indexingNode = checkIfIndexingNode();
-        boolean indexingNodeDisabling = !indexingNode && this.currentNodeAllocatedShardsGlobally();
+        this.indexingNode = checkIfIndexingNode();
+        boolean indexingNodeDisabling = !this.indexingNode && this.currentNodeAllocatedShardsGlobally();
         this.initClustering();
-        if (indexingNode) {
+        if (this.indexingNode) {
             this.initShardAllocation();
         }
         if (this.isClusteringEnabled()) {
@@ -239,13 +238,13 @@ public class IndexNodeCoordinator implements GroupEventListener {
         } else {
             this.refreshIndexShardInfo();
         }
-        if (indexingNode) {
+        if (this.indexingNode) {
             this.processLocalShards();
         }
     }
 
     public void refreshIndexShardAllocation() throws AnalyticsException {
-        if (!checkIfIndexingNode()) {
+        if (!this.indexingNode) {
             return;
         }
         Lock globalAllocationLock = AnalyticsServiceHolder.getHazelcastInstance().getLock(GSA_LOCK);
@@ -327,7 +326,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         for (Map.Entry<Integer, List<String>> entry : shardedIds.entrySet()) {
             Set<String> nodeIds = this.shardMemberMap.getNodeIdsForShard(entry.getKey());
             for (String nodeId : nodeIds) {
-                if (this.myNodeId.equals(nodeId) && !disableLocalIndexQueue ) {
+                if (this.myNodeId.equals(nodeId) && indexingNode ) {
                     localIds.addAll(entry.getValue());
                 } else {
                     Object memberNode = this.shardMemberMap.getMemberFromNodeId(nodeId);
@@ -357,7 +356,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         for (Map.Entry<Integer, List<Record>> entry : shardedRecords.entrySet()) {
             Set<String> nodeIds = this.shardMemberMap.getNodeIdsForShard(entry.getKey());
             for (String nodeId : nodeIds) {
-                if (nodeId.equals(this.myNodeId) && !disableLocalIndexQueue) {
+                if (nodeId.equals(this.myNodeId) && indexingNode) {
                     localRecords.addAll(entry.getValue());
                 } else {
                     Object memberNode = this.shardMemberMap.getMemberFromNodeId(nodeId);
@@ -651,7 +650,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
 
     private void refreshStagingWorkers() {
-        if (!checkIfIndexingNode()) {
+        if (!this.indexingNode) {
             return;
         }
         this.stopAndCleanupStagingWorkers();
@@ -690,7 +689,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.syncLocalWithGlobal();
         log.info("Indexing Initialized: " + (this.isClusteringEnabled() ?
                                              "CLUSTERED " + this.shardMemberMap : "STANDALONE") + " | Current Node Indexing: " +
-                 (checkIfIndexingNode() ? "Yes" : "No"));
+                 (this.indexingNode ? "Yes" : "No"));
     }
 
     public void waitForIndexing(long maxWait) throws AnalyticsException {
