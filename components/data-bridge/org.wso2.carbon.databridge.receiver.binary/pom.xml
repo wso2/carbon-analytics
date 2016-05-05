@@ -76,11 +76,9 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
-                            org.wso2.carbon.databridge.receiver.binary.internal,
                             org.wso2.carbon.databridge.receiver.binary.internal.*
                         </Private-Package>
                         <Export-Package>
-                            !org.wso2.carbon.databridge.receiver.binary.internal,
                             !org.wso2.carbon.databridge.receiver.binary.internal.*,
                             org.wso2.carbon.databridge.receiver.binary.*
                         </Export-Package>

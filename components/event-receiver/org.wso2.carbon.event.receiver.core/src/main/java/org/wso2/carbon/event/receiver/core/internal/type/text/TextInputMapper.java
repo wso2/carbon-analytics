@@ -232,6 +232,8 @@ public class TextInputMapper implements InputMapper {
     private int getEventAttributeLocation(InputMappingAttribute inputMappingAttribute, StreamDefinition streamDefinition) {
 
         int attributeLocation = 0;
+        int metaSize = streamDefinition.getMetaData() != null ? streamDefinition.getMetaData().size() : 0;
+        int correlationSize = streamDefinition.getCorrelationData() != null ? streamDefinition.getCorrelationData().size() : 0;
 
         if (EventReceiverUtil.isMetaAttribute(inputMappingAttribute.getToElementKey())) {
             for (Attribute metaAttribute : streamDefinition.getMetaData()) {
@@ -243,20 +245,14 @@ public class TextInputMapper implements InputMapper {
         } else if (EventReceiverUtil.isCorrelationAttribute(inputMappingAttribute.getToElementKey())) {
             for (Attribute correlationData : streamDefinition.getCorrelationData()) {
                 if (EventReceiverConstants.CORRELATION_DATA_PREFIX.concat(correlationData.getName()).equals(inputMappingAttribute.getToElementKey())) {
-                    return attributeLocation + streamDefinition.getMetaData().size();
+                    return attributeLocation + metaSize;
                 }
                 attributeLocation++;
             }
         } else {
             for (Attribute payloadData : streamDefinition.getPayloadData()) {
                 if (payloadData.getName().equals(inputMappingAttribute.getToElementKey())) {
-                    if (streamDefinition.getMetaData() != null) {
-                        attributeLocation = attributeLocation + streamDefinition.getMetaData().size();
-                    }
-                    if (streamDefinition.getCorrelationData() != null) {
-                        attributeLocation = attributeLocation + streamDefinition.getCorrelationData().size();
-                    }
-                    return attributeLocation;
+                    return attributeLocation + metaSize + correlationSize;
                 }
                 attributeLocation++;
             }
