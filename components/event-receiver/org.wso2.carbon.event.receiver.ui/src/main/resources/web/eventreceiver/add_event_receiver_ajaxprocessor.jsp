@@ -210,7 +210,9 @@
                                     mapEbProperties[index].setName(propertyNameValueAndType[0].trim());
                                     mapEbProperties[index].setValueOf(propertyNameValueAndType[1].trim());
                                     mapEbProperties[index].setType(propertyNameValueAndType[2].trim());
-                                    mapEbProperties[index].setDefaultValue(propertyNameValueAndType[3].trim());
+                                    if (propertyNameValueAndType.length >= 4) {
+                                        mapEbProperties[index].setDefaultValue(propertyNameValueAndType[3].trim());
+                                    }
                                     index++;
                                 }
                             }
