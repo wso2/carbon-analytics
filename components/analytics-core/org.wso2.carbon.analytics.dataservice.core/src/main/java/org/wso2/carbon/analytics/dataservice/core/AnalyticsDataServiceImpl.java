@@ -527,8 +527,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema)
             throws AnalyticsTableNotAvailableException, AnalyticsException {
         tableName = GenericUtils.normalizeTableName(tableName);
-        this.checkInvalidIndexNames(schema.getColumns());
-        this.checkInvalidScoreParams(schema.getColumns());
+        this.checkInvalidIndexNames(schema.getIndexedColumns());
+        this.checkInvalidScoreParams(schema.getIndexedColumns());
         AnalyticsTableInfo tableInfo = this.lookupTableInfo(tenantId, tableName);
         tableInfo.setSchema(schema);
         this.writeTableInfo(tenantId, tableName, tableInfo);
