@@ -20,10 +20,10 @@ package org.wso2.carbon.analytics.spark.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -201,26 +201,32 @@ public class ComputeClasspath {
     private static String createInitialSparkClasspath(String sparkClasspath, String carbonHome,
                                                       Set<String> requiredJars, String separator,
                                                       String[] excludeJars) {
-        File pluginsDir = new File(carbonHome + File.separator + "repository" + File.separator
-                                   + "components" + File.separator + "plugins");
+        File pluginsDir = new File(carbonHome + File.separator + "repository" + File.separator + "components" +
+                                   File.separator + "plugins");
         File[] pluginJars = listJars(pluginsDir);
 
         for (String requiredJar : requiredJars) {
+            ArrayList<String> matchingJars = new ArrayList<>();
             for (File pluginJar : pluginJars) {
                 String plugin = pluginJar.getName();
                 String jarName = plugin.split("_")[0];
-
                 if (containsInArray(excludeJars, jarName)) {
                     continue;
                 }
-
                 if (jarName.equals(requiredJar)) {
-                    if (sparkClasspath.isEmpty()) {
-                        sparkClasspath = pluginJar.getAbsolutePath();
-                    } else {
-                        sparkClasspath = sparkClasspath + separator + pluginJar.getAbsolutePath();
-                    }
+                    matchingJars.add(pluginJar.getAbsolutePath());
                 }
+            }
+
+            if (matchingJars.size() > 0) {
+                Collections.sort(matchingJars);
+                String topJar = matchingJars.get(matchingJars.size() - 1);
+                if (sparkClasspath.isEmpty()) {
+                    sparkClasspath = topJar;
+                } else {
+                    sparkClasspath = sparkClasspath + separator + topJar;
+                }
+                matchingJars.clear();
             }
         }
         return sparkClasspath;
