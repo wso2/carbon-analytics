@@ -20,9 +20,9 @@ package org.wso2.carbon.analytics.spark.core.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.core.AnalyticsTask;
-import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
@@ -332,8 +332,14 @@ public class AnalyticsPersistenceManager {
             if (scripts != null) {
                 List<AnalyticsScript> analyticsScripts = new ArrayList<>();
                 for (String script : scripts) {
-                    String configContent = RegistryUtils.decodeBytes((byte[]) registry.get(script).getContent());
-                    analyticsScripts.add(getAnalyticsScript(configContent));
+                    Object content = registry.get(script).getContent();
+                    if (content instanceof byte[]) {
+                        String configContent = RegistryUtils.decodeBytes((byte[])content);
+                        analyticsScripts.add(getAnalyticsScript(configContent));
+                    } else {
+                        log.error("Failed to load the configuration at: " + script + " for tenant: " + tenantId
+                                  + ". Resource not in valid format. Required byte[] but found " + script.getClass().getCanonicalName());
+                    }
                 }
                 return analyticsScripts;
             }
