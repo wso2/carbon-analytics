@@ -66,23 +66,23 @@
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.datasource.core.test</artifactId>
             <scope>test</scope>
         </dependency>
-
-
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ndatasource.rdbms</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.spark-project.akka</groupId>
             <artifactId>akka-actor_2.10</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.esotericsoftware.kryo</groupId>
+            <artifactId>kryo</artifactId>
         </dependency>
 
         <!--extra dependancies -->
@@ -329,11 +329,12 @@
                             org.apache.spark.sql.jdbc.carbon.*;version="${carbon.analytics.version}"
                         </Export-Package>
                         <Import-Package>
-			    com.google.common.*;version="${guava.version.range}",
+			                com.google.common.*;version="${guava.version.range}",
                             org.apache.spark.*;version="${spark.sql.version.range}",
                             org.apache.spark.sql.*;version="${spark.sql.version.range}",
                             org.apache.spark.sql.types.*;version="${spark.sql.version.range}",
-                            org.apache.spark.api.java.*;version="${spark.sql.version.range}"
+                            org.apache.spark.api.java.*;version="${spark.sql.version.range}",
+                            com.esotericsoftware.kryo.*;version="${kryo.import.version}"
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Private-Package>
