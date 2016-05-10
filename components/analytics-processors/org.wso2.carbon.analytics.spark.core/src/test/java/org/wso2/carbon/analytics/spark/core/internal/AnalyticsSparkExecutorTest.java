@@ -112,6 +112,7 @@ public class AnalyticsSparkExecutorTest {
         this.service.deleteTable(1, "CompressedEventsTable");
         this.service.createTable(1, "CompressedEventsTable");
         this.service.put(records);
+        
         ex.executeQuery(1, "CREATE TEMPORARY TABLE EventsTable USING CompressedEventAnalytics " +
             "OPTIONS(tableName \"CompressedEventsTable\", schema \"messageFlowId STRING, compotentType STRING, componentId " +
             "STRING, compotentIndex INT, startTime LONG, endTime LONG, duration FLOAT, beforePayload STRING, afterPayload STRING, " +
@@ -119,30 +120,12 @@ public class AnalyticsSparkExecutorTest {
             "dataColumn \"data\")");
         
         // Check the rows split
-        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT messageFlowId FROM EventsTable");
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM EventsTable");
         log.info(result);
-        Assert.assertEquals(result.getRows().size(), 10, "Incorrect number of rows after spliting");
-        result = ex.executeQuery(1, "SELECT messageFlowId FROM EventsTable WHERE messageFlowId=\"1\"");
-        Assert.assertEquals(result.getRows().size(), 4, "Incorrect number of rows after spliting");
+        Assert.assertEquals(result.getRows().size(), 54, "Incorrect number of rows after spliting");
         
-        // Check payload mapping 
-        String xmlPayload = "<?xml version=\'1.0\' encoding=\'utf-8\'?><soapenv:Envelope xmlns:soapenv=" +
-            "\'http://www.w3.org/2003/05/soap-envelope\'><soapenv:Body><sam:getCertificateID xmlns:sam=" +
-            "\'http://sample.esb.org\'><sam:vehicleNumber>123456</sam:vehicleNumber></sam:getCertificateID>" +
-            "</soapenv:Body></soapenv:Envelope>";
-        result = ex.executeQuery(1, "SELECT * FROM EventsTable WHERE messageFlowId=\"0\"");
-        log.info(result);
-        List<List<Object>> resultRows = result.getRows();
-        Assert.assertEquals(resultRows.get(0).get(7), xmlPayload);
-        Assert.assertEquals(resultRows.get(0).get(8), resultRows.get(1).get(7));
-
-        // Check mapping for unavailable payloads
-        Assert.assertEquals(resultRows.get(2).get(9), null);
-        
-        //Check event without payloads
-        result = ex.executeQuery(1, "SELECT * FROM EventsTable WHERE messageFlowId=\"2\"");
-        log.info(result);
-        Assert.assertEquals(result.getRows().size(), 3);
+        result = ex.executeQuery(1, "SELECT * FROM EventsTable WHERE messageFlowId=\"urn_uuid_f403b0b6-4431-4a83-935d-c7b72867a111\"");
+        Assert.assertEquals(result.getRows().size(), 27, "Incorrect number of rows after spliting");
         
         this.service.deleteTable(1, "CompressedEventsTable");
         log.info(testString("end : create temp table using Compressed Event Analytics test"));

@@ -129,13 +129,26 @@ public class AnalyticsConstants {
     // Compressed Event Analytics related strings
     public static final String COMPRESSED_EVENT_ANALYTICS_SHORTHAND = "CompressedEventAnalytics";
     public static final String DATA_COLUMN = "flowData";
-    public static final String JSON_FIELD_EVENTS = "events";
-    public static final String JSON_FIELD_EVENT = "event";
-    public static final String JSON_FIELD_PAYLOADS = "payloads";
-    public static final String JSON_FIELD_PAYLOAD = "payload";
-    public static final String JSON_FIELD_ATTRIBUTE = "attribute";
-    public static final String JSON_FIELD_EVENT_INDEX = "eventIndex";
-    public static final String JSON_FIELD_MESSAGE_FLOW_ID = "messageFlowId";
-    public static final String COMPONENT_INDEX = "componentIndex";
     public static final String META_FIELD_COMPRESSED = "meta_compressed";
+    public static final String EVENTS_ATTRIBUTE = "events";
+    public static final String PAYLOADS_ATTRIBUTE = "payloads";
+    public static final String EVENT_INDEX_ATTRIBUTE = "eventIndex";
+    public static final String MESSAGE_FLOW_ID_ATTRIBUTE = "messageFlowId";
+    public static final String COMPONENT_INDEX_ATTRIBUTE = "componentIndex";
+    public static final String COMPONENT_NAME_ATTRIBUTE = "componentName";
+    public static final String COMPONENT_TYPE_ATTRIBUTE = "componentType";
+    public static final String COMPONENT_ID_ATTRIBUTE = "componentId";
+    public static final String START_TIME_ATTRIBUTE = "startTime";
+    public static final String END_TIME_ATTRIBUTE = "endTime";
+    public static final String DURATION_ATTRIBUTE = "duration";
+    public static final String AFTER_PAYLOAD_ATTRIBUTE = "afterPayload";
+    public static final String BEFORE_PAYLOAD_ATTRIBUTE = "beforePayload";
+    public static final String CONTEXT_PROPERTIES_ATTRIBUTE = "contextPropertyMap";
+    public static final String TRANSPORT_PROPERTIES_ATTRIBUTE = "transportPropertyMap";
+    public static final String CHILDREN_ATTRIBUTE = "children";
+    public static final String ENTRY_POINT_ATTRIBUTE = "entryPoint";
+    public static final String ENTRY_POINT_HASHCODE_ATTRIBUTE = "entryPointHashcode";
+    public static final String FAULT_COUNT_ATTRIBUTE = "faultCount";
+    public static final String HASHCODE_ATTRIBUTE = "hashCode";
+    public static final String HOST_ATTRIBUTE = "host";
 }

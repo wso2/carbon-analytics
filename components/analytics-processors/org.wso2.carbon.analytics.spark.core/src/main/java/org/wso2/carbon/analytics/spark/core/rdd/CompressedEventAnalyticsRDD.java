@@ -19,24 +19,18 @@ package org.wso2.carbon.analytics.spark.core.rdd;
 
 import static scala.collection.JavaConversions.asScalaIterator;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
 
 import javax.xml.bind.DatatypeConverter;
 
-import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.Dependency;
@@ -47,9 +41,6 @@ import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse.Entry;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -57,10 +48,16 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsPartition;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
+import org.wso2.carbon.analytics.spark.core.util.CompressedEventAnalyticsUtils;
+import org.wso2.carbon.analytics.spark.core.util.PublishingPayload;
+import org.wso2.carbon.analytics.spark.core.util.PublishingPayloadEvent;
 
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
+
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
 
 /**
  * This class represents Spark analytics RDD implementation.
@@ -186,12 +183,19 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
         private String incID;
         private long incMaxTS = Long.MIN_VALUE;
         private int timestampIndex;
+        private Kryo kryo = new Kryo();
 
         public RowRecordIteratorAdaptor(Iterator<Record> recordItr, int tenantId, boolean incEnable, String incID) {
             this.recordItr = recordItr;
             this.tenantId = tenantId;
             this.incEnable = incEnable;
             this.incID = incID;
+            
+            /* Class registering precedence matters. Hence intentionally giving a registration ID */
+            kryo.register(HashMap.class, 111);
+            kryo.register(ArrayList.class, 222);
+            kryo.register(PublishingPayload.class, 333);
+            kryo.register(PublishingPayloadEvent.class, 444);
         }
 
         @Override
@@ -248,160 +252,48 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
          * 
          * @param record    Record to be converted to row(s)
          */
+        @SuppressWarnings("unchecked")
         private Iterator<Row> recordToRows(Record record) {
             List<Row> tempRows = new ArrayList<Row>();
             Map<String, Object> recordVals = record.getValues();
-            try {
-                if (recordVals.get(AnalyticsConstants.DATA_COLUMN) != null) {
-                    String eventsJson = recordVals.get(AnalyticsConstants.DATA_COLUMN).toString();
-                    if ((Boolean) recordVals.get(AnalyticsConstants.META_FIELD_COMPRESSED)) {
-                        eventsJson = decompress(eventsJson);
-                    }
-                    JSONObject eventsAggregated = new JSONObject(eventsJson);
-                    JSONArray eventsArray = eventsAggregated.getJSONArray(AnalyticsConstants.JSON_FIELD_EVENTS);
-                    Map<Integer, Map<String, String>> payloadsMap = null;
-                    if (eventsAggregated.has(AnalyticsConstants.JSON_FIELD_PAYLOADS)) {
-                        JSONArray payloadsArray = eventsAggregated.getJSONArray(AnalyticsConstants.JSON_FIELD_PAYLOADS);
-                        payloadsMap = getPayloadsAsMap(payloadsArray);
-                    }
-                    // Iterate over the array of events
-                    for (int i = 0; i < eventsArray.length(); i++) {
-                        // Create a row with extended fields
-                        tempRows.add(RowFactory.create(getFieldValues(eventsAggregated, eventsArray.getJSONObject(i),
-                            payloadsMap, i, record.getTimestamp())));
-                    }
+            if (recordVals.get(AnalyticsConstants.DATA_COLUMN) != null) {
+                String eventsString = recordVals.get(AnalyticsConstants.DATA_COLUMN).toString();
+                ByteArrayInputStream unzippedByteArray;
+                if ((Boolean) recordVals.get(AnalyticsConstants.META_FIELD_COMPRESSED)) {
+                    unzippedByteArray = CompressedEventAnalyticsUtils.decompress(eventsString);
                 } else {
-                    tempRows.add(RowFactory.create(Collections.emptyList().toArray()));
+                    unzippedByteArray = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(eventsString));
                 }
-            } catch (JSONException e) {
-                throw new RuntimeException("Error occured while splitting the record to rows: " + e.getMessage(), e);
+                Input input = new Input(unzippedByteArray);
+                
+                Map<String, Object> aggregatedEvent = this.kryo.readObject(input, HashMap.class);
+                ArrayList<Map<String, Object>> eventsList = (ArrayList<Map<String, Object>>) aggregatedEvent.get(
+                    AnalyticsConstants.EVENTS_ATTRIBUTE);
+                ArrayList<PublishingPayload> payloadsList = (ArrayList<PublishingPayload>) aggregatedEvent.get(
+                    AnalyticsConstants.PAYLOADS_ATTRIBUTE);
+                Map<Integer, Map<String, String>> payloadsMap = null;
+                if (payloadsList != null) {
+                    payloadsMap =  CompressedEventAnalyticsUtils.getPayloadsAsMap(payloadsList);
+                }
+                String host = (String)aggregatedEvent.get(AnalyticsConstants.HOST_ATTRIBUTE);
+                String messageFlowId = (String)aggregatedEvent.get(AnalyticsConstants.MESSAGE_FLOW_ID_ATTRIBUTE);
+                // Iterate over the array of events
+                for (int i = 0; i < eventsList.size(); i++) {
+                    // Create a row with extended fields
+                    tempRows.add(RowFactory.create(CompressedEventAnalyticsUtils.getFieldValues(eventsList.get(i), 
+                        outputColumns.toArray(new String[0]), payloadsMap, i, record.getTimestamp(), host, 
+                        messageFlowId)));
+                }
+            } else {
+                tempRows.add(RowFactory.create(Collections.emptyList().toArray()));
             }
             return tempRows.iterator();
         }
         
-        /**
-         * Get the values of each field of an event, as an Array.
-         * 
-         * @param event         Current event
-         * @param payloadsMap   Payloads Map
-         * @param eventIndex    Index of the current event
-         * @return              Array of values of the fields in the event
-         */
-        private Object[] getFieldValues(JSONObject eventsAggregated, JSONObject event,
-                Map<Integer, Map<String, String>> payloadsMap, int eventIndex, long timestamp) {
-            Map<String, Object> extendedRowVals = new LinkedHashMap<String, Object>();
-            String[] commonColumns = null;
-            try {
-                // Iterate over new (split) fields and add them
-                for (int j = 0; j < outputColumns.size(); j++) {
-                    String fieldName = outputColumns.get(j);
-                    if (fieldName.equals(AnalyticsConstants.TIMESTAMP_FIELD)) {
-                        this.timestampIndex = j;
-                        extendedRowVals.put(fieldName, timestamp);
-                    } else if (fieldName.equalsIgnoreCase(AnalyticsConstants.COMPONENT_INDEX)) {
-                        extendedRowVals.put(fieldName, eventIndex);
-                    } else if (event.has(fieldName)) {
-                        if (event.isNull(fieldName) && payloadsMap != null && payloadsMap.containsKey(eventIndex)) {
-                            extendedRowVals.put(fieldName, payloadsMap.get(eventIndex).get(fieldName));
-                        } else {
-                            extendedRowVals.put(fieldName, event.get(fieldName));
-                        }
-                    } else {
-                        extendedRowVals.put(fieldName, null);
-                    }
-                }
-                
-                // Iterate over common fields to all events, and add them
-                commonColumns = JSONObject.getNames(eventsAggregated);
-                for (int k = 0; k < commonColumns.length; k++) {
-                    String fieldName = commonColumns[k];
-                    if (!fieldName.equalsIgnoreCase(AnalyticsConstants.DATA_COLUMN) ||
-                        !fieldName.equalsIgnoreCase(AnalyticsConstants.JSON_FIELD_EVENTS)) {
-                        extendedRowVals.put(fieldName, eventsAggregated.get(fieldName));
-                    }
-                }
-                return extendedRowVals.values().toArray();
-            } catch (JSONException e) {
-                throw new RuntimeException("Error occured while splitting the record to rows: " + e.getMessage(), e);
-            }
-        }
-        
-        /**
-         * Convert json payload to map.
-         * 
-         * @param payloadsArray     JSON Array containing payload details
-         * @return                  map of payloads
-         */
-        private Map<Integer, Map<String, String>> getPayloadsAsMap(JSONArray payloadsArray) {
-            Map<Integer, Map<String, String>> payloadsMap = new HashMap<Integer, Map<String, String>>();
-            for (int i = 0; i < payloadsArray.length(); i++) {
-                try {
-                    String payload = payloadsArray.getJSONObject(i).getString(AnalyticsConstants.JSON_FIELD_PAYLOAD);
-                    JSONArray eventRefs = payloadsArray.getJSONObject(i).getJSONArray(AnalyticsConstants.
-                            JSON_FIELD_EVENTS);
-                    for (int j = 0; j < eventRefs.length(); j++) {
-                        int eventIndex = eventRefs.getJSONObject(j).getInt(AnalyticsConstants.JSON_FIELD_EVENT_INDEX);
-                        Map<String, String> existingPayloadMap = payloadsMap.get(eventIndex);
-                        if (existingPayloadMap == null) {
-                            Map<String, String> attributesMap = new HashMap<String, String>();
-                            attributesMap.put(eventRefs.getJSONObject(j).getString(AnalyticsConstants.
-                                    JSON_FIELD_ATTRIBUTE), payload);
-                            payloadsMap.put(eventIndex, attributesMap);
-                        } else {
-                            existingPayloadMap.put(eventRefs.getJSONObject(j).getString(AnalyticsConstants.
-                                    JSON_FIELD_ATTRIBUTE), payload);
-                        }
-                    }
-                } catch (JSONException e) {
-                    throw new RuntimeException("Error occured while generating payload map: " + e.getMessage(), e);
-                }
-            }
-            return payloadsMap;
-        }
         
         @Override
         public void remove() {
             this.recordItr.remove();
-        }
-        
-        
-        /**
-         * Decompress a compressed event string.
-         * 
-         * @param str   Compressed string
-         * @return      Decompressed string
-         */
-        private String decompress(String str) {
-            ByteArrayInputStream byteInputStream = null;
-            GZIPInputStream gzipInputStream = null;
-            BufferedReader br = null;
-            try {
-                byteInputStream = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(str));
-                gzipInputStream = new GZIPInputStream(byteInputStream);
-                br = new BufferedReader(new InputStreamReader(gzipInputStream, CharEncoding.UTF_8));
-                StringBuilder jsonStringBuilder = new StringBuilder();
-                String line;
-                while ((line = br.readLine()) != null) {
-                    jsonStringBuilder.append(line);
-                }
-                return jsonStringBuilder.toString();
-            } catch (IOException e) {
-                throw new RuntimeException("Error occured while decompressing events string: " + e.getMessage(), e);
-            } finally {
-                try {
-                    if (byteInputStream != null) {
-                        byteInputStream.close();
-                    }
-                    if (gzipInputStream != null) {
-                        gzipInputStream.close();
-                    }
-                    if (br != null) {
-                        br.close();
-                    }
-                } catch (IOException e) {
-                    log.error("Error occured while closing streams: " + e.getMessage(), e);
-                }
-            }
         }
     }
 }
