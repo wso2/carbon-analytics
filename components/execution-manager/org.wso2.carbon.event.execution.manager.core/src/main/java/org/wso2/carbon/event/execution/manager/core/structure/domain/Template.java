@@ -29,8 +29,11 @@ public class Template {
     private String description;
     private String templateType;
     private String script;
+    private String[] executionPlans;
     private String executionType;
     private Parameter[] parameters;
+    private String cronExpression;
+    private String sparkScript;
 
     public String getName() {
         return name;
@@ -76,6 +79,34 @@ public class Template {
     @XmlElement(name = "parameter")
     public void setParameters(Parameter[] parameters) {
         this.parameters = parameters;
+    }
+
+    public String[] getExecutionPlans() {
+        return executionPlans;
+    }
+
+    @XmlElementWrapper(name = "executionPlans")
+    @XmlElement(name = "executionPlan")
+    public void setExecutionPlans(String[] executionPlans) {
+        this.executionPlans = executionPlans;
+    }
+
+    public String getSparkScript() {
+        return sparkScript;
+    }
+
+    @XmlElement(name = "sparkScript")
+    public void setSparkScript(String sparkScript) {
+        this.sparkScript = sparkScript;
+    }
+
+    @XmlAttribute
+    public void setCronExpression(String cronExpression) {
+        this.cronExpression = cronExpression;
+    }
+
+    public String getCronExpression() {
+        return this.cronExpression;
     }
 
     public String getExecutionType() {

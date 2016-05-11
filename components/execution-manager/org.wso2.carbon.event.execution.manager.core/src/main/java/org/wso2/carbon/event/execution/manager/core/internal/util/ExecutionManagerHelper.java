@@ -167,14 +167,11 @@ public class ExecutionManagerHelper {
                     TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(template.getExecutionType());
                     if (deployer != null) {
                         try {
-                            DeployableTemplate deployableTemplate = new DeployableTemplate();
-                            String script = ExecutionManagerHelper.updateArtifactParameters(configuration,
-                                    template.getScript());
-
-                            deployableTemplate.setScript(script);
+                            DeployableTemplate deployableTemplate = updateArtifactParameters(configuration, template);
                             TemplateDomain domain = domains.get(configuration.getFrom());
                             deployableTemplate.setStreams(domain.getStreams());
                             deployableTemplate.setConfiguration(configuration);
+                            deployableTemplate.setCronExpression(template.getCronExpression());
                             // streams should be deployed in this call.
                             deployer.deployArtifact(deployableTemplate);
                         } catch (TemplateDeploymentException e) {
@@ -192,26 +189,52 @@ public class ExecutionManagerHelper {
     }
 
 
+    private static DeployableTemplate updateArtifactParameters(TemplateConfiguration config, Template template) {
+        DeployableTemplate deployableTemplate = new DeployableTemplate();
+
+        //updating scripts
+        deployableTemplate.setScript(updateArtifactParameters(config, template.getScript()));
+
+        //updating execution plans
+        String[] executionPlans = template.getExecutionPlans();
+        if (executionPlans != null) {
+            String[] updatedExecutionPlans = new String[executionPlans.length];
+            for (int i=0; i<executionPlans.length; i++) {
+                updatedExecutionPlans[i] = updateArtifactParameters(config, executionPlans[i]);
+            }
+            deployableTemplate.setExecutionPlans(updatedExecutionPlans);
+        }
+
+        //updating spark script
+        String sparkScript = template.getSparkScript();
+        if (sparkScript != null) {
+            sparkScript = updateArtifactParameters(config, sparkScript);
+            deployableTemplate.setSparkScript(sparkScript);
+        }
+
+        return deployableTemplate;
+    }
+
     /**
      * Update given execution plan by replacing undefined parameter values with configured parameter values
      *
      * @param config configurations which consists of parameters which will replace
-     * @param script execution script which needs to be updated
+     * @param templateElement templateElement which needs to be updated
      * @return updated execution plan
      */
-    private static String updateArtifactParameters(TemplateConfiguration config, String script) {
+    private static String updateArtifactParameters(TemplateConfiguration config, String templateElement) {
 
-        String updatedScript = script;
+        String updatedElement = templateElement;
 
-        //Execution script parameters will be replaced with given configuration parameters
-        if (config.getParameters() != null) {
+        //Execution templateElement parameters will be replaced with given configuration parameters
+        if (config.getParameters() != null && templateElement != null) {
             for (Parameter parameter : config.getParameters()) {
-                updatedScript = updatedScript.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
+                updatedElement = updatedElement.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
                         + parameter.getName(), parameter.getValue());
             }
         }
 
-        return updatedScript;
+        return updatedElement;
     }
 
     /**

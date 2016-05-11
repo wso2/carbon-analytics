@@ -22,6 +22,9 @@ public class DeployableTemplate {
     private TemplateConfiguration configuration;
     private String script;
     private String[] streams;
+    private String[] executionPlans;
+    private String sparkScript;
+    private String cronExpression;  //cron expression for the Spark script.
 
 
     public TemplateConfiguration getConfiguration() {
@@ -46,5 +49,29 @@ public class DeployableTemplate {
 
     public void setStreams(String[] streams) {
         this.streams = streams;
+    }
+
+    public String[] getExecutionPlans() {
+        return executionPlans;
+    }
+
+    public void setExecutionPlans(String[] executionPlans) {
+        this.executionPlans = executionPlans;
+    }
+
+    public String getSparkScript() {
+        return sparkScript;
+    }
+
+    public void setSparkScript(String sparkScript) {
+        this.sparkScript = sparkScript;
+    }
+
+    public String getCronExpression() {
+        return cronExpression;
+    }
+
+    public void setCronExpression(String cronExpression) {
+        this.cronExpression = cronExpression;
     }
 }
