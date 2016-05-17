@@ -16,6 +16,7 @@
 package org.wso2.carbon.event.execution.manager.admin.internal.ds;
 
 import org.wso2.carbon.event.execution.manager.core.ExecutionManagerService;
+import org.wso2.carbon.event.stream.deployer.EventStreamDeployer;
 
 /**
  * Consist of ExecutionManagerService which requires by ExecutionAdminService
@@ -23,6 +24,7 @@ import org.wso2.carbon.event.execution.manager.core.ExecutionManagerService;
 public class ExecutionManagerAdminServiceValueHolder {
 
     private static ExecutionManagerService executorManagerService;
+    private static EventStreamDeployer eventStreamDeployerService;
 
     /**
      * To avoid instantiating
@@ -34,8 +36,15 @@ public class ExecutionManagerAdminServiceValueHolder {
         return executorManagerService;
     }
 
+    public static EventStreamDeployer getEventStreamDeployerService() {
+        return eventStreamDeployerService;
+    }
+
     public static void setExecutorManagerService(ExecutionManagerService executorManagerService) {
         ExecutionManagerAdminServiceValueHolder.executorManagerService = executorManagerService;
     }
 
+    public static void setEventStreamDeployerService(EventStreamDeployer eventStreamDeployerService) {
+        ExecutionManagerAdminServiceValueHolder.eventStreamDeployerService = eventStreamDeployerService;
+    }
 }

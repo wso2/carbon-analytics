@@ -47,6 +47,11 @@
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.event.execution.manager.core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.stream.deployer</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -75,6 +80,7 @@
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.event.execution.manager.core.*,
+                            org.wso2.carbon.event.stream.deployer.*,
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
@@ -83,6 +89,4 @@
             </plugin>
         </plugins>
     </build>
-
-
 </project>

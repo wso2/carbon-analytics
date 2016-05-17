@@ -1,6 +1,4 @@
-package org.wso2.carbon.event.stream.deployer;
 /*
-<!--
   ~ Copyright (c) 2016  WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
   ~ WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,8 +14,12 @@ package org.wso2.carbon.event.stream.deployer;
   ~ KIND, either express or implied. See the License for the
   ~ specific language governing permissions and limitations
   ~ under the License.
--->
 */
+package org.wso2.carbon.event.stream.deployer;
 
 public interface EventStreamDeployer {
+    boolean deployEventStream(String eventStream);
+    boolean undeployEventStream(String eventStream);
+    String getType();
 }
+

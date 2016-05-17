@@ -20,56 +20,59 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
-import org.wso2.carbon.event.stream.deployer.internal.StreamDeployerValueHolder;
+import org.wso2.carbon.event.stream.deployer.internal.EventStreamDeployerValueHolder;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.event.stream.core.exception.StreamDefinitionAlreadyDefinedException;
 
-public class EventStreamDeployerImpl implements TemplateDeployer {
+public class EventStreamDeployerImpl implements EventStreamDeployer {
 
     private static final Log log = LogFactory.getLog(EventStreamDeployerImpl.class);
 
     @Override
-    public String getType() {
-        return "stream";
-    }
-
-
-    @Override
-    public void deployArtifact(DeployableTemplate template) throws TemplateDeploymentException {
-            deployStreams(template);
-    }
-
-    public static void deployStreams(DeployableTemplate template) {
-        if (template.getStreams() != null) {
-            for (String stream : template.getStreams()) {
-                StreamDefinition streamDefinition = null;
+    public boolean deployEventStream(String eventStream) {
+        StreamDefinition streamDefinition = null;
+        if (eventStream != null) {
                 try {
-                    streamDefinition = EventDefinitionConverterUtils.convertFromJson(stream);
-                    StreamDeployerValueHolder.getEventStreamService().addEventStreamDefinition(streamDefinition);
+                    streamDefinition = EventDefinitionConverterUtils.convertFromJson(eventStream);
+                    EventStreamDeployerValueHolder.getEventStreamService().addEventStreamDefinition(streamDefinition);
+                    return true;
                 } catch (MalformedStreamDefinitionException e) {
-                    log.error("Stream definition is incorrect in domain template " + stream, e);
+                    log.error("Stream definition is incorrect " + eventStream, e);
                 } catch (EventStreamConfigurationException e) {
                     log.error("Exception occurred when configuring stream " + streamDefinition.getName(), e);
                 } catch (StreamDefinitionAlreadyDefinedException e) {
-                    log.error("Same template stream name " + streamDefinition.getName()
+                    log.error("Same stream name " + streamDefinition.getName()
                             + " has been defined for another definition ", e);
                     throw e;
                 }
-            }
+        }else{
+            log.error("Stream definition cant be null");
         }
+        return  false;
     }
 
     @Override
-    public void undeployArtifact(String artifactId) throws TemplateDeploymentException {
-        undeployStreams();
-    }
-
-    public static void undeployStreams() {
-        try {
-            StreamDeployerValueHolder.getEventStreamService().getAllEventStreamConfigurations().get(0);
-        } catch (EventStreamConfigurationException e) {
-            log.error("");
+    public boolean undeployEventStream(String eventStream) {
+        StreamDefinition streamDefinition = null;
+        if (eventStream != null) {
+            try {
+                streamDefinition = EventDefinitionConverterUtils.convertFromJson(eventStream);
+                EventStreamDeployerValueHolder.getEventStreamService()
+                        .removeEventStreamDefinition(streamDefinition.getName(),streamDefinition.getVersion());
+                return true;
+            } catch (MalformedStreamDefinitionException e) {
+                log.error("Stream definition is incorrect " + eventStream, e);
+            } catch (EventStreamConfigurationException e) {
+                log.error("Exception occurred when configuring stream " + streamDefinition.getName(), e);
+            }
+        }else{
+            log.error("Stream definition cant be null");
         }
+        return  true;
     }
 
+    @Override
+    public String getType() {
+        return "eventStream";
+    }
 }

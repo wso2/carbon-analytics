@@ -18,12 +18,16 @@ package org.wso2.carbon.event.stream.deployer.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.event.stream.deployer.EventStreamDeployer;
+import org.wso2.carbon.event.stream.deployer.EventStreamDeployerImpl;
 import org.wso2.carbon.event.stream.deployer.internal.EventStreamDeployerValueHolder;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 
 /**
- * @scr.component name="org.wso2.carbon.event.stream.deployer.internal.ds.EventStreamDeployerDS" immediate="true"
- * @scr.reference name="org.wso2.carbon.event.stream.core.EventStreamService"
+ * This class is used to get the Event Stream service.
+ *
+ * @scr.component name="eventStreamDeployer.component" immediate="true"
+ * @scr.reference name="eventStreamService.service"
  * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
  * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  */
@@ -32,6 +36,18 @@ public class EventStreamDeployerDS {
     private static final Log log = LogFactory.getLog(EventStreamDeployerDS.class);
 
     protected void activate(ComponentContext context) {
+        try {
+            EventStreamDeployer streamDeployerService = new EventStreamDeployerImpl();
+            context.getBundleContext().registerService(EventStreamDeployer.class.getName(),
+                    streamDeployerService, null);
+            EventStreamDeployerValueHolder.setEventStreamDeployerService(streamDeployerService);
+
+            if (log.isDebugEnabled()) {
+                log.debug("Event Stream deployer service started successfully");
+            }
+        } catch (RuntimeException e) {
+            log.error("Event Stream deployer service cannot be deployed ", e);
+        }
     }
 
     protected void setEventStreamService(EventStreamService eventStreamService) {

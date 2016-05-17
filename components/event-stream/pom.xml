@@ -37,6 +37,7 @@
     <modules>
         <module>org.wso2.carbon.event.stream.core</module>
         <module>org.wso2.carbon.event.stream.admin</module>
+        <module>org.wso2.carbon.event.stream.deployer</module>
         <module>org.wso2.carbon.event.stream.ui</module>
     </modules>
     

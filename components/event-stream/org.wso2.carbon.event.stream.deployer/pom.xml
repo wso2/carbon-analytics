@@ -27,7 +27,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.event.stream.admin</artifactId>
+    <artifactId>org.wso2.carbon.event.stream.deployer</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Event Stream Admin</name>
     <description>This is a Carbon bundle that represent the event stream admin module.
@@ -46,6 +46,14 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.osgi</groupId>
+            <artifactId>org.eclipse.osgi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.osgi</groupId>
+            <artifactId>org.eclipse.osgi.services</artifactId>
         </dependency>
     </dependencies>
 
@@ -69,17 +77,19 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Export-Package>
-                            !org.wso2.carbon.event.stream.admin.internal,
-                            !org.wso2.carbon.event.stream.admin.internal.*,
-                            org.wso2.carbon.event.stream.admin.*
+                            !org.wso2.carbon.event.stream.deployer.internal,
+                            org.wso2.carbon.event.stream.deployer.*
                         </Export-Package>
                         <Private-Package>
-                            org.wso2.carbon.event.stream.admin.internal,
-                            org.wso2.carbon.event.stream.admin.internal.*
+                            org.wso2.carbon.event.stream.deployer.internal,
+                            org.wso2.carbon.event.stream.deployer.internal.*
                         </Private-Package>
                         <Import-Package>
+                            org.osgi.framework,
+                            org.osgi.service.component,
+                            org.wso2.carbon.utils.*,
+                            org.wso2.carbon.core.*,
                             org.wso2.carbon.event.stream.core.*,
-                            org.wso2.carbon.utils,
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

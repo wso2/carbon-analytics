@@ -1,4 +1,3 @@
-package org.wso2.carbon.event.stream.deployer.exception;
 /*
   ~ Copyright (c) 2016  WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
@@ -16,6 +15,8 @@ package org.wso2.carbon.event.stream.deployer.exception;
   ~ specific language governing permissions and limitations
   ~ under the License.
 */
+
+package org.wso2.carbon.event.stream.deployer.exception;
 
 /**
  * If there is a problem when deploying an event stream.

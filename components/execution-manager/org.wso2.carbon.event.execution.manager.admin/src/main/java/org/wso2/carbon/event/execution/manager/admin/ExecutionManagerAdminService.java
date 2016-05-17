@@ -211,6 +211,23 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
         try {
             ExecutionManagerAdminServiceValueHolder.getCarbonExecutorManagerService()
                     .saveConfiguration(ConfigurationMapper.mapConfiguration(configuration));
+            String stream = "{\n" +
+                    "  \"name\": \"inStream\",\n" +
+                    "  \"version\": \"2.0.0\",\n" +
+                    "  \"nickName\": \"\",\n" +
+                    "  \"description\": \"\",\n" +
+                    "  \"metaData\": [\n" +
+                    "    {\n" +
+                    "      \"name\": \"temperature\",\n" +
+                    "      \"type\": \"DOUBLE\"\n" +
+                    "    },\n" +
+                    "    {\n" +
+                    "      \"name\": \"roomNumber\",\n" +
+                    "      \"type\": \"INT\"\n" +
+                    "    }\n" +
+                    "  ]\n" +
+                    "}";
+            ExecutionManagerAdminServiceValueHolder.getEventStreamDeployerService().deployEventStream(stream);
             return true;
         } catch (ExecutionManagerException e) {
             log.error("Error occurred when saving configuration " + configuration.getName(), e);

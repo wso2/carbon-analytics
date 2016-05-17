@@ -16,11 +16,12 @@
 package org.wso2.carbon.event.stream.deployer.internal;
 
 import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.wso2.carbon.event.stream.deployer.EventStreamDeployer;
 
 public class EventStreamDeployerValueHolder {
 
     private static EventStreamService eventStreamService;
-
+    private static EventStreamDeployer eventStreamdeployerService;
 
     public static void setEventStreamService(EventStreamService eventBuilderService) {
         EventStreamDeployerValueHolder.eventStreamService = eventBuilderService;
@@ -28,6 +29,14 @@ public class EventStreamDeployerValueHolder {
 
     public static EventStreamService getEventStreamService() {
         return EventStreamDeployerValueHolder.eventStreamService;
+    }
+
+    public static void setEventStreamDeployerService(EventStreamDeployer eventStreamDeployer) {
+        EventStreamDeployerValueHolder.eventStreamdeployerService = eventStreamDeployer;
+    }
+
+    public static EventStreamDeployer getEventStreamDeployerService() {
+        return EventStreamDeployerValueHolder.eventStreamdeployerService;
     }
 
 }
