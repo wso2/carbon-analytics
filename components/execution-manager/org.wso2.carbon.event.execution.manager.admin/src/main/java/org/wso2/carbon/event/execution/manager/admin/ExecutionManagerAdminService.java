@@ -45,6 +45,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
 
     }
 
+    //TODO: DONE FROM ADMIN SERVICE SIDE, CHECK UI USAGE.
     /**
      * return domain for a given template domain name
      *
@@ -54,7 +55,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      */
     public TemplateDomainDTO getDomain(String domainName) throws AxisFault {
         try {
-            return DomainMapper.mapDomain(ExecutionManagerAdminServiceValueHolder.getCarbonExecutorManagerService()
+            return DomainMapper.mapDomain(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
                     .getDomain(domainName));
         } catch (Exception e) {
             log.error("Error occurred when getting domain " + domainName, e);
@@ -62,6 +63,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
         }
     }
 
+    //TODO: NO CHANGES NEEDED
     /**
      * return domain for a given template domain name
      *
@@ -71,7 +73,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      */
     public TemplateDomainInfoDTO getDomainInfo(String domainName) throws AxisFault {
         try {
-            return DomainMapper.mapDomainInfo(ExecutionManagerAdminServiceValueHolder.getCarbonExecutorManagerService()
+            return DomainMapper.mapDomainInfo(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
                     .getDomain(domainName));
         } catch (Exception e) {
             log.error("Error occurred when getting domain " + domainName, e);
@@ -79,6 +81,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
         }
     }
 
+    //TODO: NO CHANGES NEEDED
     /**
      * return all available template domain information
      *
@@ -88,13 +91,14 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     public TemplateDomainInfoDTO[] getAllDomainsInfo() throws AxisFault {
         try {
             return DomainMapper.mapDomainsInfo(new ArrayList<TemplateDomain>(ExecutionManagerAdminServiceValueHolder
-                    .getCarbonExecutorManagerService().getAllDomains()));
+                    .getCarbonExecutionManagerService().getAllDomains()));
         } catch (Exception e) {
             log.error("Error occurred when getting all domains ", e);
             throw new AxisFault(e.getMessage(), e);
         }
     }
 
+    //TODO: CHECK UI USAGE
     /**
      * return all available template domains
      *
@@ -104,7 +108,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     public TemplateDomainDTO[] getAllDomains() throws AxisFault {
         try {
             return DomainMapper.mapDomains(new ArrayList<TemplateDomain>(ExecutionManagerAdminServiceValueHolder
-                    .getCarbonExecutorManagerService().getAllDomains()));
+                    .getCarbonExecutionManagerService().getAllDomains()));
         } catch (Exception e) {
             log.error("Error occurred when getting all domains ", e);
             throw new AxisFault(e.getMessage(), e);
@@ -112,6 +116,8 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     }
 
 
+    //TODO: CHECK UI USAGE.
+    //Only change done in mapping is removing executionParameters.
     /**
      * return details for a given template domain name
      *
@@ -122,7 +128,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     public TemplateConfigurationDTO[] getConfigurations(String domainName) throws AxisFault {
         try {
             return ConfigurationMapper.mapConfigurations(new ArrayList<>(
-                    ExecutionManagerAdminServiceValueHolder.getCarbonExecutorManagerService()
+                    ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
                             .getConfigurations(domainName)));
         } catch (Exception e) {
             log.error("Error occurred when getting configurations for domain " + domainName, e);
@@ -130,6 +136,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
         }
     }
 
+    //TODO: CHECK UI USAGE
     /**
      * return details for a given template configuration name
      *
@@ -141,13 +148,14 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     public TemplateConfigurationDTO getConfiguration(String domainName, String configName) throws AxisFault {
         try {
             return ConfigurationMapper.mapConfiguration(ExecutionManagerAdminServiceValueHolder
-                    .getCarbonExecutorManagerService().getConfiguration(domainName, configName));
+                    .getCarbonExecutionManagerService().getConfiguration(domainName, configName));
         } catch (Exception e) {
             log.error("Error occurred when getting template configuration " + configName, e);
             throw new AxisFault(e.getMessage());
         }
     }
 
+    //TODO: SEEMS LIKE NOTHING TO BE CHANGED
     /**
      * return details for a given template domain name
      *
@@ -158,7 +166,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     public TemplateConfigurationInfoDTO[] getConfigurationsInfo(String domainName) throws AxisFault {
         try {
             return ConfigurationMapper.mapConfigurationsInfo(new ArrayList<>(
-                    ExecutionManagerAdminServiceValueHolder.getCarbonExecutorManagerService()
+                    ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
                             .getConfigurations(domainName)));
         } catch (Exception e) {
             log.error("Error occurred when getting configurations for domain " + domainName, e);
@@ -167,6 +175,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     }
 
 
+    //TODO: SEEMS LIKE NOTHING TO BE CHANGED
     /**
      * return details for a given template configuration name
      *
@@ -178,7 +187,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     public TemplateConfigurationInfoDTO getConfigurationInfo(String domainName, String configName) throws AxisFault {
         try {
             return ConfigurationMapper.mapConfigurationInfo(ExecutionManagerAdminServiceValueHolder
-                    .getCarbonExecutorManagerService().getConfiguration(domainName, configName));
+                    .getCarbonExecutionManagerService().getConfiguration(domainName, configName));
         } catch (Exception e) {
             log.error("Error occurred when getting template configuration " + configName, e);
             throw new AxisFault(e.getMessage(), e);
@@ -193,7 +202,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      */
     public boolean deleteConfiguration(String domainName, String configName) throws AxisFault {
         try {
-            ExecutionManagerAdminServiceValueHolder.getCarbonExecutorManagerService()
+            ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
                     .deleteConfiguration(domainName, configName);
             return true;
         } catch (ExecutionManagerException e) {
@@ -203,18 +212,42 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     }
 
     /**
-     * Create or update specified configuration
+     * Create or update specified configuration.
      *
      * @param configuration configuration data transfer object
+     * @return  Stream ID array
+     * @throws AxisFault
      */
-    public boolean saveConfiguration(TemplateConfigurationDTO configuration) throws AxisFault {
+    public String[] saveConfiguration(TemplateConfigurationDTO configuration) throws AxisFault {
         try {
-            ExecutionManagerAdminServiceValueHolder.getCarbonExecutorManagerService()
-                    .saveConfiguration(ConfigurationMapper.mapConfiguration(configuration));
-            return true;
+            return ConfigurationMapper.mapStreamIds(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
+                    .saveConfiguration(ConfigurationMapper.mapConfiguration(configuration)));
         } catch (ExecutionManagerException e) {
             log.error("Error occurred when saving configuration " + configuration.getName(), e);
             throw new AxisFault(e.getMessage(), e);
         }
+    }
+
+    /**
+     * When the template refers to a stream (say StreamX) which needs to be populated by a user-defined stream (say StreamY),
+     * specify how attributes in StreamY needs to be mapped to StreamX, using the streamMappingDTO,
+     * and invoke this service.
+     * This service will create a Siddhi execution plan, which will select required attributes (as specified in the mapping)
+     * from StreamY and insert into StreamX.
+     *
+     * @param streamMappingDTO  Maps a user-defined stream to a stream defined in the template.
+     * @return true on successful operation completion.
+     * @throws AxisFault
+     */
+    public boolean saveStreamMapping(
+            org.wso2.carbon.event.execution.manager.admin.dto.configuration.StreamMappingDTO streamMappingDTO) throws AxisFault {
+//        try {
+//            ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
+//                    .saveStreamMapping(ConfigurationMapper.mapStreamMapping(streamMappingDTO));
+//            return true;
+//        } catch (ExecutionManagerException e) {
+//
+//        }
+        return true;
     }
 }

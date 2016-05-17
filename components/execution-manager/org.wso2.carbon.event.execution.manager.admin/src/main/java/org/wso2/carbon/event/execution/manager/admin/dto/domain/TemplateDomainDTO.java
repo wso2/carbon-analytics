@@ -21,12 +21,9 @@ package org.wso2.carbon.event.execution.manager.admin.dto.domain;
 public class TemplateDomainDTO {
 
     private String name;
-
     private String description;
-
-    private TemplateDTO[] templateDTOs;
-
-    private String[] streams;
+    private TemplateConfigurationDTO[] templateConfigurationDTOs;
+    private CommonArtifactDTO[] commonArtifactDTOs;
 
     public String getName() {
         return name;
@@ -44,19 +41,19 @@ public class TemplateDomainDTO {
         this.description = description;
     }
 
-    public TemplateDTO[] getTemplateDTOs() {
-        return templateDTOs;
+    public TemplateConfigurationDTO[] getTemplateConfigurationDTOs() {
+        return templateConfigurationDTOs;
     }
 
-    public void setTemplateDTOs(TemplateDTO[] templateDTOs) {
-        this.templateDTOs = templateDTOs;
+    public void setTemplateConfigurationDTOs(TemplateConfigurationDTO[] templateConfigurationDTOs) {
+        this.templateConfigurationDTOs = templateConfigurationDTOs;
     }
 
-    public String[] getStreams() {
-        return streams;
+    public CommonArtifactDTO[] getCommonArtifactDTOs() {
+        return commonArtifactDTOs;
     }
 
-    public void setStreams(String[] streams) {
-        this.streams = streams;
+    public void setCommonArtifactDTOs(CommonArtifactDTO[] commonArtifactDTOs) {
+        this.commonArtifactDTOs = commonArtifactDTOs;
     }
 }

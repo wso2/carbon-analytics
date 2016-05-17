@@ -30,8 +30,6 @@ public class TemplateConfigurationDTO {
 
     private ParameterDTO[] parameterDTOs;
 
-    private String executionParameters;
-
     public String getName() {
         return name;
     }
@@ -70,13 +68,5 @@ public class TemplateConfigurationDTO {
 
     public void setParameterDTOs(ParameterDTO[] parameterDTOs) {
         this.parameterDTOs = parameterDTOs;
-    }
-
-    public String getExecutionParameters() {
-        return this.executionParameters;
-    }
-
-    public void setExecutionParameters(String executionParameters) {
-        this.executionParameters = executionParameters;
     }
 }

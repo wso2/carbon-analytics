@@ -23,9 +23,11 @@ import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
 import org.wso2.carbon.event.execution.manager.core.exception.ExecutionManagerException;
 import org.wso2.carbon.event.execution.manager.core.internal.ds.ExecutionManagerValueHolder;
-import org.wso2.carbon.event.execution.manager.core.structure.configuration.Parameter;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.TemplateConfiguration;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.Artifact;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateConfig;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateDomain;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.core.Registry;
@@ -36,7 +38,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -109,7 +113,7 @@ public class ExecutionManagerHelper {
         TemplateConfiguration templateConfiguration = null;
         try {
             Registry registry = ExecutionManagerValueHolder.getRegistryService().getConfigSystemRegistry(PrivilegedCarbonContext
-                    .getThreadLocalCarbonContext().getTenantId());
+                                                                                                                 .getThreadLocalCarbonContext().getTenantId());
 
             if (registry.resourceExists(path)) {
                 Resource configFile = registry.get(path);
@@ -148,40 +152,74 @@ public class ExecutionManagerHelper {
 
 
     /**
+     * Checks whether the present Template Domain configuration has valid content.
+     * For example, it should have at least one Template configuration.
+     *
+     * @param configuration Object containing configuration parameters. Required for logging purpose.
+     * @param templateDomain TemplateDomain object which needs to be validated.
+     * @throws ExecutionManagerException
+     */
+    public static void validateTemplateDomainConfig(TemplateConfiguration configuration,
+                                                    TemplateDomain templateDomain)
+            throws ExecutionManagerException {
+        if (templateDomain == null) {
+            throw new ExecutionManagerException("The " + configuration.getFrom() + " domain of"
+                                                + configuration.getName() + " configuration" + " is not available in the domain list.");
+        }
+        if (templateDomain.getTemplateConfigs() == null ||
+                   templateDomain.getTemplateConfigs().getTemplateConfig() == null ||
+                   templateDomain.getTemplateConfigs().getTemplateConfig().isEmpty()) {
+            //It is required to have at least one TemplateConfiguration.
+            //Having only a set of common artifacts is not a valid use case.
+            throw new ExecutionManagerException("There are no templates in the domain " + configuration.getFrom()
+                                                + " of " + configuration.getName() + " configuration");
+        }
+    }
+
+    /**
      * Deploy given configurations template Execution Plans
      *
      * @param configuration configuration object
      */
-    public static void deployArtifacts(TemplateConfiguration configuration, Map<String, TemplateDomain> domains)
+    public static void deployArtifacts(TemplateConfiguration configuration,
+                                       TemplateDomain templateDomain)
             throws ExecutionManagerException {
+        //make sure common artifacts are deployed
+        if (templateDomain.getCommonArtifacts() != null) {
+            for (Artifact artifact : templateDomain.getCommonArtifacts().getArtifact()) {
+                try {
+                    DeployableTemplate deployableTemplate = new DeployableTemplate();
+                    deployableTemplate.setArtifact(artifact.getValue());
+                    deployableTemplate.setConfiguration(configuration);
+                    TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(artifact.getType());
+                    deployer.deployArtifact(deployableTemplate);
+                } catch (TemplateDeploymentException e) {
+                    log.error("Error when trying to deploy the artifact " + configuration.getName(), e);
+                    throw new ExecutionManagerException(e);
+                }
 
-        if (domains.get(configuration.getFrom()) == null) {
-            throw new ExecutionManagerException("The " + configuration.getFrom() + " domain of"
-                    + configuration.getName() + " configuration" + " is not available in the domain list.");
-        } else if (domains.get(configuration.getFrom()).getTemplates() == null) {
-            throw new ExecutionManagerException("There are no templates in the domain " + configuration.getFrom()
-                    + " of " + configuration.getName() + " configuration");
-        } else {
-            for (Template template : domains.get(configuration.getFrom()).getTemplates()) {
-                if (template.getName().equals(configuration.getType())) {
-                    TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(template.getExecutionType());
+            }
+        }
+
+        //now, deploy templated artifacts
+        for (TemplateConfig templateConfig : templateDomain.getTemplateConfigs().getTemplateConfig()) {
+            for (Template template : templateConfig.getTemplates().getTemplate()) {
+                if (templateConfig.getName().equals(configuration.getType())) {
+                    TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(template.getType());
                     if (deployer != null) {
                         try {
-                            DeployableTemplate deployableTemplate = updateArtifactParameters(configuration, template);
-                            TemplateDomain domain = domains.get(configuration.getFrom());
-                            deployableTemplate.setStreams(domain.getStreams());
+                            DeployableTemplate deployableTemplate = new DeployableTemplate();
+                            String updatedScript = updateArtifactParameters(configuration, template.getValue());
+                            deployableTemplate.setArtifact(updatedScript);
                             deployableTemplate.setConfiguration(configuration);
-                            deployableTemplate.setCronExpression(template.getCronExpression());
-                            // streams should be deployed in this call.
                             deployer.deployArtifact(deployableTemplate);
                         } catch (TemplateDeploymentException e) {
                             log.error("Error when trying to deploy the artifact " + configuration.getName(), e);
                             throw new ExecutionManagerException(e);
                         }
                         break;
-
                     } else {
-                        throw new ExecutionManagerException("A deployer doesn't exist for template type " + template.getExecutionType());
+                        throw new ExecutionManagerException("A deployer doesn't exist for template type " + template.getType());
                     }
                 }
             }
@@ -189,52 +227,23 @@ public class ExecutionManagerHelper {
     }
 
 
-    private static DeployableTemplate updateArtifactParameters(TemplateConfiguration config, Template template) {
-        DeployableTemplate deployableTemplate = new DeployableTemplate();
-
-        //updating scripts
-        deployableTemplate.setScript(updateArtifactParameters(config, template.getScript()));
-
-        //updating execution plans
-        String[] executionPlans = template.getExecutionPlans();
-        if (executionPlans != null) {
-            String[] updatedExecutionPlans = new String[executionPlans.length];
-            for (int i=0; i<executionPlans.length; i++) {
-                updatedExecutionPlans[i] = updateArtifactParameters(config, executionPlans[i]);
-            }
-            deployableTemplate.setExecutionPlans(updatedExecutionPlans);
-        }
-
-        //updating spark script
-        String sparkScript = template.getSparkScript();
-        if (sparkScript != null) {
-            sparkScript = updateArtifactParameters(config, sparkScript);
-            deployableTemplate.setSparkScript(sparkScript);
-        }
-
-        return deployableTemplate;
-    }
-
     /**
-     * Update given execution plan by replacing undefined parameter values with configured parameter values
+     * Update given script by replacing undefined parameter values with configured parameter values
      *
      * @param config configurations which consists of parameters which will replace
-     * @param templateElement templateElement which needs to be updated
+     * @param script script which needs to be updated
      * @return updated execution plan
      */
-    private static String updateArtifactParameters(TemplateConfiguration config, String templateElement) {
-
-        String updatedElement = templateElement;
-
-        //Execution templateElement parameters will be replaced with given configuration parameters
-        if (config.getParameters() != null && templateElement != null) {
-            for (Parameter parameter : config.getParameters()) {
-                updatedElement = updatedElement.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
-                        + parameter.getName(), parameter.getValue());
+    private static String updateArtifactParameters(TemplateConfiguration config, String script) {
+        String updatedScript = script;
+        //Script parameters will be replaced with given configuration parameters
+        if (config.getParameterMap() != null && script != null) {
+            for (Map.Entry parameterMapEntry : config.getParameterMap().entrySet()) {
+                updatedScript = updatedScript.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
+                                                         + parameterMapEntry.getKey().toString(), parameterMapEntry.getValue().toString());
             }
         }
-
-        return updatedElement;
+        return updatedScript;
     }
 
     /**
@@ -244,11 +253,39 @@ public class ExecutionManagerHelper {
      * @param type       type of the execution script
      * @throws TemplateDeploymentException
      */
-    public static void unDeployExistingArtifact(String scriptName, String type)
+    public static void unDeployExistingArtifact(String scriptName, String type)    //todo: script name is yet to be decided.
             throws TemplateDeploymentException {
         TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(type);
         deployer.undeployArtifact(scriptName);
     }
 
 
+    /**
+     * Returns the list of Stream IDs(with their template symbols replaced by user-parameters) given in StreamMappings element.
+     *
+     * @param configuration Template configuration, specified by the user, containing parameter values.
+     * @param templateDomain TemplateDomain object, containing the StreamMappings element
+     * @return List of Stream IDs
+     */
+    public static List<String> getStreamIDsInMappings(TemplateConfiguration configuration,
+                                                      TemplateDomain templateDomain) {
+        List<String> streamIdList = new ArrayList<>();
+        for (TemplateConfig templateConfig: templateDomain.getTemplateConfigs().getTemplateConfig()){
+            if (configuration.getName().equals(templateConfig.getName())) {
+                if(templateConfig.getStreamMappings() != null && templateConfig.getStreamMappings().getStreamMapping() != null
+                        && !templateConfig.getStreamMappings().getStreamMapping().isEmpty()) {    //if no stream mappings present, should return null
+                    for (StreamMapping streamMapping: templateConfig.getStreamMappings().getStreamMapping()) {
+                        String toStream = streamMapping.getTo();
+                        for (Map.Entry entry: configuration.getParameterMap().entrySet()) {
+                            toStream = toStream.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
+                                                           + entry.getKey().toString(), entry.getValue().toString());
+                        }
+                        streamIdList.add(toStream);
+                    }
+                    return streamIdList;
+                }
+            }
+        }
+        return null;
+    }
 }

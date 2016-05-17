@@ -7,8 +7,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlValue;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name="template")
-public class Template {
+@XmlRootElement(name="artifact")
+public class Artifact {
+
     @XmlAttribute(name="type")
     private String type;
 
@@ -30,5 +31,4 @@ public class Template {
     public void setValue(String value) {
         this.value = value;
     }
-
 }

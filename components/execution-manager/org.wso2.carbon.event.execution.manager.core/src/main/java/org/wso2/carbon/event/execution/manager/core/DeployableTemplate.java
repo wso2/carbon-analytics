@@ -20,12 +20,7 @@ import org.wso2.carbon.event.execution.manager.core.structure.configuration.Temp
 public class DeployableTemplate {
 
     private TemplateConfiguration configuration;
-    private String script;
-    private String[] streams;
-    private String[] executionPlans;
-    private String sparkScript;
-    private String cronExpression;  //cron expression for the Spark script.
-
+    private String artifact;
 
     public TemplateConfiguration getConfiguration() {
         return configuration;
@@ -35,43 +30,12 @@ public class DeployableTemplate {
         this.configuration = configuration;
     }
 
-    public String getScript() {
-        return script;
+    public String getArtifact() {
+        return artifact;
     }
 
-    public void setScript(String script) {
-        this.script = script;
+    public void setArtifact(String artifact) {
+        this.artifact = artifact;
     }
 
-    public String[] getStreams() {
-        return streams;
-    }
-
-    public void setStreams(String[] streams) {
-        this.streams = streams;
-    }
-
-    public String[] getExecutionPlans() {
-        return executionPlans;
-    }
-
-    public void setExecutionPlans(String[] executionPlans) {
-        this.executionPlans = executionPlans;
-    }
-
-    public String getSparkScript() {
-        return sparkScript;
-    }
-
-    public void setSparkScript(String sparkScript) {
-        this.sparkScript = sparkScript;
-    }
-
-    public String getCronExpression() {
-        return cronExpression;
-    }
-
-    public void setCronExpression(String cronExpression) {
-        this.cronExpression = cronExpression;
-    }
 }

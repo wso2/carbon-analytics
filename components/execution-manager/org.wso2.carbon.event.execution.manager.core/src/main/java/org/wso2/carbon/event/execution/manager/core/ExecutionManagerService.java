@@ -20,6 +20,7 @@ import org.wso2.carbon.event.execution.manager.core.structure.configuration.Temp
 import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateDomain;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Interface consist of service methods which will be exposed by the ExecutionManagerService
@@ -31,7 +32,7 @@ public interface ExecutionManagerService {
      *
      * @param configuration configuration object which needs to be saved
      */
-    public void saveConfiguration(TemplateConfiguration configuration) throws ExecutionManagerException;
+    public List<String> saveConfiguration(TemplateConfiguration configuration) throws ExecutionManagerException;
 
     /**
      * provide all the loaded domains

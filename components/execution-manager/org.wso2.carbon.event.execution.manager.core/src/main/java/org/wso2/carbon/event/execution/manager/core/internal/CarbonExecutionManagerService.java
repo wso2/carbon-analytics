@@ -26,6 +26,7 @@ import org.wso2.carbon.event.execution.manager.core.internal.util.ExecutionManag
 import org.wso2.carbon.event.execution.manager.core.internal.util.ExecutionManagerHelper;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.TemplateConfiguration;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateConfig;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateDomain;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.core.Registry;
@@ -39,6 +40,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -59,7 +61,7 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
 
 
     @Override
-    public void saveConfiguration(TemplateConfiguration configuration) throws ExecutionManagerException {
+    public List<String> saveConfiguration(TemplateConfiguration configuration) throws ExecutionManagerException {
         try {
             Registry registry = ExecutionManagerValueHolder.getRegistryService()
                     .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
@@ -83,13 +85,19 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
                 registry.put(resourceCollectionPath, registry.newCollection());
             }
 
-            ExecutionManagerHelper.deployArtifacts(configuration, domains);
+            TemplateDomain templateDomain = domains.get(configuration.getFrom());
+            ExecutionManagerHelper.validateTemplateDomainConfig(configuration, templateDomain);
+            ExecutionManagerHelper.deployArtifacts(configuration, templateDomain);
 
             if (registry.resourceExists(resourcePath)) {
                 registry.delete(resourcePath);
             }
             resource.setMediaType("application/xml");
             registry.put(resourcePath, resource);
+
+            //If StreamMappings element is present in the TemplateDomain, then need to return those Stream IDs,
+            //so the caller (the UI) can prompt the user to map these streams to his own streams.
+            return ExecutionManagerHelper.getStreamIDsInMappings(configuration, getDomain(configuration.getFrom()));
 
         } catch (RegistryException e) {
             throw new ExecutionManagerException("Registry exception occurred when creating " + configuration.getName()
@@ -185,15 +193,16 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
         try {
 
             TemplateDomain domain = getDomain(templateConfig.getFrom());
-            String executionType = null;
-            for (Template template : domain.getTemplates()) {
-                if (templateConfig.getType().equals(template.getName())) {
-                    executionType = template.getExecutionType();
+            for (TemplateConfig domainTemplateConfig : domain.getTemplateConfigs().getTemplateConfig()) {
+                if (templateConfig.getType().equals(domainTemplateConfig.getName())) {
+                    for (Template template : domainTemplateConfig.getTemplates().getTemplate()) {
+                        ExecutionManagerHelper.unDeployExistingArtifact(domainName
+                                                                        + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + configName, template.getType());
+                        //todo: scriptName is yet to be decided
+                    }
                     break;
                 }
             }
-            ExecutionManagerHelper.unDeployExistingArtifact(domainName
-                    + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + configName, executionType);
         } catch (TemplateDeploymentException e) {
             log.error("Configuration exception when un deploying script "
                     + configName + " of Domain " + domainName, e);

@@ -20,53 +20,22 @@ package org.wso2.carbon.event.execution.manager.admin.dto.domain;
  */
 public class TemplateDTO {
 
-    private String name;
+    private String type;
+    private String artifact;
 
-    private String description;
-
-    private String executionScript;
-
-    private String executionType;
-
-    private ParameterDTO[] parameterDTOs;
-
-    public String getName() {
-        return name;
+    public String getType() {
+        return type;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public String getDescription() {
-        return description;
+    public String getArtifact() {
+        return artifact;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getExecutionScript() {
-        return executionScript;
-    }
-
-    public void setExecutionScript(String executionScript) {
-        this.executionScript = executionScript;
-    }
-
-    public ParameterDTO[] getParameterDTOs() {
-        return parameterDTOs;
-    }
-
-    public void setParameterDTOs(ParameterDTO[] parameterDTOs) {
-        this.parameterDTOs = parameterDTOs;
-    }
-
-    public String getExecutionType() {
-        return executionType;
-    }
-
-    public void setExecutionType(String executionType) {
-        this.executionType = executionType;
+    public void setArtifact(String artifact) {
+        this.artifact = artifact;
     }
 }

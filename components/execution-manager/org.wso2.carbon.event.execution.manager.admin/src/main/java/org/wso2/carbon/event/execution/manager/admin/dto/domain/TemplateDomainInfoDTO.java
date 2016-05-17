@@ -21,7 +21,6 @@ package org.wso2.carbon.event.execution.manager.admin.dto.domain;
 public class TemplateDomainInfoDTO {
 
     private String name;
-
     private String description;
 
     public String getName() {

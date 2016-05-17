@@ -1,41 +1,22 @@
-/*
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.wso2.carbon.event.execution.manager.core.structure.domain;
+
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- * JAXB Class of TemplateDomain element
- */
-@XmlRootElement
+@XmlRootElement(name = "templateDomain")
 public class TemplateDomain {
-
+    @XmlAttribute
     private String name;
     private String description;
-    private Template[] templates;
-    private String[] streams;
+    private CommonArtifacts commonArtifacts;
+    private TemplateConfigs templateConfigs;
 
     public String getName() {
         return name;
     }
 
-    @XmlAttribute
     public void setName(String name) {
         this.name = name;
     }
@@ -44,28 +25,31 @@ public class TemplateDomain {
         return description;
     }
 
-    @XmlElement
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public Template[] getTemplates() {
-        return templates;
+    /** Getter.
+     * @return the commonArtifacts
+     */
+    public CommonArtifacts getCommonArtifacts() {
+        return commonArtifacts;
     }
 
-    @XmlElementWrapper(name = "templates")
-    @XmlElement(name = "template")
-    public void setTemplates(Template[] templates) {
-        this.templates = templates;
+    /** Setter.
+     * @param commonArtifacts the commonArtifacts to set
+     */
+    @XmlElement
+    public void setCommonArtifacts(CommonArtifacts commonArtifacts) {
+        this.commonArtifacts = commonArtifacts;
     }
 
-    public String[] getStreams() {
-        return streams;
+    public TemplateConfigs getTemplateConfigs() {
+        return templateConfigs;
     }
 
-    @XmlElementWrapper(name = "streams")
-    @XmlElement(name = "stream")
-    public void setStreams(String[] streams) {
-        this.streams = streams;
+    @XmlElement
+    public void setTemplateConfigs(TemplateConfigs templateConfigs) {
+        this.templateConfigs = templateConfigs;
     }
 }

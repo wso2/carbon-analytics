@@ -16,12 +16,17 @@
 package org.wso2.carbon.event.execution.manager.admin.internal.util;
 
 import org.wso2.carbon.event.execution.manager.admin.dto.configuration.ParameterDTO;
+import org.wso2.carbon.event.execution.manager.admin.dto.configuration.StreamMappingDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.configuration.TemplateConfigurationDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.configuration.TemplateConfigurationInfoDTO;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.Parameter;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.TemplateConfiguration;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Consist of the necessary mapping methods of Configurations
@@ -109,8 +114,7 @@ public class ConfigurationMapper {
             templateConfigurationDTO.setType(templateConfig.getType());
             templateConfigurationDTO.setDescription(templateConfig.getDescription());
             templateConfigurationDTO.setFrom(templateConfig.getFrom());
-            templateConfigurationDTO.setParameterDTOs(mapParameters(templateConfig.getParameters()));
-            templateConfigurationDTO.setExecutionParameters((templateConfig.getExecutionParameters()));
+            templateConfigurationDTO.setParameterDTOs(mapParameters(templateConfig.getParameterMap()));
         }
         return templateConfigurationDTO;
     }
@@ -130,45 +134,46 @@ public class ConfigurationMapper {
             templateConfig.setType(configDTO.getType());
             templateConfig.setDescription(configDTO.getDescription());
             templateConfig.setFrom(configDTO.getFrom());
-            templateConfig.setParameters(mapParameters(configDTO.getParameterDTOs()));
-            templateConfig.setExecutionParameters(configDTO.getExecutionParameters());
+            templateConfig.setParameterMap(mapParameters(configDTO.getParameterDTOs()));
         }
         return templateConfig;
     }
 
     /**
-     * Maps given List of ParameterDTO objects to array of Parameter objects
+     * Maps given List of ParameterDTO objects to a Map in which parameter name is mapped to value.
      *
-     * @param parameterDTO ParameterDTO object which needs to mapped
-     * @return Mapped array of Parameter objects
+     * @param parameterDTOs ParameterDTO object which needs to mapped
+     * @return Parameter map
      */
-    private static Parameter[] mapParameters(ParameterDTO[] parameterDTO) {
-        Parameter[] parameters = null;
-
-        if (parameterDTO != null) {
-            parameters = new Parameter[parameterDTO.length];
-            for (int i = 0; i < parameters.length; i++) {
-                parameters[i] = mapParameter(parameterDTO[i]);
+    private static Map<String,String> mapParameters(ParameterDTO[] parameterDTOs) {
+        Map<String,String> parameterMap = new HashMap<>();
+        if (parameterDTOs != null) {
+            for (int i = 0; i < parameterDTOs.length; i++) {
+                parameterMap.put(parameterDTOs[i].getName(),parameterDTOs[i].getValue());
             }
         }
-
-        return parameters;
+        return parameterMap;
     }
 
     /**
      * Maps given List of Parameter objects to array of ParameterDTO
      *
-     * @param parameters List of Parameter object needs to be mapped
+     * @param parameterMap Map, containing the parameter names-value pairs, which needs to be mapped
      * @return Mapped array of ParameterDTO objects
      */
-    private static ParameterDTO[] mapParameters(Parameter[] parameters) {
+    private static ParameterDTO[] mapParameters(Map<String,String> parameterMap) {
         ParameterDTO[] parameterDTOs = null;
 
-        if (parameters != null) {
-            parameterDTOs = new ParameterDTO[parameters.length];
-            for (int i = 0; i < parameterDTOs.length; i++) {
-                parameterDTOs[i] = mapParameter(parameters[i]);
+        if (parameterMap != null) {
+            parameterDTOs = new ParameterDTO[parameterMap.size()];
+            int i=0;
+            for (Map.Entry<String,String> entry : parameterMap.entrySet()) {
+                ParameterDTO dto = new ParameterDTO();
+                dto.setName(entry.getKey());
+                dto.setValue(entry.getValue());
+                parameterDTOs[i] = dto;
             }
+            i++;
         }
         return parameterDTOs;
     }
@@ -179,7 +184,7 @@ public class ConfigurationMapper {
      * @param parameterDTO ParameterDTO needs to be mapped
      * @return Converyed ParameterDTO object
      */
-    private static Parameter mapParameter(ParameterDTO parameterDTO) {
+    private static Parameter mapParameter(ParameterDTO parameterDTO) {       //todo: remove if no use
         Parameter parameter = null;
 
         if (parameterDTO != null) {
@@ -197,7 +202,7 @@ public class ConfigurationMapper {
      * @param parameter Parameter needs to be mapped
      * @return Mapped ParameterDTO object
      */
-    private static ParameterDTO mapParameter(Parameter parameter) {
+    private static ParameterDTO mapParameter(Parameter parameter) {         //todo: remove if no use
         ParameterDTO parameterDTO = null;
         if (parameter != null) {
             parameterDTO = new ParameterDTO();
@@ -207,4 +212,20 @@ public class ConfigurationMapper {
         return parameterDTO;
     }
 
+    public static String[] mapStreamIds(List<String> streamIdList) {
+        return (String[]) streamIdList.toArray();
+    }
+
+    public static StreamMapping mapStreamMapping(StreamMappingDTO streamMappingDTO) {
+        StreamMapping streamMapping = new StreamMapping();
+        streamMapping.setFromStream(streamMappingDTO.getFromStream());
+        streamMapping.setToStream(streamMappingDTO.getToStream());
+        List<String[]> attributePairs = new ArrayList<>();
+        for (int i = 0; i < streamMappingDTO.getAttributePairs().length; i++) {
+            attributePairs.add(new String[]{streamMappingDTO.getAttributePairs()[i][0]
+                    , streamMappingDTO.getAttributePairs()[i][1]});
+        }
+        streamMapping.setAttributePairs(attributePairs);
+        return streamMapping;
+    }
 }

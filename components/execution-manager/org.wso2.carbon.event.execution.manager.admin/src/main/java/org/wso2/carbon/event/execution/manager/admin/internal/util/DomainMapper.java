@@ -15,12 +15,17 @@
  */
 package org.wso2.carbon.event.execution.manager.admin.internal.util;
 
+import org.wso2.carbon.event.execution.manager.admin.dto.domain.CommonArtifactDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.domain.ParameterDTO;
+import org.wso2.carbon.event.execution.manager.admin.dto.domain.StreamMappingDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateDomainDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateDomainInfoDTO;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.Artifact;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Parameter;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateConfig;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateDomain;
 
 import java.util.List;
@@ -105,50 +110,120 @@ public class DomainMapper {
             templateDomainDTO = new TemplateDomainDTO();
             templateDomainDTO.setName(templateDomain.getName());
             templateDomainDTO.setDescription(templateDomain.getName());
-            templateDomainDTO.setStreams(templateDomain.getStreams());
-            templateDomainDTO.setTemplateDTOs(mapTemplates(templateDomain.getTemplates()));
+            templateDomainDTO.setTemplateConfigurationDTOs(mapTemplateConfigListToDTOs(templateDomain.getTemplateConfigs().getTemplateConfig()));
+            templateDomainDTO.setCommonArtifactDTOs(mapCommonArtifactListToDTO(templateDomain.getCommonArtifacts().getArtifact()));
         }
 
         return templateDomainDTO;
     }
 
-    /**
-     * Maps given array of Template objects to array of TemplateDTO objects
-     *
-     * @param templates Template objects array needs to mapped
-     * @return Mapped array of TemplateDTO objects
-     */
-    private static TemplateDTO[] mapTemplates(Template[] templates) {
-        TemplateDTO[] templateDTOs = null;
+    private static CommonArtifactDTO[] mapCommonArtifactListToDTO(List<Artifact> artifacts) {
+        CommonArtifactDTO[] artifactDTOs = new CommonArtifactDTO[artifacts.size()];
+        int i = 0;
+        for (Artifact artifact: artifacts) {
+            CommonArtifactDTO artifactDTO = new CommonArtifactDTO();
+            artifactDTO.setType(artifact.getType());
+            artifactDTO.setArtifact(artifact.getValue());
+            artifactDTOs[i] = artifactDTO;
+            i++;
+        }
+        return artifactDTOs;
+    }
 
-        if (templates != null) {
-            templateDTOs = new TemplateDTO[templates.length];
-            for (int i = 0; i < templateDTOs.length; i++) {
-                templateDTOs[i] = mapTemplate(templates[i]);
-            }
+    private static org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateConfigurationDTO[] mapTemplateConfigListToDTOs(
+            List<TemplateConfig> templateConfigs) {
+        org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateConfigurationDTO[] configurationDTOs = 
+                new org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateConfigurationDTO[templateConfigs.size()];
+        int i = 0;
+        for (TemplateConfig templateConfig: templateConfigs) {
+            org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateConfigurationDTO configurationDTO =
+                    new org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateConfigurationDTO();
+            configurationDTO.setName(templateConfig.getName());
+            configurationDTO.setDescription(templateConfig.getDescription());
+            configurationDTO.setTemplateDTOs(mapTemplateListToDTOs(templateConfig.getTemplates().getTemplate()));
+            configurationDTO.setStreamMappingDTOs(mapStreamMappingListToDTOs(templateConfig.getStreamMappings().getStreamMapping()));
+            configurationDTO.setParameterDTOs(mapParameterListToDTOs(templateConfig.getParameters().getParameter()));
+            configurationDTOs[i] = configurationDTO;
+            i++;
+        }
+        return configurationDTOs;
+    }
+
+    private static ParameterDTO[] mapParameterListToDTOs(List<Parameter> parameters) {
+        ParameterDTO[] parameterDTOs = new ParameterDTO[parameters.size()];
+        int i = 0;
+        for (Parameter parameter: parameters) {
+            ParameterDTO parameterDTO = new ParameterDTO();
+            parameterDTO.setName(parameter.getName());
+            parameterDTO.setType(parameter.getType());
+            parameterDTO.setDefaultValue(parameter.getDefaultValue());
+            parameterDTO.setDescription(parameter.getDescription());
+            parameterDTO.setDisplayName(parameter.getDisplayName());
+            parameterDTO.setOptions(parameter.getOptions());
+            parameterDTOs[i] = parameterDTO;
+            i++;
+        }
+        return parameterDTOs;
+    }
+
+    private static StreamMappingDTO[] mapStreamMappingListToDTOs(List<StreamMapping> streamMappings) {
+        StreamMappingDTO[] streamMappingDTOs = new StreamMappingDTO[streamMappings.size()];
+        int i = 0;
+        for (StreamMapping streamMapping: streamMappings) {
+            StreamMappingDTO streamMappingDTO = new StreamMappingDTO();
+            streamMappingDTO.setToStream(streamMapping.getTo());
+            streamMappingDTOs[i] = streamMappingDTO;
+            i++;
+        }
+        return streamMappingDTOs;
+    }
+
+    private static TemplateDTO[] mapTemplateListToDTOs(List<Template> templates) {
+        TemplateDTO[] templateDTOs = new TemplateDTO[templates.size()];
+        int i = 0;
+        for (Template template: templates) {
+            TemplateDTO templateDTO = new TemplateDTO();
+            templateDTO.setType(template.getType());
+            templateDTO.setArtifact(template.getValue());
+            templateDTOs[i] = templateDTO;
+            i++;
         }
         return templateDTOs;
     }
-
-    /**
-     * Maps given Template object to TemplateDTO object
-     *
-     * @param template Template object needs to be mapped
-     * @return Mapped TemplateDTO object
-     */
-    private static TemplateDTO mapTemplate(Template template) {
-        TemplateDTO templateDTO = null;
-
-        if (template != null) {
-            templateDTO = new TemplateDTO();
-            templateDTO.setName(template.getName());
-            templateDTO.setDescription(template.getDescription());
-            templateDTO.setExecutionScript(template.getScript());
-            templateDTO.setParameterDTOs(mapParameters(template.getParameters()));
-            templateDTO.setExecutionType(template.getExecutionType());
-        }
-        return templateDTO;
-    }
+//
+//    /**
+//     * Maps given array of Template objects to array of TemplateDTO objects
+//     *
+//     * @param templates Template objects array needs to mapped
+//     * @return Mapped array of TemplateDTO objects
+//     */
+//    private static TemplateDTO[] mapTemplates(Template[] templates) {
+//        TemplateDTO[] templateDTOs = null;
+//
+//        if (templates != null) {
+//            templateDTOs = new TemplateDTO[templates.length];
+//            for (int i = 0; i < templateDTOs.length; i++) {
+//                templateDTOs[i] = mapTemplate(templates[i]);
+//            }
+//        }
+//        return templateDTOs;
+//    }
+//
+//    /**
+//     * Maps given Template object to TemplateDTO object
+//     *
+//     * @param template Template object needs to be mapped
+//     * @return Mapped TemplateDTO object
+//     */
+//    private static TemplateDTO mapTemplate(Template template) {
+//        TemplateDTO templateDTO = null;
+//
+//        if (template != null) {
+//            templateDTO = new TemplateDTO();
+//            templateDTO.setName(template.getType());
+//        }
+//        return templateDTO;
+//    }
 
     /**
      * Maps given array of Parameter objects to array of ParameterDTO objects

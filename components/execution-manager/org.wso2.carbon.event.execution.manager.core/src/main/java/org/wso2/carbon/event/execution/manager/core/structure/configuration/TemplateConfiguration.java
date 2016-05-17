@@ -17,8 +17,9 @@ package org.wso2.carbon.event.execution.manager.core.structure.configuration;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * JAXB Class of TemplateConfiguration element
@@ -30,8 +31,7 @@ public class TemplateConfiguration {
     private String type;
     private String from;
     private String description;
-    private Parameter[] parameters;
-    private String executionParameters;
+    private Map<String,String> parameterMap = new HashMap<>();
 
     public String getName() {
         return name;
@@ -69,25 +69,11 @@ public class TemplateConfiguration {
         this.description = description;
     }
 
-    public Parameter[] getParameters() {
-        return parameters;
+    public Map<String, String> getParameterMap() {
+        return parameterMap;
     }
 
-    @XmlElementWrapper(name = "parameters")
-    @XmlElement(name = "parameter")
-    public void setParameters(Parameter[] parameters) {
-        this.parameters = parameters;
+    public void setParameterMap(Map<String, String> parameterMap) {
+        this.parameterMap = parameterMap;
     }
-
-
-    public String getExecutionParameters() {
-        return executionParameters;
-    }
-
-    @XmlElement
-    public void setExecutionParameters(String executionParameters) {
-        this.executionParameters = executionParameters;
-    }
-
-
 }
