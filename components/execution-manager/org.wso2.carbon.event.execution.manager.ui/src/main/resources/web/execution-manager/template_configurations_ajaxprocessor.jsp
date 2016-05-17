@@ -126,16 +126,8 @@
 
         TemplateDTO currentTemplate = null;
         String saveButtonText = "template.add.button.text";
-        String nextButtonText = "template.next.button.text";
-        String saveStreamButtonText = "template.add.stream.button.text";
         String parameterString = "";
 
-        //Stream Mapping Configuration
-//    TODO: add logic to read config file and check toStream property attribute
-    String toSteamNameID="org.wso2.event.test.stream:1.0.0";
-    EventStreamAdminServiceStub eventStreamAdminServiceStub = ExecutionManagerUIUtils.getEventStreamAdminService(config,
-    session, request);
-    String[] streamIds = eventStreamAdminServiceStub.getStreamNames();
 %>
 
 
@@ -373,6 +365,18 @@ if (isExistingConfig && (configurationDTO.getExecutionParameters() != null)) {
                 <br class="c-both"/>
             </div>
 
+            <%
+                String saveStreamButtonText = "template.add.stream.button.text";
+                //TODO: add logic to read config file and check toStream property attribute
+                String toStreamNameID="";
+                String[] toStreamIDArray = {"org.wso2.event.test.stream:1.0.0"};
+                EventStreamAdminServiceStub eventStreamAdminServiceStub = ExecutionManagerUIUtils.getEventStreamAdminService(config,
+                        session, request);
+                String[] streamIds = eventStreamAdminServiceStub.getStreamNames();
+                for (String streamID:toStreamIDArray ){
+                    toStreamNameID = streamID;
+            %>
+
                 <%--TODO: add logic to map multiple streams--%>
                 <%--Adding Stream Mapping configurations--%>
             <div class="container col-md-12 marg-top-20">
@@ -383,7 +387,7 @@ if (isExistingConfig && (configurationDTO.getExecutionParameters() != null)) {
 
                 <div class="input-control input-full-width col-md-7 text">
                     <input type="text" id="toStreamID"
-                           value="<%=toSteamNameID%>" readonly="true"/>
+                           value="<%=toStreamNameID%>" readonly="true"/>
                 </div>
 
                 <label class="input-label col-md-5"><fmt:message key='template.label.from.stream.name'/></label>
@@ -412,18 +416,17 @@ if (isExistingConfig && (configurationDTO.getExecutionParameters() != null)) {
                 </div>
 
                 <%
-                    String passToStreamID,passFromStreamID,e = null;
-                    passToStreamID = "document.getElementById('"
+                    }
+                    String toStreamID = "document.getElementById('"
                             + "toStreamID" + "').value";
-                    e= "document.getElementById('"+ "fromStreamID" + "')";
-                    passFromStreamID = e + ".options[" + e + ".selectedIndex].text";
-                    String numberOfRows = "document.getElementById('"+ "addMetaEventDataTable" + "').rows.length";
+                    String fromStreamIDIndex= "document.getElementById('"+ "fromStreamID" + "')";
+                    String fromStreamID = fromStreamIDIndex + ".options[" + fromStreamIDIndex + ".selectedIndex].text";
                 %>
 
                 <div class="action-container">
                     <button type="button"
                             class="btn btn-default btn-add col-md-2 col-xs-12 pull-right marg-right-15"
-                            onclick="saveStreamConfiguration(<%=passToStreamID%>,<%=passFromStreamID%>,<%=numberOfRows%>,'domain_configurations_ajaxprocessor.jsp?domainName=<%=domainName%>')">
+                            onclick="saveStreamConfiguration(<%=toStreamID%>,<%=fromStreamID%>,'domain_configurations_ajaxprocessor.jsp?domainName=<%=domainName%>')">
                         <fmt:message key='<%=saveStreamButtonText%>'/>
                     </button>
                 </div>

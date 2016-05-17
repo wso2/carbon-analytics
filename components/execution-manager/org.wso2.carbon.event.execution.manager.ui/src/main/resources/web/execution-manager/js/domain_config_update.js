@@ -55,33 +55,24 @@ function saveConfiguration(domainName, templateType, configurationName, descript
     }
 }
 
-//Redirect to Stream Mapping logic
-function mapStreamConfiguration(redirectURL) {
-    document.location.href = redirectURL;
-}
-
 //Save Stream Mapping Configuration
-function saveStreamConfiguration(passToStreamID, passFromStreamID, numberOfRows, redirectURL) {
+function saveStreamConfiguration(toStreamID, fromStreamID, redirectURL) {
+    console.log(toStreamID);
+    console.log(fromStreamID);
 
-    console.log(passToStreamID);
-    console.log(passFromStreamID);
-    console.log(numberOfRows);
-
-    if (passFromStreamID == "Choose from here") {
-        showErrorDialog("Select a stream to map");
+    if (fromStreamID.localeCompare("Choose from here") == 0) {
+        showErrorDialog("Empty input event stream detail fields are not allowed.");
     } else {
-
+        var metaData = getStreamMappingValues("addMetaEventDataTable", 'meta');
+        console.log("metadata: " + metaData);
+        var correlationData = getStreamMappingValues("addCorrelationEventDataTable", 'correlation');
+        console.log("correlation: "+correlationData);
+        var payloadData = getStreamMappingValues("addPayloadEventDataTable", 'payload');
+        console.log("payload: "+payloadData);
         $.ajax({
             type: "POST",
             url: "manage_stream_configurations_ajaxprocessor.jsp",
-            data: "toStreamID=" + passToStreamID + "&fromStreamID=" + passFromStreamID
-            /*        success: function (data) {
-             if (data != undefined) {
-             console.log(data);
-             }
-             else
-             console.log("null");
-             }*/
+            data: "toStreamID=" + toStreamID + "&fromStreamID=" + fromStreamID
         })
             .error(function () {
                 showErrorDialog("Error occurred when saving configurations");
@@ -93,7 +84,6 @@ function saveStreamConfiguration(passToStreamID, passFromStreamID, numberOfRows,
                         document.location.href = redirectURL;
                     });
             });
-
     }
 }
 
@@ -120,6 +110,25 @@ function loadMappingFromStreamAttributes() {
     });
 }
 
+//load stream mapping values
+function getStreamMappingValues(dataTable, inputDataType) {
+
+    var eventStreamMappingTable = document.getElementById(dataTable);
+
+    var eventStreamMap = "";
+    for (var i = 0; i < eventStreamMappingTable.rows.length; i++) {
+        var column0 = document.getElementById(inputDataType + "EventMappingValue_" + i).value;
+        var column1 = document.getElementById(inputDataType + "EventMappedValue_" + i).value;
+        var column2 = document.getElementById(inputDataType + "EventType_" + i).value;
+
+        if (column0.trim() == "") {
+            return "invalid";
+        }
+
+        eventStreamMap = eventStreamMap + column0 + "^=" + column1 + "^=" + column2 + "$=";
+    }
+    return eventStreamMap;
+}
 
 function hasWhiteSpace(s) {
     return s.indexOf(' ') >= 0;
