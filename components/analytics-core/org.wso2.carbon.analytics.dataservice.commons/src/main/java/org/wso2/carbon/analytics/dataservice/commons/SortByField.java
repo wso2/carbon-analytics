@@ -28,13 +28,11 @@ public class SortByField implements Serializable {
 
     private static final long serialVersionUID = 7743069351742987010L;
     private String fieldName;
-    private SORT sort;
-    private boolean reversed;
+    private SortType sortType;
 
-    public SortByField(String field, SORT sort, boolean reversed) {
+    public SortByField(String field, SortType sortType) {
         this.fieldName = field;
-        this.sort = sort;
-        this.reversed = reversed;
+        this.sortType = sortType;
     }
 
     public String getFieldName() {
@@ -45,19 +43,11 @@ public class SortByField implements Serializable {
         this.fieldName = fieldName;
     }
 
-    public SORT getSort() {
-        return sort;
+    public SortType getSortType() {
+        return sortType;
     }
 
-    public void setSort(SORT sort) {
-        this.sort = sort;
-    }
-
-    public boolean isReversed() {
-        return reversed;
-    }
-
-    public void setReversed(boolean reversed) {
-        this.reversed = reversed;
+    public void setSortType(SortType sortType) {
+        this.sortType = sortType;
     }
 }

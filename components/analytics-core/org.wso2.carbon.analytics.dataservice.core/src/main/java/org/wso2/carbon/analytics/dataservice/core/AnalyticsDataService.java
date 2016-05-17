@@ -271,8 +271,9 @@ public interface AnalyticsDataService {
      */
     List<SearchResultEntry> search(int tenantId, String tableName,
                                    String query, int start, int count) throws AnalyticsException;
+
     /**
-     * Searches the data with a given search query.
+     * Searches the data with a given search query with sorted by given fields.
      * @param tenantId The tenant id
      * @param tableName The table name
      * @param query The search query

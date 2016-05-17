@@ -23,7 +23,7 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
-import org.wso2.carbon.analytics.dataservice.commons.SORT;
+import org.wso2.carbon.analytics.dataservice.commons.SortType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
@@ -473,29 +473,22 @@ public class Utils {
         if (sortByFieldBeans != null) {
             for (SortByFieldBean sortByFieldBean : sortByFieldBeans) {
                 SortByField sortByField = new SortByField(sortByFieldBean.getField(),
-                                                          getSortType(sortByFieldBean.getField(), sortByFieldBean.getSortType()),
-                                                          sortByFieldBean.isReversed());
+                                                          getSortType(sortByFieldBean.getField(), sortByFieldBean.getSortType()));
                 sortByFields.add(sortByField);
             }
         }
         return sortByFields;
     }
 
-    private static SORT getSortType(String field, String sortBy) throws AnalyticsException {
-        SORT sort;
+    private static SortType getSortType(String field, String sortBy) throws AnalyticsException {
+        SortType sortType;
         if (sortBy != null) {
             switch (sortBy) {
                 case "ASC":
-                    sort = SORT.ASC;
+                    sortType = SortType.ASC;
                     break;
                 case "DESC":
-                    sort = SORT.DESC;
-                    break;
-                case "RELEVANCE":
-                    sort = SORT.RELEVANCE;
-                    break;
-                case "INDEX_ORDER":
-                    sort = SORT.INDEX_ORDER;
+                    sortType = SortType.DESC;
                     break;
                 default:
                     throw new AnalyticsException("Unknown SORT order: " + sortBy + " for field: " + field);
@@ -503,7 +496,7 @@ public class Utils {
         } else {
             throw new AnalyticsException("sortType cannot be null for field: " + field);
         }
-        return sort;
+        return sortType;
     }
 
     public static List<RecordBean> getSortedRecordBeans(Map<String, RecordBean> recordBeans,

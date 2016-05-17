@@ -27,7 +27,6 @@ public class SortByFieldBean implements Serializable {
     private static final long serialVersionUID = -6075564963783989008L;
     private String fieldName;
     private String sortType;
-    private boolean reversed;
 
     public SortByFieldBean() {
 
@@ -47,13 +46,5 @@ public class SortByFieldBean implements Serializable {
 
     public void setSortType(String sortType) {
         this.sortType = sortType;
-    }
-
-    public boolean isReversed() {
-        return reversed;
-    }
-
-    public void setReversed(boolean reversed) {
-        this.reversed = reversed;
     }
 }

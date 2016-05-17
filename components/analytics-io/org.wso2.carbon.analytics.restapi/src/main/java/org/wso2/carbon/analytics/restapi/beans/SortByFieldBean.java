@@ -29,16 +29,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class SortByFieldBean {
     private String field;
     private String sortType;
-    private boolean reversed;
 
     public SortByFieldBean() {
 
     }
 
-    public SortByFieldBean(String field, String sortType, boolean reversed) {
+    public SortByFieldBean(String field, String sortType) {
         this.field = field;
         this.sortType = sortType;
-        this.reversed = reversed;
     }
 
     public String getField() {
@@ -55,13 +53,5 @@ public class SortByFieldBean {
 
     public void setSortType(String sortType) {
         this.sortType = sortType;
-    }
-
-    public boolean isReversed() {
-        return reversed;
-    }
-
-    public void setReversed(boolean reversed) {
-        this.reversed = reversed;
     }
 }

@@ -427,13 +427,9 @@ public class AnalyticsDataIndexer {
             //get all the records from 0th to the "start + count" th record from all the nodes, then sort, reverse and paginate
             List<List<SearchResultEntry>> entries = this.executeIndexLookup(new SearchCall(tenantId,
                     tableName, query, 0, start + count, sortByFields));
-            result = new ArrayList<>();
-            for (List<SearchResultEntry> entry : entries) {
-                result.addAll(entry);
-            }
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, tableName);
             result = RecordSortUtils.getSortedSearchResultEntries(tenantId, tableName, sortByFields,
-                                                                  indices, this.getAnalyticsDataService(), result);
+                                                                  indices, this.getAnalyticsDataService(), entries);
             int toIndex = start + count;
             if (toIndex >= result.size()) {
                 toIndex = result.size();
@@ -487,7 +483,7 @@ public class AnalyticsDataIndexer {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.error("Error in closing the reader: " + e.getMessage(), e);;
+                    log.error("Error in closing the reader: " + e.getMessage(), e);
                 }
             }
             searchExecutor.shutdown();
@@ -536,19 +532,16 @@ public class AnalyticsDataIndexer {
         for (SortByField sortByField : sortByFields) {
             SortField sortField;
             String fieldName = sortByField.getFieldName();
-            ColumnDefinition columnDefinition = indices.get(fieldName);
-            switch (sortByField.getSort()) {
-                case ASC: {
+            switch (sortByField.getSortType()) {
+                case ASC:
                     sortField = new SortField(fieldName, getSortFieldType(fieldName, indices));
                     break;
-                }
-                case DESC: {
+                case DESC:
                     sortField = new SortField(fieldName, getSortFieldType(fieldName, indices), true);
                     break;
-                }
                 default:
                     throw new AnalyticsIndexException("Error while processing Sorting fields: " +
-                                                 sortByField.getSort().toString() + " unsupported sortType");
+                                                 sortByField.getSortType().toString() + " unsupported sortType");
             }
             sortFields.add(sortField);
         }
@@ -639,7 +632,7 @@ public class AnalyticsDataIndexer {
         try {
             IndexLookupOperationCall<T> copyCall;
             for (Map.Entry<Object, Set<Integer>> entry : target.entrySet()) {
-                copyCall = (IndexLookupOperationCall<T>) call.copy();
+                copyCall = call.copy();
                 copyCall.setShardIndices(entry.getValue());
                 futures.add(acm.executeOneFuture(org.wso2.carbon.analytics.dataservice.core.Constants.
                         ANALYTICS_INDEXING_GROUP, entry.getKey(), copyCall));
@@ -702,7 +695,7 @@ public class AnalyticsDataIndexer {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.error("Error in closing the reader: " + e.getMessage(), e);;
+                    log.error("Error in closing the reader: " + e.getMessage(), e);
                 }
             }
         }
@@ -900,8 +893,7 @@ public class AnalyticsDataIndexer {
         if (start > resultEntries.size()-1) {
             return new ArrayList<>(0);
         }
-        List <CategorySearchResultEntry> finalResult = new ArrayList<>(resultEntries.subList(start, categoryCount));
-        return finalResult;
+        return new ArrayList<>(resultEntries.subList(start, categoryCount));
     }
 
     private List<SearchResultEntry> drillDownRecords(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
@@ -1019,7 +1011,7 @@ public class AnalyticsDataIndexer {
                 String categoryName = aCategory.getKey();
                 FacetsCollector.search(indexSearcher, drillDownQuery, Integer.MAX_VALUE, facetsCollector);
                 Facets facets = new TaxonomyFacetSumValueSource(taxonomyReader, config, facetsCollector, scoreFunction);
-                FacetResult facetResult = facets.getTopChildren(Integer.MAX_VALUE, categoryName, new String[0]);
+                FacetResult facetResult = facets.getTopChildren(Integer.MAX_VALUE, categoryName);
                 if (facetResult != null) {
                     LabelAndValue[] subCategories = facetResult.labelValues;
                     for (LabelAndValue category : subCategories) {
@@ -1172,21 +1164,16 @@ public class AnalyticsDataIndexer {
         int endIndex = startIndex + drillDownRequest.getRecordCount();
         if (endIndex <= startIndex) throw new AnalyticsIndexException("Record Count should be greater than 0");
         Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
-        List<SearchResultEntry> resultFacetList;
         if (this.isClusteringEnabled()) {
-            List<List<SearchResultEntry>> entries = this.executeIndexLookup(new DrillDownSearchCall(tenantId, drillDownRequest));
-            resultFacetList = new ArrayList<>();
-            for (List<SearchResultEntry> entry : entries) {
-                resultFacetList.addAll(entry);
-            }
+            List<List<SearchResultEntry>> sortedResultsPerNode = this.executeIndexLookup(new DrillDownSearchCall(tenantId, drillDownRequest));
+            List <SearchResultEntry> resultFacetList = RecordSortUtils.getSortedSearchResultEntries(tenantId, drillDownRequest.getTableName(),
+                    drillDownRequest.getSortByFields(), indices, this.getAnalyticsDataService(), sortedResultsPerNode);
             if (resultFacetList.size() < startIndex) {
                 return new ArrayList<>();
             }
             if (resultFacetList.size() < endIndex) {
                 return resultFacetList.subList(startIndex, resultFacetList.size());
             }
-            resultFacetList = RecordSortUtils.getSortedSearchResultEntries(tenantId, drillDownRequest.getTableName(),
-                    drillDownRequest.getSortByFields(), indices, this.getAnalyticsDataService(), resultFacetList);
             return resultFacetList.subList(startIndex, endIndex);
         } else {
             return doDrillDownPerNode(tenantId, drillDownRequest, rangeField, range);
@@ -1203,20 +1190,21 @@ public class AnalyticsDataIndexer {
         int endIndex = startIndex + drillDownRequest.getRecordCount();
         if (endIndex <= startIndex) throw new AnalyticsIndexException("Record Count should be greater than 0");
         List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
-        List<SearchResultEntry> resultFacetList = new ArrayList<>();
+        List<List<SearchResultEntry>> sortedResultsPerShard = new ArrayList<>();
+        Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
         for (int shardId : taxonomyShardIds) {
-            resultFacetList.addAll(this.drillDownRecordsPerShard(tenantId, shardId, drillDownRequest, rangeField, range));
+            sortedResultsPerShard.add(this.drillDownRecordsPerShard(tenantId, shardId, drillDownRequest, rangeField, range));
         }
-        Collections.sort(resultFacetList);
-        Collections.reverse(resultFacetList);
-        if (resultFacetList.size() < startIndex) {
+        List<SearchResultEntry> sortedSearchResultsPerNode = RecordSortUtils.getSortedSearchResultEntries(tenantId, drillDownRequest.getTableName(),
+                drillDownRequest.getSortByFields(), indices, this.getAnalyticsDataService(), sortedResultsPerShard);
+        if (sortedSearchResultsPerNode.size() < startIndex) {
             return new ArrayList<>();
         }
         //Sublists are wrapped with ArrayLists because, Sublist structore is not serialized.
-        if (resultFacetList.size() < endIndex) {
-            return new ArrayList<>(resultFacetList.subList(startIndex, resultFacetList.size()));
+        if (sortedSearchResultsPerNode.size() < endIndex) {
+            return new ArrayList<>(sortedSearchResultsPerNode.subList(startIndex, sortedSearchResultsPerNode.size()));
         }
-        return new ArrayList<>(resultFacetList.subList(startIndex, endIndex));
+        return new ArrayList<>(sortedSearchResultsPerNode.subList(startIndex, endIndex));
     }
 
     public CategoryDrillDownResponse getDrillDownCategories(int tenantId,
@@ -1344,7 +1332,7 @@ public class AnalyticsDataIndexer {
         }
         String tableId = this.generateTableId(tenantId, tableName);
         IndexWriter indexWriter = this.lookupIndexWriter(shardIndex, tableId);
-        List<Term> terms = new ArrayList<Term>(ids.size());
+        List<Term> terms = new ArrayList<>(ids.size());
         for (String id : ids) {
             terms.add(new Term(INDEX_ID_INTERNAL_FIELD, id));
         }
@@ -1817,10 +1805,10 @@ public class AnalyticsDataIndexer {
                 ExecutorService pool = Executors.newFixedThreadPool(taxonomyShardIds.size());
                 Set<Future<Set<List<String>>>> perShardUniqueCategories = new HashSet<>();
                 Set<List<String>> finalUniqueCategories = new HashSet<>();
-                for (int i = 0; i < taxonomyShardIds.size(); i++) {
+                for (Integer taxonomyShardId : taxonomyShardIds) {
                     String tableId = this.generateTableId(tenantId, aggregateRequest.getTableName());
                     Callable<Set<List<String>>> callable = new TaxonomyWorker(tenantId, AnalyticsDataIndexer.this,
-                            taxonomyShardIds.get(i), tableId, aggregateRequest);
+                                                                              taxonomyShardId, tableId, aggregateRequest);
                     Future<Set<List<String>>> result = pool.submit(callable);
                     perShardUniqueCategories.add(result);
                 }
@@ -1850,15 +1838,13 @@ public class AnalyticsDataIndexer {
             pool.shutdown();
         }
         try {
-            if(!pool.awaitTermination(WORKER_TIMEOUT, TimeUnit.SECONDS)) {
+            if(pool != null && !pool.awaitTermination(WORKER_TIMEOUT, TimeUnit.SECONDS)) {
                 pool.shutdownNow();
             }
         } catch (InterruptedException e) {
             log.error("Error while shutting down the threadpool , " + e.getMessage(), e);
             throw new AnalyticsIndexException("Error while shutting down the threadpool , " +
                                               e.getMessage(), e);
-        } finally {
-            pool = null;
         }
     }
 
@@ -1882,7 +1868,7 @@ public class AnalyticsDataIndexer {
                                         AggregateRequest aggregateRequest)
             throws AnalyticsException {
         Map<String, AggregateFunction> perAliasAggregateFunction = initPerAliasAggregateFunctions(aggregateRequest);
-        Record aggregatedRecord = null;
+        Record aggregatedRecord;
         while (iterator.hasNext()) {
             Record record = iterator.next();
             for (AggregateField field : aggregateRequest.getFields()) {
@@ -1900,7 +1886,7 @@ public class AnalyticsDataIndexer {
     private List<SearchResultEntry> getSearchResultEntries(int tenantId, String[] path,
                                                            AggregateRequest aggregateRequest)
             throws AnalyticsException {
-        List<SearchResultEntry> searchResultEntries = null;
+        List<SearchResultEntry> searchResultEntries;
         if (aggregateRequest.getGroupByField() != null && !aggregateRequest.getGroupByField().isEmpty()) {
             int recordCount = aggregateRequest.getNoOfRecords() > 0 ? aggregateRequest.getNoOfRecords() : Integer.MAX_VALUE;
             AnalyticsDrillDownRequest analyticsDrillDownRequest = new AnalyticsDrillDownRequest();
@@ -2157,7 +2143,6 @@ public class AnalyticsDataIndexer {
      */
     private class ReIndexWorker implements Runnable {
 
-        private boolean stop;
         private AnalyticsDataIndexer indexer;
         private String tableName;
         private long fromTime;
@@ -2184,7 +2169,7 @@ public class AnalyticsDataIndexer {
                 List<Record> recordBatch;
                 int i;
                 Iterator<Record> iterator = AnalyticsDataServiceUtils.responseToIterator(ads, response);
-                while (iterator.hasNext() && !this.stop) {
+                while (iterator.hasNext()) {
                     i = 0;
                     recordBatch = new ArrayList<>();
                     while (i < org.wso2.carbon.analytics.dataservice.core.Constants.RECORDS_BATCH_SIZE && iterator.hasNext()) {
