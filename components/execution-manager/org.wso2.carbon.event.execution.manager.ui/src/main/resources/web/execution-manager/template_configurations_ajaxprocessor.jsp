@@ -22,7 +22,10 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ParameterDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.TemplateDomainDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTOE" %>
+<%@ page import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
+<%@ page import="com.sun.xml.internal.bind.v2.TODO" %>
+<%@ page import="java.util.Arrays" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.execution.manager.ui.i18n.Resources">
 <!doctype html>
@@ -123,8 +126,16 @@
 
         TemplateDTO currentTemplate = null;
         String saveButtonText = "template.add.button.text";
+        String nextButtonText = "template.next.button.text";
+        String saveStreamButtonText = "template.add.stream.button.text";
         String parameterString = "";
 
+        //Stream Mapping Configuration
+//    TODO: add logic to read config file and check toStream property attribute
+    String toSteamNameID="org.wso2.event.test.stream:1.0.0";
+    EventStreamAdminServiceStub eventStreamAdminServiceStub = ExecutionManagerUIUtils.getEventStreamAdminService(config,
+    session, request);
+    String[] streamIds = eventStreamAdminServiceStub.getStreamNames();
 %>
 
 
@@ -361,6 +372,65 @@ if (isExistingConfig && (configurationDTO.getExecutionParameters() != null)) {
                 </button>
                 <br class="c-both"/>
             </div>
+
+                <%--TODO: add logic to map multiple streams--%>
+                <%--Adding Stream Mapping configurations--%>
+            <div class="container col-md-12 marg-top-20">
+
+                <h4><fmt:message key='template.stream.header.text'/></h4>
+
+                <label class="input-label col-md-5"><fmt:message key='template.label.to.stream.name'/></label>
+
+                <div class="input-control input-full-width col-md-7 text">
+                    <input type="text" id="toStreamID"
+                           value="<%=toSteamNameID%>" readonly="true"/>
+                </div>
+
+                <label class="input-label col-md-5"><fmt:message key='template.label.from.stream.name'/></label>
+
+                <div class="input-control input-full-width col-md-7 text">
+                    <select id="fromStreamID" onchange="loadMappingFromStreamAttributes()">
+                        <option selected disabled>Choose from here</option>
+                        <%
+                            if (streamIds != null) {
+                                Arrays.sort(streamIds);
+                                for (String aStreamId : streamIds) {
+                        %>
+                        <option id="fromStreamOptionID"><%=aStreamId%>
+                        </option>
+                        <%
+                                }
+                            }
+                        %>
+
+                    </select>
+                </div>
+
+                <div id="MapAttributesTable" class="input-label col-md-5">
+                    <div id="outerDiv">
+                    </div>
+                </div>
+
+                <%
+                    String passToStreamID,passFromStreamID,e = null;
+                    passToStreamID = "document.getElementById('"
+                            + "toStreamID" + "').value";
+                    e= "document.getElementById('"+ "fromStreamID" + "')";
+                    passFromStreamID = e + ".options[" + e + ".selectedIndex].text";
+                    String numberOfRows = "document.getElementById('"+ "addMetaEventDataTable" + "').rows.length";
+                %>
+
+                <div class="action-container">
+                    <button type="button"
+                            class="btn btn-default btn-add col-md-2 col-xs-12 pull-right marg-right-15"
+                            onclick="saveStreamConfiguration(<%=passToStreamID%>,<%=passFromStreamID%>,<%=numberOfRows%>,'domain_configurations_ajaxprocessor.jsp?domainName=<%=domainName%>')">
+                        <fmt:message key='<%=saveStreamButtonText%>'/>
+                    </button>
+                </div>
+
+            </div>
+            <!-- /stream mapping/body -->
+
         </div>
     </div>
     <div class="row pad-bot-50">

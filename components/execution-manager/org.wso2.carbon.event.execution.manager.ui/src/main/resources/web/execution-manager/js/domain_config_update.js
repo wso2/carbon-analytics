@@ -55,6 +55,72 @@ function saveConfiguration(domainName, templateType, configurationName, descript
     }
 }
 
+//Redirect to Stream Mapping logic
+function mapStreamConfiguration(redirectURL) {
+    document.location.href = redirectURL;
+}
+
+//Save Stream Mapping Configuration
+function saveStreamConfiguration(passToStreamID, passFromStreamID, numberOfRows, redirectURL) {
+
+    console.log(passToStreamID);
+    console.log(passFromStreamID);
+    console.log(numberOfRows);
+
+    if (passFromStreamID == "Choose from here") {
+        showErrorDialog("Select a stream to map");
+    } else {
+
+        $.ajax({
+            type: "POST",
+            url: "manage_stream_configurations_ajaxprocessor.jsp",
+            data: "toStreamID=" + passToStreamID + "&fromStreamID=" + passFromStreamID
+            /*        success: function (data) {
+             if (data != undefined) {
+             console.log(data);
+             }
+             else
+             console.log("null");
+             }*/
+        })
+            .error(function () {
+                showErrorDialog("Error occurred when saving configurations");
+            })
+            .then(function () {
+                showInfoDialog("Stream mapping saved successfully",
+                    function () {
+                        console.log("Success");
+                        document.location.href = redirectURL;
+                    });
+            });
+
+    }
+}
+
+//Load Mapping Stream Attributes
+function loadMappingFromStreamAttributes() {
+    var selectedIndex = document.getElementById("fromStreamID").selectedIndex;
+    var fromStreamNameWithVersion = document.getElementById("fromStreamID").options[selectedIndex].text;
+    var toStreamNameWithVersion = document.getElementById("toStreamID").value;
+
+    var outerDiv = document.getElementById("outerDiv");
+    outerDiv.innerHTML = "";
+
+    jQuery.ajax({
+        type: "POST",
+        url: "../execution-manager/get_mapping_ui_ajaxprocessor.jsp?toStreamNameWithVersion=" + toStreamNameWithVersion + "&fromStreamNameWithVersion=" + fromStreamNameWithVersion,
+        data: {},
+        contentType: "text/html; charset=utf-8",
+        dataType: "text",
+        success: function (ui_content) {
+            if (ui_content != null) {
+                outerDiv.innerHTML = ui_content;
+            }
+        }
+    });
+}
+
+
 function hasWhiteSpace(s) {
     return s.indexOf(' ') >= 0;
 
