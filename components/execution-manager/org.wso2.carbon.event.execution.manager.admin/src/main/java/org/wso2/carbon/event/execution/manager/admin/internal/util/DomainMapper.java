@@ -16,17 +16,17 @@
 package org.wso2.carbon.event.execution.manager.admin.internal.util;
 
 import org.wso2.carbon.event.execution.manager.admin.dto.domain.CommonArtifactDTO;
+import org.wso2.carbon.event.execution.manager.admin.dto.domain.ExecutionManagerTemplateInfoDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.domain.ParameterDTO;
+import org.wso2.carbon.event.execution.manager.admin.dto.domain.ScenarioInfoDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.domain.StreamMappingDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateDTO;
-import org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateDomainDTO;
-import org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateDomainInfoDTO;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Artifact;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Parameter;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
-import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateConfig;
-import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateDomain;
 
 import java.util.List;
 
@@ -42,80 +42,43 @@ public class DomainMapper {
     }
 
     /**
-     * Maps given list of TemplateDomain objects to array of TemplateDomainInfoDTO objects
+     * Maps given list of ExecutionManagerTemplate objects to array of ExecutionManagerTemplateInfoDTO objects
      *
-     * @param templateDomains List of TemplateDomain objects needs to be mapped
-     * @return Mapped array of TemplateDomainInfoDTO objects
+     * @param executionManagerTemplates List of ExecutionManagerTemplate objects needs to be mapped
+     * @return Mapped array of ExecutionManagerTemplateInfoDTO objects
      */
-    public static TemplateDomainInfoDTO[] mapDomainsInfo(List<TemplateDomain> templateDomains) {
-        TemplateDomainInfoDTO[] templateDomainInfoDTO = null;
+    public static ExecutionManagerTemplateInfoDTO[] mapDomainsInfo(List<ExecutionManagerTemplate> executionManagerTemplates) {
+        ExecutionManagerTemplateInfoDTO[] executionManagerTemplateInfoDTO = null;
 
-        if (templateDomains != null) {
-            templateDomainInfoDTO = new TemplateDomainInfoDTO[templateDomains.size()];
+        if (executionManagerTemplates != null) {
+            executionManagerTemplateInfoDTO = new ExecutionManagerTemplateInfoDTO[executionManagerTemplates.size()];
 
-            for (int i = 0; i < templateDomainInfoDTO.length; i++) {
-                templateDomainInfoDTO[i] = mapDomainInfo(templateDomains.get(i));
+            for (int i = 0; i < executionManagerTemplateInfoDTO.length; i++) {
+                executionManagerTemplateInfoDTO[i] = mapDomainInfo(executionManagerTemplates.get(i));
             }
         }
-        return templateDomainInfoDTO;
+        return executionManagerTemplateInfoDTO;
     }
 
     /**
-     * Maps given TemplateDomain object to TemplateDomainInfoDTO object
+     * Maps given ExecutionManagerTemplate object to ExecutionManagerTemplateInfoDTO object
      *
-     * @param templateDomain TemplateDomain object needs to be mapped
-     * @return Mapped TemplateDomainInfoDTO object
+     * @param executionManagerTemplate ExecutionManagerTemplate object needs to be mapped
+     * @return Mapped ExecutionManagerTemplateInfoDTO object
      */
-    public static TemplateDomainInfoDTO mapDomainInfo(TemplateDomain templateDomain) {
-        TemplateDomainInfoDTO templateDomainInfoDTO = null;
+    public static ExecutionManagerTemplateInfoDTO mapDomainInfo(ExecutionManagerTemplate executionManagerTemplate) {
+        ExecutionManagerTemplateInfoDTO executionManagerTemplateInfoDTO = null;
 
-        if (templateDomain != null) {
-            templateDomainInfoDTO = new TemplateDomainInfoDTO();
-            templateDomainInfoDTO.setName(templateDomain.getName());
-            templateDomainInfoDTO.setDescription(templateDomain.getDescription());
+        if (executionManagerTemplate != null) {
+            executionManagerTemplateInfoDTO = new ExecutionManagerTemplateInfoDTO();
+            executionManagerTemplateInfoDTO.setName(executionManagerTemplate.getDomain());
+            executionManagerTemplateInfoDTO.setDescription(executionManagerTemplate.getDescription());
+            executionManagerTemplateInfoDTO.setScenarioInfoDTOs(mapScenarios(executionManagerTemplate.getScenarios().getScenario()));
         }
 
-        return templateDomainInfoDTO;
+        return executionManagerTemplateInfoDTO;
     }
 
-    /**
-     * Maps given list of TemplateDomain objects to array of TemplateDomainDTO objects
-     *
-     * @param templateDomains List of TemplateDomain objects needs to be mapped
-     * @return Mapped array of TemplateDomainDTO objects
-     */
-    public static TemplateDomainDTO[] mapDomains(List<TemplateDomain> templateDomains) {
-        TemplateDomainDTO[] templateDomainDTOs = null;
-
-        if (templateDomains != null) {
-            templateDomainDTOs = new TemplateDomainDTO[templateDomains.size()];
-
-            for (int i = 0; i < templateDomainDTOs.length; i++) {
-                templateDomainDTOs[i] = mapDomain(templateDomains.get(i));
-            }
-        }
-        return templateDomainDTOs;
-    }
-
-    /**
-     * Maps given TemplateDomain object to TemplateDomainDTO object
-     *
-     * @param templateDomain TemplateDomain object needs to be mapped
-     * @return Mapped TemplateDomainDTO object
-     */
-    public static TemplateDomainDTO mapDomain(TemplateDomain templateDomain) {
-        TemplateDomainDTO templateDomainDTO = null;
-
-        if (templateDomain != null) {
-            templateDomainDTO = new TemplateDomainDTO();
-            templateDomainDTO.setName(templateDomain.getName());
-            templateDomainDTO.setDescription(templateDomain.getName());
-            templateDomainDTO.setTemplateConfigurationDTOs(mapTemplateConfigListToDTOs(templateDomain.getTemplateConfigs().getTemplateConfig()));
-            templateDomainDTO.setCommonArtifactDTOs(mapCommonArtifactListToDTO(templateDomain.getCommonArtifacts().getArtifact()));
-        }
-
-        return templateDomainDTO;
-    }
 
     private static CommonArtifactDTO[] mapCommonArtifactListToDTO(List<Artifact> artifacts) {
         CommonArtifactDTO[] artifactDTOs = new CommonArtifactDTO[artifacts.size()];
@@ -130,23 +93,18 @@ public class DomainMapper {
         return artifactDTOs;
     }
 
-    private static org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateConfigurationDTO[] mapTemplateConfigListToDTOs(
-            List<TemplateConfig> templateConfigs) {
-        org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateConfigurationDTO[] configurationDTOs = 
-                new org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateConfigurationDTO[templateConfigs.size()];
+    private static ScenarioInfoDTO[] mapScenarios(List<Scenario> scenarios) {
+        ScenarioInfoDTO[] scenarioInfoDTOs = new ScenarioInfoDTO[scenarios.size()];
         int i = 0;
-        for (TemplateConfig templateConfig: templateConfigs) {
-            org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateConfigurationDTO configurationDTO =
-                    new org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateConfigurationDTO();
-            configurationDTO.setName(templateConfig.getName());
-            configurationDTO.setDescription(templateConfig.getDescription());
-            configurationDTO.setTemplateDTOs(mapTemplateListToDTOs(templateConfig.getTemplates().getTemplate()));
-            configurationDTO.setStreamMappingDTOs(mapStreamMappingListToDTOs(templateConfig.getStreamMappings().getStreamMapping()));
-            configurationDTO.setParameterDTOs(mapParameterListToDTOs(templateConfig.getParameters().getParameter()));
-            configurationDTOs[i] = configurationDTO;
+        for (Scenario scenario : scenarios) {
+            ScenarioInfoDTO scenarioInfoDTO = new ScenarioInfoDTO();
+            scenarioInfoDTO.setName(scenario.getName());
+            scenarioInfoDTO.setDescription(scenario.getDescription());
+            scenarioInfoDTO.setParameterDTOs(mapParameterListToDTOs(scenario.getParameters().getParameter()));
+            scenarioInfoDTOs[i] = scenarioInfoDTO;
             i++;
         }
-        return configurationDTOs;
+        return scenarioInfoDTOs;
     }
 
     private static ParameterDTO[] mapParameterListToDTOs(List<Parameter> parameters) {

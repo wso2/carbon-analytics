@@ -17,6 +17,8 @@ package org.wso2.carbon.event.execution.manager.core;
 
 public interface TemplateDeployer {
 
+    enum KnownTypes {REAL_TIME, BATCH};   //todo: remove
+
     String getType();
 
     void deployArtifact(DeployableTemplate template) throws TemplateDeploymentException;

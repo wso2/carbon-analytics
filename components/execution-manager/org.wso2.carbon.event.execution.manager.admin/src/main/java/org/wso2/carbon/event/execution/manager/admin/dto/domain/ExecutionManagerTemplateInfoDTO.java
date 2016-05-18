@@ -16,14 +16,13 @@
 package org.wso2.carbon.event.execution.manager.admin.dto.domain;
 
 /**
- * DTO class of TemplateDomain for ExecutionManagerAdminService
+ * DTO class of TemplateDomainInfo for ExecutionManagerAdminService. This only consists required information to display
  */
-public class TemplateDomainDTO {
+public class ExecutionManagerTemplateInfoDTO {
 
     private String name;
     private String description;
-    private TemplateConfigurationDTO[] templateConfigurationDTOs;
-    private CommonArtifactDTO[] commonArtifactDTOs;
+    private ScenarioInfoDTO[] scenarioInfoDTOs;
 
     public String getName() {
         return name;
@@ -41,19 +40,11 @@ public class TemplateDomainDTO {
         this.description = description;
     }
 
-    public TemplateConfigurationDTO[] getTemplateConfigurationDTOs() {
-        return templateConfigurationDTOs;
+    public ScenarioInfoDTO[] getScenarioInfoDTOs() {
+        return scenarioInfoDTOs;
     }
 
-    public void setTemplateConfigurationDTOs(TemplateConfigurationDTO[] templateConfigurationDTOs) {
-        this.templateConfigurationDTOs = templateConfigurationDTOs;
-    }
-
-    public CommonArtifactDTO[] getCommonArtifactDTOs() {
-        return commonArtifactDTOs;
-    }
-
-    public void setCommonArtifactDTOs(CommonArtifactDTO[] commonArtifactDTOs) {
-        this.commonArtifactDTOs = commonArtifactDTOs;
+    public void setScenarioInfoDTOs(ScenarioInfoDTO[] scenarioInfoDTOs) {
+        this.scenarioInfoDTOs = scenarioInfoDTOs;
     }
 }

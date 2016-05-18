@@ -5,20 +5,20 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "templateDomain")
-public class TemplateDomain {
-    @XmlAttribute
-    private String name;
+@XmlRootElement(name = "executionManagerTemplate")
+public class ExecutionManagerTemplate {
+    private String domain;
     private String description;
     private CommonArtifacts commonArtifacts;
-    private TemplateConfigs templateConfigs;
+    private Scenarios scenarios;
 
-    public String getName() {
-        return name;
+    @XmlAttribute
+    public String getDomain() {
+        return domain;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     public String getDescription() {
@@ -44,12 +44,12 @@ public class TemplateDomain {
         this.commonArtifacts = commonArtifacts;
     }
 
-    public TemplateConfigs getTemplateConfigs() {
-        return templateConfigs;
+    public Scenarios getScenarios() {
+        return scenarios;
     }
 
     @XmlElement
-    public void setTemplateConfigs(TemplateConfigs templateConfigs) {
-        this.templateConfigs = templateConfigs;
+    public void setScenarios(Scenarios scenarios) {
+        this.scenarios = scenarios;
     }
 }

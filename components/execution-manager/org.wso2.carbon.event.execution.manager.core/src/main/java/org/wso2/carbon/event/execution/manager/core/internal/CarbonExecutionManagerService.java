@@ -18,25 +18,24 @@ package org.wso2.carbon.event.execution.manager.core.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.execution.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.execution.manager.core.ExecutionManagerService;
+import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
 import org.wso2.carbon.event.execution.manager.core.exception.ExecutionManagerException;
 import org.wso2.carbon.event.execution.manager.core.internal.ds.ExecutionManagerValueHolder;
 import org.wso2.carbon.event.execution.manager.core.internal.util.ExecutionManagerConstants;
 import org.wso2.carbon.event.execution.manager.core.internal.util.ExecutionManagerHelper;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.TemplateConfiguration;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
-import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateConfig;
-import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateDomain;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -50,7 +49,7 @@ import java.util.Map;
 public class CarbonExecutionManagerService implements ExecutionManagerService {
     private static final Log log = LogFactory.getLog(CarbonExecutionManagerService.class);
 
-    private Map<String, TemplateDomain> domains;
+    private Map<String, ExecutionManagerTemplate> domains;
 
     public CarbonExecutionManagerService() throws ExecutionManagerException {
 
@@ -61,56 +60,45 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
 
 
     @Override
-    public List<String> saveConfiguration(TemplateConfiguration configuration) throws ExecutionManagerException {
+    public List<String> saveConfiguration(TemplateConfiguration configuration)
+            throws ExecutionManagerException {
+        ExecutionManagerTemplate executionManagerTemplate = domains.get(configuration.getDomain());
+        ExecutionManagerHelper.deployArtifacts(configuration, executionManagerTemplate);
+
+        ExecutionManagerHelper.saveToRegistry(configuration);//todo: TBD on whether saving conditionally, based on getStreamIDsInMappings output.
+
+        //If StreamMappings element is present in the ExecutionManagerTemplate, then need to return those Stream IDs,
+        //so the caller (the UI) can prompt the user to map these streams to his own streams.
+        return ExecutionManagerHelper.getStreamIDsInMappings(configuration, getDomain(configuration.getDomain()));
+    }
+
+
+    @Override
+    public void saveConfigurationWithStreamMapping(StreamMapping streamMapping
+            , String templateConfigName, String templateConfigFrom)
+            throws ExecutionManagerException {
         try {
-            Registry registry = ExecutionManagerValueHolder.getRegistryService()
-                    .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            //deploy execution plan
+            String executionPlan = ExecutionManagerHelper.generateExecutionPlan(streamMapping, templateConfigName, templateConfigFrom);
+            DeployableTemplate deployableTemplate = new DeployableTemplate();
+            deployableTemplate.setArtifact(executionPlan);
 
-            StringWriter fileContent = new StringWriter();
-            JAXBContext jaxbContext = JAXBContext.newInstance(TemplateConfiguration.class);
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, ExecutionManagerConstants.DEFAULT_CHARSET);
+            TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get("realtime"); //todo: check name;
+            deployer.deployArtifact(deployableTemplate);
 
-            jaxbMarshaller.marshal(configuration, fileContent);
-            Resource resource = registry.newResource();
-            resource.setContent(fileContent.toString());
-            String resourceCollectionPath = ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
-                    + "/" + configuration.getFrom();
 
-            String resourcePath = resourceCollectionPath + "/"
-                    + configuration.getName() + ExecutionManagerConstants.CONFIG_FILE_EXTENSION;
-
-            //Collection directory will be created if it is not exist in the registry
-            if (!registry.resourceExists(resourceCollectionPath)) {
-                registry.put(resourceCollectionPath, registry.newCollection());
-            }
-
-            TemplateDomain templateDomain = domains.get(configuration.getFrom());
-            ExecutionManagerHelper.validateTemplateDomainConfig(configuration, templateDomain);
-            ExecutionManagerHelper.deployArtifacts(configuration, templateDomain);
-
-            if (registry.resourceExists(resourcePath)) {
-                registry.delete(resourcePath);
-            }
-            resource.setMediaType("application/xml");
-            registry.put(resourcePath, resource);
-
-            //If StreamMappings element is present in the TemplateDomain, then need to return those Stream IDs,
-            //so the caller (the UI) can prompt the user to map these streams to his own streams.
-            return ExecutionManagerHelper.getStreamIDsInMappings(configuration, getDomain(configuration.getFrom()));
-
-        } catch (RegistryException e) {
-            throw new ExecutionManagerException("Registry exception occurred when creating " + configuration.getName()
-                    + " configurations", e);
-
-        } catch (JAXBException e) {
-            throw new ExecutionManagerException("JAXB Exception when marshalling file at " + configuration.getName()
-                    + " configurations", e);
+            //save to registry
+            TemplateConfiguration templateConfiguration = ExecutionManagerHelper.getConfigurationFromRegistry(templateConfigName, templateConfigFrom);
+        } catch (TemplateDeploymentException e) {
+            throw new ExecutionManagerException("Failed to deploy execution plan, hence event flow will " +
+                    "not be complete for Template Configuration: " + templateConfigName + " in domain: " + templateConfigFrom, e);
         }
     }
 
+
+
     @Override
-    public Collection<TemplateDomain> getAllDomains() {
+    public Collection<ExecutionManagerTemplate> getAllDomains() {
         return domains.values();
     }
 
@@ -153,7 +141,7 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
     }
 
     @Override
-    public TemplateDomain getDomain(String domainName) {
+    public ExecutionManagerTemplate getDomain(String domainName) {
         return domains.get(domainName);
     }
 
@@ -192,10 +180,10 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
 
         try {
 
-            TemplateDomain domain = getDomain(templateConfig.getFrom());
-            for (TemplateConfig domainTemplateConfig : domain.getTemplateConfigs().getTemplateConfig()) {
-                if (templateConfig.getType().equals(domainTemplateConfig.getName())) {
-                    for (Template template : domainTemplateConfig.getTemplates().getTemplate()) {
+            ExecutionManagerTemplate executionManagerTemplate = getDomain(templateConfig.getDomain());
+            for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()) {
+                if (templateConfig.getScenario().equals(scenario.getName())) {
+                    for (Template template : scenario.getTemplates().getTemplate()) {
                         ExecutionManagerHelper.unDeployExistingArtifact(domainName
                                                                         + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + configName, template.getType());
                         //todo: scriptName is yet to be decided

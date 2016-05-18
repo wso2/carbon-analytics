@@ -6,8 +6,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name="templateConfig")
-public class TemplateConfig {
+@XmlRootElement(name="scenario")
+public class Scenario {
 
     @XmlAttribute(name="name")
     private String name;

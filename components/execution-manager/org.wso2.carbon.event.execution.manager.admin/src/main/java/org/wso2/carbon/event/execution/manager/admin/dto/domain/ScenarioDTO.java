@@ -3,7 +3,7 @@ package org.wso2.carbon.event.execution.manager.admin.dto.domain;
 /**
  * DTO class of TemplateConfiguration element
  */
-public class TemplateConfigurationDTO {
+public class ScenarioDTO {
     private String name;
     private String description;
     private TemplateDTO[] templateDTOs;

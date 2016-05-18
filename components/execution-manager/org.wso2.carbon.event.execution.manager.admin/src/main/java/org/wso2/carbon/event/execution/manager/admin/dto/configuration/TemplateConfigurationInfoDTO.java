@@ -22,9 +22,9 @@ public class TemplateConfigurationInfoDTO {
 
     private String name;
 
-    private String from;
+    private String domain;
 
-    private String type;
+    private String scenario;
 
     private String description;
 
@@ -36,20 +36,20 @@ public class TemplateConfigurationInfoDTO {
         this.name = name;
     }
 
-    public String getFrom() {
-        return from;
+    public String getDomain() {
+        return domain;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
-    public String getType() {
-        return type;
+    public String getScenario() {
+        return scenario;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setScenario(String scenario) {
+        this.scenario = scenario;
     }
 
     public String getDescription() {

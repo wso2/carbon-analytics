@@ -19,7 +19,8 @@ import org.wso2.carbon.event.execution.manager.admin.dto.configuration.Parameter
 import org.wso2.carbon.event.execution.manager.admin.dto.configuration.StreamMappingDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.configuration.TemplateConfigurationDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.configuration.TemplateConfigurationInfoDTO;
-import org.wso2.carbon.event.execution.manager.core.structure.configuration.Parameter;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.AttributeMapping;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.AttributeMappings;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.TemplateConfiguration;
 
@@ -72,9 +73,9 @@ public class ConfigurationMapper {
         if (templateConfig != null) {
             templateConfigurationInfoDTO = new TemplateConfigurationInfoDTO();
             templateConfigurationInfoDTO.setName(templateConfig.getName());
-            templateConfigurationInfoDTO.setType(templateConfig.getType());
+            templateConfigurationInfoDTO.setScenario(templateConfig.getScenario());
             templateConfigurationInfoDTO.setDescription(templateConfig.getDescription());
-            templateConfigurationInfoDTO.setFrom(templateConfig.getFrom());
+            templateConfigurationInfoDTO.setDomain(templateConfig.getDomain());
         }
         return templateConfigurationInfoDTO;
     }
@@ -111,9 +112,9 @@ public class ConfigurationMapper {
         if (templateConfig != null) {
             templateConfigurationDTO = new TemplateConfigurationDTO();
             templateConfigurationDTO.setName(templateConfig.getName());
-            templateConfigurationDTO.setType(templateConfig.getType());
+            templateConfigurationDTO.setScenario(templateConfig.getScenario());
             templateConfigurationDTO.setDescription(templateConfig.getDescription());
-            templateConfigurationDTO.setFrom(templateConfig.getFrom());
+            templateConfigurationDTO.setDomain(templateConfig.getDomain());
             templateConfigurationDTO.setParameterDTOs(mapParameters(templateConfig.getParameterMap()));
         }
         return templateConfigurationDTO;
@@ -131,9 +132,9 @@ public class ConfigurationMapper {
         if (configDTO != null) {
             templateConfig = new TemplateConfiguration();
             templateConfig.setName(configDTO.getName());
-            templateConfig.setType(configDTO.getType());
+            templateConfig.setScenario(configDTO.getScenario());
             templateConfig.setDescription(configDTO.getDescription());
-            templateConfig.setFrom(configDTO.getFrom());
+            templateConfig.setDomain(configDTO.getDomain());
             templateConfig.setParameterMap(mapParameters(configDTO.getParameterDTOs()));
         }
         return templateConfig;
@@ -178,39 +179,6 @@ public class ConfigurationMapper {
         return parameterDTOs;
     }
 
-    /**
-     * Maps given ParameterDTO object to ParameterDTO object
-     *
-     * @param parameterDTO ParameterDTO needs to be mapped
-     * @return Converyed ParameterDTO object
-     */
-    private static Parameter mapParameter(ParameterDTO parameterDTO) {       //todo: remove if no use
-        Parameter parameter = null;
-
-        if (parameterDTO != null) {
-            parameter = new Parameter();
-            parameter.setName(parameterDTO.getName());
-            parameter.setValue(parameterDTO.getValue());
-        }
-        return parameter;
-    }
-
-
-    /**
-     * Maps given Parameter object to ParameterDTO object
-     *
-     * @param parameter Parameter needs to be mapped
-     * @return Mapped ParameterDTO object
-     */
-    private static ParameterDTO mapParameter(Parameter parameter) {         //todo: remove if no use
-        ParameterDTO parameterDTO = null;
-        if (parameter != null) {
-            parameterDTO = new ParameterDTO();
-            parameterDTO.setName(parameter.getName());
-            parameterDTO.setValue(parameter.getValue());
-        }
-        return parameterDTO;
-    }
 
     public static String[] mapStreamIds(List<String> streamIdList) {
         return (String[]) streamIdList.toArray();
@@ -218,14 +186,18 @@ public class ConfigurationMapper {
 
     public static StreamMapping mapStreamMapping(StreamMappingDTO streamMappingDTO) {
         StreamMapping streamMapping = new StreamMapping();
-        streamMapping.setFromStream(streamMappingDTO.getFromStream());
-        streamMapping.setToStream(streamMappingDTO.getToStream());
-        List<String[]> attributePairs = new ArrayList<>();
+        streamMapping.setFrom(streamMappingDTO.getFromStream());
+        streamMapping.setTo(streamMappingDTO.getToStream());
+        List<AttributeMapping> attributeMappingList = new ArrayList<>();
         for (int i = 0; i < streamMappingDTO.getAttributePairs().length; i++) {
-            attributePairs.add(new String[]{streamMappingDTO.getAttributePairs()[i][0]
-                    , streamMappingDTO.getAttributePairs()[i][1]});
+            AttributeMapping attributeMapping = new AttributeMapping();
+            attributeMapping.setFrom(streamMappingDTO.getAttributePairs()[i][0]);
+            attributeMapping.setTo(streamMappingDTO.getAttributePairs()[i][1]);
+            attributeMappingList.add(attributeMapping);
         }
-        streamMapping.setAttributePairs(attributePairs);
+        AttributeMappings attributeMappings = new AttributeMappings();
+        attributeMappings.setAttributeMapping(attributeMappingList);
+        streamMapping.setAttributeMappings(attributeMappings);
         return streamMapping;
     }
 }

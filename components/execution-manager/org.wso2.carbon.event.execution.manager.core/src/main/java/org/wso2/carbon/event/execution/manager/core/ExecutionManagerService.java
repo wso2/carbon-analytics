@@ -16,8 +16,9 @@
 package org.wso2.carbon.event.execution.manager.core;
 
 import org.wso2.carbon.event.execution.manager.core.exception.ExecutionManagerException;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.TemplateConfiguration;
-import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateDomain;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
 
 import java.util.Collection;
 import java.util.List;
@@ -34,12 +35,26 @@ public interface ExecutionManagerService {
      */
     public List<String> saveConfiguration(TemplateConfiguration configuration) throws ExecutionManagerException;
 
+
+    /**
+     * save streamMapping object into the registry and deploy the corresponding execution plan.
+     *
+     * @param streamMapping StreamMapping object
+     * @param templateConfigName name field in org.wso2.carbon.event.execution.manager.core.
+     *                           structure.configuration.TemplateConfiguration object
+     * @param templateConfigFrom from field inorg.wso2.carbon.event.execution.manager.core.
+     *                           structure.configuration.TemplateConfiguration object
+     */
+    public void saveConfigurationWithStreamMapping(StreamMapping streamMapping, String templateConfigName, String templateConfigFrom)
+            throws ExecutionManagerException;
+
+
     /**
      * provide all the loaded domains
      *
      * @return Domain list
      */
-    public Collection<TemplateDomain> getAllDomains();
+    public Collection<ExecutionManagerTemplate> getAllDomains();
 
     /**
      * provide configurations of specified domain
@@ -53,9 +68,9 @@ public interface ExecutionManagerService {
      * get information of a specific domain
      *
      * @param domainName domain name
-     * @return TemplateDomain object
+     * @return ExecutionManagerTemplate object
      */
-    public TemplateDomain getDomain(String domainName);
+    public ExecutionManagerTemplate getDomain(String domainName);
 
 
     /**
@@ -74,6 +89,5 @@ public interface ExecutionManagerService {
      * @param configName template configuration name
      */
     public void deleteConfiguration(String domainName, String configName) throws ExecutionManagerException;
-
 
 }

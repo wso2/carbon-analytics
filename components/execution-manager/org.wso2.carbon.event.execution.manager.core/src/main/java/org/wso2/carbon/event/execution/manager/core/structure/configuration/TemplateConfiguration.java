@@ -28,10 +28,11 @@ import java.util.Map;
 public class TemplateConfiguration {
 
     private String name;
-    private String type;
-    private String from;
+    private String scenario;
+    private String domain;
     private String description;
     private Map<String,String> parameterMap = new HashMap<>();
+    private StreamMappings streamMappings;
 
     public String getName() {
         return name;
@@ -42,22 +43,22 @@ public class TemplateConfiguration {
         this.name = name;
     }
 
-    public String getType() {
-        return type;
+    public String getScenario() {
+        return scenario;
     }
 
     @XmlAttribute
-    public void setType(String type) {
-        this.type = type;
+    public void setScenario(String scenario) {
+        this.scenario = scenario;
     }
 
-    public String getFrom() {
-        return from;
+    public String getDomain() {
+        return domain;
     }
 
     @XmlAttribute
-    public void setFrom(String from) {
-        this.from = from;
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     public String getDescription() {
@@ -75,5 +76,13 @@ public class TemplateConfiguration {
 
     public void setParameterMap(Map<String, String> parameterMap) {
         this.parameterMap = parameterMap;
+    }
+
+    public StreamMappings getStreamMappings() {
+        return streamMappings;
+    }
+
+    public void setStreamMappings(StreamMappings streamMappings) {
+        this.streamMappings = streamMappings;
     }
 }
