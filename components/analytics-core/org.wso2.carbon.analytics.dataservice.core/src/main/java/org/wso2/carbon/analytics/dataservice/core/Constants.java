@@ -61,6 +61,7 @@ public class Constants {
     public static final int DEFAULT_SHARD_INDEX_WORKER_INTERVAL = 1500;
     public static final int SHARD_INDEX_WORKER_INTERVAL_MIN = 10;
     public static final int SHARD_INDEX_WORKER_INTERVAL_MAX = 60000;
+    public static final int DEFAULT_INDEX_WORKER_COUNT = 1;
     public static final String DISABLE_INDEXING_ENV_PROP = "disableIndexing";
     public static final String ANALYTICS_INDEXING_GROUP = "__ANALYTICS_INDEXING_GROUP__";
 

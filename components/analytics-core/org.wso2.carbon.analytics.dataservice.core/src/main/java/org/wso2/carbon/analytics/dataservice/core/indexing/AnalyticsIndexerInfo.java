@@ -44,6 +44,8 @@ public class AnalyticsIndexerInfo {
     private int shardIndexWorkerInterval;
     
     private String indexStoreLocation;
+    
+    private int indexWorkerCount;
 
     public Analyzer getLuceneAnalyzer() {
         return luceneAnalyzer;
@@ -115,6 +117,14 @@ public class AnalyticsIndexerInfo {
 
     public void setIndexStoreLocation(String indexStoreLocation) {
         this.indexStoreLocation = indexStoreLocation;
+    }
+
+    public int getIndexWorkerCount() {
+        return indexWorkerCount;
+    }
+
+    public void setIndexWorkerCount(int indexWorkerCount) {
+        this.indexWorkerCount = indexWorkerCount;
     }
     
 }
