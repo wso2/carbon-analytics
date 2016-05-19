@@ -38,7 +38,6 @@ import java.util.Map;
  * API Used to communicate with Data Receivers WSO2 BAM/CEP. It can be used to send events to
  * multiple DAS/CEP nodes with load balancing and failover logic.
  */
-
 public class DataPublisher {
 
     private static final Log log = LogFactory.getLog(DataPublisher.class);
@@ -53,6 +52,20 @@ public class DataPublisher {
      * The Agent for which the data publisher belongs to.
      */
     private DataEndpointAgent dataEndpointAgent;
+    
+    private static final int FAILED_EVENT_LOG_INTERVAL = 10000;
+    
+    /**
+     * The last failed event time kept, use to determine when to log an warning
+     * message, without continuously doing so.
+     */
+    private long lastFailedEventTime;
+    
+    /**
+     * The current failed event count. A normal long is used here, rather
+     * than an AtomicLong, since this is not a critical stat.
+     */
+    private long failedEventCount;
 
     /**
      * Creates the DataPublisher instance for a specific user, and the it creates
@@ -137,8 +150,8 @@ public class DataPublisher {
                                   String receiverURLSet, String authURLSet, String username, String password)
             throws DataEndpointConfigurationException, DataEndpointAgentConfigurationException,
             DataEndpointException, DataEndpointAuthenticationException, TransportException {
-        ArrayList receiverURLGroups = DataPublisherUtil.getEndpointGroups(receiverURLSet);
-        ArrayList authURLGroups = DataPublisherUtil.getEndpointGroups(authURLSet);
+        ArrayList<Object[]> receiverURLGroups = DataPublisherUtil.getEndpointGroups(receiverURLSet);
+        ArrayList<Object[]> authURLGroups = DataPublisherUtil.getEndpointGroups(authURLSet);
         DataPublisherUtil.validateURLs(receiverURLGroups, authURLGroups);
 
         for (int i = 0; i < receiverURLGroups.size(); i++) {
@@ -274,6 +287,20 @@ public class DataPublisher {
         publish(new Event(streamId, timeStamp, metaDataArray, correlationDataArray,
                 payloadDataArray, arbitraryDataMap));
     }
+    
+    private void onEventQueueFull(DataEndpointGroup endpointGroup, Event event) {
+        this.failedEventCount++;
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - this.lastFailedEventTime > FAILED_EVENT_LOG_INTERVAL) {
+            log.warn("Event queue is full, unable to process the event for endpoint group "
+                    + endpointGroup.toString() + ", " + this.failedEventCount + " events dropped so far.");
+            this.lastFailedEventTime = currentTime;
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Dropped Event: " + event.toString() + " for the endpoint group " +
+                    endpointGroup.toString());
+        }
+    }
 
     /**
      * Publish an event based on the event properties that are passed
@@ -291,12 +318,7 @@ public class DataPublisher {
                 endpointGroup.tryPublish(event);
                 sent = true;
             } catch (EventQueueFullException e) {
-                log.warn("Event queue is full, unable to process the event for endpoint group "
-                        + endpointGroup.toString() + ", dropping the event.");
-                if (log.isDebugEnabled()) {
-                    log.debug("Dropped Event: " + event.toString() + " for the endpoint group " +
-                            endpointGroup.toString());
-                }
+                this.onEventQueueFull(endpointGroup, event);
                 sent = false;
             }
         }
@@ -321,12 +343,7 @@ public class DataPublisher {
             try {
                 endpointGroup.tryPublish(event, timeoutMS);
             } catch (EventQueueFullException e) {
-                log.warn("Event queue is full, unable to process the event for endpoint group "
-                        + endpointGroup.toString() + ", dropping the event.");
-                if (log.isDebugEnabled()) {
-                    log.debug("Dropped Event: " + event.toString() + " for the endpoint group " +
-                            endpointGroup.toString());
-                }
+                this.onEventQueueFull(endpointGroup, event);
                 sent = false;
             }
         }
