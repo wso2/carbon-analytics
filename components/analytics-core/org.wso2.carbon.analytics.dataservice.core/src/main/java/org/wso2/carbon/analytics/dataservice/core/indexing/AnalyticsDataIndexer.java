@@ -261,20 +261,26 @@ public class AnalyticsDataIndexer {
         return this.indexerInfo.getShardIndexWorkerInterval();
     }
     
-    /* processIndexOperations and processIndexOperationsFlushQueue must be synchronized, they are accessed by
-     * indexer threads and wait for indexing tasks, if not done property, index corruption will happen */
-    private synchronized void processIndexOperations(int shardIndex) throws AnalyticsException {
-        long maxBatchSize = this.getShardIndexRecordBatchSize();
-        long tmpSize;
-        /* process until the queue has sizable amount of records left in it, or else, go back to the
-         * indexing thread and wait for more to fill up */
+    private void processIndexOperations(Collection<Integer> shardIndices) throws AnalyticsException {
+        boolean cont;
         do {
-            tmpSize = this.processLocalShardDataQueue(shardIndex, 
-                    this.localIndexDataStore.getIndexDataQueue(shardIndex), maxBatchSize)[1];
-        } while (tmpSize >= maxBatchSize);
+            cont = false;
+            for (int shardIndex : shardIndices) {
+                cont |= this.processIndexOperationsSlice(shardIndex);
+            }
+        } while (cont);
     }
     
-    /* processIndexOperations and processIndexOperationsFlushQueue must be synchronized */
+    /* processIndexOperationsSlice and processIndexOperationsFlushQueue must be synchronized, they are accessed by
+     * indexer threads and wait for indexing tasks, if not done property, index corruption will happen */
+    private synchronized boolean processIndexOperationsSlice(int shardIndex) throws AnalyticsException {
+        long maxBatchSize = this.getShardIndexRecordBatchSize();
+        long processedCount = this.processLocalShardDataQueue(shardIndex, 
+                this.localIndexDataStore.getIndexDataQueue(shardIndex), maxBatchSize)[1];
+        return processedCount >= maxBatchSize;
+    }
+    
+    /* processIndexOperationsSlice and processIndexOperationsFlushQueue must be synchronized */
     public synchronized void processIndexOperationsFlushQueue(int shardIndex) throws AnalyticsException {
         long maxBatchCount = this.getShardIndexRecordBatchSize();
         LocalIndexDataQueue queue = this.localIndexDataStore.getIndexDataQueue(shardIndex);
@@ -2158,9 +2164,7 @@ public class AnalyticsDataIndexer {
         public void run() {
             while (!this.stop) {
                 try {
-                    for (int shardIndex : this.getShardIndices()) {
-                        processIndexOperations(shardIndex);
-                    }
+                    processIndexOperations(this.getShardIndices());
                 } catch (Throwable e) {
                     log.error("Error in processing index batch operations: " + e.getMessage(), e);
                 }
