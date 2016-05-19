@@ -55,8 +55,8 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      */
     public ExecutionManagerTemplateInfoDTO getExecutionManagerTemplateInfo(String domainName) throws AxisFault {
         try {
-            return DomainMapper.mapDomainInfo(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
-                    .getDomain(domainName));
+            return DomainMapper.mapExecutionManagerTemplate(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
+                                                                    .getDomain(domainName));
         } catch (Exception e) {
             log.error("Error occurred when getting domain " + domainName, e);
             throw new AxisFault(e.getMessage());
@@ -72,8 +72,8 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      */
     public ExecutionManagerTemplateInfoDTO[] getAllExecutionManagerTemplateInfos() throws AxisFault {
         try {
-            return DomainMapper.mapDomainsInfo(new ArrayList<ExecutionManagerTemplate>(ExecutionManagerAdminServiceValueHolder
-                    .getCarbonExecutionManagerService().getAllDomains()));
+            return DomainMapper.mapExecutionManagerTemplates(new ArrayList
+                    <ExecutionManagerTemplate>(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService().getAllDomains()));
         } catch (Exception e) {
             log.error("Error occurred when getting all domains ", e);
             throw new AxisFault(e.getMessage(), e);

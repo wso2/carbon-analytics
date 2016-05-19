@@ -60,7 +60,8 @@ public interface ExecutionManagerService {
      * @param domainName domain template name
      * @return Domain list
      */
-    public Collection<ScenarioConfiguration> getConfigurations(String domainName);
+    public Collection<ScenarioConfiguration> getConfigurations(String domainName)
+            throws ExecutionManagerException;
 
     /**
      * get information of a specific domain
@@ -78,10 +79,10 @@ public interface ExecutionManagerService {
      * @param configName configuration name
      * @return TemplateConfig object
      */
-    public ScenarioConfiguration getConfiguration(String domainName, String configName);
+    public ScenarioConfiguration getConfiguration(String domainName, String configName)  throws ExecutionManagerException;
 
     /**
-     * delete template configuration when the name of configuration is given
+     * delete specified scenario configuration when its name is given
      *
      * @param domainName domain name
      * @param configName template configuration name

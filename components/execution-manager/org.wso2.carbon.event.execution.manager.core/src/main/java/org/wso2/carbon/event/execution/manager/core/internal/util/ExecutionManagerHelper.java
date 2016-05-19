@@ -135,8 +135,8 @@ public class ExecutionManagerHelper {
      * @param path where configurations are stored
      * @return available configurations
      */
-    public static ScenarioConfiguration getConfiguration(String path) {
-
+    public static ScenarioConfiguration getConfiguration(String path)
+            throws ExecutionManagerException {
 
         ScenarioConfiguration scenarioConfiguration = null;
         try {
@@ -150,7 +150,7 @@ public class ExecutionManagerHelper {
                 }
             }
         } catch (RegistryException e) {
-            log.error("Registry exception occurred when accessing files at "
+            throw new ExecutionManagerException("Registry exception occurred when accessing files at "
                     + ExecutionManagerConstants.TEMPLATE_CONFIG_PATH, e);
         }
 
@@ -202,7 +202,7 @@ public class ExecutionManagerHelper {
      * Deploy the artifacts given in the template domain configuration
      *
      * @param executionManagerTemplate template domain object, containing the templates.
-     * @param configuration configuration object, containing the parameters.
+     * @param configuration scenario configuration object, containing the parameters.
      */
     public static void deployArtifacts(ScenarioConfiguration configuration,
                                        ExecutionManagerTemplate executionManagerTemplate)
@@ -220,14 +220,13 @@ public class ExecutionManagerHelper {
                     log.error("Error when trying to deploy the artifact " + configuration.getName(), e);
                     throw new ExecutionManagerException(e);
                 }
-
             }
         }
 
         //now, deploy templated artifacts
         for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()) {
-            for (Template template : scenario.getTemplates().getTemplate()) {
-                if (scenario.getName().equals(configuration.getScenario())) {     //todo: check whether this check is necessary
+            if (scenario.getName().equals(configuration.getScenario())) {
+                for (Template template : scenario.getTemplates().getTemplate()) {
                     TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(template.getType());
                     if (deployer != null) {
                         try {
@@ -240,11 +239,11 @@ public class ExecutionManagerHelper {
                             log.error("Error when trying to deploy the artifact " + configuration.getName(), e);
                             throw new ExecutionManagerException(e);
                         }
-                        break;
                     } else {
                         throw new ExecutionManagerException("A deployer doesn't exist for template type " + template.getType());
                     }
                 }
+                break;
             }
         }
     }
@@ -286,7 +285,7 @@ public class ExecutionManagerHelper {
     /**
      * Returns the list of Stream IDs(with their template symbols replaced by user-parameters) given in StreamMappings element.
      *
-     * @param configuration Template configuration, specified by the user, containing parameter values.
+     * @param configuration Scenario configuration, specified by the user, containing parameter values.
      * @param executionManagerTemplate ExecutionManagerTemplate object, containing the StreamMappings element
      * @return List of Stream IDs
      */
@@ -294,9 +293,10 @@ public class ExecutionManagerHelper {
                                                       ExecutionManagerTemplate executionManagerTemplate) {
         List<String> streamIdList = new ArrayList<>();
         for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()){
-            if (configuration.getName().equals(scenario.getName())) {  //todo: check whether this check is necessary
+            if (configuration.getName().equals(scenario.getName())) {
                 if(scenario.getStreamMappings() != null && scenario.getStreamMappings().getStreamMapping() != null
-                        && !scenario.getStreamMappings().getStreamMapping().isEmpty()) {    //if no stream mappings present, should return null
+                        && !scenario.getStreamMappings().getStreamMapping().isEmpty()) {
+                        //empty check is required because, if no stream mappings present, we should return null
                     for (StreamMapping streamMapping: scenario.getStreamMappings().getStreamMapping()) {
                         String toStream = streamMapping.getTo();
                         for (Map.Entry entry: configuration.getParameterMap().entrySet()) {
@@ -307,6 +307,7 @@ public class ExecutionManagerHelper {
                     }
                     return streamIdList;
                 }
+                break;
             }
         }
         return null;
@@ -331,7 +332,6 @@ public class ExecutionManagerHelper {
         StringBuilder exportStatementBuilder = new StringBuilder(); //for building "@Export..define stream.." statements
         StringBuilder queryBuilder = new StringBuilder();           //for building "select ... insert into..." query
 
-
         for (org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping streamMapping: streamMappingList) {
             String fromStreamId = streamMapping.getFrom();
             String toStreamId = streamMapping.getTo();
@@ -341,7 +341,6 @@ public class ExecutionManagerHelper {
 
             importStatementBuilder.append(generateDefineStreamStatements(IMPORT, fromStreamId, fromStreamName) + "\n");
             exportStatementBuilder.append(generateDefineStreamStatements(EXPORT, toStreamId, toStreamName) + "\n");
-
 
             queryBuilder.append(FROM + fromStreamName + " " + SELECT);
             for (AttributeMapping attributeMapping: streamMapping.getAttributeMappings().getAttributeMapping()) {

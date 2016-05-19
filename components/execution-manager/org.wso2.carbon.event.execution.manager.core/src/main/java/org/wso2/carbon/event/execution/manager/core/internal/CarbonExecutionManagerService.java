@@ -66,7 +66,7 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
         ExecutionManagerTemplate executionManagerTemplate = domains.get(configuration.getDomain());
         ExecutionManagerHelper.deployArtifacts(configuration, executionManagerTemplate);
 
-        ExecutionManagerHelper.saveToRegistry(configuration);//todo: TBD on whether saving conditionally, based on getStreamIDsInMappings output.
+        ExecutionManagerHelper.saveToRegistry(configuration);
 
         //If StreamMappings element is present in the ExecutionManagerTemplate, then need to return those Stream IDs,
         //so the caller (the UI) can prompt the user to map these streams to his own streams.
@@ -111,7 +111,8 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
     }
 
     @Override
-    public Collection<ScenarioConfiguration> getConfigurations(String domainName) {
+    public Collection<ScenarioConfiguration> getConfigurations(String domainName)
+            throws ExecutionManagerException {
         Collection<ScenarioConfiguration> scenarioConfigurations = new ArrayList<ScenarioConfiguration>();
 
         String domainFilePath = ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
@@ -142,7 +143,8 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
      * @param filePaths              where configuration files are located
      * @param scenarioConfigurations ScenarioConfiguration collection which needs to be loaded
      */
-    private void loadConfigurations(String[] filePaths, Collection<ScenarioConfiguration> scenarioConfigurations) {
+    private void loadConfigurations(String[] filePaths, Collection<ScenarioConfiguration> scenarioConfigurations)
+            throws ExecutionManagerException {
         for (String filePath : filePaths) {
             scenarioConfigurations.add(ExecutionManagerHelper.getConfiguration(filePath));
         }
@@ -154,7 +156,8 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
     }
 
     @Override
-    public ScenarioConfiguration getConfiguration(String domainName, String configName) {
+    public ScenarioConfiguration getConfiguration(String domainName, String configName)
+            throws ExecutionManagerException {
         return ExecutionManagerHelper.getConfiguration(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
                 + "/" + domainName
                 + "/" + configName
@@ -183,11 +186,10 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
                     + domainName + RegistryConstants.PATH_SEPARATOR + configName + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
         } catch (RegistryException e) {
             log.error("Configuration exception when deleting registry configuration file "
-                    + configName + " of Domain " + domainName, e);
+                    + configName + " of Domain " + domainName, e);           //todo: why not propagate to UI?
         }
 
         try {
-
             ExecutionManagerTemplate executionManagerTemplate = getDomain(scenarioConfig.getDomain());
             for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()) {
                 if (scenarioConfig.getScenario().equals(scenario.getName())) {
