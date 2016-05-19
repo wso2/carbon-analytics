@@ -67,17 +67,43 @@
         <xs:schema xmlns:ax2137="http://domain.dto.admin.manager.execution.event.carbon.wso2.org/xsd" xmlns:ax2135="http://configuration.dto.admin.manager.execution.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.manager.execution.event.carbon.wso2.org">
             <xs:import namespace="http://configuration.dto.admin.manager.execution.event.carbon.wso2.org/xsd"/>
             <xs:import namespace="http://domain.dto.admin.manager.execution.event.carbon.wso2.org/xsd"/>
-            <xs:element name="getConfigurationsInfo">
+            <xs:element name="getConfigurationInfos">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getConfigurationsInfoResponse">
+            <xs:element name="getConfigurationInfosResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2134:TemplateConfigurationInfoDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getExecutionManagerTemplateInfo">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getExecutionManagerTemplateInfoResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2137:ExecutionManagerTemplateInfoDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllExecutionManagerTemplateInfos">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllExecutionManagerTemplateInfosResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2137:ExecutionManagerTemplateInfoDTO"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -94,61 +120,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllTemplatesInfo">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllTemplatesInfoResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2137:ExecutionManagerTemplateInfoDTO"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getTemplateInfo">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getTemplateInfoResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2137:ExecutionManagerTemplateInfoDTO"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getConfiguration">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="configName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getConfigurationResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2134:TemplateConfigurationDTO"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getConfigurations">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getConfigurationsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2134:TemplateConfigurationDTO"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -181,8 +152,43 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="getConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="configName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2134:TemplateConfigurationDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getConfigurations">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getConfigurationsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2134:TemplateConfigurationDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
         </xs:schema>
     </wsdl:types>
+    <wsdl:message name="getConfigurationInfosRequest">
+        <wsdl:part name="parameters" element="ns:getConfigurationInfos"/>
+    </wsdl:message>
+    <wsdl:message name="getConfigurationInfosResponse">
+        <wsdl:part name="parameters" element="ns:getConfigurationInfosResponse"/>
+    </wsdl:message>
     <wsdl:message name="getConfigurationsRequest">
         <wsdl:part name="parameters" element="ns:getConfigurations"/>
     </wsdl:message>
@@ -201,23 +207,23 @@
     <wsdl:message name="saveConfigurationResponse">
         <wsdl:part name="parameters" element="ns:saveConfigurationResponse"/>
     </wsdl:message>
+    <wsdl:message name="getExecutionManagerTemplateInfoRequest">
+        <wsdl:part name="parameters" element="ns:getExecutionManagerTemplateInfo"/>
+    </wsdl:message>
+    <wsdl:message name="getExecutionManagerTemplateInfoResponse">
+        <wsdl:part name="parameters" element="ns:getExecutionManagerTemplateInfoResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getAllExecutionManagerTemplateInfosRequest">
+        <wsdl:part name="parameters" element="ns:getAllExecutionManagerTemplateInfos"/>
+    </wsdl:message>
+    <wsdl:message name="getAllExecutionManagerTemplateInfosResponse">
+        <wsdl:part name="parameters" element="ns:getAllExecutionManagerTemplateInfosResponse"/>
+    </wsdl:message>
     <wsdl:message name="deleteConfigurationRequest">
         <wsdl:part name="parameters" element="ns:deleteConfiguration"/>
     </wsdl:message>
     <wsdl:message name="deleteConfigurationResponse">
         <wsdl:part name="parameters" element="ns:deleteConfigurationResponse"/>
-    </wsdl:message>
-    <wsdl:message name="getAllTemplatesInfoRequest">
-        <wsdl:part name="parameters" element="ns:getAllTemplatesInfo"/>
-    </wsdl:message>
-    <wsdl:message name="getAllTemplatesInfoResponse">
-        <wsdl:part name="parameters" element="ns:getAllTemplatesInfoResponse"/>
-    </wsdl:message>
-    <wsdl:message name="getTemplateInfoRequest">
-        <wsdl:part name="parameters" element="ns:getTemplateInfo"/>
-    </wsdl:message>
-    <wsdl:message name="getTemplateInfoResponse">
-        <wsdl:part name="parameters" element="ns:getTemplateInfoResponse"/>
     </wsdl:message>
     <wsdl:message name="getConfigurationRequest">
         <wsdl:part name="parameters" element="ns:getConfiguration"/>
@@ -225,13 +231,11 @@
     <wsdl:message name="getConfigurationResponse">
         <wsdl:part name="parameters" element="ns:getConfigurationResponse"/>
     </wsdl:message>
-    <wsdl:message name="getConfigurationsInfoRequest">
-        <wsdl:part name="parameters" element="ns:getConfigurationsInfo"/>
-    </wsdl:message>
-    <wsdl:message name="getConfigurationsInfoResponse">
-        <wsdl:part name="parameters" element="ns:getConfigurationsInfoResponse"/>
-    </wsdl:message>
     <wsdl:portType name="ExecutionManagerAdminServicePortType">
+        <wsdl:operation name="getConfigurationInfos">
+            <wsdl:input message="ns:getConfigurationInfosRequest" wsaw:Action="urn:getConfigurationInfos"/>
+            <wsdl:output message="ns:getConfigurationInfosResponse" wsaw:Action="urn:getConfigurationInfosResponse"/>
+        </wsdl:operation>
         <wsdl:operation name="getConfigurations">
             <wsdl:input message="ns:getConfigurationsRequest" wsaw:Action="urn:getConfigurations"/>
             <wsdl:output message="ns:getConfigurationsResponse" wsaw:Action="urn:getConfigurationsResponse"/>
@@ -244,29 +248,34 @@
             <wsdl:input message="ns:saveConfigurationRequest" wsaw:Action="urn:saveConfiguration"/>
             <wsdl:output message="ns:saveConfigurationResponse" wsaw:Action="urn:saveConfigurationResponse"/>
         </wsdl:operation>
+        <wsdl:operation name="getExecutionManagerTemplateInfo">
+            <wsdl:input message="ns:getExecutionManagerTemplateInfoRequest" wsaw:Action="urn:getExecutionManagerTemplateInfo"/>
+            <wsdl:output message="ns:getExecutionManagerTemplateInfoResponse" wsaw:Action="urn:getExecutionManagerTemplateInfoResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getAllExecutionManagerTemplateInfos">
+            <wsdl:input message="ns:getAllExecutionManagerTemplateInfosRequest" wsaw:Action="urn:getAllExecutionManagerTemplateInfos"/>
+            <wsdl:output message="ns:getAllExecutionManagerTemplateInfosResponse" wsaw:Action="urn:getAllExecutionManagerTemplateInfosResponse"/>
+        </wsdl:operation>
         <wsdl:operation name="deleteConfiguration">
             <wsdl:input message="ns:deleteConfigurationRequest" wsaw:Action="urn:deleteConfiguration"/>
             <wsdl:output message="ns:deleteConfigurationResponse" wsaw:Action="urn:deleteConfigurationResponse"/>
-        </wsdl:operation>
-        <wsdl:operation name="getAllTemplatesInfo">
-            <wsdl:input message="ns:getAllTemplatesInfoRequest" wsaw:Action="urn:getAllTemplatesInfo"/>
-            <wsdl:output message="ns:getAllTemplatesInfoResponse" wsaw:Action="urn:getAllTemplatesInfoResponse"/>
-        </wsdl:operation>
-        <wsdl:operation name="getTemplateInfo">
-            <wsdl:input message="ns:getTemplateInfoRequest" wsaw:Action="urn:getTemplateInfo"/>
-            <wsdl:output message="ns:getTemplateInfoResponse" wsaw:Action="urn:getTemplateInfoResponse"/>
         </wsdl:operation>
         <wsdl:operation name="getConfiguration">
             <wsdl:input message="ns:getConfigurationRequest" wsaw:Action="urn:getConfiguration"/>
             <wsdl:output message="ns:getConfigurationResponse" wsaw:Action="urn:getConfigurationResponse"/>
         </wsdl:operation>
-        <wsdl:operation name="getConfigurationsInfo">
-            <wsdl:input message="ns:getConfigurationsInfoRequest" wsaw:Action="urn:getConfigurationsInfo"/>
-            <wsdl:output message="ns:getConfigurationsInfoResponse" wsaw:Action="urn:getConfigurationsInfoResponse"/>
-        </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="ExecutionManagerAdminServiceSoap11Binding" type="ns:ExecutionManagerAdminServicePortType">
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getConfigurationInfos">
+            <soap:operation soapAction="urn:getConfigurationInfos" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="getConfigurations">
             <soap:operation soapAction="urn:getConfigurations" style="document"/>
             <wsdl:input>
@@ -294,35 +303,26 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="getExecutionManagerTemplateInfo">
+            <soap:operation soapAction="urn:getExecutionManagerTemplateInfo" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllExecutionManagerTemplateInfos">
+            <soap:operation soapAction="urn:getAllExecutionManagerTemplateInfos" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="deleteConfiguration">
             <soap:operation soapAction="urn:deleteConfiguration" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getAllTemplatesInfo">
-            <soap:operation soapAction="urn:getAllTemplatesInfo" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getTemplateInfo">
-            <soap:operation soapAction="urn:getTemplateInfo" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getConfigurationsInfo">
-            <soap:operation soapAction="urn:getConfigurationsInfo" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -342,6 +342,15 @@
     </wsdl:binding>
     <wsdl:binding name="ExecutionManagerAdminServiceSoap12Binding" type="ns:ExecutionManagerAdminServicePortType">
         <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getConfigurationInfos">
+            <soap12:operation soapAction="urn:getConfigurationInfos" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="getConfigurations">
             <soap12:operation soapAction="urn:getConfigurations" style="document"/>
             <wsdl:input>
@@ -369,35 +378,26 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="getExecutionManagerTemplateInfo">
+            <soap12:operation soapAction="urn:getExecutionManagerTemplateInfo" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllExecutionManagerTemplateInfos">
+            <soap12:operation soapAction="urn:getAllExecutionManagerTemplateInfos" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="deleteConfiguration">
             <soap12:operation soapAction="urn:deleteConfiguration" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getAllTemplatesInfo">
-            <soap12:operation soapAction="urn:getAllTemplatesInfo" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getTemplateInfo">
-            <soap12:operation soapAction="urn:getTemplateInfo" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getConfigurationsInfo">
-            <soap12:operation soapAction="urn:getConfigurationsInfo" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -417,6 +417,15 @@
     </wsdl:binding>
     <wsdl:binding name="ExecutionManagerAdminServiceHttpBinding" type="ns:ExecutionManagerAdminServicePortType">
         <http:binding verb="POST"/>
+        <wsdl:operation name="getConfigurationInfos">
+            <http:operation location="getConfigurationInfos"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="getConfigurations">
             <http:operation location="getConfigurations"/>
             <wsdl:input>
@@ -444,35 +453,26 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="getExecutionManagerTemplateInfo">
+            <http:operation location="getExecutionManagerTemplateInfo"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllExecutionManagerTemplateInfos">
+            <http:operation location="getAllExecutionManagerTemplateInfos"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="deleteConfiguration">
             <http:operation location="deleteConfiguration"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getAllTemplatesInfo">
-            <http:operation location="getAllTemplatesInfo"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getTemplateInfo">
-            <http:operation location="getTemplateInfo"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getConfigurationsInfo">
-            <http:operation location="getConfigurationsInfo"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -492,13 +492,13 @@
     </wsdl:binding>
     <wsdl:service name="ExecutionManagerAdminService">
         <wsdl:port name="ExecutionManagerAdminServiceHttpsSoap11Endpoint" binding="ns:ExecutionManagerAdminServiceSoap11Binding">
-            <soap:address location="https://100.65.90.18:9443/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsSoap11Endpoint/"/>
+            <soap:address location="https://10.100.5.59:9443/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsSoap11Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="ExecutionManagerAdminServiceHttpsSoap12Endpoint" binding="ns:ExecutionManagerAdminServiceSoap12Binding">
-            <soap12:address location="https://100.65.90.18:9443/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsSoap12Endpoint/"/>
+            <soap12:address location="https://10.100.5.59:9443/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsSoap12Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="ExecutionManagerAdminServiceHttpsEndpoint" binding="ns:ExecutionManagerAdminServiceHttpBinding">
-            <http:address location="https://100.65.90.18:9443/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsEndpoint/"/>
+            <http:address location="https://10.100.5.59:9443/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsEndpoint/"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

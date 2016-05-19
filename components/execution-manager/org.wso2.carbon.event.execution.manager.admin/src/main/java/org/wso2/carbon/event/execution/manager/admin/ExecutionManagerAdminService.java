@@ -53,7 +53,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      * @return template domain full details
      * @throws AxisFault
      */
-    public ExecutionManagerTemplateInfoDTO getTemplateInfo(String domainName) throws AxisFault {
+    public ExecutionManagerTemplateInfoDTO getExecutionManagerTemplateInfo(String domainName) throws AxisFault {
         try {
             return DomainMapper.mapDomainInfo(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
                     .getDomain(domainName));
@@ -69,7 +69,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      * @return all template domain information
      * @throws org.apache.axis2.AxisFault
      */
-    public ExecutionManagerTemplateInfoDTO[] getAllTemplatesInfo() throws AxisFault {
+    public ExecutionManagerTemplateInfoDTO[] getAllExecutionManagerTemplateInfos() throws AxisFault {
         try {
             return DomainMapper.mapDomainsInfo(new ArrayList<ExecutionManagerTemplate>(ExecutionManagerAdminServiceValueHolder
                     .getCarbonExecutionManagerService().getAllDomains()));
@@ -127,7 +127,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      * @return template domain configuration details
      * @throws AxisFault
      */
-    public TemplateConfigurationInfoDTO[] getConfigurationsInfo(String domainName) throws AxisFault {
+    public TemplateConfigurationInfoDTO[] getConfigurationInfos(String domainName) throws AxisFault {
         try {
             return ConfigurationMapper.mapConfigurationsInfo(new ArrayList<>(
                     ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
