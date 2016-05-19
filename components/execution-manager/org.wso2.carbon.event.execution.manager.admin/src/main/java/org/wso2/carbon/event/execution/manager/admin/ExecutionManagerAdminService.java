@@ -147,8 +147,8 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      */
     public String[] saveConfiguration(ScenarioConfigurationDTO configuration) throws AxisFault {
         try {
-            return ConfigurationMapper.mapStreamIds(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
-                    .saveConfiguration(ConfigurationMapper.mapConfiguration(configuration)));     //todo: remove  mapStreamIds
+            return (String[]) ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
+                    .saveConfiguration(ConfigurationMapper.mapConfiguration(configuration)).toArray();
         } catch (ExecutionManagerException e) {
             log.error("Error occurred when saving configuration " + configuration.getName(), e);
             throw new AxisFault(e.getMessage(), e);
@@ -162,18 +162,18 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      * This service will create a Siddhi execution plan, which will select required attributes (as specified in the mapping)
      * from StreamY and insert into StreamX.
      *
-     * @param streamMappingDTO  Maps a user-defined stream to a stream defined in the template.
+     * @param streamMappingDTOs  Each StreamMappingDTO maps a user-defined stream to a stream defined in the template.
      * @param configName ScenarioConfiguration name
      * @param domainName domain name of the ExecutionManagerTemplate.
      * @return true on successful operation completion.
      * @throws AxisFault
      */
     public boolean saveStreamMapping(
-            org.wso2.carbon.event.execution.manager.admin.dto.configuration.StreamMappingDTO
-                    streamMappingDTO, String configName, String domainName) throws AxisFault {
+            org.wso2.carbon.event.execution.manager.admin.dto.configuration.StreamMappingDTO[]
+                    streamMappingDTOs, String configName, String domainName) throws AxisFault {
         try {
             ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
-                    .saveConfigurationWithStreamMapping(ConfigurationMapper.mapStreamMapping(streamMappingDTO)
+                    .saveConfigurationWithStreamMapping(ConfigurationMapper.mapStreamMapping(streamMappingDTOs)
                             , configName, domainName);
             return true;
         } catch (ExecutionManagerException e) {

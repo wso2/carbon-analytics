@@ -39,11 +39,11 @@ public interface ExecutionManagerService {
     /**
      * save streamMapping object into the registry and deploy the corresponding execution plan.
      *
-     * @param streamMapping StreamMapping object
+     * @param streamMappingList StreamMapping list
      * @param scenarioConfigName name field ScenarioConfiguration object
      * @param domainName domain name of the ExecutionManagerTemplate corresponding to this scenarioConfig
      */
-    public void saveConfigurationWithStreamMapping(StreamMapping streamMapping, String scenarioConfigName, String domainName)
+    public void saveConfigurationWithStreamMapping(List<StreamMapping> streamMappingList, String scenarioConfigName, String domainName)
             throws ExecutionManagerException;
 
 

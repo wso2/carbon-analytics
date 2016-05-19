@@ -179,26 +179,25 @@ public class ConfigurationMapper {
         return parameterDTOs;
     }
 
-
-    public static String[] mapStreamIds(List<String> streamIdList) {
-        return (String[]) streamIdList.toArray();
-    }
-
-    public static StreamMapping mapStreamMapping(StreamMappingDTO streamMappingDTO) {
-        StreamMapping streamMapping = new StreamMapping();
-        streamMapping.setFrom(streamMappingDTO.getFromStream());
-        streamMapping.setTo(streamMappingDTO.getToStream());
-        List<AttributeMapping> attributeMappingList = new ArrayList<>();
-        for (int i = 0; i < streamMappingDTO.getAttributeMappingDTOs().length; i++) {
-            AttributeMapping attributeMapping = new AttributeMapping();
-            attributeMapping.setFrom(streamMappingDTO.getAttributeMappingDTOs()[i].getFromAttribute());
-            attributeMapping.setTo(streamMappingDTO.getAttributeMappingDTOs()[i].getToAttribute());
-            attributeMapping.setType(streamMappingDTO.getAttributeMappingDTOs()[i].getAttributeType());
-            attributeMappingList.add(attributeMapping);
+    public static List<StreamMapping> mapStreamMapping(StreamMappingDTO[] streamMappingDTO) {
+        List<StreamMapping> streamMappings = new ArrayList<>();
+        for (int i = 0; i < streamMappingDTO.length; i++) {
+            StreamMapping streamMapping = new StreamMapping();
+            streamMapping.setFrom(streamMappingDTO[i].getFromStream());
+            streamMapping.setTo(streamMappingDTO[i].getToStream());
+            List<AttributeMapping> attributeMappingList = new ArrayList<>();
+            for (int j = 0; j < streamMappingDTO[i].getAttributeMappingDTOs().length; j++) {
+                AttributeMapping attributeMapping = new AttributeMapping();
+                attributeMapping.setFrom(streamMappingDTO[i].getAttributeMappingDTOs()[j].getFromAttribute());
+                attributeMapping.setTo(streamMappingDTO[i].getAttributeMappingDTOs()[j].getToAttribute());
+                attributeMapping.setType(streamMappingDTO[i].getAttributeMappingDTOs()[j].getAttributeType());
+                attributeMappingList.add(attributeMapping);
+            }
+            AttributeMappings attributeMappings = new AttributeMappings();
+            attributeMappings.setAttributeMapping(attributeMappingList);
+            streamMapping.setAttributeMappings(attributeMappings);
+            streamMappings.add(streamMapping);
         }
-        AttributeMappings attributeMappings = new AttributeMappings();
-        attributeMappings.setAttributeMapping(attributeMappingList);
-        streamMapping.setAttributeMappings(attributeMappings);
-        return streamMapping;
+        return streamMappings;
     }
 }

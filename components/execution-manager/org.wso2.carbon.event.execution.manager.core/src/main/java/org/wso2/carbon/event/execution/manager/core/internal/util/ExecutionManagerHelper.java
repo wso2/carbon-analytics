@@ -57,8 +57,8 @@ public class ExecutionManagerHelper {
 
     private static final Log log = LogFactory.getLog(ExecutionManagerHelper.class);
     private static final String EXECUTION_PLAN_NAME_ANNOTATION = "@Plan:name";
-    private static final String IMPORT_ANNOTATION = "@Import";
-    private static final String EXPORT_ANNOTATION = "@Export";
+    private static final String IMPORT = "Import";
+    private static final String EXPORT = "Export";
     private static final String DEFINE_STREAM = "define stream ";
     private static final String FROM = "from ";
     private static final String SELECT = "select ";
@@ -316,79 +316,66 @@ public class ExecutionManagerHelper {
      * Returns the execution plan which selects from the "fromStream" and inserts into the "toStream"
      *
      *
-     * @param streamMapping object which specifies "fromStream", "toStream" and how attributes needs to be mapped.
+     * @param streamMappingList object which specifies "fromStream", "toStream" and how attributes needs to be mapped.
      * @param templateConfigName
      *@param templateConfigFrom @return execution plan as a deploy-ready String.
      */
     public static String generateExecutionPlan(
-            org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping streamMapping,
+            List<org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping> streamMappingList,
             String templateConfigName, String templateConfigFrom) {
-        String fromStreamId = streamMapping.getFrom();
-        String toStreamId = streamMapping.getTo();
-
-        String fromStreamName = fromStreamId.split(EventStreamConstants.STREAM_DEFINITION_DELIMITER)[0];
-        String toStreamName = toStreamId.split(EventStreamConstants.STREAM_DEFINITION_DELIMITER)[0];
-
-        StreamDefinition fromStreamDefinition = ExecutionManagerValueHolder.getEventStreamService().getStreamDefinition(fromStreamId);
-        StreamDefinition toStreamDefinition = ExecutionManagerValueHolder.getEventStreamService().getStreamDefinition(toStreamId);
-
         //@Plan:name() statement
         String planNameStatement = EXECUTION_PLAN_NAME_ANNOTATION + "('" + templateConfigFrom
-                + DELIMETER + templateConfigName + DELIMETER + fromStreamName + "Mapping')";
+                                   + DELIMETER + templateConfigName + DELIMETER + "StreamMappingPlan') \n";
+
+        StringBuilder importStatementBuilder = new StringBuilder(); //for building "@Import..define stream.." statements
+        StringBuilder exportStatementBuilder = new StringBuilder(); //for building "@Export..define stream.." statements
+        StringBuilder queryBuilder = new StringBuilder();           //for building "select ... insert into..." query
 
 
-        //@Import...define stream statements      //todo use common method
-        String importStatement = IMPORT_ANNOTATION + "('" + fromStreamId + "')";
-        StringBuilder fromStreamDefBuilder = new StringBuilder(DEFINE_STREAM + fromStreamName + " (");
-        for (Attribute metaAttribute : fromStreamDefinition.getMetaData()) {
-            fromStreamDefBuilder.append(EventStreamConstants.META_PREFIX + metaAttribute.getName()
-                                        + " " + metaAttribute.getType() + ", ");
-        }
-        for (Attribute corrAttribute : fromStreamDefinition.getCorrelationData()) {
-            fromStreamDefBuilder.append(EventStreamConstants.CORRELATION_PREFIX + corrAttribute.getName()
-                                        + " " + corrAttribute.getType() + ", ");
-        }
-        for (Attribute payloadAttribute : fromStreamDefinition.getPayloadData()) {
-            fromStreamDefBuilder.append(payloadAttribute.getName() + " " + payloadAttribute.getType() + ", ");
-        }
+        for (org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping streamMapping: streamMappingList) {
+            String fromStreamId = streamMapping.getFrom();
+            String toStreamId = streamMapping.getTo();
 
-        fromStreamDefBuilder.delete(fromStreamDefBuilder.length()-2, fromStreamDefBuilder.length()-1);
-        fromStreamDefBuilder.append(");");
-        String fromStreamDefinitionStr = fromStreamDefBuilder.toString();
-        importStatement += fromStreamDefinitionStr;
+            String fromStreamName = fromStreamId.split(EventStreamConstants.STREAM_DEFINITION_DELIMITER)[0];
+            String toStreamName = toStreamId.split(EventStreamConstants.STREAM_DEFINITION_DELIMITER)[0];
+
+            importStatementBuilder.append(generateDefineStreamStatements(IMPORT, fromStreamId, fromStreamName) + "\n");
+            exportStatementBuilder.append(generateDefineStreamStatements(EXPORT, toStreamId, toStreamName) + "\n");
 
 
-        //@Export...define stream statements
-        String exportStatement = EXPORT_ANNOTATION + "('" + toStreamId + "')";
-        StringBuilder toStreamDefBuilder = new StringBuilder(DEFINE_STREAM + toStreamName + " (");
-        for (Attribute metaAttribute : toStreamDefinition.getMetaData()) {
-            toStreamDefBuilder.append(EventStreamConstants.META_PREFIX + metaAttribute.getName()
-                                        + " " + metaAttribute.getType() + ", ");
-        }
-        for (Attribute corrAttribute : toStreamDefinition.getCorrelationData()) {
-            toStreamDefBuilder.append(EventStreamConstants.CORRELATION_PREFIX + corrAttribute.getName()
-                                        + " " + corrAttribute.getType() + ", ");
-        }
-        for (Attribute payloadAttribute : toStreamDefinition.getPayloadData()) {
-            toStreamDefBuilder.append(payloadAttribute.getName() + " " + payloadAttribute.getType() + ", ");
+            queryBuilder.append(FROM + fromStreamName + " " + SELECT);
+            for (AttributeMapping attributeMapping: streamMapping.getAttributeMappings().getAttributeMapping()) {
+                queryBuilder.append(attributeMapping.getFrom() + AS + attributeMapping.getTo() + ", ");
+            }
+            queryBuilder.deleteCharAt(queryBuilder.length() - 2);
+            queryBuilder.append(INSERT_INTO + toStreamName + ";\n");
         }
 
-        toStreamDefBuilder.delete(toStreamDefBuilder.length()-2, toStreamDefBuilder.length()-1);
-        toStreamDefBuilder.append(");");
-        String toStreamDefinitionStr = toStreamDefBuilder.toString();
-        exportStatement += toStreamDefinitionStr;
+        return planNameStatement + importStatementBuilder.toString() + exportStatementBuilder.toString() + queryBuilder.toString();
+    }
 
+    private static String generateDefineStreamStatements(String importOrExport, String streamId, String streamName) {
+        StreamDefinition streamDefinition = ExecutionManagerValueHolder.getEventStreamService().getStreamDefinition(streamId);
 
-        //select ... insert into query
-        StringBuilder queryBuilder = new StringBuilder(FROM + fromStreamName + " " + SELECT);
-        for (AttributeMapping attributeMapping: streamMapping.getAttributeMappings().getAttributeMapping()) {
-            queryBuilder.append(attributeMapping.getFrom() + AS + attributeMapping.getTo() + ", ");
+        String statement = "@" + importOrExport + "('" + streamId + "')";
+        StringBuilder streamDefBuilder = new StringBuilder(DEFINE_STREAM + streamName + " (");
+        for (Attribute metaAttribute : streamDefinition.getMetaData()) {
+            streamDefBuilder.append(EventStreamConstants.META_PREFIX + metaAttribute.getName()
+                                      + " " + metaAttribute.getType() + ", ");
         }
-        queryBuilder.deleteCharAt(queryBuilder.length() - 2);
-        queryBuilder.append(INSERT_INTO + toStreamName + ";");
-        String query = queryBuilder.toString();
+        for (Attribute corrAttribute : streamDefinition.getCorrelationData()) {
+            streamDefBuilder.append(EventStreamConstants.CORRELATION_PREFIX + corrAttribute.getName()
+                                      + " " + corrAttribute.getType() + ", ");
+        }
+        for (Attribute payloadAttribute : streamDefinition.getPayloadData()) {
+            streamDefBuilder.append(payloadAttribute.getName() + " " + payloadAttribute.getType() + ", ");
+        }
 
-        return planNameStatement + importStatement + exportStatement + query;
+        streamDefBuilder.delete(streamDefBuilder.length()-2, streamDefBuilder.length()-1);
+        streamDefBuilder.append(");");
+        String toStreamDefinitionStr = streamDefBuilder.toString();
+        statement += toStreamDefinitionStr;
+        return statement;
     }
 
 
@@ -453,6 +440,9 @@ public class ExecutionManagerHelper {
             Resource resource = registry.get(resourcePath);
 
             JAXBContext jaxbContext = JAXBContext.newInstance(ScenarioConfiguration.class);
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            ScenarioConfiguration scenarioConfiguration = (ScenarioConfiguration) jaxbUnmarshaller.unmarshal(resource.getContentStream());
+            return scenarioConfiguration;
         }
         catch (RegistryException e) {
             throw new ExecutionManagerException("Registry exception occurred when trying to access configuration registry for tenant domain: "
@@ -461,6 +451,5 @@ public class ExecutionManagerHelper {
             throw new ExecutionManagerException("JAXB exception occurred when trying to access configuration registry for tenant domain: "
                                                 + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(), e);
         }
-        return null; //todo: remove after completing impl
     }
 }

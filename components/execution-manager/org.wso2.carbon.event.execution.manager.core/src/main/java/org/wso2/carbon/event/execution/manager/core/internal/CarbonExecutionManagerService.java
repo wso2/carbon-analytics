@@ -28,6 +28,7 @@ import org.wso2.carbon.event.execution.manager.core.internal.util.ExecutionManag
 import org.wso2.carbon.event.execution.manager.core.internal.util.ExecutionManagerHelper;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.ScenarioConfiguration;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMappings;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
@@ -74,21 +75,28 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
 
 
     @Override
-    public void saveConfigurationWithStreamMapping(StreamMapping streamMapping
+    public void saveConfigurationWithStreamMapping(List<StreamMapping> streamMappingList
             , String scenarioConfigName, String domainName)
             throws ExecutionManagerException {
         try {
             //deploy execution plan
-            String executionPlan = ExecutionManagerHelper.generateExecutionPlan(streamMapping, scenarioConfigName, domainName);
+            String executionPlan = ExecutionManagerHelper.generateExecutionPlan(streamMappingList, scenarioConfigName, domainName);
+
             DeployableTemplate deployableTemplate = new DeployableTemplate();
             deployableTemplate.setArtifact(executionPlan);
 
-            TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get("realtime"); //todo: check name;
+            TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get("realtime");
             deployer.deployArtifact(deployableTemplate);
-
 
             //save to registry
             ScenarioConfiguration scenarioConfiguration = ExecutionManagerHelper.getConfigurationFromRegistry(scenarioConfigName, domainName);
+
+            StreamMappings streamMappings = new StreamMappings();
+            streamMappings.setStreamMapping(streamMappingList);
+
+            scenarioConfiguration.setStreamMappings(streamMappings);
+            ExecutionManagerHelper.saveToRegistry(scenarioConfiguration);
+
         } catch (TemplateDeploymentException e) {
             throw new ExecutionManagerException("Failed to deploy execution plan, hence event flow will " +
                     "not be complete for Template Configuration: " + scenarioConfigName + " in domain: " + domainName, e);

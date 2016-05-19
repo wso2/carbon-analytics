@@ -83,18 +83,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getAllExecutionManagerTemplateInfos">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllExecutionManagerTemplateInfosResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2134:ExecutionManagerTemplateInfoDTO"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="getConfigurationInfos">
                 <xs:complexType>
                     <xs:sequence>
@@ -112,7 +100,7 @@
             <xs:element name="saveStreamMapping">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="streamMappingDTO" nillable="true" type="ax2137:StreamMappingDTO"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="streamMappingDTOs" nillable="true" type="ax2137:StreamMappingDTO"/>
                         <xs:element minOccurs="0" name="configName" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
                     </xs:sequence>
@@ -125,18 +113,15 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getConfiguration">
+            <xs:element name="getAllExecutionManagerTemplateInfos">
                 <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="configName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
+                    <xs:sequence/>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getConfigurationResponse">
+            <xs:element name="getAllExecutionManagerTemplateInfosResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2137:ScenarioConfigurationDTO"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2134:ExecutionManagerTemplateInfoDTO"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -166,6 +151,21 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="configName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2137:ScenarioConfigurationDTO"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
