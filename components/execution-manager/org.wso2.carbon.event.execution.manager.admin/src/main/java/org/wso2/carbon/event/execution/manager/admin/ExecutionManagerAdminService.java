@@ -101,10 +101,11 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
 
 
     /**
-     * return details for a given template domain name
+     * return all of the available Scenario Configuration Info's for a given ExecutionManagerTemplate domain.
+     * This method does not return all the fields in a Scenario Configurations, rather returns only the fields which are required for the UI.
      *
-     * @param domainName template domain name
-     * @return template domain configuration details
+     * @param domainName domain name of the ExecutionManagerTemplate
+     * @return scenario configuration information.
      * @throws AxisFault
      */
     public ScenarioConfigurationInfoDTO[] getConfigurationInfos(String domainName) throws AxisFault {
@@ -120,10 +121,10 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
 
 
     /**
-     * Delete specified configuration
+     * Delete specified scenario configuration
      *
-     * @param domainName template domain name
-     * @param configName configuration name which needs to be deleted
+     * @param domainName domain name of the ExecutionManagerTemplate
+     * @param configName name of the scenario configuration which needs to be deleted
      */
     public boolean deleteConfiguration(String domainName, String configName) throws AxisFault {
         try {
@@ -137,10 +138,11 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     }
 
     /**
-     * Create or update specified configuration.
+     * Create or update specified scenario configuration.
      *
-     * @param configuration configuration data transfer object
-     * @return  Stream ID array
+     * @param configuration scenario configuration data transfer object which needs to be saved.
+     * @return  Stream ID array. In case there are StreamMappings in the ExecutionManagerTemplate (under this particular scenario),
+     * then the "toStream" IDs will be returned. If no StreamMappings present, null will be returned.
      * @throws AxisFault
      */
     public String[] saveConfiguration(ScenarioConfigurationDTO configuration) throws AxisFault {
@@ -162,6 +164,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      *
      * @param streamMappingDTO  Maps a user-defined stream to a stream defined in the template.
      * @param configName ScenarioConfiguration name
+     * @param domainName domain name of the ExecutionManagerTemplate.
      * @return true on successful operation completion.
      * @throws AxisFault
      */
