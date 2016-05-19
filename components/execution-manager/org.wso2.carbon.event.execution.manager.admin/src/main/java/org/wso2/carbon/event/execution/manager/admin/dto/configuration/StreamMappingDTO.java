@@ -7,7 +7,7 @@ public class StreamMappingDTO {
 
     private String fromStream;
     private String toStream;
-    private String[][] attributePairs;
+    private AttributeMappingDTO[] attributeMappingDTOs;
 
     public String getFromStream() {
         return fromStream;
@@ -25,11 +25,11 @@ public class StreamMappingDTO {
         this.toStream = toStream;
     }
 
-    public String[][] getAttributePairs() {
-        return attributePairs;
+    public AttributeMappingDTO[] getAttributeMappingDTOs() {
+        return attributeMappingDTOs;
     }
 
-    public void setAttributePairs(String[][] attributePairs) {
-        this.attributePairs = attributePairs;
+    public void setAttributeMappingDTOs(AttributeMappingDTO[] attributeMappingDTOs) {
+        this.attributeMappingDTOs = attributeMappingDTOs;
     }
 }

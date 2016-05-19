@@ -16,8 +16,8 @@
 package org.wso2.carbon.event.execution.manager.core;
 
 import org.wso2.carbon.event.execution.manager.core.exception.ExecutionManagerException;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.ScenarioConfiguration;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping;
-import org.wso2.carbon.event.execution.manager.core.structure.configuration.TemplateConfiguration;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
 
 import java.util.Collection;
@@ -33,19 +33,17 @@ public interface ExecutionManagerService {
      *
      * @param configuration configuration object which needs to be saved
      */
-    public List<String> saveConfiguration(TemplateConfiguration configuration) throws ExecutionManagerException;
+    public List<String> saveConfiguration(ScenarioConfiguration configuration) throws ExecutionManagerException;
 
 
     /**
      * save streamMapping object into the registry and deploy the corresponding execution plan.
      *
      * @param streamMapping StreamMapping object
-     * @param templateConfigName name field in org.wso2.carbon.event.execution.manager.core.
-     *                           structure.configuration.TemplateConfiguration object
-     * @param templateConfigFrom from field inorg.wso2.carbon.event.execution.manager.core.
-     *                           structure.configuration.TemplateConfiguration object
+     * @param scenarioConfigName name field ScenarioConfiguration object
+     * @param domainName domain name of the ExecutionManagerTemplate corresponding to this scenarioConfig
      */
-    public void saveConfigurationWithStreamMapping(StreamMapping streamMapping, String templateConfigName, String templateConfigFrom)
+    public void saveConfigurationWithStreamMapping(StreamMapping streamMapping, String scenarioConfigName, String domainName)
             throws ExecutionManagerException;
 
 
@@ -62,7 +60,7 @@ public interface ExecutionManagerService {
      * @param domainName domain template name
      * @return Domain list
      */
-    public Collection<TemplateConfiguration> getConfigurations(String domainName);
+    public Collection<ScenarioConfiguration> getConfigurations(String domainName);
 
     /**
      * get information of a specific domain
@@ -80,7 +78,7 @@ public interface ExecutionManagerService {
      * @param configName configuration name
      * @return TemplateConfig object
      */
-    public TemplateConfiguration getConfiguration(String domainName, String configName);
+    public ScenarioConfiguration getConfiguration(String domainName, String configName);
 
     /**
      * delete template configuration when the name of configuration is given

@@ -26,8 +26,8 @@ import org.wso2.carbon.event.execution.manager.core.exception.ExecutionManagerEx
 import org.wso2.carbon.event.execution.manager.core.internal.ds.ExecutionManagerValueHolder;
 import org.wso2.carbon.event.execution.manager.core.internal.util.ExecutionManagerConstants;
 import org.wso2.carbon.event.execution.manager.core.internal.util.ExecutionManagerHelper;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.ScenarioConfiguration;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping;
-import org.wso2.carbon.event.execution.manager.core.structure.configuration.TemplateConfiguration;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
@@ -60,7 +60,7 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
 
 
     @Override
-    public List<String> saveConfiguration(TemplateConfiguration configuration)
+    public List<String> saveConfiguration(ScenarioConfiguration configuration)
             throws ExecutionManagerException {
         ExecutionManagerTemplate executionManagerTemplate = domains.get(configuration.getDomain());
         ExecutionManagerHelper.deployArtifacts(configuration, executionManagerTemplate);
@@ -75,11 +75,11 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
 
     @Override
     public void saveConfigurationWithStreamMapping(StreamMapping streamMapping
-            , String templateConfigName, String templateConfigFrom)
+            , String scenarioConfigName, String domainName)
             throws ExecutionManagerException {
         try {
             //deploy execution plan
-            String executionPlan = ExecutionManagerHelper.generateExecutionPlan(streamMapping, templateConfigName, templateConfigFrom);
+            String executionPlan = ExecutionManagerHelper.generateExecutionPlan(streamMapping, scenarioConfigName, domainName);
             DeployableTemplate deployableTemplate = new DeployableTemplate();
             deployableTemplate.setArtifact(executionPlan);
 
@@ -88,10 +88,10 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
 
 
             //save to registry
-            TemplateConfiguration templateConfiguration = ExecutionManagerHelper.getConfigurationFromRegistry(templateConfigName, templateConfigFrom);
+            ScenarioConfiguration scenarioConfiguration = ExecutionManagerHelper.getConfigurationFromRegistry(scenarioConfigName, domainName);
         } catch (TemplateDeploymentException e) {
             throw new ExecutionManagerException("Failed to deploy execution plan, hence event flow will " +
-                    "not be complete for Template Configuration: " + templateConfigName + " in domain: " + templateConfigFrom, e);
+                    "not be complete for Template Configuration: " + scenarioConfigName + " in domain: " + domainName, e);
         }
     }
 
@@ -103,8 +103,8 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
     }
 
     @Override
-    public Collection<TemplateConfiguration> getConfigurations(String domainName) {
-        Collection<TemplateConfiguration> templateConfigurations = new ArrayList<TemplateConfiguration>();
+    public Collection<ScenarioConfiguration> getConfigurations(String domainName) {
+        Collection<ScenarioConfiguration> scenarioConfigurations = new ArrayList<ScenarioConfiguration>();
 
         String domainFilePath = ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
                 + "/" + domainName;
@@ -117,14 +117,14 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
                 //All the resources of collection will be loaded
                 if (resource instanceof org.wso2.carbon.registry.core.Collection) {
                     loadConfigurations(((org.wso2.carbon.registry.core.Collection) resource).getChildren(),
-                            templateConfigurations);
+                                       scenarioConfigurations);
                 }
             }
         } catch (RegistryException e) {
             log.error("Registry exception occurred when accessing files at "
                     + ExecutionManagerConstants.TEMPLATE_CONFIG_PATH, e);
         }
-        return templateConfigurations;
+        return scenarioConfigurations;
 
     }
 
@@ -132,11 +132,11 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
      * Load all the configurations of given list of file paths
      *
      * @param filePaths              where configuration files are located
-     * @param templateConfigurations TemplateConfiguration collection which needs to be loaded
+     * @param scenarioConfigurations ScenarioConfiguration collection which needs to be loaded
      */
-    private void loadConfigurations(String[] filePaths, Collection<TemplateConfiguration> templateConfigurations) {
+    private void loadConfigurations(String[] filePaths, Collection<ScenarioConfiguration> scenarioConfigurations) {
         for (String filePath : filePaths) {
-            templateConfigurations.add(ExecutionManagerHelper.getConfiguration(filePath));
+            scenarioConfigurations.add(ExecutionManagerHelper.getConfiguration(filePath));
         }
     }
 
@@ -146,7 +146,7 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
     }
 
     @Override
-    public TemplateConfiguration getConfiguration(String domainName, String configName) {
+    public ScenarioConfiguration getConfiguration(String domainName, String configName) {
         return ExecutionManagerHelper.getConfiguration(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
                 + "/" + domainName
                 + "/" + configName
@@ -160,10 +160,10 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
             Then try to un deploy execution plan and log errors occur.
             So even one operation failed other operation will be executed
          */
-        TemplateConfiguration templateConfig = null;
+        ScenarioConfiguration scenarioConfig = null;
         try {
             // need to distinguish the type to delegate to the pluggable deployer.
-            templateConfig = ExecutionManagerHelper.getConfiguration(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
+            scenarioConfig = ExecutionManagerHelper.getConfiguration(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
                     + RegistryConstants.PATH_SEPARATOR + domainName
                     + RegistryConstants.PATH_SEPARATOR + configName
                     + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
@@ -180,9 +180,9 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
 
         try {
 
-            ExecutionManagerTemplate executionManagerTemplate = getDomain(templateConfig.getDomain());
+            ExecutionManagerTemplate executionManagerTemplate = getDomain(scenarioConfig.getDomain());
             for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()) {
-                if (templateConfig.getScenario().equals(scenario.getName())) {
+                if (scenarioConfig.getScenario().equals(scenario.getName())) {
                     for (Template template : scenario.getTemplates().getTemplate()) {
                         ExecutionManagerHelper.unDeployExistingArtifact(domainName
                                                                         + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + configName, template.getType());

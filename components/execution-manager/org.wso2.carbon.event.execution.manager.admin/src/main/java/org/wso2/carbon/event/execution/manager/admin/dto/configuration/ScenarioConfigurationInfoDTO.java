@@ -16,19 +16,17 @@
 package org.wso2.carbon.event.execution.manager.admin.dto.configuration;
 
 /**
- * DTO class of TemplateConfiguration for ExecutionManagerAdminService
+ * DTO class of Parameter for ExecutionManagerAdminService. This only consists required information to display
  */
-public class TemplateConfigurationDTO {
+public class ScenarioConfigurationInfoDTO {
 
     private String name;
 
-    private String scenario;  //scenario
+    private String domain;
 
-    private String domain;  //domain
+    private String scenario;
 
     private String description;
-
-    private ParameterDTO[] parameterDTOs;
 
     public String getName() {
         return name;
@@ -36,14 +34,6 @@ public class TemplateConfigurationDTO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getScenario() {
-        return scenario;
-    }
-
-    public void setScenario(String scenario) {
-        this.scenario = scenario;
     }
 
     public String getDomain() {
@@ -54,19 +44,19 @@ public class TemplateConfigurationDTO {
         this.domain = domain;
     }
 
+    public String getScenario() {
+        return scenario;
+    }
+
+    public void setScenario(String scenario) {
+        this.scenario = scenario;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public ParameterDTO[] getParameterDTOs() {
-        return parameterDTOs;
-    }
-
-    public void setParameterDTOs(ParameterDTO[] parameterDTOs) {
-        this.parameterDTOs = parameterDTOs;
     }
 }

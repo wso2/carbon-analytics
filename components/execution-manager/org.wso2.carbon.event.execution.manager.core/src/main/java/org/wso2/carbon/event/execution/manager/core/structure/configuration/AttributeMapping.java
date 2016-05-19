@@ -15,6 +15,9 @@ public class AttributeMapping {
     @XmlAttribute(name="to")
     private String to;
 
+    @XmlAttribute(name="type")
+    private String type;
+
     public String getFrom() {
         return from;
     }
@@ -29,5 +32,13 @@ public class AttributeMapping {
 
     public void setTo(String to) {
         this.to = to;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

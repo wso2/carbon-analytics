@@ -26,7 +26,7 @@ import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
 import org.wso2.carbon.event.execution.manager.core.exception.ExecutionManagerException;
 import org.wso2.carbon.event.execution.manager.core.internal.ds.ExecutionManagerValueHolder;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.AttributeMapping;
-import org.wso2.carbon.event.execution.manager.core.structure.configuration.TemplateConfiguration;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.ScenarioConfiguration;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Artifact;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.StreamMapping;
@@ -135,10 +135,10 @@ public class ExecutionManagerHelper {
      * @param path where configurations are stored
      * @return available configurations
      */
-    public static TemplateConfiguration getConfiguration(String path) {
+    public static ScenarioConfiguration getConfiguration(String path) {
 
 
-        TemplateConfiguration templateConfiguration = null;
+        ScenarioConfiguration scenarioConfiguration = null;
         try {
             Registry registry = ExecutionManagerValueHolder.getRegistryService().getConfigSystemRegistry(PrivilegedCarbonContext
                                                                                                                  .getThreadLocalCarbonContext().getTenantId());
@@ -146,7 +146,7 @@ public class ExecutionManagerHelper {
             if (registry.resourceExists(path)) {
                 Resource configFile = registry.get(path);
                 if (configFile != null) {
-                    templateConfiguration = unmarshalConfiguration(configFile.getContent());
+                    scenarioConfiguration = unmarshalConfiguration(configFile.getContent());
                 }
             }
         } catch (RegistryException e) {
@@ -154,7 +154,7 @@ public class ExecutionManagerHelper {
                     + ExecutionManagerConstants.TEMPLATE_CONFIG_PATH, e);
         }
 
-        return templateConfiguration;
+        return scenarioConfiguration;
     }
 
     /**
@@ -163,19 +163,19 @@ public class ExecutionManagerHelper {
      * @param configFileContent file for unmarshalling
      * @return templateConfiguration object
      */
-    private static TemplateConfiguration unmarshalConfiguration(Object configFileContent) {
-        TemplateConfiguration templateConfiguration = null;
+    private static ScenarioConfiguration unmarshalConfiguration(Object configFileContent) {
+        ScenarioConfiguration scenarioConfiguration = null;
         try {
 
             StringReader reader = new StringReader(new String((byte[]) configFileContent));
-            JAXBContext jaxbContext = JAXBContext.newInstance(TemplateConfiguration.class);
+            JAXBContext jaxbContext = JAXBContext.newInstance(ScenarioConfiguration.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            templateConfiguration = (TemplateConfiguration) jaxbUnmarshaller.unmarshal(reader);
+            scenarioConfiguration = (ScenarioConfiguration) jaxbUnmarshaller.unmarshal(reader);
         } catch (JAXBException e) {
             log.error("JAXB Exception occurred when unmarshalling configuration ", e);
         }
 
-        return templateConfiguration;
+        return scenarioConfiguration;
     }
 
 
@@ -191,7 +191,7 @@ public class ExecutionManagerHelper {
         if (executionManagerTemplate.getScenarios() == null ||
             executionManagerTemplate.getScenarios().getScenario() == null ||
             executionManagerTemplate.getScenarios().getScenario().isEmpty()) {
-            //It is required to have at least one TemplateConfiguration.
+            //It is required to have at least one ScenarioConfiguration.
             //Having only a set of common artifacts is not a valid use case.
             throw new ExecutionManagerException("There are no template configurations in the domain " + executionManagerTemplate.getDomain());
         }
@@ -204,7 +204,7 @@ public class ExecutionManagerHelper {
      * @param executionManagerTemplate template domain object, containing the templates.
      * @param configuration configuration object, containing the parameters.
      */
-    public static void deployArtifacts(TemplateConfiguration configuration,
+    public static void deployArtifacts(ScenarioConfiguration configuration,
                                        ExecutionManagerTemplate executionManagerTemplate)
             throws ExecutionManagerException {
         //make sure common artifacts are deployed
@@ -257,7 +257,7 @@ public class ExecutionManagerHelper {
      * @param script script which needs to be updated
      * @return updated execution plan
      */
-    private static String updateArtifactParameters(TemplateConfiguration config, String script) {
+    private static String updateArtifactParameters(ScenarioConfiguration config, String script) {
         String updatedScript = script;
         //Script parameters will be replaced with given configuration parameters
         if (config.getParameterMap() != null && script != null) {
@@ -290,7 +290,7 @@ public class ExecutionManagerHelper {
      * @param executionManagerTemplate ExecutionManagerTemplate object, containing the StreamMappings element
      * @return List of Stream IDs
      */
-    public static List<String> getStreamIDsInMappings(TemplateConfiguration configuration,
+    public static List<String> getStreamIDsInMappings(ScenarioConfiguration configuration,
                                                       ExecutionManagerTemplate executionManagerTemplate) {
         List<String> streamIdList = new ArrayList<>();
         for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()){
@@ -392,14 +392,14 @@ public class ExecutionManagerHelper {
     }
 
 
-    public static void saveToRegistry(TemplateConfiguration configuration)
+    public static void saveToRegistry(ScenarioConfiguration configuration)
             throws ExecutionManagerException {
         try {
             Registry registry = ExecutionManagerValueHolder.getRegistryService()
                     .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
 
             StringWriter fileContent = new StringWriter();
-            JAXBContext jaxbContext = JAXBContext.newInstance(TemplateConfiguration.class);
+            JAXBContext jaxbContext = JAXBContext.newInstance(ScenarioConfiguration.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
             jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, ExecutionManagerConstants.DEFAULT_CHARSET);
 
@@ -439,7 +439,7 @@ public class ExecutionManagerHelper {
      * @param templateConfigFrom Name of the Template Domain which contains the Template Configuration.
      * @return
      */
-    public static TemplateConfiguration getConfigurationFromRegistry(String templateConfigName,
+    public static ScenarioConfiguration getConfigurationFromRegistry(String templateConfigName,
                                                                      String templateConfigFrom)
             throws ExecutionManagerException {
         try {
@@ -452,7 +452,7 @@ public class ExecutionManagerHelper {
                                   + templateConfigName + ExecutionManagerConstants.CONFIG_FILE_EXTENSION;
             Resource resource = registry.get(resourcePath);
 
-            JAXBContext jaxbContext = JAXBContext.newInstance(TemplateConfiguration.class);
+            JAXBContext jaxbContext = JAXBContext.newInstance(ScenarioConfiguration.class);
         }
         catch (RegistryException e) {
             throw new ExecutionManagerException("Registry exception occurred when trying to access configuration registry for tenant domain: "

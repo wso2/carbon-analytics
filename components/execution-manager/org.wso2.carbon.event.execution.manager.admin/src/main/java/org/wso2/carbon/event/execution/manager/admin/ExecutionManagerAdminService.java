@@ -19,8 +19,8 @@ import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.core.AbstractAdmin;
-import org.wso2.carbon.event.execution.manager.admin.dto.configuration.TemplateConfigurationDTO;
-import org.wso2.carbon.event.execution.manager.admin.dto.configuration.TemplateConfigurationInfoDTO;
+import org.wso2.carbon.event.execution.manager.admin.dto.configuration.ScenarioConfigurationDTO;
+import org.wso2.carbon.event.execution.manager.admin.dto.configuration.ScenarioConfigurationInfoDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.domain.ExecutionManagerTemplateInfoDTO;
 import org.wso2.carbon.event.execution.manager.admin.internal.ds.ExecutionManagerAdminServiceValueHolder;
 import org.wso2.carbon.event.execution.manager.admin.internal.util.ConfigurationMapper;
@@ -46,11 +46,11 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
 
 
     /**
-     * return Execution Manager Template Info DTO for a given template domain name.
-     * This info DTO contains only the fields which are required by the UI.
+     * Return "limited information" with regards to an Execution Manager Template, given  its domain name.
+     * "limited information" means, only the information which are required by the UI will be returned.
      *
-     * @param domainName template domain name
-     * @return template domain full details
+     * @param domainName domain name of the ExecutionManagerTemplate.
+     * @return ExecutionManagerTemplateInfoDTO object
      * @throws AxisFault
      */
     public ExecutionManagerTemplateInfoDTO getExecutionManagerTemplateInfo(String domainName) throws AxisFault {
@@ -64,9 +64,10 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     }
 
     /**
-     * return all available template domain information
+     * Return "limited information" with regards to all available ExecutionManagerTemplates.
+     * "limited information" means, only the information which are required by the UI will be returned.
      *
-     * @return all template domain information
+     * @return ExecutionManagerTemplate information for all of the available ExecutionManagerTemplates
      * @throws org.apache.axis2.AxisFault
      */
     public ExecutionManagerTemplateInfoDTO[] getAllExecutionManagerTemplateInfos() throws AxisFault {
@@ -80,36 +81,15 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     }
 
 
-    //TODO: THIS WILL BE DELETED AS IT HAS NO UI USAGE.
-    //Only change done in mapping is removing executionParameters.
-    /**
-     * return details for a given template domain name
-     *
-     * @param domainName template domain name
-     * @return template domain configuration details
-     * @throws AxisFault
-     */
-    public TemplateConfigurationDTO[] getConfigurations(String domainName) throws AxisFault {
-        try {
-            return ConfigurationMapper.mapConfigurations(new ArrayList<>(
-                    ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
-                            .getConfigurations(domainName)));
-        } catch (Exception e) {
-            log.error("Error occurred when getting configurations for domain " + domainName, e);
-            throw new AxisFault(e.getMessage());
-        }
-    }
-
-
     /**
      * return details for a given template configuration name
      *
-     * @param domainName template domain name
-     * @param configName template configuration name
-     * @return template domain configuration details
+     * @param domainName domain name of the ExecutionManagerTemplate, corresponding to the configuration
+     * @param configName scenario configuration name
+     * @return scenario configuration details
      * @throws AxisFault
      */
-    public TemplateConfigurationDTO getConfiguration(String domainName, String configName) throws AxisFault {
+    public ScenarioConfigurationDTO getConfiguration(String domainName, String configName) throws AxisFault {
         try {
             return ConfigurationMapper.mapConfiguration(ExecutionManagerAdminServiceValueHolder
                     .getCarbonExecutionManagerService().getConfiguration(domainName, configName));
@@ -127,7 +107,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      * @return template domain configuration details
      * @throws AxisFault
      */
-    public TemplateConfigurationInfoDTO[] getConfigurationInfos(String domainName) throws AxisFault {
+    public ScenarioConfigurationInfoDTO[] getConfigurationInfos(String domainName) throws AxisFault {
         try {
             return ConfigurationMapper.mapConfigurationsInfo(new ArrayList<>(
                     ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
@@ -163,7 +143,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      * @return  Stream ID array
      * @throws AxisFault
      */
-    public String[] saveConfiguration(TemplateConfigurationDTO configuration) throws AxisFault {
+    public String[] saveConfiguration(ScenarioConfigurationDTO configuration) throws AxisFault {
         try {
             return ConfigurationMapper.mapStreamIds(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
                     .saveConfiguration(ConfigurationMapper.mapConfiguration(configuration)));     //todo: remove  mapStreamIds
@@ -181,7 +161,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      * from StreamY and insert into StreamX.
      *
      * @param streamMappingDTO  Maps a user-defined stream to a stream defined in the template.
-     * @param configName TemplateConfiguration name
+     * @param configName ScenarioConfiguration name
      * @return true on successful operation completion.
      * @throws AxisFault
      */

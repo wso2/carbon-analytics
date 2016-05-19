@@ -15,18 +15,18 @@
  */
 package org.wso2.carbon.event.execution.manager.core;
 
-import org.wso2.carbon.event.execution.manager.core.structure.configuration.TemplateConfiguration;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.ScenarioConfiguration;
 
 public class DeployableTemplate {
 
-    private TemplateConfiguration configuration;
+    private ScenarioConfiguration configuration;
     private String artifact;
 
-    public TemplateConfiguration getConfiguration() {
+    public ScenarioConfiguration getConfiguration() {
         return configuration;
     }
 
-    public void setConfiguration(TemplateConfiguration configuration) {
+    public void setConfiguration(ScenarioConfiguration configuration) {
         this.configuration = configuration;
     }
 

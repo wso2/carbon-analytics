@@ -16,13 +16,13 @@
 package org.wso2.carbon.event.execution.manager.admin.internal.util;
 
 import org.wso2.carbon.event.execution.manager.admin.dto.configuration.ParameterDTO;
+import org.wso2.carbon.event.execution.manager.admin.dto.configuration.ScenarioConfigurationDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.configuration.StreamMappingDTO;
-import org.wso2.carbon.event.execution.manager.admin.dto.configuration.TemplateConfigurationDTO;
-import org.wso2.carbon.event.execution.manager.admin.dto.configuration.TemplateConfigurationInfoDTO;
+import org.wso2.carbon.event.execution.manager.admin.dto.configuration.ScenarioConfigurationInfoDTO;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.AttributeMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.AttributeMappings;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.ScenarioConfiguration;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping;
-import org.wso2.carbon.event.execution.manager.core.structure.configuration.TemplateConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,102 +42,102 @@ public class ConfigurationMapper {
 
 
     /**
-     * Maps given list of TemplateConfiguration objects to array of TemplateConfigurationInfoDTO objects
+     * Maps given list of ScenarioConfiguration objects to array of ScenarioConfigurationInfoDTO objects
      *
-     * @param templateConfigurations List of TemplateConfiguration objects which needs to be mapped
-     * @return Mapped array of TemplateConfigurationInfoDTO
+     * @param scenarioConfigurations List of ScenarioConfiguration objects which needs to be mapped
+     * @return Mapped array of ScenarioConfigurationInfoDTO
      */
-    public static TemplateConfigurationInfoDTO[] mapConfigurationsInfo(
-            List<TemplateConfiguration> templateConfigurations) {
-        TemplateConfigurationInfoDTO[] templateConfigurationInfoDTO = null;
+    public static ScenarioConfigurationInfoDTO[] mapConfigurationsInfo(
+            List<ScenarioConfiguration> scenarioConfigurations) {
+        ScenarioConfigurationInfoDTO[] scenarioConfigurationInfoDTO = null;
 
-        if (templateConfigurations != null) {
-            templateConfigurationInfoDTO = new TemplateConfigurationInfoDTO[templateConfigurations.size()];
+        if (scenarioConfigurations != null) {
+            scenarioConfigurationInfoDTO = new ScenarioConfigurationInfoDTO[scenarioConfigurations.size()];
 
-            for (int i = 0; i < templateConfigurationInfoDTO.length; i++) {
-                templateConfigurationInfoDTO[i] = mapConfigurationInfo(templateConfigurations.get(i));
+            for (int i = 0; i < scenarioConfigurationInfoDTO.length; i++) {
+                scenarioConfigurationInfoDTO[i] = mapConfigurationInfo(scenarioConfigurations.get(i));
             }
         }
-        return templateConfigurationInfoDTO;
+        return scenarioConfigurationInfoDTO;
     }
 
     /**
-     * Maps given TemplateConfiguration object to TemplateConfigurationInfoDTO object
+     * Maps given ScenarioConfiguration object to ScenarioConfigurationInfoDTO object
      *
-     * @param templateConfig TemplateConfiguration object needs to be mapped
-     * @return Mapped TemplateConfigurationInfoDTO object
+     * @param scenarioConfig ScenarioConfiguration object needs to be mapped
+     * @return Mapped ScenarioConfigurationInfoDTO object
      */
-    public static TemplateConfigurationInfoDTO mapConfigurationInfo(TemplateConfiguration templateConfig) {
-        TemplateConfigurationInfoDTO templateConfigurationInfoDTO = null;
+    public static ScenarioConfigurationInfoDTO mapConfigurationInfo(ScenarioConfiguration scenarioConfig) {
+        ScenarioConfigurationInfoDTO scenarioConfigurationInfoDTO = null;
 
-        if (templateConfig != null) {
-            templateConfigurationInfoDTO = new TemplateConfigurationInfoDTO();
-            templateConfigurationInfoDTO.setName(templateConfig.getName());
-            templateConfigurationInfoDTO.setScenario(templateConfig.getScenario());
-            templateConfigurationInfoDTO.setDescription(templateConfig.getDescription());
-            templateConfigurationInfoDTO.setDomain(templateConfig.getDomain());
+        if (scenarioConfig != null) {
+            scenarioConfigurationInfoDTO = new ScenarioConfigurationInfoDTO();
+            scenarioConfigurationInfoDTO.setName(scenarioConfig.getName());
+            scenarioConfigurationInfoDTO.setScenario(scenarioConfig.getScenario());
+            scenarioConfigurationInfoDTO.setDescription(scenarioConfig.getDescription());
+            scenarioConfigurationInfoDTO.setDomain(scenarioConfig.getDomain());
         }
-        return templateConfigurationInfoDTO;
+        return scenarioConfigurationInfoDTO;
     }
 
     /**
-     * Maps given list of TemplateConfiguration objects to array of TemplateConfigurationDTO objects
+     * Maps given list of ScenarioConfiguration objects to array of ScenarioConfigurationDTO objects
      *
-     * @param templateConfigurations List of TemplateConfiguration objects which needs to be mapped
-     * @return Mapped TemplateConfigurationDTO object
+     * @param scenarioConfigurations List of ScenarioConfiguration objects which needs to be mapped
+     * @return Mapped ScenarioConfigurationDTO object
      */
-    public static TemplateConfigurationDTO[] mapConfigurations(
-            List<TemplateConfiguration> templateConfigurations) {
-        TemplateConfigurationDTO[] templateConfigurationDTOs = null;
+    public static ScenarioConfigurationDTO[] mapConfigurations(
+            List<ScenarioConfiguration> scenarioConfigurations) {
+        ScenarioConfigurationDTO[] scenarioConfigurationDTOs = null;
 
-        if (templateConfigurations != null) {
-            templateConfigurationDTOs = new TemplateConfigurationDTO[templateConfigurations.size()];
+        if (scenarioConfigurations != null) {
+            scenarioConfigurationDTOs = new ScenarioConfigurationDTO[scenarioConfigurations.size()];
 
-            for (int i = 0; i < templateConfigurationDTOs.length; i++) {
-                templateConfigurationDTOs[i] = mapConfiguration(templateConfigurations.get(i));
+            for (int i = 0; i < scenarioConfigurationDTOs.length; i++) {
+                scenarioConfigurationDTOs[i] = mapConfiguration(scenarioConfigurations.get(i));
             }
         }
-        return templateConfigurationDTOs;
+        return scenarioConfigurationDTOs;
     }
 
     /**
-     * Maps given TemplateConfiguration object to TemplateConfigurationDTO object
+     * Maps given ScenarioConfiguration object to ScenarioConfigurationDTO object
      *
-     * @param templateConfig TemplateConfiguration object needs to be mapped
-     * @return Mapped TemplateConfigurationDTO object
+     * @param scenarioConfig ScenarioConfiguration object needs to be mapped
+     * @return Mapped ScenarioConfigurationDTO object
      */
-    public static TemplateConfigurationDTO mapConfiguration(TemplateConfiguration templateConfig) {
-        TemplateConfigurationDTO templateConfigurationDTO = null;
+    public static ScenarioConfigurationDTO mapConfiguration(ScenarioConfiguration scenarioConfig) {
+        ScenarioConfigurationDTO scenarioConfigurationDTO = null;
 
-        if (templateConfig != null) {
-            templateConfigurationDTO = new TemplateConfigurationDTO();
-            templateConfigurationDTO.setName(templateConfig.getName());
-            templateConfigurationDTO.setScenario(templateConfig.getScenario());
-            templateConfigurationDTO.setDescription(templateConfig.getDescription());
-            templateConfigurationDTO.setDomain(templateConfig.getDomain());
-            templateConfigurationDTO.setParameterDTOs(mapParameters(templateConfig.getParameterMap()));
+        if (scenarioConfig != null) {
+            scenarioConfigurationDTO = new ScenarioConfigurationDTO();
+            scenarioConfigurationDTO.setName(scenarioConfig.getName());
+            scenarioConfigurationDTO.setScenario(scenarioConfig.getScenario());
+            scenarioConfigurationDTO.setDescription(scenarioConfig.getDescription());
+            scenarioConfigurationDTO.setDomain(scenarioConfig.getDomain());
+            scenarioConfigurationDTO.setParameterDTOs(mapParameters(scenarioConfig.getParameterMap()));
         }
-        return templateConfigurationDTO;
+        return scenarioConfigurationDTO;
     }
 
     /**
-     * Maps given TemplateConfigurationDTO object to TemplateConfiguration object
+     * Maps given ScenarioConfigurationDTO object to ScenarioConfiguration object
      *
-     * @param configDTO TemplateConfigurationDTO object which needs to be mapped
-     * @return Mapped TemplateConfiguration object
+     * @param configDTO ScenarioConfigurationDTO object which needs to be mapped
+     * @return Mapped ScenarioConfiguration object
      */
-    public static TemplateConfiguration mapConfiguration(TemplateConfigurationDTO configDTO) {
-        TemplateConfiguration templateConfig = null;
+    public static ScenarioConfiguration mapConfiguration(ScenarioConfigurationDTO configDTO) {
+        ScenarioConfiguration scenarioConfig = null;
 
         if (configDTO != null) {
-            templateConfig = new TemplateConfiguration();
-            templateConfig.setName(configDTO.getName());
-            templateConfig.setScenario(configDTO.getScenario());
-            templateConfig.setDescription(configDTO.getDescription());
-            templateConfig.setDomain(configDTO.getDomain());
-            templateConfig.setParameterMap(mapParameters(configDTO.getParameterDTOs()));
+            scenarioConfig = new ScenarioConfiguration();
+            scenarioConfig.setName(configDTO.getName());
+            scenarioConfig.setScenario(configDTO.getScenario());
+            scenarioConfig.setDescription(configDTO.getDescription());
+            scenarioConfig.setDomain(configDTO.getDomain());
+            scenarioConfig.setParameterMap(mapParameters(configDTO.getParameterDTOs()));
         }
-        return templateConfig;
+        return scenarioConfig;
     }
 
     /**
@@ -189,10 +189,11 @@ public class ConfigurationMapper {
         streamMapping.setFrom(streamMappingDTO.getFromStream());
         streamMapping.setTo(streamMappingDTO.getToStream());
         List<AttributeMapping> attributeMappingList = new ArrayList<>();
-        for (int i = 0; i < streamMappingDTO.getAttributePairs().length; i++) {
+        for (int i = 0; i < streamMappingDTO.getAttributeMappingDTOs().length; i++) {
             AttributeMapping attributeMapping = new AttributeMapping();
-            attributeMapping.setFrom(streamMappingDTO.getAttributePairs()[i][0]);
-            attributeMapping.setTo(streamMappingDTO.getAttributePairs()[i][1]);
+            attributeMapping.setFrom(streamMappingDTO.getAttributeMappingDTOs()[i].getFromAttribute());
+            attributeMapping.setTo(streamMappingDTO.getAttributeMappingDTOs()[i].getToAttribute());
+            attributeMapping.setType(streamMappingDTO.getAttributeMappingDTOs()[i].getAttributeType());
             attributeMappingList.add(attributeMapping);
         }
         AttributeMappings attributeMappings = new AttributeMappings();
