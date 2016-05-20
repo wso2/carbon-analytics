@@ -32,6 +32,7 @@ import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionMa
 import org.wso2.carbon.event.execution.manager.core.structure.domain.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
+import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.core.Registry;
@@ -215,7 +216,11 @@ public class ExecutionManagerHelper {
                     deployableTemplate.setArtifact(artifact.getValue());
                     deployableTemplate.setConfiguration(configuration);
                     TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(artifact.getType());
-                    deployer.deployArtifact(deployableTemplate);
+                    if (deployer != null) {
+                        deployer.deployArtifact(deployableTemplate);
+                    } else {
+                        throw new ExecutionManagerException("A deployer doesn't exist for template type " + artifact.getType());
+                    }
                 } catch (TemplateDeploymentException e) {
                     log.error("Error when trying to deploy the artifact " + configuration.getName(), e);
                     throw new ExecutionManagerException(e);
@@ -293,7 +298,7 @@ public class ExecutionManagerHelper {
                                                       ExecutionManagerTemplate executionManagerTemplate) {
         List<String> streamIdList = new ArrayList<>();
         for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()){
-            if (configuration.getName().equals(scenario.getName())) {
+            if (configuration.getScenario().equals(scenario.getName())) {
                 if(scenario.getStreamMappings() != null && scenario.getStreamMappings().getStreamMapping() != null
                         && !scenario.getStreamMappings().getStreamMapping().isEmpty()) {
                         //empty check is required because, if no stream mappings present, we should return null
@@ -323,7 +328,8 @@ public class ExecutionManagerHelper {
      */
     public static String generateExecutionPlan(
             List<org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping> streamMappingList,
-            String templateConfigName, String templateConfigFrom) {
+            String templateConfigName, String templateConfigFrom)
+            throws EventStreamConfigurationException {
         //@Plan:name() statement
         String planNameStatement = EXECUTION_PLAN_NAME_ANNOTATION + "('" + templateConfigFrom
                                    + DELIMETER + templateConfigName + DELIMETER + "StreamMappingPlan') \n";
@@ -353,8 +359,10 @@ public class ExecutionManagerHelper {
         return planNameStatement + importStatementBuilder.toString() + exportStatementBuilder.toString() + queryBuilder.toString();
     }
 
-    private static String generateDefineStreamStatements(String importOrExport, String streamId, String streamName) {
+    private static String generateDefineStreamStatements(String importOrExport, String streamId, String streamName)
+            throws EventStreamConfigurationException {
         StreamDefinition streamDefinition = ExecutionManagerValueHolder.getEventStreamService().getStreamDefinition(streamId);
+        //todo: fix EventStreamService as it does not really have to throw EventStreamConfigurationException
 
         String statement = "@" + importOrExport + "('" + streamId + "')";
         StringBuilder streamDefBuilder = new StringBuilder(DEFINE_STREAM + streamName + " (");
