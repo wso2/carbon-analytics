@@ -29,6 +29,7 @@ import org.wso2.carbon.event.execution.manager.core.exception.ExecutionManagerEx
 import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Consist of the methods exposed by ExecutionManagerAdminService
@@ -147,8 +148,13 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      */
     public String[] saveConfiguration(ScenarioConfigurationDTO configuration) throws AxisFault {
         try {
-            return (String[]) ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
-                    .saveConfiguration(ConfigurationMapper.mapConfiguration(configuration)).toArray();
+            List<String> streamIdList = ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
+                    .saveConfiguration(ConfigurationMapper.mapConfiguration(configuration));
+            if (streamIdList != null) {
+               return streamIdList.toArray(new String[0]);
+            } else {
+                return null;
+            }
         } catch (ExecutionManagerException e) {
             log.error("Error occurred when saving configuration " + configuration.getName(), e);
             throw new AxisFault(e.getMessage(), e);

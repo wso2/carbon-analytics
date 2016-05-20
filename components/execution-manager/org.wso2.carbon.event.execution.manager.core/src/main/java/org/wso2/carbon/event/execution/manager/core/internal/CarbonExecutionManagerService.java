@@ -32,6 +32,7 @@ import org.wso2.carbon.event.execution.manager.core.structure.configuration.Stre
 import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
+import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
@@ -98,8 +99,12 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
             ExecutionManagerHelper.saveToRegistry(scenarioConfiguration);
 
         } catch (TemplateDeploymentException e) {
-            throw new ExecutionManagerException("Failed to deploy execution plan, hence event flow will " +
+            throw new ExecutionManagerException("Failed to deploy stream-mapping-execution plan, hence event flow will " +
                     "not be complete for Template Configuration: " + scenarioConfigName + " in domain: " + domainName, e);
+        } catch (EventStreamConfigurationException e) {
+            throw new ExecutionManagerException("Failed to deploy stream-mapping-execution plan, hence event flow will " +
+                                                "not be complete for Template Configuration: " + scenarioConfigName + " in domain: " + domainName, e);
+            //todo: remove this catch block after fixing EventStreamService, as generateExecutionPlan() will not really throw this exception.
         }
     }
 
