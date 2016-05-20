@@ -1065,8 +1065,12 @@ public class AnalyticsDataIndexer {
             }
             DrillDownQuery drillDownQuery = new DrillDownQuery(config, languageQuery);
             if (range != null && rangeField != null) {
-                drillDownQuery.add(rangeField, NumericRangeQuery.newDoubleRange(rangeField,
-                                                                                range.getFrom(), range.getTo(), true, false));
+                ColumnDefinition columnDefinition = indices.get(rangeField);
+                NumericRangeQuery numericRangeQuery = getNumericRangeQuery(rangeField, range, columnDefinition);
+                if (numericRangeQuery == null) {
+                    throw new AnalyticsIndexException("RangeField is not a numeric field");
+                }
+                drillDownQuery.add(rangeField, numericRangeQuery);
             }
             if (drillDownRequest.getCategoryPaths() != null && !drillDownRequest.getCategoryPaths().isEmpty()) {
                 for (Map.Entry<String, List<String>> entry : drillDownRequest.getCategoryPaths()
@@ -1086,6 +1090,27 @@ public class AnalyticsDataIndexer {
             throw new AnalyticsIndexException("Error while parsing lucene query '" +
                                               languageQuery + "': " + e.getMessage(), e.getCause() );
         }
+    }
+
+    private NumericRangeQuery getNumericRangeQuery(String rangeField, AnalyticsDrillDownRange range,
+                                                   ColumnDefinition columnDefinition) {
+        NumericRangeQuery numericRangeQuery = null;
+        if (columnDefinition != null) {
+            if (columnDefinition.getType() == AnalyticsSchema.ColumnType.DOUBLE) {
+                numericRangeQuery = NumericRangeQuery.newDoubleRange(rangeField,
+                                                                     range.getFrom(), range.getTo(), true, false);
+            } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.FLOAT) {
+                numericRangeQuery = NumericRangeQuery.newFloatRange(rangeField,
+                        new Double(range.getFrom()).floatValue(), new Double(range.getTo()).floatValue(), true, false);
+            } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.INTEGER) {
+                numericRangeQuery = NumericRangeQuery.newIntRange(rangeField,
+                        new Double(range.getFrom()).intValue(), new Double(range.getTo()).intValue(), true, false);
+            } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.LONG) {
+                numericRangeQuery = NumericRangeQuery.newLongRange(rangeField,
+                        new Double(range.getFrom()).longValue(), new Double(range.getTo()).longValue(), true, false);
+            }
+        }
+        return numericRangeQuery;
     }
 
     private FacetsConfig getFacetsConfigurations(Map<String, ColumnDefinition> indices) {
