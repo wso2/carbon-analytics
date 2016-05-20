@@ -28,14 +28,13 @@
     String parametersJson = request.getParameter("parameters");
     String valueSeparator = "::";
     String templateType = request.getParameter("templateType");*/
-    String toStreamID = request.getParameter("toStreamID");
-    String fromStreamID = request.getParameter("fromStreamID");
+    String streamMappingObjectArray = request.getParameter("streamMappingObjectArray");
+//    String fromStreamID = request.getParameter("fromStreamID");
 
 //    ParameterDTOE[] parameters;
 
     ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
-    System.out.println("toStream: " + toStreamID);
-    System.out.println("fromStream: " + fromStreamID);
+    System.out.println("streamMappingObjectArray: " + streamMappingObjectArray);
 
     return;
 /*

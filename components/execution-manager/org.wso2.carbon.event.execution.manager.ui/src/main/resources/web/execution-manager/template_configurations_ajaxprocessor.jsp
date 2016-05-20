@@ -148,7 +148,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="container col-md-12 marg-top-20">
+        <div class="container col-md-12 marg-top-20" id="parameterMappingDivID">
             <%
 
                 if (domain.getTemplateDTOs() != null && !templateType.equals("")) {
@@ -352,6 +352,8 @@ if (isExistingConfig && (configurationDTO.getExecutionParameters() != null)) {
         parameterString = "''";
     }
 }
+    //todo: read file set ismapping
+    boolean isStreamMapping = true;
 %>
 
             <div class="action-container">
@@ -359,41 +361,44 @@ if (isExistingConfig && (configurationDTO.getExecutionParameters() != null)) {
                         onclick="saveConfiguration('<%=domainName%>',
                                 document.getElementById('cBoxTemplates').options[document.getElementById('cBoxTemplates').selectedIndex].text,
                                 document.getElementById('txtName').value, document.getElementById('txtDescription').value,'domain_configurations_ajaxprocessor.jsp?domainName=<%=domainName%>',
-                                <%=parameterString%>, <%=executionParamString%>)">
+                                <%=parameterString%>, <%=executionParamString%>,<%=isStreamMapping%>)">
                     <fmt:message key='<%=saveButtonText%>'/>
                 </button>
                 <br class="c-both"/>
             </div>
+        </div>
+        <%
+            String saveStreamButtonText = "template.add.stream.button.text";
+            //TODO: add logic to read config file and check toStream property attribute
+            String toStreamNameID = "";
+            String[] toStreamIDArray = {"org.wso2.event.test.stream:1.0.0", "org.wso2.event.grouped.sensor.stream:1.0.0"};
+            EventStreamAdminServiceStub eventStreamAdminServiceStub = ExecutionManagerUIUtils.getEventStreamAdminService(config,
+                    session, request);
+            String[] streamIds = eventStreamAdminServiceStub.getStreamNames();
+        %>
 
+        <!-- stream mapping/body -->
+        <div class="container col-md-12 marg-top-20" id="streamMappingDivID">
             <%
-                String saveStreamButtonText = "template.add.stream.button.text";
-                //TODO: add logic to read config file and check toStream property attribute
-                String toStreamNameID="";
-                String[] toStreamIDArray = {"org.wso2.event.test.stream:1.0.0"};
-                EventStreamAdminServiceStub eventStreamAdminServiceStub = ExecutionManagerUIUtils.getEventStreamAdminService(config,
-                        session, request);
-                String[] streamIds = eventStreamAdminServiceStub.getStreamNames();
-                for (String streamID:toStreamIDArray ){
-                    toStreamNameID = streamID;
+                for (int i = 0; i < toStreamIDArray.length; i++) {
+                    toStreamNameID = toStreamIDArray[i];
             %>
-
-                <%--TODO: add logic to map multiple streams--%>
-                <%--Adding Stream Mapping configurations--%>
-            <div class="container col-md-12 marg-top-20">
+            <div class="container col-md-12 marg-top-20" id="streamMappingConfigurationID_<%=i%>">
 
                 <h4><fmt:message key='template.stream.header.text'/></h4>
 
                 <label class="input-label col-md-5"><fmt:message key='template.label.to.stream.name'/></label>
 
                 <div class="input-control input-full-width col-md-7 text">
-                    <input type="text" id="toStreamID"
+                    <input type="text" id="toStreamID_<%=i%>"
                            value="<%=toStreamNameID%>" readonly="true"/>
                 </div>
 
                 <label class="input-label col-md-5"><fmt:message key='template.label.from.stream.name'/></label>
 
+                <%--todo: add new js function to load mapping table for updated values--%>
                 <div class="input-control input-full-width col-md-7 text">
-                    <select id="fromStreamID" onchange="loadMappingFromStreamAttributes()">
+                    <select id="fromStreamID_<%=i%>" onchange="loadMappingFromStreamAttributes(<%=i%>)">
                         <option selected disabled>Choose from here</option>
                         <%
                             if (streamIds != null) {
@@ -406,35 +411,26 @@ if (isExistingConfig && (configurationDTO.getExecutionParameters() != null)) {
                                 }
                             }
                         %>
-
                     </select>
                 </div>
 
-                <div id="MapAttributesTable" class="input-label col-md-5">
-                    <div id="outerDiv">
-                    </div>
-                </div>
-
-                <%
-                    }
-                    String toStreamID = "document.getElementById('"
-                            + "toStreamID" + "').value";
-                    String fromStreamIDIndex= "document.getElementById('"+ "fromStreamID" + "')";
-                    String fromStreamID = fromStreamIDIndex + ".options[" + fromStreamIDIndex + ".selectedIndex].text";
-                %>
-
-                <div class="action-container">
-                    <button type="button"
-                            class="btn btn-default btn-add col-md-2 col-xs-12 pull-right marg-right-15"
-                            onclick="saveStreamConfiguration(<%=toStreamID%>,<%=fromStreamID%>,'domain_configurations_ajaxprocessor.jsp?domainName=<%=domainName%>')">
-                        <fmt:message key='<%=saveStreamButtonText%>'/>
-                    </button>
+                <div id="outerDiv_<%=i%>" class="input-label col-md-5">
                 </div>
 
             </div>
-            <!-- /stream mapping/body -->
+            <%
+                }
+            %>
 
+            <div class="action-container">
+                    <button type="button"
+                            class="btn btn-default btn-add col-md-2 col-xs-12 pull-right marg-right-15"
+                            onclick="saveStreamConfiguration(<%=toStreamIDArray.length%>,'domain_configurations_ajaxprocessor.jsp?domainName=<%=domainName%>')">
+                        <fmt:message key='<%=saveStreamButtonText%>'/>
+                    </button>
+                </div>
         </div>
+        <!-- /stream mapping/body -->
     </div>
     <div class="row pad-bot-50">
         <div class="container col-md-8">
@@ -464,6 +460,8 @@ if (isExistingConfig && (configurationDTO.getExecutionParameters() != null)) {
 <script type="text/javascript">
 
     $(document).ready(function () {
+
+        $('#streamMappingDivID').hide();
 
         $('[data-toggle="tooltip"]').tooltip();
 
