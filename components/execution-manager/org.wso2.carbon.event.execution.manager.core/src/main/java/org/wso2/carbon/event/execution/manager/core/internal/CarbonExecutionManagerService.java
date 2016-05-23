@@ -70,13 +70,13 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
 
         //If StreamMappings element is present in the ExecutionManagerTemplate, then need to return those Stream IDs,
         //so the caller (the UI) can prompt the user to map these streams to his own streams.
-        return ExecutionManagerHelper.getStreamIDsInMappings(configuration, getDomain(configuration.getDomain()));
+        return ExecutionManagerHelper.getStreamIDsToBeMapped(configuration, getDomain(configuration.getDomain()));
     }
 
 
     @Override
-    public void saveConfigurationWithStreamMapping(List<StreamMapping> streamMappingList
-            , String scenarioConfigName, String domainName)
+    public void saveStreamMapping(List<StreamMapping> streamMappingList,
+                                  String scenarioConfigName, String domainName)
             throws ExecutionManagerException {
         try {
             //deploy execution plan
@@ -87,6 +87,7 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
             deployableTemplate.setArtifact(executionPlan);
 
             TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(ExecutionManagerConstants.DEPLOYER_TYPE_REALTIME);
+              //todo: handle null deployer
             deployer.deployArtifact(deployableTemplate, planName);
 
             //save to registry

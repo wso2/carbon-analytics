@@ -43,7 +43,8 @@ public interface ExecutionManagerService {
      * @param scenarioConfigName name field ScenarioConfiguration object
      * @param domainName domain name of the ExecutionManagerTemplate corresponding to this scenarioConfig
      */
-    public void saveConfigurationWithStreamMapping(List<StreamMapping> streamMappingList, String scenarioConfigName, String domainName)
+    public void saveStreamMapping(List<StreamMapping> streamMappingList, String scenarioConfigName,
+                                  String domainName)
             throws ExecutionManagerException;
 
 

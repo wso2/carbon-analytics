@@ -58,7 +58,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
         try {
             return DomainMapper.mapExecutionManagerTemplate(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
                                                                     .getDomain(domainName));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("Error occurred when getting domain " + domainName, e);
             throw new AxisFault(e.getMessage());
         }
@@ -75,7 +75,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
         try {
             return DomainMapper.mapExecutionManagerTemplates(new ArrayList
                     <ExecutionManagerTemplate>(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService().getAllDomains()));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("Error occurred when getting all domains ", e);
             throw new AxisFault(e.getMessage(), e);
         }
@@ -94,7 +94,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
         try {
             return ConfigurationMapper.mapConfiguration(ExecutionManagerAdminServiceValueHolder
                     .getCarbonExecutionManagerService().getConfiguration(domainName, configName));
-        } catch (Exception e) {
+        } catch (ExecutionManagerException e) {
             log.error("Error occurred when getting template configuration " + configName, e);
             throw new AxisFault(e.getMessage());
         }
@@ -114,7 +114,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
             return ConfigurationMapper.mapConfigurationsInfo(new ArrayList<>(
                     ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
                             .getConfigurations(domainName)));
-        } catch (Exception e) {
+        } catch (ExecutionManagerException e) {
             log.error("Error occurred when getting configurations for domain " + domainName, e);
             throw new AxisFault(e.getMessage());
         }
@@ -179,7 +179,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
                     streamMappingDTOs, String configName, String domainName) throws AxisFault {
         try {
             ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
-                    .saveConfigurationWithStreamMapping(ConfigurationMapper.mapStreamMapping(streamMappingDTOs)
+                    .saveStreamMapping(ConfigurationMapper.mapStreamMapping(streamMappingDTOs)
                             , configName, domainName);
             return true;
         } catch (ExecutionManagerException e) {

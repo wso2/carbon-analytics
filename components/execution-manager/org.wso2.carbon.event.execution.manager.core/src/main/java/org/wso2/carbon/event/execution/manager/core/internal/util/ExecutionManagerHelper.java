@@ -233,8 +233,7 @@ public class ExecutionManagerHelper {
                         throw new ExecutionManagerException("A deployer doesn't exist for template type " + artifact.getType());
                     }
                 } catch (TemplateDeploymentException e) {
-                    log.error("Error when trying to deploy the artifact " + configuration.getName(), e);
-                    throw new ExecutionManagerException(e);
+                    throw new ExecutionManagerException("Error when trying to deploy the artifact " + configuration.getName(), e);
                 }
             }
         }
@@ -263,8 +262,7 @@ public class ExecutionManagerHelper {
                             deployer.deployArtifact(deployableTemplate, artifactId);
                             artifactTypeCountingMap.put(artifactType, artifactCount);
                         } catch (TemplateDeploymentException e) {
-                            log.error("Error when trying to deploy the artifact " + configuration.getName(), e);
-                            throw new ExecutionManagerException(e);
+                            throw new ExecutionManagerException("Error when trying to deploy the artifact " + configuration.getName() ,e);
                         }
                     } else {
                         throw new ExecutionManagerException("A deployer doesn't exist for template type " + template.getType());
@@ -290,6 +288,7 @@ public class ExecutionManagerHelper {
             for (Map.Entry parameterMapEntry : config.getParameterMap().entrySet()) {
                 updatedScript = updatedScript.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
                                                          + parameterMapEntry.getKey().toString(), parameterMapEntry.getValue().toString());
+                //todo: improvement for regex
             }
         }
         return updatedScript;
@@ -316,7 +315,7 @@ public class ExecutionManagerHelper {
      * @param executionManagerTemplate ExecutionManagerTemplate object, containing the StreamMappings element
      * @return List of Stream IDs
      */
-    public static List<String> getStreamIDsInMappings(ScenarioConfiguration configuration,
+    public static List<String> getStreamIDsToBeMapped(ScenarioConfiguration configuration,
                                                       ExecutionManagerTemplate executionManagerTemplate) {
         List<String> streamIdList = new ArrayList<>();
         for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()){
@@ -368,12 +367,12 @@ public class ExecutionManagerHelper {
             importStatementBuilder.append(generateDefineStreamStatements(IMPORT, fromStreamId, fromStreamName) + "\n");
             exportStatementBuilder.append(generateDefineStreamStatements(EXPORT, toStreamId, toStreamName) + "\n");
 
-            queryBuilder.append(FROM + fromStreamName + " " + SELECT);
+            queryBuilder.append(FROM + fromStreamName + " \n" + SELECT);
             for (AttributeMapping attributeMapping: streamMapping.getAttributeMappings().getAttributeMapping()) {
                 queryBuilder.append(attributeMapping.getFrom() + AS + attributeMapping.getTo() + ", ");
             }
             queryBuilder.deleteCharAt(queryBuilder.length() - 2);
-            queryBuilder.append(INSERT_INTO + toStreamName + ";\n");
+            queryBuilder.append("\n").append(INSERT_INTO).append(toStreamName).append(";\n");   //todo: do SB.append() for all
         }
 
         return planNameStatement + importStatementBuilder.toString() + exportStatementBuilder.toString() + queryBuilder.toString();
