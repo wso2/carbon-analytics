@@ -32,7 +32,6 @@ import org.wso2.carbon.event.execution.manager.core.structure.configuration.Stre
 import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
-import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
@@ -81,13 +80,14 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
             throws ExecutionManagerException {
         try {
             //deploy execution plan
-            String executionPlan = ExecutionManagerHelper.generateExecutionPlan(streamMappingList, scenarioConfigName, domainName);
+            String planName = ExecutionManagerHelper.getStreamMappingPlanId(domainName, scenarioConfigName);
+            String executionPlan = ExecutionManagerHelper.generateExecutionPlan(streamMappingList, planName);
 
             DeployableTemplate deployableTemplate = new DeployableTemplate();
             deployableTemplate.setArtifact(executionPlan);
 
-            TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get("realtime");
-            deployer.deployArtifact(deployableTemplate);
+            TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(ExecutionManagerConstants.DEPLOYER_TYPE_REALTIME);
+            deployer.deployArtifact(deployableTemplate, planName);
 
             //save to registry
             ScenarioConfiguration scenarioConfiguration = ExecutionManagerHelper.getConfigurationFromRegistry(scenarioConfigName, domainName);
@@ -101,10 +101,6 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
         } catch (TemplateDeploymentException e) {
             throw new ExecutionManagerException("Failed to deploy stream-mapping-execution plan, hence event flow will " +
                     "not be complete for Template Configuration: " + scenarioConfigName + " in domain: " + domainName, e);
-        } catch (EventStreamConfigurationException e) {
-            throw new ExecutionManagerException("Failed to deploy stream-mapping-execution plan, hence event flow will " +
-                                                "not be complete for Template Configuration: " + scenarioConfigName + " in domain: " + domainName, e);
-            //todo: remove this catch block after fixing EventStreamService, as generateExecutionPlan() will not really throw this exception.
         }
     }
 
@@ -135,7 +131,7 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
                 }
             }
         } catch (RegistryException e) {
-            log.error("Registry exception occurred when accessing files at "
+            throw new ExecutionManagerException("Registry exception occurred when accessing files at "
                     + ExecutionManagerConstants.TEMPLATE_CONFIG_PATH, e);
         }
         return scenarioConfigurations;
@@ -191,25 +187,36 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
                     + domainName + RegistryConstants.PATH_SEPARATOR + configName + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
         } catch (RegistryException e) {
             log.error("Configuration exception when deleting registry configuration file "
-                    + configName + " of Domain " + domainName, e);           //todo: why not propagate to UI?
+                    + configName + " of Domain " + domainName, e);           //todo: propagate to UI
         }
 
         try {
-            ExecutionManagerTemplate executionManagerTemplate = getDomain(scenarioConfig.getDomain());
+            ExecutionManagerTemplate executionManagerTemplate = getDomain(domainName);
+
             for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()) {
                 if (scenarioConfig.getScenario().equals(scenario.getName())) {
+                    Map<String,Integer> artifactTypeCountingMap = new HashMap<>();
                     for (Template template : scenario.getTemplates().getTemplate()) {
-                        ExecutionManagerHelper.unDeployExistingArtifact(domainName
-                                                                        + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + configName, template.getType());
-                        //todo: scriptName is yet to be decided
+                        String artifactType = template.getType();
+                        Integer artifactCount = artifactTypeCountingMap.get(artifactType);
+                        if (artifactCount == null) {
+                            artifactCount = 1;  //Count starts with one, instead of zero for user-friendliness.
+                        } else {
+                            artifactCount++;
+                        }
+                        String artifactId = ExecutionManagerHelper.getArtifactId(domainName, scenario.getName(), configName, artifactType, artifactCount);
+                        ExecutionManagerHelper.unDeployExistingArtifact(artifactId, template.getType());
                     }
+
+                    //undeploy stream-mapping execution plan
+                    String streamMappingPlanName = ExecutionManagerHelper.getStreamMappingPlanId(domainName, scenarioConfig.getName());
+                    ExecutionManagerHelper.unDeployExistingArtifact(streamMappingPlanName, ExecutionManagerConstants.DEPLOYER_TYPE_REALTIME);
                     break;
                 }
             }
         } catch (TemplateDeploymentException e) {
             log.error("Configuration exception when un deploying script "
                     + configName + " of Domain " + domainName, e);
-
         }
     }
 
