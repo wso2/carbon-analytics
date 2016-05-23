@@ -31,27 +31,30 @@ function deleteConfiguration(domainName, configurationName, row, tableId) {
     });
 }
 
-function saveConfiguration(domainName, templateType, configurationName, description, redirectURL, parameters, executionParameters, isStreamMapping) {
+function saveConfiguration(domainName, templateType, configurationName, description, redirectURL, parameters, executionParameters) {
 
     if (hasWhiteSpace(configurationName) | configurationName == "") {
         showErrorDialog("Configuration name cannot be empty or consist of white spaces");
     } else {
+        var streamMappingDivID = document.getElementById("streamMappingDivID");
+        streamMappingDivID.innerHTML = "";
 
         $.ajax({
             type: "POST",
             url: "manage_configurations_ajaxprocessor.jsp",
             data: "domainName=" + domainName + "&configurationName=" + configurationName + "&templateType="
-                + templateType + "&description=" + description + "&saveType=save" + "&parameters=" + parameters + "&executionParameters=" + executionParameters
+            + templateType + "&description=" + description + "&saveType=save" + "&parameters=" + parameters + "&executionParameters=" + executionParameters
         })
             .error(function () {
                 showErrorDialog("Error occurred when saving configurations");
             })
-            .then(function () {
+            .then(function (ui_content) {
                 showInfoDialog("Configurations saved successfully",
                     function () {
-                        if (isStreamMapping == false) {
+                        if (ui_content == null) {
                             document.location.href = redirectURL;
                         } else {
+                            streamMappingDivID.innerHTML = ui_content;
                             $('#parameterMappingDivID').hide();
                             $('#streamMappingDivID').show();
                         }
@@ -61,7 +64,7 @@ function saveConfiguration(domainName, templateType, configurationName, descript
 }
 
 //Save Stream Mapping Configuration
-function saveStreamConfiguration(streamMappingArrayLength, redirectURL) {
+function saveStreamConfiguration(streamMappingArrayLength, redirectURL, domainName, configurationName) {
 
     var streamMappingObjectArray = getStreamMappingObjectArray(streamMappingArrayLength);
 
@@ -70,7 +73,7 @@ function saveStreamConfiguration(streamMappingArrayLength, redirectURL) {
         $.ajax({
             type: "POST",
             url: "manage_stream_configurations_ajaxprocessor.jsp",
-            data: "streamMappingObjectArray=" + streamMappingObjectArray
+            data: "streamMappingObjectArray=" + JSON.stringify(streamMappingObjectArray) + "&domainName=" + domainName + "&configurationName=" + configurationName
         })
             .error(function () {
                 showErrorDialog("Error occurred when saving configurations");

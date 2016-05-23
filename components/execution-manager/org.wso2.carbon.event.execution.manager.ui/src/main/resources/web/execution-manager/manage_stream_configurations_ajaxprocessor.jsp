@@ -1,8 +1,11 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.ui.ExecutionManagerUIUtils" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.TemplateConfigurationDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTOE" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.AttributeMappingDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.StreamMappingDTO" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
 <%--
   ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
@@ -20,67 +23,73 @@
   --%>
 
 <%
-
-    /*String domainName = request.getParameter("domainName");
-    String configuration = request.getParameter("configurationName");
-    String saveType = request.getParameter("saveType");
-    String description = request.getParameter("description");
-    String parametersJson = request.getParameter("parameters");
-    String valueSeparator = "::";
-    String templateType = request.getParameter("templateType");*/
-    String streamMappingObjectArray = request.getParameter("streamMappingObjectArray");
-//    String fromStreamID = request.getParameter("fromStreamID");
-
-//    ParameterDTOE[] parameters;
-
-    ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
-    System.out.println("streamMappingObjectArray: " + streamMappingObjectArray);
-
-    return;
-/*
-
     try {
-        if (saveType.equals("delete")) {
-            proxy.deleteConfiguration(domainName, configuration);
-        } else {
+        String domainName = request.getParameter("domainName");
+        String configuration = request.getParameter("configurationName");
+        String streamMappingObjectArray = request.getParameter("streamMappingObjectArray");
 
-            TemplateConfigurationDTO templateConfigurationDTO = new TemplateConfigurationDTO();
+        ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
+        //extract stream mapping strings from json string
+        String[] valuesInQuotes = StringUtils.substringsBetween(streamMappingObjectArray, "[", "]");
 
-            templateConfigurationDTO.setName(configuration);
-            templateConfigurationDTO.setFrom(domainName);
-            templateConfigurationDTO.setDescription(description);
-            templateConfigurationDTO.setType(templateType);
+        //extract each stream mapping string
+        String[] streamMappingStrings = StringUtils.substringsBetween(valuesInQuotes[0], "{", "}");
 
-            if (parametersJson.length() < 1) {
-                parameters = new ParameterDTOE[0];
+        List<StreamMappingDTO> streamMappingDTOsList = new ArrayList<StreamMappingDTO>();
+        List<AttributeMappingDTO> attributeMappingDTOsList = new ArrayList<AttributeMappingDTO>();
 
-            } else {
-                String[] parameterStrings = parametersJson.split(",");
-                parameters = new ParameterDTOE[parameterStrings.length];
-                int index = 0;
+        //iterate each stream map and get stream map elements
+        for (String streamMappingString : streamMappingStrings) {
+            StreamMappingDTO streamMappingDTO = new StreamMappingDTO();
 
-                for (String parameterString : parameterStrings) {
-                    ParameterDTOE parameterDTO = new ParameterDTOE();
-                    parameterDTO.setName(parameterString.split(valueSeparator)[0]);
-                    parameterDTO.setValue(parameterString.split(valueSeparator)[1]);
-                    parameters[index] = parameterDTO;
-                    index++;
+            String[] streamMapElements = streamMappingString.split(",");
+            //iterate through each stream map element array
+            for (int i = 0; i < streamMapElements.length; i++) {
+                String[] keyValueArray = streamMapElements[i].split(":");
+                if (i == 0) {
+                    //extract toStream id
+                    streamMappingDTO.setToStream(keyValueArray[1] + ":" + keyValueArray[2]);
+                    System.out.println("stream: " + keyValueArray[1] + ":" + keyValueArray[2]);
+                } else if (i == 1) {
+                    //extract fromStream id
+                    streamMappingDTO.setFromStream(keyValueArray[1] + ":" + keyValueArray[2]);
+                    System.out.println("stream: " + keyValueArray[1] + ":" + keyValueArray[2]);
+                } else {
+                    //extract property mapping
+                    if (!keyValueArray[1].equals("\"\"")) {
+                        String[] properties = StringUtils.substringsBetween(keyValueArray[1], "\"", "\"")[0].split("\\$=");
+
+                        if (properties != null) {
+                            for (String property : properties) {
+                                String[] propertyNameValueAndType = property.split("\\^=");
+                                if (propertyNameValueAndType != null) {
+                                    AttributeMappingDTO attributeMappingDTO = new AttributeMappingDTO();
+
+                                    attributeMappingDTO.setFromAttribute(propertyNameValueAndType[0]);
+                                    System.out.println("mappingAttribute: " + propertyNameValueAndType[0]);
+                                    attributeMappingDTO.setToAttribute(propertyNameValueAndType[1]);
+                                    System.out.println("mappedAttribute: " + propertyNameValueAndType[1]);
+                                    attributeMappingDTO.setAttributeType(propertyNameValueAndType[2]);
+                                    System.out.println("mappedAttributeType: " + propertyNameValueAndType[2]);
+
+                                    //add attributeMappingDTO to attribute mapping dto array
+                                    attributeMappingDTOsList.add(attributeMappingDTO);
+                                }
+                            }
+                        }
+                    }
+
+                    if (i == 4) {
+                        streamMappingDTO.setAttributeMappingDTOs(attributeMappingDTOsList.toArray());
+                    }
                 }
             }
+            // add streamMappingDTO to streamMappingDTOs[]
+            streamMappingDTOsList.add(streamMappingDTO);
 
-            templateConfigurationDTO.setParameterDTOs(parameters);
-
-            if (cronExpression != null && cronExpression.length() > 0) {
-                templateConfigurationDTO.setExecutionParameters(cronExpression);
-            }
-
-            proxy.saveConfiguration(templateConfigurationDTO);
+            proxy.saveStreamMapping(streamMappingDTOsList.toArray(),configuration,domainName);
         }
-
     } catch (AxisFault e) {
         response.sendError(500);
     }
-*/
-
-
 %>
