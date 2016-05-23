@@ -35,10 +35,12 @@ import org.wso2.carbon.analytics.dataservice.core.indexing.IndexNodeCoordinator.
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
+import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
 
 /**
  * This class represents the remote member index message sending functionality in a cluster.
@@ -77,7 +79,8 @@ public class RemoteMemberIndexCommunicator {
                 disruptor = this.disruptorMap.get(member);
                 if (disruptor == null) {
                     disruptor = new Disruptor<>(new RecordsEventFactory(), 
-                            REMOTE_INDEX_COMMUNICATOR_BUFFER_SIZE, this.executor);
+                            REMOTE_INDEX_COMMUNICATOR_BUFFER_SIZE, this.executor, ProducerType.MULTI, 
+                            new BlockingWaitStrategy());
                     disruptor.handleEventsWith(new RecordsEventHandler(member));
                     this.disruptorMap.put(member, disruptor);
                     disruptor.start();

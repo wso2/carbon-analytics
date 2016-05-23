@@ -47,6 +47,8 @@ public class AnalyticsDataServiceConfiguration {
         
     private int recordsBatchSize = Constants.RECORDS_BATCH_SIZE;
     
+    private int indexWorkerCount = Constants.DEFAULT_INDEX_WORKER_COUNT;
+    
     @XmlElement (name = "analytics-record-store", nillable = false)
     public AnalyticsRecordStoreConfiguration[] getAnalyticsRecordStoreConfigurations() {
         return analyticsRecordStoreConfigurations;
@@ -117,6 +119,15 @@ public class AnalyticsDataServiceConfiguration {
 
     public void setRecordsBatchSize(int recordsBatchSize) {
         this.recordsBatchSize = recordsBatchSize;
+    }
+    
+    @XmlElement (name = "indexWorkerCount", defaultValue = "" + Constants.DEFAULT_INDEX_WORKER_COUNT)
+    public int getIndexWorkerCount() {
+        return indexWorkerCount;
+    }
+
+    public void setIndexWorkerCount(int indexWorkerCount) {
+        this.indexWorkerCount = indexWorkerCount;
     }
 
     @XmlElement(name = "analytics-data-purging")

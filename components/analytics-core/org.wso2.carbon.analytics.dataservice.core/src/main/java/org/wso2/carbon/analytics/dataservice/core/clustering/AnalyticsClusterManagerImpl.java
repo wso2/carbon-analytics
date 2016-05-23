@@ -215,6 +215,7 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         return ANALYTICS_CLUSTER_GROUP_DATA_PREFIX + groupId;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private List<Member> getGroupMembers(String groupId) {
         return new HzDistributedList(this.hz.getMap(this.generateGroupListId(groupId)));
     }

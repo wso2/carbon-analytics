@@ -32,4 +32,8 @@
         at a given time. Usually, higher the batch data amount, higher the throughput of the indexing operations, but will have a higher latency
         of record insertion to indexing. Minimum value of this is 10, and a maximum value is 60000 (1 minute). -->
    <shardIndexWorkerInterval>1500</shardIndexWorkerInterval>
+   <!-- The number of index workers to operate in the current node. This basically results in the number of execution threads created
+        to do the indexing operations of the local shards. When this value is increased, the parallel I/O operations being done on the
+        system grows larger. So a system which can handle parallel I/O operation could increase this, e.g. SSDs -->
+   <indexWorkerCount>1</indexWorkerCount>
 </analytics-dataservice-configuration>

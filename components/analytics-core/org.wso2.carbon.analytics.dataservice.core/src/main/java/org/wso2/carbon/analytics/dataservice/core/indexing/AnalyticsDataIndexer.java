@@ -261,20 +261,26 @@ public class AnalyticsDataIndexer {
         return this.indexerInfo.getShardIndexWorkerInterval();
     }
     
-    /* processIndexOperations and processIndexOperationsFlushQueue must be synchronized, they are accessed by
-     * indexer threads and wait for indexing tasks, if not done property, index corruption will happen */
-    private synchronized void processIndexOperations(int shardIndex) throws AnalyticsException {
-        long maxBatchSize = this.getShardIndexRecordBatchSize();
-        long tmpSize;
-        /* process until the queue has sizable amount of records left in it, or else, go back to the
-         * indexing thread and wait for more to fill up */
+    private void processIndexOperations(Collection<Integer> shardIndices) throws AnalyticsException {
+        boolean cont;
         do {
-            tmpSize = this.processLocalShardDataQueue(shardIndex, 
-                    this.localIndexDataStore.getIndexDataQueue(shardIndex), maxBatchSize)[1];
-        } while (tmpSize >= maxBatchSize);
+            cont = false;
+            for (int shardIndex : shardIndices) {
+                cont |= this.processIndexOperationsSlice(shardIndex);
+            }
+        } while (cont);
     }
     
-    /* processIndexOperations and processIndexOperationsFlushQueue must be synchronized */
+    /* processIndexOperationsSlice and processIndexOperationsFlushQueue must be synchronized, they are accessed by
+     * indexer threads and wait for indexing tasks, if not done property, index corruption will happen */
+    private synchronized boolean processIndexOperationsSlice(int shardIndex) throws AnalyticsException {
+        long maxBatchSize = this.getShardIndexRecordBatchSize();
+        long processedCount = this.processLocalShardDataQueue(shardIndex, 
+                this.localIndexDataStore.getIndexDataQueue(shardIndex), maxBatchSize)[1];
+        return processedCount >= maxBatchSize;
+    }
+    
+    /* processIndexOperationsSlice and processIndexOperationsFlushQueue must be synchronized */
     public synchronized void processIndexOperationsFlushQueue(int shardIndex) throws AnalyticsException {
         long maxBatchCount = this.getShardIndexRecordBatchSize();
         LocalIndexDataQueue queue = this.localIndexDataStore.getIndexDataQueue(shardIndex);
@@ -393,15 +399,35 @@ public class AnalyticsDataIndexer {
         }
     }
     
+    private List<List<Integer>> generateIndexWorkerPlan() {
+        int indexWorkerCount = this.indexerInfo.getIndexWorkerCount();
+        List<Integer> localShardsList = new ArrayList<>(this.localShards);
+        int localShardCount = localShardsList.size();
+        if (indexWorkerCount > localShardCount) {
+            indexWorkerCount = localShardCount;
+        }
+        List<Integer[]> ranges = GenericUtils.splitNumberRange(localShardCount, indexWorkerCount);
+        List<List<Integer>> result = new ArrayList<>(ranges.size());
+        for (Integer[] range : ranges) {
+            List<Integer> entry = new ArrayList<>(range[1]);
+            for (int i = 0; i < range[1]; i++) {
+                entry.add(localShardsList.get(range[0] + i));
+            }
+            result.add(entry);
+        }
+        return result;
+    }
+    
     private void reschuduleWorkers() throws AnalyticsException {
         this.stopAndCleanupIndexProcessing();
-        this.workers = new ArrayList<>(this.localShards.size());
         if (this.localShards.size() == 0) {
             return;
         }
-        this.shardWorkerExecutor = Executors.newFixedThreadPool(this.localShards.size());
-        for (int shardIndex : this.localShards) {
-            IndexWorker worker = new IndexWorker(shardIndex);
+        List<List<Integer>> indexWorkerPlan = this.generateIndexWorkerPlan();
+        this.workers = new ArrayList<>(indexWorkerPlan.size());
+        this.shardWorkerExecutor = Executors.newFixedThreadPool(indexWorkerPlan.size());
+        for (List<Integer> indexWorkerIndices : indexWorkerPlan) {
+            IndexWorker worker = new IndexWorker(indexWorkerIndices);
             this.workers.add(worker);
             this.shardWorkerExecutor.execute(worker);
         }
@@ -2132,14 +2158,14 @@ public class AnalyticsDataIndexer {
         
         private boolean stop;
         
-        private int shardIndex;
+        private Collection<Integer> shardIndices;
         
-        public IndexWorker(int shardIndex) {
-            this.shardIndex = shardIndex;
+        public IndexWorker(Collection<Integer> shardIndices) {
+            this.shardIndices = shardIndices;
         }
         
-        public int getShardIndex() {
-            return shardIndex;
+        public Collection<Integer> getShardIndices() {
+            return shardIndices;
         }
         
         public void stop() {
@@ -2150,7 +2176,7 @@ public class AnalyticsDataIndexer {
         public void run() {
             while (!this.stop) {
                 try {
-                    processIndexOperations(this.getShardIndex());
+                    processIndexOperations(this.getShardIndices());
                 } catch (Throwable e) {
                     log.error("Error in processing index batch operations: " + e.getMessage(), e);
                 }

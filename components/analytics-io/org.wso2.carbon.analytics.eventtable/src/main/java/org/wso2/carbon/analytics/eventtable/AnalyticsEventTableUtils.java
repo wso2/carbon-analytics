@@ -98,7 +98,7 @@ public class AnalyticsEventTableUtils {
     }
     
     public static StreamEvent recordsToStreamEvent(List<Attribute> attrs, List<Record> records) {
-        ComplexEventChunk<StreamEvent> eventChunk = new ComplexEventChunk<StreamEvent>();
+        ComplexEventChunk<StreamEvent> eventChunk = new ComplexEventChunk<StreamEvent>(true);
         for (Record record : records) {
             eventChunk.add(recordToStreamEvent(attrs, record));
         }

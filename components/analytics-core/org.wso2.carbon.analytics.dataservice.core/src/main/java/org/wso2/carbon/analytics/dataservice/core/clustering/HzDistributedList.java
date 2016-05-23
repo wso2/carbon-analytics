@@ -60,19 +60,16 @@ public class HzDistributedList<E> implements List<E> {
         return hzMap.isEmpty();
     }
 
-    @SuppressWarnings({"unchecked", "NullableProblems", "SuspiciousMethodCalls"})
     @Override
     public boolean contains(Object o) {
         return hzMap.containsValue(o);
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     public Iterator<E> iterator() {
         return new HzDistributedListIterator<>();
     }
 
-    @SuppressWarnings({"unchecked", "NullableProblems"})
     @Override
     public Object[] toArray() {
         synchronized (hzMap) {
@@ -106,13 +103,11 @@ public class HzDistributedList<E> implements List<E> {
         }
     }
 
-    @SuppressWarnings({"unchecked", "NullableProblems"})
     @Override
     public boolean addAll(Collection<? extends E> c) {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
     }
 
-    @SuppressWarnings({"unchecked", "NullableProblems"})
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
@@ -123,25 +118,22 @@ public class HzDistributedList<E> implements List<E> {
         this.hzMap.clear();
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     public boolean retainAll(Collection<?> c) {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     public boolean removeAll(Collection<?> c) {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
     }
 
-    @SuppressWarnings({"unchecked", "NullableProblems"})
     @Override
     public boolean containsAll(Collection<?> c) {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
     }
 
-    @SuppressWarnings({"unchecked", "NullableProblems", "SuspiciousSystemArraycopy"})
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T[] toArray(T[] a) {
         // Make a new array of a's runtime type, but my contents:
@@ -228,19 +220,16 @@ public class HzDistributedList<E> implements List<E> {
         return -1;
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     public ListIterator<E> listIterator() {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     public ListIterator<E> listIterator(int index) {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
         throw new UnsupportedOperationException("This method is not implemented in Hazelcast distributed Lists.");

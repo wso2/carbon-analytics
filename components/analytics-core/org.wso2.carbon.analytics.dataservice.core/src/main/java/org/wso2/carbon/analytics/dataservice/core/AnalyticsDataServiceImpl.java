@@ -150,6 +150,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         indexerInfo.setLuceneAnalyzer(luceneAnalyzer);
         indexerInfo.setIndexStoreLocation(GenericUtils.resolveLocation(Constants.DEFAULT_INDEX_STORE_LOCATION));
         indexerInfo.setIndexReplicationFactor(config.getIndexReplicationFactor());
+        indexerInfo.setIndexWorkerCount(this.extractIndexWorkerCount(config));
         this.indexer = new AnalyticsDataIndexer(indexerInfo);
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
@@ -158,6 +159,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         } 
         this.indexer.init();
         this.initDataPurging(config);
+    }
+    
+    private int extractIndexWorkerCount(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
+        int value = config.getIndexWorkerCount();
+        if (value <= 0) {
+            throw new AnalyticsException("The index worker count must be greater than zero");
+        }
+        return value;
     }
     
     private long extractShardIndexRecordBatchSize(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
