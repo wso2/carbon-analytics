@@ -1,7 +1,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.ui.ExecutionManagerUIUtils" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.TemplateConfigurationDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ScenarioConfigurationDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTOE" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
 <%@ page import="java.util.Arrays" %>
@@ -23,31 +23,33 @@
   --%>
 
 <%
-    //todo: rename to ScenarioConfigurationDTO,remove cron expression
+    //renamed TemplateConfigurationDTO to ScenarioConfigurationDTO -done , todo:  remove cron expression
 
     String domainName = request.getParameter("domainName");
     String configuration = request.getParameter("configurationName");
     String saveType = request.getParameter("saveType");
+    System.out.println(saveType);
     String description = request.getParameter("description");
     String parametersJson = request.getParameter("parameters");
     String templateType = request.getParameter("templateType");
-    String cronExpression = request.getParameter("executionParameters");
+//    String cronExpression = request.getParameter("executionParameters");
     String valueSeparator = "::";
 
     ParameterDTOE[] parameters;
 
     ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
+    System.out.println("test delete: " + saveType.equals("delete"));
     try {
         if (saveType.equals("delete")) {
             proxy.deleteConfiguration(domainName, configuration);
         } else {
 
-            TemplateConfigurationDTO templateConfigurationDTO = new TemplateConfigurationDTO();
+            ScenarioConfigurationDTO scenarioConfigurationDTO = new ScenarioConfigurationDTO();
 
-            templateConfigurationDTO.setName(configuration);
-            templateConfigurationDTO.setFrom(domainName);
-            templateConfigurationDTO.setDescription(description);
-            templateConfigurationDTO.setType(templateType);
+            scenarioConfigurationDTO.setName(configuration);
+            scenarioConfigurationDTO.setDomain(domainName);
+            scenarioConfigurationDTO.setDescription(description);
+            scenarioConfigurationDTO.setScenario(templateType);
 
             if (parametersJson.length() < 1) {
                parameters = new ParameterDTOE[0];
@@ -55,6 +57,7 @@
             } else {
                 String[] parameterStrings = parametersJson.split(",");
                 parameters = new ParameterDTOE[parameterStrings.length];
+                System.out.println("length"+parameterStrings.length);
                 int index = 0;
 
                 for (String parameterString : parameterStrings) {
@@ -62,19 +65,22 @@
                     parameterDTO.setName(parameterString.split(valueSeparator)[0]);
                     parameterDTO.setValue(parameterString.split(valueSeparator)[1]);
                     parameters[index] = parameterDTO;
+                    System.out.println("parametersArray:" + parameters[index].getName());
                     index++;
                 }
             }
 
-            templateConfigurationDTO.setParameterDTOs(parameters);
+            scenarioConfigurationDTO.setParameterDTOs(parameters);
+            System.out.println("test");
 
-            if (cronExpression != null && cronExpression.length() > 0) {
-                        templateConfigurationDTO.setExecutionParameters(cronExpression);
-            }
+           /* if (cronExpression != null && cronExpression.length() > 0) {
+                        scenarioConfigurationDTO.setExecutionParameters(cronExpression);
+            }*/
 
-            //checks the "proxy.saveConfiguration(templateConfigurationDTO)" return value for not null and build stream mapping div
-            if (proxy.saveConfiguration(templateConfigurationDTO) != null) {
-                String toStreamIDArray[] = proxy.saveConfiguration(templateConfigurationDTO);
+            //checks the "proxy.saveConfiguration(scenarioConfigurationDTO)" return value for not null and build stream mapping div
+            System.out.println("saving:" + proxy.saveConfiguration(scenarioConfigurationDTO));
+            if (proxy.saveConfiguration(scenarioConfigurationDTO) != null) {
+                String toStreamIDArray[] = proxy.saveConfiguration(scenarioConfigurationDTO);
                 String toStreamNameID = "";
                 EventStreamAdminServiceStub eventStreamAdminServiceStub = ExecutionManagerUIUtils.getEventStreamAdminService(config,
                         session, request);
@@ -98,7 +104,7 @@
 
         <label class="input-label col-md-5"><fmt:message key='template.label.from.stream.name'/></label>
 
-        <%--todo: add new js function to load mapping table for updated values--%>
+        <%--todo: add new js function to load mapping table for updated values. need to send a boolean flag to identify stream mapping true or false--%>
         <div class="input-control input-full-width col-md-7 text">
             <select id="fromStreamID_<%=i%>" onchange="loadMappingFromStreamAttributes(<%=i%>)">
                 <option selected disabled>Choose from here</option>
@@ -133,7 +139,7 @@
 </div>
 <%
             } else {
-                proxy.saveConfiguration(templateConfigurationDTO);
+                proxy.saveConfiguration(scenarioConfigurationDTO);
             }
         }
     } catch (AxisFault e) {

@@ -6,6 +6,7 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
+
 <%--
   ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
@@ -21,7 +22,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   --%>
-
 <%
     try {
         String domainName = request.getParameter("domainName");
@@ -38,7 +38,7 @@
         List<StreamMappingDTO> streamMappingDTOsList = new ArrayList<StreamMappingDTO>();
         List<AttributeMappingDTO> attributeMappingDTOsList = new ArrayList<AttributeMappingDTO>();
 
-        //iterate each stream map and get stream map elements
+        //iterate through each stream map and get stream map elements
         for (String streamMappingString : streamMappingStrings) {
             StreamMappingDTO streamMappingDTO = new StreamMappingDTO();
 
@@ -47,11 +47,11 @@
             for (int i = 0; i < streamMapElements.length; i++) {
                 String[] keyValueArray = streamMapElements[i].split(":");
                 if (i == 0) {
-                    //extract toStream id
+                    //set toStream id
                     streamMappingDTO.setToStream(keyValueArray[1] + ":" + keyValueArray[2]);
                     System.out.println("stream: " + keyValueArray[1] + ":" + keyValueArray[2]);
                 } else if (i == 1) {
-                    //extract fromStream id
+                    //set fromStream id
                     streamMappingDTO.setFromStream(keyValueArray[1] + ":" + keyValueArray[2]);
                     System.out.println("stream: " + keyValueArray[1] + ":" + keyValueArray[2]);
                 } else {
@@ -72,7 +72,7 @@
                                     attributeMappingDTO.setAttributeType(propertyNameValueAndType[2]);
                                     System.out.println("mappedAttributeType: " + propertyNameValueAndType[2]);
 
-                                    //add attributeMappingDTO to attribute mapping dto array
+                                    //add attributeMappingDTO to attribute mapping DTOs list
                                     attributeMappingDTOsList.add(attributeMappingDTO);
                                 }
                             }
@@ -80,6 +80,7 @@
                     }
 
                     if (i == 4) {
+                        //set property/attribute mapping
                         streamMappingDTO.setAttributeMappingDTOs(attributeMappingDTOsList.toArray());
                     }
                 }
@@ -87,7 +88,7 @@
             // add streamMappingDTO to streamMappingDTOs[]
             streamMappingDTOsList.add(streamMappingDTO);
 
-            proxy.saveStreamMapping(streamMappingDTOsList.toArray(),configuration,domainName);
+            proxy.saveStreamMapping(streamMappingDTOsList.toArray(), configuration, domainName);
         }
     } catch (AxisFault e) {
         response.sendError(500);

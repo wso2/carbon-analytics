@@ -17,10 +17,10 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.ui.ExecutionManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.TemplateConfigurationDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.TemplateDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ScenarioConfigurationDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ScenarioInfoDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ParameterDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.TemplateDomainDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ExecutionManagerTemplateInfoDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTOE" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
 
@@ -111,17 +111,17 @@
 
         ExecutionManagerAdminServiceStub proxy =
                 ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
-        TemplateDomainDTO domain =
-                proxy.getDomain(domainName);
+        ExecutionManagerTemplateInfoDTO domain =
+                proxy.getExecutionManagerTemplateInfo(domainName); //todo: refactored TemplateDomainDTO to ExecutionManagerTemplateDTO & getDomain to getExecutionManagerTemplateInfo
 
-        TemplateConfigurationDTO configurationDTO = proxy.getConfiguration(domainName,
-                configurationName);
+        ScenarioConfigurationDTO configurationDTO = proxy.getConfiguration(domainName,
+                configurationName); //todo: refactored TemplateConfigurationDTO to ScenarioConfigurationDTO
 
         if (configurationDTO != null) {
             isExistingConfig = true;
         }
 
-        TemplateDTO currentTemplate = null;
+        ScenarioInfoDTO currentTemplate = null;
         String saveButtonText = "template.add.button.text";
         String parameterString = "";
 
@@ -148,15 +148,15 @@
         <div class="container col-md-12 marg-top-20" id="parameterMappingDivID">
             <%
 
-                if (domain.getTemplateDTOs() != null && !templateType.equals("")) {
-                    for (TemplateDTO template : domain.getTemplateDTOs()) {
-                        if (configurationName == null || template.getName().equals(templateType)) {
-                            currentTemplate = template;
+                if (domain.getScenarioInfoDTOs() != null && !templateType.equals("")) {
+                    for (ScenarioInfoDTO scenarioInfoDTO : domain.getScenarioInfoDTOs()) {
+                        if (configurationName == null || scenarioInfoDTO.getName().equals(templateType)) {
+                            currentTemplate = scenarioInfoDTO;
                             break;
                         }
                     }
-                } else if (domain.getTemplateDTOs() != null && domain.getTemplateDTOs().length > 0) {
-                    currentTemplate = domain.getTemplateDTOs()[0];
+                } else if (domain.getScenarioInfoDTOs() != null && domain.getScenarioInfoDTOs().length > 0) {
+                    currentTemplate = domain.getScenarioInfoDTOs()[0];
                 }
 
 
@@ -171,16 +171,16 @@
                 <select id="cBoxTemplates"
                         onchange="document.location.href=document.getElementById('cBoxTemplates').options[document.getElementById('cBoxTemplates').selectedIndex].value">
                     <%
-                        for (TemplateDTO templateDTO : domain.getTemplateDTOs()) {
+                        for (ScenarioInfoDTO scenarioInfoDTO : domain.getScenarioInfoDTOs()) {
 
                             String selectedValue = "";
-                            if (templateDTO.getName().trim().equals(currentTemplate.getName())) {
+                            if (scenarioInfoDTO.getName().trim().equals(currentTemplate.getName())) {
                                 selectedValue = "selected=true";
                             }
                     %>
                     <option <%=selectedValue%>
-                            value="template_configurations_ajaxprocessor.jsp?configurationName=<%=configurationName%>&domainName=<%=domainName%>&templateType=<%=templateDTO.getName()%>">
-                        <%=templateDTO.getName()%>
+                            value="template_configurations_ajaxprocessor.jsp?configurationName=<%=configurationName%>&domainName=<%=domainName%>&templateType=<%=scenarioInfoDTO.getName()%>">
+                        <%=scenarioInfoDTO.getName()%>
                     </option>
                     <%}%>
                 </select>
@@ -312,9 +312,9 @@
             <br class="c-both"/>
             <hr class="wr-separate"/>
 
-<%
+<%--<%
 String executionParamString = null;
-//    todo: remove cron configs
+//    todo: remove cron configs. configurationDTO.getExecutionParameters() does not exist
 if ("batch".equals(currentTemplate.getExecutionType())) {
 %>
            <h4><fmt:message key='template.scheduler.header.text'/></h4>
@@ -350,20 +350,19 @@ if (isExistingConfig && (configurationDTO.getExecutionParameters() != null)) {
         parameterString = "''";
     }
 }
-%>
+%>--%>
 
             <div class="action-container">
                 <button type="button" class="btn btn-default btn-add col-md-2 col-xs-12 pull-right marg-right-15"
                         onclick="saveConfiguration('<%=domainName%>',
                                 document.getElementById('cBoxTemplates').options[document.getElementById('cBoxTemplates').selectedIndex].text,
                                 document.getElementById('txtName').value, document.getElementById('txtDescription').value,'domain_configurations_ajaxprocessor.jsp?domainName=<%=domainName%>',
-                                <%=parameterString%>, <%=executionParamString%>)">
+                                <%=parameterString%>)">
                     <fmt:message key='<%=saveButtonText%>'/>
                 </button>
                 <br class="c-both"/>
             </div>
         </div>
-        <%--todo: add inner stream mapping div to manage_stream_config,remove class of streamma--%>
         <!-- stream mapping/body -->
         <div class="container col-md-12 marg-top-20" id="streamMappingDivID">
         </div>

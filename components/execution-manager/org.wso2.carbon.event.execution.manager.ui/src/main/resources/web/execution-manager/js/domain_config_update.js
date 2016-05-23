@@ -31,7 +31,7 @@ function deleteConfiguration(domainName, configurationName, row, tableId) {
     });
 }
 
-function saveConfiguration(domainName, templateType, configurationName, description, redirectURL, parameters, executionParameters) {
+function saveConfiguration(domainName, templateType, configurationName, description, redirectURL, parameters) {
 
     if (hasWhiteSpace(configurationName) | configurationName == "") {
         showErrorDialog("Configuration name cannot be empty or consist of white spaces");
@@ -43,22 +43,22 @@ function saveConfiguration(domainName, templateType, configurationName, descript
             type: "POST",
             url: "manage_configurations_ajaxprocessor.jsp",
             data: "domainName=" + domainName + "&configurationName=" + configurationName + "&templateType="
-            + templateType + "&description=" + description + "&saveType=save" + "&parameters=" + parameters + "&executionParameters=" + executionParameters
+            + templateType + "&description=" + description + "&saveType=save" + "&parameters=" + parameters
         })
             .error(function () {
                 showErrorDialog("Error occurred when saving configurations");
             })
             .then(function (ui_content) {
-                showInfoDialog("Configurations saved successfully",
-                    function () {
-                        if (ui_content == null) {
+                if (ui_content == null) {
+                    showInfoDialog("Configurations saved successfully",
+                        function () {
                             document.location.href = redirectURL;
-                        } else {
-                            streamMappingDivID.innerHTML = ui_content;
-                            $('#parameterMappingDivID').hide();
-                            $('#streamMappingDivID').show();
-                        }
-                    });
+                        });
+                } else {
+                    streamMappingDivID.innerHTML = ui_content;
+                    $('#parameterMappingDivID').hide();
+                    $('#streamMappingDivID').show();
+                }
             });
     }
 }
@@ -163,16 +163,13 @@ function getStreamMappingObjectArray(streamMappingArrayLength) {
                     "correlationData": correlationData,
                     "payloadData": payloadData
                 };
-            } else{
+            } else {
                 showErrorDialog("Invalid stream mapping");
                 return;
             }
         }
         streamMappingObjectArray.push(streamMappingObject);
     }
-/*    for (var i = 0; i < streamMappingObjectArray.length; i++) {
-        alert("array object payload data: " + streamMappingObjectArray[i].payloadData);
-    }*/
     return streamMappingObjectArray;
 }
 
