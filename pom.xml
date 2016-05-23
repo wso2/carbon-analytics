@@ -401,7 +401,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.stream.deployer</artifactId>
+                <artifactId>org.wso2.carbon.event.execution.manager.stream.template.deployer</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>

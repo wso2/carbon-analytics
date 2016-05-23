@@ -36,6 +36,7 @@
         <module>org.wso2.carbon.event.execution.manager.core</module>
         <module>org.wso2.carbon.event.execution.manager.admin</module>
         <module>org.wso2.carbon.event.execution.manager.ui</module>
+        <module>org.wso2.carbon.event.execution.manager.stream.template.deployer</module>
     </modules>
 
 

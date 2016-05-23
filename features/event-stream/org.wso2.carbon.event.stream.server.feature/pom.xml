@@ -43,10 +43,6 @@
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.event.stream.admin</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.event.stream.deployer</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
@@ -79,9 +75,6 @@
                                 </bundleDef>
                                 <bundleDef>
                                     org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.admin:${carbon.analytics.common.version}
-                                </bundleDef>
-                                <bundleDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.deployer:${carbon.analytics.common.version}
                                 </bundleDef>
                             </bundles>
                             <importFeatures>
