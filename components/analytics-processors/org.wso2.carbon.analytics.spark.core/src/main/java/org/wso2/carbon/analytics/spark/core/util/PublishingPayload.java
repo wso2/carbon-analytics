@@ -1,37 +1,34 @@
 /*
  * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
+ * 
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
+ * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
  */
 
 package org.wso2.carbon.analytics.spark.core.util;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class PublishingPayload {
     private String payload;
-
-    private ArrayList<PublishingPayloadEvent> events = new ArrayList<>();
-
-    public PublishingPayloadEvent getEvent(int index) {
-        return events.get(index);
-    }
-
-    public boolean addEvent(PublishingPayloadEvent publishingPayloadEvent) {
-        return events.add(publishingPayloadEvent);
-    }
+    // position of the outer list corresponds to the event index
+    //private List<List<Integer>> events = new LinkedList<List<Integer>>();
+    
+    private Map<Integer, List<Integer>> events = new HashMap<Integer, List<Integer>>();
 
     public String getPayload() {
         return payload;
@@ -41,11 +38,11 @@ public class PublishingPayload {
         this.payload = payload;
     }
 
-    public ArrayList<PublishingPayloadEvent> getEvents() {
+    public Map<Integer, List<Integer>> getEvents() {
         return events;
     }
 
-    public void setEvents(ArrayList<PublishingPayloadEvent> events) {
+    public void setEvents(Map<Integer, List<Integer>> events) {
         this.events = events;
     }
 

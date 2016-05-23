@@ -67,7 +67,6 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
     private static final Log log = LogFactory.getLog(CompressedEventAnalyticsRDD.class);
     private static final long serialVersionUID = 5948588299500227997L;
     private List<String> allColumns;
-    private List<String> outputColumns;
     private int tenantId;
     private String tableName;
     private long timeFrom;
@@ -95,7 +94,6 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
         super(sc, deps, evidence);
         this.tenantId = tenantId;
         this.tableName = tableName;
-        this.outputColumns = new ArrayList<String>(columns);
         this.allColumns = getAllColumns(columns);
         this.timeFrom = timeFrom;
         this.timeTo = timeTo;
@@ -267,22 +265,17 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
                 Input input = new Input(unzippedByteArray);
                 
                 Map<String, Object> aggregatedEvent = this.kryo.readObject(input, HashMap.class);
-                ArrayList<Map<String, Object>> eventsList = (ArrayList<Map<String, Object>>) aggregatedEvent.get(
+                List<List<Object>> eventsList = (List<List<Object>>) aggregatedEvent.get(
                     AnalyticsConstants.EVENTS_ATTRIBUTE);
-                ArrayList<PublishingPayload> payloadsList = (ArrayList<PublishingPayload>) aggregatedEvent.get(
+                List<PublishingPayload> payloadsList = (List<PublishingPayload>) aggregatedEvent.get(
                     AnalyticsConstants.PAYLOADS_ATTRIBUTE);
-                Map<Integer, Map<String, String>> payloadsMap = null;
-                if (payloadsList != null) {
-                    payloadsMap =  CompressedEventAnalyticsUtils.getPayloadsAsMap(payloadsList);
-                }
+                
                 String host = (String)aggregatedEvent.get(AnalyticsConstants.HOST_ATTRIBUTE);
-                String messageFlowId = (String)aggregatedEvent.get(AnalyticsConstants.MESSAGE_FLOW_ID_ATTRIBUTE);
                 // Iterate over the array of events
                 for (int i = 0; i < eventsList.size(); i++) {
                     // Create a row with extended fields
                     tempRows.add(RowFactory.create(CompressedEventAnalyticsUtils.getFieldValues(eventsList.get(i), 
-                        outputColumns.toArray(new String[0]), payloadsMap, i, record.getTimestamp(), host, 
-                        messageFlowId)));
+                        payloadsList, i, record.getTimestamp(), host)));
                 }
             } else {
                 tempRows.add(RowFactory.create(Collections.emptyList().toArray()));
