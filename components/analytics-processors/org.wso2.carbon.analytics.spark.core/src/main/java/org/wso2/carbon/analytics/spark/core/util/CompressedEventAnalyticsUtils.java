@@ -77,35 +77,6 @@ public class CompressedEventAnalyticsUtils {
     }
 
     /**
-     * Convert payload to map.
-     * 
-     * @param payloadsList  List containing payload details
-     * @return              Map of payloads
-     */
-    /*public static Map<Integer, Map<String, String>> getPayloadsAsMap(List<PublishingPayload> payloadsList) {
-        Map<Integer, Map<String, String>> payloadsMap = new HashMap<Integer, Map<String, String>>();
-        for (int i = 0; i < payloadsList.size(); i++) {
-            PublishingPayload publishingPayload = payloadsList.get(i);
-            String payload = publishingPayload.getPayload();
-            List<PublishingPayloadEvent> eventRefs = publishingPayload.getEvents();
-
-            for (int j = 0; j < eventRefs.size(); j++) {
-                PublishingPayloadEvent eventRef = eventRefs.get(j);
-                int eventIndex = eventRef.getEventIndex();
-                Map<String, String> existingPayloadMap = payloadsMap.get(eventIndex);
-                if (existingPayloadMap == null) {
-                    Map<String, String> attributesMap = new HashMap<String, String>();
-                    attributesMap.put(eventRef.getAttribute(), payload);
-                    payloadsMap.put(eventIndex, attributesMap);
-                } else {
-                    existingPayloadMap.put(eventRef.getAttribute(), payload);
-                }
-            }
-        }
-        return payloadsMap;
-    }*/
-
-    /**
      * Decompress a compressed event string.
      * 
      * @param str   Compressed string
