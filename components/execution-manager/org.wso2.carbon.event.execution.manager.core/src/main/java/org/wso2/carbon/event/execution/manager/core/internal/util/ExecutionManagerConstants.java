@@ -45,6 +45,10 @@ public class ExecutionManagerConstants {
 
     public static final String REGEX_NAME_COMMENTED_VALUE = "\\(.*?\\)";
 
+    public static final String STREAM_MAPPING_PLAN_SUFFIX = "StreamMappingPlan";
+
+    public static final String DEPLOYER_TYPE_REALTIME = "realtime";
+
     /**
      * To avoid instantiating
      */

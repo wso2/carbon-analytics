@@ -19,7 +19,14 @@ public interface TemplateDeployer {
 
     String getType();
 
-    void deployArtifact(DeployableTemplate template) throws TemplateDeploymentException;
+    /**
+     * deploys the artifact, given inside the template
+     *
+     * @param template The template, updated with user-specified parameters.
+     * @param artifactId  A unique name given for the artifact. Using this name as the artifact name (e.g. the stream name), it can be deployed without conflicts.
+     * @throws TemplateDeploymentException
+     */
+    void deployArtifact(DeployableTemplate template, String artifactId) throws TemplateDeploymentException;
 
     void undeployArtifact(String artifactId) throws TemplateDeploymentException;
 
