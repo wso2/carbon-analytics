@@ -19,14 +19,11 @@
 package org.wso2.carbon.analytics.spark.core.util;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class PublishingPayload {
     private String payload;
-    // position of the outer list corresponds to the event index
-    //private List<List<Integer>> events = new LinkedList<List<Integer>>();
     
     private Map<Integer, List<Integer>> events = new HashMap<Integer, List<Integer>>();
 

@@ -50,7 +50,6 @@ import org.wso2.carbon.analytics.spark.core.sources.AnalyticsPartition;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.CompressedEventAnalyticsUtils;
 import org.wso2.carbon.analytics.spark.core.util.PublishingPayload;
-import org.wso2.carbon.analytics.spark.core.util.PublishingPayloadEvent;
 
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
@@ -193,7 +192,6 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
             kryo.register(HashMap.class, 111);
             kryo.register(ArrayList.class, 222);
             kryo.register(PublishingPayload.class, 333);
-            kryo.register(PublishingPayloadEvent.class, 444);
         }
 
         @Override
