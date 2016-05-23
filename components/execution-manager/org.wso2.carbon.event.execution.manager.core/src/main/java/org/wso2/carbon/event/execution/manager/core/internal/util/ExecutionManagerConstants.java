@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.event.execution.manager.core.internal.util;
 
+import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.File;
@@ -28,9 +29,9 @@ public class ExecutionManagerConstants {
     public static final String TEMPLATE_DOMAIN_PATH = CarbonUtils.getCarbonConfigDirPath()
             + File.separator + "execution-manager" + File.separator + "domain-template";
 
-    public static final String TEMPLATE_CONFIG_PATH = File.separator + "repository"
-            + File.separator + "components" + File.separator
-            + "org.wso2.carbon.event.execution.manager.core" + File.separator + "template-config";
+    public static final String TEMPLATE_CONFIG_PATH = RegistryConstants.PATH_SEPARATOR + "repository"
+            + RegistryConstants.PATH_SEPARATOR + "components" + RegistryConstants.PATH_SEPARATOR
+            + "org.wso2.carbon.event.execution.manager.core" + RegistryConstants.PATH_SEPARATOR + "template-config";
 
     public static final String CONFIG_NAME_SEPARATOR = "-";
 

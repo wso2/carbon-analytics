@@ -47,19 +47,13 @@ function populateAnalyticsTable(analyticsTable, columnInformation, type) {
         var typeCell = row.insertCell(cellNo++);
         YAHOO.util.Dom.addClass(typeCell, "property-names");
         var selectElement = document.createElement('select');
-        if (column1 == 'string') {
-            selectElement.options[0] = new Option('STRING', 'string');
-            selectElement.options[1] = new Option('FACET', 'FACET');
-        } else {
-            selectElement.options[0] = new Option('STRING', 'string');
-            selectElement.options[1] = new Option('INTEGER', 'int');
-            selectElement.options[2] = new Option('LONG', 'long');
-            selectElement.options[3] = new Option('BOOLEAN', 'bool');
-            selectElement.options[4] = new Option('FLOAT', 'float');
-            selectElement.options[5] = new Option('DOUBLE', 'double');
-            selectElement.options[6] = new Option('FACET', 'FACET');
-            selectElement.disabled = true;
-        }
+        selectElement.options[0] = new Option('STRING', 'string');
+        selectElement.options[1] = new Option('INTEGER', 'int');
+        selectElement.options[2] = new Option('LONG', 'long');
+        selectElement.options[3] = new Option('BOOLEAN', 'bool');
+        selectElement.options[4] = new Option('FLOAT', 'float');
+        selectElement.options[5] = new Option('DOUBLE', 'double');
+        selectElement.disabled = true;
         selectElement.value = column1;
         typeCell.appendChild(selectElement);
 
@@ -89,6 +83,15 @@ function populateAnalyticsTable(analyticsTable, columnInformation, type) {
             scoreParamCheckElement.disabled = true;
         }
         scoreParamCell.appendChild(scoreParamCheckElement);
+
+        var isFacetCell = row.insertCell(cellNo++);
+        YAHOO.util.Dom.addClass(isFacetCell, "property-names");
+        var isFacetCheckElement = document.createElement('input');
+        isFacetCheckElement.type = "checkbox";
+        if (column0 == '_timestamp') {
+            isFacetCheckElement.disabled = true;
+        }
+        isFacetCell.appendChild(isFacetCheckElement);
     }
 }
 
@@ -138,7 +141,7 @@ function setRowValues(currentCount, indexTable, element, isPayload) {
     for (var j = 1; j < currentCount; j++) {
         var row = indexTable.rows[j];
         var columnName = row.cells[1].textContent;
-        var jsonColumnName
+        var jsonColumnName;
         if (isPayload) {
             jsonColumnName = element.columnName;
         } else {
@@ -157,6 +160,7 @@ function setRowValues(currentCount, indexTable, element, isPayload) {
             row.cells[3].childNodes[0].checked = element.primaryKey;
             row.cells[4].childNodes[0].checked = element.indexed;
             row.cells[5].childNodes[0].checked = element.scoreParam;
+            row.cells[6].childNodes[0].checked = element.isFacet;
             break;
         }
     }
@@ -178,7 +182,6 @@ function setRowValuesForArbitrary(indexTable, element) {
     selectElement.options[3] = new Option('BOOLEAN', 'BOOLEAN');
     selectElement.options[4] = new Option('FLOAT', 'FLOAT');
     selectElement.options[5] = new Option('DOUBLE', 'DOUBLE');
-    selectElement.options[6] = new Option('FACET', 'FACET');
     selectElement.disabled = true;
     selectElement.value = element.columnType;
     typeCell.appendChild(selectElement);
@@ -206,7 +209,16 @@ function setRowValuesForArbitrary(indexTable, element) {
     scoreParamCheckElement.checked = element.scoreParam;
     scoreParamCheckElement.disabled = true;
     scoreParamCell.appendChild(scoreParamCheckElement);
-    var newCel3 = newTableRow.insertCell(5);
+
+    var isFacetCell = newTableRow.insertCell(5);
+    YAHOO.util.Dom.addClass(isFacetCell, "property-names");
+    var isFacetCheckElement = document.createElement('input');
+    isFacetCheckElement.type = "checkbox";
+    isFacetCheckElement.checked = element.isFacet;
+    isFacetCheckElement.disabled = true;
+    isFacetCell.appendChild(isFacetCheckElement);
+
+    var newCel3 = newTableRow.insertCell(6);
     newCel3.innerHTML = '<a class="icon-link" style="background-image:url(../admin/images/delete.gif)" onclick="removeStreamAttribute(this)">Delete</a>';
     YAHOO.util.Dom.addClass(newCel3, "property-names");
     document.getElementById("noOutputArbitraryData").style.display = "none";
@@ -280,7 +292,8 @@ function getAnalyticsIndexDataValues(dataTable) {
             var primary = row.cells[3].childNodes[0].checked;
             var index = row.cells[4].childNodes[0].checked;
             var scoreParam = row.cells[5].childNodes[0].checked;
-            wso2EventData = wso2EventData + persist + "^=" + columnName + "^=" + type + "^=" + primary + "^=" + index + "^=" + scoreParam + "^=" + "$=";
+            var isFacet = row.cells[6].childNodes[0].checked;
+            wso2EventData = wso2EventData + persist + "^=" + columnName + "^=" + type + "^=" + primary + "^=" + index + "^=" + scoreParam + "^=" + isFacet + "^=" + "$=";
         }
     return wso2EventData;
 }
@@ -294,7 +307,8 @@ function getArbitraryIndexDataValues(dataTable) {
         var primary = row.cells[2].childNodes[0].checked;
         var index = row.cells[3].childNodes[0].checked;
         var scoreParam = row.cells[4].childNodes[0].checked;
-        wso2EventData = wso2EventData + columnName + "^=" + type + "^=" + primary + "^=" + index + "^=" + scoreParam + "^=" + "$=";
+        var isFacet = row.cells[5].childNodes[0].checked;
+        wso2EventData = wso2EventData + columnName + "^=" + type + "^=" + primary + "^=" + index + "^=" + scoreParam + "^=" + isFacet + "^=" + "$=";
     }
     return wso2EventData;
 }
@@ -317,6 +331,7 @@ function addArbitraryAttribute() {
     var primary = document.getElementById("eventPersistPrimaryKeyCheckbox");
     var index = document.getElementById("eventPersistIndexCheckbox");
     var scoreParam = document.getElementById("eventPersistScoreParamCheckbox");
+    var isFacet = document.getElementById("eventPersistIsFacetCheckbox");
     var arbitraryTable = document.getElementById("arbitraryIndexTable");
 
     arbitraryTable.style.display = "";
@@ -335,7 +350,6 @@ function addArbitraryAttribute() {
     selectElement.options[3] = new Option('BOOLEAN', 'BOOLEAN');
     selectElement.options[4] = new Option('FLOAT', 'FLOAT');
     selectElement.options[5] = new Option('DOUBLE', 'DOUBLE');
-    selectElement.options[6] = new Option('FACET', 'FACET');
     selectElement.disabled = true;
     selectElement.value = attributeType.value;
     typeCell.appendChild(selectElement);
@@ -363,7 +377,16 @@ function addArbitraryAttribute() {
     scoreParamCheckElement.checked = scoreParam.checked;
     scoreParamCheckElement.disabled = true;
     scoreParamCell.appendChild(scoreParamCheckElement);
-    var newCel3 = newTableRow.insertCell(5);
+
+    var isFacetCell = newTableRow.insertCell(5);
+    YAHOO.util.Dom.addClass(isFacetCell, "property-names");
+    var isFacetCheckElement = document.createElement('input');
+    isFacetCheckElement.type = "checkbox";
+    isFacetCheckElement.checked = isFacet.checked;
+    isFacetCheckElement.disabled = true;
+    isFacetCell.appendChild(isFacetCheckElement);
+
+    var newCel3 = newTableRow.insertCell(6);
     newCel3.innerHTML = '<a class="icon-link" style="background-image:url(../admin/images/delete.gif)" onclick="removeStreamAttribute(this)">Delete</a>';
     YAHOO.util.Dom.addClass(newCel3, "property-names");
     document.getElementById("noOutputArbitraryData").style.display = "none";
@@ -371,12 +394,13 @@ function addArbitraryAttribute() {
     primary.checked = false;
     index.checked = false;
     scoreParam.checked = false;
+    isFacet.checked = false;
     document.getElementById("eventPersistScoreParamCheckbox").disabled = false;
 }
 
 function changeScoreParam(ele) {
     var value = ele.value;
-    if (value == 'STRING' || value == 'BOOLEAN' || value == 'FACET') {
+    if (value == 'STRING' || value == 'BOOLEAN') {
         document.getElementById("eventPersistScoreParamCheckbox").disabled = true;
     } else {
         document.getElementById("eventPersistScoreParamCheckbox").disabled = false;

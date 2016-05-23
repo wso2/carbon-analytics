@@ -54,7 +54,7 @@ public class CarbonEventStreamService implements EventStreamService {
     private final List<StreamDefinition> pendingStreams = new ArrayList<StreamDefinition>();
     private Map<Integer, ConcurrentHashMap<String, EventStreamConfiguration>> tenantSpecificEventStreamConfigs = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, EventStreamConfiguration>>();
 
-    public void removeEventStreamConfigurationFromMap(String fileName) {
+    public void removeEventStreamConfigurationFromMap(String fileName) throws EventStreamConfigurationException{
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
         String streamId = null;
@@ -73,6 +73,7 @@ public class CarbonEventStreamService implements EventStreamService {
                         DataBridgeCommonsUtils.getStreamNameFromStreamId(streamId),
                         DataBridgeCommonsUtils.getStreamVersionFromStreamId(streamId));
             }
+            EventStreamServiceValueHolder.getEventStreamRuntime().deleteStreamJunction(streamId);
         }
     }
 

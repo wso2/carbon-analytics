@@ -496,6 +496,9 @@
                                                                 <th class="leftCol-med">
                                                                     <fmt:message key="attribute.scoreParam"/>
                                                                 </th>
+                                                                <th class="leftCol-med">
+                                                                    <fmt:message key="attribute.facet"/>
+                                                                </th>
                                                             </tr>
                                                             </thead>
                                                             <tbody>
@@ -523,6 +526,13 @@
                                                                 <td class="property-names">
                                                                     <input type="checkbox" onclick="return false"
                                                                             <% if (analyticsTableRecord.getScoreParam())
+																					{ %>
+                                                                           checked   <% } %>
+                                                                            >
+                                                                </td>
+                                                                <td class="property-names">
+                                                                    <input type="checkbox" onclick="return false"
+                                                                            <% if (analyticsTableRecord.getFacet())
 																					{ %>
                                                                            checked   <% } %>
                                                                             >

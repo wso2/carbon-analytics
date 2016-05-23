@@ -28,6 +28,7 @@ public class AnalyticsTableRecord {
     private boolean scoreParam;
     private boolean indexed;
     private boolean primaryKey;
+    private boolean isFacet;
 
     public String getColumnName() {
         return columnName;
@@ -67,5 +68,13 @@ public class AnalyticsTableRecord {
 
     public void setPrimaryKey(boolean primaryKey) {
         this.primaryKey = primaryKey;
+    }
+
+    public boolean isFacet() {
+        return isFacet;
+    }
+
+    public void setFacet(boolean isFacet) {
+        this.isFacet = isFacet;
     }
 }

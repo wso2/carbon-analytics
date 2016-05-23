@@ -40,7 +40,7 @@ import java.util.List;
 public class ThriftDataEndpoint extends DataEndpoint {
 
     @Override
-    protected String login(Object client, String userName, String password)
+    protected synchronized String login(Object client, String userName, String password)
             throws DataEndpointAuthenticationException {
         try {
             return ((ThriftSecureEventTransmissionService.Client) client).connect(userName, password);
@@ -52,7 +52,7 @@ public class ThriftDataEndpoint extends DataEndpoint {
     }
 
     @Override
-    protected void logout(Object client, String sessionId)
+    protected synchronized void logout(Object client, String sessionId)
             throws DataEndpointAuthenticationException {
         try {
             ((ThriftSecureEventTransmissionService.Client) client).disconnect(sessionId);
@@ -62,7 +62,7 @@ public class ThriftDataEndpoint extends DataEndpoint {
     }
 
     @Override
-    protected void send(Object client, List<Event> events) throws DataEndpointException,
+    protected synchronized void send(Object client, List<Event> events) throws DataEndpointException,
             SessionTimeoutException, UndefinedEventTypeException {
         ThriftEventBundle thriftEventBundle = null;
         for (Event event : events) {
