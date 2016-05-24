@@ -112,16 +112,16 @@
         ExecutionManagerAdminServiceStub proxy =
                 ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
         ExecutionManagerTemplateInfoDTO domain =
-                proxy.getExecutionManagerTemplateInfo(domainName); //todo: refactored TemplateDomainDTO to ExecutionManagerTemplateDTO & getDomain to getExecutionManagerTemplateInfo
+                proxy.getExecutionManagerTemplateInfo(domainName);
 
-        ScenarioConfigurationDTO configurationDTO = proxy.getConfiguration(domainName,
-                configurationName); //todo: refactored TemplateConfigurationDTO to ScenarioConfigurationDTO
+        ScenarioConfigurationDTO scenarioConfigurationDTO = proxy.getConfiguration(domainName,
+                configurationName);
 
-        if (configurationDTO != null) {
+        if (scenarioConfigurationDTO != null) {
             isExistingConfig = true;
         }
 
-        ScenarioInfoDTO currentTemplate = null;
+        ScenarioInfoDTO currentScenario = null;
         String saveButtonText = "template.add.button.text";
         String parameterString = "";
 
@@ -151,17 +151,17 @@
                 if (domain.getScenarioInfoDTOs() != null && !templateType.equals("")) {
                     for (ScenarioInfoDTO scenarioInfoDTO : domain.getScenarioInfoDTOs()) {
                         if (configurationName == null || scenarioInfoDTO.getName().equals(templateType)) {
-                            currentTemplate = scenarioInfoDTO;
+                            currentScenario = scenarioInfoDTO;
                             break;
                         }
                     }
                 } else if (domain.getScenarioInfoDTOs() != null && domain.getScenarioInfoDTOs().length > 0) {
-                    currentTemplate = domain.getScenarioInfoDTOs()[0];
+                    currentScenario = domain.getScenarioInfoDTOs()[0];
                 }
 
 
 
-                if (currentTemplate != null) {
+                if (currentScenario != null) {
                     String parameterValue = "";
                     String description = "";
             %>
@@ -174,7 +174,7 @@
                         for (ScenarioInfoDTO scenarioInfoDTO : domain.getScenarioInfoDTOs()) {
 
                             String selectedValue = "";
-                            if (scenarioInfoDTO.getName().trim().equals(currentTemplate.getName())) {
+                            if (scenarioInfoDTO.getName().trim().equals(currentScenario.getName())) {
                                 selectedValue = "selected=true";
                             }
                     %>
@@ -185,14 +185,14 @@
                     <%}%>
                 </select>
 
-                <div class="sectionHelp"><%=currentTemplate.getDescription()%>
+                <div class="sectionHelp"><%=currentScenario.getDescription()%>
                 </div>
             </div>
 
             <%
 
                 if (isExistingConfig) {
-                    configurationName = configurationDTO.getName().trim();
+                    configurationName = scenarioConfigurationDTO.getName().trim();
                     saveButtonText = "template.update.button.text";
                 }
             %>
@@ -210,7 +210,7 @@
             <%
 
                 if (isExistingConfig) {
-                    description = configurationDTO.getDescription().trim();
+                    description = scenarioConfigurationDTO.getDescription().trim();
                 }
             %>
             <label class="input-label col-md-5"><fmt:message key='template.label.configuration.description'/></label>
@@ -228,17 +228,17 @@
             <%
               int indexParam = 0;
 
-              if (currentTemplate.getParameterDTOs() != null) {
-                for (ParameterDTO parameter : currentTemplate.getParameterDTOs()) {
+              if (currentScenario.getParameterDTOs() != null) {
+                for (ParameterDTO parameter : currentScenario.getParameterDTOs()) {
 
                     if (parameter == null) {
                         continue;
                     }
                     if (!isExistingConfig) {
                         parameterValue = parameter.getDefaultValue().trim();
-                    } else if (configurationDTO.getParameterDTOs() != null) {
+                    } else if (scenarioConfigurationDTO.getParameterDTOs() != null) {
 
-                        for (ParameterDTOE param : configurationDTO.getParameterDTOs()) {
+                        for (ParameterDTOE param : scenarioConfigurationDTO.getParameterDTOs()) {
                             if (param.getName().equals(parameter.getName())) {
                                 parameterValue = param.getValue().trim();
                                 break;
@@ -300,7 +300,7 @@
                                 + parameter.getName() + "').value";
 
                         indexParam++;
-                        if (indexParam < currentTemplate.getParameterDTOs().length) {
+                        if (indexParam < currentScenario.getParameterDTOs().length) {
                             parameterString += "+ ',' +";
                         }
 
@@ -311,46 +311,6 @@
 
             <br class="c-both"/>
             <hr class="wr-separate"/>
-
-<%--<%
-String executionParamString = null;
-//    todo: remove cron configs. configurationDTO.getExecutionParameters() does not exist
-if ("batch".equals(currentTemplate.getExecutionType())) {
-%>
-           <h4><fmt:message key='template.scheduler.header.text'/></h4>
-
- <label class="input-label col-md-5">
- <fmt:message key='template.scheduler.label.text'/>
- </label>
- <div class="input-control input-full-width col-md-7 text">
-
-<%
-if (isExistingConfig && (configurationDTO.getExecutionParameters() != null)) {
-%>
-
-                    <input type="text" id="cronExpressionValue"
-                                           value="<%=configurationDTO.getExecutionParameters()%>"/>
-
-                    <%
-                } else {
-                %>
- <input type="text" id="cronExpressionValue"
-                       value=""/>
-
-<%
-}
-%>
-               </div>
-
-<%
-    executionParamString =  "document.getElementById('"
-                                + "cronExpressionValue" + "').value";
-
-    if (parameterString.length() < 1) {
-        parameterString = "''";
-    }
-}
-%>--%>
 
             <div class="action-container">
                 <button type="button" class="btn btn-default btn-add col-md-2 col-xs-12 pull-right marg-right-15"

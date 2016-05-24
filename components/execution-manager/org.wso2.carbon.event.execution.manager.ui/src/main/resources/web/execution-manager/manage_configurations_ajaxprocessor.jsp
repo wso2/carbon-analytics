@@ -22,23 +22,20 @@
   ~ limitations under the License.
   --%>
 
+<fmt:bundle basename="org.wso2.carbon.event.execution.manager.ui.i18n.Resources">
 <%
-    //renamed TemplateConfigurationDTO to ScenarioConfigurationDTO -done , todo:  remove cron expression
 
     String domainName = request.getParameter("domainName");
     String configuration = request.getParameter("configurationName");
     String saveType = request.getParameter("saveType");
-    System.out.println(saveType);
     String description = request.getParameter("description");
     String parametersJson = request.getParameter("parameters");
     String templateType = request.getParameter("templateType");
-//    String cronExpression = request.getParameter("executionParameters");
     String valueSeparator = "::";
 
     ParameterDTOE[] parameters;
 
     ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
-    System.out.println("test delete: " + saveType.equals("delete"));
     try {
         if (saveType.equals("delete")) {
             proxy.deleteConfiguration(domainName, configuration);
@@ -57,7 +54,6 @@
             } else {
                 String[] parameterStrings = parametersJson.split(",");
                 parameters = new ParameterDTOE[parameterStrings.length];
-                System.out.println("length"+parameterStrings.length);
                 int index = 0;
 
                 for (String parameterString : parameterStrings) {
@@ -65,17 +61,11 @@
                     parameterDTO.setName(parameterString.split(valueSeparator)[0]);
                     parameterDTO.setValue(parameterString.split(valueSeparator)[1]);
                     parameters[index] = parameterDTO;
-                    System.out.println("parametersArray:" + parameters[index].getName());
                     index++;
                 }
             }
 
             scenarioConfigurationDTO.setParameterDTOs(parameters);
-            System.out.println("test");
-
-           /* if (cronExpression != null && cronExpression.length() > 0) {
-                        scenarioConfigurationDTO.setExecutionParameters(cronExpression);
-            }*/
 
             //checks the "proxy.saveConfiguration(scenarioConfigurationDTO)" return value for not null and build stream mapping div
             System.out.println("saving:" + proxy.saveConfiguration(scenarioConfigurationDTO));
@@ -104,7 +94,6 @@
 
         <label class="input-label col-md-5"><fmt:message key='template.label.from.stream.name'/></label>
 
-        <%--todo: add new js function to load mapping table for updated values. need to send a boolean flag to identify stream mapping true or false--%>
         <div class="input-control input-full-width col-md-7 text">
             <select id="fromStreamID_<%=i%>" onchange="loadMappingFromStreamAttributes(<%=i%>)">
                 <option selected disabled>Choose from here</option>
@@ -122,17 +111,21 @@
             </select>
         </div>
 
-        <div id="outerDiv_<%=i%>" class="input-label col-md-5">
+        <div id="outerDiv_<%=i%>">
         </div>
 
     </div>
     <%
         }
     %>
+
+    <br class="c-both"/>
+    <hr class="wr-separate"/>
+
     <div class="action-container">
         <button type="button"
                 class="btn btn-default btn-add col-md-2 col-xs-12 pull-right marg-right-15"
-                onclick="saveStreamConfiguration(<%=toStreamIDArray.length%>,'domain_configurations_ajaxprocessor.jsp?domainName=<%=domainName%>',<%=domainName%>,<%=configuration%>)">
+                onclick="saveStreamConfiguration('<%=toStreamIDArray.length%>','<%=domainName%>','<%=configuration%>')">
             <fmt:message key='template.add.stream.button.text'/>
         </button>
     </div>
@@ -148,3 +141,4 @@
 
 
 %>
+</fmt:bundle>
