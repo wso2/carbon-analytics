@@ -83,6 +83,18 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="getAllExecutionManagerTemplateInfos">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllExecutionManagerTemplateInfosResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2137:ExecutionManagerTemplateInfoDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="getExecutionManagerTemplateInfo">
                 <xs:complexType>
                     <xs:sequence>
@@ -97,15 +109,17 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getAllExecutionManagerTemplateInfos">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllExecutionManagerTemplateInfosResponse">
+            <xs:element name="saveConfiguration">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2137:ExecutionManagerTemplateInfoDTO"/>
+                        <xs:element minOccurs="0" name="configuration" nillable="true" type="ax2134:ScenarioConfigurationDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -121,20 +135,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" nillable="true" type="ax2134:ScenarioConfigurationDTO"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="saveConfiguration">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="configuration" nillable="true" type="ax2134:ScenarioConfigurationDTO"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="saveConfigurationResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -443,13 +443,13 @@
     </wsdl:binding>
     <wsdl:service name="ExecutionManagerAdminService">
         <wsdl:port name="ExecutionManagerAdminServiceHttpsSoap11Endpoint" binding="ns:ExecutionManagerAdminServiceSoap11Binding">
-            <soap:address location="https://192.168.8.102:9443/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsSoap11Endpoint/"/>
+            <soap:address location="https://10.100.5.59:9443/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsSoap11Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="ExecutionManagerAdminServiceHttpsSoap12Endpoint" binding="ns:ExecutionManagerAdminServiceSoap12Binding">
-            <soap12:address location="https://192.168.8.102:9443/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsSoap12Endpoint/"/>
+            <soap12:address location="https://10.100.5.59:9443/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsSoap12Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="ExecutionManagerAdminServiceHttpsEndpoint" binding="ns:ExecutionManagerAdminServiceHttpBinding">
-            <http:address location="https://192.168.8.102:9443/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsEndpoint/"/>
+            <http:address location="https://10.100.5.59:9443/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsEndpoint/"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
