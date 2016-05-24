@@ -16,6 +16,11 @@
 <%@ page import="org.wso2.carbon.event.receiver.stub.EventReceiverAdminServiceStub" %>
 
 <%
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(405);
+        return;
+    }
+
     String msg = "fail";
     EventReceiverAdminServiceStub stub = EventReceiverUIUtils.getEventReceiverAdminService(config, session, request);
     String eventReceiverName = request.getParameter("eventReceiverName");

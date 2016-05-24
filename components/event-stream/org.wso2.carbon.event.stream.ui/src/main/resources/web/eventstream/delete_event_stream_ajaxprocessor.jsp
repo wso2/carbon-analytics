@@ -16,6 +16,11 @@
 <%@ page import="org.wso2.carbon.event.stream.ui.EventStreamUIUtils" %>
 
 <%
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(405);
+        return;
+    }
+
     String msg = "fail";
     EventStreamAdminServiceStub stub = EventStreamUIUtils.getEventStreamAdminService(config, session, request);
     String eventStreamName = request.getParameter("eventStreamName");

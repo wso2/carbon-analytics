@@ -19,6 +19,10 @@
 <%@ page import="org.wso2.carbon.event.publisher.ui.EventPublisherUIUtils" %>
 <%
 
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(405);
+        return;
+    }
 
     String msg = null;
     try {

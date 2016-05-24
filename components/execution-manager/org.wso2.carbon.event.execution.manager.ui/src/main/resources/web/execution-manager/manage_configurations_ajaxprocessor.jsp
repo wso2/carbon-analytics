@@ -21,6 +21,11 @@
 
 <%
 
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(405);
+        return;
+    }
+
     String domainName = request.getParameter("domainName");
     String configuration = request.getParameter("configurationName");
     String saveType = request.getParameter("saveType");
