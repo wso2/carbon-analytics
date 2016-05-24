@@ -64,7 +64,7 @@ function saveConfiguration(domainName, templateType, configurationName, descript
 }
 
 //Save Stream Mapping Configuration
-function saveStreamConfiguration(streamMappingArrayLength, redirectURL, domainName, configurationName) {
+function saveStreamConfiguration(streamMappingArrayLength, domainName, configurationName) {
 
     var streamMappingObjectArray = getStreamMappingObjectArray(streamMappingArrayLength);
 
@@ -76,12 +76,12 @@ function saveStreamConfiguration(streamMappingArrayLength, redirectURL, domainNa
             data: "streamMappingObjectArray=" + JSON.stringify(streamMappingObjectArray) + "&domainName=" + domainName + "&configurationName=" + configurationName
         })
             .error(function () {
-                showErrorDialog("Error occurred when saving configurations");
+                showErrorDialog("Error occurred when saving stream configurations");
             })
             .then(function () {
-                showInfoDialog("Stream mapping saved successfully",
+                showInfoDialog("Stream mapping configuration saved successfully",
                     function () {
-                        document.location.href = redirectURL;
+                        document.location.href = "domain_configurations_ajaxprocessor.jsp?domainName=" + domainName;
                     });
             });
     }
@@ -89,12 +89,9 @@ function saveStreamConfiguration(streamMappingArrayLength, redirectURL, domainNa
 
 //Load Mapping Stream Attributes
 function loadMappingFromStreamAttributes(index) {
-    console.log(index);
     var selectedIndex = document.getElementById("fromStreamID_" + index).selectedIndex;
     var fromStreamNameWithVersion = document.getElementById("fromStreamID_" + index).options[selectedIndex].text;
-    console.log(fromStreamNameWithVersion);
     var toStreamNameWithVersion = document.getElementById("toStreamID_" + index).value;
-    console.log(toStreamNameWithVersion);
 
     var outerDiv = document.getElementById("outerDiv_" + index);
     outerDiv.innerHTML = "";
@@ -140,10 +137,8 @@ function getStreamMappingObjectArray(streamMappingArrayLength) {
 
     for (var i = 0; i < streamMappingArrayLength; i++) {
         var toStreamID = document.getElementById("toStreamID_" + i).value;
-        console.log("toStream: " + toStreamID);
         var fromStreamIDIndex = document.getElementById("fromStreamID_" + i);
         var fromStreamID = fromStreamIDIndex.options[fromStreamIDIndex.selectedIndex].text;
-        console.log("fromStream: " + fromStreamID);
 
         if (fromStreamID.localeCompare("Choose from here") == 0) {
             showErrorDialog("Empty input event stream detail fields are not allowed");
@@ -151,11 +146,8 @@ function getStreamMappingObjectArray(streamMappingArrayLength) {
         } else {
             if (fromStreamID.localeCompare(toStreamID) != 0) {
                 var metaData = getStreamMappingValues("addMetaEventDataTable_" + i, 'meta', i);
-                console.log("metadata: " + metaData);
                 var correlationData = getStreamMappingValues("addCorrelationEventDataTable_" + i, 'correlation', i);
-                console.log("correlation: " + correlationData);
                 var payloadData = getStreamMappingValues("addPayloadEventDataTable_" + i, 'payload', i);
-                console.log("payload: " + payloadData);
                 streamMappingObject = {
                     "toStreamID": toStreamID,
                     "fromStreamID": fromStreamID,

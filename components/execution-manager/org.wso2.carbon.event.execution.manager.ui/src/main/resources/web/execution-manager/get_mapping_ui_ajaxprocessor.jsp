@@ -58,14 +58,14 @@
 
     <h4><fmt:message
             key='template.stream.attribute.mapping.header.text'/></h4>
-    <table>
+    <table style="width:100%">
         <tbody>
 
             <%--Map Meta Data--%>
         <tr id="metaMappingRow">
             <td colspan="2">
                 <h6><fmt:message key="meta.attribute.mapping"/></h6>
-                <table id="addMetaEventDataTable_<%=index%>">
+                <table id="addMetaEventDataTable_<%=index%>" style="width:100%">
                     <tbody>
                     <%
                         if (toStreamDefinitionDto.getMetaData() != null) {
@@ -131,7 +131,7 @@
         <tr id="correlationMappingRow">
             <td colspan="2">
                 <h6><fmt:message key="correlation.attribute.mapping"/></h6>
-                <table id="addCorrelationEventDataTable_<%=index%>">
+                <table id="addCorrelationEventDataTable_<%=index%>" style="width:100%">
                     <tbody>
                     <%
                         if (toStreamDefinitionDto.getCorrelationData() != null) {
@@ -197,7 +197,7 @@
         <tr id="PayloadMappingRow">
             <td colspan="2">
                 <h6><fmt:message key="payload.attribute.mapping"/></h6>
-                <table id="addPayloadEventDataTable_<%=index%>">
+                <table id="addPayloadEventDataTable_<%=index%>" style="width:100%">
                     <tbody>
                     <%
                         if (toStreamDefinitionDto.getPayloadData() != null) {
