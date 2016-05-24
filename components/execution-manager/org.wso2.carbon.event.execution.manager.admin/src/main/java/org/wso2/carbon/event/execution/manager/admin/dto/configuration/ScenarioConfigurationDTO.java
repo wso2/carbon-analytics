@@ -30,6 +30,8 @@ public class ScenarioConfigurationDTO {
 
     private ParameterDTO[] parameterDTOs;
 
+    private StreamMappingDTO[] streamMappingDTOs;
+
     public String getName() {
         return name;
     }
@@ -68,5 +70,13 @@ public class ScenarioConfigurationDTO {
 
     public void setParameterDTOs(ParameterDTO[] parameterDTOs) {
         this.parameterDTOs = parameterDTOs;
+    }
+
+    public StreamMappingDTO[] getStreamMappingDTOs() {
+        return streamMappingDTOs;
+    }
+
+    public void setStreamMappingDTOs(StreamMappingDTO[] streamMappingDTOs) {
+        this.streamMappingDTOs = streamMappingDTOs;
     }
 }

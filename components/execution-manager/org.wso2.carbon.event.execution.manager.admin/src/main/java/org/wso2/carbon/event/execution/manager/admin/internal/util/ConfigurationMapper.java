@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.event.execution.manager.admin.internal.util;
 
+import org.wso2.carbon.event.execution.manager.admin.dto.configuration.AttributeMappingDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.configuration.ParameterDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.configuration.ScenarioConfigurationDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.configuration.StreamMappingDTO;
@@ -116,8 +117,33 @@ public class ConfigurationMapper {
             scenarioConfigurationDTO.setDescription(scenarioConfig.getDescription());
             scenarioConfigurationDTO.setDomain(scenarioConfig.getDomain());
             scenarioConfigurationDTO.setParameterDTOs(mapParameters(scenarioConfig.getParameterMap()));
+            scenarioConfigurationDTO.setStreamMappingDTOs(mapStreamMappings(scenarioConfig.getStreamMappings().getStreamMapping()));
         }
         return scenarioConfigurationDTO;
+    }
+
+    private static StreamMappingDTO[] mapStreamMappings(List<StreamMapping> streamMappingList) {
+        StreamMappingDTO[] mappingDTOArray = new StreamMappingDTO[streamMappingList.size()];
+        int i = 0;
+        for (StreamMapping streamMapping: streamMappingList) {
+            StreamMappingDTO mappingDTO = new StreamMappingDTO();
+            mappingDTO.setFromStream(streamMapping.getFrom());
+            mappingDTO.setToStream(streamMapping.getTo());
+            AttributeMappingDTO[] attributeDTOArray = new AttributeMappingDTO[streamMapping.getAttributeMappings().getAttributeMapping().size()];
+            int j = 0;
+            for (AttributeMapping attributeMapping: streamMapping.getAttributeMappings().getAttributeMapping()) {
+                AttributeMappingDTO attributeDTO = new AttributeMappingDTO();
+                attributeDTO.setFromAttribute(attributeMapping.getFrom());
+                attributeDTO.setToAttribute(attributeMapping.getTo());
+                attributeDTO.setAttributeType(attributeMapping.getType());
+                attributeDTOArray[j] = attributeDTO;
+                j++;
+            }
+            mappingDTO.setAttributeMappingDTOs(attributeDTOArray);
+            mappingDTOArray[i] = mappingDTO;
+            i++;
+        }
+        return mappingDTOArray;
     }
 
     /**
