@@ -17,6 +17,11 @@
 
 <%
 
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(405);
+        return;
+    }
+
     String eventStreamDefinitionDtoString = null;
 
     try {

@@ -28,6 +28,12 @@
 <fmt:bundle basename="org.wso2.carbon.event.statistics.ui.i18n.Resources">
 
     <%
+
+        if (!"post".equalsIgnoreCase(request.getMethod())) {
+            response.sendError(405);
+            return;
+        }
+
         String category = request.getParameter("category");
         String deployment = request.getParameter("deployment");
         String element = request.getParameter("element");

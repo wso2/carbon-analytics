@@ -19,6 +19,12 @@
         import="org.wso2.carbon.event.receiver.ui.EventReceiverUIUtils" %>
 
 <%
+
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(405);
+        return;
+    }
+
     String eventAdapterType = request.getParameter("eventReceiverName");
     String action = request.getParameter("action");
 
