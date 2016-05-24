@@ -30,5 +30,7 @@ public interface TemplateDeployer {
 
     void undeployArtifact(String artifactId) throws TemplateDeploymentException;
 
+    //todo: add another method: deployIfNotExists(); Needed for commonArtifact deployment.
+
 
 }

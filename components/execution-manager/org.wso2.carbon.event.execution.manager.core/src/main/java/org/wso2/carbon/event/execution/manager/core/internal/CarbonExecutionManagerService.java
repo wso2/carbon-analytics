@@ -80,7 +80,13 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
             throws ExecutionManagerException {
         try {
             //save to registry
-            ScenarioConfiguration scenarioConfiguration = ExecutionManagerHelper.getConfigurationFromRegistry(scenarioConfigName, domainName);
+            String resourceCollectionPath = ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
+                                            + "/" + domainName;
+
+            String resourcePath = resourceCollectionPath + "/"
+                                  + scenarioConfigName + ExecutionManagerConstants.CONFIG_FILE_EXTENSION;
+
+            ScenarioConfiguration scenarioConfiguration = ExecutionManagerHelper.getConfiguration(resourcePath);
 
             StreamMappings streamMappings = new StreamMappings();
             streamMappings.setStreamMapping(streamMappingList);

@@ -343,7 +343,7 @@ public class ExecutionManagerHelper {
                 queryBuilder.append(attributeMapping.getFrom()).append(AS).append(attributeMapping.getTo()).append(", ");
             }
             queryBuilder.deleteCharAt(queryBuilder.length() - 2);
-            queryBuilder.append("\n").append(INSERT_INTO).append(TO_STREAM).append(";\n\n");   //todo: do SB.append() for all
+            queryBuilder.append("\n").append(INSERT_INTO).append(TO_STREAM).append(";\n\n");
         }
 
         return planNameStatement + importStatementBuilder.toString() + exportStatementBuilder.toString() + queryBuilder.toString();
@@ -428,40 +428,6 @@ public class ExecutionManagerHelper {
         }
     }
 
-    /**
-     * Returns a Template Configuration from the registry.
-     *
-     * @param templateConfigName Name of the Template Configuration.
-     * @param templateConfigFrom Name of the Template Domain which contains the Template Configuration.
-     * @return
-     */
-    public static ScenarioConfiguration getConfigurationFromRegistry(String templateConfigName,
-                                                                     String templateConfigFrom)
-            throws ExecutionManagerException {
-        try {
-            Registry registry = ExecutionManagerValueHolder.getRegistryService()
-                    .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
-            String resourceCollectionPath = ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
-                                            + "/" + templateConfigFrom;
-
-            String resourcePath = resourceCollectionPath + "/"
-                                  + templateConfigName + ExecutionManagerConstants.CONFIG_FILE_EXTENSION;
-            Resource resource = registry.get(resourcePath);
-
-            JAXBContext jaxbContext = JAXBContext.newInstance(ScenarioConfiguration.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            return  (ScenarioConfiguration) jaxbUnmarshaller.unmarshal(resource.getContentStream());
-        }
-        catch (RegistryException e) {
-            throw new ExecutionManagerException("Registry exception occurred when trying to access configuration registry for tenant domain: "
-                                                + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(), e);
-        } catch (JAXBException e) {
-            throw new ExecutionManagerException("JAXB exception occurred when trying to access configuration registry for tenant domain: "
-                                                + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(), e);
-        }
-    }
-
-
 
     /**
      * Provide template configurations available in the given registry and given path
@@ -469,7 +435,7 @@ public class ExecutionManagerHelper {
      * @param path where configurations are stored
      * @return available configurations
      */
-    public static ScenarioConfiguration getConfiguration(String path)     //todo: why 2 mthods: getConfig and getConfigFrmReg()?
+    public static ScenarioConfiguration getConfiguration(String path)     //todo: why 2 mthodgetConfigFrmRegs: getConfig and ()?
             throws ExecutionManagerException {
 
         ScenarioConfiguration scenarioConfiguration = null;
