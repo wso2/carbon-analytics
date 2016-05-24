@@ -183,7 +183,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
                             , configName, domainName);
             return true;
         } catch (ExecutionManagerException e) {
-            log.error("Error occurred when saving configuration " + configName + " in domain " + domainName + " with stream mappings");
+            log.error("Error occurred when saving configuration " + configName + " in domain " + domainName + " with stream mappings", e);
             throw new AxisFault(e.getMessage(), e);
         }
     }

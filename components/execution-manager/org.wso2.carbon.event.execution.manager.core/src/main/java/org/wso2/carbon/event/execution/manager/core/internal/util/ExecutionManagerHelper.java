@@ -58,13 +58,15 @@ public class ExecutionManagerHelper {
 
     private static final Log log = LogFactory.getLog(ExecutionManagerHelper.class);
     private static final String EXECUTION_PLAN_NAME_ANNOTATION = "@Plan:name";
-    private static final String IMPORT = "Import";
-    private static final String EXPORT = "Export";
     private static final String DEFINE_STREAM = "define stream ";
     private static final String FROM = "from ";
     private static final String SELECT = "select ";
-    private static final String AS = "as ";
+    private static final String AS = " as ";
     private static final String INSERT_INTO = "insert into ";
+    private static final String FROM_STREAM = "fromStream";
+    private static final String TO_STREAM = "toStream";
+
+    private static enum DefineStreamTypes {IMPORT, EXPORT};
 
     /**
      * To avoid instantiating
@@ -323,7 +325,7 @@ public class ExecutionManagerHelper {
             String planName)
             throws ExecutionManagerException {
         //@Plan:name() statement
-        String planNameStatement = EXECUTION_PLAN_NAME_ANNOTATION + "('" + planName + "') \n";
+        String planNameStatement = EXECUTION_PLAN_NAME_ANNOTATION + "('" + planName + "') \n\n";
 
         StringBuilder importStatementBuilder = new StringBuilder(); //for building "@Import..define stream.." statements
         StringBuilder exportStatementBuilder = new StringBuilder(); //for building "@Export..define stream.." statements
@@ -333,25 +335,21 @@ public class ExecutionManagerHelper {
             String fromStreamId = streamMapping.getFrom();
             String toStreamId = streamMapping.getTo();
 
-            String fromStreamName = fromStreamId.split(EventStreamConstants.STREAM_DEFINITION_DELIMITER)[0];
-            String toStreamName = toStreamId.split(EventStreamConstants.STREAM_DEFINITION_DELIMITER)[0];
+            importStatementBuilder.append(generateDefineStreamStatements(DefineStreamTypes.IMPORT, fromStreamId)).append("\n\n");
+            exportStatementBuilder.append(generateDefineStreamStatements(DefineStreamTypes.EXPORT, toStreamId)).append("\n\n");
 
-            importStatementBuilder.append(generateDefineStreamStatements(IMPORT, fromStreamId, fromStreamName) + "\n");
-            exportStatementBuilder.append(generateDefineStreamStatements(EXPORT, toStreamId, toStreamName) + "\n");
-
-            queryBuilder.append(FROM + fromStreamName + " \n" + SELECT);
+            queryBuilder.append(FROM).append(FROM_STREAM).append(" \n").append(SELECT);
             for (AttributeMapping attributeMapping: streamMapping.getAttributeMappings().getAttributeMapping()) {
-                queryBuilder.append(attributeMapping.getFrom() + AS + attributeMapping.getTo() + ", ");
+                queryBuilder.append(attributeMapping.getFrom()).append(AS).append(attributeMapping.getTo()).append(", ");
             }
             queryBuilder.deleteCharAt(queryBuilder.length() - 2);
-            queryBuilder.append("\n").append(INSERT_INTO).append(toStreamName).append(";\n");   //todo: do SB.append() for all
+            queryBuilder.append("\n").append(INSERT_INTO).append(TO_STREAM).append(";\n\n");   //todo: do SB.append() for all
         }
 
         return planNameStatement + importStatementBuilder.toString() + exportStatementBuilder.toString() + queryBuilder.toString();
     }
 
-    private static String generateDefineStreamStatements(String importOrExport, String streamId,
-                                                         String streamName)
+    private static String generateDefineStreamStatements(DefineStreamTypes type, String streamId)
             throws ExecutionManagerException {
         try {
             StreamDefinition streamDefinition = ExecutionManagerValueHolder.getEventStreamService().getStreamDefinition(streamId);
@@ -359,23 +357,23 @@ public class ExecutionManagerHelper {
                 throw new ExecutionManagerException("No stream has being deployed with Stream ID: " + streamId);
             }
 
-            String statement = "@" + importOrExport + "('" + streamId + "')";
-            StringBuilder streamDefBuilder = new StringBuilder(DEFINE_STREAM + streamName + " (");
+            String siddhiStreamName = (DefineStreamTypes.IMPORT.toString().equals(type.toString())) ? FROM_STREAM : TO_STREAM;
+
+            String statement = "@" + type.toString() + "('" + streamId + "')\n";
+            StringBuilder streamDefBuilder = new StringBuilder(DEFINE_STREAM + siddhiStreamName + " (");
             if (streamDefinition.getMetaData() != null) {
                 for (Attribute metaAttribute : streamDefinition.getMetaData()) {
-                    streamDefBuilder.append(EventStreamConstants.META_PREFIX + metaAttribute.getName()
-                                            + " " + metaAttribute.getType() + ", ");
+                    streamDefBuilder.append(EventStreamConstants.META_PREFIX).append(metaAttribute.getName()).append(" ").append(metaAttribute.getType()).append(", ");
                 }
             }
             if (streamDefinition.getCorrelationData() != null) {
                 for (Attribute corrAttribute : streamDefinition.getCorrelationData()) {
-                    streamDefBuilder.append(EventStreamConstants.CORRELATION_PREFIX + corrAttribute.getName()
-                                            + " " + corrAttribute.getType() + ", ");
+                    streamDefBuilder.append(EventStreamConstants.CORRELATION_PREFIX).append(corrAttribute.getName()).append(" ").append(corrAttribute.getType()).append(", ");
                 }
             }
             if (streamDefinition.getPayloadData() != null) {
                 for (Attribute payloadAttribute : streamDefinition.getPayloadData()) {
-                    streamDefBuilder.append(payloadAttribute.getName() + " " + payloadAttribute.getType() + ", ");
+                    streamDefBuilder.append(payloadAttribute.getName()).append(" ").append(payloadAttribute.getType()).append(", ");
                 }
             }
 
@@ -452,8 +450,7 @@ public class ExecutionManagerHelper {
 
             JAXBContext jaxbContext = JAXBContext.newInstance(ScenarioConfiguration.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            ScenarioConfiguration scenarioConfiguration = (ScenarioConfiguration) jaxbUnmarshaller.unmarshal(resource.getContentStream());
-            return scenarioConfiguration;
+            return  (ScenarioConfiguration) jaxbUnmarshaller.unmarshal(resource.getContentStream());
         }
         catch (RegistryException e) {
             throw new ExecutionManagerException("Registry exception occurred when trying to access configuration registry for tenant domain: "
@@ -472,7 +469,7 @@ public class ExecutionManagerHelper {
      * @param path where configurations are stored
      * @return available configurations
      */
-    public static ScenarioConfiguration getConfiguration(String path)
+    public static ScenarioConfiguration getConfiguration(String path)     //todo: why 2 mthods: getConfig and getConfigFrmReg()?
             throws ExecutionManagerException {
 
         ScenarioConfiguration scenarioConfiguration = null;
