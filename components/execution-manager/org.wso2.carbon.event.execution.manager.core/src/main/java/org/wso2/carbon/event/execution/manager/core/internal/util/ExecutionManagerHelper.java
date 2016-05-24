@@ -435,7 +435,7 @@ public class ExecutionManagerHelper {
      * @param path where configurations are stored
      * @return available configurations
      */
-    public static ScenarioConfiguration getConfiguration(String path)     //todo: why 2 mthodgetConfigFrmRegs: getConfig and ()?
+    public static ScenarioConfiguration getConfiguration(String path)
             throws ExecutionManagerException {
 
         ScenarioConfiguration scenarioConfiguration = null;
