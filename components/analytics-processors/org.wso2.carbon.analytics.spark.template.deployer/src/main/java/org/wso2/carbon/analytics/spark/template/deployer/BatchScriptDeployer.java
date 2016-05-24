@@ -18,17 +18,12 @@ package org.wso2.carbon.analytics.spark.template.deployer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
+import org.wso2.carbon.analytics.spark.template.deployer.internal.BatchScriptDeployerConstants;
+import org.wso2.carbon.analytics.spark.template.deployer.internal.BatchScriptDeployerValueHolder;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
-import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import org.wso2.carbon.event.execution.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
-import org.wso2.carbon.analytics.spark.template.deployer.internal.BatchScriptDeployerConstants;
-import org.wso2.carbon.analytics.spark.template.deployer.internal.BatchScriptDeployerValueHolder;
-import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
-import org.wso2.carbon.event.stream.core.exception.StreamDefinitionAlreadyDefinedException;
 
 public class BatchScriptDeployer implements TemplateDeployer {
 
@@ -41,16 +36,15 @@ public class BatchScriptDeployer implements TemplateDeployer {
     }
 
     @Override
-    public void deployArtifact(DeployableTemplate template) throws TemplateDeploymentException {
+    public void deployArtifact(DeployableTemplate template, String artifactName) throws TemplateDeploymentException {
         try {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-            String artifactId = template.getConfiguration().getFrom()
+            String artifactId = template.getConfiguration().getDomain()
                     + BatchScriptDeployerConstants.CONFIG_NAME_SEPARATOR + template.getConfiguration().getName();
             BatchScriptDeployerValueHolder.getAnalyticsProcessorService().deleteScript(tenantId, artifactId);
-            deployStreams(template);
 
             BatchScriptDeployerValueHolder.getAnalyticsProcessorService().saveScript(tenantId,
-                    artifactId, template.getScript(), template.getConfiguration().getExecutionParameters());
+                    artifactId, template.getArtifact(), template.getConfiguration().getParameterMap().get("CronExpression"));   //todo
         } catch (AnalyticsPersistenceException e) {
             throw new TemplateDeploymentException("Error when saving batch script." + template.getConfiguration().getName(), e);
         }
@@ -63,26 +57,6 @@ public class BatchScriptDeployer implements TemplateDeployer {
             BatchScriptDeployerValueHolder.getAnalyticsProcessorService().deleteScript(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(), artifactId);
         } catch (AnalyticsPersistenceException e) {
             throw new TemplateDeploymentException("Error when deleting batch script " + artifactId, e);
-        }
-    }
-
-    public static void deployStreams(DeployableTemplate template) {
-        if (template.getStreams() != null) {
-            for (String stream : template.getStreams()) {
-                StreamDefinition streamDefinition = null;
-                try {
-                    streamDefinition = EventDefinitionConverterUtils.convertFromJson(stream);
-                    BatchScriptDeployerValueHolder.getEventStreamService().addEventStreamDefinition(streamDefinition);
-                } catch (MalformedStreamDefinitionException e) {
-                    log.error("Stream definition is incorrect in domain template " + stream, e);
-                } catch (EventStreamConfigurationException e) {
-                    log.error("Exception occurred when configuring stream " + streamDefinition.getName(), e);
-                } catch (StreamDefinitionAlreadyDefinedException e) {
-                    log.error("Same template stream name " + streamDefinition.getName()
-                            + " has been defined for another definition ", e);
-                    throw e;
-                }
-            }
         }
     }
 }
