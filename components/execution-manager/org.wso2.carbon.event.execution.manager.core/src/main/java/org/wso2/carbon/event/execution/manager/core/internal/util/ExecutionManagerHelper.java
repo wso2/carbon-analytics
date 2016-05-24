@@ -130,34 +130,6 @@ public class ExecutionManagerHelper {
     }
 
     /**
-     * Provide template configurations available in the given registry and given path
-     *
-     * @param path where configurations are stored
-     * @return available configurations
-     */
-    public static ScenarioConfiguration getConfiguration(String path)
-            throws ExecutionManagerException {
-
-        ScenarioConfiguration scenarioConfiguration = null;
-        try {
-            Registry registry = ExecutionManagerValueHolder.getRegistryService().getConfigSystemRegistry(PrivilegedCarbonContext
-                                                                                                                 .getThreadLocalCarbonContext().getTenantId());
-
-            if (registry.resourceExists(path)) {
-                Resource configFile = registry.get(path);
-                if (configFile != null) {
-                    scenarioConfiguration = unmarshalConfiguration(configFile.getContent());
-                }
-            }
-        } catch (RegistryException e) {
-            throw new ExecutionManagerException("Registry exception occurred when accessing files at "
-                    + ExecutionManagerConstants.TEMPLATE_CONFIG_PATH, e);
-        }
-
-        return scenarioConfiguration;
-    }
-
-    /**
      * Unmarshalling ExecutionManagerTemplate object by given file content object
      *
      * @param configFileContent file for unmarshalling
@@ -491,6 +463,37 @@ public class ExecutionManagerHelper {
                                                 + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(), e);
         }
     }
+
+
+
+    /**
+     * Provide template configurations available in the given registry and given path
+     *
+     * @param path where configurations are stored
+     * @return available configurations
+     */
+    public static ScenarioConfiguration getConfiguration(String path)
+            throws ExecutionManagerException {
+
+        ScenarioConfiguration scenarioConfiguration = null;
+        try {
+            Registry registry = ExecutionManagerValueHolder.getRegistryService().getConfigSystemRegistry(PrivilegedCarbonContext
+                                                                                                                 .getThreadLocalCarbonContext().getTenantId());
+
+            if (registry.resourceExists(path)) {
+                Resource configFile = registry.get(path);
+                if (configFile != null) {
+                    scenarioConfiguration = unmarshalConfiguration(configFile.getContent());
+                }
+            }
+        } catch (RegistryException e) {
+            throw new ExecutionManagerException("Registry exception occurred when accessing files at "
+                                                + ExecutionManagerConstants.TEMPLATE_CONFIG_PATH, e);
+        }
+
+        return scenarioConfiguration;
+    }
+
 
     /**
      * Returns a unique ID for a templated artifact.

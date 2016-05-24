@@ -79,17 +79,6 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
                                   String scenarioConfigName, String domainName)
             throws ExecutionManagerException {
         try {
-            //deploy execution plan
-            String planName = ExecutionManagerHelper.getStreamMappingPlanId(domainName, scenarioConfigName);
-            String executionPlan = ExecutionManagerHelper.generateExecutionPlan(streamMappingList, planName);
-
-            DeployableTemplate deployableTemplate = new DeployableTemplate();
-            deployableTemplate.setArtifact(executionPlan);
-
-            TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(ExecutionManagerConstants.DEPLOYER_TYPE_REALTIME);
-              //todo: handle null deployer
-            deployer.deployArtifact(deployableTemplate, planName);
-
             //save to registry
             ScenarioConfiguration scenarioConfiguration = ExecutionManagerHelper.getConfigurationFromRegistry(scenarioConfigName, domainName);
 
@@ -98,6 +87,21 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
 
             scenarioConfiguration.setStreamMappings(streamMappings);
             ExecutionManagerHelper.saveToRegistry(scenarioConfiguration);
+
+            //deploy execution plan
+            String planName = ExecutionManagerHelper.getStreamMappingPlanId(domainName, scenarioConfigName);
+            String executionPlan = ExecutionManagerHelper.generateExecutionPlan(streamMappingList, planName);
+
+            DeployableTemplate deployableTemplate = new DeployableTemplate();
+            deployableTemplate.setArtifact(executionPlan);
+            deployableTemplate.setConfiguration(scenarioConfiguration);
+
+            TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(ExecutionManagerConstants.DEPLOYER_TYPE_REALTIME);
+            if (deployer != null) {
+                deployer.deployArtifact(deployableTemplate, planName);
+            } else {
+                throw new ExecutionManagerException("A deployer doesn't exist for template type " + ExecutionManagerConstants.DEPLOYER_TYPE_REALTIME);
+            }
 
         } catch (TemplateDeploymentException e) {
             throw new ExecutionManagerException("Failed to deploy stream-mapping-execution plan, hence event flow will " +
