@@ -25,6 +25,11 @@
 <fmt:bundle basename="org.wso2.carbon.event.execution.manager.ui.i18n.Resources">
 <%
 
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(405);
+        return;
+    }
+
     String domainName = request.getParameter("domainName");
     String configuration = request.getParameter("configurationName");
     String saveType = request.getParameter("saveType");

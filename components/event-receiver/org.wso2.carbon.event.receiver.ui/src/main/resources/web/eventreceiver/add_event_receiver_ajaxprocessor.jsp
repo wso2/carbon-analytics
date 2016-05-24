@@ -23,6 +23,11 @@
 <%@ page import="org.wso2.carbon.event.receiver.ui.EventReceiverUIUtils" %>
 
 <%
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(405);
+        return;
+    }
+
     // get required parameters to add a event receiver to back end.
     EventReceiverAdminServiceStub stub = EventReceiverUIUtils.getEventReceiverAdminService(config, session, request);
     String eventReceiverName = request.getParameter("eventReceiverName");
