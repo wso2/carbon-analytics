@@ -20,10 +20,7 @@ package org.wso2.carbon.analytics.spark.core.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.bind.DatatypeConverter;
@@ -43,65 +40,40 @@ public class CompressedEventAnalyticsUtils {
      * Get the values of the attributes of an event, as an array.
      * 
      * @param event         Current Event
-     * @param payloadsMap   Payloads Map
+     * @param payloadsList   Payloads Map
      * @param eventIndex    Index of the current event
      * @param timestamp     Tmestamp of the current event
      * @param host          Host of the current event
-     * @param messageFlowId Message ID of the current event
      * @return              Array of values of the fields in the event
      */
-    public static Object[] getFieldValues(Map<String, Object> event, String[] outputColumns,
-        Map<Integer, Map<String, String>> payloadsMap, int eventIndex, long timestamp, String host, String messageFlowId) {
-        Map<String, Object> extendedRowVals = new LinkedHashMap<String, Object>();
+    public static Object[] getFieldValues(List<Object> event, List<PublishingPayload> payloadsList, int eventIndex, 
+            long timestamp, String host) {
+        Object [] fieldsVals = new Object[event.size() + 2];
+        // Adding component attributes
         if (event != null) {
-            for (int j = 0; j < outputColumns.length; j++) {
-                String fieldName = outputColumns[j];
-                Object fieldValue = event.get(fieldName);
-                if (fieldName.equals(AnalyticsConstants.MESSAGE_FLOW_ID_ATTRIBUTE)) {
-                    extendedRowVals.put(fieldName, messageFlowId);
-                } else if (fieldName.equals(AnalyticsConstants.HOST_ATTRIBUTE)) {
-                    extendedRowVals.put(fieldName, host);
-                } else if (fieldName.equals(AnalyticsConstants.TIMESTAMP_FIELD)) {
-                    extendedRowVals.put(fieldName, timestamp);
-                } else if (fieldName.equalsIgnoreCase(AnalyticsConstants.COMPONENT_INDEX_ATTRIBUTE)) {
-                    extendedRowVals.put(fieldName, eventIndex);
-                } else if (fieldValue == null && payloadsMap != null && payloadsMap.containsKey(eventIndex)) {
-                    extendedRowVals.put(fieldName, payloadsMap.get(eventIndex).get(fieldName));
-                } else {
-                    extendedRowVals.put(fieldName, fieldValue);
+            for (int i = 0; i < event.size(); i++) {
+                    fieldsVals[i] = event.get(i);;
+            }
+        }
+        
+        //Add the host and timestamp
+        fieldsVals[fieldsVals.length - 2] = host;
+        fieldsVals[fieldsVals.length - 1] = timestamp;
+        
+        // Adding payloads
+        if (payloadsList != null) {
+            for (int j = 0 ; j < payloadsList.size() ; j++) {
+                PublishingPayload publishingPalyload = payloadsList.get(j);
+                String payload = publishingPalyload.getPayload();
+                List<Integer> mappingAttributes = publishingPalyload.getEvents().get(eventIndex);
+                if (mappingAttributes != null) {
+                    for (int k = 0 ; k < mappingAttributes.size() ; k++) {
+                        fieldsVals[mappingAttributes.get(k)] = payload;
+                    }
                 }
             }
         }
-        return extendedRowVals.values().toArray();
-    }
-
-    /**
-     * Convert payload to map.
-     * 
-     * @param payloadsList  List containing payload details
-     * @return              Map of payloads
-     */
-    public static Map<Integer, Map<String, String>> getPayloadsAsMap(ArrayList<PublishingPayload> payloadsList) {
-        Map<Integer, Map<String, String>> payloadsMap = new HashMap<Integer, Map<String, String>>();
-        for (int i = 0; i < payloadsList.size(); i++) {
-            PublishingPayload publishingPayload = payloadsList.get(i);
-            String payload = publishingPayload.getPayload();
-            ArrayList<PublishingPayloadEvent> eventRefs = publishingPayload.getEvents();
-
-            for (int j = 0; j < eventRefs.size(); j++) {
-                PublishingPayloadEvent eventRef = eventRefs.get(j);
-                int eventIndex = eventRef.getEventIndex();
-                Map<String, String> existingPayloadMap = payloadsMap.get(eventIndex);
-                if (existingPayloadMap == null) {
-                    Map<String, String> attributesMap = new HashMap<String, String>();
-                    attributesMap.put(eventRef.getAttribute(), payload);
-                    payloadsMap.put(eventIndex, attributesMap);
-                } else {
-                    existingPayloadMap.put(eventRef.getAttribute(), payload);
-                }
-            }
-        }
-        return payloadsMap;
+        return fieldsVals;
     }
 
     /**
