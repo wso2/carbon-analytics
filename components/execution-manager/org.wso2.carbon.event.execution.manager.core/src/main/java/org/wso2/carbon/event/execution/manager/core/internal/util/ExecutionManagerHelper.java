@@ -33,7 +33,6 @@ import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
-import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.Resource;
@@ -362,12 +361,12 @@ public class ExecutionManagerHelper {
             StringBuilder streamDefBuilder = new StringBuilder(DEFINE_STREAM + siddhiStreamName + " (");
             if (streamDefinition.getMetaData() != null) {
                 for (Attribute metaAttribute : streamDefinition.getMetaData()) {
-                    streamDefBuilder.append(EventStreamConstants.META_PREFIX).append(metaAttribute.getName()).append(" ").append(metaAttribute.getType()).append(", ");
+                    streamDefBuilder.append(metaAttribute.getName()).append(" ").append(metaAttribute.getType()).append(", ");
                 }
             }
             if (streamDefinition.getCorrelationData() != null) {
                 for (Attribute corrAttribute : streamDefinition.getCorrelationData()) {
-                    streamDefBuilder.append(EventStreamConstants.CORRELATION_PREFIX).append(corrAttribute.getName()).append(" ").append(corrAttribute.getType()).append(", ");
+                    streamDefBuilder.append(corrAttribute.getName()).append(" ").append(corrAttribute.getType()).append(", ");
                 }
             }
             if (streamDefinition.getPayloadData() != null) {
