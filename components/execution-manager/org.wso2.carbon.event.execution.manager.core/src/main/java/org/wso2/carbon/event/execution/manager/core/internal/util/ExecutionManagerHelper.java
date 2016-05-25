@@ -201,7 +201,7 @@ public class ExecutionManagerHelper {
                     deployableTemplate.setConfiguration(configuration);
                     TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(artifact.getType());
                     if (deployer != null) {
-                        deployer.deployArtifact(deployableTemplate, artifactId);
+                        deployer.deployIfNotDoneAlready(deployableTemplate, artifactId);
                         artifactTypeCountingMap.put(artifactType, artifactCount);
                     } else {
                         throw new ExecutionManagerException("A deployer doesn't exist for template type " + artifact.getType());
@@ -211,7 +211,6 @@ public class ExecutionManagerHelper {
                 }
             }
         }
-
         //now, deploy templated artifacts
         for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()) {
             if (scenario.getName().equals(configuration.getScenario())) {
