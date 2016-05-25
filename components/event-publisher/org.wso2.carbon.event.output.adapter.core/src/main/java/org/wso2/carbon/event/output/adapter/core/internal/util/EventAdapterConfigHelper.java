@@ -31,16 +31,22 @@ import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.securevault.SecretResolver;
 import org.wso2.securevault.SecretResolverFactory;
 
+import org.apache.xerces.impl.Constants;
+import org.apache.xerces.util.SecurityManager;
+
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 
 public class EventAdapterConfigHelper {
 
     private static final Log log = LogFactory.getLog(EventAdapterConfigHelper.class);
     private static SecretResolver secretResolver;
+    private static final int ENTITY_EXPANSION_LIMIT = 0;
 
     public static void secureResolveDocument(Document doc)
             throws OutputEventAdapterException {
@@ -56,7 +62,7 @@ public class EventAdapterConfigHelper {
     }
 
     public static Document convertToDocument(File file) throws OutputEventAdapterException {
-        DocumentBuilderFactory fac = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory fac = getSecuredDocumentBuilder();
         fac.setNamespaceAware(true);
         try {
             return fac.newDocumentBuilder().parse(file);
@@ -65,6 +71,29 @@ public class EventAdapterConfigHelper {
                     e.getMessage(), e);
         }
     }
+
+    private static DocumentBuilderFactory getSecuredDocumentBuilder() {
+
+                        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                dbf.setNamespaceAware(true);
+                dbf.setXIncludeAware(false);
+                dbf.setExpandEntityReferences(false);
+                try {
+                        dbf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE, false);
+                        dbf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
+                        dbf.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.LOAD_EXTERNAL_DTD_FEATURE, false);
+                    } catch (ParserConfigurationException e) {
+                        log.error(
+                                        "Failed to load XML Processor Feature " + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE + " or " +
+                                                Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE + " or " + Constants.LOAD_EXTERNAL_DTD_FEATURE);
+                    }
+
+                        SecurityManager securityManager = new SecurityManager();
+                securityManager.setEntityExpansionLimit(ENTITY_EXPANSION_LIMIT);
+                dbf.setAttribute(Constants.XERCES_PROPERTY_PREFIX + Constants.SECURITY_MANAGER_PROPERTY, securityManager);
+
+                        return dbf;
+            }
 
     private static void secureLoadElement(Element element)
             throws CryptoException {
