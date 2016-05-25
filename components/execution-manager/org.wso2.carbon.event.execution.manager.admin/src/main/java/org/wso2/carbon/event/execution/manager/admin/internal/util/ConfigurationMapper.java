@@ -24,6 +24,7 @@ import org.wso2.carbon.event.execution.manager.core.structure.configuration.Attr
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.AttributeMappings;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.ScenarioConfiguration;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMappings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -117,12 +118,16 @@ public class ConfigurationMapper {
             scenarioConfigurationDTO.setDescription(scenarioConfig.getDescription());
             scenarioConfigurationDTO.setDomain(scenarioConfig.getDomain());
             scenarioConfigurationDTO.setParameterDTOs(mapParameters(scenarioConfig.getParameterMap()));
-            scenarioConfigurationDTO.setStreamMappingDTOs(mapStreamMappings(scenarioConfig.getStreamMappings().getStreamMapping()));
+            scenarioConfigurationDTO.setStreamMappingDTOs(mapStreamMappings(scenarioConfig.getStreamMappings()));
         }
         return scenarioConfigurationDTO;
     }
 
-    private static StreamMappingDTO[] mapStreamMappings(List<StreamMapping> streamMappingList) {
+    private static StreamMappingDTO[] mapStreamMappings(StreamMappings streamMappings) {
+        if (streamMappings == null) {
+            return null;
+        }
+        List<StreamMapping> streamMappingList = streamMappings.getStreamMapping();
         StreamMappingDTO[] mappingDTOArray = new StreamMappingDTO[streamMappingList.size()];
         int i = 0;
         for (StreamMapping streamMapping: streamMappingList) {
@@ -199,8 +204,8 @@ public class ConfigurationMapper {
                 dto.setName(entry.getKey());
                 dto.setValue(entry.getValue());
                 parameterDTOs[i] = dto;
+                i++;
             }
-            i++;
         }
         return parameterDTOs;
     }
