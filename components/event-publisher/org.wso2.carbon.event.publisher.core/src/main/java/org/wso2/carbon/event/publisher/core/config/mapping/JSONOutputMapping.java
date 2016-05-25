@@ -21,6 +21,7 @@ public class JSONOutputMapping extends OutputMapping {
 
     private String mappingText;
     private boolean registryResource;
+    private long cacheTimeoutDuration;
 
     public String getMappingText() {
         return mappingText;
@@ -43,5 +44,11 @@ public class JSONOutputMapping extends OutputMapping {
         this.registryResource = registryResource;
     }
 
+    public long getCacheTimeoutDuration() {
+        return cacheTimeoutDuration;
+    }
 
+    public void setCacheTimeoutDuration(long cacheTimeoutDuration) {
+        this.cacheTimeoutDuration = cacheTimeoutDuration;
+    }
 }

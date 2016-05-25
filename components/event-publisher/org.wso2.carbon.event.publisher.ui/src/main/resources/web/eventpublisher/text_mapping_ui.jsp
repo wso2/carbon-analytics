@@ -14,8 +14,21 @@
   --%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-
+<%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <fmt:bundle basename="org.wso2.carbon.event.publisher.ui.i18n.Resources">
+
+    <carbon:breadcrumb
+            label="eventpublisher.list"
+            resourceBundle="org.wso2.carbon.event.publisher.ui.i18n.Resources"
+            topPage="false"
+            request="<%=request%>"/>
+
+    <carbon:jsi18n
+            resourceBundle="org.wso2.carbon.event.publisher.ui.i18n.Resources"
+            request="<%=request%>"
+            namespace="org.wso2.carbon.event.publisher.ui"/>
+
+
     <link type="text/css" href="../eventpublisher/css/eventPublisher.css" rel="stylesheet"/>
     <script type="text/javascript" src="../eventpublisher/js/event_publisher.js"></script>
     <table class="styledLeft noBorders spacer-bot"
@@ -51,7 +64,7 @@
         <tr name="outputTextMappingRegistry" style="display:none" id="outputTextMappingRegistry">
             <td class="leftCol-med" colspan="1"><fmt:message key="resource.path"/><span
                     class="required">*</span></td>
-            <td colspan="1"><input type="text" id="textSourceRegistry" disabled="disabled"
+            <td colspan="1"><input type="text" id="textSourceRegistry"
                                    class="initE"
                                    value=""
                                    style="width:100%"/></td>
@@ -67,6 +80,13 @@
                    onclick="showRegistryBrowser('textSourceRegistry', '/_system/governance');"><fmt:message
                         key="gov.registry"/></a>
             </td>
+        </tr>
+        <tr name="outputTextMappingRegistryCacheTimeout" style="display:none" id="outputTextMappingRegistryCacheTimeout">
+            <td class="leftCol-med" colspan="1"><fmt:message key="cache.timeout"/><span class="required">*</span></td>
+            <td colspan="1"><input type="text" id="textCacheTimeout"
+                                               class="initE"
+                                               value="0"
+                                               style="width:100%"/></td>
         </tr>
         </tbody>
     </table>

@@ -52,7 +52,7 @@
             <td class="leftCol-med" colspan="1"><fmt:message key="resource.path"/><span
                     class="required">*</span></td>
             <td colspan="1">
-                <input type="text" id="jsonSourceRegistry" disabled="disabled" class="initE"
+                <input type="text" id="jsonSourceRegistry" class="initE"
                        value=""
                        style="width:100%"/>
             </td>
@@ -67,6 +67,13 @@
                    onclick="showRegistryBrowser('jsonSourceRegistry', '/_system/governance');"><fmt:message
                         key="gov.registry"/></a>
             </td>
+        </tr>
+        <tr name="outputJSONMappingRegistryCacheTimeout" style="display:none" id="outputJSONMappingRegistryCacheTimeout">
+            <td class="leftCol-med" colspan="1"><fmt:message key="cache.timeout"/><span class="required">*</span></td>
+            <td colspan="1"><input type="text" id="textCacheTimeout"
+                                               class="initE"
+                                               value="0"
+                                               style="width:100%"/></td>
         </tr>
         </tbody>
     </table>

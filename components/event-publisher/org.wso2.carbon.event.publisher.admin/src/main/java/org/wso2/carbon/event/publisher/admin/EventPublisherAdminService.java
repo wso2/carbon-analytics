@@ -219,6 +219,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                     JSONOutputMappingDto jsonOutputMappingDto = new JSONOutputMappingDto();
                     jsonOutputMappingDto.setMappingText(jsonOutputMapping.getMappingText());
                     jsonOutputMappingDto.setRegistryResource(jsonOutputMapping.isRegistryResource());
+                    jsonOutputMappingDto.setCacheTimeoutDuration(jsonOutputMapping.getCacheTimeoutDuration());
                     eventPublisherConfigurationDto.setJsonOutputMappingDto(jsonOutputMappingDto);
                     eventPublisherConfigurationDto.setCustomMappingEnabled(jsonOutputMapping.isCustomMappingEnabled());
                     eventPublisherConfigurationDto.setMessageFormat(EventPublisherConstants.EF_JSON_MAPPING_TYPE);
@@ -227,6 +228,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                     XMLOutputMappingDto xmlOutputMappingDto = new XMLOutputMappingDto();
                     xmlOutputMappingDto.setMappingXMLText(xmlOutputMapping.getMappingXMLText());
                     xmlOutputMappingDto.setRegistryResource(xmlOutputMapping.isRegistryResource());
+                    xmlOutputMappingDto.setCacheTimeoutDuration(xmlOutputMapping.getCacheTimeoutDuration());
                     eventPublisherConfigurationDto.setCustomMappingEnabled(xmlOutputMapping.isCustomMappingEnabled());
                     eventPublisherConfigurationDto.setXmlOutputMappingDto(xmlOutputMappingDto);
                     eventPublisherConfigurationDto.setMessageFormat(EventPublisherConstants.EF_XML_MAPPING_TYPE);
@@ -235,6 +237,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                     TextOutputMappingDto textOutputMappingDto = new TextOutputMappingDto();
                     textOutputMappingDto.setMappingText(textOutputMapping.getMappingText());
                     textOutputMappingDto.setRegistryResource(textOutputMapping.isRegistryResource());
+                    textOutputMappingDto.setCacheTimeoutDuration(textOutputMapping.getCacheTimeoutDuration());
                     eventPublisherConfigurationDto.setTextOutputMappingDto(textOutputMappingDto);
                     eventPublisherConfigurationDto.setCustomMappingEnabled(textOutputMapping.isCustomMappingEnabled());
                     eventPublisherConfigurationDto.setMessageFormat(EventPublisherConstants.EF_TEXT_MAPPING_TYPE);
@@ -458,7 +461,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                                                          String eventAdapterType,
                                                          String textData,
                                                          BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                         String dataFrom, boolean mappingEnabled)
+                                                         String dataFrom, long cacheTimeoutDuration, boolean mappingEnabled)
             throws AxisFault {
 
         if (checkEventPublisherValidity(eventPublisherName)) {
@@ -475,16 +478,21 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 constructOutputAdapterRelatedConfigs(eventPublisherName, eventAdapterType, outputPropertyConfiguration,
                         eventPublisherConfiguration, EventPublisherConstants.EF_TEXT_MAPPING_TYPE);
 
+                if (cacheTimeoutDuration < 0) {
+                    cacheTimeoutDuration = 0;
+                }
+
                 TextOutputMapping textOutputMapping = new TextOutputMapping();
                 textOutputMapping.setCustomMappingEnabled(mappingEnabled);
 
                 textOutputMapping.setRegistryResource(validateRegistrySource(dataFrom));
                 textOutputMapping.setMappingText(textData);
+                textOutputMapping.setCacheTimeoutDuration(cacheTimeoutDuration);
 
                 List<String> outputEventAttributes = new ArrayList<String>();
 
                 if (mappingEnabled) {
-                    if (dataFrom.equalsIgnoreCase("registry")) {
+                    if (dataFrom.equalsIgnoreCase("registry") && !textData.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) || textData.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) < 0) {
                         textData = eventPublisherService.getRegistryResourceContent(textData);
                     }
                     outputEventAttributes = getOutputMappingPropertyList(textData);
@@ -512,7 +520,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                                                         String eventAdapterType,
                                                         String textData,
                                                         BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                        String dataFrom, boolean mappingEnabled)
+                                                        String dataFrom, long cacheTimeoutDuration, boolean mappingEnabled)
             throws AxisFault {
 
         if (checkEventPublisherValidity(eventPublisherName)) {
@@ -534,8 +542,12 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 List<String> outputEventAttributes = new ArrayList<String>();
 
                 if (mappingEnabled) {
+                    if (cacheTimeoutDuration < 0) {
+                        cacheTimeoutDuration = 0;
+                    }
                     xmlOutputMapping.setMappingXMLText(textData);
                     xmlOutputMapping.setRegistryResource(validateRegistrySource(dataFrom));
+                    xmlOutputMapping.setCacheTimeoutDuration(cacheTimeoutDuration);
                     outputEventAttributes = getOutputMappingPropertyList(textData);
                 }
 
@@ -618,7 +630,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                                                          String eventAdapterType,
                                                          String jsonData,
                                                          BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                         String dataFrom, boolean mappingEnabled)
+                                                         String dataFrom, long cacheTimeoutDuration, boolean mappingEnabled)
             throws AxisFault {
 
         if (checkEventPublisherValidity(eventPublisherName)) {
@@ -641,8 +653,12 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 List<String> outputEventAttributes = new ArrayList<String>();
 
                 if (mappingEnabled) {
+                    if (cacheTimeoutDuration < 0) {
+                        cacheTimeoutDuration = 0;
+                    }
                     jsonOutputMapping.setRegistryResource(validateRegistrySource(dataFrom));
                     jsonOutputMapping.setMappingText(jsonData);
+                    jsonOutputMapping.setCacheTimeoutDuration(cacheTimeoutDuration);
                     outputEventAttributes = getOutputMappingPropertyList(jsonData);
                 }
 
@@ -943,8 +959,8 @@ public class EventPublisherAdminService extends AbstractAdmin {
     }
 
     public void testPublisherConnection(String eventPublisherName, String eventAdapterType,
-                             BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                             String messageFormat) throws AxisFault {
+                                        BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                        String messageFormat) throws AxisFault {
 
         try {
 
@@ -988,7 +1004,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
         return isEditable;
     }
 
-    public boolean isPublisherStatisticsEnabled(String eventPublisherName){
+    public boolean isPublisherStatisticsEnabled(String eventPublisherName) {
         EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
         List<EventPublisherConfiguration> eventPublisherConfigurationList = null;
         boolean isStatisticsEnabled = false;
@@ -1008,7 +1024,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
         return isStatisticsEnabled;
     }
 
-    public boolean isPublisherTraceEnabled(String eventPublisherName){
+    public boolean isPublisherTraceEnabled(String eventPublisherName) {
         EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
         List<EventPublisherConfiguration> eventPublisherConfigurationList = null;
         boolean isTraceEnabled = false;
