@@ -20,6 +20,8 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.analytics.spark.template.deployer.internal.BatchScriptDeployerValueHolder;
+import org.wso2.carbon.analytics.spark.template.deployer.internal.data.model.ExecutionParameters;
+import org.wso2.carbon.analytics.spark.template.deployer.internal.util.DeployerHelper;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.execution.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
@@ -41,14 +43,22 @@ public class BatchScriptDeployer implements TemplateDeployer {
     @Override
     public void deployArtifact(DeployableTemplate template) throws TemplateDeploymentException {
         try {
-            String artifactId = template.getArtifactId();
+            if (template == null) {
+                throw new TemplateDeploymentException("No artifact received to be deployed.");
+            }
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+
+            String artifactId = template.getArtifactId();
+            ExecutionParameters executionParameters = DeployerHelper.getExecutionParameters(template.getArtifact());
+
             BatchScriptDeployerValueHolder.getAnalyticsProcessorService().deleteScript(tenantId, artifactId);
 
             BatchScriptDeployerValueHolder.getAnalyticsProcessorService().saveScript(tenantId,
-                    artifactId, template.getArtifact(), template.getConfiguration().getParameterMap().get("CronExpression"));   //todo
+                    artifactId, executionParameters.getSparkScript(), executionParameters.getCron());
         } catch (AnalyticsPersistenceException e) {
-            throw new TemplateDeploymentException("Error when saving batch script." + template.getConfiguration().getName(), e);
+            throw new TemplateDeploymentException("Error when deploying batch script." +
+                                                  template.getConfiguration().getName() + "for tenant domain " +
+                                                  PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true), e);
         }
     }
 
@@ -57,6 +67,9 @@ public class BatchScriptDeployer implements TemplateDeployer {
     public void deployIfNotDoneAlready(DeployableTemplate template)
             throws TemplateDeploymentException {
         try {
+            if (template == null) {
+                throw new TemplateDeploymentException("No artifact received to be deployed.");
+            }
             String planName = template.getArtifactId();
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             List<AnalyticsScript> analyticsScripts = BatchScriptDeployerValueHolder.getAnalyticsProcessorService().getAllScripts(tenantId);
@@ -80,7 +93,8 @@ public class BatchScriptDeployer implements TemplateDeployer {
         try {
             BatchScriptDeployerValueHolder.getAnalyticsProcessorService().deleteScript(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(), artifactId);
         } catch (AnalyticsPersistenceException e) {
-            throw new TemplateDeploymentException("Error when deleting batch script " + artifactId, e);
+            throw new TemplateDeploymentException("Error when deleting batch script " + artifactId +
+                                                  "for tenant domain " + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true), e);
         }
     }
 
