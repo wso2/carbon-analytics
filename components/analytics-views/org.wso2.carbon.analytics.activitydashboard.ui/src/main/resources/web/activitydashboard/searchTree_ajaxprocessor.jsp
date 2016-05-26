@@ -21,6 +21,11 @@
 <%@ page import="org.wso2.carbon.analytics.activitydashboard.ui.SearchTreeUIUtil" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        return;
+    }
+
     Object searchTreeObj = request.getSession().getAttribute("SearchExpression");
     String responseStr;
     if (searchTreeObj == null) {

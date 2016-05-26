@@ -27,6 +27,11 @@
         import="org.wso2.carbon.analytics.activitydashboard.stub.ActivityDashboardAdminServiceActivityDashboardExceptionException" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        return;
+    }
+
     Object searchTreeObj = request.getSession().getAttribute("SearchExpression");
     String fromTimeString = request.getParameter("fromTime");
     String toTimeString = request.getParameter("toTime");

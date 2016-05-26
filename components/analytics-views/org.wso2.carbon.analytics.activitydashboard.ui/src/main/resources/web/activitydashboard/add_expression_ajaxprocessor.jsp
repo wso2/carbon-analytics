@@ -18,6 +18,11 @@
 <%@ page import="org.wso2.carbon.analytics.activitydashboard.commons.*" %>
 
 <%
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        return;
+    }
+
     boolean isQueryExpression = Boolean.parseBoolean(request.getParameter("isQueryType"));
     Object searchExpressionObj = request.getSession().getAttribute("SearchExpression");
     String expressionNodeId = request.getParameter("nodeId");
