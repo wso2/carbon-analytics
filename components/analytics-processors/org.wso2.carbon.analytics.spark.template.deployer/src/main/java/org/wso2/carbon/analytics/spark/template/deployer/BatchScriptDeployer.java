@@ -68,7 +68,7 @@ public class BatchScriptDeployer implements TemplateDeployer {
             }
         } catch (AnalyticsPersistenceException e) {
             throw new TemplateDeploymentException("Error when obtaining all Spark scripts for tenant domain "
-                                                  + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true));
+                                                  + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true), e);
         }
     }
 
