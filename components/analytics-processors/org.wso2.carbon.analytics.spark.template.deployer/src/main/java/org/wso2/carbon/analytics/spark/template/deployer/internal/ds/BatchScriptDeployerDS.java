@@ -19,8 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
+import org.wso2.carbon.analytics.spark.template.deployer.BatchScriptTemplateDeployer;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
-import org.wso2.carbon.analytics.spark.template.deployer.BatchScriptDeployer;
 import org.wso2.carbon.analytics.spark.template.deployer.internal.BatchScriptDeployerValueHolder;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 
@@ -40,8 +40,8 @@ public class BatchScriptDeployerDS {
 
     protected void activate(ComponentContext context) {
         try {
-            BatchScriptDeployer deployer = new BatchScriptDeployer();
-            context.getBundleContext().registerService(TemplateDeployer.class.getName(), deployer, null);
+            BatchScriptTemplateDeployer templateDeployer = new BatchScriptTemplateDeployer();
+            context.getBundleContext().registerService(TemplateDeployer.class.getName(), templateDeployer, null);
         } catch (RuntimeException e) {
             log.error("Couldn't register BatchScriptDeployer service", e);
         }

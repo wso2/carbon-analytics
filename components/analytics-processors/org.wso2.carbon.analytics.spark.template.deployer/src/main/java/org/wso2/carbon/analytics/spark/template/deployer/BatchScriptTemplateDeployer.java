@@ -21,7 +21,7 @@ import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceExcept
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.analytics.spark.template.deployer.internal.BatchScriptDeployerValueHolder;
 import org.wso2.carbon.analytics.spark.template.deployer.internal.data.model.ExecutionParameters;
-import org.wso2.carbon.analytics.spark.template.deployer.internal.util.DeployerHelper;
+import org.wso2.carbon.analytics.spark.template.deployer.internal.util.TemplateDeployerHelper;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.execution.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
@@ -29,9 +29,9 @@ import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
 
 import java.util.List;
 
-public class BatchScriptDeployer implements TemplateDeployer {
+public class BatchScriptTemplateDeployer implements TemplateDeployer {
 
-    private static final Log log = LogFactory.getLog(BatchScriptDeployer.class);
+    private static final Log log = LogFactory.getLog(BatchScriptTemplateDeployer.class);
 
 
     @Override
@@ -49,7 +49,7 @@ public class BatchScriptDeployer implements TemplateDeployer {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
             String artifactId = template.getArtifactId();
-            ExecutionParameters executionParameters = DeployerHelper.getExecutionParameters(template.getArtifact());
+            ExecutionParameters executionParameters = TemplateDeployerHelper.getExecutionParameters(template.getArtifact());
 
             BatchScriptDeployerValueHolder.getAnalyticsProcessorService().deleteScript(tenantId, artifactId);
 

@@ -8,7 +8,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
 
-public class DeployerHelper {
+public class TemplateDeployerHelper {
 
     /**
      * Generates ExecutionParameters object out of the given xmlString
