@@ -39,8 +39,9 @@ public class BatchScriptDeployer implements TemplateDeployer {
 
 
     @Override
-    public void deployArtifact(DeployableTemplate template, String artifactId) throws TemplateDeploymentException {
+    public void deployArtifact(DeployableTemplate template) throws TemplateDeploymentException {
         try {
+            String artifactId = template.getArtifactId();
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             BatchScriptDeployerValueHolder.getAnalyticsProcessorService().deleteScript(tenantId, artifactId);
 
@@ -53,13 +54,14 @@ public class BatchScriptDeployer implements TemplateDeployer {
 
 
     @Override
-    public void deployIfNotDoneAlready(DeployableTemplate template, String planName)
+    public void deployIfNotDoneAlready(DeployableTemplate template)
             throws TemplateDeploymentException {
         try {
+            String planName = template.getArtifactId();
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             List<AnalyticsScript> analyticsScripts = BatchScriptDeployerValueHolder.getAnalyticsProcessorService().getAllScripts(tenantId);
             if (analyticsScripts == null || analyticsScripts.isEmpty()) {
-                deployArtifact(template, planName);
+                deployArtifact(template);
             } else {
                 if(log.isDebugEnabled()) {
                     log.debug("Common Artifact: " + planName + " of Domain " + template.getConfiguration().getDomain()
