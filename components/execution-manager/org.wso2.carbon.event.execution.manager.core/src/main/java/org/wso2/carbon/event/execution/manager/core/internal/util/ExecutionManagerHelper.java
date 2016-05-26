@@ -192,8 +192,7 @@ public class ExecutionManagerHelper {
                     } else {
                         artifactCount++;
                     }
-                    String artifactId = executionManagerTemplate.getDomain() + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR
-                                        + artifactType + artifactCount;
+                    String artifactId = ExecutionManagerHelper.getCommonArtifactId(executionManagerTemplate.getDomain(), artifactType, artifactCount);
 
                     DeployableTemplate deployableTemplate = new DeployableTemplate();
                     deployableTemplate.setArtifact(artifact.getValue());
@@ -222,8 +221,8 @@ public class ExecutionManagerHelper {
                     } else {
                         artifactCount++;
                     }
-                    String artifactId = ExecutionManagerHelper.getArtifactId(executionManagerTemplate.getDomain(),
-                                                                             scenario.getName(), configuration.getName(), artifactType, artifactCount);
+                    String artifactId = ExecutionManagerHelper.getTemplatedArtifactId(executionManagerTemplate.getDomain(),
+                                                                                      scenario.getName(), configuration.getName(), artifactType, artifactCount);
                     TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(template.getType());
                     if (deployer != null) {
                         try {
@@ -457,7 +456,7 @@ public class ExecutionManagerHelper {
 
 
     /**
-     * Returns a unique ID for a templated artifact.
+     * Returns the ID of a templated artifact.
      * @param domainName
      * @param scenarioName
      * @param scenarioConfigName
@@ -465,14 +464,16 @@ public class ExecutionManagerHelper {
      * @param sequenceNumber
      * @return
      */
-    public static String getArtifactId(String domainName, String scenarioName, String scenarioConfigName, String artifactType, int sequenceNumber) {
+    public static String getTemplatedArtifactId(String domainName, String scenarioName,
+                                                String scenarioConfigName, String artifactType,
+                                                int sequenceNumber) {
         return domainName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR
                + scenarioName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + scenarioConfigName
                + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + artifactType + sequenceNumber;
     }
 
     /**
-     * Returns a unique ID for the Stream Mapping execution plan.
+     * Returns the ID of a Stream Mapping execution plan.
      * @param domainName
      * @param scenarioConfigName
      * @return
@@ -480,5 +481,17 @@ public class ExecutionManagerHelper {
     public static String getStreamMappingPlanId(String domainName, String scenarioConfigName) {
         return domainName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + scenarioConfigName
                           + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + ExecutionManagerConstants.STREAM_MAPPING_PLAN_SUFFIX;
+    }
+
+    /**
+     * Returns the ID of a common artifact.
+     * @param domainName
+     * @param artifactType
+     * @param sequenceNumber
+     * @return
+     */
+    public static String getCommonArtifactId(String domainName, String artifactType,
+                                                int sequenceNumber) {
+        return domainName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + artifactType + sequenceNumber;
     }
 }
