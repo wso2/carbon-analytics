@@ -14,6 +14,9 @@
  */
 package org.wso2.carbon.event.receiver.core.internal.util;
 
+import org.apache.xerces.impl.Constants;
+import org.apache.xerces.util.*;
+import org.apache.xerces.util.SecurityManager;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.w3c.dom.Document;
@@ -38,6 +41,8 @@ import java.io.Writer;
  */
 public class XmlFormatter {
 
+    private static final int ENTITY_EXPANSION_LIMIT = 0;
+
     private XmlFormatter() {
     }
 
@@ -59,9 +64,27 @@ public class XmlFormatter {
         }
     }
 
+    private static DocumentBuilderFactory getSecuredDocumentBuilder() throws ParserConfigurationException {
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        dbf.setXIncludeAware(false);
+        dbf.setExpandEntityReferences(false);
+        dbf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE, false);
+        dbf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
+        dbf.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.LOAD_EXTERNAL_DTD_FEATURE, false);
+
+        org.apache.xerces.util.SecurityManager securityManager = new SecurityManager();
+        securityManager.setEntityExpansionLimit(ENTITY_EXPANSION_LIMIT);
+        dbf.setAttribute(Constants.XERCES_PROPERTY_PREFIX + Constants.SECURITY_MANAGER_PROPERTY, securityManager);
+
+        return dbf;
+    }
+
+
     private static Document parseXmlFile(String in) {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory dbf = getSecuredDocumentBuilder();
             DocumentBuilder db = dbf.newDocumentBuilder();
             InputSource is = new InputSource(new StringReader(in));
             return db.parse(is);
