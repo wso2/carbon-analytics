@@ -197,9 +197,10 @@ public class ExecutionManagerHelper {
                     DeployableTemplate deployableTemplate = new DeployableTemplate();
                     deployableTemplate.setArtifact(artifact.getValue());
                     deployableTemplate.setConfiguration(configuration);
+                    deployableTemplate.setArtifactId(artifactId);
                     TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(artifact.getType());
                     if (deployer != null) {
-                        deployer.deployIfNotDoneAlready(deployableTemplate, artifactId);
+                        deployer.deployIfNotDoneAlready(deployableTemplate);
                         artifactTypeCountingMap.put(artifactType, artifactCount);
                     } else {
                         throw new ExecutionManagerException("A deployer doesn't exist for template type " + artifact.getType());
@@ -230,7 +231,8 @@ public class ExecutionManagerHelper {
                             String updatedScript = updateArtifactParameters(configuration, template.getValue());
                             deployableTemplate.setArtifact(updatedScript);
                             deployableTemplate.setConfiguration(configuration);
-                            deployer.deployArtifact(deployableTemplate, artifactId);
+                            deployableTemplate.setArtifactId(artifactId);
+                            deployer.deployArtifact(deployableTemplate);
                             artifactTypeCountingMap.put(artifactType, artifactCount);
                         } catch (TemplateDeploymentException e) {
                             throw new ExecutionManagerException("Error when trying to deploy the artifact " + configuration.getName() ,e);

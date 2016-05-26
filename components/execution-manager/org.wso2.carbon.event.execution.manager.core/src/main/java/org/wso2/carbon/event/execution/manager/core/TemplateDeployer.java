@@ -23,10 +23,9 @@ public interface TemplateDeployer {
      * This method is used to deploy an artifact given under a Template.
      *
      * @param template The template, updated with user-specified parameters.
-     * @param artifactId  A unique name given for the artifact. Using this name as the artifact name (e.g. the stream name), it can be deployed without conflicts.
      * @throws TemplateDeploymentException
      */
-    void deployArtifact(DeployableTemplate template, String artifactId) throws TemplateDeploymentException;
+    void deployArtifact(DeployableTemplate template) throws TemplateDeploymentException;
 
     /**
      * Undeploys an artifact, given its ID.
@@ -40,8 +39,7 @@ public interface TemplateDeployer {
      * This method is used to deploy an artifact given under Common Artifacts.
      *
      * @param template
-     * @param artifactId
      */
-    void deployIfNotDoneAlready(DeployableTemplate template, String artifactId) throws TemplateDeploymentException;
+    void deployIfNotDoneAlready(DeployableTemplate template) throws TemplateDeploymentException;
 
 }

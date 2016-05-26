@@ -98,10 +98,11 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
             DeployableTemplate deployableTemplate = new DeployableTemplate();
             deployableTemplate.setArtifact(executionPlan);
             deployableTemplate.setConfiguration(scenarioConfiguration);
+            deployableTemplate.setArtifactId(planName);
 
             TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(ExecutionManagerConstants.DEPLOYER_TYPE_REALTIME);
             if (deployer != null) {
-                deployer.deployArtifact(deployableTemplate, planName);
+                deployer.deployArtifact(deployableTemplate);
             } else {
                 throw new ExecutionManagerException("A deployer doesn't exist for template type " + ExecutionManagerConstants.DEPLOYER_TYPE_REALTIME);
             }
