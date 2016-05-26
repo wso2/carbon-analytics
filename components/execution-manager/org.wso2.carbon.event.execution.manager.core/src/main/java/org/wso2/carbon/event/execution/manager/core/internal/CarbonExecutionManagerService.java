@@ -62,12 +62,17 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
     @Override
     public List<String> saveConfiguration(ScenarioConfiguration configuration)
             throws ExecutionManagerException {
-        ExecutionManagerTemplate executionManagerTemplate = domains.get(configuration.getDomain());
-        ExecutionManagerHelper.deployArtifacts(configuration, executionManagerTemplate);
-        ExecutionManagerHelper.saveToRegistry(configuration);
-        //If StreamMappings element is present in the ExecutionManagerTemplate, then need to return those Stream IDs,
-        //so the caller (the UI) can prompt the user to map these streams to his own streams.
-        return ExecutionManagerHelper.getStreamIDsToBeMapped(configuration, getDomain(configuration.getDomain()));
+        try {
+            ExecutionManagerTemplate executionManagerTemplate = domains.get(configuration.getDomain());
+            ExecutionManagerHelper.deployArtifacts(configuration, executionManagerTemplate);
+            ExecutionManagerHelper.saveToRegistry(configuration);
+            //If StreamMappings element is present in the ExecutionManagerTemplate, then need to return those Stream IDs,
+            //so the caller (the UI) can prompt the user to map these streams to his own streams.
+            return ExecutionManagerHelper.getStreamIDsToBeMapped(configuration, getDomain(configuration.getDomain()));
+        } catch (ExecutionManagerException e) {
+            throw new ExecutionManagerException("Error occurred when saving Scenario Configuration " + configuration.getName()
+                                                + " in domain: " + configuration.getDomain(), e);
+        }
     }
 
 
