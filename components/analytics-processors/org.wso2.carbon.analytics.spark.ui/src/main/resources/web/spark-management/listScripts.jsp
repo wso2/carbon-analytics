@@ -60,7 +60,6 @@
 
         <div id="workArea">
 
-            <form id="listScripts" name="listScripts" action="" method="POST">
                 <table class="styledLeft">
                     <thead>
                     <tr>
@@ -81,6 +80,12 @@
                         </label>
                         </td>
                         <td>
+                            <form name='executeScript_<%=aScript.getName()%>' action='executeScript.jsp' method='post'>
+                                <input type="hidden" name="scriptName" value="<%=aScript.getName()%>"/>
+                            </form>
+                            <form name='executeInBackground_<%=aScript.getName()%>' action='executeScriptInBackground.jsp' method='post'>
+                                <input type="hidden" name="scriptName" value="<%=aScript.getName()%>"/>
+                            </form>
                             <% if (aScript.getEditable()) {%>
                             <a class="icon-link"
                                style="background: url('../spark-management/images/edit.gif') no-repeat;"
@@ -109,11 +114,13 @@
                                href="addOrEditScript.jsp?scriptName=<%=aScript.getName()%>&editable=false">View</a>
                             <% if (client.isAnalyticsExecutionEnabled()) {%>
                             <a class="icon-link"
-                               href="executeScript.jsp?scriptName=<%=aScript.getName()%>"
+                               onclick="document.forms['executeScript_<%=aScript.getName()%>'].submit();"
+                               href="#"
                                style="background: url('../spark-management/images/execute.gif') no-repeat;">
                                 Execute</a>
                             <a class="icon-link"
-                               href="executeScriptInBackground.jsp?scriptName=<%=aScript.getName()%>"
+                               onclick="document.forms['executeInBackground_<%=aScript.getName()%>'].submit();"
+                               href="#"
                                style="background: url('../spark-management/images/execute.gif') no-repeat;">
                                 Execute in Background</a>
                             <%
@@ -134,9 +141,7 @@
                     <% }
                     %>
                     </tbody>
-                    <input type="hidden" id="driver" name="driver" value="">
                 </table>
-            </form>
             <table>
                 <tbody>
                 <tr>
