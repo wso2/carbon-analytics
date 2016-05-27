@@ -91,6 +91,7 @@
         String templateType = "";
         String domainName = "";
         Boolean isExistingConfig = false;
+        Boolean isStreamMappingUpdate=false;
 
         if (request.getParameter("configurationName") != null) {
             configurationName = request.getParameter("configurationName");
@@ -194,7 +195,11 @@
                 if (isExistingConfig) {
                     configurationName = scenarioConfigurationDTO.getName().trim();
                     saveButtonText = "template.update.button.text";
-                }
+                    if(scenarioConfigurationDTO.getStreamMappingDTOs()!=null){
+                        session.setAttribute("streamMappingDTOs", scenarioConfigurationDTO.getStreamMappingDTOs());
+                        isStreamMappingUpdate=true;
+                    }
+                    }
             %>
             <label class="input-label col-md-5"><fmt:message key='template.label.configuration.name'/></label>
 
@@ -317,7 +322,7 @@
                         onclick="saveConfiguration('<%=domainName%>',
                                 document.getElementById('cBoxTemplates').options[document.getElementById('cBoxTemplates').selectedIndex].text,
                                 document.getElementById('txtName').value, document.getElementById('txtDescription').value,'domain_configurations_ajaxprocessor.jsp?domainName=<%=domainName%>',
-                                <%=parameterString%>)">
+                                <%=parameterString%>,<%=isStreamMappingUpdate%>)">
                     <fmt:message key='<%=saveButtonText%>'/>
                 </button>
                 <br class="c-both"/>
