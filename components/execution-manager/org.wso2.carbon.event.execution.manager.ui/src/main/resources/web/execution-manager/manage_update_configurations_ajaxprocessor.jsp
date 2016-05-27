@@ -37,8 +37,6 @@
             return;
         }
 
-        System.out.println("manageUpdateConfig");
-
         String domainName = request.getParameter("domainName");
         String configuration = request.getParameter("configurationName");
         String saveType = request.getParameter("saveType");
