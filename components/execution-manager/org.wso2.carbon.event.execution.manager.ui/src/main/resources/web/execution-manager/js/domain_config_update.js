@@ -56,7 +56,7 @@ function saveConfiguration(domainName, templateType, configurationName, descript
                 showErrorDialog("Error occurred when saving configurations");
             })
             .then(function (ui_content) {
-                if (ui_content == null) {
+                if (ui_content.indexOf("return") > -1) {
                     showInfoDialog("Configurations saved successfully",
                         function () {
                             document.location.href = redirectURL;
