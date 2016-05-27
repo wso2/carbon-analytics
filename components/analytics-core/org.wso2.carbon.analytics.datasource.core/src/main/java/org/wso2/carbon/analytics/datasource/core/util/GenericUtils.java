@@ -417,10 +417,10 @@ public class GenericUtils {
         if (in == null) {
             return null;
         }
-        if (in.available() == 0) {
+        DataInputStream dataIn = new DataInputStream(new PushbackInputStream(in));
+        if (dataIn.available() == 0) {
             throw new EOFException();
         }
-        DataInputStream dataIn = new DataInputStream(in);
         int size = dataIn.readInt();
         byte[] buff = new byte[size];
         dataIn.readFully(buff);
