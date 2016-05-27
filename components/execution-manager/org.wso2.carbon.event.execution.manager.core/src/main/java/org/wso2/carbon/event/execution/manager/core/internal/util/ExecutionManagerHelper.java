@@ -261,7 +261,6 @@ public class ExecutionManagerHelper {
             for (Map.Entry parameterMapEntry : config.getParameterMap().entrySet()) {
                 updatedScript = updatedScript.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
                                                          + parameterMapEntry.getKey().toString(), parameterMapEntry.getValue().toString());
-                //todo: improvement for regex
             }
         }
         return updatedScript;
