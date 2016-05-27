@@ -17,6 +17,7 @@ package org.wso2.carbon.event.execution.manager.core.internal.ds;
 
 import org.wso2.carbon.event.execution.manager.core.ExecutionManagerService;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +31,7 @@ public class ExecutionManagerValueHolder {
     private static RegistryService registryService;
     private static ExecutionManagerService executionManagerService;
     private static ConcurrentHashMap<String, TemplateDeployer> templateDeployers = new ConcurrentHashMap();
+    private static EventStreamService eventStreamService;
 
 
     /**
@@ -59,4 +61,11 @@ public class ExecutionManagerValueHolder {
         return templateDeployers;
     }
 
+    public static void setEventStreamService(EventStreamService eventStreamService) {
+        ExecutionManagerValueHolder.eventStreamService = eventStreamService;
+    }
+
+    public static EventStreamService getEventStreamService() {
+        return ExecutionManagerValueHolder.eventStreamService;
+    }
 }

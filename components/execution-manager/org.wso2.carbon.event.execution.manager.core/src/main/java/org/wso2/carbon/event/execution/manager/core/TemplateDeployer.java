@@ -19,9 +19,27 @@ public interface TemplateDeployer {
 
     String getType();
 
+    /**
+     * This method is used to deploy an artifact given under a Template.
+     *
+     * @param template The template, updated with user-specified parameters.
+     * @throws TemplateDeploymentException
+     */
     void deployArtifact(DeployableTemplate template) throws TemplateDeploymentException;
 
+    /**
+     * Undeploys an artifact, given its ID.
+     *
+     * @param artifactId Unique ID for the artifact. E.g. If the artifact is a CEP Execution Plan, then plan name is the artifactId.
+     * @throws TemplateDeploymentException
+     */
     void undeployArtifact(String artifactId) throws TemplateDeploymentException;
 
+    /**
+     * This method is used to deploy an artifact given under Common Artifacts.
+     *
+     * @param template
+     */
+    void deployIfNotDoneAlready(DeployableTemplate template) throws TemplateDeploymentException;
 
 }

@@ -22,7 +22,7 @@ import org.wso2.carbon.event.execution.manager.core.ExecutionManagerService;
  */
 public class ExecutionManagerAdminServiceValueHolder {
 
-    private static ExecutionManagerService executorManagerService;
+    private static ExecutionManagerService executionManagerService;
 
     /**
      * To avoid instantiating
@@ -30,12 +30,12 @@ public class ExecutionManagerAdminServiceValueHolder {
     private ExecutionManagerAdminServiceValueHolder() {
     }
 
-    public static ExecutionManagerService getCarbonExecutorManagerService() {
-        return executorManagerService;
+    public static ExecutionManagerService getCarbonExecutionManagerService() {
+        return executionManagerService;
     }
 
-    public static void setExecutorManagerService(ExecutionManagerService executorManagerService) {
-        ExecutionManagerAdminServiceValueHolder.executorManagerService = executorManagerService;
+    public static void setExecutionManagerService(ExecutionManagerService executionManagerService) {
+        ExecutionManagerAdminServiceValueHolder.executionManagerService = executionManagerService;
     }
 
 }

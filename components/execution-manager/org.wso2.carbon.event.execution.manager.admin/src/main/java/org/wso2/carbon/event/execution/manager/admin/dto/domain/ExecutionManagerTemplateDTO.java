@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.event.execution.manager.admin.dto.configuration;
+package org.wso2.carbon.event.execution.manager.admin.dto.domain;
 
 /**
- * DTO class of Parameter for ExecutionManagerAdminService. This only consists required information to display
+ * DTO class of ExecutionManagerTemplate for ExecutionManagerAdminService
  */
-public class TemplateConfigurationInfoDTO {
+public class ExecutionManagerTemplateDTO {
 
     private String name;
-
-    private String from;
-
-    private String type;
-
     private String description;
+    private ScenarioDTO[] scenarioDTOs;
+    private CommonArtifactDTO[] commonArtifactDTOs;
 
     public String getName() {
         return name;
@@ -36,27 +33,27 @@ public class TemplateConfigurationInfoDTO {
         this.name = name;
     }
 
-    public String getFrom() {
-        return from;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public ScenarioDTO[] getScenarioDTOs() {
+        return scenarioDTOs;
+    }
+
+    public void setScenarioDTOs(ScenarioDTO[] scenarioDTOs) {
+        this.scenarioDTOs = scenarioDTOs;
+    }
+
+    public CommonArtifactDTO[] getCommonArtifactDTOs() {
+        return commonArtifactDTOs;
+    }
+
+    public void setCommonArtifactDTOs(CommonArtifactDTO[] commonArtifactDTOs) {
+        this.commonArtifactDTOs = commonArtifactDTOs;
     }
 }

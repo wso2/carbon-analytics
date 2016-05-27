@@ -31,28 +31,138 @@ function deleteConfiguration(domainName, configurationName, row, tableId) {
     });
 }
 
-function saveConfiguration(domainName, templateType, configurationName, description, redirectURL, parameters, executionParameters) {
+function saveConfiguration(domainName, templateType, configurationName, description, redirectURL, parameters) {
 
     if (hasWhiteSpace(configurationName) | configurationName == "") {
         showErrorDialog("Configuration name cannot be empty or consist of white spaces");
     } else {
+        var streamMappingDivID = document.getElementById("streamMappingDivID");
+        streamMappingDivID.innerHTML = "";
 
         $.ajax({
             type: "POST",
             url: "manage_configurations_ajaxprocessor.jsp",
             data: "domainName=" + domainName + "&configurationName=" + configurationName + "&templateType="
-                + templateType + "&description=" + description + "&saveType=save" + "&parameters=" + parameters + "&executionParameters=" + executionParameters
+            + templateType + "&description=" + description + "&saveType=save" + "&parameters=" + parameters
         })
             .error(function () {
                 showErrorDialog("Error occurred when saving configurations");
             })
+            .then(function (ui_content) {
+                if (ui_content == null) {
+                    showInfoDialog("Configurations saved successfully",
+                        function () {
+                            document.location.href = redirectURL;
+                        });
+                } else {
+                    streamMappingDivID.innerHTML = ui_content;
+                    $('#parameterMappingDivID').hide();
+                    $('#streamMappingDivID').show();
+                }
+            });
+    }
+}
+
+//Save Stream Mapping Configuration
+function saveStreamConfiguration(streamMappingArrayLength, domainName, configurationName) {
+
+    var streamMappingObjectArray = getStreamMappingObjectArray(streamMappingArrayLength);
+
+    //todo: should we redirect to template-configuration_ajaxprocessor.jsp page on error?
+    if (streamMappingObjectArray != undefined) {
+        $.ajax({
+            type: "POST",
+            url: "manage_stream_configurations_ajaxprocessor.jsp",
+            data: "streamMappingObjectArray=" + JSON.stringify(streamMappingObjectArray) + "&domainName=" + domainName + "&configurationName=" + configurationName
+        })
+            .error(function () {
+                showErrorDialog("Error occurred when saving stream configurations");
+            })
             .then(function () {
-                showInfoDialog("Configurations saved successfully",
+                showInfoDialog("Stream mapping configuration saved successfully",
                     function () {
-                        document.location.href = redirectURL;
+                        document.location.href = "domain_configurations_ajaxprocessor.jsp?domainName=" + domainName;
                     });
             });
     }
+}
+
+//Load Mapping Stream Attributes
+function loadMappingFromStreamAttributes(index) {
+    var selectedIndex = document.getElementById("fromStreamID_" + index).selectedIndex;
+    var fromStreamNameWithVersion = document.getElementById("fromStreamID_" + index).options[selectedIndex].text;
+    var toStreamNameWithVersion = document.getElementById("toStreamID_" + index).value;
+
+    var outerDiv = document.getElementById("outerDiv_" + index);
+    outerDiv.innerHTML = "";
+
+    jQuery.ajax({
+        type: "POST",
+        url: "../execution-manager/get_mapping_ui_ajaxprocessor.jsp?toStreamNameWithVersion=" + toStreamNameWithVersion + "&fromStreamNameWithVersion=" + fromStreamNameWithVersion + "&index=" + index,
+        data: {},
+        contentType: "text/html; charset=utf-8",
+        dataType: "text",
+        success: function (ui_content) {
+            if (ui_content != null) {
+                outerDiv.innerHTML = ui_content;
+            }
+        }
+    });
+}
+
+//Get Stream Mapping Values
+function getStreamMappingValues(dataTable, inputDataType, index) {
+    var eventStreamMappingTable = document.getElementById(dataTable);
+
+    var eventStreamAttributeMap = "";
+    for (var colIndex = 0; colIndex < eventStreamMappingTable.rows.length; colIndex++) {
+        var column0 = document.getElementById(inputDataType + "EventMappingValue_" + index + colIndex).value;
+        var column1 = document.getElementById(inputDataType + "EventMappedValue_" + index + colIndex).value;
+        var column2 = document.getElementById(inputDataType + "EventType_" + index + colIndex).value;
+
+        if (column0.localeCompare("No matching attribute type to map") == 0) {
+            showErrorDialog("Invalid stream mapping");
+            return error;
+        } else {
+            eventStreamAttributeMap = eventStreamAttributeMap + column0 + "^=" + column1 + "^=" + column2 + "$=";
+        }
+    }
+    return eventStreamAttributeMap;
+}
+
+//Get Stream Mapping Object Array
+function getStreamMappingObjectArray(streamMappingArrayLength) {
+    var streamMappingObjectArray = [];
+    var streamMappingObject = {};
+
+    for (var i = 0; i < streamMappingArrayLength; i++) {
+        var toStreamID = document.getElementById("toStreamID_" + i).value;
+        var fromStreamIDIndex = document.getElementById("fromStreamID_" + i);
+        var fromStreamID = fromStreamIDIndex.options[fromStreamIDIndex.selectedIndex].text;
+
+        if (fromStreamID.localeCompare("Choose from here") == 0) {
+            showErrorDialog("Empty input event stream detail fields are not allowed");
+            return;
+        } else {
+            if (fromStreamID.localeCompare(toStreamID) != 0) {
+                var metaData = getStreamMappingValues("addMetaEventDataTable_" + i, 'meta', i);
+                var correlationData = getStreamMappingValues("addCorrelationEventDataTable_" + i, 'correlation', i);
+                var payloadData = getStreamMappingValues("addPayloadEventDataTable_" + i, 'payload', i);
+                streamMappingObject = {
+                    "toStreamID": toStreamID,
+                    "fromStreamID": fromStreamID,
+                    "metaData": metaData,
+                    "correlationData": correlationData,
+                    "payloadData": payloadData
+                };
+            } else {
+                showErrorDialog("Invalid stream mapping");
+                return;
+            }
+        }
+        streamMappingObjectArray.push(streamMappingObject);
+    }
+    return streamMappingObjectArray;
 }
 
 function hasWhiteSpace(s) {

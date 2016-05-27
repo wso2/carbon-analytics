@@ -18,18 +18,18 @@ package org.wso2.carbon.event.execution.manager.admin.dto.domain;
 /**
  * DTO class of TemplateDomainInfo for ExecutionManagerAdminService. This only consists required information to display
  */
-public class TemplateDomainInfoDTO {
+public class ExecutionManagerTemplateInfoDTO {
 
-    private String name;
-
+    private String domain;
     private String description;
+    private ScenarioInfoDTO[] scenarioInfoDTOs;
 
-    public String getName() {
-        return name;
+    public String getDomain() {
+        return domain;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     public String getDescription() {
@@ -38,5 +38,13 @@ public class TemplateDomainInfoDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public ScenarioInfoDTO[] getScenarioInfoDTOs() {
+        return scenarioInfoDTOs;
+    }
+
+    public void setScenarioInfoDTOs(ScenarioInfoDTO[] scenarioInfoDTOs) {
+        this.scenarioInfoDTOs = scenarioInfoDTOs;
     }
 }

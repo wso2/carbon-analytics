@@ -16,10 +16,12 @@
 package org.wso2.carbon.event.execution.manager.core;
 
 import org.wso2.carbon.event.execution.manager.core.exception.ExecutionManagerException;
-import org.wso2.carbon.event.execution.manager.core.structure.configuration.TemplateConfiguration;
-import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateDomain;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.ScenarioConfiguration;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Interface consist of service methods which will be exposed by the ExecutionManagerService
@@ -31,14 +33,27 @@ public interface ExecutionManagerService {
      *
      * @param configuration configuration object which needs to be saved
      */
-    public void saveConfiguration(TemplateConfiguration configuration) throws ExecutionManagerException;
+    public List<String> saveConfiguration(ScenarioConfiguration configuration) throws ExecutionManagerException;
+
+
+    /**
+     * save streamMapping object into the registry and deploy the corresponding execution plan.
+     *
+     * @param streamMappingList StreamMapping list
+     * @param scenarioConfigName name field ScenarioConfiguration object
+     * @param domainName domain name of the ExecutionManagerTemplate corresponding to this scenarioConfig
+     */
+    public void saveStreamMapping(List<StreamMapping> streamMappingList, String scenarioConfigName,
+                                  String domainName)
+            throws ExecutionManagerException;
+
 
     /**
      * provide all the loaded domains
      *
      * @return Domain list
      */
-    public Collection<TemplateDomain> getAllDomains();
+    public Collection<ExecutionManagerTemplate> getAllDomains();
 
     /**
      * provide configurations of specified domain
@@ -46,15 +61,16 @@ public interface ExecutionManagerService {
      * @param domainName domain template name
      * @return Domain list
      */
-    public Collection<TemplateConfiguration> getConfigurations(String domainName);
+    public Collection<ScenarioConfiguration> getConfigurations(String domainName)
+            throws ExecutionManagerException;
 
     /**
      * get information of a specific domain
      *
      * @param domainName domain name
-     * @return TemplateDomain object
+     * @return ExecutionManagerTemplate object
      */
-    public TemplateDomain getDomain(String domainName);
+    public ExecutionManagerTemplate getDomain(String domainName);
 
 
     /**
@@ -64,15 +80,14 @@ public interface ExecutionManagerService {
      * @param configName configuration name
      * @return TemplateConfig object
      */
-    public TemplateConfiguration getConfiguration(String domainName, String configName);
+    public ScenarioConfiguration getConfiguration(String domainName, String configName)  throws ExecutionManagerException;
 
     /**
-     * delete template configuration when the name of configuration is given
+     * delete specified scenario configuration when its name is given
      *
      * @param domainName domain name
      * @param configName template configuration name
      */
     public void deleteConfiguration(String domainName, String configName) throws ExecutionManagerException;
-
 
 }

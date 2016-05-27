@@ -18,25 +18,35 @@ package org.wso2.carbon.event.execution.manager.core.internal.util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.execution.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
 import org.wso2.carbon.event.execution.manager.core.exception.ExecutionManagerException;
 import org.wso2.carbon.event.execution.manager.core.internal.ds.ExecutionManagerValueHolder;
-import org.wso2.carbon.event.execution.manager.core.structure.configuration.Parameter;
-import org.wso2.carbon.event.execution.manager.core.structure.configuration.TemplateConfiguration;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.AttributeMapping;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.ScenarioConfiguration;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.Artifact;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
-import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateDomain;
+import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.Resource;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +56,16 @@ import java.util.Map;
 public class ExecutionManagerHelper {
 
     private static final Log log = LogFactory.getLog(ExecutionManagerHelper.class);
+    private static final String EXECUTION_PLAN_NAME_ANNOTATION = "@Plan:name";
+    private static final String DEFINE_STREAM = "define stream ";
+    private static final String FROM = "from ";
+    private static final String SELECT = "select ";
+    private static final String AS = " as ";
+    private static final String INSERT_INTO = "insert into ";
+    private static final String FROM_STREAM = "fromStream";
+    private static final String TO_STREAM = "toStream";
+
+    private static enum DefineStreamTypes {IMPORT, EXPORT};
 
     /**
      * To avoid instantiating
@@ -56,17 +76,30 @@ public class ExecutionManagerHelper {
     /**
      * Load All domains templates available in the file directory
      */
-    public static Map<String, TemplateDomain> loadDomains() {
+    public static Map<String, ExecutionManagerTemplate> loadDomains() {
         //Get domain template folder and load all the domain template files
         File folder = new File(ExecutionManagerConstants.TEMPLATE_DOMAIN_PATH);
-        Map<String, TemplateDomain> domains = new HashMap<>();
+        Map<String, ExecutionManagerTemplate> domains = new HashMap<>();
 
         File[] files = folder.listFiles();
         if (files != null) {
             for (final File fileEntry : files) {
                 if (fileEntry.isFile() && fileEntry.getName().endsWith("xml")) {
-                    TemplateDomain templateDomain = unmarshalDomain(fileEntry);
-                    domains.put(templateDomain.getName(), templateDomain);
+                    ExecutionManagerTemplate executionManagerTemplate = unmarshalDomain(fileEntry);
+                    if (executionManagerTemplate != null) {
+                        try {
+                            validateTemplateDomainConfig(executionManagerTemplate);
+                        } catch (ExecutionManagerException e) {
+                            //In case an invalid template configuration is found, this loader logs
+                            // an error message and aborts loading that particular template domain config.
+                            //However, this will load all the valid template domain configurations.
+                            log.error("Invalid Template Domain configuration file found: " + fileEntry.getName(), e);
+                        }
+                        domains.put(executionManagerTemplate.getDomain(), executionManagerTemplate);
+                    } else {
+                        log.error("Invalid Template Domain configuration file found: " + fileEntry.getName());
+                    }
+
                 }
             }
         }
@@ -75,27 +108,325 @@ public class ExecutionManagerHelper {
     }
 
     /**
-     * Unmarshalling TemplateDomain object by given file
+     * Unmarshalling ExecutionManagerTemplate object by given file
      *
      * @param fileEntry file for unmarshalling
      * @return templateDomain object
      */
-    private static TemplateDomain unmarshalDomain(File fileEntry) {
-        TemplateDomain templateDomain = null;
+    private static ExecutionManagerTemplate unmarshalDomain(File fileEntry) {
+        ExecutionManagerTemplate executionManagerTemplate = null;
 
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(TemplateDomain.class);
+            JAXBContext jaxbContext = JAXBContext.newInstance(ExecutionManagerTemplate.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            templateDomain = (TemplateDomain) jaxbUnmarshaller.unmarshal(fileEntry);
+            executionManagerTemplate = (ExecutionManagerTemplate) jaxbUnmarshaller.unmarshal(fileEntry);
 
         } catch (JAXBException e) {
             log.error("JAXB Exception when unmarshalling domain template file at "
                     + fileEntry.getPath(), e);
         }
 
-        return templateDomain;
+        return executionManagerTemplate;
 
     }
+
+    /**
+     * Unmarshalling ExecutionManagerTemplate object by given file content object
+     *
+     * @param configFileContent file for unmarshalling
+     * @return templateConfiguration object
+     */
+    private static ScenarioConfiguration unmarshalConfiguration(Object configFileContent) {
+        ScenarioConfiguration scenarioConfiguration = null;
+        try {
+
+            StringReader reader = new StringReader(new String((byte[]) configFileContent));
+            JAXBContext jaxbContext = JAXBContext.newInstance(ScenarioConfiguration.class);
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            scenarioConfiguration = (ScenarioConfiguration) jaxbUnmarshaller.unmarshal(reader);
+        } catch (JAXBException e) {
+            log.error("JAXB Exception occurred when unmarshalling configuration ", e);
+        }
+
+        return scenarioConfiguration;
+    }
+
+
+    /**
+     * Checks whether the present Template Domain configuration has valid content.
+     * Validity criteria - It should have at least one Template configuration.
+     *
+     * @param executionManagerTemplate ExecutionManagerTemplate object which needs to be validated.
+     * @throws ExecutionManagerException
+     */
+    public static void validateTemplateDomainConfig(ExecutionManagerTemplate executionManagerTemplate)
+            throws ExecutionManagerException {
+        if (executionManagerTemplate.getScenarios() == null ||
+            executionManagerTemplate.getScenarios().getScenario() == null ||
+            executionManagerTemplate.getScenarios().getScenario().isEmpty()) {
+            //It is required to have at least one ScenarioConfiguration.
+            //Having only a set of common artifacts is not a valid use case.
+            throw new ExecutionManagerException("There are no template configurations in the domain " + executionManagerTemplate.getDomain());
+        }
+    }
+
+
+    /**
+     * Deploy the artifacts given in the template domain configuration
+     *
+     * @param executionManagerTemplate template domain object, containing the templates.
+     * @param configuration scenario configuration object, containing the parameters.
+     */
+    public static void deployArtifacts(ScenarioConfiguration configuration,
+                                       ExecutionManagerTemplate executionManagerTemplate)
+            throws ExecutionManagerException {
+        //make sure common artifacts are deployed
+        if (executionManagerTemplate.getCommonArtifacts() != null) {
+            Map<String,Integer> artifactTypeCountingMap = new HashMap<>();
+            for (Artifact artifact : executionManagerTemplate.getCommonArtifacts().getArtifact()) {
+                try {
+                    String artifactType = artifact.getType();
+                    Integer artifactCount = artifactTypeCountingMap.get(artifactType);
+                    if (artifactCount == null) {
+                        artifactCount = 1;  //Count starts with one, instead of zero for user-friendliness.
+                    } else {
+                        artifactCount++;
+                    }
+                    String artifactId = ExecutionManagerHelper.getCommonArtifactId(executionManagerTemplate.getDomain(), artifactType, artifactCount);
+
+                    DeployableTemplate deployableTemplate = new DeployableTemplate();
+                    deployableTemplate.setArtifact(artifact.getValue());
+                    deployableTemplate.setConfiguration(configuration);
+                    deployableTemplate.setArtifactId(artifactId);
+                    TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(artifact.getType());
+                    if (deployer != null) {
+                        deployer.deployIfNotDoneAlready(deployableTemplate);
+                        artifactTypeCountingMap.put(artifactType, artifactCount);
+                    } else {
+                        throw new ExecutionManagerException("A deployer doesn't exist for template type " + artifact.getType());
+                    }
+                } catch (TemplateDeploymentException e) {
+                    throw new ExecutionManagerException("Error when trying to deploy the artifact " + configuration.getName(), e);
+                }
+            }
+        }
+        //now, deploy templated artifacts
+        for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()) {
+            if (scenario.getName().equals(configuration.getScenario())) {
+                Map<String,Integer> artifactTypeCountingMap = new HashMap<>();
+                for (Template template : scenario.getTemplates().getTemplate()) {
+                    String artifactType = template.getType();
+                    Integer artifactCount = artifactTypeCountingMap.get(artifactType);
+                    if (artifactCount == null) {
+                        artifactCount = 1;  //Count starts with one, instead of zero for user-friendliness.
+                    } else {
+                        artifactCount++;
+                    }
+                    String artifactId = ExecutionManagerHelper.getTemplatedArtifactId(executionManagerTemplate.getDomain(),
+                                                                                      scenario.getName(), configuration.getName(), artifactType, artifactCount);
+                    TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(template.getType());
+                    if (deployer != null) {
+                        try {
+                            DeployableTemplate deployableTemplate = new DeployableTemplate();
+                            String updatedScript = updateArtifactParameters(configuration, template.getValue());
+                            deployableTemplate.setArtifact(updatedScript);
+                            deployableTemplate.setConfiguration(configuration);
+                            deployableTemplate.setArtifactId(artifactId);
+                            deployer.deployArtifact(deployableTemplate);
+                            artifactTypeCountingMap.put(artifactType, artifactCount);
+                        } catch (TemplateDeploymentException e) {
+                            throw new ExecutionManagerException("Error when trying to deploy the artifact " + configuration.getName() ,e);
+                        }
+                    } else {
+                        throw new ExecutionManagerException("A deployer doesn't exist for template type " + template.getType());
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+
+    /**
+     * Update given script by replacing undefined parameter values with configured parameter values
+     *
+     * @param config configurations which consists of parameters which will replace
+     * @param script script which needs to be updated
+     * @return updated execution plan
+     */
+    private static String updateArtifactParameters(ScenarioConfiguration config, String script) {
+        String updatedScript = script;
+        //Script parameters will be replaced with given configuration parameters
+        if (config.getParameterMap() != null && script != null) {
+            for (Map.Entry parameterMapEntry : config.getParameterMap().entrySet()) {
+                updatedScript = updatedScript.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
+                                                         + parameterMapEntry.getKey().toString(), parameterMapEntry.getValue().toString());
+                //todo: improvement for regex
+            }
+        }
+        return updatedScript;
+    }
+
+    /**
+     * Check weather given execution plan is already exists and un deploy it
+     *
+     * @param artifactId Artifact ID
+     * @param type       type of the artifact e.g Realtime, batch
+     * @throws TemplateDeploymentException
+     */
+    public static void unDeployExistingArtifact(String artifactId, String type)
+            throws TemplateDeploymentException {
+        TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(type);
+        deployer.undeployArtifact(artifactId);
+    }
+
+
+    /**
+     * Returns the list of Stream IDs(with their template symbols replaced by user-parameters) given in StreamMappings element.
+     *
+     * @param configuration Scenario configuration, specified by the user, containing parameter values.
+     * @param executionManagerTemplate ExecutionManagerTemplate object, containing the StreamMappings element
+     * @return List of Stream IDs
+     */
+    public static List<String> getStreamIDsToBeMapped(ScenarioConfiguration configuration,
+                                                      ExecutionManagerTemplate executionManagerTemplate) {
+        List<String> streamIdList = new ArrayList<>();
+        for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()){
+            if (configuration.getScenario().equals(scenario.getName())) {
+                if(scenario.getStreamMappings() != null && scenario.getStreamMappings().getStreamMapping() != null
+                        && !scenario.getStreamMappings().getStreamMapping().isEmpty()) {
+                        //empty check is required because, if no stream mappings present, we should return null
+                    for (StreamMapping streamMapping: scenario.getStreamMappings().getStreamMapping()) {
+                        String toStream = streamMapping.getTo();
+                        for (Map.Entry entry: configuration.getParameterMap().entrySet()) {
+                            toStream = toStream.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
+                                                           + entry.getKey().toString(), entry.getValue().toString());
+                        }
+                        streamIdList.add(toStream);
+                    }
+                    return streamIdList;
+                }
+                break;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the execution plan which selects from the "fromStream" and inserts into the "toStream"
+     *
+     *
+     * @param streamMappingList object which specifies "fromStream", "toStream" and how attributes needs to be mapped.
+     * @return execution plan as a deploy-ready String.
+     */
+    public static String generateExecutionPlan(
+            List<org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping> streamMappingList,
+            String planName)
+            throws ExecutionManagerException {
+        //@Plan:name() statement
+        String planNameStatement = EXECUTION_PLAN_NAME_ANNOTATION + "('" + planName + "') \n\n";
+
+        StringBuilder importStatementBuilder = new StringBuilder(); //for building "@Import..define stream.." statements
+        StringBuilder exportStatementBuilder = new StringBuilder(); //for building "@Export..define stream.." statements
+        StringBuilder queryBuilder = new StringBuilder();           //for building "select ... insert into..." query
+
+        for (org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping streamMapping: streamMappingList) {
+            String fromStreamId = streamMapping.getFrom();
+            String toStreamId = streamMapping.getTo();
+
+            importStatementBuilder.append(generateDefineStreamStatements(DefineStreamTypes.IMPORT, fromStreamId)).append("\n\n");
+            exportStatementBuilder.append(generateDefineStreamStatements(DefineStreamTypes.EXPORT, toStreamId)).append("\n\n");
+
+            queryBuilder.append(FROM).append(FROM_STREAM).append(" \n").append(SELECT);
+            for (AttributeMapping attributeMapping: streamMapping.getAttributeMappings().getAttributeMapping()) {
+                queryBuilder.append(attributeMapping.getFrom()).append(AS).append(attributeMapping.getTo()).append(", ");
+            }
+            queryBuilder.deleteCharAt(queryBuilder.length() - 2);
+            queryBuilder.append("\n").append(INSERT_INTO).append(TO_STREAM).append(";\n\n");
+        }
+
+        return planNameStatement + importStatementBuilder.toString() + exportStatementBuilder.toString() + queryBuilder.toString();
+    }
+
+    private static String generateDefineStreamStatements(DefineStreamTypes type, String streamId)
+            throws ExecutionManagerException {
+        try {
+            StreamDefinition streamDefinition = ExecutionManagerValueHolder.getEventStreamService().getStreamDefinition(streamId);
+            if (streamDefinition == null) {
+                throw new ExecutionManagerException("No stream has being deployed with Stream ID: " + streamId);
+            }
+
+            String siddhiStreamName = (DefineStreamTypes.IMPORT.toString().equals(type.toString())) ? FROM_STREAM : TO_STREAM;
+
+            String statement = "@" + type.toString() + "('" + streamId + "')\n";
+            StringBuilder streamDefBuilder = new StringBuilder(DEFINE_STREAM + siddhiStreamName + " (");
+            if (streamDefinition.getMetaData() != null) {
+                for (Attribute metaAttribute : streamDefinition.getMetaData()) {
+                    streamDefBuilder.append(metaAttribute.getName()).append(" ").append(metaAttribute.getType()).append(", ");
+                }
+            }
+            if (streamDefinition.getCorrelationData() != null) {
+                for (Attribute corrAttribute : streamDefinition.getCorrelationData()) {
+                    streamDefBuilder.append(corrAttribute.getName()).append(" ").append(corrAttribute.getType()).append(", ");
+                }
+            }
+            if (streamDefinition.getPayloadData() != null) {
+                for (Attribute payloadAttribute : streamDefinition.getPayloadData()) {
+                    streamDefBuilder.append(payloadAttribute.getName()).append(" ").append(payloadAttribute.getType()).append(", ");
+                }
+            }
+
+            streamDefBuilder.delete(streamDefBuilder.length() - 2, streamDefBuilder.length() - 1);
+            streamDefBuilder.append(");");
+            String toStreamDefinitionStr = streamDefBuilder.toString();
+            statement += toStreamDefinitionStr;
+            return statement;
+        } catch (EventStreamConfigurationException e) {
+            throw new ExecutionManagerException("Failed to get stream definition for Stream ID: " + streamId, e);
+        }
+    }
+
+
+    public static void saveToRegistry(ScenarioConfiguration configuration)
+            throws ExecutionManagerException {
+        try {
+            Registry registry = ExecutionManagerValueHolder.getRegistryService()
+                    .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+
+            StringWriter fileContent = new StringWriter();
+            JAXBContext jaxbContext = JAXBContext.newInstance(ScenarioConfiguration.class);
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+            jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, ExecutionManagerConstants.DEFAULT_CHARSET);
+
+            jaxbMarshaller.marshal(configuration, fileContent);
+            Resource resource = registry.newResource();
+            resource.setContent(fileContent.toString());
+            String resourceCollectionPath = ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
+                                            + "/" + configuration.getDomain();
+
+            String resourcePath = resourceCollectionPath + "/"
+                                  + configuration.getName() + ExecutionManagerConstants.CONFIG_FILE_EXTENSION;
+
+            //Collection directory will be created if it is not exist in the registry
+            if (!registry.resourceExists(resourceCollectionPath)) {
+                registry.put(resourceCollectionPath, registry.newCollection());
+            }
+
+            if (registry.resourceExists(resourcePath)) {
+                registry.delete(resourcePath);
+            }
+            resource.setMediaType("application/xml");
+            registry.put(resourcePath, resource);
+        } catch (RegistryException e) {
+            throw new ExecutionManagerException("Registry exception occurred when creating " + configuration.getName()
+                                                + " configurations", e);
+
+        } catch (JAXBException e) {
+            throw new ExecutionManagerException("JAXB Exception when marshalling file at " + configuration.getName()
+                                                + " configurations", e);
+        }
+    }
+
 
     /**
      * Provide template configurations available in the given registry and given path
@@ -103,129 +434,66 @@ public class ExecutionManagerHelper {
      * @param path where configurations are stored
      * @return available configurations
      */
-    public static TemplateConfiguration getConfiguration(String path) {
+    public static ScenarioConfiguration getConfiguration(String path)
+            throws ExecutionManagerException {
 
-
-        TemplateConfiguration templateConfiguration = null;
+        ScenarioConfiguration scenarioConfiguration = null;
         try {
             Registry registry = ExecutionManagerValueHolder.getRegistryService().getConfigSystemRegistry(PrivilegedCarbonContext
-                    .getThreadLocalCarbonContext().getTenantId());
+                                                                                                                 .getThreadLocalCarbonContext().getTenantId());
 
             if (registry.resourceExists(path)) {
                 Resource configFile = registry.get(path);
                 if (configFile != null) {
-                    templateConfiguration = unmarshalConfiguration(configFile.getContent());
+                    scenarioConfiguration = unmarshalConfiguration(configFile.getContent());
                 }
             }
         } catch (RegistryException e) {
-            log.error("Registry exception occurred when accessing files at "
-                    + ExecutionManagerConstants.TEMPLATE_CONFIG_PATH, e);
+            throw new ExecutionManagerException("Registry exception occurred when accessing files at "
+                                                + ExecutionManagerConstants.TEMPLATE_CONFIG_PATH, e);
         }
 
-        return templateConfiguration;
-    }
-
-    /**
-     * Unmarshalling TemplateDomain object by given file content object
-     *
-     * @param configFileContent file for unmarshalling
-     * @return templateConfiguration object
-     */
-    private static TemplateConfiguration unmarshalConfiguration(Object configFileContent) {
-        TemplateConfiguration templateConfiguration = null;
-        try {
-
-            StringReader reader = new StringReader(new String((byte[]) configFileContent));
-            JAXBContext jaxbContext = JAXBContext.newInstance(TemplateConfiguration.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            templateConfiguration = (TemplateConfiguration) jaxbUnmarshaller.unmarshal(reader);
-        } catch (JAXBException e) {
-            log.error("JAXB Exception occurred when unmarshalling configuration ", e);
-        }
-
-        return templateConfiguration;
+        return scenarioConfiguration;
     }
 
 
     /**
-     * Deploy given configurations template Execution Plans
-     *
-     * @param configuration configuration object
+     * Returns the ID of a templated artifact.
+     * @param domainName
+     * @param scenarioName
+     * @param scenarioConfigName
+     * @param artifactType
+     * @param sequenceNumber
+     * @return
      */
-    public static void deployArtifacts(TemplateConfiguration configuration, Map<String, TemplateDomain> domains)
-            throws ExecutionManagerException {
-
-        if (domains.get(configuration.getFrom()) == null) {
-            throw new ExecutionManagerException("The " + configuration.getFrom() + " domain of"
-                    + configuration.getName() + " configuration" + " is not available in the domain list.");
-        } else if (domains.get(configuration.getFrom()).getTemplates() == null) {
-            throw new ExecutionManagerException("There are no templates in the domain " + configuration.getFrom()
-                    + " of " + configuration.getName() + " configuration");
-        } else {
-            for (Template template : domains.get(configuration.getFrom()).getTemplates()) {
-                if (template.getName().equals(configuration.getType())) {
-                    TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(template.getExecutionType());
-                    if (deployer != null) {
-                        try {
-                            DeployableTemplate deployableTemplate = new DeployableTemplate();
-                            String script = ExecutionManagerHelper.updateArtifactParameters(configuration,
-                                    template.getScript());
-
-                            deployableTemplate.setScript(script);
-                            TemplateDomain domain = domains.get(configuration.getFrom());
-                            deployableTemplate.setStreams(domain.getStreams());
-                            deployableTemplate.setConfiguration(configuration);
-                            // streams should be deployed in this call.
-                            deployer.deployArtifact(deployableTemplate);
-                        } catch (TemplateDeploymentException e) {
-                            log.error("Error when trying to deploy the artifact " + configuration.getName(), e);
-                            throw new ExecutionManagerException(e);
-                        }
-                        break;
-
-                    } else {
-                        throw new ExecutionManagerException("A deployer doesn't exist for template type " + template.getExecutionType());
-                    }
-                }
-            }
-        }
-    }
-
-
-    /**
-     * Update given execution plan by replacing undefined parameter values with configured parameter values
-     *
-     * @param config configurations which consists of parameters which will replace
-     * @param script execution script which needs to be updated
-     * @return updated execution plan
-     */
-    private static String updateArtifactParameters(TemplateConfiguration config, String script) {
-
-        String updatedScript = script;
-
-        //Execution script parameters will be replaced with given configuration parameters
-        if (config.getParameters() != null) {
-            for (Parameter parameter : config.getParameters()) {
-                updatedScript = updatedScript.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
-                        + parameter.getName(), parameter.getValue());
-            }
-        }
-
-        return updatedScript;
+    public static String getTemplatedArtifactId(String domainName, String scenarioName,
+                                                String scenarioConfigName, String artifactType,
+                                                int sequenceNumber) {
+        return domainName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR
+               + scenarioName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + scenarioConfigName
+               + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + artifactType + sequenceNumber;
     }
 
     /**
-     * Check weather given execution plan is already exists and un deploy it
-     *
-     * @param scriptName name of the execution script
-     * @param type       type of the execution script
-     * @throws TemplateDeploymentException
+     * Returns the ID of a Stream Mapping execution plan.
+     * @param domainName
+     * @param scenarioConfigName
+     * @return
      */
-    public static void unDeployExistingArtifact(String scriptName, String type)
-            throws TemplateDeploymentException {
-        TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(type);
-        deployer.undeployArtifact(scriptName);
+    public static String getStreamMappingPlanId(String domainName, String scenarioConfigName) {
+        return domainName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + scenarioConfigName
+                          + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + ExecutionManagerConstants.STREAM_MAPPING_PLAN_SUFFIX;
     }
 
-
+    /**
+     * Returns the ID of a common artifact.
+     * @param domainName
+     * @param artifactType
+     * @param sequenceNumber
+     * @return
+     */
+    public static String getCommonArtifactId(String domainName, String artifactType,
+                                                int sequenceNumber) {
+        return domainName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + artifactType + sequenceNumber;
+    }
 }
