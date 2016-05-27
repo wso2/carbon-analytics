@@ -39,11 +39,7 @@ public class ExecutionManagerConstants {
 
     public static final String DEFAULT_CHARSET = "UTF-8";
 
-    public static final String EXECUTION_PLAN_NAME_ANNOTATION = "@Plan:name";
-
     public static final String REGEX_NAME_VALUE = "\\$";
-
-    public static final String REGEX_NAME_COMMENTED_VALUE = "\\(.*?\\)";
 
     public static final String STREAM_MAPPING_PLAN_SUFFIX = "StreamMappingPlan";
 
