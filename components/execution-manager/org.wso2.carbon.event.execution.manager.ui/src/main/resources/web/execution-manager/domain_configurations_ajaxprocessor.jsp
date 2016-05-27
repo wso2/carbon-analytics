@@ -17,7 +17,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.ui.ExecutionManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.TemplateConfigurationInfoDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ScenarioConfigurationInfoDTO" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.execution.manager.ui.i18n.Resources">
@@ -94,8 +94,8 @@
 
                         try {
 
-                            TemplateConfigurationInfoDTO[] configurations = proxy
-                                    .getConfigurationsInfo(request.getParameter("domainName"));
+                            ScenarioConfigurationInfoDTO[] configurations = proxy
+                                    .getConfigurationInfos(request.getParameter("domainName"));
 
 
                 %>
@@ -140,22 +140,22 @@
                     </thead>
                     <tbody>
                     <%
-                        for (TemplateConfigurationInfoDTO templateConfigurationDTO : configurations) {
+                        for (ScenarioConfigurationInfoDTO scenarioConfigurationDTO : configurations) {
                     %>
 
                     <tr>
                         <td>
-                            <%=templateConfigurationDTO.getName()%>
+                            <%=scenarioConfigurationDTO.getName()%>
                         </td>
-                        <td><%=templateConfigurationDTO.getDescription()%>
+                        <td><%=scenarioConfigurationDTO.getDescription()%>
                         </td>
-                        <td><%=templateConfigurationDTO.getType()%>
+                        <td><%=scenarioConfigurationDTO.getScenario()%>
                         <td class="tcenter">
-                            <a onclick="deleteConfiguration('<%=templateConfigurationDTO.getFrom()%>','<%=templateConfigurationDTO.getName()%>',this, 'tblConfigs')">
+                            <a onclick="deleteConfiguration('<%=scenarioConfigurationDTO.getDomain()%>','<%=scenarioConfigurationDTO.getName()%>',this, 'tblConfigs')">
                                 <i class="glyphicon glyphicon-remove"></i>
                                 <fmt:message key='common.button.delete'/></a></td>
                         <td class="tcenter">
-                            <a href="template_configurations_ajaxprocessor.jsp?configurationName=<%=templateConfigurationDTO.getName()%>&domainName=<%=templateConfigurationDTO.getFrom()%>&templateType=<%=templateConfigurationDTO.getType()%>">
+                            <a href="template_configurations_ajaxprocessor.jsp?configurationName=<%=scenarioConfigurationDTO.getName()%>&domainName=<%=scenarioConfigurationDTO.getDomain()%>&templateType=<%=scenarioConfigurationDTO.getScenario()%>">
                                 <i class="glyphicon glyphicon-cog"></i>
                                 <fmt:message key='common.button.edit'/></a></td>
                     </tr>

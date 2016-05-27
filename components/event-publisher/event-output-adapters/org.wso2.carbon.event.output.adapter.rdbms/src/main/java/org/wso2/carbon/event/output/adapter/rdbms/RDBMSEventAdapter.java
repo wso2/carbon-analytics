@@ -50,13 +50,12 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
     private Map<String, String> dbTypeMappings;
     private ExecutionInfo executionInfo = null;
     private DataSource dataSource;
-    private float count;
+    private boolean isUpdate;
 
     public RDBMSEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                              Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
-        this.count = 0;
     }
 
     @Override
@@ -149,6 +148,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
 
         if (resourceBundle.getString(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_EXECUTION_MODE_UPDATE)
                 .equalsIgnoreCase(executionMode)) {
+            isUpdate = true;
             executionInfo.setUpdateMode(true);
         }
 
@@ -288,7 +288,13 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
             throws OutputEventAdapterException {
 
         createTableIfNotExist(tableName);
-        executeDbActions(message);
+        if (isUpdate) {
+            synchronized (this) {
+                executeDbActions(message);
+            }
+        } else {
+            executeDbActions(message);
+        }
     }
 
     public void executeDbActions(Object message)

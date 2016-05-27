@@ -1,89 +1,55 @@
-/*
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.wso2.carbon.event.execution.manager.core.structure.domain;
 
+import org.wso2.carbon.event.execution.manager.core.structure.domain.handler.TemplateHandler;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
-/**
- * JAXB Class of Template element
- */
-@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name="template")
 public class Template {
-    private String name;
-    private String description;
-    private String templateType;
-    private String script;
-    private String executionType;
-    private Parameter[] parameters;
 
-    public String getName() {
-        return name;
+    @XmlAttribute(name="type")
+    private String type;
+
+    @XmlAnyElement(TemplateHandler.class)
+    @XmlMixed
+    private List<Object> content;
+
+    public String getType() {
+        return type;
     }
 
-    @XmlAttribute
-    public void setName(String name) {
-        this.name = name;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public String getDescription() {
-        return description;
+    private List<Object> getContent() {
+        return content;
     }
 
-    @XmlAttribute
-    public void setTemplateType(String type) {
-        this.templateType = type;
+    private void setContent(List<Object> content) {
+        this.content = content;
     }
 
-    public String getTemplateType() {
-        return this.templateType;
-    }
-
-    @XmlElement
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getScript() {
-        return script;
-    }
-
-    @XmlElement
-    public void setScript(String script) {
-        this.script = script;
-    }
-
-    public Parameter[] getParameters() {
-        return parameters;
-    }
-
-    @XmlElementWrapper(name = "parameters")
-    @XmlElement(name = "parameter")
-    public void setParameters(Parameter[] parameters) {
-        this.parameters = parameters;
-    }
-
-    public String getExecutionType() {
-        return executionType;
-    }
-
-    @XmlElement
-    public void setExecutionType(String executionType) {
-        this.executionType = executionType;
+    public String getValue() {
+        if (this.content != null && !content.isEmpty()) {
+            for (Object obj: content) {
+                if (obj instanceof String) {
+                    String contentItem = obj.toString();
+                    if (!contentItem.trim().isEmpty()) {
+                        return contentItem;
+                    }
+                }
+            }
+        } else {
+            return null;
+        }
+        return null;
     }
 }

@@ -19,6 +19,11 @@
 <%@ page import="org.wso2.carbon.event.publisher.ui.EventPublisherUIUtils" %>
 
 <%
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(405);
+        return;
+    }
+
     // get Event Stream Definition
     EventPublisherAdminServiceStub stub = EventPublisherUIUtils.getEventPublisherAdminService(config, session, request);
     EventPublisherConfigurationInfoDto[] eventPublishers = stub.getAllActiveEventPublisherConfigurations();

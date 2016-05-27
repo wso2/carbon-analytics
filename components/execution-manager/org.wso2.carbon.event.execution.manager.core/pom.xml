@@ -38,16 +38,20 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
-          </dependency>
-          <dependency>
-              <groupId>org.wso2.carbon</groupId>
-              <artifactId>org.wso2.carbon.core</artifactId>
-          </dependency>
-          <dependency>
-              <groupId>org.wso2.carbon</groupId>
-              <artifactId>org.wso2.carbon.registry.core</artifactId>
-          </dependency>
-      </dependencies>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.registry.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.stream.core</artifactId>
+        </dependency>
+    </dependencies>
 
       <build>
           <plugins>

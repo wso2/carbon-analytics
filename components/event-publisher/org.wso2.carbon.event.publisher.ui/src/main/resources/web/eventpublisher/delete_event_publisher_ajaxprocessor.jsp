@@ -17,6 +17,11 @@
 <%@ page import="org.wso2.carbon.event.publisher.stub.EventPublisherAdminServiceStub" %>
 
 <%
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(405);
+        return;
+    }
+
     String msg = "fail";
     EventPublisherAdminServiceStub stub = EventPublisherUIUtils.getEventPublisherAdminService(config, session, request);
     String eventPublisherName = request.getParameter("eventPublisherName");

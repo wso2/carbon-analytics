@@ -18,7 +18,7 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.ui.ExecutionManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.TemplateDomainInfoDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ExecutionManagerTemplateInfoDTO" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.execution.manager.ui.i18n.Resources">
 
@@ -93,19 +93,19 @@
             <%
                 ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
                 try {
-                    TemplateDomainInfoDTO[] domainDTOs = proxy.getAllDomainsInfo();
+                    ExecutionManagerTemplateInfoDTO[] domainDTOs = proxy.getAllExecutionManagerTemplateInfos();
 
                     if (domainDTOs != null && domainDTOs.length > 0) {
 
-                        for (TemplateDomainInfoDTO domainDTO : domainDTOs) {
+                        for (ExecutionManagerTemplateInfoDTO domainDTO : domainDTOs) {
             %>
 
 
 
                 <div class="col-sm-6">
-                    <a href="domain_configurations_ajaxprocessor.jsp?ordinal=1&domainName=<%=domainDTO.getName()%>">
+                    <a href="domain_configurations_ajaxprocessor.jsp?ordinal=1&domainName=<%=domainDTO.getDomain()%>">
                         <div class="tile green">
-                            <h3 class="title"><%=domainDTO.getName()%>
+                            <h3 class="title"><%=domainDTO.getDomain()%>
                             </h3>
 
                             <p><%=domainDTO.getDescription()%>

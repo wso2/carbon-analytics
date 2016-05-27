@@ -16,6 +16,11 @@
         import="org.wso2.carbon.event.publisher.stub.EventPublisherAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.publisher.ui.EventPublisherUIUtils" %>
 <%
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(405);
+        return;
+    }
+
     // get required parameters to add a event publisher to back end.
     EventPublisherAdminServiceStub stub = EventPublisherUIUtils.getEventPublisherAdminService(config, session, request);
     String eventPublisherName = request.getParameter("eventPublisherName");

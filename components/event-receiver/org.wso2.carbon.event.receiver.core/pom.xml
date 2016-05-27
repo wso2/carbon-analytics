@@ -80,6 +80,7 @@
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
+            <!--<version>${xercesImpl.version}</version>-->
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.metrics</groupId>

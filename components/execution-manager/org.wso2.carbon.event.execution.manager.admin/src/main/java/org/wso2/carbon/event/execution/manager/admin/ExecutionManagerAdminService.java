@@ -19,17 +19,17 @@ import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.core.AbstractAdmin;
-import org.wso2.carbon.event.execution.manager.admin.dto.configuration.TemplateConfigurationDTO;
-import org.wso2.carbon.event.execution.manager.admin.dto.configuration.TemplateConfigurationInfoDTO;
-import org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateDomainDTO;
-import org.wso2.carbon.event.execution.manager.admin.dto.domain.TemplateDomainInfoDTO;
+import org.wso2.carbon.event.execution.manager.admin.dto.configuration.ScenarioConfigurationDTO;
+import org.wso2.carbon.event.execution.manager.admin.dto.configuration.ScenarioConfigurationInfoDTO;
+import org.wso2.carbon.event.execution.manager.admin.dto.domain.ExecutionManagerTemplateInfoDTO;
 import org.wso2.carbon.event.execution.manager.admin.internal.ds.ExecutionManagerAdminServiceValueHolder;
 import org.wso2.carbon.event.execution.manager.admin.internal.util.ConfigurationMapper;
 import org.wso2.carbon.event.execution.manager.admin.internal.util.DomainMapper;
 import org.wso2.carbon.event.execution.manager.core.exception.ExecutionManagerException;
-import org.wso2.carbon.event.execution.manager.core.structure.domain.TemplateDomain;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Consist of the methods exposed by ExecutionManagerAdminService
@@ -45,122 +45,76 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
 
     }
 
+
     /**
-     * return domain for a given template domain name
+     * Return "limited information" with regards to an Execution Manager Template, given  its domain name.
+     * "limited information" means, only the information which are required by the UI will be returned.
      *
-     * @param domainName template domain name
-     * @return template domain full details
+     * @param domainName domain name of the ExecutionManagerTemplate.
+     * @return ExecutionManagerTemplateInfoDTO object
      * @throws AxisFault
      */
-    public TemplateDomainDTO getDomain(String domainName) throws AxisFault {
+    public ExecutionManagerTemplateInfoDTO getExecutionManagerTemplateInfo(String domainName) throws AxisFault {
         try {
-            return DomainMapper.mapDomain(ExecutionManagerAdminServiceValueHolder.getCarbonExecutorManagerService()
-                    .getDomain(domainName));
-        } catch (Exception e) {
+            return DomainMapper.mapExecutionManagerTemplate(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
+                                                                    .getDomain(domainName));
+        } catch (Throwable e) {
             log.error("Error occurred when getting domain " + domainName, e);
             throw new AxisFault(e.getMessage());
         }
     }
 
     /**
-     * return domain for a given template domain name
+     * Return "limited information" with regards to all available ExecutionManagerTemplates.
+     * "limited information" means, only the information which are required by the UI will be returned.
      *
-     * @param domainName template domain name
-     * @return template domain full details
-     * @throws AxisFault
-     */
-    public TemplateDomainInfoDTO getDomainInfo(String domainName) throws AxisFault {
-        try {
-            return DomainMapper.mapDomainInfo(ExecutionManagerAdminServiceValueHolder.getCarbonExecutorManagerService()
-                    .getDomain(domainName));
-        } catch (Exception e) {
-            log.error("Error occurred when getting domain " + domainName, e);
-            throw new AxisFault(e.getMessage());
-        }
-    }
-
-    /**
-     * return all available template domain information
-     *
-     * @return all template domain information
+     * @return ExecutionManagerTemplate information for all of the available ExecutionManagerTemplates
      * @throws org.apache.axis2.AxisFault
      */
-    public TemplateDomainInfoDTO[] getAllDomainsInfo() throws AxisFault {
+    public ExecutionManagerTemplateInfoDTO[] getAllExecutionManagerTemplateInfos() throws AxisFault {
         try {
-            return DomainMapper.mapDomainsInfo(new ArrayList<TemplateDomain>(ExecutionManagerAdminServiceValueHolder
-                    .getCarbonExecutorManagerService().getAllDomains()));
-        } catch (Exception e) {
+            return DomainMapper.mapExecutionManagerTemplates(new ArrayList
+                    <ExecutionManagerTemplate>(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService().getAllDomains()));
+        } catch (Throwable e) {
             log.error("Error occurred when getting all domains ", e);
             throw new AxisFault(e.getMessage(), e);
         }
     }
 
-    /**
-     * return all available template domains
-     *
-     * @return all template domain information
-     * @throws org.apache.axis2.AxisFault
-     */
-    public TemplateDomainDTO[] getAllDomains() throws AxisFault {
-        try {
-            return DomainMapper.mapDomains(new ArrayList<TemplateDomain>(ExecutionManagerAdminServiceValueHolder
-                    .getCarbonExecutorManagerService().getAllDomains()));
-        } catch (Exception e) {
-            log.error("Error occurred when getting all domains ", e);
-            throw new AxisFault(e.getMessage(), e);
-        }
-    }
-
-
-    /**
-     * return details for a given template domain name
-     *
-     * @param domainName template domain name
-     * @return template domain configuration details
-     * @throws AxisFault
-     */
-    public TemplateConfigurationDTO[] getConfigurations(String domainName) throws AxisFault {
-        try {
-            return ConfigurationMapper.mapConfigurations(new ArrayList<>(
-                    ExecutionManagerAdminServiceValueHolder.getCarbonExecutorManagerService()
-                            .getConfigurations(domainName)));
-        } catch (Exception e) {
-            log.error("Error occurred when getting configurations for domain " + domainName, e);
-            throw new AxisFault(e.getMessage());
-        }
-    }
 
     /**
      * return details for a given template configuration name
      *
-     * @param domainName template domain name
-     * @param configName template configuration name
-     * @return template domain configuration details
+     * @param domainName domain name of the ExecutionManagerTemplate, corresponding to the configuration
+     * @param configName scenario configuration name
+     * @return scenario configuration details
      * @throws AxisFault
      */
-    public TemplateConfigurationDTO getConfiguration(String domainName, String configName) throws AxisFault {
+    public ScenarioConfigurationDTO getConfiguration(String domainName, String configName) throws AxisFault {
         try {
             return ConfigurationMapper.mapConfiguration(ExecutionManagerAdminServiceValueHolder
-                    .getCarbonExecutorManagerService().getConfiguration(domainName, configName));
-        } catch (Exception e) {
+                    .getCarbonExecutionManagerService().getConfiguration(domainName, configName));
+        } catch (ExecutionManagerException e) {
             log.error("Error occurred when getting template configuration " + configName, e);
             throw new AxisFault(e.getMessage());
         }
     }
 
+
     /**
-     * return details for a given template domain name
+     * return all of the available Scenario Configuration Info's for a given ExecutionManagerTemplate domain.
+     * This method does not return all the fields in a Scenario Configurations, rather returns only the fields which are required for the UI.
      *
-     * @param domainName template domain name
-     * @return template domain configuration details
+     * @param domainName domain name of the ExecutionManagerTemplate
+     * @return scenario configuration information.
      * @throws AxisFault
      */
-    public TemplateConfigurationInfoDTO[] getConfigurationsInfo(String domainName) throws AxisFault {
+    public ScenarioConfigurationInfoDTO[] getConfigurationInfos(String domainName) throws AxisFault {
         try {
             return ConfigurationMapper.mapConfigurationsInfo(new ArrayList<>(
-                    ExecutionManagerAdminServiceValueHolder.getCarbonExecutorManagerService()
+                    ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
                             .getConfigurations(domainName)));
-        } catch (Exception e) {
+        } catch (ExecutionManagerException e) {
             log.error("Error occurred when getting configurations for domain " + domainName, e);
             throw new AxisFault(e.getMessage());
         }
@@ -168,32 +122,14 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
 
 
     /**
-     * return details for a given template configuration name
+     * Delete specified scenario configuration
      *
-     * @param domainName template domain name
-     * @param configName template configuration name
-     * @return template domain configuration details
-     * @throws AxisFault
-     */
-    public TemplateConfigurationInfoDTO getConfigurationInfo(String domainName, String configName) throws AxisFault {
-        try {
-            return ConfigurationMapper.mapConfigurationInfo(ExecutionManagerAdminServiceValueHolder
-                    .getCarbonExecutorManagerService().getConfiguration(domainName, configName));
-        } catch (Exception e) {
-            log.error("Error occurred when getting template configuration " + configName, e);
-            throw new AxisFault(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Delete specified configuration
-     *
-     * @param domainName template domain name
-     * @param configName configuration name which needs to be deleted
+     * @param domainName domain name of the ExecutionManagerTemplate
+     * @param configName name of the scenario configuration which needs to be deleted
      */
     public boolean deleteConfiguration(String domainName, String configName) throws AxisFault {
         try {
-            ExecutionManagerAdminServiceValueHolder.getCarbonExecutorManagerService()
+            ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
                     .deleteConfiguration(domainName, configName);
             return true;
         } catch (ExecutionManagerException e) {
@@ -203,17 +139,51 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     }
 
     /**
-     * Create or update specified configuration
+     * Create or update specified scenario configuration.
      *
-     * @param configuration configuration data transfer object
+     * @param configuration scenario configuration data transfer object which needs to be saved.
+     * @return  Stream ID array. In case there are StreamMappings in the ExecutionManagerTemplate (under this particular scenario),
+     * then the "toStream" IDs will be returned. If no StreamMappings present, null will be returned.
+     * @throws AxisFault
      */
-    public boolean saveConfiguration(TemplateConfigurationDTO configuration) throws AxisFault {
+    public String[] saveConfiguration(ScenarioConfigurationDTO configuration) throws AxisFault {
         try {
-            ExecutionManagerAdminServiceValueHolder.getCarbonExecutorManagerService()
+            List<String> streamIdList = ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
                     .saveConfiguration(ConfigurationMapper.mapConfiguration(configuration));
-            return true;
+            if (streamIdList != null) {
+               return streamIdList.toArray(new String[0]);
+            } else {
+                return null;
+            }
         } catch (ExecutionManagerException e) {
             log.error("Error occurred when saving configuration " + configuration.getName(), e);
+            throw new AxisFault(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * When the template refers to a stream (say StreamX) which needs to be populated by a user-defined stream (say StreamY),
+     * specify how attributes in StreamY needs to be mapped to StreamX, using the streamMappingDTO,
+     * and invoke this service.
+     * This service will create a Siddhi execution plan, which will select required attributes (as specified in the mapping)
+     * from StreamY and insert into StreamX.
+     *
+     * @param streamMappingDTOs  Each StreamMappingDTO maps a user-defined stream to a stream defined in the template.
+     * @param configName ScenarioConfiguration name
+     * @param domainName domain name of the ExecutionManagerTemplate.
+     * @return true on successful operation completion.
+     * @throws AxisFault
+     */
+    public boolean saveStreamMapping(
+            org.wso2.carbon.event.execution.manager.admin.dto.configuration.StreamMappingDTO[]
+                    streamMappingDTOs, String configName, String domainName) throws AxisFault {
+        try {
+            ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
+                    .saveStreamMapping(ConfigurationMapper.mapStreamMapping(streamMappingDTOs)
+                            , configName, domainName);
+            return true;
+        } catch (ExecutionManagerException e) {
+            log.error("Error occurred when saving configuration " + configName + " in domain " + domainName + " with stream mappings", e);
             throw new AxisFault(e.getMessage(), e);
         }
     }

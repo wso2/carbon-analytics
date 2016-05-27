@@ -9,6 +9,11 @@
 <%@ page import="java.rmi.RemoteException" %>
 
 <%
+    if (!"post".equalsIgnoreCase(request.getMethod())) {
+        response.sendError(405);
+        return;
+    }
+
     String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
 
     ConfigurationContext configContext =

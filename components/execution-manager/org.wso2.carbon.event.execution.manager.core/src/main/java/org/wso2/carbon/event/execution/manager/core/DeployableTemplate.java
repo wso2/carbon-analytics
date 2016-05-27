@@ -15,36 +15,35 @@
  */
 package org.wso2.carbon.event.execution.manager.core;
 
-import org.wso2.carbon.event.execution.manager.core.structure.configuration.TemplateConfiguration;
+import org.wso2.carbon.event.execution.manager.core.structure.configuration.ScenarioConfiguration;
 
 public class DeployableTemplate {
 
-    private TemplateConfiguration configuration;
-    private String script;
-    private String[] streams;
+    private ScenarioConfiguration configuration;
+    private String artifact;
+    private String artifactId;
 
-
-    public TemplateConfiguration getConfiguration() {
+    public ScenarioConfiguration getConfiguration() {
         return configuration;
     }
 
-    public void setConfiguration(TemplateConfiguration configuration) {
+    public void setConfiguration(ScenarioConfiguration configuration) {
         this.configuration = configuration;
     }
 
-    public String getScript() {
-        return script;
+    public String getArtifact() {
+        return artifact;
     }
 
-    public void setScript(String script) {
-        this.script = script;
+    public void setArtifact(String artifact) {
+        this.artifact = artifact;
     }
 
-    public String[] getStreams() {
-        return streams;
+    public String getArtifactId() {
+        return artifactId;
     }
 
-    public void setStreams(String[] streams) {
-        this.streams = streams;
+    public void setArtifactId(String artifactId) {
+        this.artifactId = artifactId;
     }
 }

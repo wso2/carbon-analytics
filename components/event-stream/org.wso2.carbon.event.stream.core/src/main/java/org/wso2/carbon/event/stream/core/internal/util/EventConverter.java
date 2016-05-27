@@ -60,7 +60,13 @@ public class EventConverter {
 
     public static org.wso2.siddhi.core.event.Event convertToEvent(Event event, boolean metaFlag, boolean correlationFlag, boolean payloadFlag, int size) {
 
-        Object[] eventObject = new Object[size];
+        Object[] eventObject;
+        if (event.getArbitraryDataMap() != null) { // If there is arbitrary data map
+            eventObject = new Object[size + 1];
+            eventObject[size] = event.getArbitraryDataMap();
+        } else {
+            eventObject = new Object[size];
+        }
         int count = 0;
         Object[] metaData = event.getMetaData();
         Object[] correlationData = event.getCorrelationData();

@@ -21,6 +21,7 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.event.execution.manager.core.ExecutionManagerService;
 import org.wso2.carbon.event.execution.manager.core.exception.ExecutionManagerException;
 import org.wso2.carbon.event.execution.manager.core.internal.CarbonExecutionManagerService;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 
@@ -31,6 +32,9 @@ import org.wso2.carbon.registry.core.service.RegistryService;
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService"
  * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
+ * @scr.reference name="eventStreamService.service"
+ * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
+ * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  */
 public class ExecutionManagerServiceDS {
     private static final Log log = LogFactory.getLog(ExecutionManagerServiceDS.class);
@@ -60,6 +64,14 @@ public class ExecutionManagerServiceDS {
 
     protected void unsetRegistryService(RegistryService registryService) {
         ExecutionManagerValueHolder.setRegistryService(null);
+    }
+
+    protected void setEventStreamService(EventStreamService eventStreamService) {
+        ExecutionManagerValueHolder.setEventStreamService(eventStreamService);
+    }
+
+    protected void unsetEventStreamService(EventStreamService eventStreamService) {
+        ExecutionManagerValueHolder.setEventStreamService(null);
     }
 
 }

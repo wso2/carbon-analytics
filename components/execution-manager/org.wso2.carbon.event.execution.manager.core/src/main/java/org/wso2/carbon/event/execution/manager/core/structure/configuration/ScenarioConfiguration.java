@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.event.execution.manager.core.structure.domain;
+package org.wso2.carbon.event.execution.manager.core.structure.configuration;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * JAXB Class of TemplateDomain element
+ * JAXB Class of ScenarioConfiguration element
  */
 @XmlRootElement
-public class TemplateDomain {
+public class ScenarioConfiguration {
 
     private String name;
+    private String scenario;
+    private String domain;
     private String description;
-    private Template[] templates;
-    private String[] streams;
+    private Map<String,String> parameterMap = new HashMap<>();
+    private StreamMappings streamMappings;
 
     public String getName() {
         return name;
@@ -38,6 +41,24 @@ public class TemplateDomain {
     @XmlAttribute
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getScenario() {
+        return scenario;
+    }
+
+    @XmlAttribute
+    public void setScenario(String scenario) {
+        this.scenario = scenario;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    @XmlAttribute
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     public String getDescription() {
@@ -49,23 +70,19 @@ public class TemplateDomain {
         this.description = description;
     }
 
-    public Template[] getTemplates() {
-        return templates;
+    public Map<String, String> getParameterMap() {
+        return parameterMap;
     }
 
-    @XmlElementWrapper(name = "templates")
-    @XmlElement(name = "template")
-    public void setTemplates(Template[] templates) {
-        this.templates = templates;
+    public void setParameterMap(Map<String, String> parameterMap) {
+        this.parameterMap = parameterMap;
     }
 
-    public String[] getStreams() {
-        return streams;
+    public StreamMappings getStreamMappings() {
+        return streamMappings;
     }
 
-    @XmlElementWrapper(name = "streams")
-    @XmlElement(name = "stream")
-    public void setStreams(String[] streams) {
-        this.streams = streams;
+    public void setStreamMappings(StreamMappings streamMappings) {
+        this.streamMappings = streamMappings;
     }
 }
