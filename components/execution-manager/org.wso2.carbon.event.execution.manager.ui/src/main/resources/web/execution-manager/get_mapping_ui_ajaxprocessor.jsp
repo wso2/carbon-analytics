@@ -19,9 +19,7 @@
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamDefinitionDto" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.ui.ExecutionManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamAttributeDto" %>
-<%@ page import="java.util.Arrays" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.ui.ExecutionManagerUIConstants" %>
-<%@ page import="org.apache.commons.lang.ArrayUtils" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
@@ -31,7 +29,6 @@
         String fromStreamId = request.getParameter("fromStreamNameWithVersion");
         String toStreamId = request.getParameter("toStreamNameWithVersion");
         String index = request.getParameter("index");
-        String attributeMappingDTOArray = request.getParameter("attributeMappingDTOArray");
         EventStreamAdminServiceStub eventStreamAdminServiceStub = ExecutionManagerUIUtils.getEventStreamAdminService(config, session, request);
         EventStreamDefinitionDto toStreamDefinitionDto = eventStreamAdminServiceStub.getStreamDefinitionDto(toStreamId);
         EventStreamDefinitionDto fromStreamDefinitionDto = eventStreamAdminServiceStub.getStreamDefinitionDto(fromStreamId);

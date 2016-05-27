@@ -5,6 +5,8 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTOE" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.StreamMappingDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.AttributeMappingDTO" %>
+<%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamAttributeDto" %>
+<%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamDefinitionDto" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
 <%@ page import="java.util.Arrays" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub" %>
@@ -91,8 +93,7 @@
                             session, request);
                     String[] fromStreamIds = eventStreamAdminServiceStub.getStreamNames();
 
-                    //if update then set isExistingConfig to true
-                    System.out.println("session " + ((StreamMappingDTO[]) session.getAttribute("streamMappingDTOs")));
+                    //if update then get stream mapping dtos
                     if (((StreamMappingDTO[]) session.getAttribute("streamMappingDTOs")) != null) {
                         streamMappingDTOs = (StreamMappingDTO[]) session.getAttribute("streamMappingDTOs");
                     } else {
@@ -128,9 +129,8 @@
                         if (fromStreamIds != null) {
                             Arrays.sort(fromStreamIds);
                             for (String aStreamId : fromStreamIds) {
-                                fromStreamNameID = aStreamId;
                     %>
-                    <option id="fromStreamOptionID"><%=fromStreamNameID%>
+                    <option id="fromStreamOptionID"><%=aStreamId%>
                     </option>
                     <%
                             }
@@ -143,6 +143,7 @@
             <div id="outerDiv_<%=i%>">
 
                 <%
+                    //process attribute mapping dto to sort meta,correlation and payload attributes
                     ArrayList<AttributeMappingDTO> metaAttributeMappingDTOList = new ArrayList<AttributeMappingDTO>();
                     ArrayList<AttributeMappingDTO> correlationAttributeMappingDTOList = new ArrayList<AttributeMappingDTO>();
                     ArrayList<AttributeMappingDTO> payloadAttributeMappingDTOList = new ArrayList<AttributeMappingDTO>();
@@ -158,7 +159,30 @@
                             //set payload data
                             payloadAttributeMappingDTOList.add(attributeMappingDTO);
                         }
-                    }%>
+                    }
+
+                    //process from stream attributes
+                    EventStreamDefinitionDto fromStreamDefinitionDto = eventStreamAdminServiceStub.getStreamDefinitionDto(fromStreamNameID);
+                    ArrayList<EventStreamAttributeDto> fromStreamAttributeArray = new ArrayList<EventStreamAttributeDto>();
+                    if (fromStreamDefinitionDto.getMetaData() != null) {
+                        //get meta data
+                        for (EventStreamAttributeDto fromStreamMetaAttribute : fromStreamDefinitionDto.getMetaData()) {
+                            fromStreamAttributeArray.add(fromStreamMetaAttribute);
+                        }
+                    }
+                    if (fromStreamDefinitionDto.getCorrelationData() != null) {
+                        //get correlation data
+                        for (EventStreamAttributeDto fromStreamCorrelationAttribute : fromStreamDefinitionDto.getCorrelationData()) {
+                            fromStreamAttributeArray.add(fromStreamCorrelationAttribute);
+                        }
+                    }
+                    if (fromStreamDefinitionDto.getPayloadData() != null) {
+                        //get payload data
+                        for (EventStreamAttributeDto fromStreamPayloadAttribute : fromStreamDefinitionDto.getPayloadData()) {
+                            fromStreamAttributeArray.add(fromStreamPayloadAttribute);
+                        }
+                    }
+                %>
 
                 <h4><fmt:message
                         key='template.stream.attribute.mapping.header.text'/></h4>
@@ -183,6 +207,23 @@
                             <select id="metaEventMappingValue_<%=i%><%=metaCounter%>">
                                 <option selected><%=metaAttributeMappingDTO.getFromAttribute()%>
                                 </option>
+                                <%
+                                    boolean isMatchingAttributeType = false;
+                                    for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
+                                        if (fromStreamAttribute.getAttributeType().equals(metaAttributeMappingDTO.getAttributeType())) {
+                                            isMatchingAttributeType = true;
+                                %>
+                                <option><%=fromStreamAttribute.getAttributeName()%>
+                                </option>
+                                <%
+                                        }
+                                    }
+                                    if (isMatchingAttributeType == false) {
+                                %>
+                                <option>No matching attribute type to map</option>
+                                <%
+                                    }
+                                %>
                             </select>
                         </td>
                         <td>Mapped To :
@@ -233,6 +274,23 @@
                             <select id="correlationEventMappingValue_<%=i%><%=correlationCounter%>">
                                 <option selected><%=correlationAttributeMappingDTO.getFromAttribute()%>
                                 </option>
+                                <%
+                                    boolean isMatchingAttributeType = false;
+                                    for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
+                                        if (fromStreamAttribute.getAttributeType().equals(correlationAttributeMappingDTO.getAttributeType())) {
+                                            isMatchingAttributeType = true;
+                                %>
+                                <option><%=fromStreamAttribute.getAttributeName()%>
+                                </option>
+                                <%
+                                        }
+                                    }
+                                    if (isMatchingAttributeType == false) {
+                                %>
+                                <option>No matching attribute type to map</option>
+                                <%
+                                    }
+                                %>
                             </select>
                         </td>
                         <td>Mapped To :
@@ -283,6 +341,23 @@
                             <select id="payloadEventMappingValue_<%=i%><%=payloadCounter%>">
                                 <option selected><%=payloadAttributeMappingDTO.getFromAttribute()%>
                                 </option>
+                                <%
+                                    boolean isMatchingAttributeType = false;
+                                    for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
+                                        if (fromStreamAttribute.getAttributeType().equals(payloadAttributeMappingDTO.getAttributeType())) {
+                                            isMatchingAttributeType = true;
+                                %>
+                                <option><%=fromStreamAttribute.getAttributeName()%>
+                                </option>
+                                <%
+                                        }
+                                    }
+                                    if (isMatchingAttributeType == false) {
+                                %>
+                                <option>No matching attribute type to map</option>
+                                <%
+                                    }
+                                %>
                             </select>
                         </td>
                         <td>Mapped To :

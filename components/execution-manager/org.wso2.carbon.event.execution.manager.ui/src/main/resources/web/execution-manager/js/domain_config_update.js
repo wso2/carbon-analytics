@@ -117,8 +117,7 @@ function loadMappingFromStreamAttributes(index) {
 }
 
 //Get Stream Mapping Values
-function getStreamMappingValues(dataTable, inputDataType, index , numOfRows) {
-    var eventStreamMappingTable = document.getElementById(dataTable);
+function getStreamMappingValues(inputDataType, index , numOfRows) {
 
     var eventStreamAttributeMap = "";
     for (var colIndex = 0; colIndex < numOfRows; colIndex++) {
@@ -155,9 +154,9 @@ function getStreamMappingObjectArray(streamMappingArrayLength) {
                 var correlationRows = document.getElementById("correlationRows").value;
                 var payloadRows = document.getElementById("payloadRows").value;
 
-                var metaData = getStreamMappingValues("addMetaEventDataTable_" + i, 'meta', i, metaRows);
-                var correlationData = getStreamMappingValues("addCorrelationEventDataTable_" + i, 'correlation', i, correlationRows);
-                var payloadData = getStreamMappingValues("addPayloadEventDataTable_" + i, 'payload', i, payloadRows);
+                var metaData = getStreamMappingValues('meta', i, metaRows);
+                var correlationData = getStreamMappingValues('correlation', i, correlationRows);
+                var payloadData = getStreamMappingValues('payload', i, payloadRows);
                 streamMappingObject = {
                     "toStreamID": toStreamID,
                     "fromStreamID": fromStreamID,
