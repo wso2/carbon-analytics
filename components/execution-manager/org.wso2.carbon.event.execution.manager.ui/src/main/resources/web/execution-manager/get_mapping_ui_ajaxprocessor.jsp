@@ -31,6 +31,7 @@
         String fromStreamId = request.getParameter("fromStreamNameWithVersion");
         String toStreamId = request.getParameter("toStreamNameWithVersion");
         String index = request.getParameter("index");
+        String attributeMappingDTOArray = request.getParameter("attributeMappingDTOArray");
         EventStreamAdminServiceStub eventStreamAdminServiceStub = ExecutionManagerUIUtils.getEventStreamAdminService(config, session, request);
         EventStreamDefinitionDto toStreamDefinitionDto = eventStreamAdminServiceStub.getStreamDefinitionDto(toStreamId);
         EventStreamDefinitionDto fromStreamDefinitionDto = eventStreamAdminServiceStub.getStreamDefinitionDto(fromStreamId);
@@ -62,201 +63,211 @@
         <tbody>
 
             <%--Map Meta Data--%>
-        <tr id="metaMappingRow">
-            <td colspan="2">
+        <tr>
+            <td colspan="6">
                 <h6><fmt:message key="meta.attribute.mapping"/></h6>
-                <table id="addMetaEventDataTable_<%=index%>" style="width:100%">
-                    <tbody>
-                    <%
-                        if (toStreamDefinitionDto.getMetaData() != null) {
-                            int counter = 0;
-                            for (EventStreamAttributeDto metaAttribute : toStreamDefinitionDto.getMetaData()) {
-                    %>
+            </td>
+        </tr>
+        <%
+            int metaCounter = 0;
+            if (toStreamDefinitionDto.getMetaData() != null) {
+                for (EventStreamAttributeDto metaAttribute : toStreamDefinitionDto.getMetaData()) {
+        %>
 
-                    <tr>
-                        <td>Mapped From :
-                        </td>
-                        <td>
-                            <select id="metaEventMappingValue_<%=index%><%=counter%>">
-                                <%
-                                    boolean isMatchingAttributeType = false;
-                                    for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
-                                        if (fromStreamAttribute.getAttributeType().equals(metaAttribute.getAttributeType())) {
-                                            isMatchingAttributeType = true;
-                                %>
-                                <option><%=fromStreamAttribute.getAttributeName()%>
-                                </option>
-                                <%
-                                        }
-                                    }
-                                    if (isMatchingAttributeType == false) {
-                                %>
-                                <option>No matching attribute type to map</option>
-                                <%
-                                    }
-                                %>
-                            </select>
-                        </td>
-                        <td>Mapped To :
-                        </td>
-                        <td>
-                            <input type="text" id="metaEventMappedValue_<%=index%><%=counter%>"
-                                   value="<%=ExecutionManagerUIConstants.PROPERTY_META_PREFIX + metaAttribute.getAttributeName()%>"
-                                   readonly="true"/>
-                        </td>
-                        <td>Attribute Type :
-                        </td>
-                        <td>
-                            <input type="text" id="metaEventType_<%=index%><%=counter%>"
-                                   value="<%=metaAttribute.getAttributeType()%>" readonly="true"/>
-                        </td>
-                    </tr>
+        <tr id="metaMappingRow_<%=metaCounter%>">
+            <td>Mapped From :
+            </td>
+            <td>
+                <select id="metaEventMappingValue_<%=index%><%=metaCounter%>">
                     <%
-                            counter++;
-                        }
-                    } else {
+                        boolean isMatchingAttributeType = false;
+                        for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
+                            if (fromStreamAttribute.getAttributeType().equals(metaAttribute.getAttributeType())) {
+                                isMatchingAttributeType = true;
                     %>
+                    <option><%=fromStreamAttribute.getAttributeName()%>
+                    </option>
+                    <%
+                            }
+                        }
+                        if (isMatchingAttributeType == false) {
+                    %>
+                    <option>No matching attribute type to map</option>
+                    <%
+                        }
+                    %>
+                </select>
+            </td>
+            <td>Mapped To :
+            </td>
+            <td>
+                <input type="text" id="metaEventMappedValue_<%=index%><%=metaCounter%>"
+                       value="<%=ExecutionManagerUIConstants.PROPERTY_META_PREFIX + metaAttribute.getAttributeName()%>"
+                       readonly="true"/>
+            </td>
+            <td>Attribute Type :
+            </td>
+            <td>
+                <input type="text" id="metaEventType_<%=index%><%=metaCounter%>"
+                       value="<%=metaAttribute.getAttributeType()%>" readonly="true"/>
+            </td>
+        </tr>
+        <%
+                metaCounter++;
+            }
+
+        } else {
+        %>
+            <tr>
+                <td colspan="6">
                     <div id="noInputMetaEventData">
                         No Meta Attributes to define
                     </div>
-                    <%
-                        }
-                    %>
-                    </tbody>
-                </table>
-            </td>
-        </tr>
+                </td>
+            </tr>
+        <%
+            }
+        %>
 
             <%--Map Correlation Data--%>
-        <tr id="correlationMappingRow">
-            <td colspan="2">
-                <h6><fmt:message key="correlation.attribute.mapping"/></h6>
-                <table id="addCorrelationEventDataTable_<%=index%>" style="width:100%">
-                    <tbody>
-                    <%
-                        if (toStreamDefinitionDto.getCorrelationData() != null) {
-                            int counter = 0;
-                            for (EventStreamAttributeDto correlationAttribute : toStreamDefinitionDto.getCorrelationData()) {
-                    %>
+            <tr>
+                <td colspan="6">
+                    <h6><fmt:message key="correlation.attribute.mapping"/></h6>
+                </td>
+            </tr>
+        <%
+            int correlationCounter = 0;
+            if (toStreamDefinitionDto.getCorrelationData() != null) {
+                for (EventStreamAttributeDto correlationAttribute : toStreamDefinitionDto.getCorrelationData()) {
+        %>
 
-                    <tr>
-                        <td>Mapped From :
-                        </td>
-                        <td>
-                            <select id="correlationEventMappingValue_<%=index%><%=counter%>">
-                                <%
-                                    boolean isMatchingAttributeType = false;
-                                    for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
-                                        if (fromStreamAttribute.getAttributeType().equals(correlationAttribute.getAttributeType())) {
-                                            isMatchingAttributeType = true;
-                                %>
-                                <option><%=fromStreamAttribute.getAttributeName()%>
-                                </option>
-                                <%
-                                        }
-                                    }
-                                    if (isMatchingAttributeType == false) {
-                                %>
-                                <option>No matching attribute type to map</option>
-                                <%
-                                    }
-                                %>
-                            </select>
-                        </td>
-                        <td>Mapped To :
-                        </td>
-                        <td>
-                            <input type="text" id="correlationEventMappedValue_<%=index%><%=counter%>"
-                                   value="<%=ExecutionManagerUIConstants.PROPERTY_CORRELATION_PREFIX + correlationAttribute.getAttributeName()%>"
-                                   readonly="true"/>
-                        </td>
-                        <td>Attribute Type :
-                        </td>
-                        <td>
-                            <input type="text" id="correlationEventType_<%=index%><%=counter%>"
-                                   value="<%=correlationAttribute.getAttributeType()%>" readonly="true"/>
-                        </td>
-                    </tr>
+        <tr id="correlationMappingRow_<%=correlationCounter%>">
+            <td>Mapped From :
+            </td>
+            <td>
+                <select id="correlationEventMappingValue_<%=index%><%=correlationCounter%>">
                     <%
-                            counter++;
-                        }
-                    } else {
+                        boolean isMatchingAttributeType = false;
+                        for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
+                            if (fromStreamAttribute.getAttributeType().equals(correlationAttribute.getAttributeType())) {
+                                isMatchingAttributeType = true;
                     %>
-                    <div id="noInputPayloadEventData">
-                        No Correlation Attributes to define
-                    </div>
+                    <option><%=fromStreamAttribute.getAttributeName()%>
+                    </option>
+                    <%
+                            }
+                        }
+                        if (isMatchingAttributeType == false) {
+                    %>
+                    <option>No matching attribute type to map</option>
                     <%
                         }
                     %>
-                    </tbody>
-                </table>
+                </select>
+            </td>
+            <td>Mapped To :
+            </td>
+            <td>
+                <input type="text" id="correlationEventMappedValue_<%=index%><%=correlationCounter%>"
+                       value="<%=ExecutionManagerUIConstants.PROPERTY_CORRELATION_PREFIX + correlationAttribute.getAttributeName()%>"
+                       readonly="true"/>
+            </td>
+            <td>Attribute Type :
+            </td>
+            <td>
+                <input type="text" id="correlationEventType_<%=index%><%=correlationCounter%>"
+                       value="<%=correlationAttribute.getAttributeType()%>" readonly="true"/>
             </td>
         </tr>
+        <%
+                correlationCounter++;
+            }
+        } else {
+        %>
+            <tr>
+                <td colspan="6">
+                    <div id="noInputCorrelationEventData">
+                        No Correlation Attributes to define
+                    </div>
+                </td>
+            </tr>
+        <%
+            }
+        %>
 
             <%--Map Payload Data--%>
-        <tr id="PayloadMappingRow">
-            <td colspan="2">
-                <h6><fmt:message key="payload.attribute.mapping"/></h6>
-                <table id="addPayloadEventDataTable_<%=index%>" style="width:100%">
-                    <tbody>
-                    <%
-                        if (toStreamDefinitionDto.getPayloadData() != null) {
-                            int counter = 0;
-                            for (EventStreamAttributeDto payloadAttribute : toStreamDefinitionDto.getPayloadData()) {
-                    %>
+            <tr>
+                <td colspan="6">
+                    <h6><fmt:message key="payload.attribute.mapping"/></h6>
+                </td>
+            </tr>
+        <%
+            int payloadCounter = 0;
+            if (toStreamDefinitionDto.getPayloadData() != null) {
+                for (EventStreamAttributeDto payloadAttribute : toStreamDefinitionDto.getPayloadData()) {
+        %>
 
-                    <tr>
-                        <td>Mapped From :
-                        </td>
-                        <td>
-                            <select id="payloadEventMappingValue_<%=index%><%=counter%>">
-                                <%
-                                    boolean isMatchingAttributeType = false;
-                                    for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
-                                        if (fromStreamAttribute.getAttributeType().equals(payloadAttribute.getAttributeType())) {
-                                            isMatchingAttributeType = true;
-                                %>
-                                <option><%=fromStreamAttribute.getAttributeName()%>
-                                </option>
-                                <%
-                                        }
-                                    }
-                                    if (isMatchingAttributeType == false) {
-                                %>
-                                <option>No matching attribute type to map</option>
-                                <%
-                                    }
-                                %>
-                            </select>
-                        </td>
-                        <td>Mapped To :
-                        </td>
-                        <td>
-                            <input type="text" id="payloadEventMappedValue_<%=index%><%=counter%>"
-                                   value="<%=payloadAttribute.getAttributeName()%>" readonly="true"/>
-                        </td>
-                        <td>Attribute Type :
-                        </td>
-                        <td>
-                            <input type="text" id="payloadEventType_<%=index%><%=counter%>"
-                                   value="<%=payloadAttribute.getAttributeType()%>" readonly="true"/>
-                        </td>
-                    </tr>
+        <tr id="payloadMappingRow_<%=payloadCounter%>">
+            <td>Mapped From :
+            </td>
+            <td>
+                <select id="payloadEventMappingValue_<%=index%><%=payloadCounter%>">
                     <%
-                            counter++;
-                        }
-                    } else {
+                        boolean isMatchingAttributeType = false;
+                        for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
+                            if (fromStreamAttribute.getAttributeType().equals(payloadAttribute.getAttributeType())) {
+                                isMatchingAttributeType = true;
                     %>
+                    <option><%=fromStreamAttribute.getAttributeName()%>
+                    </option>
+                    <%
+                            }
+                        }
+                        if (isMatchingAttributeType == false) {
+                    %>
+                    <option>No matching attribute type to map</option>
+                    <%
+                        }
+                    %>
+                </select>
+            </td>
+            <td>Mapped To :
+            </td>
+            <td>
+                <input type="text" id="payloadEventMappedValue_<%=index%><%=payloadCounter%>"
+                       value="<%=payloadAttribute.getAttributeName()%>" readonly="true"/>
+            </td>
+            <td>Attribute Type :
+            </td>
+            <td>
+                <input type="text" id="payloadEventType_<%=index%><%=payloadCounter%>"
+                       value="<%=payloadAttribute.getAttributeType()%>" readonly="true"/>
+            </td>
+        </tr>
+        <%
+                payloadCounter++;
+            }
+        } else {
+        %>
+            <tr>
+                <td colspan="6">
                     <div id="noInputPayloadEventData">
                         No Payload Attributes to define
                     </div>
-                    <%
-                        }
-                    %>
-                    </tbody>
-                </table>
-            </td>
-        </tr>
+                </td>
+            </tr>
+        <%
+            }
+        %>
+        <div style="display: none">
+            <input type="text" id="metaRows"
+                   value="<%=metaCounter%>"/>
+            <input type="text" id="correlationRows"
+                   value="<%=correlationCounter%>"/>
+            <input type="text" id="payloadRows"
+                   value="<%=payloadCounter%>"/>
+        </div>
+
         </tbody>
     </table>
 </fmt:bundle>

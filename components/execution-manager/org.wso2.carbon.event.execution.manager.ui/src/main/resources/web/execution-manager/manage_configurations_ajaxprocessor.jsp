@@ -3,6 +3,8 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.ui.ExecutionManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ScenarioConfigurationDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTOE" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.StreamMappingDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.AttributeMappingDTO" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
 <%@ page import="java.util.Arrays" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub" %>
@@ -73,18 +75,22 @@
             scenarioConfigurationDTO.setParameterDTOs(parameters);
 
             //checks the "proxy.saveConfiguration(scenarioConfigurationDTO)" return value for not null and build stream mapping div
-            System.out.println("saving:" + proxy.saveConfiguration(scenarioConfigurationDTO));
             if (proxy.saveConfiguration(scenarioConfigurationDTO) != null) {
+                String toStreamNameID="";
+                String fromStreamNameID="";
+                StreamMappingDTO[] streamMappingDTOs=null;
+
+                //toStreamIDArray.length defines the number of stream mappings per configuration
                 String toStreamIDArray[] = proxy.saveConfiguration(scenarioConfigurationDTO);
-                String toStreamNameID = "";
                 EventStreamAdminServiceStub eventStreamAdminServiceStub = ExecutionManagerUIUtils.getEventStreamAdminService(config,
                         session, request);
-                String[] streamIds = eventStreamAdminServiceStub.getStreamNames();
+                String[] fromStreamIds = eventStreamAdminServiceStub.getStreamNames();
+
 %>
 <div class="container col-md-12 marg-top-20" id="streamMappingInnerDivID">
     <%
         for (int i = 0; i < toStreamIDArray.length; i++) {
-            toStreamNameID = toStreamIDArray[i];
+                toStreamNameID = toStreamIDArray[i];
     %>
     <div class="container col-md-12 marg-top-20" id="streamMappingConfigurationID_<%=i%>">
 
@@ -103,11 +109,12 @@
             <select id="fromStreamID_<%=i%>" onchange="loadMappingFromStreamAttributes(<%=i%>)">
                 <option selected disabled>Choose from here</option>
                 <%
-                    if (streamIds != null) {
-                        Arrays.sort(streamIds);
-                        for (String aStreamId : streamIds) {
+                    if (fromStreamIds != null) {
+                        Arrays.sort(fromStreamIds);
+                        for (String aStreamId : fromStreamIds) {
+                            fromStreamNameID = aStreamId;
                 %>
-                <option id="fromStreamOptionID"><%=aStreamId%>
+                <option id="fromStreamOptionID"><%=fromStreamNameID%>
                 </option>
                 <%
                         }
