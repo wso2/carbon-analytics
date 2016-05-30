@@ -23,7 +23,7 @@
             <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
         </recordTableInitQueries>
     </database>
-    <database name="mysql" category="write_read_optimized">
+    <database name="mysql" category="write_optimized">
         <recordCountSupported>false</recordCountSupported>
         <paginationSupported>true</paginationSupported>
         <paginationMode>MODE1</paginationMode>
@@ -48,7 +48,7 @@
             <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
         </recordTableInitQueries>     
     </database>
-    <database name="mysql" category="concurrency_optimized">
+    <database name="mysql" category="read_write_optimized">
         <recordCountSupported>false</recordCountSupported>
         <paginationSupported>true</paginationSupported>
         <paginationMode>MODE1</paginationMode>
