@@ -18,13 +18,20 @@
 -->
 <analytics-dataservice-configuration>
    <!-- The name of the primary record store -->
-   <primaryRecordStore>EVENT_STORE</primaryRecordStore>
+   <primaryRecordStore>EVENT_STORE_RWO</primaryRecordStore>
    <!-- Analytics Record Store - properties related to record storage implementation -->
-   <analytics-record-store name="EVENT_STORE">
+   <analytics-record-store name="EVENT_STORE_RWO">
       <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
       <properties>
          <property name="datasource">WSO2_ANALYTICS_EVENT_STORE_DB</property>
-         <property name="category">write_read_optimized</property>
+         <property name="category">read_write_optimized</property>
+      </properties>
+   </analytics-record-store>
+   <analytics-record-store name="EVENT_STORE_WO">
+      <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
+      <properties>
+         <property name="datasource">WSO2_ANALYTICS_EVENT_STORE_DB</property>
+         <property name="category">write_optimized</property>
       </properties>
    </analytics-record-store>
    <analytics-record-store name="PROCESSED_DATA_STORE">
