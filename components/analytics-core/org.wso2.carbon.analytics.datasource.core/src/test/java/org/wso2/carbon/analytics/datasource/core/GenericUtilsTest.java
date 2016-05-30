@@ -23,8 +23,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -136,7 +138,7 @@ public class GenericUtilsTest {
             cols.put("Column D - " + i, i + 0.535);
         }
         long start = System.currentTimeMillis();
-        int count = 100000;
+        int count = 200000;
         byte[] data = null;
         for (int i = 0; i < count; i++) {
             data = GenericUtils.encodeRecordValues(cols);
@@ -195,6 +197,32 @@ public class GenericUtilsTest {
         Assert.assertEquals(obj1, objIn1);
         Assert.assertEquals(obj2, objIn2);
         GenericUtils.deserializeObject(byteIn);
+    }
+    
+    @Test
+    public void testSerializeDeserializeObjectPerf() throws AnalyticsException, IOException {
+        List<Integer> obj = new ArrayList<Integer>(1);
+        obj.add(123);
+        long start = System.currentTimeMillis();
+        int count = 200000;
+        byte[] data = null;
+        for (int i = 0; i < count; i++) {
+            data = GenericUtils.serializeObject(obj);
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("Object Serialize TPS: " + (count) / (double) (end - start) * 1000.0);
+        start = System.currentTimeMillis();
+        for (int i = 0; i < count; i++) {
+            GenericUtils.deserializeObject(data);
+        }
+        end = System.currentTimeMillis();
+        System.out.println("Object Deserialize Byte[] TPS: " + (count) / (double) (end - start) * 1000.0);
+        start = System.currentTimeMillis();
+        for (int i = 0; i < count; i++) {
+            GenericUtils.deserializeObject(new ByteArrayInputStream(data));
+        }
+        end = System.currentTimeMillis();
+        System.out.println("Object Deserialize Input Stream TPS: " + (count) / (double) (end - start) * 1000.0);
     }
     
 }

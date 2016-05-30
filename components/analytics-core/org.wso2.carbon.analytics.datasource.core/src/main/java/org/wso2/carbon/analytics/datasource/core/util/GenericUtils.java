@@ -417,9 +417,7 @@ public class GenericUtils {
         if (in == null) {
             return null;
         }
-        if (in.available() == 0) {
-            throw new EOFException();
-        }
+        in = checkAndGetAvailableStream(in);
         DataInputStream dataIn = new DataInputStream(in);
         int size = dataIn.readInt();
         byte[] buff = new byte[size];
@@ -428,6 +426,24 @@ public class GenericUtils {
         try (Input input = new Input(buff)) {
             return kryo.readClassAndObject(input);
         }
+    }
+    
+    public static InputStream checkAndGetAvailableStream(InputStream in) throws IOException {
+        InputStream result;
+        int n = in.available();
+        if (n == 0) {
+            PushbackInputStream pin = new PushbackInputStream(in, 1);
+            int data = pin.read();
+            if (data == -1) {
+                throw new EOFException();
+            } else {
+                pin.unread(data);
+                result = pin;
+            }
+        } else {
+            result = in;
+        }
+        return result;
     }
 
     private static void addDataSourceProviders(List<String> providers) throws DataSourceException {
