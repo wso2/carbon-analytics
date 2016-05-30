@@ -138,7 +138,7 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
         sb.append("jaggeryapps").append(File.separator).append(GadgetTemplateDeployerConstants.APP_NAME).append(File.separator)
                 .append("store").append(File.separator)
                 .append(CarbonContext.getThreadLocalCarbonContext().getTenantDomain()).append(File.separator)
-                /*.append(GadgetTemplateDeployerConstants.DEFAULT_STORE_TYPE).append(File.separator)*/.append(artifactName)
+                .append(GadgetTemplateDeployerConstants.DEFAULT_STORE_TYPE).append(File.separator).append(artifactName)
                 .append(File.separator);
         return sb.toString();
     }
