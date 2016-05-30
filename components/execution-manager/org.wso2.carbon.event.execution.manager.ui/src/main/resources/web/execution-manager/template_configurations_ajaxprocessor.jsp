@@ -195,7 +195,7 @@
                 if (isExistingConfig) {
                     configurationName = scenarioConfigurationDTO.getName().trim();
                     saveButtonText = "template.update.button.text";
-                    if(scenarioConfigurationDTO.getStreamMappingDTOs()!=null){
+                    if (scenarioConfigurationDTO.getStreamMappingDTOs()[0] != null) {
                         session.setAttribute("streamMappingDTOs", scenarioConfigurationDTO.getStreamMappingDTOs());
                         isStreamMappingUpdate=true;
                     }

@@ -235,7 +235,8 @@ public class ExecutionManagerHelper {
                             deployer.deployArtifact(deployableTemplate);
                             artifactTypeCountingMap.put(artifactType, artifactCount);
                         } catch (TemplateDeploymentException e) {
-                            throw new ExecutionManagerException("Error when trying to deploy the artifact " + configuration.getName() ,e);
+                            throw new ExecutionManagerException("Error when trying to deploy the artifact of type: "
+                                                                + template.getType() + ", for configuration:" + configuration.getName() ,e);
                         }
                     } else {
                         throw new ExecutionManagerException("A deployer doesn't exist for template type " + template.getType());
@@ -261,7 +262,6 @@ public class ExecutionManagerHelper {
             for (Map.Entry parameterMapEntry : config.getParameterMap().entrySet()) {
                 updatedScript = updatedScript.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
                                                          + parameterMapEntry.getKey().toString(), parameterMapEntry.getValue().toString());
-                //todo: improvement for regex
             }
         }
         return updatedScript;

@@ -1,0 +1,14 @@
+{
+    "info": {
+        "id": "batch",
+        "name": "Batch Data Source",
+        "image": ""
+    },
+    "config" : [
+        {
+            "fieldType" : "advanced",
+            "childPartial" : "myPartial",
+            "dynamicJS" : ["foo"]
+        }
+    ]
+}
