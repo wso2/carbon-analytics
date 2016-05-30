@@ -33,7 +33,6 @@ import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
-import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.Resource;
@@ -193,15 +192,15 @@ public class ExecutionManagerHelper {
                     } else {
                         artifactCount++;
                     }
-                    String artifactId = executionManagerTemplate.getDomain() + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR
-                                        + artifactType + artifactCount;
+                    String artifactId = ExecutionManagerHelper.getCommonArtifactId(executionManagerTemplate.getDomain(), artifactType, artifactCount);
 
                     DeployableTemplate deployableTemplate = new DeployableTemplate();
                     deployableTemplate.setArtifact(artifact.getValue());
                     deployableTemplate.setConfiguration(configuration);
+                    deployableTemplate.setArtifactId(artifactId);
                     TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(artifact.getType());
                     if (deployer != null) {
-                        deployer.deployArtifact(deployableTemplate, artifactId);
+                        deployer.deployIfNotDoneAlready(deployableTemplate);
                         artifactTypeCountingMap.put(artifactType, artifactCount);
                     } else {
                         throw new ExecutionManagerException("A deployer doesn't exist for template type " + artifact.getType());
@@ -211,7 +210,6 @@ public class ExecutionManagerHelper {
                 }
             }
         }
-
         //now, deploy templated artifacts
         for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()) {
             if (scenario.getName().equals(configuration.getScenario())) {
@@ -224,8 +222,8 @@ public class ExecutionManagerHelper {
                     } else {
                         artifactCount++;
                     }
-                    String artifactId = ExecutionManagerHelper.getArtifactId(executionManagerTemplate.getDomain(),
-                                                                             scenario.getName(), configuration.getName(), artifactType, artifactCount);
+                    String artifactId = ExecutionManagerHelper.getTemplatedArtifactId(executionManagerTemplate.getDomain(),
+                                                                                      scenario.getName(), configuration.getName(), artifactType, artifactCount);
                     TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(template.getType());
                     if (deployer != null) {
                         try {
@@ -233,7 +231,8 @@ public class ExecutionManagerHelper {
                             String updatedScript = updateArtifactParameters(configuration, template.getValue());
                             deployableTemplate.setArtifact(updatedScript);
                             deployableTemplate.setConfiguration(configuration);
-                            deployer.deployArtifact(deployableTemplate, artifactId);
+                            deployableTemplate.setArtifactId(artifactId);
+                            deployer.deployArtifact(deployableTemplate);
                             artifactTypeCountingMap.put(artifactType, artifactCount);
                         } catch (TemplateDeploymentException e) {
                             throw new ExecutionManagerException("Error when trying to deploy the artifact " + configuration.getName() ,e);
@@ -363,12 +362,12 @@ public class ExecutionManagerHelper {
             StringBuilder streamDefBuilder = new StringBuilder(DEFINE_STREAM + siddhiStreamName + " (");
             if (streamDefinition.getMetaData() != null) {
                 for (Attribute metaAttribute : streamDefinition.getMetaData()) {
-                    streamDefBuilder.append(EventStreamConstants.META_PREFIX).append(metaAttribute.getName()).append(" ").append(metaAttribute.getType()).append(", ");
+                    streamDefBuilder.append(metaAttribute.getName()).append(" ").append(metaAttribute.getType()).append(", ");
                 }
             }
             if (streamDefinition.getCorrelationData() != null) {
                 for (Attribute corrAttribute : streamDefinition.getCorrelationData()) {
-                    streamDefBuilder.append(EventStreamConstants.CORRELATION_PREFIX).append(corrAttribute.getName()).append(" ").append(corrAttribute.getType()).append(", ");
+                    streamDefBuilder.append(corrAttribute.getName()).append(" ").append(corrAttribute.getType()).append(", ");
                 }
             }
             if (streamDefinition.getPayloadData() != null) {
@@ -459,7 +458,7 @@ public class ExecutionManagerHelper {
 
 
     /**
-     * Returns a unique ID for a templated artifact.
+     * Returns the ID of a templated artifact.
      * @param domainName
      * @param scenarioName
      * @param scenarioConfigName
@@ -467,14 +466,16 @@ public class ExecutionManagerHelper {
      * @param sequenceNumber
      * @return
      */
-    public static String getArtifactId(String domainName, String scenarioName, String scenarioConfigName, String artifactType, int sequenceNumber) {
+    public static String getTemplatedArtifactId(String domainName, String scenarioName,
+                                                String scenarioConfigName, String artifactType,
+                                                int sequenceNumber) {
         return domainName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR
                + scenarioName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + scenarioConfigName
                + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + artifactType + sequenceNumber;
     }
 
     /**
-     * Returns a unique ID for the Stream Mapping execution plan.
+     * Returns the ID of a Stream Mapping execution plan.
      * @param domainName
      * @param scenarioConfigName
      * @return
@@ -482,5 +483,17 @@ public class ExecutionManagerHelper {
     public static String getStreamMappingPlanId(String domainName, String scenarioConfigName) {
         return domainName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + scenarioConfigName
                           + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + ExecutionManagerConstants.STREAM_MAPPING_PLAN_SUFFIX;
+    }
+
+    /**
+     * Returns the ID of a common artifact.
+     * @param domainName
+     * @param artifactType
+     * @param sequenceNumber
+     * @return
+     */
+    public static String getCommonArtifactId(String domainName, String artifactType,
+                                                int sequenceNumber) {
+        return domainName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + artifactType + sequenceNumber;
     }
 }

@@ -21,6 +21,7 @@ public class DeployableTemplate {
 
     private ScenarioConfiguration configuration;
     private String artifact;
+    private String artifactId;
 
     public ScenarioConfiguration getConfiguration() {
         return configuration;
@@ -38,4 +39,11 @@ public class DeployableTemplate {
         this.artifact = artifact;
     }
 
+    public String getArtifactId() {
+        return artifactId;
+    }
+
+    public void setArtifactId(String artifactId) {
+        this.artifactId = artifactId;
+    }
 }

@@ -86,10 +86,11 @@
             }
             // add streamMappingDTO to streamMappingDTOs[]
             streamMappingDTOsList.add(streamMappingDTO);
-
-            StreamMappingDTO streamMappingDTOs[] = streamMappingDTOsList.toArray(new StreamMappingDTO[streamMappingDTOsList.size()]);
-            proxy.saveStreamMapping(streamMappingDTOs, configuration, domainName);
         }
+        //save stream mapping
+        StreamMappingDTO streamMappingDTOs[] = streamMappingDTOsList.toArray(new StreamMappingDTO[streamMappingDTOsList.size()]);
+        proxy.saveStreamMapping(streamMappingDTOs, configuration, domainName);
+
     } catch (AxisFault e) {
         response.sendError(500);
     }

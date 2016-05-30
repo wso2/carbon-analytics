@@ -13,6 +13,7 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name="template")
 public class Template {
+
     @XmlAttribute(name="type")
     private String type;
 
@@ -38,10 +39,17 @@ public class Template {
 
     public String getValue() {
         if (this.content != null && !content.isEmpty()) {
-            return this.content.get(0).toString();
+            for (Object obj: content) {
+                if (obj instanceof String) {
+                    String contentItem = obj.toString();
+                    if (!contentItem.trim().isEmpty()) {
+                        return contentItem;
+                    }
+                }
+            }
         } else {
             return null;
         }
+        return null;
     }
-
 }
