@@ -19,8 +19,7 @@ public class TemplateHandler implements DomHandler<String, StreamResult> {
 
     @Override
     public String getElement(StreamResult rt) {
-        String xml = rt.getWriter().toString();
-        return xml.replaceFirst("<\\?.*\\?>","");    //removing XML prologue if it's included in the xml
+        return rt.getWriter().toString().trim();
     }
 
     @Override

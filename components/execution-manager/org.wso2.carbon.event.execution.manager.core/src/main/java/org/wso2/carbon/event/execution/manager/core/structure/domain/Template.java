@@ -37,7 +37,6 @@ public class Template {
         this.content = content;
     }
 
-    // TODO: Check for possible bug
     public String getValue() {
         if (this.content != null && !content.isEmpty()) {
             StringBuilder builder = new StringBuilder();
@@ -50,8 +49,14 @@ public class Template {
                 }
             }
             String value = builder.toString().trim();
+            // Remove duplicate xml entries
             if (!value.isEmpty()) {
-                return value;
+                String[] elements = value.split("<\\?.*\\?>");
+                if (elements.length > 1) {
+                    return elements[elements.length - 1];
+                } else {
+                    return value;
+                }
             }
         }
         return null;
