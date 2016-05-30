@@ -18,6 +18,7 @@ package org.wso2.carbon.event.execution.manager.admin.internal.ds;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.event.execution.manager.core.ExecutionManagerService;
 
+
 /**
  * This class is used to get the EventProcessor service.
  *
@@ -46,4 +47,11 @@ public class ExecutionManagerAdminServiceDS {
         ExecutionManagerAdminServiceValueHolder.setExecutionManagerService(null);
     }
 
+    /*protected void setEventStreamService(EventStreamDeployerImpl eventStreamDeployer) {
+        ExecutionManagerAdminServiceValueHolder.setEventStreamDeployerService(eventStreamDeployer);
+    }
+
+    protected void unsetEventStreamService(EventStreamDeployerImpl eventStreamDeployer) {
+        ExecutionManagerAdminServiceValueHolder.setEventStreamDeployerService(null);
+    }*/
 }
