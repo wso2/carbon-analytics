@@ -1,4 +1,4 @@
-package org.wso2.carbon.application.deployer;
+package org.wso2.carbon.gadget.template.deployer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -6,9 +6,9 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.wso2.carbon.application.deployer.internal.GadgetTemplateDeployerConstants;
-import org.wso2.carbon.application.deployer.internal.GadgetTemplateDeployerException;
-import org.wso2.carbon.application.deployer.internal.util.GadgetTemplateDeployerUtility;
+import org.wso2.carbon.gadget.template.deployer.internal.GadgetTemplateDeployerConstants;
+import org.wso2.carbon.gadget.template.deployer.internal.GadgetTemplateDeployerException;
+import org.wso2.carbon.gadget.template.deployer.internal.util.GadgetTemplateDeployerUtility;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.event.execution.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
@@ -21,8 +21,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
             Document document = builder.parse(new InputSource(new StringReader(content)));
             NodeList configNodes = document.getElementsByTagName(GadgetTemplateDeployerConstants.CONFIG_TAG);
             if (configNodes.getLength() > 0) {
-                Node configNode = configNodes.item(0);
+                Node configNode = configNodes.item(0);  // Only one node is expected
                 if (configNode.hasChildNodes()) {
 
                     // Extract the details
@@ -96,10 +96,11 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
                     GadgetTemplateDeployerUtility.copyFolder(templateDirectory, destination);
 
                     // Save the artifacts
-                    for (String fileName : artifacts.keySet()) {
+                    for (Map.Entry<String, String> entry : artifacts.entrySet()) {
+                        String fileName = entry.getKey();
                         File targetFile = new File(destination, fileName);
-                        try (PrintWriter writer = new PrintWriter(targetFile)) {
-                            writer.print(artifacts.get(fileName));
+                        try (FileWriter writer = new FileWriter(targetFile)) {
+                            writer.write(entry.getValue());
                         }
                     }
 

@@ -1,9 +1,9 @@
-package org.wso2.carbon.application.deployer.internal.ds;
+package org.wso2.carbon.gadget.template.deployer.internal.ds;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.application.deployer.GadgetTemplateDeployer;
+import org.wso2.carbon.gadget.template.deployer.GadgetTemplateDeployer;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
 
 /**

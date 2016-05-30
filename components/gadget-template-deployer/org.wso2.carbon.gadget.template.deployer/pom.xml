@@ -77,6 +77,10 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
@@ -85,16 +89,15 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
-                            org.wso2.carbon.application.deployer.internal,
-                            org.wso2.carbon.application.deployer.internal.*
+                            org.wso2.carbon.gadget.template.deployer.internal,
+                            org.wso2.carbon.gadget.template.deployer.internal.*
                         </Private-Package>
                         <Export-Package>
-                            !org.wso2.carbon.application.deployer.internal,
-                            !org.wso2.carbon.application.deployer.internal.*,
-                            org.wso2.carbon.application.deployer.*
+                            !org.wso2.carbon.gadget.template.deployer.internal,
+                            !org.wso2.carbon.gadget.template.deployer.internal.*,
+                            org.wso2.carbon.gadget.template.deployer.*
                         </Export-Package>
                         <Import-Package>
-                            org.wso2.carbon.event.execution.manager.core,
                             org.apache.commons.logging.*,
                             *;resolution:=optional
                         </Import-Package>

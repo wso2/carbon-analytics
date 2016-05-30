@@ -1,4 +1,4 @@
-package org.wso2.carbon.application.deployer.internal;
+package org.wso2.carbon.gadget.template.deployer.internal;
 
 public class GadgetTemplateDeployerConstants {
     private GadgetTemplateDeployerConstants() {
