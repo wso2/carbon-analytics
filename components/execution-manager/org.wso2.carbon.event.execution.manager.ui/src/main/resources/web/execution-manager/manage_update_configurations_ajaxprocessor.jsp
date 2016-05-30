@@ -211,10 +211,12 @@
                                     for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
                                         if (fromStreamAttribute.getAttributeType().equals(metaAttributeMappingDTO.getAttributeType())) {
                                             isMatchingAttributeType = true;
+                                            if (!fromStreamAttribute.getAttributeName().equals(metaAttributeMappingDTO.getFromAttribute())) {
                                 %>
                                 <option><%=fromStreamAttribute.getAttributeName()%>
                                 </option>
                                 <%
+                                            }
                                         }
                                     }
                                     if (isMatchingAttributeType == false) {
@@ -278,10 +280,12 @@
                                     for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
                                         if (fromStreamAttribute.getAttributeType().equals(correlationAttributeMappingDTO.getAttributeType())) {
                                             isMatchingAttributeType = true;
+                                            if (!fromStreamAttribute.getAttributeName().equals(correlationAttributeMappingDTO.getFromAttribute())) {
                                 %>
                                 <option><%=fromStreamAttribute.getAttributeName()%>
                                 </option>
                                 <%
+                                            }
                                         }
                                     }
                                     if (isMatchingAttributeType == false) {
@@ -345,10 +349,12 @@
                                     for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
                                         if (fromStreamAttribute.getAttributeType().equals(payloadAttributeMappingDTO.getAttributeType())) {
                                             isMatchingAttributeType = true;
+                                            if (!fromStreamAttribute.getAttributeName().equals(payloadAttributeMappingDTO.getFromAttribute())) {
                                 %>
                                 <option><%=fromStreamAttribute.getAttributeName()%>
                                 </option>
                                 <%
+                                            }
                                         }
                                     }
                                     if (isMatchingAttributeType == false) {
