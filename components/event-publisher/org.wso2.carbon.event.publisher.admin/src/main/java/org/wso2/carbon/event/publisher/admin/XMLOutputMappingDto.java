@@ -18,8 +18,8 @@ package org.wso2.carbon.event.publisher.admin;
 public class XMLOutputMappingDto {
 
     private String mappingXMLText;
-
     private boolean registryResource;
+    private long cacheTimeoutDuration;
 
     public String getMappingXMLText() {
         return mappingXMLText;
@@ -36,5 +36,13 @@ public class XMLOutputMappingDto {
 
     public void setRegistryResource(boolean registryResource) {
         this.registryResource = registryResource;
+    }
+
+    public long getCacheTimeoutDuration() {
+        return cacheTimeoutDuration;
+    }
+
+    public void setCacheTimeoutDuration(long cacheTimeoutDuration) {
+        this.cacheTimeoutDuration = cacheTimeoutDuration;
     }
 }

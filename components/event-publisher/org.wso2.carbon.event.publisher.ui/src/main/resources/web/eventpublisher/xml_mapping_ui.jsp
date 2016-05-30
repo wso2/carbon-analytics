@@ -53,8 +53,7 @@
             <td class="leftCol-med" colspan="1"><fmt:message key="resource.path"/><span
                     class="required">*</span></td>
             <td colspan="1">
-                <input type="text" id="xmlSourceRegistry" disabled="disabled" class="initE" value=""
-                       style="width:100%"/>
+                <input type="text" id="xmlSourceRegistry" class="initE" value="" style="width:100%"/>
             </td>
             <td class="nopadding" style="border:none" colspan="1">
                 <a href="#registryBrowserLink" class="registry-picker-icon-link"
@@ -67,6 +66,13 @@
                    onclick="showRegistryBrowser('xmlSourceRegistry', '/_system/governance');"><fmt:message
                         key="gov.registry"/></a>
             </td>
+        </tr>
+        <tr name="outputXMLMappingRegistryCacheTimeout" style="display:none" id="outputXMLMappingRegistryCacheTimeout">
+            <td class="leftCol-med" colspan="1"><fmt:message key="cache.timeout"/><span class="required">*</span></td>
+            <td colspan="1"><input type="text" id="textCacheTimeout"
+                                               class="initE"
+                                               value="0"
+                                               style="width:100%"/></td>
         </tr>
         </tbody>
     </table>

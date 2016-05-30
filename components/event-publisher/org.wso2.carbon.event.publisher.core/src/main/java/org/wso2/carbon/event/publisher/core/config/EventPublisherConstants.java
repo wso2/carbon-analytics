@@ -51,6 +51,7 @@ public final class EventPublisherConstants {
     public static final String EF_JSON_MAPPING_TYPE = "json";
     public static final String EF_ELE_MAPPING_INLINE = "inline";
     public static final String EF_ELE_MAPPING_REGISTRY = "registry";
+    public static final String EF_ELE_CACHE_TIMEOUT_DURATION = "cacheTimeoutDuration";
     public static final String ATTR_TYPE_FLOAT = "float";
     public static final String ATTR_TYPE_DOUBLE = "double";
     public static final String ATTR_TYPE_INTEGER = "int";

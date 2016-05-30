@@ -21,6 +21,7 @@ public class TextOutputMapping extends OutputMapping {
 
     private String mappingText;
     private boolean registryResource;
+    private long cacheTimeoutDuration;
 
     public String getMappingText() {
         return mappingText;
@@ -41,5 +42,13 @@ public class TextOutputMapping extends OutputMapping {
 
     public void setRegistryResource(boolean registryResource) {
         this.registryResource = registryResource;
+    }
+
+    public long getCacheTimeoutDuration() {
+        return cacheTimeoutDuration;
+    }
+
+    public void setCacheTimeoutDuration(long cacheTimeoutDuration) {
+        this.cacheTimeoutDuration = cacheTimeoutDuration;
     }
 }

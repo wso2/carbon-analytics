@@ -21,6 +21,7 @@ public class XMLOutputMapping extends OutputMapping {
 
     private String mappingXMLText;
     private boolean registryResource;
+    private long cacheTimeoutDuration;
 
     public String getMappingXMLText() {
         return mappingXMLText;
@@ -41,5 +42,13 @@ public class XMLOutputMapping extends OutputMapping {
 
     public void setRegistryResource(boolean registryResource) {
         this.registryResource = registryResource;
+    }
+
+    public long getCacheTimeoutDuration() {
+        return cacheTimeoutDuration;
+    }
+
+    public void setCacheTimeoutDuration(long cacheTimeoutDuration) {
+        this.cacheTimeoutDuration = cacheTimeoutDuration;
     }
 }
