@@ -235,7 +235,8 @@ public class ExecutionManagerHelper {
                             deployer.deployArtifact(deployableTemplate);
                             artifactTypeCountingMap.put(artifactType, artifactCount);
                         } catch (TemplateDeploymentException e) {
-                            throw new ExecutionManagerException("Error when trying to deploy the artifact " + configuration.getName() ,e);
+                            throw new ExecutionManagerException("Error when trying to deploy the artifact of type: "
+                                                                + template.getType() + ", for configuration:" + configuration.getName() ,e);
                         }
                     } else {
                         throw new ExecutionManagerException("A deployer doesn't exist for template type " + template.getType());
