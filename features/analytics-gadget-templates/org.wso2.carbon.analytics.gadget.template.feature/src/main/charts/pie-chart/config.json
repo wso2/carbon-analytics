@@ -1,0 +1,23 @@
+{
+    "info": {
+        "id": "donut-chart",
+        "name": "Donut Chart"
+    },
+    "config": [
+        {
+            "fieldLabel": "X axis",
+            "fieldName": "x",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "Color domain",
+            "fieldName": "color",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"]
+        }
+    ],
+    "common-libs" : ["wso2gadgets","chart-utils"],
+    "chart-libs" : ["d3.min","vega","VizGrammar.min"]
+}
+
