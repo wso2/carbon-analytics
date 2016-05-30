@@ -51,6 +51,11 @@ public class ExecutionManagerConstants {
 
     public static final String DEPLOYER_TYPE_REALTIME = "realtime";
 
+    public static final String META_PREFIX = "meta_";
+
+    public static final String CORRELATION_PREFIX = "correlation_";
+
+
     /**
      * To avoid instantiating
      */
