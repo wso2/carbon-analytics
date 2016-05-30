@@ -47,11 +47,6 @@
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.event.execution.manager.core</artifactId>
         </dependency>
-       <!-- <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.event.execution.manager.stream.template.deployer</artifactId>
-        </dependency>-->
-
     </dependencies>
 
     <build>
@@ -88,4 +83,6 @@
             </plugin>
         </plugins>
     </build>
+
+
 </project>
