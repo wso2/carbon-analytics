@@ -16,10 +16,12 @@
 package org.wso2.carbon.analytics.eventsink.template.deployer.internal;
 
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
+import org.wso2.carbon.registry.core.service.RegistryService;
 
 public class EventSinkTemplateDeployerValueHolder {
 
     private static AnalyticsEventSinkService analyticsEventSinkService;
+    private static RegistryService registryService;
 
     public static void setAnalyticsEventSinkService(
             AnalyticsEventSinkService analyticsEventSinkService) {
@@ -28,5 +30,13 @@ public class EventSinkTemplateDeployerValueHolder {
 
     public static AnalyticsEventSinkService getAnalyticsEventSinkService() {
         return EventSinkTemplateDeployerValueHolder.analyticsEventSinkService;
+    }
+
+    public static void setRegistryService(RegistryService registryService) {
+        EventSinkTemplateDeployerValueHolder.registryService = registryService;
+    }
+
+    public static RegistryService getRegistryService() {
+        return registryService;
     }
 }

@@ -22,6 +22,8 @@ import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.analytics.eventsink.template.deployer.EventSinkTemplateDeployer;
 import org.wso2.carbon.analytics.eventsink.template.deployer.internal.EventSinkTemplateDeployerValueHolder;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.service.RegistryService;
 
 
 /**
@@ -29,6 +31,9 @@ import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
  * @scr.reference name="analyticsEventSinkService.service"
  * interface="org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService" cardinality="1..1"
  * policy="dynamic" bind="setAnalyticsEventSinkService" unbind="unsetAnalyticsEventSinkService"
+ * @scr.reference name="registry.service"
+ * interface="org.wso2.carbon.registry.core.service.RegistryService"
+ * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
  */
 public class EventSinkTemplateDeployerDS {
 
@@ -51,5 +56,15 @@ public class EventSinkTemplateDeployerDS {
 
     protected void unsetAnalyticsEventSinkService(AnalyticsEventSinkService analyticsEventSinkService) {
         EventSinkTemplateDeployerValueHolder.setAnalyticsEventSinkService(null);
+    }
+
+    protected void setRegistryService(RegistryService registryService) throws
+                                                                       RegistryException {
+        EventSinkTemplateDeployerValueHolder.setRegistryService(registryService);
+
+    }
+
+    protected void unsetRegistryService(RegistryService registryService) {
+        EventSinkTemplateDeployerValueHolder.setRegistryService(null);
     }
 }
