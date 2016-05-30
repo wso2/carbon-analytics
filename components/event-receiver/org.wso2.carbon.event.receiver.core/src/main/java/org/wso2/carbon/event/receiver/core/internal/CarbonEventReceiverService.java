@@ -120,6 +120,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
     @Override
     public void undeployInactiveEventReceiverConfiguration(String filename)
             throws EventReceiverConfigurationException {
+        validateFilePath(filename);
         EventReceiverConfigurationFileSystemInvoker.delete(filename);
 
     }
@@ -130,6 +131,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
             String filename)
             throws EventReceiverConfigurationException {
 
+        validateFilePath(filename);
         editEventReceiverConfiguration(filename, eventReceiverConfiguration, null);
     }
 
@@ -208,6 +210,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
     @Override
     public String getInactiveEventReceiverConfigurationContent(String fileName)
             throws EventReceiverConfigurationException {
+        validateFilePath(fileName);
         return EventReceiverConfigurationFileSystemInvoker.readEventReceiverConfigurationFile(fileName);
     }
 
@@ -334,6 +337,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
 
     public void removeEventReceiverConfigurationFile(String fileName)
             throws EventReceiverConfigurationException {
+        validateFilePath(fileName);
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         List<EventReceiverConfigurationFile> eventReceiverConfigurationFileList =
                 tenantSpecificEventReceiverConfigurationFileMap.get(tenantId);
@@ -609,6 +613,12 @@ public class CarbonEventReceiverService implements EventReceiverService {
 
     public Map<Integer, Map<String, EventReceiver>> getTenantSpecificEventReceiverMap() {
         return tenantSpecificEventReceiverConfigurationMap;
+    }
+
+    private void validateFilePath(String file) throws EventReceiverConfigurationException {
+        if (file.contains("../") || file.contains("..\\")) {
+            throw new EventReceiverConfigurationException("File name contains restricted path elements. " + file);
+        }
     }
 
     public void start() {

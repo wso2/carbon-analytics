@@ -37,8 +37,6 @@
             return;
         }
 
-        System.out.println("manageUpdateConfig");
-
         String domainName = request.getParameter("domainName");
         String configuration = request.getParameter("configurationName");
         String saveType = request.getParameter("saveType");
@@ -81,14 +79,15 @@
 
                 scenarioConfigurationDTO.setParameterDTOs(parameters);
 
-                //checks the "proxy.saveConfiguration(scenarioConfigurationDTO)" return value for not null and build stream mapping div
-                if (proxy.saveConfiguration(scenarioConfigurationDTO) != null) {
+                //toStreamIDArray.length defines the number of stream mappings per configuration
+                String[] toStreamIDArray = proxy.saveConfiguration(scenarioConfigurationDTO);
+
+                //when stream mapping is disabled, stub returns a string array with a null element hence need to check for toStreamIDArray[0]
+                if (toStreamIDArray[0] != null) {
                     String toStreamNameID = "";
                     String fromStreamNameID = "";
                     StreamMappingDTO[] streamMappingDTOs = null;
 
-                    //toStreamIDArray.length defines the number of stream mappings per configuration
-                    String toStreamIDArray[] = proxy.saveConfiguration(scenarioConfigurationDTO);
                     EventStreamAdminServiceStub eventStreamAdminServiceStub = ExecutionManagerUIUtils.getEventStreamAdminService(config,
                             session, request);
                     String[] fromStreamIds = eventStreamAdminServiceStub.getStreamNames();
@@ -212,10 +211,12 @@
                                     for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
                                         if (fromStreamAttribute.getAttributeType().equals(metaAttributeMappingDTO.getAttributeType())) {
                                             isMatchingAttributeType = true;
+                                            if (!fromStreamAttribute.getAttributeName().equals(metaAttributeMappingDTO.getFromAttribute())) {
                                 %>
                                 <option><%=fromStreamAttribute.getAttributeName()%>
                                 </option>
                                 <%
+                                            }
                                         }
                                     }
                                     if (isMatchingAttributeType == false) {
@@ -279,10 +280,12 @@
                                     for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
                                         if (fromStreamAttribute.getAttributeType().equals(correlationAttributeMappingDTO.getAttributeType())) {
                                             isMatchingAttributeType = true;
+                                            if (!fromStreamAttribute.getAttributeName().equals(correlationAttributeMappingDTO.getFromAttribute())) {
                                 %>
                                 <option><%=fromStreamAttribute.getAttributeName()%>
                                 </option>
                                 <%
+                                            }
                                         }
                                     }
                                     if (isMatchingAttributeType == false) {
@@ -346,10 +349,12 @@
                                     for (EventStreamAttributeDto fromStreamAttribute : fromStreamAttributeArray) {
                                         if (fromStreamAttribute.getAttributeType().equals(payloadAttributeMappingDTO.getAttributeType())) {
                                             isMatchingAttributeType = true;
+                                            if (!fromStreamAttribute.getAttributeName().equals(payloadAttributeMappingDTO.getFromAttribute())) {
                                 %>
                                 <option><%=fromStreamAttribute.getAttributeName()%>
                                 </option>
                                 <%
+                                            }
                                         }
                                     }
                                     if (isMatchingAttributeType == false) {
@@ -417,8 +422,10 @@
         </div>
     </div>
     <%
-                } else {
-                    proxy.saveConfiguration(scenarioConfigurationDTO);
+    } else {
+    %>
+    return
+    <%
                 }
             }
         } catch (AxisFault e) {
