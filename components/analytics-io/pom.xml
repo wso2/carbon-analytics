@@ -34,6 +34,7 @@
     <modules>
         <module>org.wso2.carbon.analytics.restapi</module>
         <module>org.wso2.carbon.analytics.eventsink</module>
+        <module>org.wso2.carbon.analytics.eventsink.template.deployer</module>
         <module>org.wso2.carbon.analytics.servlet</module>
         <module>org.wso2.carbon.analytics.io.commons</module>
         <module>org.wso2.carbon.analytics.api</module>
