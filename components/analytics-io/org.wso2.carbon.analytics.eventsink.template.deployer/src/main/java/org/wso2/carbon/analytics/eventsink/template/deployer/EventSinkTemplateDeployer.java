@@ -89,7 +89,7 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
             }
             String streamName = streamIdComponents[0];
 
-            Registry registry = ExecutionManagerValueHolder.getRegistryService()
+            Registry registry = EventSinkTemplateDeployerValueHolder.getRegistryService()
                     .getConfigSystemRegistry(tenantId);
 
             if (!registry.resourceExists(EventSinkTemplateDeployerConstants.META_INFO_COLLECTION_PATH)) {
