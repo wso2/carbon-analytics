@@ -20,17 +20,19 @@
     var callback;
 
     /**
-     *
+     * TODO Need to read hostname,port, and tenantId from providerConfig
      * @param providerConfig
      * @param schema
      */
     registerCallBackforPush = function(providerConfig, schema, _callback) {
         var streamId = providerConfig['streamName'];
+        var hostname = window.parent.location.hostname;
+        var port = window.parent.location.port;
         subscribe(streamId.split(":")[0], streamId.split(":")[1],
             '10', "carbon.super",
             onData, onError,
-            "localhost",
-            "9443",
+            hostname,
+            port,
             'WEBSOCKET',
             "SECURED"
         );
@@ -46,3 +48,4 @@
     };
 
 }());
+
