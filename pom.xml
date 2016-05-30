@@ -45,6 +45,7 @@
         <module>components/event-receiver</module>
         <module>components/event-publisher</module>
         <module>components/execution-manager</module>
+        <module>components/gadget-template-deployer</module>
         <module>features/event-stream</module>
         <module>features/data-bridge</module>
         <module>features/analytics-dashboard</module>
@@ -57,6 +58,7 @@
         <module>features/execution-manager</module>
         <module>features/spark-common</module>
         <module>features/analytics-gadget-templates</module>
+        <module>features/gadget-template-deployer</module>
     </modules>
 
     <dependencyManagement>
@@ -583,6 +585,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.stream.template.deployer</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.gadget.template.deployer</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>

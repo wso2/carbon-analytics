@@ -137,17 +137,19 @@
         } else if (mappingType.equals("text")) {
             String dataSet = request.getParameter("textData");
             String dataFrom = request.getParameter("dataFrom");
+            long cacheTimeoutDuration = Long.parseLong(request.getParameter("cacheTimeoutDuration"));
 
             // add event adapter via admin service
-            stub.deployTextEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType, dataSet, eventPublisherProperties, dataFrom, customMappingEnabled);
+            stub.deployTextEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType, dataSet, eventPublisherProperties, dataFrom, cacheTimeoutDuration, customMappingEnabled);
             msg = "true";
 
         } else if (mappingType.equals("xml")) {
             String dataSet = request.getParameter("textData");
             String dataFrom = request.getParameter("dataFrom");
+            long cacheTimeoutDuration = Long.parseLong(request.getParameter("cacheTimeoutDuration"));
 
             // add event adapter via admin service
-            stub.deployXmlEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType, dataSet, eventPublisherProperties, dataFrom, customMappingEnabled);
+            stub.deployXmlEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType, dataSet, eventPublisherProperties, dataFrom, cacheTimeoutDuration, customMappingEnabled);
             msg = "true";
 
         } else if (mappingType.equals("map")) {
@@ -181,8 +183,10 @@
         } else if (mappingType.equals("json")) {
             String dataSet = request.getParameter("jsonData");
             String dataFrom = request.getParameter("dataFrom");
+            long cacheTimeoutDuration = Long.parseLong(request.getParameter("cacheTimeoutDuration"));
+
             // add event adapter via admin service
-            stub.deployJsonEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType, dataSet, eventPublisherProperties, dataFrom, customMappingEnabled);
+            stub.deployJsonEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType, dataSet, eventPublisherProperties, dataFrom, cacheTimeoutDuration, customMappingEnabled);
             msg = "true";
         }
 

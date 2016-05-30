@@ -23,10 +23,10 @@ import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfiguratio
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
+import org.wso2.carbon.event.publisher.core.internal.util.RuntimeResourceLoader;
 import org.wso2.siddhi.core.event.Event;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -36,21 +36,37 @@ public class TextOutputMapper implements OutputMapper {
     private EventPublisherConfiguration eventPublisherConfiguration = null;
     private Map<String, Integer> propertyPositionMap = null;
     private final StreamDefinition streamDefinition;
+    private boolean isCustomRegistryPath;
+    private final RuntimeResourceLoader runtimeResourceLoader;
 
     public TextOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                             Map<String, Integer> propertyPositionMap, int tenantId,
                             StreamDefinition streamDefinition) throws
-                                                               EventPublisherConfigurationException {
+            EventPublisherConfigurationException {
         this.eventPublisherConfiguration = eventPublisherConfiguration;
         this.propertyPositionMap = propertyPositionMap;
         this.streamDefinition = streamDefinition;
 
+        TextOutputMapping outputMapping = ((TextOutputMapping) eventPublisherConfiguration.getOutputMapping());
+        this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration());
+
+        String mappingText;
         if (eventPublisherConfiguration.getOutputMapping().isCustomMappingEnabled()) {
-            validateStreamDefinitionWithOutputProperties(tenantId);
+            mappingText = outputMapping.getMappingText();
+            if (outputMapping.isRegistryResource()) {
+                this.isCustomRegistryPath = mappingText.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && mappingText.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0;
+                if (!this.isCustomRegistryPath) {
+                    mappingText = this.runtimeResourceLoader.getResourceContent(outputMapping.getMappingText());
+                }
+            }
+            validateStreamDefinitionWithOutputProperties(mappingText);
         } else {
-            generateTemplateTextEvent(streamDefinition);
+            mappingText = generateTemplateTextEvent(streamDefinition);
         }
 
+        if (!outputMapping.isRegistryResource()) {     // Store only if it is not from registry
+            this.mappingTextList = generateMappingTextList(mappingText);
+        }
     }
 
     private List<String> getOutputMappingPropertyList(String mappingText) {
@@ -66,7 +82,7 @@ public class TextOutputMapper implements OutputMapper {
         return mappingTextList;
     }
 
-    private void setMappingTextList(String mappingText) {
+    private List<String> generateMappingTextList(String mappingText) {
 
         List<String> mappingTextList = new ArrayList<String>();
         String text = mappingText;
@@ -78,34 +94,48 @@ public class TextOutputMapper implements OutputMapper {
             text = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) + 2);
         }
         mappingTextList.add(text);
-        this.mappingTextList = mappingTextList;
+
+        return mappingTextList;
     }
 
-    private void validateStreamDefinitionWithOutputProperties(int tenantId)
+    private void validateStreamDefinitionWithOutputProperties(String actualMappingText)
             throws EventPublisherConfigurationException {
-
-        TextOutputMapping textOutputMapping = ((TextOutputMapping) eventPublisherConfiguration.getOutputMapping());
-        String actualMappingText = textOutputMapping.getMappingText();
-        if (textOutputMapping.isRegistryResource()) {
-            actualMappingText = EventPublisherServiceValueHolder.getCarbonEventPublisherService().getRegistryResourceContent(textOutputMapping.getMappingText());
-        }
-
-        setMappingTextList(actualMappingText);
         List<String> mappingProperties = getOutputMappingPropertyList(actualMappingText);
-
-        Iterator<String> mappingTextListIterator = mappingProperties.iterator();
-        for (; mappingTextListIterator.hasNext(); ) {
-            String property = mappingTextListIterator.next();
+        for (String property : mappingProperties) {
             if (!propertyPositionMap.containsKey(property)) {
-                throw new EventPublisherStreamValidationException("Property '" + property + "' is not in the input stream definition. ", streamDefinition.getStreamId());
+                throw new EventPublisherStreamValidationException("Property " + property + " is not in the input stream definition.",
+                        eventPublisherConfiguration.getFromStreamName() + ":" + eventPublisherConfiguration.getFromStreamVersion());
             }
         }
-
     }
 
     @Override
     public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
+
+        // Retrieve resource at runtime if it is from registry
+        TextOutputMapping outputMapping = (TextOutputMapping) eventPublisherConfiguration.getOutputMapping();
+        if (outputMapping.isRegistryResource()) {
+            String path = outputMapping.getMappingText();
+            if (isCustomRegistryPath) {
+                // Retrieve the actual path
+                List<String> pathMappingTextList = generateMappingTextList(path);
+                StringBuilder pathBuilder = new StringBuilder(pathMappingTextList.get(0));
+                for (int i = 1; i < pathMappingTextList.size(); i++) {
+                    if (i % 2 == 0) {
+                        pathBuilder.append(pathMappingTextList.get(i));
+                    } else {
+                        pathBuilder.append(getPropertyValue(event.getData(), pathMappingTextList.get(i)));
+                    }
+                }
+                path = pathBuilder.toString();
+            }
+            // Retrieve actual content
+            String actualMappingText = this.runtimeResourceLoader.getResourceContent(path);
+            validateStreamDefinitionWithOutputProperties(actualMappingText);
+            this.mappingTextList = generateMappingTextList(actualMappingText);
+        }
+
         StringBuilder eventText = new StringBuilder(mappingTextList.get(0));
         for (int i = 1; i < mappingTextList.size(); i++) {
             if (i % 2 == 0) {
@@ -135,7 +165,7 @@ public class TextOutputMapper implements OutputMapper {
         return "";
     }
 
-    private void generateTemplateTextEvent(StreamDefinition streamDefinition) {
+    private String generateTemplateTextEvent(StreamDefinition streamDefinition) {
 
         String templateTextEvent = "";
 
@@ -161,10 +191,10 @@ public class TextOutputMapper implements OutputMapper {
             }
         }
         if (templateTextEvent.trim().endsWith(EventPublisherConstants.EVENT_ATTRIBUTE_SEPARATOR)) {
-            setMappingTextList(templateTextEvent.substring(0, templateTextEvent.length() - 1).trim());
-        } else {
-            setMappingTextList(templateTextEvent);
+            templateTextEvent = templateTextEvent.substring(0, templateTextEvent.length() - 1).trim();
         }
+
+        return templateTextEvent;
     }
 
 }

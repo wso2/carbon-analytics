@@ -17,27 +17,30 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
-        <artifactId>event-stream-feature</artifactId>
+        <artifactId>gadget-template-deployer-feature</artifactId>
         <version>5.0.12-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.event.stream.template.deployer.server.feature</artifactId>
+    <artifactId>org.wso2.carbon.gadget.template.deployer.server.feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Event Stream Template Deployer Server Feature</name>
+    <name>WSO2 Carbon - Gadget Template Deployer Server Feature</name>
     <url>http://wso2.org</url>
-    <description>This feature contains the core bundles required for Back-end Event Stream template deployment functionality</description>
-
+    <description>This feature contains the core bundles required for Gadget Template Deployment
+        functionality
+    </description>
 
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.event.stream.template.deployer</artifactId>
+            <artifactId>org.wso2.carbon.gadget.template.deployer</artifactId>
         </dependency>
     </dependencies>
 
@@ -55,7 +58,7 @@
                             <goal>p2-feature-gen</goal>
                         </goals>
                         <configuration>
-                            <id>org.wso2.carbon.event.stream.template.deployer.server</id>
+                            <id>org.wso2.carbon.gadget.template.deployer.server</id>
                             <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <adviceFile>
                                 <properties>
@@ -67,11 +70,12 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.template.deployer:${carbon.analytics.common.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.gadget.template.deployer:${carbon.analytics.common.version}
                                 </bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}
+                                <importFeatureDef>
+                                    org.wso2.carbon.core.server:${carbon.kernel.version}
                                 </importFeatureDef>
                             </importFeatures>
                         </configuration>

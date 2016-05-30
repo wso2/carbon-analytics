@@ -18,8 +18,8 @@ package org.wso2.carbon.event.publisher.admin;
 public class JSONOutputMappingDto {
 
     private String mappingText;
-
     private boolean registryResource;
+    private long cacheTimeoutDuration;
 
     public String getMappingText() {
         return mappingText;
@@ -38,5 +38,11 @@ public class JSONOutputMappingDto {
         this.registryResource = registryResource;
     }
 
+    public long getCacheTimeoutDuration() {
+        return cacheTimeoutDuration;
+    }
 
+    public void setCacheTimeoutDuration(long cacheTimeoutDuration) {
+        this.cacheTimeoutDuration = cacheTimeoutDuration;
+    }
 }
