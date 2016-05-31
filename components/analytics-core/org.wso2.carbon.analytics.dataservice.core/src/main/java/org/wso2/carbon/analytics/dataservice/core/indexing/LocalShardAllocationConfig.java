@@ -49,7 +49,7 @@ public class LocalShardAllocationConfig implements Serializable {
         } catch (FileNotFoundException e) {
             this.init = false;
             return;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new AnalyticsException("Error in loading local shard allocation configuration: " + e.getMessage(), e);
         }
         String[] entries = config.split("\n");

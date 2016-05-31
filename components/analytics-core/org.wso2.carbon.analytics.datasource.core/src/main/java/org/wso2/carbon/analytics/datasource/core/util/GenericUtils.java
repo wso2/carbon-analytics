@@ -25,6 +25,8 @@ import com.hazelcast.core.IAtomicLong;
 
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -58,6 +60,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * Generic utility methods for analytics data source implementations.
  */
 public class GenericUtils {
+    
+    private static final Log log = LogFactory.getLog(GenericUtils.class);
 
     private static final String CUSTOM_WSO2_CONF_DIR_NAME = "conf";
 
@@ -507,8 +511,11 @@ public class GenericUtils {
         File confDir = null;
         try {
             confDir = new File(CarbonUtils.getCarbonConfigDirPath());
-        } catch (Throwable ignore) {
+        } catch (Exception e) {
             /* some kind of an exception can be thrown if we are in a non-Carbon env */
+            if (log.isDebugEnabled()) {
+                log.debug("Error in getting carbon config path: " + e.getMessage(), e);
+            }
         }
         if (confDir == null || !confDir.exists()) {
             return getCustomAnalyticsConfDirectory();
@@ -765,7 +772,11 @@ public class GenericUtils {
         String carbonHome = null;
         try {
             carbonHome = CarbonUtils.getCarbonHome();
-        } catch (Throwable ignore) { }
+        } catch (Throwable e) { 
+            if (log.isDebugEnabled()) {
+                log.debug("Error in getting Carbon home for path resolve: " + e.getMessage(), e);
+            }
+        }
         if (carbonHome == null) {
             carbonHome = "./target";
         }

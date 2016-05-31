@@ -72,7 +72,7 @@ public class AnalyticsDataServiceComponent {
             if (log.isDebugEnabled()) {
                 log.debug("Finished AnalyticsDataServiceComponent#activate");
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             log.error("Error in activating analytics data service: " + e.getMessage(), e);
         }
     }
@@ -83,7 +83,7 @@ public class AnalyticsDataServiceComponent {
             if (service != null) {
                 service.destroy();
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             log.error("Error in deactivating analytics data service: " + e.getMessage(), e);
         }
     }

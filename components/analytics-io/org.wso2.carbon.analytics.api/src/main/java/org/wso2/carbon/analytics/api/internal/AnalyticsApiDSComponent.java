@@ -36,15 +36,18 @@ import org.wso2.carbon.analytics.dataservice.core.SecureAnalyticsDataService;
  * cardinality="0..1" policy="dynamic"  bind="setSecureAnalyticsDataService" unbind="unsetSecureAnalyticsDataService"
  */
 public class AnalyticsApiDSComponent {
+    
     private static final Log log = LogFactory.getLog(AnalyticsApiDSComponent.class);
 
     protected void activate(ComponentContext ctx) {
-        if (log.isDebugEnabled()) log.debug("Starting Analytics API component");
+        if (log.isDebugEnabled()) { 
+            log.debug("Starting Analytics API component");
+        }
         BundleContext bundleContext = ctx.getBundleContext();
         try {
             bundleContext.registerService(AnalyticsDataAPI.class, new CarbonAnalyticsAPI(), null);
-        } catch (Throwable e) {
-            log.error("Error while starting the Analytics API component. " + e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("Error while starting the Analytics API component: " + e.getMessage(), e);
         }
     }
 
@@ -63,4 +66,5 @@ public class AnalyticsApiDSComponent {
     protected void unsetSecureAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
         ServiceHolder.setSecureAnalyticsDataService(null);
     }
+    
 }

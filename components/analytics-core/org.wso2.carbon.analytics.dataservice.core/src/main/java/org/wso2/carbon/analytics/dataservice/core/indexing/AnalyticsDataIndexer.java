@@ -181,7 +181,7 @@ public class AnalyticsDataIndexer {
 
     private static final String NO_OF_RECORDS = "noOfRecords";
 
-    private Map<String, IndexWriter> indexWriters = new HashMap<>();
+    private final Map<String, IndexWriter> indexWriters = new HashMap<>();
 
     private Map<String, DirectoryTaxonomyWriter> indexTaxonomyWriters = new HashMap<>();
 
@@ -1092,7 +1092,7 @@ public class AnalyticsDataIndexer {
             DrillDownQuery drillDownQuery = new DrillDownQuery(config, languageQuery);
             if (range != null && rangeField != null) {
                 ColumnDefinition columnDefinition = indices.get(rangeField);
-                NumericRangeQuery numericRangeQuery = getNumericRangeQuery(rangeField, range, columnDefinition);
+                NumericRangeQuery<? extends Number> numericRangeQuery = getNumericRangeQuery(rangeField, range, columnDefinition);
                 if (numericRangeQuery == null) {
                     throw new AnalyticsIndexException("RangeField is not a numeric field");
                 }
@@ -1118,9 +1118,9 @@ public class AnalyticsDataIndexer {
         }
     }
 
-    private NumericRangeQuery getNumericRangeQuery(String rangeField, AnalyticsDrillDownRange range,
+    private NumericRangeQuery<? extends Number> getNumericRangeQuery(String rangeField, AnalyticsDrillDownRange range,
                                                    ColumnDefinition columnDefinition) {
-        NumericRangeQuery numericRangeQuery = null;
+        NumericRangeQuery<? extends Number> numericRangeQuery = null;
         if (columnDefinition != null) {
             if (columnDefinition.getType() == AnalyticsSchema.ColumnType.DOUBLE) {
                 numericRangeQuery = NumericRangeQuery.newDoubleRange(rangeField,
@@ -2177,7 +2177,7 @@ public class AnalyticsDataIndexer {
             while (!this.stop) {
                 try {
                     processIndexOperations(this.getShardIndices());
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     log.error("Error in processing index batch operations: " + e.getMessage(), e);
                 }
                 try {
@@ -2229,7 +2229,7 @@ public class AnalyticsDataIndexer {
                     }
                     indexer.put(recordBatch);
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 log.error("Error in re-indexing records: " + e.getMessage(), e);
             }
         }

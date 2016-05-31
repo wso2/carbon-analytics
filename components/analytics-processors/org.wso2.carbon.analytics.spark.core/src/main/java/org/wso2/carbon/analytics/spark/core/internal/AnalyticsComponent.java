@@ -26,7 +26,6 @@ import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.CarbonAnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.SparkScriptCAppDeployer;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
-import org.wso2.carbon.analytics.spark.core.sources.AnalyticsIncrementalMetaStore;
 import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
@@ -75,7 +74,7 @@ public class AnalyticsComponent {
                     ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor(
                             this.getLocalHostname(), portOffset));
                     ServiceHolder.getAnalyticskExecutor().initializeSparkServer();
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     String msg = "Error initializing analytics executor: " + e.getMessage();
                     log.error(msg, e);
                 }
@@ -91,8 +90,8 @@ public class AnalyticsComponent {
             if (log.isDebugEnabled()) {
                 log.debug("Finished activating Analytics Spark Core");
             }
-        }catch (Throwable throwable){
-            log.error("Error in registering the analytics processor service! ", throwable);
+        } catch (Exception ex) {
+            log.error("Error in registering the analytics processor service! ", ex);
         }
     }
 

@@ -15,7 +15,6 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-
 package org.wso2.carbon.analytics.eventsink.subscriber;
 
 import org.wso2.carbon.analytics.eventsink.internal.queue.AnalyticsEventQueueManager;
@@ -26,10 +25,11 @@ import org.wso2.carbon.event.stream.core.WSO2EventConsumer;
 /**
  * This is the actual consumer which is getting registered for the list of
  * wso2 events received in stream junction for a specific stream.
- *
  */
 public class AnalyticsWSO2EventConsumer implements WSO2EventConsumer {
+    
     private String streamId;
+    
     private int tenantId;
 
     public AnalyticsWSO2EventConsumer(String streamId, int tenantId) {
@@ -57,6 +57,7 @@ public class AnalyticsWSO2EventConsumer implements WSO2EventConsumer {
         //Nothing we need to do here.
     }
 
+    @Override
     public boolean equals(Object object){
         if (object != null && object instanceof AnalyticsWSO2EventConsumer){
             AnalyticsWSO2EventConsumer anotherObj = (AnalyticsWSO2EventConsumer) object;
@@ -66,4 +67,10 @@ public class AnalyticsWSO2EventConsumer implements WSO2EventConsumer {
         }
         return false;
     }
+    
+    @Override
+    public int hashCode() {
+        return this.streamId.hashCode() + this.tenantId << 10;
+    }
+    
 }

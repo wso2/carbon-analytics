@@ -27,6 +27,7 @@ public class CategorySearchResultEntry implements Comparable<CategorySearchResul
                                                   Serializable {
 
     private static final long serialVersionUID = -146528425726651682L;
+    
     private String categoryValue;
 
     private double score;
@@ -55,6 +56,21 @@ public class CategorySearchResultEntry implements Comparable<CategorySearchResul
         } else {
             return 0;
         }
+    }
+    
+    @Override
+    public boolean equals(Object rhs) {
+        if (rhs instanceof CategorySearchResultEntry) {
+            CategorySearchResultEntry obj = (CategorySearchResultEntry) rhs;
+            return obj.getCategoryValue().equals(this.getCategoryValue()) && obj.getScore() == this.getScore();
+        } else {
+            return false;
+        }
+    }
+    
+    @Override
+    public int hashCode() {
+        return this.getCategoryValue().hashCode() + Double.hashCode(this.getScore()) << 10;
     }
     
 }

@@ -41,11 +41,9 @@ import javax.xml.bind.Unmarshaller;
 import java.io.File;
 
 /**
- * This is the declarative service component which registers the required osgi
+ * This is the declarative service component which registers the required OSGi
  * services for this component's operation.
- */
-
-/**
+ * 
  * @scr.component name="analytics.eventsink.comp" immediate="true"
  * @scr.reference name="registry.streamdefn.comp"
  * interface="org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore"
@@ -58,7 +56,6 @@ import java.io.File;
  * interface="org.wso2.carbon.event.processor.manager.core.EventManagementService" cardinality="1..1"
  * policy="dynamic" bind="setEventManagementService" unbind="unsetEventManagementService"
  */
-
 public class AnalyticsEventSinkComponent {
     private static Log log = LogFactory.getLog(AnalyticsEventSinkComponent.class);
 
@@ -80,7 +77,7 @@ public class AnalyticsEventSinkComponent {
             ServiceHolder.getEventManagementService().subscribe(ServiceHolder.getEventPublisherManagementService());
             this.loadAnalyticsEventSinkConfiguration();
             ServiceHolder.setAnalyticsDSConnector(new AnalyticsDSConnector());
-        } catch (Throwable e) {
+        } catch (Exception e) {
             log.error("Error while activating the AnalyticsEventSinkComponent.", e);
         }
     }

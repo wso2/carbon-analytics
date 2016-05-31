@@ -252,7 +252,6 @@ public class AnalyticsDataBackupTool {
             restoreTableFromFiles(service, table, timeFrom, timeTo, myDir);
             System.out.println();
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println("Error in restoring table: " + table + " - " + e.getMessage());
         }
     }
@@ -450,7 +449,7 @@ public class AnalyticsDataBackupTool {
     private static void migrateTablesV30ToV31(AnalyticsDataService dataService) throws AnalyticsException {
         System.out.println("Starting Analytics Table Migration from v3.x to v3.1+");
         AnalyticsDataServiceImpl ads = ((AnalyticsDataServiceImpl) dataService);
-        ads.setInitIndexedTableStore(false);
+        AnalyticsDataServiceImpl.setInitIndexedTableStore(false);
         ads.convertTableInfoFromv30Tov31();
         System.out.println("Analytics Table Migration done.");
     }

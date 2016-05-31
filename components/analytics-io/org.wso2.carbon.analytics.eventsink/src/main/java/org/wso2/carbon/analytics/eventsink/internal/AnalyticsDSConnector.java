@@ -270,6 +270,8 @@ public class AnalyticsDSConnector {
                         return Integer.parseInt(fieldStrValue);
                     case LONG:
                         return Long.parseLong(fieldStrValue);
+                    case FACET:
+                        return fieldStrValue;
                 }
                 return fieldValue;
             } else {

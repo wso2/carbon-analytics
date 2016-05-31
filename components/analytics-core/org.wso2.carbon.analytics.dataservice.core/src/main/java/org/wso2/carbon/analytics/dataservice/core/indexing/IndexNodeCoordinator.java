@@ -218,7 +218,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
 
     private boolean currentNodeAllocatedShardsGlobally() throws AnalyticsException {
-        return this.extractExistingLocalShardsFromGlobal().size() > 0;
+        return !this.extractExistingLocalShardsFromGlobal().isEmpty();
     }
 
     public void init() throws AnalyticsException {
@@ -274,6 +274,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
                         case NORMAL:
                             break;
                         case RESTORE:
+                            break;
+                        default:
                             break;
                     }
                 }
@@ -388,10 +390,13 @@ public class IndexNodeCoordinator implements GroupEventListener {
             } else {
                 this.remoteCommunicator.put(member, records);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
+            String msg = "Error in sending remote record batch put to member: " + member + ": " + e.getMessage() +
+                    " -> adding to staging area for later pickup..";
             if (!this.suppressWarnMessagesInactiveMembers.contains(member.hashCode())) {
-                log.warn("Error in sending remote record batch put to member: " + member + ": " + e.getMessage() +
-                         " -> adding to staging area for later pickup..");
+                log.warn(msg);
+            } else {
+                log.debug(msg);
             }
             this.suppressWarnMessagesInactiveMembers.add(member.hashCode());
             this.checkFailedOperationCountRefresh();
@@ -417,10 +422,13 @@ public class IndexNodeCoordinator implements GroupEventListener {
             } else {
                 this.remoteCommunicator.delete(member, tenantId, tableName, ids);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
+            String msg = "Error in sending remote record batch delete to member: " + member + ": " + e.getMessage() +
+                    " -> adding to staging area for later pickup..";
             if (!this.suppressWarnMessagesInactiveMembers.contains(member.hashCode())) {
-                log.warn("Error in sending remote record batch delete to member: " + member + ": " + e.getMessage() +
-                         " -> adding to staging area for later pickup..");
+                log.warn(msg);
+            } else {
+                log.debug(msg);
             }
             this.suppressWarnMessagesInactiveMembers.add(member.hashCode());
             this.checkFailedOperationCountRefresh();
@@ -561,6 +569,9 @@ public class IndexNodeCoordinator implements GroupEventListener {
                     create = true;
                 }
             } catch (FileNotFoundException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("My node id file not found: " + e.getMessage(), e);
+                }
                 create = true;
             } catch (Exception e) {
                 throw new AnalyticsException("Error in reading my node id: " + e.getMessage(), e);
@@ -654,7 +665,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
             return;
         }
         this.stopAndCleanupStagingWorkers();
-        Integer[] localShardIndices = this.localShardAllocationConfig.getShardIndices();;
+        Integer[] localShardIndices = this.localShardAllocationConfig.getShardIndices();
         if (localShardIndices.length == 0) {
             return;
         }
@@ -933,7 +944,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
             }
         } catch (AnalyticsInterruptException e) {
             throw e;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new AnalyticsException("Error in processing index staging entry: " + e.getMessage(), e);
         }
         this.stagingIndexDataStore.removeEntries(this.myNodeId, shardIndex, Arrays.asList(entry.getRecordId()));
@@ -973,17 +984,13 @@ public class IndexNodeCoordinator implements GroupEventListener {
                             processStagingEntry(this.shardIndex, entry);
                         }
                     } else {
-                        try {
-                            Thread.sleep(STAGING_INDEXER_WORKER_SLEEP);
-                        } catch (InterruptedException e) {
-                            break;
-                        }
+                        Thread.sleep(STAGING_INDEXER_WORKER_SLEEP);
                     }
-                } catch (AnalyticsInterruptException e) {
+                } catch (AnalyticsInterruptException | InterruptedException e) {
                     // This exception can be thrown from data queues, if the shutdown hook is triggered
                     log.debug("Staging Data Index Worker Interuppted [" + this.shardIndex + "]: " + e.getMessage(), e);
                     return;
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     log.error("Error in processing staging index data: " + e.getMessage(), e);
                 }
             }
