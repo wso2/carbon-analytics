@@ -70,7 +70,8 @@ public class CategorySearchResultEntry implements Comparable<CategorySearchResul
     
     @Override
     public int hashCode() {
-        return this.getCategoryValue().hashCode() + Double.hashCode(this.getScore()) << 10;
+        long bits = Double.doubleToLongBits(this.getScore());
+        return this.getCategoryValue().hashCode() + (int)(bits ^ (bits >>> 32)) << 10;
     }
     
 }

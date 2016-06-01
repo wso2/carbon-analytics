@@ -69,7 +69,7 @@ public class SearchResultEntry implements Comparable<SearchResultEntry>, Seriali
     
     @Override
     public int hashCode() {
-        return this.getId().hashCode() + Float.hashCode(this.getScore()) << 10;
+        return this.getId().hashCode() + Float.floatToIntBits(this.getScore()) << 10;
     }
     
 }
