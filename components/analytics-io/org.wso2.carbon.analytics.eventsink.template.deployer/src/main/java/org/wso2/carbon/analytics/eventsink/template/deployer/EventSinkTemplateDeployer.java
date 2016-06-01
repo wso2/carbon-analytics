@@ -21,21 +21,17 @@ import org.wso2.carbon.analytics.eventsink.AnalyticsEventStore;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
 import org.wso2.carbon.analytics.eventsink.template.deployer.internal.EventSinkTemplateDeployerValueHolder;
 import org.wso2.carbon.analytics.eventsink.template.deployer.internal.util.EventSinkTemplateDeployerConstants;
+import org.wso2.carbon.analytics.eventsink.template.deployer.internal.util.EventSinkTemplateDeployerHelper;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.execution.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
 import org.wso2.carbon.event.execution.manager.core.internal.ds.ExecutionManagerValueHolder;
-import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.StringReader;
 import java.util.List;
 
 public class EventSinkTemplateDeployer implements TemplateDeployer {
@@ -56,38 +52,13 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
                 throw new TemplateDeploymentException("No artifact received to be deployed.");
             }
 
-            String eventSinkConfigXml = template.getArtifact();
-            if (eventSinkConfigXml == null || eventSinkConfigXml.isEmpty()) {
-                throw new TemplateDeploymentException("EventSink configuration in Domain: " + template.getConfiguration().getDomain()
-                                                      + ", Scenario: " +template.getConfiguration().getScenario() + "is empty or not available.");
-            }
-
-            JAXBContext context = JAXBContext.newInstance(AnalyticsEventStore.class);
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            StringReader reader = new StringReader(eventSinkConfigXml);
-            AnalyticsEventStore analyticsEventStore = (AnalyticsEventStore) unmarshaller.unmarshal(reader);
+            AnalyticsEventStore analyticsEventStore = EventSinkTemplateDeployerHelper
+                    .unmarshallEventSinkConfig(template);
 
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             EventSinkTemplateDeployerValueHolder.getAnalyticsEventSinkService().putEventStore(tenantId, analyticsEventStore);
 
-            //template-validation to avoid NPE
-            if (analyticsEventStore.getEventSource() == null) {
-                throw new TemplateDeploymentException("Invalid EventSink configuration. No EventSource information given in EventSink Configuration. "
-                                                      + "For Domain: " + template.getConfiguration().getDomain() + ", for Scenario: "
-                                                      + template.getConfiguration().getScenario());
-            }
-            streamIds = analyticsEventStore.getEventSource().getStreamIds();
-            if (streamIds == null || streamIds.isEmpty()) {
-                throw new TemplateDeploymentException("Invalid EventSink configuration. No EventSource information given in EventSink Configuration. "
-                                                      + "For Domain: " + template.getConfiguration().getDomain() + ", for Scenario: "
-                                                      + template.getConfiguration().getScenario());
-            }
-            //In a valid configuration, all the stream Id's have the same stream name. Here we get the stream name from zero'th element.
-            String[] streamIdComponents = streamIds.get(0).split(EventStreamConstants.STREAM_DEFINITION_DELIMITER);
-            if (streamIdComponents.length != 2) {
-                throw new TemplateDeploymentException("Invalid Stream Id: " + streamIds.get(0) + " found in Event Sink Configuration.");
-            }
-            String streamName = streamIdComponents[0];
+            String streamName = EventSinkTemplateDeployerHelper.getEventStreamName(analyticsEventStore, template);
 
             Registry registry = EventSinkTemplateDeployerValueHolder.getRegistryService()
                     .getConfigSystemRegistry(tenantId);
@@ -96,13 +67,13 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
                 registry.put(EventSinkTemplateDeployerConstants.META_INFO_COLLECTION_PATH, registry.newCollection());
             }
 
-            Resource mappingResource = null;
+            Resource mappingResource;
             String mappingResourceContent = null;
             String mappingResourcePath = EventSinkTemplateDeployerConstants.META_INFO_COLLECTION_PATH + RegistryConstants.PATH_SEPARATOR + streamName;
 
             if (registry.resourceExists(mappingResourcePath)) {
                 mappingResource = registry.get(mappingResourcePath);
-                mappingResourceContent = mappingResource.getContent().toString();//todo: test
+                mappingResourceContent = new String((byte[])registry.get(mappingResourcePath).getContent());
             } else {
                 mappingResource = registry.newResource();
             }
@@ -119,11 +90,7 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
             registry.put(mappingResourcePath, mappingResource);
 
 
-        } catch (JAXBException e) {
-            throw new TemplateDeploymentException("Failed to deploy eventSink configuration in Domain: "
-                                                  + template.getConfiguration().getDomain() + ", Scenario: "
-                                                  + template.getConfiguration().getScenario() + ". Could not unmarshall Event Sink configuration.", e);
-        } catch (AnalyticsEventStoreException e) {
+        }  catch (AnalyticsEventStoreException e) {
             throw new TemplateDeploymentException("Failed to deploy eventSink configuration in Domain: "
                                                   + template.getConfiguration().getDomain() + ", Scenario: "
                                                   + template.getConfiguration().getScenario() + ". Error occurred in the deployment process.", e);
@@ -145,43 +112,18 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
                 throw new TemplateDeploymentException("No artifact received to be deployed.");
             }
 
-            String eventSinkConfigXml = template.getArtifact();
-            if (eventSinkConfigXml == null || eventSinkConfigXml.isEmpty()) {
-                throw new TemplateDeploymentException("EventSink configuration in Domain: " + template.getConfiguration().getDomain()
-                                                      + ", Scenario: " +template.getConfiguration().getScenario() + "is empty or not available.");
-            }
-
-            JAXBContext context = JAXBContext.newInstance(AnalyticsEventStore.class);
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            StringReader reader = new StringReader(eventSinkConfigXml);
-            AnalyticsEventStore analyticsEventStore = (AnalyticsEventStore) unmarshaller.unmarshal(reader);
+            AnalyticsEventStore analyticsEventStore = EventSinkTemplateDeployerHelper
+                    .unmarshallEventSinkConfig(template);
 
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-            EventSinkTemplateDeployerValueHolder.getAnalyticsEventSinkService().putEventStore(tenantId, analyticsEventStore);
-
-            //template-validation to avoid NPE
-            if (analyticsEventStore.getEventSource() == null) {
-                throw new TemplateDeploymentException("Invalid EventSink configuration. No EventSource information given in EventSink Configuration. "
-                                                      + "For Domain: " + template.getConfiguration().getDomain() + ", for Scenario: "
-                                                      + template.getConfiguration().getScenario());
-            }
-            streamIds = analyticsEventStore.getEventSource().getStreamIds();
-            if (streamIds == null || streamIds.isEmpty()) {
-                throw new TemplateDeploymentException("Invalid EventSink configuration. No EventSource information given in EventSink Configuration. "
-                                                      + "For Domain: " + template.getConfiguration().getDomain() + ", for Scenario: "
-                                                      + template.getConfiguration().getScenario());
-            }
-            //In a valid configuration, all the stream Id's have the same stream name. Here we get the stream name from zero'th element.
-            String[] streamIdComponents = streamIds.get(0).split(EventStreamConstants.STREAM_DEFINITION_DELIMITER);
-            if (streamIdComponents.length != 2) {
-                throw new TemplateDeploymentException("Invalid Stream Id: " + streamIds.get(0) + " found in Event Sink Configuration.");
-            }
-            String streamName = streamIdComponents[0];
 
             Registry registry = ExecutionManagerValueHolder.getRegistryService()
                     .getConfigSystemRegistry(tenantId);
 
-            if (!registry.resourceExists(EventSinkTemplateDeployerConstants.META_INFO_COLLECTION_PATH + RegistryConstants.PATH_SEPARATOR + streamName)) {
+            String streamName = EventSinkTemplateDeployerHelper.getEventStreamName(analyticsEventStore, template);
+            String mappingResourcePath = EventSinkTemplateDeployerConstants.META_INFO_COLLECTION_PATH + RegistryConstants.PATH_SEPARATOR
+                                         + streamName;
+            if (!registry.resourceExists(mappingResourcePath)) {
                 deployArtifact(template);
             } else {
                 if(log.isDebugEnabled()) {
@@ -190,26 +132,70 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
                 }
             }
 
-        } catch (JAXBException e) {
-            throw new TemplateDeploymentException("Failed to deploy eventSink configuration in Domain: "
-                                                  + template.getConfiguration().getDomain() + ", Scenario: "
-                                                  + template.getConfiguration().getScenario() + ". Could not unmarshall Event Sink configuration.", e);
-        } catch (AnalyticsEventStoreException e) {
-            throw new TemplateDeploymentException("Failed to deploy eventSink configuration in Domain: "
-                                                  + template.getConfiguration().getDomain() + ", Scenario: "
-                                                  + template.getConfiguration().getScenario() + ". Error occurred in the deployment process.", e);
-        } catch (RegistryException e) {
+        }  catch (RegistryException e) {
             throw new TemplateDeploymentException("Could not load the Registry for Tenant Domain: "
                                                   + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true)
                                                   + ", when deploying Event Sink for Stream: " + streamIds.get(0) , e);
         }
-
     }
 
 
     @Override
     public void undeployArtifact(String artifactId) throws TemplateDeploymentException {
-        //todo: does nothing for now
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        try {
+            Registry registry = EventSinkTemplateDeployerValueHolder.getRegistryService()
+                    .getConfigSystemRegistry(tenantId);
+
+            if (registry.resourceExists(EventSinkTemplateDeployerConstants.META_INFO_COLLECTION_PATH)) {
+                String[] mappingResourcePaths = registry.get(EventSinkTemplateDeployerConstants.META_INFO_COLLECTION_PATH,0,-1).getChildren();
+                boolean hasMapping = false;
+
+                for (int i = 0; i<mappingResourcePaths.length; i++) {
+                    Resource mappingResource = registry.get(mappingResourcePaths[i]);
+                    String mappingResourceContent = new String((byte[])mappingResource.getContent());
+
+                    if (mappingResourceContent.contains(artifactId)) {
+
+                        //Removing artifact ID, along with separator comma.
+                        int beforeCommaIndex = mappingResourceContent.indexOf(artifactId) - 1;
+                        int afterCommaIndex = mappingResourceContent.indexOf(artifactId) + artifactId.length();
+                        if (beforeCommaIndex != 0) {
+                            mappingResourceContent = mappingResourceContent.replace(
+                                    EventSinkTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER + artifactId, "");
+                        } else if (afterCommaIndex != mappingResourceContent.length() - 1) {
+                            mappingResourceContent = mappingResourceContent.replace(
+                                    artifactId + EventSinkTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER, "");
+                        } else {
+                            mappingResourceContent = mappingResourceContent.replace(artifactId, "");
+                        }
+
+                        //if no other artifact IDs are mapped to this stream name, we can delete the Event Sink Config file.
+                        if (mappingResourceContent.equals("")) {
+                            String[] pathChunks = mappingResourcePaths[i].split(RegistryConstants.PATH_SEPARATOR);
+                            String streamName = pathChunks[pathChunks.length -1];
+                            EventSinkTemplateDeployerHelper.deleteEventSinkConfigurationFile(tenantId, streamName);
+                            registry.delete(mappingResourcePaths[i]);
+                        } else {
+                            mappingResource.setContent(mappingResourceContent);
+                            registry.put(mappingResourcePaths[i], mappingResource);
+                        }
+                        hasMapping = true;
+                        break;
+                    }
+                }
+                if (!hasMapping) {
+                    log.warn("No collection exist at registry path: " + EventSinkTemplateDeployerConstants
+                            .META_INFO_COLLECTION_PATH + ". Nothing to undeploy.");
+                }
+            } else {
+                log.warn("No mapping exist for Event Sink Artifact ID: " + artifactId + ". Nothing to undeploy.");
+            }
+        } catch (RegistryException e) {
+            throw new TemplateDeploymentException("Could not load the Registry for Tenant Domain: "
+                                                  + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true)
+                                                  + ", when undeploying Event Sink Template with ID: " + artifactId , e);
+        }
 
     }
 
