@@ -64,9 +64,6 @@
                                 <bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.eventsink.template.deployer:${carbon.analytics.version}
                                 </bundleDef>
-                                <bundleDef>
-                                    org.wso2.orbit.com.lmax:disruptor:${orbit.version.disruptor}
-                                </bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
