@@ -27,7 +27,7 @@ import org.wso2.carbon.event.publisher.core.config.mapping.JSONOutputMapping;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
-import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
+import org.wso2.carbon.event.publisher.core.internal.util.RuntimeResourceLoader;
 import org.wso2.siddhi.core.event.Event;
 
 import java.util.ArrayList;
@@ -41,6 +41,8 @@ public class JSONOutputMapper implements OutputMapper {
     private EventPublisherConfiguration eventPublisherConfiguration = null;
     private Map<String, Integer> propertyPositionMap = null;
     private final StreamDefinition streamDefinition;
+    private boolean isCustomRegistryPath;
+    private final RuntimeResourceLoader runtimeResourceLoader;
 
     public JSONOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                             Map<String, Integer> propertyPositionMap, int tenantId,
@@ -49,14 +51,21 @@ public class JSONOutputMapper implements OutputMapper {
         this.eventPublisherConfiguration = eventPublisherConfiguration;
         this.propertyPositionMap = propertyPositionMap;
         this.streamDefinition = streamDefinition;
+
+        JSONOutputMapping outputMapping = (JSONOutputMapping) eventPublisherConfiguration.getOutputMapping();
+        this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration());
+
         String mappingText;
-        if (eventPublisherConfiguration.getOutputMapping().isCustomMappingEnabled()) {
+        if (outputMapping.isCustomMappingEnabled()) {
             mappingText = getCustomMappingText();
             validateStreamDefinitionWithOutputProperties(mappingText);
         } else {
             mappingText = generateJsonEventTemplate(streamDefinition);
         }
-        this.mappingTextList = generateMappingTextList(mappingText);
+
+        if (!outputMapping.isRegistryResource()) {     // Store only if it is not from registry
+            this.mappingTextList = generateMappingTextList(mappingText);
+        }
     }
 
 
@@ -107,6 +116,30 @@ public class JSONOutputMapper implements OutputMapper {
     @Override
     public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
+
+        // Retrieve resource at runtime if it is from registry
+        JSONOutputMapping outputMapping = (JSONOutputMapping) eventPublisherConfiguration.getOutputMapping();
+        if (outputMapping.isRegistryResource()) {
+            String path = outputMapping.getMappingText();
+            if (isCustomRegistryPath) {
+                // Retrieve the actual path
+                List<String> pathMappingTextList = generateMappingTextList(path);
+                StringBuilder pathBuilder = new StringBuilder(pathMappingTextList.get(0));
+                for (int i = 1; i < pathMappingTextList.size(); i++) {
+                    if (i % 2 == 0) {
+                        pathBuilder.append(pathMappingTextList.get(i));
+                    } else {
+                        pathBuilder.append(getPropertyValue(event.getData(), pathMappingTextList.get(i)));
+                    }
+                }
+                path = pathBuilder.toString();
+            }
+            // Retrieve actual content
+            String actualMappingText = this.runtimeResourceLoader.getResourceContent(path);
+            validateStreamDefinitionWithOutputProperties(actualMappingText);
+            this.mappingTextList = generateMappingTextList(actualMappingText);
+        }
+
         StringBuilder eventText = new StringBuilder(mappingTextList.get(0));
         for (int i = 1, size = mappingTextList.size(); i < size; i++) {
             if (i % 2 == 0) {
@@ -151,7 +184,10 @@ public class JSONOutputMapper implements OutputMapper {
             throw new EventPublisherConfigurationException("Json mapping text is empty!");
         }
         if (jsonOutputMapping.isRegistryResource()) {
-            actualMappingText = EventPublisherServiceValueHolder.getCarbonEventPublisherService().getRegistryResourceContent(jsonOutputMapping.getMappingText());
+            this.isCustomRegistryPath = actualMappingText.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && actualMappingText.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0;
+            if (!this.isCustomRegistryPath) {
+                actualMappingText = this.runtimeResourceLoader.getResourceContent(jsonOutputMapping.getMappingText());
+            }
         }
         return actualMappingText;
     }

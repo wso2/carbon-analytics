@@ -362,12 +362,12 @@ public class ExecutionManagerHelper {
             StringBuilder streamDefBuilder = new StringBuilder(DEFINE_STREAM + siddhiStreamName + " (");
             if (streamDefinition.getMetaData() != null) {
                 for (Attribute metaAttribute : streamDefinition.getMetaData()) {
-                    streamDefBuilder.append(metaAttribute.getName()).append(" ").append(metaAttribute.getType()).append(", ");
+                    streamDefBuilder.append(ExecutionManagerConstants.META_PREFIX).append(metaAttribute.getName()).append(" ").append(metaAttribute.getType()).append(", ");
                 }
             }
             if (streamDefinition.getCorrelationData() != null) {
                 for (Attribute corrAttribute : streamDefinition.getCorrelationData()) {
-                    streamDefBuilder.append(corrAttribute.getName()).append(" ").append(corrAttribute.getType()).append(", ");
+                    streamDefBuilder.append(ExecutionManagerConstants.CORRELATION_PREFIX).append(corrAttribute.getName()).append(" ").append(corrAttribute.getType()).append(", ");
                 }
             }
             if (streamDefinition.getPayloadData() != null) {

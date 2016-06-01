@@ -37,12 +37,16 @@
         //get meta data
         if (fromStreamDefinitionDto.getMetaData() != null) {
             for (EventStreamAttributeDto fromStreamMetaAttribute : fromStreamDefinitionDto.getMetaData()) {
+                fromStreamMetaAttribute.setAttributeName(ExecutionManagerUIConstants.PROPERTY_META_PREFIX
+                                                                + fromStreamMetaAttribute.getAttributeName());
                 fromStreamAttributeArray.add(fromStreamMetaAttribute);
             }
         }
         //get correlation data
         if (fromStreamDefinitionDto.getCorrelationData() != null) {
             for (EventStreamAttributeDto fromStreamCorrelationAttribute : fromStreamDefinitionDto.getCorrelationData()) {
+                fromStreamCorrelationAttribute.setAttributeName(ExecutionManagerUIConstants.PROPERTY_CORRELATION_PREFIX
+                                                                + fromStreamCorrelationAttribute.getAttributeName());
                 fromStreamAttributeArray.add(fromStreamCorrelationAttribute);
             }
         }
@@ -69,6 +73,8 @@
             int metaCounter = 0;
             if (toStreamDefinitionDto.getMetaData() != null) {
                 for (EventStreamAttributeDto metaAttribute : toStreamDefinitionDto.getMetaData()) {
+                    metaAttribute.setAttributeName(ExecutionManagerUIConstants.PROPERTY_META_PREFIX
+                            + metaAttribute.getAttributeName());
         %>
 
         <tr id="metaMappingRow_<%=metaCounter%>">
@@ -99,7 +105,7 @@
             </td>
             <td>
                 <input type="text" id="metaEventMappedValue_<%=index%><%=metaCounter%>"
-                       value="<%=ExecutionManagerUIConstants.PROPERTY_META_PREFIX + metaAttribute.getAttributeName()%>"
+                       value="<%=metaAttribute.getAttributeName()%>"
                        readonly="true"/>
             </td>
             <td>Attribute Type :
@@ -136,6 +142,8 @@
             int correlationCounter = 0;
             if (toStreamDefinitionDto.getCorrelationData() != null) {
                 for (EventStreamAttributeDto correlationAttribute : toStreamDefinitionDto.getCorrelationData()) {
+                    correlationAttribute.setAttributeName(ExecutionManagerUIConstants.PROPERTY_CORRELATION_PREFIX
+                            + correlationAttribute.getAttributeName());
         %>
 
         <tr id="correlationMappingRow_<%=correlationCounter%>">
@@ -166,7 +174,7 @@
             </td>
             <td>
                 <input type="text" id="correlationEventMappedValue_<%=index%><%=correlationCounter%>"
-                       value="<%=ExecutionManagerUIConstants.PROPERTY_CORRELATION_PREFIX + correlationAttribute.getAttributeName()%>"
+                       value="<%=correlationAttribute.getAttributeName()%>"
                        readonly="true"/>
             </td>
             <td>Attribute Type :

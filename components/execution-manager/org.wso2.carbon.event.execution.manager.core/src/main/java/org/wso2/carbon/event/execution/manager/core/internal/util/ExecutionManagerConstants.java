@@ -33,6 +33,12 @@ public class ExecutionManagerConstants {
             + RegistryConstants.PATH_SEPARATOR + "components" + RegistryConstants.PATH_SEPARATOR
             + "org.wso2.carbon.event.execution.manager.core" + RegistryConstants.PATH_SEPARATOR + "template-config";
 
+    //this is the registry path where specific deployers save their meta information.
+    public static final String DEPLOYER_META_INFO_PATH = RegistryConstants.PATH_SEPARATOR + "repository"
+                                                         + RegistryConstants.PATH_SEPARATOR + "components" + RegistryConstants.PATH_SEPARATOR
+                                                         + "org.wso2.carbon.event.execution.manager.core" + RegistryConstants.PATH_SEPARATOR
+                                                         + "deployer-meta-info";
+
     public static final String CONFIG_NAME_SEPARATOR = "-";
 
     public static final String CONFIG_FILE_EXTENSION = ".xml";
@@ -44,6 +50,11 @@ public class ExecutionManagerConstants {
     public static final String STREAM_MAPPING_PLAN_SUFFIX = "StreamMappingPlan";
 
     public static final String DEPLOYER_TYPE_REALTIME = "realtime";
+
+    public static final String META_PREFIX = "meta_";
+
+    public static final String CORRELATION_PREFIX = "correlation_";
+
 
     /**
      * To avoid instantiating

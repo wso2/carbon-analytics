@@ -68,13 +68,23 @@ public class XMLOutputMapperConfigurationBuilder {
                         throw new EventPublisherConfigurationException("XML Mapping that provided is not valid : " + e.getMessage(), e);
                     }
 
+                    String cacheTimeoutDurationValue = innerMappingElement.getAttributeValue(QName.valueOf(EventPublisherConstants.EF_ELE_CACHE_TIMEOUT_DURATION));
+                    if (cacheTimeoutDurationValue == null || cacheTimeoutDurationValue.isEmpty()) {
+                        xmlOutputMapping.setCacheTimeoutDuration(0);
+                    } else {
+                        xmlOutputMapping.setCacheTimeoutDuration(Long.parseLong(cacheTimeoutDurationValue));
+                    }
+
                 } else {
                     throw new EventPublisherConfigurationException("XML Mapping is not valid, Mapping should be inline or from registry");
                 }
             }
 
             String xmlMappingText = innerMappingElement.toString();
-            if (innerMappingElement.getChildElements().hasNext()) {
+            if (xmlOutputMapping.isRegistryResource() && innerMappingElement.getText() != null && !innerMappingElement.getText().trim().isEmpty()) {
+                // Registry source
+                xmlOutputMapping.setMappingXMLText(innerMappingElement.getText());
+            } else if (innerMappingElement.getChildElements().hasNext()) {
                 int index1 = xmlMappingText.indexOf(">");
                 int index2 = xmlMappingText.lastIndexOf("<");
                 xmlMappingText = xmlMappingText.substring(index1 + 1, index2);
@@ -128,6 +138,9 @@ public class XMLOutputMapperConfigurationBuilder {
                 innerMappingElement.declareDefaultNamespace(EventPublisherConstants.EF_CONF_NS);
                 mappingOMElement.addChild(innerMappingElement);
                 innerMappingElement.setText(xmlText);
+
+                // Cache timeout of registry resource
+                innerMappingElement.addAttribute(EventPublisherConstants.EF_ELE_CACHE_TIMEOUT_DURATION, Long.toString(xmlOutputMapping.getCacheTimeoutDuration()), null);
             } else {
                 innerMappingElement = factory.createOMElement(new QName(
                         EventPublisherConstants.EF_ELE_MAPPING_INLINE));

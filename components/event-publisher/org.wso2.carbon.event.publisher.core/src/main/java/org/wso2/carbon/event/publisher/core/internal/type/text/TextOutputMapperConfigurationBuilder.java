@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.event.publisher.core.internal.type.text;
 
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
@@ -62,6 +63,12 @@ public class TextOutputMapperConfigurationBuilder {
                         new QName(EventPublisherConstants.EF_CONF_NS, EventPublisherConstants.EF_ELE_MAPPING_REGISTRY));
                 if (innerMappingElement != null) {
                     textOutputMapping.setRegistryResource(true);
+                    String cacheTimeoutDurationValue = innerMappingElement.getAttributeValue(QName.valueOf(EventPublisherConstants.EF_ELE_CACHE_TIMEOUT_DURATION));
+                    if (cacheTimeoutDurationValue == null || cacheTimeoutDurationValue.isEmpty()) {
+                        textOutputMapping.setCacheTimeoutDuration(0);
+                    } else {
+                        textOutputMapping.setCacheTimeoutDuration(Long.parseLong(cacheTimeoutDurationValue));
+                    }
                 } else {
                     throw new EventPublisherConfigurationException("Text Mapping is not valid, Mapping should be inline or from registry");
                 }
@@ -117,6 +124,9 @@ public class TextOutputMapperConfigurationBuilder {
                 innerMappingElement = factory.createOMElement(new QName(
                         EventPublisherConstants.EF_ELE_MAPPING_REGISTRY));
                 innerMappingElement.declareDefaultNamespace(EventPublisherConstants.EF_CONF_NS);
+
+                // Cache timeout of registry resource
+                innerMappingElement.addAttribute(EventPublisherConstants.EF_ELE_CACHE_TIMEOUT_DURATION, Long.toString(textOutputMapping.getCacheTimeoutDuration()), null);
             } else {
                 innerMappingElement = factory.createOMElement(new QName(
                         EventPublisherConstants.EF_ELE_MAPPING_INLINE));

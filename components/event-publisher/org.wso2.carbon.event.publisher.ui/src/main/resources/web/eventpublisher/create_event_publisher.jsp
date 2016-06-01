@@ -29,6 +29,12 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.publisher.ui.i18n.Resources">
+
+    <carbon:jsi18n
+    		resourceBundle="org.wso2.carbon.event.publisher.ui.i18n.Resources"
+    		request="<%=request%>"
+    		namespace="org.wso2.carbon.event.publisher.ui"/>
+
 <script type="text/javascript" src="../eventpublisher/js/event_publisher.js"></script>
 <script type="text/javascript" src="../eventpublisher/js/create_eventPublisher_helper.js"></script>
 <script type="text/javascript" src="../eventpublisher/js/registry-browser.js"></script>

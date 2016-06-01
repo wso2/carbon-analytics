@@ -376,6 +376,7 @@ function addEventPublisher(form, streamNameWithVersion) {
                 dataFrom = inline;
             } else if ((document.getElementById("registry_text")).checked) {
                 textData = document.getElementById("textSourceRegistry").value;
+                cacheTimeoutDuration = document.getElementById("textCacheTimeout").value;
                 dataFrom = registry;
             }
             customMappingEnabled = "enable";
@@ -384,13 +385,22 @@ function addEventPublisher(form, streamNameWithVersion) {
         if (textData == "" && ((advancedMappingCounter % 2) != 0)) {
             CARBON.showErrorDialog("Mapping parameters cannot be empty.");
             return;
+        } else if(!isInt(cacheTimeoutDuration)) {
+           CARBON.showErrorDialog(org_wso2_carbon_event_publisher_ui_jsi18n["registry.resource.cache.timeout.nan"] + ' ' + document.getElementById("textCacheTimeout").value);
+           return;
         } else {
+            cacheTimeoutDuration = parseInt(cacheTimeoutDuration, 10);
+            if (cacheTimeoutDuration < 0) {
+                CARBON.showErrorDialog(org_wso2_carbon_event_publisher_ui_jsi18n["registry.resource.cache.timeout.negative"] + ' ' + document.getElementById("textCacheTimeout").value);
+                return;
+            }
+
             new Ajax.Request('../eventpublisher/add_event_publisher_ajaxprocessor.jsp', {
                 method:'POST',
                 asynchronous:false,
                 parameters:{eventPublisher:eventPublisherName, streamNameWithVersion:streamNameWithVersion,
                     eventAdapterInfo:eventAdapterInfo, mappingType:"text", outputParameters:outputPropertyParameterString,
-                    textData:textData, dataFrom:dataFrom, customMappingValue:customMappingEnabled},
+                    textData:textData, dataFrom:dataFrom, cacheTimeoutDuration:cacheTimeoutDuration, customMappingValue:customMappingEnabled},
                 onSuccess:function (response) {
                     if ("true" == response.responseText.trim()) {
                         CARBON.showInfoDialog("Event publisher added successfully!!", function () {
@@ -416,6 +426,7 @@ function addEventPublisher(form, streamNameWithVersion) {
                 dataFrom = inline;
             } else if ((document.getElementById("registry_xml")).checked) {
                 textData = document.getElementById("xmlSourceRegistry").value;
+                cacheTimeoutDuration = parseInt(document.getElementById("textCacheTimeout").value, 10);
                 dataFrom = registry;
             }
 
@@ -425,13 +436,21 @@ function addEventPublisher(form, streamNameWithVersion) {
         if (textData == "" && ((advancedMappingCounter % 2) != 0)) {
             CARBON.showErrorDialog("Mapping parameters cannot be empty.");
             return;
+        } else if(!isInt(cacheTimeoutDuration)) {
+           CARBON.showErrorDialog(org_wso2_carbon_event_publisher_ui_jsi18n["registry.resource.cache.timeout.nan"] + ' ' + document.getElementById("textCacheTimeout").value);
+           return;
         } else {
+            cacheTimeoutDuration = parseInt(cacheTimeoutDuration, 10);
+            if (cacheTimeoutDuration < 0) {
+                CARBON.showErrorDialog(org_wso2_carbon_event_publisher_ui_jsi18n["registry.resource.cache.timeout.negative"] + ' ' + document.getElementById("textCacheTimeout").value);
+                return;
+            }
             new Ajax.Request('../eventpublisher/add_event_publisher_ajaxprocessor.jsp', {
                 method:'POST',
                 asynchronous:false,
                 parameters:{eventPublisher:eventPublisherName, streamNameWithVersion:streamNameWithVersion,
                     eventAdapterInfo:eventAdapterInfo, mappingType:"xml", outputParameters:outputPropertyParameterString,
-                    textData:textData, dataFrom:dataFrom, customMappingValue:customMappingEnabled},
+                    textData:textData, dataFrom:dataFrom, cacheTimeoutDuration:cacheTimeoutDuration, customMappingValue:customMappingEnabled},
                 onSuccess:function (response) {
                     if ("true" == response.responseText.trim()) {
                         CARBON.showInfoDialog("Event publisher added successfully!!", function () {
@@ -492,6 +511,7 @@ function addEventPublisher(form, streamNameWithVersion) {
             } else if ((document.getElementById("registry_json")).checked) {
                 jsonData = document.getElementById("jsonSourceRegistry").value;
                 parameters = parameters + "&jsonData=" + jsonData;
+                cacheTimeoutDuration = parseInt(document.getElementById("textCacheTimeout").value, 10);
                 dataFrom = registry;
             }
             customMappingEnabled = "enable";
@@ -500,13 +520,21 @@ function addEventPublisher(form, streamNameWithVersion) {
         if (jsonData == "" && ((advancedMappingCounter % 2) != 0)) {
             CARBON.showErrorDialog("Mapping parameters cannot be empty.");
             return;
+        } else if(!isInt(cacheTimeoutDuration)) {
+           CARBON.showErrorDialog(org_wso2_carbon_event_publisher_ui_jsi18n["registry.resource.cache.timeout.nan"] + ' ' + document.getElementById("textCacheTimeout").value);
+           return;
         } else {
+            cacheTimeoutDuration = parseInt(cacheTimeoutDuration, 10);
+            if (cacheTimeoutDuration < 0) {
+                CARBON.showErrorDialog(org_wso2_carbon_event_publisher_ui_jsi18n["registry.resource.cache.timeout.negative"] + ' ' + document.getElementById("textCacheTimeout").value);
+                return;
+            }
             new Ajax.Request('../eventpublisher/add_event_publisher_ajaxprocessor.jsp', {
                 method:'POST',
                 asynchronous:false,
                 parameters:{eventPublisher:eventPublisherName, streamNameWithVersion:streamNameWithVersion,
                     eventAdapterInfo:eventAdapterInfo, mappingType:"json", outputParameters:outputPropertyParameterString,
-                    dataFrom:dataFrom, jsonData:jsonData, customMappingValue:customMappingEnabled},
+                    dataFrom:dataFrom, jsonData:jsonData, cacheTimeoutDuration:cacheTimeoutDuration, customMappingValue:customMappingEnabled},
                     onSuccess:function (response) {
                     if ("true" == response.responseText.trim()) {
                         CARBON.showInfoDialog("Event publisher added successfully!!", function () {
@@ -690,4 +718,9 @@ function removeOutputProperty(link, format) {
     rowToRemove.parentNode.removeChild(rowToRemove);
     CARBON.showInfoDialog("Mapped Property removed successfully!!");
     return;
+}
+
+function isInt(val) {
+   var int_val = parseInt(val, 10);
+   return !isNaN(int_val) && val == int_val && val.toString() == int_val.toString();
 }

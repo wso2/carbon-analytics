@@ -55,7 +55,7 @@
                             <goal>p2-feature-gen</goal>
                         </goals>
                         <configuration>
-                            <id>org.wso2.carbon.event.stream.server</id>
+                            <id>org.wso2.carbon.event.stream.template.deployer.server</id>
                             <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <adviceFile>
                                 <properties>

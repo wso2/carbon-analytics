@@ -11,10 +11,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name="template")
+@XmlRootElement(name = "template")
 public class Template {
 
-    @XmlAttribute(name="type")
+    @XmlAttribute(name = "type")
     private String type;
 
     @XmlAnyElement(TemplateHandler.class)
@@ -39,16 +39,25 @@ public class Template {
 
     public String getValue() {
         if (this.content != null && !content.isEmpty()) {
-            for (Object obj: content) {
+            StringBuilder builder = new StringBuilder();
+            for (Object obj : content) {
                 if (obj instanceof String) {
                     String contentItem = obj.toString();
                     if (!contentItem.trim().isEmpty()) {
-                        return contentItem;
+                        builder.append(contentItem);
                     }
                 }
             }
-        } else {
-            return null;
+            String value = builder.toString().trim();
+            // Remove duplicate xml entries
+            if (!value.isEmpty()) {
+                String[] elements = value.split("<\\?.*\\?>");
+                if (elements.length > 1) {
+                    return elements[elements.length - 1];
+                } else {
+                    return value;
+                }
+            }
         }
         return null;
     }

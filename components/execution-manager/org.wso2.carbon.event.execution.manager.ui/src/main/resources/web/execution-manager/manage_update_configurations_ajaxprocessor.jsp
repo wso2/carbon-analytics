@@ -148,10 +148,10 @@
                     ArrayList<AttributeMappingDTO> payloadAttributeMappingDTOList = new ArrayList<AttributeMappingDTO>();
 
                     for (AttributeMappingDTO attributeMappingDTO : attributeMappingDTOs) {
-                        if (attributeMappingDTO.getToAttribute().contains("meta_")) {
+                        if (attributeMappingDTO.getToAttribute().startsWith(ExecutionManagerUIConstants.PROPERTY_META_PREFIX)) {
                             //set meta data
                             metaAttributeMappingDTOList.add(attributeMappingDTO);
-                        } else if (attributeMappingDTO.getToAttribute().contains("correlation_")) {
+                        } else if (attributeMappingDTO.getToAttribute().startsWith(ExecutionManagerUIConstants.PROPERTY_CORRELATION_PREFIX)) {
                             //set correlation data
                             correlationAttributeMappingDTOList.add(attributeMappingDTO);
                         } else {
@@ -166,12 +166,14 @@
                     if (fromStreamDefinitionDto.getMetaData() != null) {
                         //get meta data
                         for (EventStreamAttributeDto fromStreamMetaAttribute : fromStreamDefinitionDto.getMetaData()) {
+                            fromStreamMetaAttribute.setAttributeName(ExecutionManagerUIConstants.PROPERTY_META_PREFIX + fromStreamMetaAttribute.getAttributeName());
                             fromStreamAttributeArray.add(fromStreamMetaAttribute);
                         }
                     }
                     if (fromStreamDefinitionDto.getCorrelationData() != null) {
                         //get correlation data
                         for (EventStreamAttributeDto fromStreamCorrelationAttribute : fromStreamDefinitionDto.getCorrelationData()) {
+                            fromStreamCorrelationAttribute.setAttributeName(ExecutionManagerUIConstants.PROPERTY_CORRELATION_PREFIX + fromStreamCorrelationAttribute.getAttributeName());
                             fromStreamAttributeArray.add(fromStreamCorrelationAttribute);
                         }
                     }
@@ -231,7 +233,7 @@
                         </td>
                         <td>
                             <input type="text" id="metaEventMappedValue_<%=i%><%=metaCounter%>"
-                                   value="<%=ExecutionManagerUIConstants.PROPERTY_META_PREFIX + metaAttributeMappingDTO.getToAttribute()%>"
+                                   value="<%=metaAttributeMappingDTO.getToAttribute()%>"
                                    readonly="true"/>
                         </td>
                         <td>Attribute Type :
@@ -300,7 +302,7 @@
                         </td>
                         <td>
                             <input type="text" id="correlationEventMappedValue_<%=i%><%=correlationCounter%>"
-                                   value="<%=ExecutionManagerUIConstants.PROPERTY_CORRELATION_PREFIX + correlationAttributeMappingDTO.getToAttribute()%>"
+                                   value="<%=correlationAttributeMappingDTO.getToAttribute()%>"
                                    readonly="true"/>
                         </td>
                         <td>Attribute Type :

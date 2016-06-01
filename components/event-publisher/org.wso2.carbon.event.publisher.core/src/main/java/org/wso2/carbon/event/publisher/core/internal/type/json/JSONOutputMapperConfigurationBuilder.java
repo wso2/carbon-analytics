@@ -40,7 +40,7 @@ public class JSONOutputMapperConfigurationBuilder {
 
     public static OutputMapping fromOM(
             OMElement mappingElement)
-            throws  EventPublisherConfigurationException {
+            throws EventPublisherConfigurationException {
 
 
         JSONOutputMapping jsonOutputMapping = new JSONOutputMapping();
@@ -61,6 +61,12 @@ public class JSONOutputMapperConfigurationBuilder {
                         new QName(EventPublisherConstants.EF_CONF_NS, EventPublisherConstants.EF_ELE_MAPPING_REGISTRY));
                 if (innerMappingElement != null) {
                     jsonOutputMapping.setRegistryResource(true);
+                    String cacheTimeoutDurationValue = innerMappingElement.getAttributeValue(QName.valueOf(EventPublisherConstants.EF_ELE_CACHE_TIMEOUT_DURATION));
+                    if (cacheTimeoutDurationValue == null || cacheTimeoutDurationValue.isEmpty()) {
+                        jsonOutputMapping.setCacheTimeoutDuration(0);
+                    } else {
+                        jsonOutputMapping.setCacheTimeoutDuration(Long.parseLong(cacheTimeoutDurationValue));
+                    }
                 } else {
                     throw new EventPublisherConfigurationException("XML Mapping is not valid, Mapping should be inline or from registry");
                 }
@@ -115,6 +121,9 @@ public class JSONOutputMapperConfigurationBuilder {
                 innerMappingElement = factory.createOMElement(new QName(
                         EventPublisherConstants.EF_ELE_MAPPING_REGISTRY));
                 innerMappingElement.declareDefaultNamespace(EventPublisherConstants.EF_CONF_NS);
+
+                // Cache timeout of registry resource
+                innerMappingElement.addAttribute(EventPublisherConstants.EF_ELE_CACHE_TIMEOUT_DURATION, Long.toString(jsonOutputMapping.getCacheTimeoutDuration()), null);
             } else {
                 innerMappingElement = factory.createOMElement(new QName(
                         EventPublisherConstants.EF_ELE_MAPPING_INLINE));

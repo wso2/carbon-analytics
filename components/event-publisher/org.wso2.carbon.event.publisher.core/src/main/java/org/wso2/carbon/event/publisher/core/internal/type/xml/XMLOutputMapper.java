@@ -33,7 +33,7 @@ import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfiguratio
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherProcessingException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
-import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
+import org.wso2.carbon.event.publisher.core.internal.util.RuntimeResourceLoader;
 import org.wso2.siddhi.core.event.Event;
 
 import javax.xml.namespace.QName;
@@ -47,8 +47,9 @@ public class XMLOutputMapper implements OutputMapper {
     private static final Log log = LogFactory.getLog(XMLOutputMapper.class);
     private EventPublisherConfiguration eventPublisherConfiguration = null;
     private Map<String, Integer> propertyPositionMap = null;
-    private String outputXMLText = "";
     private List<String> mappingTextList;
+    private boolean isCustomRegistryPath;
+    private final RuntimeResourceLoader runtimeResourceLoader;
 
     public XMLOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                            Map<String, Integer> propertyPositionMap,
@@ -57,21 +58,31 @@ public class XMLOutputMapper implements OutputMapper {
         this.eventPublisherConfiguration = eventPublisherConfiguration;
         this.propertyPositionMap = propertyPositionMap;
 
-        if (eventPublisherConfiguration.getOutputMapping().isCustomMappingEnabled()) {
-            this.outputXMLText = getCustomMappingText();
-            validateStreamDefinitionWithOutputProperties(this.outputXMLText);
+        XMLOutputMapping outputMapping = (XMLOutputMapping) eventPublisherConfiguration.getOutputMapping();
+        this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration());
+
+        String mappingText;
+        if (outputMapping.isCustomMappingEnabled()) {
+            mappingText = getCustomMappingText();
+            validateStreamDefinitionWithOutputProperties(mappingText);
         } else {
-            this.outputXMLText = generateTemplateXMLEvent(streamDefinition);
+            mappingText = generateTemplateXMLEvent(streamDefinition);
         }
+
+        if (!outputMapping.isRegistryResource()) {     // Store only if it is not from registry
+            mappingText = validateXML(mappingText);
+            this.mappingTextList = generateMappingTextList(mappingText);
+        }
+    }
+
+    private String validateXML(String text) throws EventPublisherConfigurationException {
         try {
             //Parsing and converting back to string to discover parse exceptions early.
-            OMElement mappingOMElement = AXIOMUtil.stringToOM(this.outputXMLText);
-            this.outputXMLText = mappingOMElement.toString();
+            OMElement mappingOMElement = AXIOMUtil.stringToOM(text);
+            return mappingOMElement.toString();
         } catch (XMLStreamException e) {
             throw new EventPublisherConfigurationException("Could not parse the mapping text:" + e.getMessage(), e);
         }
-
-        this.mappingTextList = generateMappingTextList(this.outputXMLText);
     }
 
     private List<String> getOutputMappingPropertyList(String mappingText) throws EventPublisherConfigurationException {
@@ -134,8 +145,10 @@ public class XMLOutputMapper implements OutputMapper {
         XMLOutputMapping textOutputMapping = ((XMLOutputMapping) eventPublisherConfiguration.getOutputMapping());
         String actualMappingText = textOutputMapping.getMappingXMLText();
         if (textOutputMapping.isRegistryResource()) {
-            actualMappingText = EventPublisherServiceValueHolder.getCarbonEventPublisherService()
-                    .getRegistryResourceContent(textOutputMapping.getMappingXMLText());
+            this.isCustomRegistryPath = actualMappingText.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && actualMappingText.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0;
+            if (!this.isCustomRegistryPath) {
+                actualMappingText = this.runtimeResourceLoader.getResourceContent(textOutputMapping.getMappingXMLText());
+            }
         }
         return actualMappingText;
     }
@@ -175,6 +188,33 @@ public class XMLOutputMapper implements OutputMapper {
     public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
         if (event.getData().length > 0) {
+
+            // Retrieve resource at runtime if it is from registry
+            XMLOutputMapping outputMapping = (XMLOutputMapping) eventPublisherConfiguration.getOutputMapping();
+            if(outputMapping.isRegistryResource()) {
+                String path = outputMapping.getMappingXMLText();
+                if (isCustomRegistryPath) {
+
+                    // Retrieve the actual path
+                    List<String> pathMappingTextList = generateMappingTextList(path);
+                    StringBuilder pathBuilder = new StringBuilder(pathMappingTextList.get(0));
+                    for (int i = 1; i < pathMappingTextList.size(); i++) {
+                        if (i % 2 == 0) {
+                            pathBuilder.append(pathMappingTextList.get(i));
+                        } else {
+                            pathBuilder.append(getPropertyValue(event.getData(), pathMappingTextList.get(i)));
+                        }
+                    }
+                    path = pathBuilder.toString();
+                }
+                // Retrieve actual content
+                String actualMappingText = this.runtimeResourceLoader.getResourceContent(path);
+                validateStreamDefinitionWithOutputProperties(actualMappingText);
+                // Validate XML
+                actualMappingText = validateXML(actualMappingText);
+                this.mappingTextList = generateMappingTextList(actualMappingText);
+            }
+
             return buildOutputMessage(event.getData());
         } else {
             throw new EventPublisherProcessingException("Input Object array is empty!");
