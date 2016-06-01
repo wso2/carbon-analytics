@@ -33,6 +33,7 @@ public class DataEndpointConstants {
     public static final int DEFAULT_DATA_AGENT_BATCH_SIZE = 100;
     public static final String LB_URL_GROUP_SEPARATOR = ",";
     public static final String FAILOVER_URL_GROUP_SEPARATOR = "|";
+    public static final String FAILOVER_URL_GROUP_SEPARATOR_REGEX = "\\|";
     public static final int DEFAULT_AUTH_PORT_OFFSET = 100;
     public static final String SEPARATOR = "##";
 

@@ -84,7 +84,7 @@ public class DataPublisherUtil {
         } else if (isLBURL) {
             urls = aURLGroup.split(DataEndpointConstants.LB_URL_GROUP_SEPARATOR);
         } else if (isFailOverURL) {
-            urls = aURLGroup.split(DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR);
+            urls = aURLGroup.split(DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR_REGEX);
         } else {
             urls = new String[]{aURLGroup};
         }
