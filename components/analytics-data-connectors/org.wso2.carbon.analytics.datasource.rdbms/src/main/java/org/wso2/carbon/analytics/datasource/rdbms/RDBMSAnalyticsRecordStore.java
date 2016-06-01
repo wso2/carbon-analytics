@@ -758,10 +758,11 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
 
         @Override
-        public void finalize() {
+        public void finalize() throws Throwable {
             /* in the unlikely case, this iterator does not go to the end,
              * we have to make sure the connection is cleaned up */
             RDBMSUtils.cleanupConnection(this.rs, this.stmt, this.conn);
+            super.finalize();
         }
 
         @Override

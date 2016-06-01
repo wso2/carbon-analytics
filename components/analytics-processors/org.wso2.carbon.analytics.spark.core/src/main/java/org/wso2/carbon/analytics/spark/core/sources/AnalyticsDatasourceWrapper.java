@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.analytics.spark.core.sources;
 
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
@@ -27,9 +26,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Created by niranda on 8/10/15.
+ * Wrapper class for data sources.
  */
-public class AnalyticsDatasourceWrapper implements Serializable{
+public class AnalyticsDatasourceWrapper implements Serializable {
 
     private static final long serialVersionUID = 8861289441809536781L;
 
@@ -42,4 +41,5 @@ public class AnalyticsDatasourceWrapper implements Serializable{
     public Connection getConnection() throws DataSourceException, SQLException {
         return ((DataSource)GenericUtils.loadGlobalDataSource(this.dsName)).getConnection();
     }
+    
 }

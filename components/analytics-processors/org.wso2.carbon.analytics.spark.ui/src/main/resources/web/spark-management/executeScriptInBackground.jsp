@@ -28,6 +28,10 @@
 
 <fmt:bundle basename="org.wso2.carbon.analytics.spark.ui.i18n.Resources">
     <%
+        if (!"post".equalsIgnoreCase(request.getMethod())) {
+            response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            return;
+        }
         String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
         ConfigurationContext configContext =
                 (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);

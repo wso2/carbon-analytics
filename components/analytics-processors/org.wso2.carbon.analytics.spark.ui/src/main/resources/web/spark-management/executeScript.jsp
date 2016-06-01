@@ -26,6 +26,10 @@
     <link rel="stylesheet" type="text/css" href="css/spark-explorer-styles.css">
 
     <%
+        if (!"post".equalsIgnoreCase(request.getMethod())) {
+            response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            return;
+        }
         String scriptName = request.getParameter("scriptName");
     %>
 

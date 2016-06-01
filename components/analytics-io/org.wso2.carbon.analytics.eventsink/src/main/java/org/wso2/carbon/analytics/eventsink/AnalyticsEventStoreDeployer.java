@@ -46,7 +46,7 @@ import java.util.List;
  */
 public class AnalyticsEventStoreDeployer extends AbstractDeployer {
 
-    private static Log log = LogFactory.getLog(AnalyticsEventStoreDeployer.class);
+    private final static Log log = LogFactory.getLog(AnalyticsEventStoreDeployer.class);
     private static List<DeploymentFileData> pausedDeployments = new ArrayList<>();
     private boolean eventSinkEnabled;
 
@@ -85,10 +85,10 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
                 String errMsg = "Error while deploying file: " + deploymentFileData.getName() + " for tenant id: " + tenantId;
                 log.error(errMsg, e);
                 throw new AnalyticsEventStoreDeploymentException(errMsg, e);
-            } catch (Throwable throwable) {
-                String errorMsg = "Unable to deploy the event store: " + deploymentFileData.getName() + ". " + throwable.getMessage();
-                log.error(errorMsg, throwable);
-                throw new AnalyticsEventStoreDeploymentException(errorMsg, throwable);
+            } catch (Exception e) {
+                String errorMsg = "Unable to deploy the event store: " + deploymentFileData.getName() + ". " + e.getMessage();
+                log.error(errorMsg, e);
+                throw new AnalyticsEventStoreDeploymentException(errorMsg, e);
             }
             log.info("Deployed successfully analytics event store: " + deploymentFileData.getName());
         } else {

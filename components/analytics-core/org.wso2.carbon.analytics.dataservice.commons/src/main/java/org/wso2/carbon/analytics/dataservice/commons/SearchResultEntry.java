@@ -57,4 +57,19 @@ public class SearchResultEntry implements Comparable<SearchResultEntry>, Seriali
         }
     }
     
+    @Override
+    public boolean equals(Object rhs) {
+        if (rhs instanceof SearchResultEntry) {
+            SearchResultEntry obj = (SearchResultEntry) rhs;
+            return obj.getId().equals(this.getId()) && obj.getScore() == this.getScore();
+        } else {
+            return false;
+        }
+    }
+    
+    @Override
+    public int hashCode() {
+        return this.getId().hashCode() + Float.floatToIntBits(this.getScore()) << 10;
+    }
+    
 }

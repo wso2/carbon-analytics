@@ -81,12 +81,18 @@ public class AnalyticsEventStore {
         return name;
     }
 
+    @Override
     public boolean equals(Object object) {
         if (object != null && object instanceof AnalyticsEventStore) {
             AnalyticsEventStore analyticsEventStore = (AnalyticsEventStore) object;
             return analyticsEventStore.getName().equalsIgnoreCase(this.getName());
         }
         return false;
+    }
+    
+    @Override
+    public int hashCode() {
+        return this.getName().hashCode();
     }
 
     private String generateName(String streamId) {

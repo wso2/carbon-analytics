@@ -269,7 +269,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private boolean isClientMode() throws AnalyticsClusterException {
-        if (!this.sparkMaster.isEmpty() && this.sparkMaster.trim().toLowerCase().startsWith("spark")) {
+        if (!this.sparkMaster.isEmpty() &&
+            (this.sparkMaster.trim().toLowerCase().startsWith("spark") ||
+             this.sparkMaster.trim().toLowerCase().startsWith("yarn") ||
+             this.sparkMaster.trim().toLowerCase().startsWith("mesos"))) {
             this.sparkConf.setMaster(this.sparkMaster);
             return true;
         }
@@ -636,7 +639,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                          + getLog4jPropertiesJvmOpt(analyticsSparkConfDir);
 
         conf.set("spark.executor.extraJavaOptions", conf.get("spark.executor.extraJavaOptions", "") + jvmOpts);
-        conf.set("spark.driver.extraJavaOptions", conf.get("spark.driver.extraJavaOptions", "") +  jvmOpts);
+        conf.set("spark.driver.extraJavaOptions", conf.get("spark.driver.extraJavaOptions", "") + jvmOpts);
 
         //setting the default limit for the spark query results
         conf.setIfMissing("carbon.spark.results.limit", "1000");
@@ -734,8 +737,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
 
         // process incremental table commit query
-        String [] splits = query.split("\\s+");
-        if (splits.length == 2 && isIncTableCommitQuery(splits[0])){
+        // todo: enable this for multiple tables
+        // todo: add an incremental table reset query with wild cards
+        // todo: add an incremental table show data query w/ wild cards
+        String[] splits = query.split("\\s+");
+        if (splits.length == 2 && isIncTableCommitQuery(splits[0])) {
             try {
                 long tempTS = ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp
                         (tenantId, splits[1], false);

@@ -19,12 +19,11 @@ package org.wso2.carbon.analytics.spark.event.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 
 /**
- * Declarative service component for spark eventing.
+ * Declarative service component for spark evening.
  *
  * @scr.component name="spark.eventing" immediate="true"
  * @scr.reference name="event.streamService" interface="org.wso2.carbon.event.stream.core.EventStreamService"
@@ -37,14 +36,6 @@ public class EventingComponent {
     protected void activate(ComponentContext ctx) {
         if (log.isDebugEnabled()) {
             log.debug("Activating Spark Eventing");
-        }
-        try {
-            BundleContext bundleContext = ctx.getBundleContext();
-            if (log.isDebugEnabled()) {
-                log.debug("Finished activating Analytics Spark Eventing");
-            }
-        } catch (Throwable throwable) {
-            log.error("Error in registering the spark eventing service! ", throwable);
         }
     }
 
@@ -61,6 +52,5 @@ public class EventingComponent {
     protected void unsetEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.setEventStreamService(null);
     }
-
 
 }

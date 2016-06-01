@@ -30,6 +30,11 @@
 
 <table class="carbonFormTable">
     <%
+        if (!"post".equalsIgnoreCase(request.getMethod())) {
+            response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            return;
+        }
+
         String activityId = request.getParameter("activityId");
         Object searchTreeObj = request.getSession().getAttribute("SearchExpression");
         String[] tableNames = new String[0];

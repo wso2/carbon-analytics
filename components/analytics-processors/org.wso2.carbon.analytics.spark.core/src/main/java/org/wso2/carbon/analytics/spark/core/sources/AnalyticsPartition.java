@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.analytics.spark.core.sources;
 
 import org.apache.spark.Partition;
@@ -58,6 +57,15 @@ public class AnalyticsPartition implements Partition, Serializable {
     @Override
     public int hashCode() {
         return this.recordGroup.hashCode();
+    }
+    
+    @Override
+    public boolean equals(Object rhs) {
+        if (!(rhs instanceof AnalyticsPartition)) {
+            return false;
+        }
+        AnalyticsPartition part = (AnalyticsPartition) rhs;
+        return this.index == part.index && this.recordGroup.equals(part.getRecordGroup());
     }
     
 }
