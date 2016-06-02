@@ -369,6 +369,7 @@ function addEventPublisher(form, streamNameWithVersion) {
 
         var textData = "";
         var customMappingEnabled = "disable";
+        var cacheTimeoutDuration = 0;
 
         if (((advancedMappingCounter % 2) != 0)) {
             if ((document.getElementById("inline_text")).checked) {
@@ -419,6 +420,7 @@ function addEventPublisher(form, streamNameWithVersion) {
 
         var textData = "";
         var customMappingEnabled = "disable";
+        var cacheTimeoutDuration = 0;
 
         if (((advancedMappingCounter % 2) != 0)) {
             if ((document.getElementById("inline_xml")).checked) {
@@ -503,6 +505,7 @@ function addEventPublisher(form, streamNameWithVersion) {
 
         var jsonData = "";
         var customMappingEnabled = "disable";
+        var cacheTimeoutDuration = 0;
 
         if (advancedMappingCounter % 2 != 0) {
             if ((document.getElementById("inline_json")).checked) {
