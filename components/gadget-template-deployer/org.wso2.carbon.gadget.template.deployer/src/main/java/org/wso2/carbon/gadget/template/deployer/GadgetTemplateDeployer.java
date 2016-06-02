@@ -1,18 +1,21 @@
 package org.wso2.carbon.gadget.template.deployer;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.wso2.carbon.gadget.template.deployer.internal.GadgetTemplateDeployerConstants;
-import org.wso2.carbon.gadget.template.deployer.internal.GadgetTemplateDeployerException;
-import org.wso2.carbon.gadget.template.deployer.internal.util.GadgetTemplateDeployerUtility;
-import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.event.execution.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
+import org.wso2.carbon.gadget.template.deployer.internal.GadgetTemplateDeployerConstants;
+import org.wso2.carbon.gadget.template.deployer.internal.GadgetTemplateDeployerException;
+import org.wso2.carbon.gadget.template.deployer.internal.util.GadgetTemplateDeployerUtility;
+import org.wso2.carbon.registry.api.Registry;
+import org.wso2.carbon.registry.api.RegistryException;
+import org.wso2.carbon.registry.api.Resource;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -26,20 +29,22 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 public class GadgetTemplateDeployer implements TemplateDeployer {
     private static final Log log = LogFactory.getLog(GadgetTemplateDeployer.class);
 
     @Override
     public String getType() {
-        return "gadget";
+        return GadgetTemplateDeployerConstants.ARTIFACT_TYPE;
     }
 
 
     @Override
     public void deployArtifact(DeployableTemplate template) throws TemplateDeploymentException {
 
-        String planName = template.getArtifactId();
+        String artifactId = template.getArtifactId();
         String content = template.getArtifact();
 
         Map<String, String> artifacts = new HashMap<>();
@@ -65,7 +70,7 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
                                 Node propertyNode = propertiesNodeList.item(j);
                                 if (GadgetTemplateDeployerConstants.PROPERTY_TAG.equalsIgnoreCase(propertyNode.getNodeName())) {
                                     Attr attr = (Attr) propertyNode.getAttributes().getNamedItem(GadgetTemplateDeployerConstants.NAME_ATTRIBUTE);
-                                    properties.put(attr.getValue(), propertyNode.getFirstChild().getNodeValue());
+                                    properties.put(attr.getValue(), propertyNode.getFirstChild().getNodeValue().trim());
                                 }
                             }
                         } else if (GadgetTemplateDeployerConstants.ARTIFACTS_TAG.equalsIgnoreCase(node.getNodeName()) && node.hasChildNodes()) {
@@ -81,9 +86,29 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
                     }
 
                     // Deploy the gadget
-                    // Create destination
-                    String storePath = getArtifactPath("gadget");
-                    File destination = new File(storePath + properties.get(GadgetTemplateDeployerConstants.DIRECTORY_NAME));
+                    File destination = new File(GadgetTemplateDeployerUtility.getGadgetArtifactPath() + properties.get(GadgetTemplateDeployerConstants.DIRECTORY_NAME));
+
+                    // Store the directory name for the artifact id
+                    Registry registry = GadgetTemplateDeployerUtility.getRegistry();
+                    try {
+                        Resource resource;
+                        if (registry.resourceExists(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH)) {
+                            // If same gadgets for same artifact exist, remove them first
+                            resource = registry.get(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH);
+
+                            // Delete this artifact if exists
+                            if (resource.getProperty(artifactId) != null) {
+                                undeployArtifact(artifactId);
+                            }
+                        } else {
+                            resource = registry.newResource();
+                        }
+                        resource.setProperty(artifactId, properties.get(GadgetTemplateDeployerConstants.DIRECTORY_NAME));
+                        // Save the resource
+                        registry.put(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH, resource);
+                    } catch (RegistryException e) {
+                        throw new GadgetTemplateDeployerException("Failed to retrieve resource from registry", e);
+                    }
 
                     // Copy the static files
                     String path = new StringBuilder(CarbonUtils.getCarbonConfigDirPath())
@@ -93,7 +118,7 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
                     File templateDirectory = new File(path);
 
                     // Copy all the default templates
-                    GadgetTemplateDeployerUtility.copyFolder(templateDirectory, destination);
+                    FileUtils.copyDirectory(templateDirectory, destination);
 
                     // Save the artifacts
                     for (Map.Entry<String, String> entry : artifacts.entrySet()) {
@@ -104,8 +129,7 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
                         }
                     }
 
-                    log.info("Gadget [" + planName + "] has been deployed at " + destination
-                            .getAbsolutePath());
+                    log.info("Deployed successfully gadget: " + artifactId);
                 }
             }
         } catch (ParserConfigurationException | SAXException | IOException e) {
@@ -115,31 +139,73 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
 
     @Override
     public void deployIfNotDoneAlready(DeployableTemplate template) throws TemplateDeploymentException {
+        Registry registry = GadgetTemplateDeployerUtility.getRegistry();
 
-        log.info("DeployIfNotDoneAlready:" + template.getArtifactId());
+        try {
+            if (registry.resourceExists(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH)) {
+                // If same gadgets for same artifact exist, remove them first
+                Resource resource = registry.get(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH);
+                if (resource.getProperty(template.getArtifactId()) == null) {
+                    deployArtifact(template);
+                }
+            } else {
+                deployArtifact(template);
+            }
+        } catch (RegistryException e) {
+            throw new GadgetTemplateDeployerException("Failed to retrieve resource from registry", e);
+        }
     }
 
 
     @Override
     public void undeployArtifact(String artifactId) throws TemplateDeploymentException {
 
-        log.info("UnDeployIfNotDoneAlready:" + artifactId);
-    }
+        Registry registry = GadgetTemplateDeployerUtility.getRegistry();
+        try {
+            if (registry.resourceExists(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH)) {
+                Resource resource = registry.get(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH);
+                String directory = resource.getProperty(artifactId);
 
-    /**
-     * Returns the absolute path for the artifact store location.
-     *
-     * @param artifactName name of the artifact.
-     * @return path of the artifact
-     */
-    protected String getArtifactPath(String artifactName) {
-        String carbonRepository = CarbonUtils.getCarbonRepository();
-        StringBuilder sb = new StringBuilder(carbonRepository);
-        sb.append("jaggeryapps").append(File.separator).append(GadgetTemplateDeployerConstants.APP_NAME).append(File.separator)
-                .append("store").append(File.separator)
-                .append(CarbonContext.getThreadLocalCarbonContext().getTenantDomain()).append(File.separator)
-                .append(GadgetTemplateDeployerConstants.DEFAULT_STORE_TYPE).append(File.separator).append(artifactName)
-                .append(File.separator);
-        return sb.toString();
+                if (directory != null) {
+                    // Remove the artifact entry from registry
+                    resource.removeProperty(artifactId);
+
+                    boolean isSharedGadgetDirectory = false;
+
+                    // Check whether other artifacts use the same gadget. If so, don't delete the folder.
+                    Properties properties = resource.getProperties();
+                    Set<Object> keys = properties.keySet();
+                    for (Object key : keys) {
+                        String dir = resource.getProperty(key.toString());
+                        if (directory.equals(dir)) {
+                            // Same gadget is used by other artifacts too
+                            isSharedGadgetDirectory = true;
+                            break;
+                        }
+                    }
+
+                    if (!isSharedGadgetDirectory) {
+                        File destination = new File(GadgetTemplateDeployerUtility.getGadgetArtifactPath() + directory);
+                        try {
+                            FileUtils.deleteDirectory(destination);
+                        } catch (IOException e) {
+                            throw new GadgetTemplateDeployerException("Failed to delete directory: " + destination.getAbsolutePath(), e);
+                        }
+                    }
+
+                    registry.put(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH, resource);
+
+                    log.info("Undeployed successfully gadget: " + artifactId);
+                } else {
+                    // Does not exist
+                    throw new GadgetTemplateDeployerException("Artifact does not exists: " + artifactId);
+                }
+            } else {
+                // Does not exist
+                throw new GadgetTemplateDeployerException("Artifact does not exists: " + artifactId);
+            }
+        } catch (RegistryException e) {
+            throw new GadgetTemplateDeployerException("Failed to retrieve resource from registry", e);
+        }
     }
 }
