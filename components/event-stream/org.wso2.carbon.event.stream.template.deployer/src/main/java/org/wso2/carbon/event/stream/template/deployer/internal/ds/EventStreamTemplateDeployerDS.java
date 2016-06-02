@@ -22,6 +22,8 @@ import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.event.stream.template.deployer.EventStreamTemplateDeployer;
 import org.wso2.carbon.event.stream.template.deployer.internal.EventStreamTemplateDeployerValueHolder;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.service.RegistryService;
 
 
 /**
@@ -29,6 +31,9 @@ import org.wso2.carbon.event.stream.template.deployer.internal.EventStreamTempla
  * @scr.reference name="eventStreamService.service"
  * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
  * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
+ * @scr.reference name="registry.service"
+ * interface="org.wso2.carbon.registry.core.service.RegistryService"
+ * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
  */
 public class EventStreamTemplateDeployerDS {
 
@@ -51,5 +56,15 @@ public class EventStreamTemplateDeployerDS {
 
     protected void unsetEventStreamService(EventStreamService eventStreamService) {
         EventStreamTemplateDeployerValueHolder.setEventStreamService(null);
+    }
+
+    protected void setRegistryService(RegistryService registryService) throws
+                                                                       RegistryException {
+        EventStreamTemplateDeployerValueHolder.setRegistryService(registryService);
+
+    }
+
+    protected void unsetRegistryService(RegistryService registryService) {
+        EventStreamTemplateDeployerValueHolder.setRegistryService(null);
     }
 }
