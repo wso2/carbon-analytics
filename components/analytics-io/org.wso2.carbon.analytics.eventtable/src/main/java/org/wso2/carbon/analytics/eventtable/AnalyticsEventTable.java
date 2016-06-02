@@ -141,7 +141,7 @@ public class AnalyticsEventTable implements EventTable {
         }
         try {
             this.tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-        } catch (Throwable e) {
+        } catch (Error e) {
             /* this would never happens in real server runtime, caught for unit tests */
             this.tenantId = -1;
         }        
@@ -283,9 +283,10 @@ public class AnalyticsEventTable implements EventTable {
         operator.update(updatingEventChunk, null, null);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
-    public void overwriteOrAdd(ComplexEventChunk complexEventChunk, Operator operator, int[] ints) {
-        throw new RuntimeException("Unsupprted method invoked!");
+    public void overwriteOrAdd(ComplexEventChunk complexEventChunk, Operator operator, int[] mappingPosition) {
+        this.update(complexEventChunk, operator, mappingPosition);
     }
 
     /**
@@ -782,9 +783,10 @@ public class AnalyticsEventTable implements EventTable {
             }
         }
 
+        @SuppressWarnings("rawtypes")
         @Override
-        public void overwriteOrAdd(ComplexEventChunk complexEventChunk, Object o, int[] ints) {
-            throw new RuntimeException("Unsupprted method invoked!");
+        public void overwriteOrAdd(ComplexEventChunk complexEventChunk, Object candidateEvents, int[] mappingPosition) {
+            this.update(complexEventChunk, candidateEvents, mappingPosition);
         }
         
         private void updateRecordsWithEvent(List<Record> records, ComplexEvent event) {
