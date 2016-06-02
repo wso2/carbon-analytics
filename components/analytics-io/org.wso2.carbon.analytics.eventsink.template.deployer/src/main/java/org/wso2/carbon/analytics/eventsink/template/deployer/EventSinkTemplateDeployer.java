@@ -73,7 +73,7 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
 
             if (registry.resourceExists(mappingResourcePath)) {
                 mappingResource = registry.get(mappingResourcePath);
-                mappingResourceContent = new String((byte[])registry.get(mappingResourcePath).getContent());
+                mappingResourceContent = new String((byte[])mappingResource.getContent());
             } else {
                 mappingResource = registry.newResource();
             }
@@ -126,10 +126,8 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
             if (!registry.resourceExists(mappingResourcePath)) {
                 deployArtifact(template);
             } else {
-                if(log.isDebugEnabled()) {
-                    log.debug("Event Sink Common Artifact with Stream name: " + streamName + " of Domain " + template.getConfiguration().getDomain()
-                              + " was not deployed as it is already being deployed.");
-                }
+                log.info("Event Sink Common Artifact with Stream name: " + streamName + " of Domain " + template.getConfiguration().getDomain()
+                          + " was not deployed as it is already being deployed.");
             }
 
         }  catch (RegistryException e) {
