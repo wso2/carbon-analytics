@@ -220,6 +220,7 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
                         }
                         String artifactId = ExecutionManagerHelper.getTemplatedArtifactId(domainName, scenario.getName(), configName, artifactType, artifactCount);
                         ExecutionManagerHelper.unDeployExistingArtifact(artifactId, template.getType());
+                        artifactTypeCountingMap.put(artifactType, artifactCount);
                     }
 
                     //undeploy stream-mapping execution plan
