@@ -16,10 +16,12 @@
 package org.wso2.carbon.event.stream.template.deployer.internal;
 
 import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.wso2.carbon.registry.core.service.RegistryService;
 
 public class EventStreamTemplateDeployerValueHolder {
 
     private static EventStreamService eventStreamService;
+    private static RegistryService registryService;
 
     public static void setEventStreamService(EventStreamService eventBuilderService) {
         EventStreamTemplateDeployerValueHolder.eventStreamService = eventBuilderService;
@@ -29,4 +31,11 @@ public class EventStreamTemplateDeployerValueHolder {
         return EventStreamTemplateDeployerValueHolder.eventStreamService;
     }
 
+    public static void setRegistryService(RegistryService registryService) {
+        EventStreamTemplateDeployerValueHolder.registryService = registryService;
+    }
+
+    public static RegistryService getRegistryService() {
+        return registryService;
+    }
 }
