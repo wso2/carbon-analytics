@@ -16,13 +16,16 @@
 package org.wso2.carbon.analytics.spark.event.internal;
 
 import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.wso2.carbon.ntask.core.service.TaskService;
 
 /**
- * This class holds the OSGI services registered with Declarative service component.
+ * This class holds the OSGI services registered with declarative service component.
  */
 public class ServiceHolder {
 
     private static EventStreamService eventStreamService;
+    
+    private static TaskService taskService;
 
     private ServiceHolder() {
         /**
@@ -37,4 +40,13 @@ public class ServiceHolder {
     public static void setEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.eventStreamService = eventStreamService;
     }
+
+    public static TaskService getTaskService() {
+        return taskService;
+    }
+
+    public static void setTaskService(TaskService taskService) {
+        ServiceHolder.taskService = taskService;
+    }
+    
 }

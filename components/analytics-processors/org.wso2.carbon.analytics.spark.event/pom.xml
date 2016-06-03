@@ -53,17 +53,6 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-scr-plugin</artifactId>
             </plugin>
-
-            <!--<plugin>-->
-                <!--<artifactId>maven-surefire-plugin</artifactId>-->
-                <!--<configuration>-->
-                    <!--<suiteXmlFiles>-->
-                        <!--<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>-->
-                    <!--</suiteXmlFiles>-->
-                    <!--&lt;!&ndash;<debugForkedProcess>true</debugForkedProcess>&ndash;&gt;-->
-                <!--</configuration>-->
-            <!--</plugin>-->
-
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -75,7 +64,6 @@
                             org.wso2.carbon.analytics.spark.event.*;version="${carbon.analytics.version}"
                         </Export-Package>
                         <Import-Package>
-
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Private-Package>

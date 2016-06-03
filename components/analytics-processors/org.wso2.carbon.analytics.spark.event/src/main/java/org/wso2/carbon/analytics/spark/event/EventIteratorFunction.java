@@ -17,12 +17,9 @@
  */
 package org.wso2.carbon.analytics.spark.event;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.types.StructType;
-import org.wso2.carbon.databridge.agent.DataPublisher;
-import org.wso2.carbon.databridge.commons.Event;
+import org.wso2.carbon.analytics.dataservice.core.Constants;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import scala.collection.Iterator;
 import scala.runtime.AbstractFunction1;
 import scala.runtime.BoxedUnit;
@@ -35,60 +32,43 @@ import java.util.List;
  * Iterates over a resultset from the select query, builds events from them and
  * publishes to the event stream.
  */
-public class EventIteratorFunction extends AbstractFunction1<Iterator<Row>, BoxedUnit>
-        implements Serializable {
-
-    private static final Log log = LogFactory.getLog(EventIteratorFunction.class);
+public class EventIteratorFunction extends AbstractFunction1<Iterator<Row>, BoxedUnit> implements Serializable {
+    
     private static final long serialVersionUID = 4048303072566432397L;
 
     private int tenantId;
-    private StructType schema;
+    
     private String streamId;
-    private String receiverURLSet;
-    private String authURLSet;
-    private String username;
-    private String password;
-    private DataPublisher dataPublisher;
 
-    public EventIteratorFunction(int tenantId,String streamId, StructType schema,
-                                 String receiverURLSet, String authURLSet, String username, String password) {
+    public EventIteratorFunction(int tenantId,String streamId) {
         this.tenantId = tenantId;
         this.streamId = streamId;
-        this.schema = schema;
-        this.receiverURLSet = receiverURLSet;
-        this.authURLSet = authURLSet;
-        this.username = username;
-        this.password = password;
     }
 
     @Override
     public BoxedUnit apply(Iterator<Row> iterator) {
-        dataPublisher = DataPublisherHolder.getInstance().getDataPublisher(receiverURLSet, authURLSet, username, password);
-        while (iterator.hasNext()) {
-            Row row = iterator.next();
-            List<Object> result = new ArrayList<Object>();
-            for (int i = 0; i < row.length(); i++) {
-                result.add(row.get(i));
-            }
-            if (dataPublisher != null) {
-                dataPublisher.publish(buildEvent(result));
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Publisher is not initialized properly. Couldn't publish events to streamId: " + this.streamId);
+        List<List<Object>> storeEntries = new ArrayList<>(Constants.RECORDS_BATCH_SIZE);
+        try {
+            while (iterator.hasNext()) {
+                storeEntries.add(this.createStoreEntryFromRow(iterator.next()));
+                if (storeEntries.size() % Constants.RECORDS_BATCH_SIZE == 0) {
+                    EventStreamDataStore.addToStore(this.tenantId, this.streamId, storeEntries);
+                    storeEntries.clear();
                 }
             }
-            if (log.isDebugEnabled()) {
-                log.debug("Published event to streamId: " + this.streamId);
-            }
+            EventStreamDataStore.addToStore(this.tenantId, this.streamId, storeEntries);
+        } catch (AnalyticsException e) {
+            throw new RuntimeException("Error in writing event store entires: " + e.getMessage(), e);
         }
         return BoxedUnit.UNIT;
     }
 
-    private Event buildEvent(List<Object> payloadData) {
-        Event event = new Event();
-        event.setTimeStamp(System.currentTimeMillis());
-        event.setStreamId(this.streamId);
-        event.setPayloadData(payloadData.toArray());
-        return event;
+    private List<Object> createStoreEntryFromRow(Row row) {
+        List<Object> result = new ArrayList<Object>(row.length());
+        for (int i = 0; i < row.length(); i++) {
+            result.add(row.get(i));
+        }
+        return result;
     }
+    
 }

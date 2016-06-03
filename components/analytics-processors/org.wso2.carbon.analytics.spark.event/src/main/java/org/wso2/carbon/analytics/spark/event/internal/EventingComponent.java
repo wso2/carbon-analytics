@@ -20,7 +20,13 @@ package org.wso2.carbon.analytics.spark.event.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.analytics.spark.event.EventStreamDataStore;
+import org.wso2.carbon.analytics.spark.event.EventingConstants;
+import org.wso2.carbon.analytics.spark.event.EventingTask;
 import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.wso2.carbon.ntask.core.TaskInfo;
+import org.wso2.carbon.ntask.core.TaskManager;
+import org.wso2.carbon.ntask.core.service.TaskService;
 
 /**
  * Declarative service component for spark evening.
@@ -28,6 +34,8 @@ import org.wso2.carbon.event.stream.core.EventStreamService;
  * @scr.component name="spark.eventing" immediate="true"
  * @scr.reference name="event.streamService" interface="org.wso2.carbon.event.stream.core.EventStreamService"
  * cardinality="1..1" policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
+ * @scr.reference name="ntask.component" interface="org.wso2.carbon.ntask.core.service.TaskService"
+ * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
  */
 public class EventingComponent {
 
@@ -36,6 +44,29 @@ public class EventingComponent {
     protected void activate(ComponentContext ctx) {
         if (log.isDebugEnabled()) {
             log.debug("Activating Spark Eventing");
+        }
+        this.initializeSparkEventingTask();
+        if (log.isDebugEnabled()) {
+            log.debug("Spark Eventing Activated");
+        }
+    }
+    
+    private void initializeSparkEventingTask() {
+        try {
+            if (this.isReceiverNode() && !this.isSparkEventingTaskDisabled()) {
+                EventStreamDataStore.initStore();
+                ServiceHolder.getTaskService().registerTaskType(EventingConstants.ANALYTICS_SPARK_EVENTING_TASK_TYPE);
+                TaskInfo.TriggerInfo triggerInfo = new TaskInfo.TriggerInfo(null, null, 
+                        EventingConstants.SPARK_EVENTING_TASK_RUN_INTERVAL_MS, -1);
+                triggerInfo.setDisallowConcurrentExecution(true);
+                TaskInfo taskInfo = new TaskInfo(EventingConstants.ANALYTICS_SPARK_EVENTING_TASK_NAME, 
+                        EventingTask.class.getCanonicalName(), null, triggerInfo);
+                TaskManager tm = ServiceHolder.getTaskService().getTaskManager(EventingConstants.ANALYTICS_SPARK_EVENTING_TASK_TYPE);
+                tm.registerTask(taskInfo);
+                tm.rescheduleTask(taskInfo.getName());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error while scheduling Spark eventing task: " + e.getMessage(), e);
         }
     }
 
@@ -51,6 +82,32 @@ public class EventingComponent {
 
     protected void unsetEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.setEventStreamService(null);
+    }
+    
+    private boolean isReceiverNode() {
+        String propVal = System.getProperty(EventingConstants.DISABLE_EVENT_SINK_SYS_PROP);
+        if (propVal == null) {
+            return true;
+        } else {
+            return !Boolean.parseBoolean(propVal);
+        }
+    }
+    
+    private boolean isSparkEventingTaskDisabled() {
+        String propVal = System.getProperty(EventingConstants.DISABLE_SPARK_EVENTING_TASK_SYS_PROP);
+        if (propVal == null) {
+            return false;
+        } else {
+            return Boolean.parseBoolean(propVal);
+        }
+    }
+    
+    protected void setTaskService(TaskService taskService) {
+        ServiceHolder.setTaskService(taskService);
+    }
+
+    protected void unsetTaskService(TaskService taskService) {
+        ServiceHolder.setTaskService(null);
     }
 
 }
