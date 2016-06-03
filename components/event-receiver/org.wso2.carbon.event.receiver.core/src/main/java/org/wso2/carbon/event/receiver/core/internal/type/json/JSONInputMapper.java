@@ -138,13 +138,19 @@ public class JSONInputMapper implements InputMapper {
                 JsonPath jsonPath = jsonPathData.getJsonPath();
                 AttributeType type = jsonPathData.getType();
                 try {
-                    Object resultObject = jsonPath.read(jsonString);
+                    Object resultObject = null;
                     Object returnedObj = null;
+
+                    try {
+                        resultObject = jsonPath.read(jsonString);
+                    } catch (InvalidPathException e) {
+                        log.debug(e.getMessage() + ". Could not find match for JSONPath : " + jsonPath.toString() + " for event: " + obj.toString());
+                    }
 
                     if (resultObject == null) {
                         if (jsonPathData.getDefaultValue() != null && !jsonPathData.getDefaultValue().isEmpty()) {
                             returnedObj = getPropertyValue(jsonPathData.getDefaultValue(), type);
-                            log.warn("Unable to parse JSONPath to retrieve required attribute. Sending defaults.");
+                            log.debug("Unable to parse JSONPath to retrieve required attribute. Sending defaults.");
                         } else if (!(AttributeType.STRING.equals(jsonPathData.getType()))) {
                             throw new InvalidPropertyValueException("Found Invalid property value null for attribute ");
                         }
@@ -162,9 +168,6 @@ public class JSONInputMapper implements InputMapper {
                     objList.add(returnedObj);
                 } catch (NumberFormatException e) {
                     log.error("Unable to cast the input data to required type :" + type + " ,hence dropping the event " + obj.toString(), e);
-                    return null;
-                } catch (InvalidPathException e) {
-                    log.error("Could not find any matches for the incoming event with JSONPath : " + jsonPath.toString() + " ,hence dropping the event " + obj.toString());
                     return null;
                 } catch (InvalidPropertyValueException e) {
                     log.error(e.getMessage() + " ,hence dropping the event : " + obj.toString());
