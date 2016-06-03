@@ -40,7 +40,7 @@ public class EventStreamTemplateDeployer implements TemplateDeployer {
 
     @Override
     public String getType() {
-        return "eventstream";
+        return EventStreamTemplateDeployerConstants.EVENT_STREAM_DEPLOYER_TYPE;
     }
 
 
@@ -53,8 +53,6 @@ public class EventStreamTemplateDeployer implements TemplateDeployer {
                 throw new TemplateDeploymentException("No artifact received to be deployed.");
             }
 
-            String artifactId = template.getArtifactId();
-
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             Registry registry = EventStreamTemplateDeployerValueHolder.getRegistryService()
                     .getConfigSystemRegistry(tenantId);
@@ -65,6 +63,7 @@ public class EventStreamTemplateDeployer implements TemplateDeployer {
 
             Collection infoCollection = registry.get(EventStreamTemplateDeployerConstants.META_INFO_COLLECTION_PATH, 0, -1);
 
+            String artifactId = template.getArtifactId();
             String streamId = infoCollection.getProperty(artifactId);
 
             //~~~~~~~~~~~~~Cleaning up previously deployed stream, if any.
@@ -134,8 +133,8 @@ public class EventStreamTemplateDeployer implements TemplateDeployer {
 
             if (EventStreamTemplateDeployerValueHolder.getEventStreamService().
                     getStreamDefinition(streamDefinition.getStreamId()) == null) {
-                EventStreamTemplateDeployerValueHolder.getEventStreamService().addEventStreamDefinition(streamDefinition);
-            } else {
+                deployArtifact(template);
+            }  else {
                 log.info("Common Artifact: EventStream with Stream ID " + streamDefinition.getStreamId() + " of Domain " + template.getConfiguration().getDomain()
                          + " was not deployed as it is already being deployed.");
             }
