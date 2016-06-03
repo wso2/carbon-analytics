@@ -22,7 +22,9 @@ public class EventSinkTemplateDeployerConstants {
 
     public static final char META_INFO_STREAM_NAME_SEPARATER = ',';
 
+    public static final String EVENT_SINK_DEPLOYER_TYPE = "eventsink";
+
     public static final String META_INFO_COLLECTION_PATH = ExecutionManagerConstants.DEPLOYER_META_INFO_PATH
-                                                           + RegistryConstants.PATH_SEPARATOR + "eventsink";
+                                                           + RegistryConstants.PATH_SEPARATOR + EVENT_SINK_DEPLOYER_TYPE;
 
 }
