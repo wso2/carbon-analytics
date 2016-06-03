@@ -59,9 +59,6 @@
                             </importFeatures>
                             <includedFeatures>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.dashboard.server.feature:${carbon.analytics.version}
-                                </includedFeatureDef>
-                                <includedFeatureDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.dashboard.ui.feature:${carbon.analytics.version}
                                 </includedFeatureDef>
                             </includedFeatures>
