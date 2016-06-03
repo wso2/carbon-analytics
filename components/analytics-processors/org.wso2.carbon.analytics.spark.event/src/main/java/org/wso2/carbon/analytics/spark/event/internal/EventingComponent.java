@@ -23,6 +23,8 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.spark.event.EventStreamDataStore;
 import org.wso2.carbon.analytics.spark.event.EventingConstants;
 import org.wso2.carbon.analytics.spark.event.EventingTask;
+import org.wso2.carbon.analytics.spark.event.SparkEventingTaskLocationResolver;
+import org.wso2.carbon.event.processor.manager.core.EventManagementService;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.ntask.core.TaskManager;
@@ -36,6 +38,9 @@ import org.wso2.carbon.ntask.core.service.TaskService;
  * cardinality="1..1" policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  * @scr.reference name="ntask.component" interface="org.wso2.carbon.ntask.core.service.TaskService"
  * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
+ * @scr.reference name="eventManagement.service"
+ * interface="org.wso2.carbon.event.processor.manager.core.EventManagementService" cardinality="1..1"
+ * policy="dynamic" bind="setEventManagementService" unbind="unsetEventManagementService"
  */
 public class EventingComponent {
 
@@ -45,6 +50,8 @@ public class EventingComponent {
         if (log.isDebugEnabled()) {
             log.debug("Activating Spark Eventing");
         }
+        ServiceHolder.setEventPublisherManagementService(new SparkEventingPublisherManagementService());
+        ServiceHolder.getEventManagementService().subscribe(ServiceHolder.getEventPublisherManagementService());
         this.initializeSparkEventingTask();
         if (log.isDebugEnabled()) {
             log.debug("Spark Eventing Activated");
@@ -61,6 +68,7 @@ public class EventingComponent {
                 triggerInfo.setDisallowConcurrentExecution(true);
                 TaskInfo taskInfo = new TaskInfo(EventingConstants.ANALYTICS_SPARK_EVENTING_TASK_NAME, 
                         EventingTask.class.getCanonicalName(), null, triggerInfo);
+                taskInfo.setLocationResolverClass(SparkEventingTaskLocationResolver.class.getCanonicalName());
                 TaskManager tm = ServiceHolder.getTaskService().getTaskManager(EventingConstants.ANALYTICS_SPARK_EVENTING_TASK_TYPE);
                 tm.registerTask(taskInfo);
                 tm.rescheduleTask(taskInfo.getName());
@@ -108,6 +116,14 @@ public class EventingComponent {
 
     protected void unsetTaskService(TaskService taskService) {
         ServiceHolder.setTaskService(null);
+    }
+    
+    protected void setEventManagementService(EventManagementService eventManagementService) {
+        ServiceHolder.setEventManagementService(eventManagementService);
+    }
+
+    protected void unsetEventManagementService(EventManagementService eventManagementService) {
+        ServiceHolder.setEventManagementService(null);
     }
 
 }
