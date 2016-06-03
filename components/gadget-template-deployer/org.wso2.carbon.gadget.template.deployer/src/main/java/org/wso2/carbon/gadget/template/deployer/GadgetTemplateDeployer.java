@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.wso2.carbon.gadget.template.deployer;
 
 import org.apache.commons.io.FileUtils;
@@ -33,6 +49,7 @@ import java.util.Properties;
 import java.util.Set;
 
 public class GadgetTemplateDeployer implements TemplateDeployer {
+
     private static final Log log = LogFactory.getLog(GadgetTemplateDeployer.class);
 
     @Override
@@ -84,61 +101,85 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
                             }
                         }
                     }
-
-                    // Deploy the gadget
-                    File destination = new File(GadgetTemplateDeployerUtility.getGadgetArtifactPath() + properties.get(GadgetTemplateDeployerConstants.DIRECTORY_NAME));
-
-                    // Store the directory name for the artifact id
-                    Registry registry = GadgetTemplateDeployerUtility.getRegistry();
-                    try {
-                        Resource resource;
-                        if (registry.resourceExists(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH)) {
-                            // If same gadgets for same artifact exist, remove them first
-                            resource = registry.get(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH);
-
-                            // Delete this artifact if exists
-                            if (resource.getProperty(artifactId) != null) {
-                                undeployArtifact(artifactId);
-                            }
-                        } else {
-                            resource = registry.newResource();
-                        }
-                        resource.setProperty(artifactId, properties.get(GadgetTemplateDeployerConstants.DIRECTORY_NAME));
-                        // Save the resource
-                        registry.put(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH, resource);
-                    } catch (RegistryException e) {
-                        throw new GadgetTemplateDeployerException("Failed to retrieve resource from registry", e);
-                    }
-
-                    // Copy the static files
-                    String path = new StringBuilder(CarbonUtils.getCarbonConfigDirPath())
-                            .append(File.separator).append("execution-manager").append(File.separator)
-                            .append("gadget-templates").append(File.separator)
-                            .append(properties.get(GadgetTemplateDeployerConstants.TEMPLATE_DIRECTORY)).toString();
-                    File templateDirectory = new File(path);
-
-                    // Copy all the default templates
-                    FileUtils.copyDirectory(templateDirectory, destination);
-
-                    // Save the artifacts
-                    for (Map.Entry<String, String> entry : artifacts.entrySet()) {
-                        String fileName = entry.getKey();
-                        File targetFile = new File(destination, fileName);
-                        try (FileWriter writer = new FileWriter(targetFile)) {
-                            writer.write(entry.getValue());
-                        }
-                    }
-
-                    log.info("Deployed successfully gadget: " + artifactId);
                 }
             }
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            throw new GadgetTemplateDeployerException(e.getMessage(), e);
+        } catch (ParserConfigurationException e) {
+            throw new GadgetTemplateDeployerException("Error in creating XML document builder.", e);
+        } catch (SAXException e) {
+            throw new GadgetTemplateDeployerException("Error in parsing XML content of: " + artifactId, e);
+        } catch (IOException e) {
+            throw new GadgetTemplateDeployerException("Error in loading XML content of: " + artifactId, e);
         }
+
+        if (!properties.containsKey(GadgetTemplateDeployerConstants.DIRECTORY_NAME)) {
+            throw new GadgetTemplateDeployerException("Artifact does not contain " + GadgetTemplateDeployerConstants.DIRECTORY_NAME + " property.");
+        }
+
+        File destination = new File(GadgetTemplateDeployerUtility.getGadgetArtifactPath() + properties.get(GadgetTemplateDeployerConstants.DIRECTORY_NAME));
+
+        // Store the directory name for the artifact id
+        Registry registry = GadgetTemplateDeployerUtility.getRegistry();
+        try {
+            Resource resource;
+            if (registry.resourceExists(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH)) {
+                // If same gadgets for same artifact exist, remove them first
+                resource = registry.get(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH);
+
+                // Delete this artifact if exists
+                if (resource.getProperty(artifactId) != null) {
+                    undeployArtifact(artifactId);
+                }
+            } else {
+                resource = registry.newResource();
+            }
+            resource.setProperty(artifactId, properties.get(GadgetTemplateDeployerConstants.DIRECTORY_NAME));
+            // Save the resource
+            registry.put(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH, resource);
+        } catch (RegistryException e) {
+            throw new GadgetTemplateDeployerException("Failed to access resource at: " + GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH + " from registry", e);
+        }
+
+        // Copy the static files
+        String path = new StringBuilder(CarbonUtils.getCarbonConfigDirPath())
+                .append(File.separator).append(GadgetTemplateDeployerConstants.EXECUTION_MANAGER).append(File.separator)
+                .append(GadgetTemplateDeployerConstants.GADGET_TEMPLATES).append(File.separator)
+                .append(properties.get(GadgetTemplateDeployerConstants.TEMPLATE_DIRECTORY)).toString();
+        File templateDirectory = new File(path);
+
+        // Copy all the default templates
+        try {
+            FileUtils.copyDirectory(templateDirectory, destination);
+        } catch (IOException e) {
+            throw new GadgetTemplateDeployerException("Failed to copy " + templateDirectory.getAbsolutePath() + " to " + destination.getAbsolutePath(), e);
+        }
+
+        // Save the artifacts
+        for (Map.Entry<String, String> entry : artifacts.entrySet()) {
+            String fileName = entry.getKey();
+            File targetFile = new File(destination, fileName);
+            FileWriter writer = null;
+            try {
+                writer = new FileWriter(targetFile);
+                writer.write(entry.getValue());
+            } catch (IOException e) {
+                throw new GadgetTemplateDeployerException("Failed to write artifact to: " + targetFile.getAbsolutePath(), e);
+            } finally {
+                if (writer != null) {
+                    try {
+                        writer.close();
+                    } catch (IOException e) {
+                        log.warn("Failed to close FileWriter of " + targetFile.getAbsolutePath());
+                    }
+                }
+            }
+        }
+
+        log.info("Deployed successfully gadget: " + artifactId);
     }
 
     @Override
     public void deployIfNotDoneAlready(DeployableTemplate template) throws TemplateDeploymentException {
+
         Registry registry = GadgetTemplateDeployerUtility.getRegistry();
 
         try {
@@ -152,7 +193,7 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
                 deployArtifact(template);
             }
         } catch (RegistryException e) {
-            throw new GadgetTemplateDeployerException("Failed to retrieve resource from registry", e);
+            throw new GadgetTemplateDeployerException("Failed to access resource at: " + GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH + " from registry", e);
         }
     }
 
@@ -198,14 +239,14 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
                     log.info("Undeployed successfully gadget: " + artifactId);
                 } else {
                     // Does not exist
-                    throw new GadgetTemplateDeployerException("Artifact does not exists: " + artifactId);
+                    log.warn("Artifact: " + artifactId + " does not exist to undeploy");
                 }
             } else {
                 // Does not exist
-                throw new GadgetTemplateDeployerException("Artifact does not exists: " + artifactId);
+                log.warn("Artifact: " + artifactId + " does not exist to undeploy");
             }
         } catch (RegistryException e) {
-            throw new GadgetTemplateDeployerException("Failed to retrieve resource from registry", e);
+            throw new GadgetTemplateDeployerException("Failed to access resource at: " + GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH + " from registry", e);
         }
     }
 }

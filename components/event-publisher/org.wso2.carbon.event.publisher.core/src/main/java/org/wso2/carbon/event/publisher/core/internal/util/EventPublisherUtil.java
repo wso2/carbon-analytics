@@ -21,12 +21,16 @@ import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
+import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.siddhi.core.event.Event;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class EventPublisherUtil {
@@ -181,5 +185,38 @@ public class EventPublisherUtil {
         }
 
         return new Event(inputEvent.getTimeStamp(), data);
+    }
+
+    public static void validateStreamDefinitionWithOutputProperties(String actualMappingText, Map<String, Integer> propertyPositionMap)
+            throws EventPublisherConfigurationException {
+        List<String> mappingProperties = EventPublisherUtil.getOutputMappingPropertyList(actualMappingText);
+        Iterator<String> mappingTextListIterator = mappingProperties.iterator();
+        for (; mappingTextListIterator.hasNext(); ) {
+            String property = mappingTextListIterator.next();
+            if (!propertyPositionMap.containsKey(property)) {
+                throw new EventPublisherStreamValidationException("Property " + property + " is not in the input stream definition.");
+            }
+        }
+    }
+
+    public static List<String> getOutputMappingPropertyList(String mappingText) throws EventPublisherConfigurationException {
+
+        List<String> mappingTextList = new ArrayList<String>();
+        String text = mappingText;
+
+        int prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
+        int postFixIndex;
+        while (prefixIndex > 0) {
+            postFixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX);
+            if (postFixIndex > prefixIndex) {
+                mappingTextList.add(text.substring(prefixIndex + 2, postFixIndex));
+                text = text.substring(postFixIndex + 2);
+            } else {
+                throw new EventPublisherConfigurationException("Found template attribute prefix " + EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX
+                        + " without corresponding postfix " + EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX + ". Please verify your template.");
+            }
+            prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
+        }
+        return mappingTextList;
     }
 }

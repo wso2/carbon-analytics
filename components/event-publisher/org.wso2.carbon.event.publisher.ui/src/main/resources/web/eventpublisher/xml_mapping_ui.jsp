@@ -71,8 +71,12 @@
             <td class="leftCol-med" colspan="1"><fmt:message key="cache.timeout"/><span class="required">*</span></td>
             <td colspan="1"><input type="text" id="textCacheTimeout"
                                                class="initE"
-                                               value="0"
-                                               style="width:100%"/></td>
+                                               value="15"
+                                               style="width:100%"/>
+            <div class="sectionHelp">
+                 <fmt:message key="event.publisher.cache.timeout.help"/>
+            </div>
+            </td>
         </tr>
         </tbody>
     </table>

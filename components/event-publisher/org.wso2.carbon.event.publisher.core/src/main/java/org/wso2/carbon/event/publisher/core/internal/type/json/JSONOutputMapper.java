@@ -25,13 +25,12 @@ import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.config.mapping.JSONOutputMapping;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
-import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
+import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
 import org.wso2.carbon.event.publisher.core.internal.util.RuntimeResourceLoader;
 import org.wso2.siddhi.core.event.Event;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -53,12 +52,12 @@ public class JSONOutputMapper implements OutputMapper {
         this.streamDefinition = streamDefinition;
 
         JSONOutputMapping outputMapping = (JSONOutputMapping) eventPublisherConfiguration.getOutputMapping();
-        this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration());
+        this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration(), propertyPositionMap);
 
         String mappingText;
         if (outputMapping.isCustomMappingEnabled()) {
             mappingText = getCustomMappingText();
-            validateStreamDefinitionWithOutputProperties(mappingText);
+            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap);
         } else {
             mappingText = generateJsonEventTemplate(streamDefinition);
         }
@@ -66,28 +65,6 @@ public class JSONOutputMapper implements OutputMapper {
         if (!outputMapping.isRegistryResource()) {     // Store only if it is not from registry
             this.mappingTextList = generateMappingTextList(mappingText);
         }
-    }
-
-
-    private List<String> getOutputMappingPropertyList(String mappingText) throws EventPublisherConfigurationException {
-
-        List<String> mappingTextList = new ArrayList<String>();
-        String text = mappingText;
-
-        int prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
-        int postFixIndex;
-        while (prefixIndex > 0) {
-            postFixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX);
-            if (postFixIndex > prefixIndex) {
-                mappingTextList.add(text.substring(prefixIndex + 2, postFixIndex));
-                text = text.substring(postFixIndex + 2);
-            } else {
-                throw new EventPublisherConfigurationException("Found template attribute prefix " + EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX
-                        + " without corresponding postfix " + EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX + ". Please verify your JSON template.");
-            }
-            prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
-        }
-        return mappingTextList;
     }
 
     private List<String> generateMappingTextList(String mappingText) throws EventPublisherConfigurationException {
@@ -136,7 +113,6 @@ public class JSONOutputMapper implements OutputMapper {
             }
             // Retrieve actual content
             String actualMappingText = this.runtimeResourceLoader.getResourceContent(path);
-            validateStreamDefinitionWithOutputProperties(actualMappingText);
             this.mappingTextList = generateMappingTextList(actualMappingText);
         }
 
@@ -165,17 +141,6 @@ public class JSONOutputMapper implements OutputMapper {
         return convertToMappedInputEvent(event);
     }
 
-    private void validateStreamDefinitionWithOutputProperties(String actualMappingText)
-            throws EventPublisherConfigurationException {
-        List<String> mappingProperties = getOutputMappingPropertyList(actualMappingText);
-        Iterator<String> mappingTextListIterator = mappingProperties.iterator();
-        for (; mappingTextListIterator.hasNext(); ) {
-            String property = mappingTextListIterator.next();
-            if (!propertyPositionMap.containsKey(property)) {
-                throw new EventPublisherStreamValidationException("Property " + property + " is not in the input stream definition.", streamDefinition.getStreamId());
-            }
-        }
-    }
 
     private String getCustomMappingText() throws EventPublisherConfigurationException {
         JSONOutputMapping jsonOutputMapping = ((JSONOutputMapping) eventPublisherConfiguration.getOutputMapping());
