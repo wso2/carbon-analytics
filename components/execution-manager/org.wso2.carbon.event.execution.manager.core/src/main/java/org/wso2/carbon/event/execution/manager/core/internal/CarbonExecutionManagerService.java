@@ -243,6 +243,7 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
                     }
                     String artifactId = ExecutionManagerHelper.getCommonArtifactId(domainName, artifactType, artifactCount);
                     ExecutionManagerHelper.unDeployExistingArtifact(artifactId, artifactType);
+                    artifactTypeCountingMap.put(artifactType, artifactCount);
                 }
             }
         } catch (TemplateDeploymentException e) {
