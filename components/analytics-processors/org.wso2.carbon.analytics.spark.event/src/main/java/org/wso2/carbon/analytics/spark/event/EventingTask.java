@@ -20,6 +20,8 @@ package org.wso2.carbon.analytics.spark.event;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.event.internal.ServiceHolder;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Event;
@@ -31,6 +33,8 @@ import org.wso2.carbon.ntask.core.Task;
  */
 public class EventingTask implements Task {
 
+    private static final Log log = LogFactory.getLog(EventingTask.class);
+    
     @Override
     public void init() { }
 
@@ -53,7 +57,10 @@ public class EventingTask implements Task {
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(entry.getKey());
                 for (Event event : entry.getValue()) {
                     ServiceHolder.getEventStreamService().publish(event);
-                }                
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug("Dispatched " + entry.getValue().size() + " events for tenant: " + entry.getKey());
+                }
             } finally {
                 PrivilegedCarbonContext.endTenantFlow();
             }
