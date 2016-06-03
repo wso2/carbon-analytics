@@ -92,11 +92,13 @@
                                href="addOrEditScript.jsp?scriptName=<%=aScript.getName()%>">Edit</a>
                             <%if (client.isAnalyticsExecutionEnabled()) {%>
                             <a class="icon-link"
-                               href="executeScript.jsp?scriptName=<%=aScript.getName()%>"
+                               onclick="document.forms['executeScript_<%=aScript.getName()%>'].submit();"
+                               href="#"
                                style="background: url('../spark-management/images/execute.gif') no-repeat;">
                                 Execute</a>
                             <a class="icon-link"
-                               href="executeScriptInBackground.jsp?scriptName=<%=aScript.getName()%>"
+                               onclick="document.forms['executeInBackground_<%=aScript.getName()%>'].submit();"
+                               href="#"
                                style="background: url('../spark-management/images/execute.gif') no-repeat;">
                                 Execute in Background</a>
                             <%}%>
