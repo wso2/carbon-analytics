@@ -70,6 +70,7 @@ public class EventStreamTemplateDeployer implements TemplateDeployer {
 
             if (streamId != null) {    //meaning, this particular template element has previously deployed a stream. We need to undeploy it if it has no other users.
                 infoCollection.removeProperty(artifactId);    //cleaning up the map before undeploying
+                registry.put(EventStreamTemplateDeployerConstants.META_INFO_COLLECTION_PATH, infoCollection);
 
                 //Checking whether any other scenario configs/domains are using this stream....
                 //this info is being kept in a map
@@ -164,6 +165,8 @@ public class EventStreamTemplateDeployer implements TemplateDeployer {
 
             if (streamId != null) {
                 infoCollection.removeProperty(artifactId);    //cleaning up the map
+                registry.put(EventStreamTemplateDeployerConstants.META_INFO_COLLECTION_PATH, infoCollection);
+
                 String mappingResourcePath = EventStreamTemplateDeployerConstants.META_INFO_COLLECTION_PATH + RegistryConstants.PATH_SEPARATOR + streamId;
                 if (registry.resourceExists(mappingResourcePath)) {
                     EventStreamTemplateDeployerHelper.cleanMappingResourceAndUndeploy(registry, mappingResourcePath, artifactId, streamId);

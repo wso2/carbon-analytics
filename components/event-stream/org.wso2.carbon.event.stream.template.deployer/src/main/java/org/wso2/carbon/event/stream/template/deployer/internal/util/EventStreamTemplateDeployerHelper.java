@@ -17,6 +17,7 @@ public class EventStreamTemplateDeployerHelper {
                                           String artifactId, String streamId)
             throws RegistryException {
         infoCollection.addProperty(artifactId, streamId);
+        registry.put(EventStreamTemplateDeployerConstants.META_INFO_COLLECTION_PATH, infoCollection);
 
         Resource mappingResource;
         String mappingResourceContent = null;
@@ -54,10 +55,10 @@ public class EventStreamTemplateDeployerHelper {
             //Removing artifact ID, along with separator comma.
             int beforeCommaIndex = mappingResourceContent.indexOf(artifactId) - 1;
             int afterCommaIndex = mappingResourceContent.indexOf(artifactId) + artifactId.length();
-            if (beforeCommaIndex != 0) {
+            if (beforeCommaIndex > 0) {
                 mappingResourceContent = mappingResourceContent.replace(
                         EventStreamTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER + artifactId, "");
-            } else if (afterCommaIndex != mappingResourceContent.length() - 1) {
+            } else if (afterCommaIndex < mappingResourceContent.length()) {
                 mappingResourceContent = mappingResourceContent.replace(
                         artifactId + EventStreamTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER, "");
             } else {
