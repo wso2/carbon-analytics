@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.wso2.carbon.dashboard.template.deployer;
 
 import org.apache.commons.logging.Log;
@@ -29,6 +45,7 @@ import java.util.Properties;
 import java.util.Set;
 
 public class DashboardTemplateDeployer implements TemplateDeployer {
+
     private static final Log log = LogFactory.getLog(DashboardTemplateDeployer.class);
 
     @Override
@@ -38,6 +55,7 @@ public class DashboardTemplateDeployer implements TemplateDeployer {
 
     @Override
     public void deployArtifact(DeployableTemplate template) throws TemplateDeploymentException {
+
         String artifactId = template.getArtifactId();
         String content = null;
 
@@ -70,53 +88,57 @@ public class DashboardTemplateDeployer implements TemplateDeployer {
                             content = node.getFirstChild().getNodeValue();
                         }
                     }
-
-                    if (content == null || content.trim().isEmpty()) {
-                        throw new DashboardTemplateDeployerException("Empty dashboard content");
-                    }
-
-                    // Store the directory name for the artifact id
-                    Registry registry = DashboardTemplateDeployerUtility.getRegistry();
-                    try {
-                        Resource resource;
-                        if (registry.resourceExists(DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH)) {
-                            // If same gadgets for same artifact exist, remove them first
-                            resource = registry.get(DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH);
-
-                            // Delete this artifact if exists
-                            if (resource.getProperty(artifactId) != null) {
-                                undeployArtifact(artifactId);
-                            }
-                        } else {
-                            resource = registry.newResource();
-                        }
-                        resource.setProperty(artifactId, properties.get(DashboardTemplateDeployerConstants.DASHBOARD_ID));
-                        // Save the resource
-                        registry.put(DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH, resource);
-                    } catch (RegistryException e) {
-                        throw new DashboardTemplateDeployerException("Failed to retrieve resource from registry", e);
-                    }
-
-                    try {
-                        Resource resource = registry.newResource();
-                        resource.setContent(content);
-                        resource.setMediaType("application/json");
-                        registry.put(DashboardTemplateDeployerConstants.DASHBOARDS_RESOURCE_PATH + properties.get(DashboardTemplateDeployerConstants.DASHBOARD_ID), resource);
-
-                        log.info("Dashboard definition of [" + artifactId + "] has been created.");
-                    } catch (RegistryException e) {
-                        throw new DashboardTemplateDeployerException(e.getMessage(), e);
-                    }
                 }
             }
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            throw new DashboardTemplateDeployerException(e.getMessage(), e);
+        } catch (ParserConfigurationException e) {
+            throw new DashboardTemplateDeployerException("Error in creating XML document builder.", e);
+        } catch (SAXException e) {
+            throw new DashboardTemplateDeployerException("Error in parsing XML content of: " + artifactId, e);
+        } catch (IOException e) {
+            throw new DashboardTemplateDeployerException("Error in loading XML content of: " + artifactId, e);
         }
+
+        if (content == null || content.trim().isEmpty()) {
+            throw new DashboardTemplateDeployerException("Empty dashboard content for artifact: " + artifactId);
+        }
+
+        // Store the directory name for the artifact id
+        Registry registry = DashboardTemplateDeployerUtility.getRegistry();
+        try {
+            Resource resource;
+            if (registry.resourceExists(DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH)) {
+                // If same gadgets for same artifact exist, remove them first
+                resource = registry.get(DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH);
+
+                // Delete this artifact if exists
+                if (resource.getProperty(artifactId) != null) {
+                    undeployArtifact(artifactId);
+                }
+            } else {
+                resource = registry.newResource();
+            }
+            resource.setProperty(artifactId, properties.get(DashboardTemplateDeployerConstants.DASHBOARD_ID));
+            // Save the resource
+            registry.put(DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH, resource);
+        } catch (RegistryException e) {
+            throw new DashboardTemplateDeployerException("Failed to access resource at: " + DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH + " in registry", e);
+        }
+
+        try {
+            Resource resource = registry.newResource();
+            resource.setContent(content);
+            resource.setMediaType("application/json");
+            registry.put(DashboardTemplateDeployerConstants.DASHBOARDS_RESOURCE_PATH + properties.get(DashboardTemplateDeployerConstants.DASHBOARD_ID), resource);
+
+            log.info("Dashboard definition of [" + artifactId + "] has been created.");
+        } catch (RegistryException e) {
+            throw new DashboardTemplateDeployerException("Failed to access resource at: " + DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH + " in registry", e);
+        }
+
     }
 
     @Override
     public void undeployArtifact(String artifactId) throws TemplateDeploymentException {
-
 
         Registry registry = DashboardTemplateDeployerUtility.getRegistry();
         try {
@@ -149,7 +171,7 @@ public class DashboardTemplateDeployer implements TemplateDeployer {
                                 registry.delete(path);
                                 log.info("Dashboard definition of [" + artifactId + "] has been undeployed.");
                             } else {
-                                throw new DashboardTemplateDeployerException("Dashboard artifact does not exist");
+                                log.warn("Dashboard definition of [" + artifactId + "] does not exist at " + path);
                             }
                         } catch (RegistryException e) {
                             throw new DashboardTemplateDeployerException(e.getMessage(), e);
@@ -161,14 +183,14 @@ public class DashboardTemplateDeployer implements TemplateDeployer {
                     log.info("Undeployed successfully gadget: " + artifactId);
                 } else {
                     // Does not exist
-                    throw new DashboardTemplateDeployerException("Artifact does not exists: " + artifactId);
+                    log.warn("Artifact: " + artifactId + " does not exist to undeploy");
                 }
             } else {
                 // Does not exist
-                throw new DashboardTemplateDeployerException("Artifact does not exists: " + artifactId);
+                log.warn("Artifact: " + artifactId + " does not exist to undeploy");
             }
         } catch (RegistryException e) {
-            throw new DashboardTemplateDeployerException("Failed to retrieve resource from registry", e);
+            throw new DashboardTemplateDeployerException("Failed to access resource at: " + DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH + " from registry", e);
         }
 
 
@@ -190,7 +212,7 @@ public class DashboardTemplateDeployer implements TemplateDeployer {
                 deployArtifact(template);
             }
         } catch (RegistryException e) {
-            throw new DashboardTemplateDeployerException("Failed to retrieve resource from registry", e);
+            throw new DashboardTemplateDeployerException("Failed to access resource at: " + DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH + " from registry", e);
         }
     }
 }
