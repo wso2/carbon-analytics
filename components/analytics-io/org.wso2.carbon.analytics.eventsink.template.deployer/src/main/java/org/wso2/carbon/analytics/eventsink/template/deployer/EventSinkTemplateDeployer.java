@@ -30,7 +30,6 @@ import org.wso2.carbon.event.execution.manager.core.internal.ds.ExecutionManager
 import org.wso2.carbon.registry.core.Collection;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
-import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 
 import java.util.List;
@@ -70,6 +69,7 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
 
             if (streamName != null) {    //meaning, this particular template element has previously deployed an event sink. We need to undeploy it if it has no other users.
                 infoCollection.removeProperty(artifactId);    //cleaning up the map before undeploying
+                registry.put(EventSinkTemplateDeployerConstants.META_INFO_COLLECTION_PATH, infoCollection);
 
                 //Checking whether any other scenario configs/domains are using this event sink....
                 //this info is being kept in a map
@@ -93,30 +93,7 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
 
             EventSinkTemplateDeployerValueHolder.getAnalyticsEventSinkService().putEventStore(tenantId, analyticsEventStore);
 
-
-
-
-            Resource mappingResource;
-            String mappingResourceContent = null;
-            String mappingResourcePath = EventSinkTemplateDeployerConstants.META_INFO_COLLECTION_PATH + RegistryConstants.PATH_SEPARATOR + streamName;
-
-            if (registry.resourceExists(mappingResourcePath)) {
-                mappingResource = registry.get(mappingResourcePath);
-                mappingResourceContent = new String((byte[])mappingResource.getContent());
-            } else {
-                mappingResource = registry.newResource();
-            }
-
-            if (mappingResourceContent == null) {
-                mappingResourceContent = template.getArtifactId();
-            } else {
-                mappingResourceContent += EventSinkTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER
-                                          + template.getArtifactId();
-            }
-
-            mappingResource.setMediaType("text/plain");
-            mappingResource.setContent(mappingResourceContent);
-            registry.put(mappingResourcePath, mappingResource);
+            EventSinkTemplateDeployerHelper.updateRegistryMaps(registry, infoCollection, artifactId, streamName);
 
         }  catch (AnalyticsEventStoreException e) {
             throw new TemplateDeploymentException("Failed to deploy eventSink configuration in Domain: "
@@ -183,6 +160,7 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
 
             if (streamName != null) {
                 infoCollection.removeProperty(artifactId);    //cleaning up the map before undeploying
+                registry.put(EventSinkTemplateDeployerConstants.META_INFO_COLLECTION_PATH, infoCollection);
 
                 //Checking whether any other scenario configs/domains are using this event sink....
                 //this info is being kept in a map

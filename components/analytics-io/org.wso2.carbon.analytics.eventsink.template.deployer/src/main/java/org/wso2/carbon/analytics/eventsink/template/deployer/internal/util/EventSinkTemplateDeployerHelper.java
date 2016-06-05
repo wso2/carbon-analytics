@@ -7,7 +7,9 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.execution.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
 import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
+import org.wso2.carbon.registry.core.Collection;
 import org.wso2.carbon.registry.core.Registry;
+import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
@@ -92,10 +94,10 @@ public class EventSinkTemplateDeployerHelper {
             //Removing artifact ID, along with separator comma.
             int beforeCommaIndex = mappingResourceContent.indexOf(artifactId) - 1;
             int afterCommaIndex = mappingResourceContent.indexOf(artifactId) + artifactId.length();
-            if (beforeCommaIndex != 0) {
+            if (beforeCommaIndex > 0) {
                 mappingResourceContent = mappingResourceContent.replace(
                         EventSinkTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER + artifactId, "");
-            } else if (afterCommaIndex != mappingResourceContent.length() - 1) {
+            } else if (afterCommaIndex < mappingResourceContent.length()) {
                 mappingResourceContent = mappingResourceContent.replace(
                         artifactId + EventSinkTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER, "");
             } else {
@@ -118,6 +120,37 @@ public class EventSinkTemplateDeployerHelper {
                                                   + ", when trying to undeploy Event Stream with artifact ID: " + artifactId, e);
         }
 
+    }
+
+
+    public static void updateRegistryMaps(Registry registry, Collection infoCollection,
+                                          String artifactId, String streamName)
+            throws RegistryException {
+        infoCollection.addProperty(artifactId, streamName);
+        registry.put(EventSinkTemplateDeployerConstants.META_INFO_COLLECTION_PATH, infoCollection);
+
+        Resource mappingResource;
+        String mappingResourceContent = null;
+        String mappingResourcePath = EventSinkTemplateDeployerConstants.
+                                             META_INFO_COLLECTION_PATH + RegistryConstants.PATH_SEPARATOR + streamName;
+
+        if (registry.resourceExists(mappingResourcePath)) {
+            mappingResource = registry.get(mappingResourcePath);
+            mappingResourceContent = new String((byte[]) mappingResource.getContent());
+        } else {
+            mappingResource = registry.newResource();
+        }
+
+        if (mappingResourceContent == null) {
+            mappingResourceContent = artifactId;
+        } else {
+            mappingResourceContent += EventSinkTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER
+                                      + artifactId;
+        }
+
+        mappingResource.setMediaType("text/plain");
+        mappingResource.setContent(mappingResourceContent);
+        registry.put(mappingResourcePath, mappingResource);
     }
 
 
