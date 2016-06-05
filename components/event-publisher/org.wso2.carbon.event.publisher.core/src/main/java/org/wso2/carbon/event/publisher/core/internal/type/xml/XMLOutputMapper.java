@@ -31,8 +31,8 @@ import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.config.mapping.XMLOutputMapping;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherProcessingException;
-import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
+import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
 import org.wso2.carbon.event.publisher.core.internal.util.RuntimeResourceLoader;
 import org.wso2.siddhi.core.event.Event;
 
@@ -59,12 +59,12 @@ public class XMLOutputMapper implements OutputMapper {
         this.propertyPositionMap = propertyPositionMap;
 
         XMLOutputMapping outputMapping = (XMLOutputMapping) eventPublisherConfiguration.getOutputMapping();
-        this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration());
+        this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration(), propertyPositionMap);
 
         String mappingText;
         if (outputMapping.isCustomMappingEnabled()) {
             mappingText = getCustomMappingText();
-            validateStreamDefinitionWithOutputProperties(mappingText);
+            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap);
         } else {
             mappingText = generateTemplateXMLEvent(streamDefinition);
         }
@@ -130,17 +130,6 @@ public class XMLOutputMapper implements OutputMapper {
         return mappingTextList;
     }
 
-    private void validateStreamDefinitionWithOutputProperties(String actualMappingText)
-            throws EventPublisherConfigurationException {
-        List<String> mappingProperties = getOutputMappingPropertyList(actualMappingText);
-        for (String property : mappingProperties) {
-            if (!propertyPositionMap.containsKey(property)) {
-                throw new EventPublisherStreamValidationException("Property " + property + " is not in the input stream definition.",
-                        eventPublisherConfiguration.getFromStreamName() + ":" + eventPublisherConfiguration.getFromStreamVersion());
-            }
-        }
-    }
-
     private String getCustomMappingText() throws EventPublisherConfigurationException {
         XMLOutputMapping textOutputMapping = ((XMLOutputMapping) eventPublisherConfiguration.getOutputMapping());
         String actualMappingText = textOutputMapping.getMappingXMLText();
@@ -191,7 +180,7 @@ public class XMLOutputMapper implements OutputMapper {
 
             // Retrieve resource at runtime if it is from registry
             XMLOutputMapping outputMapping = (XMLOutputMapping) eventPublisherConfiguration.getOutputMapping();
-            if(outputMapping.isRegistryResource()) {
+            if (outputMapping.isRegistryResource()) {
                 String path = outputMapping.getMappingXMLText();
                 if (isCustomRegistryPath) {
 
@@ -209,7 +198,6 @@ public class XMLOutputMapper implements OutputMapper {
                 }
                 // Retrieve actual content
                 String actualMappingText = this.runtimeResourceLoader.getResourceContent(path);
-                validateStreamDefinitionWithOutputProperties(actualMappingText);
                 // Validate XML
                 actualMappingText = validateXML(actualMappingText);
                 this.mappingTextList = generateMappingTextList(actualMappingText);

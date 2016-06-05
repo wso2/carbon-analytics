@@ -22,21 +22,31 @@ import com.google.common.cache.LoadingCache;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
 
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class RuntimeResourceLoader {
-    private static final long DEFAULT_TIMEOUT_DURATION = 0;
-    private final LoadingCache<String, String> cache;
 
-    public RuntimeResourceLoader(long cacheTimeoutDuration) {
+    private static final long DEFAULT_TIMEOUT_DURATION = 15;
+    private final LoadingCache<String, String> cache;
+    private Map<String, Integer> propertyPositionMap = null;
+
+    public RuntimeResourceLoader(long cacheTimeoutDuration, Map<String, Integer> propertyPositionMap) {
+
+
+        this.propertyPositionMap = propertyPositionMap;
+
         if (cacheTimeoutDuration < 0) {
             cacheTimeoutDuration = DEFAULT_TIMEOUT_DURATION;
         }
+
         CacheLoader<String, String> loader = new CacheLoader<String, String>() {
             @Override
             public String load(String path) throws EventPublisherConfigurationException {
-                return EventPublisherServiceValueHolder.getCarbonEventPublisherService().getRegistryResourceContent(path);
+                String content = EventPublisherServiceValueHolder.getCarbonEventPublisherService().getRegistryResourceContent(path);
+                EventPublisherUtil.validateStreamDefinitionWithOutputProperties(content, RuntimeResourceLoader.this.propertyPositionMap);
+                return content;
             }
         };
         // Default time unit is minute
@@ -48,6 +58,7 @@ public class RuntimeResourceLoader {
         try {
             return cache.get(path);
         } catch (ExecutionException e) {
+            // pass the orgonal exception as well
             throw new EventPublisherConfigurationException(e.getCause());
         }
     }

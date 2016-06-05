@@ -20,9 +20,8 @@ import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.config.mapping.TextOutputMapping;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
-import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
-import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
+import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
 import org.wso2.carbon.event.publisher.core.internal.util.RuntimeResourceLoader;
 import org.wso2.siddhi.core.event.Event;
 
@@ -48,7 +47,7 @@ public class TextOutputMapper implements OutputMapper {
         this.streamDefinition = streamDefinition;
 
         TextOutputMapping outputMapping = ((TextOutputMapping) eventPublisherConfiguration.getOutputMapping());
-        this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration());
+        this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration(), propertyPositionMap);
 
         String mappingText;
         if (eventPublisherConfiguration.getOutputMapping().isCustomMappingEnabled()) {
@@ -59,7 +58,7 @@ public class TextOutputMapper implements OutputMapper {
                     mappingText = this.runtimeResourceLoader.getResourceContent(outputMapping.getMappingText());
                 }
             }
-            validateStreamDefinitionWithOutputProperties(mappingText);
+            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap);
         } else {
             mappingText = generateTemplateTextEvent(streamDefinition);
         }
@@ -98,17 +97,6 @@ public class TextOutputMapper implements OutputMapper {
         return mappingTextList;
     }
 
-    private void validateStreamDefinitionWithOutputProperties(String actualMappingText)
-            throws EventPublisherConfigurationException {
-        List<String> mappingProperties = getOutputMappingPropertyList(actualMappingText);
-        for (String property : mappingProperties) {
-            if (!propertyPositionMap.containsKey(property)) {
-                throw new EventPublisherStreamValidationException("Property " + property + " is not in the input stream definition.",
-                        eventPublisherConfiguration.getFromStreamName() + ":" + eventPublisherConfiguration.getFromStreamVersion());
-            }
-        }
-    }
-
     @Override
     public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
@@ -132,7 +120,6 @@ public class TextOutputMapper implements OutputMapper {
             }
             // Retrieve actual content
             String actualMappingText = this.runtimeResourceLoader.getResourceContent(path);
-            validateStreamDefinitionWithOutputProperties(actualMappingText);
             this.mappingTextList = generateMappingTextList(actualMappingText);
         }
 
