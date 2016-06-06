@@ -26,6 +26,7 @@ import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.CarbonAnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.SparkScriptCAppDeployer;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
+import org.wso2.carbon.analytics.spark.core.internal.jmx.IncrementalLastProcessedTimestamp;
 import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
@@ -35,6 +36,9 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.utils.CarbonUtils;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import java.lang.management.ManagementFactory;
 import java.net.SocketException;
 
 /**
@@ -92,6 +96,17 @@ public class AnalyticsComponent {
             }
         } catch (Exception ex) {
             log.error("Error in registering the analytics processor service! ", ex);
+        }
+        try {
+            String objectName = "org.wso2.carbon:00=analytics,01=LAST_PROCESSED_TIMESTAMP";
+            ObjectName mbeanName = new ObjectName(objectName);
+            MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
+            if (!platformMBeanServer.isRegistered(mbeanName)) {
+                IncrementalLastProcessedTimestamp processedTimestampBean = new IncrementalLastProcessedTimestamp();
+                platformMBeanServer.registerMBean(processedTimestampBean, mbeanName);
+            }
+        } catch (Exception e) {
+            log.error("Unable to create EventCounter stat MBean: " + e.getMessage(), e);
         }
     }
 

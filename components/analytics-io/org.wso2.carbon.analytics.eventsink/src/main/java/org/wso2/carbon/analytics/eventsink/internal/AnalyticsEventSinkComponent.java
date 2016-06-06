@@ -84,7 +84,6 @@ public class AnalyticsEventSinkComponent {
         } catch (Exception e) {
             log.error("Error while activating the AnalyticsEventSinkComponent.", e);
         }
-
         try {
             String objectName = "org.wso2.carbon:00=analytics,01=EVENT_COUNTER";
             ObjectName mbeanName = new ObjectName(objectName);

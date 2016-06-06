@@ -26,5 +26,9 @@ package org.wso2.carbon.analytics.eventsink.internal.jmx;
  */
 public interface StreamEventReceiverCounterMBean {
 
+    /**
+     * This will return total number of event count from server startup.
+     * @return The event received count.
+     */
     int getCurrentCount();
 }
