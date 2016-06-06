@@ -24,8 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
-import org.wso2.carbon.databridge.core.Utils.DataBridgeUtils;
-import org.wso2.carbon.databridge.core.Utils.EventComposite;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;

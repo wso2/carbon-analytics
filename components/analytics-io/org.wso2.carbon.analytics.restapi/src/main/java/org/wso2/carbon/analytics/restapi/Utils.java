@@ -47,6 +47,7 @@ import org.wso2.carbon.analytics.restapi.beans.SortByFieldBean;
 import org.wso2.carbon.analytics.restapi.beans.SubCategoriesBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.ArrayList;
@@ -77,6 +78,23 @@ public class Utils {
             throw new AnalyticsException("Analytics Data API is not available.");
         }
         return analyticsDataAPI;
+    }
+
+    /**
+     * Gets User Realm OSGI service.
+     *
+     * @return the relam service instance.
+     * @throws AnalyticsException
+     */
+    public static RealmService getRealmService()
+            throws AnalyticsException {
+        RealmService realmService;
+        realmService = (RealmService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                .getOSGiService(RealmService.class, null);
+        if (realmService == null) {
+            throw new AnalyticsException("RealmService is not available.");
+        }
+        return realmService;
     }
 
     /**

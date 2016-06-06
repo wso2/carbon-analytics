@@ -20,16 +20,17 @@ package org.wso2.carbon.analytics.eventsink.subscriber;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.eventsink.AnalyticsEventStore;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
 import org.wso2.carbon.analytics.eventsink.internal.AnalyticsEventStoreManager;
-import org.wso2.carbon.analytics.eventsink.AnalyticsEventStore;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkUtil;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
