@@ -26,7 +26,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>CEP - Execution Manager</title>
+        <title>CEP - Template Manager</title>
 
         <link rel="icon" href="../admin/images/favicon.ico" type="image/x-icon"/>
         <link rel="shortcut icon" href="../admin/images/favicon.ico" type="image/x-icon"/>
@@ -86,6 +86,9 @@
             <div class="row">
                 <div class="container col-md-12">
                     <div class="wr-head"><h2>Domains</h2></div>
+                </div>
+                <div class="container col-md-12">
+                    <div class="wr-head"><h3>Select a Domain to proceed</h3></div>
                 </div>
             </div>
 
