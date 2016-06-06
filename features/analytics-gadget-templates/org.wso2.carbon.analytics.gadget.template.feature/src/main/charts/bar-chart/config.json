@@ -15,6 +15,18 @@
             "fieldName": "y",
             "fieldType": "dropdown",
             "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "Color domain",
+            "fieldName": "color",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "Chart mode",
+            "fieldName": "mode",
+            "fieldType": "dropdown",
+            "valueSet": ["stack", "group"]
         }
     ],
     "common-libs" : ["wso2gadgets","chart-utils"],
