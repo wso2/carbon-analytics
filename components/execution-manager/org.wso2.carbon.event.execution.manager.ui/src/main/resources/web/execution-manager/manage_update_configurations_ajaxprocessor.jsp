@@ -99,14 +99,12 @@
                         response.sendError(500);
                         return;
                     }
+
+                    for (int i = 0; i < toStreamIDArray.length; i++) {
+                        toStreamNameID = streamMappingDTOs[i].getToStream();
+                        fromStreamNameID = streamMappingDTOs[i].getFromStream();
+                        AttributeMappingDTO[] attributeMappingDTOs = streamMappingDTOs[i].getAttributeMappingDTOs();
     %>
-    <div class="container col-md-12 marg-top-20" id="streamMappingInnerDivID">
-        <%
-            for (int i = 0; i < toStreamIDArray.length; i++) {
-                toStreamNameID = streamMappingDTOs[i].getToStream();
-                fromStreamNameID = streamMappingDTOs[i].getFromStream();
-                AttributeMappingDTO[] attributeMappingDTOs = streamMappingDTOs[i].getAttributeMappingDTOs();
-        %>
         <div class="container col-md-12 marg-top-20" id="streamMappingConfigurationID_<%=i%>">
 
             <h4><fmt:message key='template.stream.header.text'/></h4>
@@ -422,7 +420,6 @@
                 <fmt:message key='template.add.stream.button.text'/>
             </button>
         </div>
-    </div>
     <%
     } else {
     %>

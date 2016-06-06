@@ -25,7 +25,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CEP - Execution Manager</title>
+    <title>CEP - Template Manager</title>
 
     <link rel="icon" href="../admin/images/favicon.ico" type="image/x-icon"/>
     <link rel="shortcut icon" href="../admin/images/favicon.ico" type="image/x-icon"/>
@@ -116,7 +116,7 @@
                 <div class="action-container">
                     <button id="" type="button"
                             onclick="location.href = 'template_configurations_ajaxprocessor.jsp?ordinal=1&domainName=<%=request.getParameter("domainName")%>';"
-                            class="btn btn-default btn-add col-md-2 col-xs-12 pull-left">Add Configuration
+                            class="btn btn-default btn-add col-md-2 col-xs-12 pull-left">Create New Scenario
                     </button>
                 </div>
                 <br class="c-both"/>
