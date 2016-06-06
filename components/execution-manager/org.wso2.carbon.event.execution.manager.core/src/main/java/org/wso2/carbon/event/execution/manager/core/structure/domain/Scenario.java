@@ -9,8 +9,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="scenario")
 public class Scenario {
 
-    @XmlAttribute(name="name")
-    private String name;
+    @XmlAttribute(name="type")
+    private String type;
 
     private String description;
 
@@ -28,12 +28,12 @@ public class Scenario {
         this.description = description;
     }
 
-    public String getName() {
-        return name;
+    public String getType() {
+        return type;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Templates getTemplates() {

@@ -18,7 +18,7 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.ui.ExecutionManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ExecutionManagerTemplateInfoDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.DomainInfoDTO" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.execution.manager.ui.i18n.Resources">
 
@@ -93,11 +93,11 @@
             <%
                 ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
                 try {
-                    ExecutionManagerTemplateInfoDTO[] domainDTOs = proxy.getAllExecutionManagerTemplateInfos();
+                    DomainInfoDTO[] domainDTOs = proxy.getAllDomainInfos();
 
                     if (domainDTOs != null && domainDTOs.length > 0) {
 
-                        for (ExecutionManagerTemplateInfoDTO domainDTO : domainDTOs) {
+                        for (DomainInfoDTO domainDTO : domainDTOs) {
             %>
 
 

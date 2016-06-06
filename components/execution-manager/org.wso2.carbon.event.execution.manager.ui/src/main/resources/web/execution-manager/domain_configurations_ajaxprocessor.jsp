@@ -149,13 +149,13 @@
                         </td>
                         <td><%=scenarioConfigurationDTO.getDescription()%>
                         </td>
-                        <td><%=scenarioConfigurationDTO.getScenario()%>
+                        <td><%=scenarioConfigurationDTO.getType()%>
                         <td class="tcenter">
                             <a onclick="deleteConfiguration('<%=scenarioConfigurationDTO.getDomain()%>','<%=scenarioConfigurationDTO.getName()%>',this, 'tblConfigs')">
                                 <i class="glyphicon glyphicon-remove"></i>
                                 <fmt:message key='common.button.delete'/></a></td>
                         <td class="tcenter">
-                            <a href="template_configurations_ajaxprocessor.jsp?configurationName=<%=scenarioConfigurationDTO.getName()%>&domainName=<%=scenarioConfigurationDTO.getDomain()%>&templateType=<%=scenarioConfigurationDTO.getScenario()%>">
+                            <a href="template_configurations_ajaxprocessor.jsp?configurationName=<%=scenarioConfigurationDTO.getName()%>&domainName=<%=scenarioConfigurationDTO.getDomain()%>&templateType=<%=scenarioConfigurationDTO.getType()%>">
                                 <i class="glyphicon glyphicon-cog"></i>
                                 <fmt:message key='common.button.edit'/></a></td>
                     </tr>

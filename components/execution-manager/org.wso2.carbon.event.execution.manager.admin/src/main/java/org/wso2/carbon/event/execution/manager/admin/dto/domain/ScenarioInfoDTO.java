@@ -1,16 +1,16 @@
 package org.wso2.carbon.event.execution.manager.admin.dto.domain;
 
 public class ScenarioInfoDTO {
-    private String name;
+    private String type;
     private String description;
     private ParameterDTO[] parameterDTOs;
 
-    public String getName() {
-        return name;
+    public String getType() {
+        return type;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getDescription() {

@@ -19,9 +19,9 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ScenarioConfigurationDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ScenarioInfoDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ParameterDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ExecutionManagerTemplateInfoDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTOE" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ParameterDTOE" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.DomainInfoDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTO" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.execution.manager.ui.i18n.Resources">
@@ -112,8 +112,8 @@
 
         ExecutionManagerAdminServiceStub proxy =
                 ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
-        ExecutionManagerTemplateInfoDTO domain =
-                proxy.getExecutionManagerTemplateInfo(domainName);
+        DomainInfoDTO domain =
+                proxy.getDomainInfo(domainName);
 
         ScenarioConfigurationDTO scenarioConfigurationDTO = proxy.getConfiguration(domainName,
                 configurationName);
@@ -151,7 +151,7 @@
 
                 if (domain.getScenarioInfoDTOs() != null && !templateType.equals("")) {
                     for (ScenarioInfoDTO scenarioInfoDTO : domain.getScenarioInfoDTOs()) {
-                        if (configurationName == null || scenarioInfoDTO.getName().equals(templateType)) {
+                        if (configurationName == null || scenarioInfoDTO.getType().equals(templateType)) {
                             currentScenario = scenarioInfoDTO;
                             break;
                         }
@@ -175,13 +175,13 @@
                         for (ScenarioInfoDTO scenarioInfoDTO : domain.getScenarioInfoDTOs()) {
 
                             String selectedValue = "";
-                            if (scenarioInfoDTO.getName().trim().equals(currentScenario.getName())) {
+                            if (scenarioInfoDTO.getType().trim().equals(currentScenario.getType())) {
                                 selectedValue = "selected=true";
                             }
                     %>
                     <option <%=selectedValue%>
-                            value="template_configurations_ajaxprocessor.jsp?configurationName=<%=configurationName%>&domainName=<%=domainName%>&templateType=<%=scenarioInfoDTO.getName()%>">
-                        <%=scenarioInfoDTO.getName()%>
+                            value="template_configurations_ajaxprocessor.jsp?configurationName=<%=configurationName%>&domainName=<%=domainName%>&templateType=<%=scenarioInfoDTO.getType()%>">
+                        <%=scenarioInfoDTO.getType()%>
                     </option>
                     <%}%>
                 </select>
@@ -234,7 +234,7 @@
               int indexParam = 0;
 
               if (currentScenario.getParameterDTOs() != null) {
-                for (ParameterDTO parameter : currentScenario.getParameterDTOs()) {
+                for (ParameterDTOE parameter : currentScenario.getParameterDTOs()) {
 
                     if (parameter == null) {
                         continue;
@@ -243,7 +243,7 @@
                         parameterValue = parameter.getDefaultValue().trim();
                     } else if (scenarioConfigurationDTO.getParameterDTOs() != null) {
 
-                        for (ParameterDTOE param : scenarioConfigurationDTO.getParameterDTOs()) {
+                        for (ParameterDTO param : scenarioConfigurationDTO.getParameterDTOs()) {
                             if (param.getName().equals(parameter.getName())) {
                                 parameterValue = param.getValue().trim();
                                 break;

@@ -2,7 +2,7 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.ui.ExecutionManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ScenarioConfigurationDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTOE" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.StreamMappingDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.AttributeMappingDTO" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
@@ -40,7 +40,7 @@
     String templateType = request.getParameter("templateType");
     String valueSeparator = "::";
 
-    ParameterDTOE[] parameters;
+    ParameterDTO[] parameters;
 
     ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
     try {
@@ -53,18 +53,18 @@
             scenarioConfigurationDTO.setName(configuration);
             scenarioConfigurationDTO.setDomain(domainName);
             scenarioConfigurationDTO.setDescription(description);
-            scenarioConfigurationDTO.setScenario(templateType);
+            scenarioConfigurationDTO.setType(templateType);
 
             if (parametersJson.length() < 1) {
-               parameters = new ParameterDTOE[0];
+               parameters = new ParameterDTO[0];
 
             } else {
                 String[] parameterStrings = parametersJson.split(",");
-                parameters = new ParameterDTOE[parameterStrings.length];
+                parameters = new ParameterDTO[parameterStrings.length];
                 int index = 0;
 
                 for (String parameterString : parameterStrings) {
-                    ParameterDTOE parameterDTO = new ParameterDTOE();
+                    ParameterDTO parameterDTO = new ParameterDTO();
                     parameterDTO.setName(parameterString.split(valueSeparator)[0]);
                     parameterDTO.setValue(parameterString.split(valueSeparator)[1]);
                     parameters[index] = parameterDTO;

@@ -22,9 +22,9 @@ public class ScenarioConfigurationDTO {
 
     private String name;
 
-    private String scenario;  //scenario < type
+    private String type;
 
-    private String domain;  //domain < from
+    private String domain;
 
     private String description;
 
@@ -40,12 +40,12 @@ public class ScenarioConfigurationDTO {
         this.name = name;
     }
 
-    public String getScenario() {
-        return scenario;
+    public String getType() {
+        return type;
     }
 
-    public void setScenario(String scenario) {
-        this.scenario = scenario;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getDomain() {
