@@ -24,6 +24,7 @@ import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkServiceImpl;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventStoreCAppDeployer;
+import org.wso2.carbon.analytics.eventsink.internal.jmx.QueueEventBufferSizeCalculator;
 import org.wso2.carbon.analytics.eventsink.internal.jmx.StreamEventReceiverCounter;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
@@ -85,12 +86,18 @@ public class AnalyticsEventSinkComponent {
             log.error("Error while activating the AnalyticsEventSinkComponent.", e);
         }
         try {
-            String objectName = "org.wso2.carbon:00=analytics,01=EVENT_COUNTER";
-            ObjectName mbeanName = new ObjectName(objectName);
             MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
-            if (!platformMBeanServer.isRegistered(mbeanName)) {
+            String eventCounterObject = "org.wso2.carbon:00=analytics,01=EVENT_COUNTER";
+            ObjectName eventCounterMbean = new ObjectName(eventCounterObject);
+            if (!platformMBeanServer.isRegistered(eventCounterMbean)) {
                 StreamEventReceiverCounter counter = new StreamEventReceiverCounter();
-                platformMBeanServer.registerMBean(counter, mbeanName);
+                platformMBeanServer.registerMBean(counter, eventCounterMbean);
+            }
+            String queueBufferSize = "org.wso2.carbon:00=analytics,01=RECEIVER_REMAINING_QUEUE_BUFFER_SIZE_IN_BYTES";
+            ObjectName queueBufferMbean = new ObjectName(queueBufferSize);
+            if (!platformMBeanServer.isRegistered(queueBufferMbean)) {
+                QueueEventBufferSizeCalculator counter = new QueueEventBufferSizeCalculator();
+                platformMBeanServer.registerMBean(counter, queueBufferMbean);
             }
         } catch (Exception e) {
             log.error("Unable to create EventCounter stat MBean: " + e.getMessage(), e);
