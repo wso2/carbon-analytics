@@ -25,7 +25,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CEP - Execution Manager</title>
+    <title>CEP - Template Manager</title>
 
     <link rel="icon" href="../admin/images/favicon.ico" type="image/x-icon"/>
     <link rel="shortcut icon" href="../admin/images/favicon.ico" type="image/x-icon"/>
@@ -116,7 +116,7 @@
                 <div class="action-container">
                     <button id="" type="button"
                             onclick="location.href = 'template_configurations_ajaxprocessor.jsp?ordinal=1&domainName=<%=request.getParameter("domainName")%>';"
-                            class="btn btn-default btn-add col-md-2 col-xs-12 pull-left">Add Configuration
+                            class="btn btn-default btn-add col-md-2 col-xs-12 pull-left">Create New Scenario
                     </button>
                 </div>
                 <br class="c-both"/>
@@ -149,13 +149,13 @@
                         </td>
                         <td><%=scenarioConfigurationDTO.getDescription()%>
                         </td>
-                        <td><%=scenarioConfigurationDTO.getScenario()%>
+                        <td><%=scenarioConfigurationDTO.getType()%>
                         <td class="tcenter">
                             <a onclick="deleteConfiguration('<%=scenarioConfigurationDTO.getDomain()%>','<%=scenarioConfigurationDTO.getName()%>',this, 'tblConfigs')">
                                 <i class="glyphicon glyphicon-remove"></i>
                                 <fmt:message key='common.button.delete'/></a></td>
                         <td class="tcenter">
-                            <a href="template_configurations_ajaxprocessor.jsp?configurationName=<%=scenarioConfigurationDTO.getName()%>&domainName=<%=scenarioConfigurationDTO.getDomain()%>&templateType=<%=scenarioConfigurationDTO.getScenario()%>">
+                            <a href="template_configurations_ajaxprocessor.jsp?configurationName=<%=scenarioConfigurationDTO.getName()%>&domainName=<%=scenarioConfigurationDTO.getDomain()%>&templateType=<%=scenarioConfigurationDTO.getType()%>">
                                 <i class="glyphicon glyphicon-cog"></i>
                                 <fmt:message key='common.button.edit'/></a></td>
                     </tr>

@@ -18,7 +18,7 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.ui.ExecutionManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ExecutionManagerTemplateInfoDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.DomainInfoDTO" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.execution.manager.ui.i18n.Resources">
 
@@ -26,7 +26,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>CEP - Execution Manager</title>
+        <title>CEP - Template Manager</title>
 
         <link rel="icon" href="../admin/images/favicon.ico" type="image/x-icon"/>
         <link rel="shortcut icon" href="../admin/images/favicon.ico" type="image/x-icon"/>
@@ -90,17 +90,19 @@
             </div>
 
             <div class="row">
-            <%
-                ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
-                try {
-                    ExecutionManagerTemplateInfoDTO[] domainDTOs = proxy.getAllExecutionManagerTemplateInfos();
+                <%
+                    ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
+                    try {
+                        DomainInfoDTO[] domainDTOs = proxy.getAllDomainInfos();
 
-                    if (domainDTOs != null && domainDTOs.length > 0) {
-
-                        for (ExecutionManagerTemplateInfoDTO domainDTO : domainDTOs) {
-            %>
-
-
+                        if (domainDTOs != null && domainDTOs.length > 0) {
+                %>
+                <div class="container col-md-12">
+                    <div class="wr-head"><h3>Select a Domain to proceed</h3></div>
+                </div>
+                <%
+                    for (DomainInfoDTO domainDTO : domainDTOs) {
+                %>
 
                 <div class="col-sm-6">
                     <a href="domain_configurations_ajaxprocessor.jsp?ordinal=1&domainName=<%=domainDTO.getDomain()%>">

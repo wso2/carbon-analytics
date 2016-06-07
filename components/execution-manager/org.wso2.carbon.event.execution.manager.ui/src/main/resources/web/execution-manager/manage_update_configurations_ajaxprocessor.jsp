@@ -2,7 +2,7 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.ui.ExecutionManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ScenarioConfigurationDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTOE" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.StreamMappingDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.AttributeMappingDTO" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamAttributeDto" %>
@@ -45,7 +45,7 @@
         String templateType = request.getParameter("templateType");
         String valueSeparator = "::";
 
-        ParameterDTOE[] parameters;
+        ParameterDTO[] parameters;
 
         ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
         try {
@@ -58,18 +58,18 @@
                 scenarioConfigurationDTO.setName(configuration);
                 scenarioConfigurationDTO.setDomain(domainName);
                 scenarioConfigurationDTO.setDescription(description);
-                scenarioConfigurationDTO.setScenario(templateType);
+                scenarioConfigurationDTO.setType(templateType);
 
                 if (parametersJson.length() < 1) {
-                    parameters = new ParameterDTOE[0];
+                    parameters = new ParameterDTO[0];
 
                 } else {
                     String[] parameterStrings = parametersJson.split(",");
-                    parameters = new ParameterDTOE[parameterStrings.length];
+                    parameters = new ParameterDTO[parameterStrings.length];
                     int index = 0;
 
                     for (String parameterString : parameterStrings) {
-                        ParameterDTOE parameterDTO = new ParameterDTOE();
+                        ParameterDTO parameterDTO = new ParameterDTO();
                         parameterDTO.setName(parameterString.split(valueSeparator)[0]);
                         parameterDTO.setValue(parameterString.split(valueSeparator)[1]);
                         parameters[index] = parameterDTO;
@@ -99,24 +99,15 @@
                         response.sendError(500);
                         return;
                     }
+
+                    for (int i = 0; i < toStreamIDArray.length; i++) {
+                        toStreamNameID = streamMappingDTOs[i].getToStream();
+                        fromStreamNameID = streamMappingDTOs[i].getFromStream();
+                        AttributeMappingDTO[] attributeMappingDTOs = streamMappingDTOs[i].getAttributeMappingDTOs();
     %>
-    <div class="container col-md-12 marg-top-20" id="streamMappingInnerDivID">
-        <%
-            for (int i = 0; i < toStreamIDArray.length; i++) {
-                toStreamNameID = streamMappingDTOs[i].getToStream();
-                fromStreamNameID = streamMappingDTOs[i].getFromStream();
-                AttributeMappingDTO[] attributeMappingDTOs = streamMappingDTOs[i].getAttributeMappingDTOs();
-        %>
         <div class="container col-md-12 marg-top-20" id="streamMappingConfigurationID_<%=i%>">
 
             <h4><fmt:message key='template.stream.header.text'/></h4>
-
-            <label class="input-label col-md-5"><fmt:message key='template.label.to.stream.name'/></label>
-
-            <div class="input-control input-full-width col-md-7 text">
-                <input type="text" id="toStreamID_<%=i%>"
-                       value="<%=toStreamNameID%>" readonly="true"/>
-            </div>
 
             <label class="input-label col-md-5"><fmt:message key='template.label.from.stream.name'/></label>
 
@@ -128,14 +119,23 @@
                         if (fromStreamIds != null) {
                             Arrays.sort(fromStreamIds);
                             for (String aStreamId : fromStreamIds) {
+                                if(!fromStreamNameID.equals(aStreamId)){
                     %>
                     <option id="fromStreamOptionID"><%=aStreamId%>
                     </option>
                     <%
+                                }
                             }
                         }
                     %>
                 </select>
+            </div>
+
+            <label class="input-label col-md-5"><fmt:message key='template.label.to.stream.name'/></label>
+
+            <div class="input-control input-full-width col-md-7 text">
+                <input type="text" id="toStreamID_<%=i%>"
+                       value="<%=toStreamNameID%>" readonly="true"/>
             </div>
 
                 <%-- add attribute mapping --%>
@@ -422,7 +422,6 @@
                 <fmt:message key='template.add.stream.button.text'/>
             </button>
         </div>
-    </div>
     <%
     } else {
     %>

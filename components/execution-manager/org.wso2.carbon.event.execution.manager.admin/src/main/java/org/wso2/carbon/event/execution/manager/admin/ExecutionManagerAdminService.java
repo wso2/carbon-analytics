@@ -21,12 +21,12 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.event.execution.manager.admin.dto.configuration.ScenarioConfigurationDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.configuration.ScenarioConfigurationInfoDTO;
-import org.wso2.carbon.event.execution.manager.admin.dto.domain.ExecutionManagerTemplateInfoDTO;
+import org.wso2.carbon.event.execution.manager.admin.dto.domain.DomainInfoDTO;
 import org.wso2.carbon.event.execution.manager.admin.internal.ds.ExecutionManagerAdminServiceValueHolder;
 import org.wso2.carbon.event.execution.manager.admin.internal.util.ConfigurationMapper;
 import org.wso2.carbon.event.execution.manager.admin.internal.util.DomainMapper;
 import org.wso2.carbon.event.execution.manager.core.exception.ExecutionManagerException;
-import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.Domain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,14 +47,14 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
 
 
     /**
-     * Return "limited information" with regards to an Execution Manager Template, given  its domain name.
+     * Return "limited information" with regards to a Domain Template, given  its name.
      * "limited information" means, only the information which are required by the UI will be returned.
      *
-     * @param domainName domain name of the ExecutionManagerTemplate.
-     * @return ExecutionManagerTemplateInfoDTO object
+     * @param domainName name of the Domain.
+     * @return DomainInfoDTO object
      * @throws AxisFault
      */
-    public ExecutionManagerTemplateInfoDTO getExecutionManagerTemplateInfo(String domainName) throws AxisFault {
+    public DomainInfoDTO getDomainInfo(String domainName) throws AxisFault {
         try {
             return DomainMapper.mapExecutionManagerTemplate(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
                                                                     .getDomain(domainName));
@@ -65,16 +65,16 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     }
 
     /**
-     * Return "limited information" with regards to all available ExecutionManagerTemplates.
+     * Return "limited information" with regards to all available Domain Templates.
      * "limited information" means, only the information which are required by the UI will be returned.
      *
-     * @return ExecutionManagerTemplate information for all of the available ExecutionManagerTemplates
+     * @return Domain information for all of the available Domain Templates
      * @throws org.apache.axis2.AxisFault
      */
-    public ExecutionManagerTemplateInfoDTO[] getAllExecutionManagerTemplateInfos() throws AxisFault {
+    public DomainInfoDTO[] getAllDomainInfos() throws AxisFault {
         try {
             return DomainMapper.mapExecutionManagerTemplates(new ArrayList
-                    <ExecutionManagerTemplate>(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService().getAllDomains()));
+                    <Domain>(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService().getAllDomains()));
         } catch (Throwable e) {
             log.error("Error occurred when getting all domains ", e);
             throw new AxisFault(e.getMessage(), e);
@@ -85,7 +85,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     /**
      * return details for a given template configuration name
      *
-     * @param domainName domain name of the ExecutionManagerTemplate, corresponding to the configuration
+     * @param domainName domain name of the Domain, corresponding to the configuration
      * @param configName scenario configuration name
      * @return scenario configuration details
      * @throws AxisFault
@@ -102,10 +102,10 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
 
 
     /**
-     * return all of the available Scenario Configuration Info's for a given ExecutionManagerTemplate domain.
+     * return all of the available Scenario Configuration Info's for a given Domain domain.
      * This method does not return all the fields in a Scenario Configurations, rather returns only the fields which are required for the UI.
      *
-     * @param domainName domain name of the ExecutionManagerTemplate
+     * @param domainName domain name of the Domain
      * @return scenario configuration information.
      * @throws AxisFault
      */
@@ -124,7 +124,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     /**
      * Delete specified scenario configuration
      *
-     * @param domainName domain name of the ExecutionManagerTemplate
+     * @param domainName domain name of the Domain
      * @param configName name of the scenario configuration which needs to be deleted
      */
     public boolean deleteConfiguration(String domainName, String configName) throws AxisFault {
@@ -142,7 +142,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      * Create or update specified scenario configuration.
      *
      * @param configuration scenario configuration data transfer object which needs to be saved.
-     * @return  Stream ID array. In case there are StreamMappings in the ExecutionManagerTemplate (under this particular scenario),
+     * @return  Stream ID array. In case there are StreamMappings in the Domain (under this particular scenario),
      * then the "toStream" IDs will be returned. If no StreamMappings present, null will be returned.
      * @throws AxisFault
      */
@@ -170,7 +170,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      *
      * @param streamMappingDTOs  Each StreamMappingDTO maps a user-defined stream to a stream defined in the template.
      * @param configName ScenarioConfiguration name
-     * @param domainName domain name of the ExecutionManagerTemplate.
+     * @param domainName domain name of the Domain.
      * @return true on successful operation completion.
      * @throws AxisFault
      */

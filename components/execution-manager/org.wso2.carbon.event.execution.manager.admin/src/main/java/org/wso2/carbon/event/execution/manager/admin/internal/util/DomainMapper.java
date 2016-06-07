@@ -15,10 +15,10 @@
  */
 package org.wso2.carbon.event.execution.manager.admin.internal.util;
 
-import org.wso2.carbon.event.execution.manager.admin.dto.domain.ExecutionManagerTemplateInfoDTO;
+import org.wso2.carbon.event.execution.manager.admin.dto.domain.DomainInfoDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.domain.ParameterDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.domain.ScenarioInfoDTO;
-import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.Domain;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Parameter;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
 
@@ -37,44 +37,44 @@ public class DomainMapper {
 
 
     /**
-     * Maps given ExecutionManagerTemplate object to ExecutionManagerTemplateInfoDTO object
+     * Maps given Domain object to DomainInfoDTO object
      *
-     * @param executionManagerTemplate ExecutionManagerTemplate object needs to be mapped
-     * @return Mapped ExecutionManagerTemplateInfoDTO object
+     * @param domain Domain object needs to be mapped
+     * @return Mapped DomainInfoDTO object
      */
-    public static ExecutionManagerTemplateInfoDTO mapExecutionManagerTemplate(
-            ExecutionManagerTemplate executionManagerTemplate) {
-        ExecutionManagerTemplateInfoDTO executionManagerTemplateInfoDTO = null;
+    public static DomainInfoDTO mapExecutionManagerTemplate(
+            Domain domain) {
+        DomainInfoDTO domainInfoDTO = null;
 
-        if (executionManagerTemplate != null) {
-            executionManagerTemplateInfoDTO = new ExecutionManagerTemplateInfoDTO();
-            executionManagerTemplateInfoDTO.setDomain(executionManagerTemplate.getDomain());
-            executionManagerTemplateInfoDTO.setDescription(executionManagerTemplate.getDescription());
-            executionManagerTemplateInfoDTO.setScenarioInfoDTOs(mapScenarios(executionManagerTemplate.getScenarios().getScenario()));
+        if (domain != null) {
+            domainInfoDTO = new DomainInfoDTO();
+            domainInfoDTO.setDomain(domain.getName());
+            domainInfoDTO.setDescription(domain.getDescription());
+            domainInfoDTO.setScenarioInfoDTOs(mapScenarios(domain.getScenarios().getScenario()));
         }
 
-        return executionManagerTemplateInfoDTO;
+        return domainInfoDTO;
     }
 
 
     /**
-     * Maps given list of ExecutionManagerTemplate objects to array of ExecutionManagerTemplateInfoDTO objects
+     * Maps given list of Domain objects to array of DomainInfoDTO objects
      *
-     * @param executionManagerTemplates List of ExecutionManagerTemplate objects needs to be mapped
-     * @return Mapped array of ExecutionManagerTemplateInfoDTO objects
+     * @param domains List of Domain objects needs to be mapped
+     * @return Mapped array of DomainInfoDTO objects
      */
-    public static ExecutionManagerTemplateInfoDTO[] mapExecutionManagerTemplates(
-            List<ExecutionManagerTemplate> executionManagerTemplates) {
-        ExecutionManagerTemplateInfoDTO[] executionManagerTemplateInfoDTO = null;
+    public static DomainInfoDTO[] mapExecutionManagerTemplates(
+            List<Domain> domains) {
+        DomainInfoDTO[] domainInfoDTO = null;
 
-        if (executionManagerTemplates != null) {
-            executionManagerTemplateInfoDTO = new ExecutionManagerTemplateInfoDTO[executionManagerTemplates.size()];
+        if (domains != null) {
+            domainInfoDTO = new DomainInfoDTO[domains.size()];
 
-            for (int i = 0; i < executionManagerTemplateInfoDTO.length; i++) {
-                executionManagerTemplateInfoDTO[i] = mapExecutionManagerTemplate(executionManagerTemplates.get(i));
+            for (int i = 0; i < domainInfoDTO.length; i++) {
+                domainInfoDTO[i] = mapExecutionManagerTemplate(domains.get(i));
             }
         }
-        return executionManagerTemplateInfoDTO;
+        return domainInfoDTO;
     }
 
 
@@ -83,7 +83,7 @@ public class DomainMapper {
         int i = 0;
         for (Scenario scenario : scenarios) {
             ScenarioInfoDTO scenarioInfoDTO = new ScenarioInfoDTO();
-            scenarioInfoDTO.setName(scenario.getName());
+            scenarioInfoDTO.setType(scenario.getType());
             scenarioInfoDTO.setDescription(scenario.getDescription());
             scenarioInfoDTO.setParameterDTOs(mapParameters(scenario.getParameters().getParameter()));
             scenarioInfoDTOs[i] = scenarioInfoDTO;
