@@ -97,7 +97,7 @@
 
         <div class="input-control input-full-width col-md-7 text">
             <select id="fromStreamID_<%=i%>" onchange="loadMappingFromStreamAttributes(<%=i%>)">
-                <option selected disabled>Select an Input Stream to Map</option>
+                <option selected disabled>Select an input stream to map</option>
                 <%
                     if (fromStreamIds != null) {
                         Arrays.sort(fromStreamIds);

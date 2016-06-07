@@ -87,23 +87,22 @@
                 <div class="container col-md-12">
                     <div class="wr-head"><h2>Domains</h2></div>
                 </div>
-                <div class="container col-md-12">
-                    <div class="wr-head"><h3>Select a Domain to proceed</h3></div>
-                </div>
             </div>
 
             <div class="row">
-            <%
-                ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
-                try {
-                    DomainInfoDTO[] domainDTOs = proxy.getAllDomainInfos();
+                <%
+                    ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
+                    try {
+                        DomainInfoDTO[] domainDTOs = proxy.getAllDomainInfos();
 
-                    if (domainDTOs != null && domainDTOs.length > 0) {
-
-                        for (DomainInfoDTO domainDTO : domainDTOs) {
-            %>
-
-
+                        if (domainDTOs != null && domainDTOs.length > 0) {
+                %>
+                <div class="container col-md-12">
+                    <div class="wr-head"><h3>Select a Domain to proceed</h3></div>
+                </div>
+                <%
+                    for (DomainInfoDTO domainDTO : domainDTOs) {
+                %>
 
                 <div class="col-sm-6">
                     <a href="domain_configurations_ajaxprocessor.jsp?ordinal=1&domainName=<%=domainDTO.getDomain()%>">

@@ -109,13 +109,6 @@
 
             <h4><fmt:message key='template.stream.header.text'/></h4>
 
-            <label class="input-label col-md-5"><fmt:message key='template.label.to.stream.name'/></label>
-
-            <div class="input-control input-full-width col-md-7 text">
-                <input type="text" id="toStreamID_<%=i%>"
-                       value="<%=toStreamNameID%>" readonly="true"/>
-            </div>
-
             <label class="input-label col-md-5"><fmt:message key='template.label.from.stream.name'/></label>
 
             <div class="input-control input-full-width col-md-7 text">
@@ -126,14 +119,23 @@
                         if (fromStreamIds != null) {
                             Arrays.sort(fromStreamIds);
                             for (String aStreamId : fromStreamIds) {
+                                if(!fromStreamNameID.equals(aStreamId)){
                     %>
                     <option id="fromStreamOptionID"><%=aStreamId%>
                     </option>
                     <%
+                                }
                             }
                         }
                     %>
                 </select>
+            </div>
+
+            <label class="input-label col-md-5"><fmt:message key='template.label.to.stream.name'/></label>
+
+            <div class="input-control input-full-width col-md-7 text">
+                <input type="text" id="toStreamID_<%=i%>"
+                       value="<%=toStreamNameID%>" readonly="true"/>
             </div>
 
                 <%-- add attribute mapping --%>
