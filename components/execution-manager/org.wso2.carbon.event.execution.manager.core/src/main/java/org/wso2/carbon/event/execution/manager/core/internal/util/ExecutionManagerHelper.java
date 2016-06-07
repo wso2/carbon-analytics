@@ -35,6 +35,7 @@ import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.core.Registry;
+import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 
 import javax.xml.bind.JAXBContext;
@@ -179,12 +180,11 @@ public class ExecutionManagerHelper {
      */
     public static void deployArtifacts(ScenarioConfiguration configuration,
                                        Domain domain)
-            throws ExecutionManagerException {
+            throws TemplateDeploymentException {
         //make sure common artifacts are deployed
         if (domain.getCommonArtifacts() != null) {
             Map<String,Integer> artifactTypeCountingMap = new HashMap<>();
             for (Artifact artifact : domain.getCommonArtifacts().getArtifact()) {
-                try {
                     String artifactType = artifact.getType();
                     Integer artifactCount = artifactTypeCountingMap.get(artifactType);
                     if (artifactCount == null) {
@@ -203,11 +203,8 @@ public class ExecutionManagerHelper {
                         deployer.deployIfNotDoneAlready(deployableTemplate);
                         artifactTypeCountingMap.put(artifactType, artifactCount);
                     } else {
-                        throw new ExecutionManagerException("A deployer doesn't exist for template type " + artifact.getType());
+                        throw new TemplateDeploymentException("A deployer doesn't exist for template type " + artifact.getType());
                     }
-                } catch (TemplateDeploymentException e) {
-                    throw new ExecutionManagerException("Error when trying to deploy the artifact " + configuration.getName(), e);
-                }
             }
         }
         //now, deploy templated artifacts
@@ -226,7 +223,6 @@ public class ExecutionManagerHelper {
                                                                                       scenario.getType(), configuration.getName(), artifactType, artifactCount);
                     TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(template.getType());
                     if (deployer != null) {
-                        try {
                             DeployableTemplate deployableTemplate = new DeployableTemplate();
                             String updatedScript = updateArtifactParameters(configuration, template.getValue());
                             deployableTemplate.setArtifact(updatedScript);
@@ -234,12 +230,8 @@ public class ExecutionManagerHelper {
                             deployableTemplate.setArtifactId(artifactId);
                             deployer.deployArtifact(deployableTemplate);
                             artifactTypeCountingMap.put(artifactType, artifactCount);
-                        } catch (TemplateDeploymentException e) {
-                            throw new ExecutionManagerException("Error when trying to deploy the artifact of type: "
-                                                                + template.getType() + ", for configuration:" + configuration.getName() ,e);
-                        }
                     } else {
-                        throw new ExecutionManagerException("A deployer doesn't exist for template type " + template.getType());
+                        throw new TemplateDeploymentException("A deployer doesn't exist for template type " + template.getType());
                     }
                 }
                 break;
@@ -417,13 +409,35 @@ public class ExecutionManagerHelper {
             }
             resource.setMediaType("application/xml");
             registry.put(resourcePath, resource);
-        } catch (RegistryException e) {
-            throw new ExecutionManagerException("Registry exception occurred when creating " + configuration.getName()
-                                                + " configurations", e);
-
         } catch (JAXBException e) {
-            throw new ExecutionManagerException("JAXB Exception when marshalling file at " + configuration.getName()
-                                                + " configurations", e);
+            throw new ExecutionManagerException("Could not marshall Scenario: " + configuration.getName() + ", for Domain: "
+                                                + configuration.getDomain() + ". Could not save to registry.", e);
+        } catch (RegistryException e) {
+            throw new ExecutionManagerException("Could not save Scenario: " + configuration.getName() + ", for Domain: "
+                                                + configuration.getDomain() + ", to the registry.", e);
+        }
+    }
+
+
+    /**
+     * Deletes a scenario config from the registry. This does not undeploy any artifact.
+     * If some error occurred in the deployment process, this can be used for "rolling back" the config saved in the registry.
+     *
+     * @param domainName domain name
+     * @param configName config name
+     * @throws RegistryException
+     */
+    public static void deleteConfigWithoutUndeploy(String domainName, String configName)
+            throws ExecutionManagerException {
+        try {
+        Registry registry = ExecutionManagerValueHolder.getRegistryService()
+                .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+
+        registry.delete(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH + RegistryConstants.PATH_SEPARATOR
+                        + domainName + RegistryConstants.PATH_SEPARATOR + configName + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
+        } catch (RegistryException e) {
+            throw new ExecutionManagerException("Failed to delete scenario from the registry. Scenario name: " + configName
+                                                + ", Domain name: " + domainName, e);
         }
     }
 

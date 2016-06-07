@@ -19,6 +19,7 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.DomainInfoDTO" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.execution.manager.ui.i18n.Resources">
 
@@ -110,7 +111,7 @@
                             <h3 class="title"><%=domainDTO.getDomain()%>
                             </h3>
 
-                            <p><%=domainDTO.getDescription()%>
+                            <p><%=Encode.forHtmlContent(domainDTO.getDescription())%>
                             </p>
                             <!--   <div class="edit-domain tright"><i class="glyphicon glyphicon-cog"></i> Edit</div>-->
                         </div>

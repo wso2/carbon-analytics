@@ -23,6 +23,7 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.DomainInfoDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTO" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.execution.manager.ui.i18n.Resources">
 <!doctype html>
@@ -186,7 +187,7 @@
                     <%}%>
                 </select>
 
-                <div class="sectionHelp"><%=currentScenario.getDescription()%>
+                <div class="sectionHelp"><%=Encode.forHtmlContent(currentScenario.getDescription())%>
                 </div>
             </div>
 
@@ -222,7 +223,7 @@
 
             <div class="input-control input-full-width col-md-7 text">
                 <input type="text" id="txtDescription"
-                       value="<%=description%>"/>
+                       value="<%=Encode.forHtmlAttribute(description)%>"/>
             </div>
 
             <br class="c-both"/>
@@ -295,7 +296,7 @@
 
                     if (!parameter.getDescription().equals("")) {
                 %>
-                <div class="sectionHelp"><%=parameter.getDescription()%>
+                <div class="sectionHelp"><%=Encode.forHtmlContent(parameter.getDescription())%>
                 </div>
                 <%}%>
             </div>
