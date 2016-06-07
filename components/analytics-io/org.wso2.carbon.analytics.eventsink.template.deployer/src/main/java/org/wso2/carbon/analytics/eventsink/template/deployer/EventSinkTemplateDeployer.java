@@ -87,11 +87,7 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
 
             streamName = EventSinkTemplateDeployerHelper.getEventStreamName(analyticsEventStore, template);
 
-            AnalyticsEventStore existingEventStore = EventSinkTemplateDeployerHelper.getExistingEventStore(tenantId, streamName);
-
-            analyticsEventStore = EventSinkTemplateDeployerHelper.mergeWithExistingEventStore(existingEventStore, analyticsEventStore);
-
-            EventSinkTemplateDeployerValueHolder.getAnalyticsEventSinkService().putEventStore(tenantId, analyticsEventStore);
+            EventSinkTemplateDeployerValueHolder.getAnalyticsEventSinkService().putEventStoreWithSchemaMerge(tenantId, analyticsEventStore);
 
             EventSinkTemplateDeployerHelper.updateRegistryMaps(registry, infoCollection, artifactId, streamName);
 
