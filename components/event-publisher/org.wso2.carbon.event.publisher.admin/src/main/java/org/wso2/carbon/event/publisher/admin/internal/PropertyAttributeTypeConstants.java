@@ -45,5 +45,5 @@ public final class PropertyAttributeTypeConstants {
     public static final String PROPERTY_META_PREFIX = "meta_";
     public static final String PROPERTY_CORRELATION_PREFIX = "correlation_";
 
-
+    public static final String ARBITRARY_MAP_PREFIX = "arbitrary_";
 }

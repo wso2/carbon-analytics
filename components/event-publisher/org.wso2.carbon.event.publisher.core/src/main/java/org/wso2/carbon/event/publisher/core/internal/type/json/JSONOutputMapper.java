@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.event.publisher.core.internal.type.json;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
@@ -42,6 +44,7 @@ public class JSONOutputMapper implements OutputMapper {
     private final StreamDefinition streamDefinition;
     private boolean isCustomRegistryPath;
     private final RuntimeResourceLoader runtimeResourceLoader;
+    private final boolean isCustomMappingEnabled;
 
     public JSONOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                             Map<String, Integer> propertyPositionMap, int tenantId,
@@ -53,9 +56,10 @@ public class JSONOutputMapper implements OutputMapper {
 
         JSONOutputMapping outputMapping = (JSONOutputMapping) eventPublisherConfiguration.getOutputMapping();
         this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration(), propertyPositionMap);
+        this.isCustomMappingEnabled = outputMapping.isCustomMappingEnabled();
 
         String mappingText;
-        if (outputMapping.isCustomMappingEnabled()) {
+        if (this.isCustomMappingEnabled) {
             mappingText = getCustomMappingText();
             EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap);
         } else {
@@ -106,7 +110,7 @@ public class JSONOutputMapper implements OutputMapper {
                     if (i % 2 == 0) {
                         pathBuilder.append(pathMappingTextList.get(i));
                     } else {
-                        pathBuilder.append(getPropertyValue(event.getData(), pathMappingTextList.get(i)));
+                        pathBuilder.append(getPropertyValue(event, pathMappingTextList.get(i)));
                     }
                 }
                 path = pathBuilder.toString();
@@ -121,7 +125,7 @@ public class JSONOutputMapper implements OutputMapper {
             if (i % 2 == 0) {
                 eventText.append(mappingTextList.get(i));
             } else {
-                Object propertyValue = getPropertyValue(event.getData(), mappingTextList.get(i));
+                Object propertyValue = getPropertyValue(event, mappingTextList.get(i));
                 if (propertyValue != null && propertyValue instanceof String) {
                     eventText.append(EventPublisherConstants.DOUBLE_QUOTE)
                             .append(propertyValue)
@@ -132,7 +136,19 @@ public class JSONOutputMapper implements OutputMapper {
             }
         }
 
-        return eventText.toString();
+        String text = eventText.toString();
+        if (!this.isCustomMappingEnabled) {
+            Map<String, Object> arbitraryDataMap = event.getArbitraryDataMap();
+            if (arbitraryDataMap != null && !arbitraryDataMap.isEmpty()) {
+                Gson gson = new Gson();
+                JsonParser parser = new JsonParser();
+                JsonObject jsonObject = parser.parse(text).getAsJsonObject();
+                jsonObject.getAsJsonObject(EventPublisherConstants.EVENT_PARENT_TAG).add(EventPublisherConstants.EVENT_ARBITRARY_DATA_MAP_TAG, gson.toJsonTree(arbitraryDataMap));
+                text = gson.toJson(jsonObject);
+            }
+        }
+
+        return text;
     }
 
     @Override
@@ -157,12 +173,18 @@ public class JSONOutputMapper implements OutputMapper {
         return actualMappingText;
     }
 
-    private Object getPropertyValue(Object[] eventData, String mappingProperty) {
-        if (eventData.length != 0) {
-            int position = propertyPositionMap.get(mappingProperty);
-            return eventData[position];
+    private Object getPropertyValue(Event event, String mappingProperty) {
+        Object[] eventData = event.getData();
+        Map<String, Object> arbitraryMap = event.getArbitraryDataMap();
+        Integer position = propertyPositionMap.get(mappingProperty);
+        Object data = null;
+
+        if (position != null && eventData.length != 0) {
+            data = eventData[position];
+        } else if (mappingProperty != null && arbitraryMap != null && mappingProperty.startsWith(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX)) {
+            data = arbitraryMap.get(mappingProperty.replaceFirst(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX, ""));
         }
-        return null;
+        return data;
     }
 
     private String generateJsonEventTemplate(StreamDefinition streamDefinition) {

@@ -37,6 +37,7 @@ public class TextOutputMapper implements OutputMapper {
     private final StreamDefinition streamDefinition;
     private boolean isCustomRegistryPath;
     private final RuntimeResourceLoader runtimeResourceLoader;
+    private final boolean isCustomMappingEnabled;
 
     public TextOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                             Map<String, Integer> propertyPositionMap, int tenantId,
@@ -48,9 +49,10 @@ public class TextOutputMapper implements OutputMapper {
 
         TextOutputMapping outputMapping = ((TextOutputMapping) eventPublisherConfiguration.getOutputMapping());
         this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration(), propertyPositionMap);
+        this.isCustomMappingEnabled = outputMapping.isCustomMappingEnabled();
 
         String mappingText;
-        if (eventPublisherConfiguration.getOutputMapping().isCustomMappingEnabled()) {
+        if (this.isCustomMappingEnabled) {
             mappingText = outputMapping.getMappingText();
             if (outputMapping.isRegistryResource()) {
                 this.isCustomRegistryPath = mappingText.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && mappingText.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0;
@@ -113,7 +115,7 @@ public class TextOutputMapper implements OutputMapper {
                     if (i % 2 == 0) {
                         pathBuilder.append(pathMappingTextList.get(i));
                     } else {
-                        pathBuilder.append(getPropertyValue(event.getData(), pathMappingTextList.get(i)));
+                        pathBuilder.append(getPropertyValue(event, pathMappingTextList.get(i)));
                     }
                 }
                 path = pathBuilder.toString();
@@ -128,7 +130,19 @@ public class TextOutputMapper implements OutputMapper {
             if (i % 2 == 0) {
                 eventText.append(mappingTextList.get(i));
             } else {
-                eventText.append(getPropertyValue(event.getData(), mappingTextList.get(i)));
+                eventText.append(getPropertyValue(event, mappingTextList.get(i)));
+            }
+        }
+
+        if (!this.isCustomMappingEnabled) {
+            Map<String, Object> arbitraryDataMap = event.getArbitraryDataMap();
+            if (arbitraryDataMap != null && !arbitraryDataMap.isEmpty()) {
+                // Add arbitrary data map to the default template
+                eventText.append(EventPublisherConstants.EVENT_ATTRIBUTE_SEPARATOR);
+                for (Map.Entry<String, Object> entry : arbitraryDataMap.entrySet()) {
+                    eventText.append("\n" + EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX + entry.getKey() + EventPublisherConstants.EVENT_ATTRIBUTE_VALUE_SEPARATOR + entry.getValue() + EventPublisherConstants.EVENT_ATTRIBUTE_SEPARATOR);
+                }
+                eventText.deleteCharAt(eventText.lastIndexOf(EventPublisherConstants.EVENT_ATTRIBUTE_SEPARATOR));
             }
         }
         return eventText.toString();
@@ -141,13 +155,19 @@ public class TextOutputMapper implements OutputMapper {
     }
 
 
-    private String getPropertyValue(Object[] eventData, String mappingProperty) {
-        if (eventData.length != 0) {
-            int position = propertyPositionMap.get(mappingProperty);
-            Object data = eventData[position];
-            if (data != null) {
-                return data.toString();
-            }
+    private String getPropertyValue(Event event, String mappingProperty) {
+        Object[] eventData = event.getData();
+        Map<String, Object> arbitraryMap = event.getArbitraryDataMap();
+        Integer position = propertyPositionMap.get(mappingProperty);
+        Object data = null;
+
+        if (position != null && eventData.length != 0) {
+            data = eventData[position];
+        } else if (mappingProperty != null && arbitraryMap != null && mappingProperty.startsWith(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX)) {
+            data = arbitraryMap.get(mappingProperty.replaceFirst(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX, ""));
+        }
+        if (data != null) {
+            return data.toString();
         }
         return "";
     }

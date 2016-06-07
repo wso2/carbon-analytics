@@ -886,7 +886,11 @@ public class EventPublisherAdminService extends AbstractAdmin {
 
         mappingTextList.clear();
         while (text.contains("{{") && text.indexOf("}}") > 0) {
-            mappingTextList.add(text.substring(text.indexOf("{{") + 2, text.indexOf("}}")));
+            String property = text.substring(text.indexOf("{{") + 2, text.indexOf("}}"));
+            if(property != null && !property.startsWith(PropertyAttributeTypeConstants.ARBITRARY_MAP_PREFIX)) {
+                // Do not consider arbitrary map properties for validation
+                mappingTextList.add(property);
+            }
             text = text.substring(text.indexOf("}}") + 2);
         }
         return mappingTextList;

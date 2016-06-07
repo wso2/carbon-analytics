@@ -65,8 +65,9 @@ public class MapOutputMapper implements OutputMapper {
         Iterator<EventOutputProperty> outputPropertyConfigurationIterator = outputPropertyConfiguration.iterator();
         for (; outputPropertyConfigurationIterator.hasNext(); ) {
             EventOutputProperty outputProperty = outputPropertyConfigurationIterator.next();
-            if (!propertyPositionMap.containsKey(outputProperty.getValueOf())) {
-                throw new EventPublisherStreamValidationException("Property " + outputProperty.getValueOf() + " is not in the input stream definition. ", streamDefinition.getStreamId());
+            String valueOf = outputProperty.getValueOf();
+            if (!propertyPositionMap.containsKey(valueOf) && (valueOf == null || !valueOf.startsWith(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX))) {
+                throw new EventPublisherStreamValidationException("Property " + valueOf + " is not in the input stream definition. ", streamDefinition.getStreamId());
             }
         }
     }
@@ -76,14 +77,20 @@ public class MapOutputMapper implements OutputMapper {
             throws EventPublisherConfigurationException {
         Map<Object, Object> eventMapObject = new TreeMap<Object, Object>();
         Object[] eventData = event.getData();
+        Map<String, Object> arbitraryDataMap = event.getArbitraryDataMap();
 
         MapOutputMapping mapOutputMapping = (MapOutputMapping) eventPublisherConfiguration.getOutputMapping();
         List<EventOutputProperty> outputPropertyConfiguration = mapOutputMapping.getOutputPropertyConfiguration();
 
         if (outputPropertyConfiguration.size() != 0 && eventData.length > 0) {
             for (EventOutputProperty eventOutputProperty : outputPropertyConfiguration) {
-                int position = propertyPositionMap.get(eventOutputProperty.getValueOf());
-                eventMapObject.put(eventOutputProperty.getName(), eventData[position]);
+                String valueOf = eventOutputProperty.getValueOf();
+                Integer position = propertyPositionMap.get(valueOf);
+                if(position != null) {
+                    eventMapObject.put(eventOutputProperty.getName(), eventData[position]);
+                } else if (valueOf != null && arbitraryDataMap != null && valueOf.startsWith(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX)) {
+                    eventMapObject.put(eventOutputProperty.getName(), arbitraryDataMap.get(valueOf.replaceFirst(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX, "")));
+                }
             }
         }
         return eventMapObject;
@@ -113,6 +120,13 @@ public class MapOutputMapper implements OutputMapper {
             for (Attribute payloadData : streamDefinition.getPayloadData()) {
                 eventMapObject.put(payloadData.getName(), eventData[counter]);
                 counter++;
+            }
+        }
+
+        Map<String, Object> arbitraryDataMap = event.getArbitraryDataMap();
+        if(arbitraryDataMap != null) {
+            for (Map.Entry<String, Object> entry : arbitraryDataMap.entrySet()) {
+                eventMapObject.put(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX + entry.getKey(), entry.getValue());
             }
         }
 
