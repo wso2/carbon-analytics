@@ -480,11 +480,11 @@ public class AnalyticsAPIHttpClient {
             HttpResponse httpResponse = httpClient.execute(deleteMethod);
             if (httpResponse.getStatusLine().getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
                 String response = getResponseString(httpResponse);
-                throw new AnalyticsServiceUnauthorizedException("Unable to create the table - " + tableName +
+                throw new AnalyticsServiceUnauthorizedException("Unable to delete the table - " + tableName +
                         " for tenant id : " + tenantId + ". " + response);
             } else if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
-                throw new AnalyticsServiceException("Unable to create the table - " + tableName + " for tenant id : " + tenantId + ". " + response);
+                throw new AnalyticsServiceException("Unable to delete the table - " + tableName + " for tenant id : " + tenantId + ". " + response);
             } else {
                 EntityUtils.consume(httpResponse.getEntity());
             }

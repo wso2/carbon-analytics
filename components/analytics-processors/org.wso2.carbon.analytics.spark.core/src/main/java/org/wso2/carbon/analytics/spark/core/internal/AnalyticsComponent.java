@@ -26,6 +26,7 @@ import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.CarbonAnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.SparkScriptCAppDeployer;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
+import org.wso2.carbon.analytics.spark.core.internal.jmx.AnalyticsScriptLastExecutionStartTime;
 import org.wso2.carbon.analytics.spark.core.internal.jmx.IncrementalLastProcessedTimestamp;
 import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
@@ -98,12 +99,18 @@ public class AnalyticsComponent {
             log.error("Error in registering the analytics processor service! ", ex);
         }
         try {
-            String objectName = "org.wso2.carbon:00=analytics,01=LAST_PROCESSED_TIMESTAMP";
-            ObjectName mbeanName = new ObjectName(objectName);
             MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
-            if (!platformMBeanServer.isRegistered(mbeanName)) {
+            String lastProcessedTimestamp = "org.wso2.carbon:00=analytics,01=LAST_PROCESSED_TIMESTAMP";
+            ObjectName lastProcessedTimestampMbean = new ObjectName(lastProcessedTimestamp);
+            if (!platformMBeanServer.isRegistered(lastProcessedTimestampMbean)) {
                 IncrementalLastProcessedTimestamp processedTimestampBean = new IncrementalLastProcessedTimestamp();
-                platformMBeanServer.registerMBean(processedTimestampBean, mbeanName);
+                platformMBeanServer.registerMBean(processedTimestampBean, lastProcessedTimestampMbean);
+            }
+            String lastExecutionStartTime = "org.wso2.carbon:00=analytics,01=ANALYTICS_SCRIPT_LAST_EXECUTION_START_TIME";
+            ObjectName lastExecutionStartTimeMbean = new ObjectName(lastExecutionStartTime);
+            if (!platformMBeanServer.isRegistered(lastExecutionStartTimeMbean)) {
+                AnalyticsScriptLastExecutionStartTime analyticsScriptLastExecutionStartTime = new AnalyticsScriptLastExecutionStartTime();
+                platformMBeanServer.registerMBean(analyticsScriptLastExecutionStartTime, lastExecutionStartTimeMbean);
             }
         } catch (Exception e) {
             log.error("Unable to create EventCounter stat MBean: " + e.getMessage(), e);

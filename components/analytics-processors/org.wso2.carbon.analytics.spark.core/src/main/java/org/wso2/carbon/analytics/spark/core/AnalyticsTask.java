@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
+import org.wso2.carbon.analytics.spark.core.internal.jmx.AnalyticsScriptLastExecutionStartTimeHolder;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.ntask.core.Task;
 
@@ -57,6 +58,8 @@ public class AnalyticsTask implements Task {
                 }
                 if (ServiceHolder.getAnalyticsProcessorService() != null) {
                     ServiceHolder.getAnalyticsProcessorService().executeScript(tenantId, this.scriptName);
+                    String id = AnalyticsScriptLastExecutionStartTimeHolder.generateId(tenantId, scriptName);
+                    AnalyticsScriptLastExecutionStartTimeHolder.add(id, System.currentTimeMillis());
                 } else {
                     log.warn("Analytics Processor inactive now, and hence ignoring the triggered execution");
                 }
