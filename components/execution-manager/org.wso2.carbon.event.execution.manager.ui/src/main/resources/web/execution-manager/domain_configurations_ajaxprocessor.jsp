@@ -19,6 +19,7 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ScenarioConfigurationInfoDTO" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.execution.manager.ui.i18n.Resources">
 <html>
@@ -147,7 +148,7 @@
                         <td>
                             <%=scenarioConfigurationDTO.getName()%>
                         </td>
-                        <td><%=scenarioConfigurationDTO.getDescription()%>
+                        <td><%=Encode.forHtmlContent(scenarioConfigurationDTO.getDescription())%>
                         </td>
                         <td><%=scenarioConfigurationDTO.getType()%>
                         <td class="tcenter">
