@@ -86,7 +86,7 @@ function saveStreamConfiguration(streamMappingArrayLength, domainName, configura
                 showErrorDialog("Error occurred when saving stream configurations");
             })
             .then(function () {
-                showInfoDialog("Stream mapping configuration saved successfully",
+                showInfoDialog("Stream mapping saved successfully",
                     function () {
                         document.location.href = "domain_configurations_ajaxprocessor.jsp?domainName=" + domainName;
                     });
@@ -145,7 +145,7 @@ function getStreamMappingObjectArray(streamMappingArrayLength) {
         var fromStreamIDIndex = document.getElementById("fromStreamID_" + i);
         var fromStreamID = fromStreamIDIndex.options[fromStreamIDIndex.selectedIndex].text;
 
-        if (fromStreamID.localeCompare("Choose from here") == 0) {
+        if (fromStreamID.localeCompare("Select an input stream to map") == 0) {
             showErrorDialog("Empty input event stream detail fields are not allowed");
             return;
         } else {
