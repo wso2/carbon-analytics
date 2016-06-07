@@ -1,7 +1,7 @@
 {
     "info": {
-        "id": "donut-chart",
-        "name": "Donut Chart"
+        "id": "pie-chart",
+        "name": "Pie Chart"
     },
     "config": [
         {
