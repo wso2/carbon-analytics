@@ -64,14 +64,15 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
             throws ExecutionManagerException {
         try {
             Domain domain = domains.get(configuration.getDomain());
-            ExecutionManagerHelper.deployArtifacts(configuration, domain);
             ExecutionManagerHelper.saveToRegistry(configuration);
+            ExecutionManagerHelper.deployArtifacts(configuration, domain);
             //If StreamMappings element is present in the Domain, then need to return those Stream IDs,
             //so the caller (the UI) can prompt the user to map these streams to his own streams.
             return ExecutionManagerHelper.getStreamIDsToBeMapped(configuration, getDomain(configuration.getDomain()));
-        } catch (ExecutionManagerException e) {
-            throw new ExecutionManagerException("Error occurred when saving Scenario Configuration " + configuration.getName()
-                                                + " in domain: " + configuration.getDomain(), e);
+        } catch (TemplateDeploymentException e) {
+            ExecutionManagerHelper.deleteConfigWithoutUndeploy(configuration.getDomain(), configuration.getName());
+            throw new ExecutionManagerException("Failed to save Scenario: " + configuration.getName() + ", for Domain: "
+                                                + configuration.getDomain(), e);
         }
     }
 
