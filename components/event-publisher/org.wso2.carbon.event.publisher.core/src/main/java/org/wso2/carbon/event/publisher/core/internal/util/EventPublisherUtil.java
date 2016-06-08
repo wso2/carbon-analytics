@@ -29,7 +29,6 @@ import org.wso2.siddhi.core.event.Event;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -183,17 +182,18 @@ public class EventPublisherUtil {
         if (inputEvent.getPayloadData() != null) {
             data = ObjectArrays.concat(data, inputEvent.getPayloadData(), Object.class);
         }
-
-        return new Event(inputEvent.getTimeStamp(), data);
+        Event event = new Event(inputEvent.getTimeStamp(), data);
+        // Unchecked assignment is required to convert Map<String, String> to Map<String, Object>
+        Map map = inputEvent.getArbitraryDataMap();
+        event.setArbitraryDataMap(map);
+        return event;
     }
 
     public static void validateStreamDefinitionWithOutputProperties(String actualMappingText, Map<String, Integer> propertyPositionMap)
             throws EventPublisherConfigurationException {
         List<String> mappingProperties = EventPublisherUtil.getOutputMappingPropertyList(actualMappingText);
-        Iterator<String> mappingTextListIterator = mappingProperties.iterator();
-        for (; mappingTextListIterator.hasNext(); ) {
-            String property = mappingTextListIterator.next();
-            if (!propertyPositionMap.containsKey(property)) {
+        for (String property : mappingProperties) {
+            if (!propertyPositionMap.containsKey(property) && (property == null || !property.startsWith(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX))) {
                 throw new EventPublisherStreamValidationException("Property " + property + " is not in the input stream definition.");
             }
         }

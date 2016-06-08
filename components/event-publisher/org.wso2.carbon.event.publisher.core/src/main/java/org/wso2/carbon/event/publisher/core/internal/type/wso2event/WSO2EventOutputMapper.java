@@ -210,6 +210,11 @@ public class WSO2EventOutputMapper implements OutputMapper {
             }
         }
 
+        Map map = event.getArbitraryDataMap();
+        if(map != null) {
+            eventObject.setArbitraryDataMap(map);
+        }
+
         return eventObject;
     }
 

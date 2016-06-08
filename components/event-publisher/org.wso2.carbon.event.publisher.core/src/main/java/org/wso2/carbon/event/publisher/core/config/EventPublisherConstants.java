@@ -60,6 +60,7 @@ public final class EventPublisherConstants {
     public static final String ATTR_TYPE_BOOL = "bool";
     public static final String PROPERTY_META_PREFIX = "meta_";
     public static final String PROPERTY_CORRELATION_PREFIX = "correlation_";
+    public static final String PROPERTY_ARBITRARY_DATA_MAP_PREFIX = "arbitrary_";
 
     public static final Map<String, AttributeType> STRING_ATTRIBUTE_TYPE_MAP = Collections.unmodifiableMap(new HashMap<String, AttributeType>() {{
         put(ATTR_TYPE_BOOL, AttributeType.BOOL);
@@ -94,6 +95,7 @@ public final class EventPublisherConstants {
     public static final String EVENT_META_TAG = "metaData";
     public static final String EVENT_CORRELATION_TAG = "correlationData";
     public static final String EVENT_PAYLOAD_TAG = "payloadData";
+    public static final String EVENT_ARBITRARY_DATA_MAP_TAG = "arbitraryDataMap";
     public static final String EVENT_DEFAULT_NAMESPACE = "http://wso2.org/carbon/events";
     public static final String TEMPLATE_EVENT_ATTRIBUTE_PREFIX = "{{";
     public static final String TEMPLATE_EVENT_ATTRIBUTE_POSTFIX = "}}";
