@@ -35,13 +35,13 @@ import java.util.Set;
 public class ComputeClasspath {
     private static final String SEP = System.getProperty("os.name").toLowerCase().contains("win") ? ";" : ":";
 
-    private static List<String> additionalJars = new ArrayList<>();
+    private static Set<String> additionalJars = new HashSet<>();
 
     public static void addAdditionalJarToClasspath(String jarName){
         additionalJars.add(jarName);
     }
 
-    public static List<String> getAdditionalJars(){
+    public static Set<String> getAdditionalJars(){
         return additionalJars;
     }
 

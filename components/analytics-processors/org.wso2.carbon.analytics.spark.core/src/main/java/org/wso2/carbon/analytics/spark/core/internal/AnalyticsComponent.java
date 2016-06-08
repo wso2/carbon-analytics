@@ -30,6 +30,7 @@ import org.wso2.carbon.analytics.spark.core.internal.jmx.AnalyticsScriptLastExec
 import org.wso2.carbon.analytics.spark.core.internal.jmx.IncrementalLastProcessedTimestamp;
 import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
+import org.wso2.carbon.analytics.spark.utils.ComputeClasspath;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.service.TaskService;
@@ -39,6 +40,7 @@ import org.wso2.carbon.utils.CarbonUtils;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.net.SocketException;
 
@@ -169,9 +171,18 @@ public class AnalyticsComponent {
             } else {
                 ServiceHolder.addCarbonUDFs(carbonUDF);
             }
+
+            addCarbonUDFJarToSparkClasspath(carbonUDF.getClass());
         } catch (AnalyticsUDFException e) {
             log.error("Error while registering UDFs from OSGI components: " + e.getMessage(), e);
         }
+    }
+
+    private void addCarbonUDFJarToSparkClasspath(Class carbonUDFClass) {
+        String[] jarPath = carbonUDFClass.getProtectionDomain().getCodeSource().getLocation().getPath()
+                .split(File.separator);
+        String jarName = jarPath[jarPath.length-1].split("_")[0];
+        ComputeClasspath.addAdditionalJarToClasspath(jarName);
     }
 
     protected void removeCarbonUDFs(CarbonUDF carbonUDF) {
