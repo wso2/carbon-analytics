@@ -159,8 +159,12 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
                 startTime = ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(
                         this.tenantId, this.incID, true);
                 if (startTime > 0) {
-                    startTime -= startTime % this.incWindowSizeMS;
-                    startTime -= this.incBuffer * this.incWindowSizeMS;
+                    if (this.incWindowSizeMS != 0) {
+                        startTime -= startTime % this.incWindowSizeMS;
+                        startTime -= this.incBuffer * this.incWindowSizeMS;
+                    } else {
+                        startTime += 1;
+                    }
                 }
 
                 endTime = System.currentTimeMillis() + AnalyticsConstants.INC_END_TIME_BUFFER_MS;
