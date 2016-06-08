@@ -26,13 +26,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * this class creates the spark classpath by looking at the plugins folder
  */
 public class ComputeClasspath {
-    private static String SEP = System.getProperty("os.name").toLowerCase().contains("win") ? ";" : ":";
+    private static final String SEP = System.getProperty("os.name").toLowerCase().contains("win") ? ";" : ":";
+
+    private static List<String> additionalJars = new ArrayList<>();
+
+    public static void addAdditionalJarToClasspath(String jarName){
+        additionalJars.add(jarName);
+    }
+
+    public static List<String> getAdditionalJars(){
+        return additionalJars;
+    }
 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
@@ -73,6 +84,9 @@ public class ComputeClasspath {
 
         // Add the default list of jars
         Collections.addAll(result, populateDefaultJarsList());
+
+        // Add additional jars
+        result.addAll(getAdditionalJars());
 
         // Read from the file
         File jarsFile = new File(carbonHome + File.separator + "repository" + File.separator + "conf"
