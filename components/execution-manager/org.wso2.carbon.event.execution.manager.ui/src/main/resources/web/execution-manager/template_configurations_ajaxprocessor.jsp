@@ -19,10 +19,11 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ScenarioConfigurationDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ScenarioInfoDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ParameterDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ExecutionManagerTemplateInfoDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTOE" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ParameterDTOE" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.DomainInfoDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTO" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.execution.manager.ui.i18n.Resources">
 <!doctype html>
@@ -30,7 +31,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CEP - Execution Manager</title>
+    <title>CEP - Template Manager</title>
 
     <link rel="icon" href="../admin/images/favicon.ico" type="image/x-icon"/>
     <link rel="shortcut icon" href="../admin/images/favicon.ico" type="image/x-icon"/>
@@ -112,8 +113,8 @@
 
         ExecutionManagerAdminServiceStub proxy =
                 ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
-        ExecutionManagerTemplateInfoDTO domain =
-                proxy.getExecutionManagerTemplateInfo(domainName);
+        DomainInfoDTO domain =
+                proxy.getDomainInfo(domainName);
 
         ScenarioConfigurationDTO scenarioConfigurationDTO = proxy.getConfiguration(domainName,
                 configurationName);
@@ -151,7 +152,7 @@
 
                 if (domain.getScenarioInfoDTOs() != null && !templateType.equals("")) {
                     for (ScenarioInfoDTO scenarioInfoDTO : domain.getScenarioInfoDTOs()) {
-                        if (configurationName == null || scenarioInfoDTO.getName().equals(templateType)) {
+                        if (configurationName == null || scenarioInfoDTO.getType().equals(templateType)) {
                             currentScenario = scenarioInfoDTO;
                             break;
                         }
@@ -175,18 +176,18 @@
                         for (ScenarioInfoDTO scenarioInfoDTO : domain.getScenarioInfoDTOs()) {
 
                             String selectedValue = "";
-                            if (scenarioInfoDTO.getName().trim().equals(currentScenario.getName())) {
+                            if (scenarioInfoDTO.getType().trim().equals(currentScenario.getType())) {
                                 selectedValue = "selected=true";
                             }
                     %>
                     <option <%=selectedValue%>
-                            value="template_configurations_ajaxprocessor.jsp?configurationName=<%=configurationName%>&domainName=<%=domainName%>&templateType=<%=scenarioInfoDTO.getName()%>">
-                        <%=scenarioInfoDTO.getName()%>
+                            value="template_configurations_ajaxprocessor.jsp?configurationName=<%=configurationName%>&domainName=<%=domainName%>&templateType=<%=scenarioInfoDTO.getType()%>">
+                        <%=scenarioInfoDTO.getType()%>
                     </option>
                     <%}%>
                 </select>
 
-                <div class="sectionHelp"><%=currentScenario.getDescription()%>
+                <div class="sectionHelp"><%=Encode.forHtmlContent(currentScenario.getDescription())%>
                 </div>
             </div>
 
@@ -222,7 +223,7 @@
 
             <div class="input-control input-full-width col-md-7 text">
                 <input type="text" id="txtDescription"
-                       value="<%=description%>"/>
+                       value="<%=Encode.forHtmlAttribute(description)%>"/>
             </div>
 
             <br class="c-both"/>
@@ -234,7 +235,7 @@
               int indexParam = 0;
 
               if (currentScenario.getParameterDTOs() != null) {
-                for (ParameterDTO parameter : currentScenario.getParameterDTOs()) {
+                for (ParameterDTOE parameter : currentScenario.getParameterDTOs()) {
 
                     if (parameter == null) {
                         continue;
@@ -243,7 +244,7 @@
                         parameterValue = parameter.getDefaultValue().trim();
                     } else if (scenarioConfigurationDTO.getParameterDTOs() != null) {
 
-                        for (ParameterDTOE param : scenarioConfigurationDTO.getParameterDTOs()) {
+                        for (ParameterDTO param : scenarioConfigurationDTO.getParameterDTOs()) {
                             if (param.getName().equals(parameter.getName())) {
                                 parameterValue = param.getValue().trim();
                                 break;
@@ -295,7 +296,7 @@
 
                     if (!parameter.getDescription().equals("")) {
                 %>
-                <div class="sectionHelp"><%=parameter.getDescription()%>
+                <div class="sectionHelp"><%=Encode.forHtmlContent(parameter.getDescription())%>
                 </div>
                 <%}%>
             </div>

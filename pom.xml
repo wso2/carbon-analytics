@@ -46,6 +46,7 @@
         <module>components/event-publisher</module>
         <module>components/execution-manager</module>
         <module>components/gadget-template-deployer</module>
+        <module>components/dashboard-template-deployer</module>
         <module>features/event-stream</module>
         <module>features/data-bridge</module>
         <module>features/analytics-dashboard</module>
@@ -59,6 +60,7 @@
         <module>features/spark-common</module>
         <module>features/analytics-gadget-templates</module>
         <module>features/gadget-template-deployer</module>
+        <module>features/dashboard-template-deployer</module>
     </modules>
 
     <dependencyManagement>
@@ -593,6 +595,11 @@
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.dashboard.template.deployer</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.commons</groupId>
                 <artifactId>org.wso2.carbon.ntask.core</artifactId>
                 <version>${carbon.commons.version}</version>
@@ -1015,6 +1022,11 @@
                 <artifactId>smslib</artifactId>
                 <version>${org.smslib.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
+                <artifactId>encoder</artifactId>
+                <version>${encoder.wso2.version}</version>
+            </dependency>
 
             <!--carbon-deployment features start-->
             <!--<dependency>-->
@@ -1340,6 +1352,7 @@
 
         <wsdl4j.wso2.version>1.6.2.wso2v2</wsdl4j.wso2.version>
         <org.smslib.version>3.4.5</org.smslib.version>
+        <encoder.wso2.version>1.2.0.wso2v1</encoder.wso2.version>
 
         <libthrift.wso2.imp.pkg.version.range>[0.9.2.wso2v1, 1.0.0)</libthrift.wso2.imp.pkg.version.range>
     </properties>

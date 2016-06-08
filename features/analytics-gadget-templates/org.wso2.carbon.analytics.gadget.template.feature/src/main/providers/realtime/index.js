@@ -131,11 +131,6 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
             payloadDataLength = payloadData.length;
         }
 
-        output.push({
-            fieldName: "TIMESTAMP",
-            fieldType: "time"
-        });
-
         var allDataLength = metaDataLength + correlationDataLength + payloadDataLength;
         for (var i = 0; i < metaDataLength; i++) {
             output.push({

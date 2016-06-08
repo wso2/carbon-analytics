@@ -75,7 +75,7 @@ public class ConfigurationMapper {
         if (scenarioConfig != null) {
             scenarioConfigurationInfoDTO = new ScenarioConfigurationInfoDTO();
             scenarioConfigurationInfoDTO.setName(scenarioConfig.getName());
-            scenarioConfigurationInfoDTO.setScenario(scenarioConfig.getScenario());
+            scenarioConfigurationInfoDTO.setType(scenarioConfig.getScenario());
             scenarioConfigurationInfoDTO.setDescription(scenarioConfig.getDescription());
             scenarioConfigurationInfoDTO.setDomain(scenarioConfig.getDomain());
         }
@@ -114,7 +114,7 @@ public class ConfigurationMapper {
         if (scenarioConfig != null) {
             scenarioConfigurationDTO = new ScenarioConfigurationDTO();
             scenarioConfigurationDTO.setName(scenarioConfig.getName());
-            scenarioConfigurationDTO.setScenario(scenarioConfig.getScenario());
+            scenarioConfigurationDTO.setType(scenarioConfig.getScenario());
             scenarioConfigurationDTO.setDescription(scenarioConfig.getDescription());
             scenarioConfigurationDTO.setDomain(scenarioConfig.getDomain());
             scenarioConfigurationDTO.setParameterDTOs(mapParameters(scenarioConfig.getParameterMap()));
@@ -163,7 +163,7 @@ public class ConfigurationMapper {
         if (configDTO != null) {
             scenarioConfig = new ScenarioConfiguration();
             scenarioConfig.setName(configDTO.getName());
-            scenarioConfig.setScenario(configDTO.getScenario());
+            scenarioConfig.setScenario(configDTO.getType());
             scenarioConfig.setDescription(configDTO.getDescription());
             scenarioConfig.setDomain(configDTO.getDomain());
             scenarioConfig.setParameterMap(mapParameters(configDTO.getParameterDTOs()));

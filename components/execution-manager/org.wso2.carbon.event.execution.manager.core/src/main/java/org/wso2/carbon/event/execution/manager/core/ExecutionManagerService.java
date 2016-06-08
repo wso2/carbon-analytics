@@ -18,7 +18,7 @@ package org.wso2.carbon.event.execution.manager.core;
 import org.wso2.carbon.event.execution.manager.core.exception.ExecutionManagerException;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.ScenarioConfiguration;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping;
-import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.Domain;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +41,7 @@ public interface ExecutionManagerService {
      *
      * @param streamMappingList StreamMapping list
      * @param scenarioConfigName name field ScenarioConfiguration object
-     * @param domainName domain name of the ExecutionManagerTemplate corresponding to this scenarioConfig
+     * @param domainName domain name of the Domain corresponding to this scenarioConfig
      */
     public void saveStreamMapping(List<StreamMapping> streamMappingList, String scenarioConfigName,
                                   String domainName)
@@ -53,7 +53,7 @@ public interface ExecutionManagerService {
      *
      * @return Domain list
      */
-    public Collection<ExecutionManagerTemplate> getAllDomains();
+    public Collection<Domain> getAllDomains();
 
     /**
      * provide configurations of specified domain
@@ -68,9 +68,9 @@ public interface ExecutionManagerService {
      * get information of a specific domain
      *
      * @param domainName domain name
-     * @return ExecutionManagerTemplate object
+     * @return Domain object
      */
-    public ExecutionManagerTemplate getDomain(String domainName);
+    public Domain getDomain(String domainName);
 
 
     /**

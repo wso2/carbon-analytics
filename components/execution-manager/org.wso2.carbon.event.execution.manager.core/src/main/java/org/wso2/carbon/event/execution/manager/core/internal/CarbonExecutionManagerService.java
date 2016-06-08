@@ -30,7 +30,7 @@ import org.wso2.carbon.event.execution.manager.core.structure.configuration.Scen
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMappings;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Artifact;
-import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.Domain;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
 import org.wso2.carbon.registry.api.RegistryException;
@@ -51,7 +51,7 @@ import java.util.Map;
 public class CarbonExecutionManagerService implements ExecutionManagerService {
     private static final Log log = LogFactory.getLog(CarbonExecutionManagerService.class);
 
-    private Map<String, ExecutionManagerTemplate> domains;
+    private Map<String, Domain> domains;
 
     public CarbonExecutionManagerService() throws ExecutionManagerException {
         domains = new HashMap<>();
@@ -63,15 +63,16 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
     public List<String> saveConfiguration(ScenarioConfiguration configuration)
             throws ExecutionManagerException {
         try {
-            ExecutionManagerTemplate executionManagerTemplate = domains.get(configuration.getDomain());
-            ExecutionManagerHelper.deployArtifacts(configuration, executionManagerTemplate);
+            Domain domain = domains.get(configuration.getDomain());
             ExecutionManagerHelper.saveToRegistry(configuration);
-            //If StreamMappings element is present in the ExecutionManagerTemplate, then need to return those Stream IDs,
+            ExecutionManagerHelper.deployArtifacts(configuration, domain);
+            //If StreamMappings element is present in the Domain, then need to return those Stream IDs,
             //so the caller (the UI) can prompt the user to map these streams to his own streams.
             return ExecutionManagerHelper.getStreamIDsToBeMapped(configuration, getDomain(configuration.getDomain()));
-        } catch (ExecutionManagerException e) {
-            throw new ExecutionManagerException("Error occurred when saving Scenario Configuration " + configuration.getName()
-                                                + " in domain: " + configuration.getDomain(), e);
+        } catch (TemplateDeploymentException e) {
+            ExecutionManagerHelper.deleteConfigWithoutUndeploy(configuration.getDomain(), configuration.getName());
+            throw new ExecutionManagerException("Failed to save Scenario: " + configuration.getName() + ", for Domain: "
+                                                + configuration.getDomain(), e);
         }
     }
 
@@ -121,7 +122,7 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
 
 
     @Override
-    public Collection<ExecutionManagerTemplate> getAllDomains() {
+    public Collection<Domain> getAllDomains() {
         return domains.values();
     }
 
@@ -166,7 +167,7 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
     }
 
     @Override
-    public ExecutionManagerTemplate getDomain(String domainName) {
+    public Domain getDomain(String domainName) {
         return domains.get(domainName);
     }
 
@@ -205,10 +206,10 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
         }
 
         try {
-            ExecutionManagerTemplate executionManagerTemplate = getDomain(domainName);
+            Domain domain = getDomain(domainName);
 
-            for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()) {
-                if (scenarioConfig.getScenario().equals(scenario.getName())) {
+            for (Scenario scenario : domain.getScenarios().getScenario()) {
+                if (scenarioConfig.getScenario().equals(scenario.getType())) {
                     Map<String,Integer> artifactTypeCountingMap = new HashMap<>();
                     for (Template template : scenario.getTemplates().getTemplate()) {
                         String artifactType = template.getType();
@@ -218,8 +219,9 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
                         } else {
                             artifactCount++;
                         }
-                        String artifactId = ExecutionManagerHelper.getTemplatedArtifactId(domainName, scenario.getName(), configName, artifactType, artifactCount);
+                        String artifactId = ExecutionManagerHelper.getTemplatedArtifactId(domainName, scenario.getType(), configName, artifactType, artifactCount);
                         ExecutionManagerHelper.unDeployExistingArtifact(artifactId, template.getType());
+                        artifactTypeCountingMap.put(artifactType, artifactCount);
                     }
 
                     //undeploy stream-mapping execution plan
@@ -230,9 +232,9 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
             }
 
             //If this was the last scenario configuration left, then delete all the common artifacts.
-            if (getConfigurations(domainName).isEmpty() && executionManagerTemplate.getCommonArtifacts() != null) {
+            if (getConfigurations(domainName).isEmpty() && domain.getCommonArtifacts() != null) {
                 Map<String,Integer> artifactTypeCountingMap = new HashMap<>();
-                for (Artifact artifact: executionManagerTemplate.getCommonArtifacts().getArtifact()) {
+                for (Artifact artifact: domain.getCommonArtifacts().getArtifact()) {
                     String artifactType = artifact.getType();
                     Integer artifactCount = artifactTypeCountingMap.get(artifact.getType());
                     if (artifactCount == null) {
@@ -242,6 +244,7 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
                     }
                     String artifactId = ExecutionManagerHelper.getCommonArtifactId(domainName, artifactType, artifactCount);
                     ExecutionManagerHelper.unDeployExistingArtifact(artifactId, artifactType);
+                    artifactTypeCountingMap.put(artifactType, artifactCount);
                 }
             }
         } catch (TemplateDeploymentException e) {

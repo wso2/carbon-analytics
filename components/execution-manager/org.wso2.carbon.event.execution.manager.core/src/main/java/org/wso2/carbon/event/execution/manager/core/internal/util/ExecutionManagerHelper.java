@@ -28,13 +28,14 @@ import org.wso2.carbon.event.execution.manager.core.internal.ds.ExecutionManager
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.AttributeMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.configuration.ScenarioConfiguration;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Artifact;
-import org.wso2.carbon.event.execution.manager.core.structure.domain.ExecutionManagerTemplate;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.Domain;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.core.Registry;
+import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 
 import javax.xml.bind.JAXBContext;
@@ -76,26 +77,26 @@ public class ExecutionManagerHelper {
     /**
      * Load All domains templates available in the file directory
      */
-    public static Map<String, ExecutionManagerTemplate> loadDomains() {
+    public static Map<String, Domain> loadDomains() {
         //Get domain template folder and load all the domain template files
         File folder = new File(ExecutionManagerConstants.TEMPLATE_DOMAIN_PATH);
-        Map<String, ExecutionManagerTemplate> domains = new HashMap<>();
+        Map<String, Domain> domains = new HashMap<>();
 
         File[] files = folder.listFiles();
         if (files != null) {
             for (final File fileEntry : files) {
                 if (fileEntry.isFile() && fileEntry.getName().endsWith("xml")) {
-                    ExecutionManagerTemplate executionManagerTemplate = unmarshalDomain(fileEntry);
-                    if (executionManagerTemplate != null) {
+                    Domain domain = unmarshalDomain(fileEntry);
+                    if (domain != null) {
                         try {
-                            validateTemplateDomainConfig(executionManagerTemplate);
+                            validateTemplateDomainConfig(domain);
                         } catch (ExecutionManagerException e) {
                             //In case an invalid template configuration is found, this loader logs
                             // an error message and aborts loading that particular template domain config.
                             //However, this will load all the valid template domain configurations.
                             log.error("Invalid Template Domain configuration file found: " + fileEntry.getName(), e);
                         }
-                        domains.put(executionManagerTemplate.getDomain(), executionManagerTemplate);
+                        domains.put(domain.getName(), domain);
                     } else {
                         log.error("Invalid Template Domain configuration file found: " + fileEntry.getName());
                     }
@@ -108,30 +109,30 @@ public class ExecutionManagerHelper {
     }
 
     /**
-     * Unmarshalling ExecutionManagerTemplate object by given file
+     * Unmarshalling Domain object by given file
      *
      * @param fileEntry file for unmarshalling
      * @return templateDomain object
      */
-    private static ExecutionManagerTemplate unmarshalDomain(File fileEntry) {
-        ExecutionManagerTemplate executionManagerTemplate = null;
+    private static Domain unmarshalDomain(File fileEntry) {
+        Domain domain = null;
 
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(ExecutionManagerTemplate.class);
+            JAXBContext jaxbContext = JAXBContext.newInstance(Domain.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            executionManagerTemplate = (ExecutionManagerTemplate) jaxbUnmarshaller.unmarshal(fileEntry);
+            domain = (Domain) jaxbUnmarshaller.unmarshal(fileEntry);
 
         } catch (JAXBException e) {
             log.error("JAXB Exception when unmarshalling domain template file at "
                     + fileEntry.getPath(), e);
         }
 
-        return executionManagerTemplate;
+        return domain;
 
     }
 
     /**
-     * Unmarshalling ExecutionManagerTemplate object by given file content object
+     * Unmarshalling Domain object by given file content object
      *
      * @param configFileContent file for unmarshalling
      * @return templateConfiguration object
@@ -156,17 +157,17 @@ public class ExecutionManagerHelper {
      * Checks whether the present Template Domain configuration has valid content.
      * Validity criteria - It should have at least one Template configuration.
      *
-     * @param executionManagerTemplate ExecutionManagerTemplate object which needs to be validated.
+     * @param domain Domain object which needs to be validated.
      * @throws ExecutionManagerException
      */
-    public static void validateTemplateDomainConfig(ExecutionManagerTemplate executionManagerTemplate)
+    public static void validateTemplateDomainConfig(Domain domain)
             throws ExecutionManagerException {
-        if (executionManagerTemplate.getScenarios() == null ||
-            executionManagerTemplate.getScenarios().getScenario() == null ||
-            executionManagerTemplate.getScenarios().getScenario().isEmpty()) {
+        if (domain.getScenarios() == null ||
+            domain.getScenarios().getScenario() == null ||
+            domain.getScenarios().getScenario().isEmpty()) {
             //It is required to have at least one ScenarioConfiguration.
             //Having only a set of common artifacts is not a valid use case.
-            throw new ExecutionManagerException("There are no template configurations in the domain " + executionManagerTemplate.getDomain());
+            throw new ExecutionManagerException("There are no template configurations in the domain " + domain.getName());
         }
     }
 
@@ -174,17 +175,16 @@ public class ExecutionManagerHelper {
     /**
      * Deploy the artifacts given in the template domain configuration
      *
-     * @param executionManagerTemplate template domain object, containing the templates.
+     * @param domain template domain object, containing the templates.
      * @param configuration scenario configuration object, containing the parameters.
      */
     public static void deployArtifacts(ScenarioConfiguration configuration,
-                                       ExecutionManagerTemplate executionManagerTemplate)
-            throws ExecutionManagerException {
+                                       Domain domain)
+            throws TemplateDeploymentException {
         //make sure common artifacts are deployed
-        if (executionManagerTemplate.getCommonArtifacts() != null) {
+        if (domain.getCommonArtifacts() != null) {
             Map<String,Integer> artifactTypeCountingMap = new HashMap<>();
-            for (Artifact artifact : executionManagerTemplate.getCommonArtifacts().getArtifact()) {
-                try {
+            for (Artifact artifact : domain.getCommonArtifacts().getArtifact()) {
                     String artifactType = artifact.getType();
                     Integer artifactCount = artifactTypeCountingMap.get(artifactType);
                     if (artifactCount == null) {
@@ -192,7 +192,7 @@ public class ExecutionManagerHelper {
                     } else {
                         artifactCount++;
                     }
-                    String artifactId = ExecutionManagerHelper.getCommonArtifactId(executionManagerTemplate.getDomain(), artifactType, artifactCount);
+                    String artifactId = ExecutionManagerHelper.getCommonArtifactId(domain.getName(), artifactType, artifactCount);
 
                     DeployableTemplate deployableTemplate = new DeployableTemplate();
                     deployableTemplate.setArtifact(artifact.getValue());
@@ -203,16 +203,13 @@ public class ExecutionManagerHelper {
                         deployer.deployIfNotDoneAlready(deployableTemplate);
                         artifactTypeCountingMap.put(artifactType, artifactCount);
                     } else {
-                        throw new ExecutionManagerException("A deployer doesn't exist for template type " + artifact.getType());
+                        throw new TemplateDeploymentException("A deployer doesn't exist for template type " + artifact.getType());
                     }
-                } catch (TemplateDeploymentException e) {
-                    throw new ExecutionManagerException("Error when trying to deploy the artifact " + configuration.getName(), e);
-                }
             }
         }
         //now, deploy templated artifacts
-        for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()) {
-            if (scenario.getName().equals(configuration.getScenario())) {
+        for (Scenario scenario : domain.getScenarios().getScenario()) {
+            if (scenario.getType().equals(configuration.getScenario())) {
                 Map<String,Integer> artifactTypeCountingMap = new HashMap<>();
                 for (Template template : scenario.getTemplates().getTemplate()) {
                     String artifactType = template.getType();
@@ -222,11 +219,10 @@ public class ExecutionManagerHelper {
                     } else {
                         artifactCount++;
                     }
-                    String artifactId = ExecutionManagerHelper.getTemplatedArtifactId(executionManagerTemplate.getDomain(),
-                                                                                      scenario.getName(), configuration.getName(), artifactType, artifactCount);
+                    String artifactId = ExecutionManagerHelper.getTemplatedArtifactId(domain.getName(),
+                                                                                      scenario.getType(), configuration.getName(), artifactType, artifactCount);
                     TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(template.getType());
                     if (deployer != null) {
-                        try {
                             DeployableTemplate deployableTemplate = new DeployableTemplate();
                             String updatedScript = updateArtifactParameters(configuration, template.getValue());
                             deployableTemplate.setArtifact(updatedScript);
@@ -234,12 +230,8 @@ public class ExecutionManagerHelper {
                             deployableTemplate.setArtifactId(artifactId);
                             deployer.deployArtifact(deployableTemplate);
                             artifactTypeCountingMap.put(artifactType, artifactCount);
-                        } catch (TemplateDeploymentException e) {
-                            throw new ExecutionManagerException("Error when trying to deploy the artifact of type: "
-                                                                + template.getType() + ", for configuration:" + configuration.getName() ,e);
-                        }
                     } else {
-                        throw new ExecutionManagerException("A deployer doesn't exist for template type " + template.getType());
+                        throw new TemplateDeploymentException("A deployer doesn't exist for template type " + template.getType());
                     }
                 }
                 break;
@@ -285,14 +277,14 @@ public class ExecutionManagerHelper {
      * Returns the list of Stream IDs(with their template symbols replaced by user-parameters) given in StreamMappings element.
      *
      * @param configuration Scenario configuration, specified by the user, containing parameter values.
-     * @param executionManagerTemplate ExecutionManagerTemplate object, containing the StreamMappings element
+     * @param domain Domain object, containing the StreamMappings element
      * @return List of Stream IDs
      */
     public static List<String> getStreamIDsToBeMapped(ScenarioConfiguration configuration,
-                                                      ExecutionManagerTemplate executionManagerTemplate) {
+                                                      Domain domain) {
         List<String> streamIdList = new ArrayList<>();
-        for (Scenario scenario : executionManagerTemplate.getScenarios().getScenario()){
-            if (configuration.getScenario().equals(scenario.getName())) {
+        for (Scenario scenario : domain.getScenarios().getScenario()){
+            if (configuration.getScenario().equals(scenario.getType())) {
                 if(scenario.getStreamMappings() != null && scenario.getStreamMappings().getStreamMapping() != null
                         && !scenario.getStreamMappings().getStreamMapping().isEmpty()) {
                         //empty check is required because, if no stream mappings present, we should return null
@@ -417,13 +409,35 @@ public class ExecutionManagerHelper {
             }
             resource.setMediaType("application/xml");
             registry.put(resourcePath, resource);
-        } catch (RegistryException e) {
-            throw new ExecutionManagerException("Registry exception occurred when creating " + configuration.getName()
-                                                + " configurations", e);
-
         } catch (JAXBException e) {
-            throw new ExecutionManagerException("JAXB Exception when marshalling file at " + configuration.getName()
-                                                + " configurations", e);
+            throw new ExecutionManagerException("Could not marshall Scenario: " + configuration.getName() + ", for Domain: "
+                                                + configuration.getDomain() + ". Could not save to registry.", e);
+        } catch (RegistryException e) {
+            throw new ExecutionManagerException("Could not save Scenario: " + configuration.getName() + ", for Domain: "
+                                                + configuration.getDomain() + ", to the registry.", e);
+        }
+    }
+
+
+    /**
+     * Deletes a scenario config from the registry. This does not undeploy any artifact.
+     * If some error occurred in the deployment process, this can be used for "rolling back" the config saved in the registry.
+     *
+     * @param domainName domain name
+     * @param configName config name
+     * @throws RegistryException
+     */
+    public static void deleteConfigWithoutUndeploy(String domainName, String configName)
+            throws ExecutionManagerException {
+        try {
+        Registry registry = ExecutionManagerValueHolder.getRegistryService()
+                .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+
+        registry.delete(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH + RegistryConstants.PATH_SEPARATOR
+                        + domainName + RegistryConstants.PATH_SEPARATOR + configName + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
+        } catch (RegistryException e) {
+            throw new ExecutionManagerException("Failed to delete scenario from the registry. Scenario name: " + configName
+                                                + ", Domain name: " + domainName, e);
         }
     }
 

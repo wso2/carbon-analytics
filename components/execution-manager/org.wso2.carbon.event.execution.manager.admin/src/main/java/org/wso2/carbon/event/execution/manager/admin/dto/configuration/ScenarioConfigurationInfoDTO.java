@@ -24,7 +24,7 @@ public class ScenarioConfigurationInfoDTO {
 
     private String domain;
 
-    private String scenario;
+    private String type;
 
     private String description;
 
@@ -44,12 +44,12 @@ public class ScenarioConfigurationInfoDTO {
         this.domain = domain;
     }
 
-    public String getScenario() {
-        return scenario;
+    public String getType() {
+        return type;
     }
 
-    public void setScenario(String scenario) {
-        this.scenario = scenario;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getDescription() {

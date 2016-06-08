@@ -1,48 +1,58 @@
+/*
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.wso2.carbon.gadget.template.deployer.internal.util;
 
-import org.wso2.carbon.gadget.template.deployer.internal.GadgetTemplateDeployerException;
+import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.RegistryType;
+import org.wso2.carbon.gadget.template.deployer.internal.GadgetTemplateDeployerConstants;
+import org.wso2.carbon.registry.api.Registry;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 public class GadgetTemplateDeployerUtility {
+
     private GadgetTemplateDeployerUtility() {
     }
 
-    public static void copyFolder(File src, File dest) throws GadgetTemplateDeployerException, IOException {
-        if (src.isDirectory()) {
-            //if directory not exists, create it
-            if (!dest.exists()) {
-                if (!dest.mkdir()) {
-                    throw new GadgetTemplateDeployerException("Failed to create destination: " + dest.getAbsolutePath());
-                }
-            }
-            String files[] = src.list();
-            if (files != null) {
-                for (String file : files) {
-                    //construct the src and dest file structure
-                    File srcFile = new File(src, file);
-                    File destFile = new File(dest, file);
-                    //recursive copy
-                    copyFolder(srcFile, destFile);
-                }
-            }
-        } else {
-            //if file, then copy it
-            //Use bytes stream to support all file types
-            try (InputStream in = new FileInputStream(src);
-                 OutputStream out = new FileOutputStream(dest);) {
-                byte[] buffer = new byte[1024];
-                int length;
-                //copy the file content in bytes
-                while ((length = in.read(buffer)) > 0) {
-                    out.write(buffer, 0, length);
-                }
-            }
-        }
+    /**
+     * Return the Carbon Registry.
+     *
+     * @return
+     */
+    public static Registry getRegistry() {
+        CarbonContext cCtx = CarbonContext.getThreadLocalCarbonContext();
+        Registry registry = cCtx.getRegistry(RegistryType.SYSTEM_CONFIGURATION);
+        return registry;
+    }
+
+    /**
+     * Returns the absolute path for the artifact store location.
+     *
+     * @return path of the artifact
+     */
+    public static String getGadgetArtifactPath() {
+        String carbonRepository = CarbonUtils.getCarbonRepository();
+        StringBuilder sb = new StringBuilder(carbonRepository);
+        sb.append("jaggeryapps").append(File.separator).append(GadgetTemplateDeployerConstants.APP_NAME).append(File.separator)
+                .append("store").append(File.separator)
+                .append(CarbonContext.getThreadLocalCarbonContext().getTenantDomain()).append(File.separator)
+                .append(GadgetTemplateDeployerConstants.DEFAULT_STORE_TYPE).append(File.separator).append(GadgetTemplateDeployerConstants.ARTIFACT_TYPE)
+                .append(File.separator);
+        return sb.toString();
     }
 }
