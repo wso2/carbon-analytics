@@ -33,6 +33,7 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.restapi.Constants;
 import org.wso2.carbon.analytics.restapi.UnauthenticatedUserException;
 import org.wso2.carbon.analytics.restapi.Utils;
@@ -1144,4 +1145,32 @@ public class AnalyticsResource extends AbstractResource {
         }
         return username;
     }
+
+	/**
+	 * Gets the database persist name for a table
+	 *
+	 * @param tableName the table name of which the persist name to be retrieved
+	 * @return Response containing the table persist name in database
+	 * @throws AnalyticsException
+	 */
+	@GET
+	@Produces({MediaType.TEXT_PLAIN})
+	@Path("tables/{tableName}/persistName")
+	public Response getTablePersistName(@PathParam("tableName") String tableName,
+										@HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+			throws AnalyticsException {
+		if (logger.isDebugEnabled()) {
+			logger.debug("Invoking getTablePersistName for table : " + tableName);
+		}
+
+		String username = authenticate(authHeader);
+		RealmService realmService = Utils.getRealmService();
+		String tenantDomain = MultitenantUtils.getTenantDomain(username);
+		try {
+			int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+			return Response.ok(GenericUtils.generateTableUUID(tenantId, tableName)).build();
+		} catch (UserStoreException e) {
+			throw new AnalyticsException("Error while getting tenant ID for user: " + username + "[" + e.getMessage() + "]", e);
+		}
+	}
 }

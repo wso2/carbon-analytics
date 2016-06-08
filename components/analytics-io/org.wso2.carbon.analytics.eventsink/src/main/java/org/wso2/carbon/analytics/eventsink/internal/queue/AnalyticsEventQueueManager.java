@@ -57,4 +57,8 @@ public class AnalyticsEventQueueManager {
         }
         eventQueue.put(event);
     }
+
+    public AnalyticsEventQueue getAnalyticsEventQueue(int tenantId) {
+        return queueMap.get(tenantId);
+    }
 }

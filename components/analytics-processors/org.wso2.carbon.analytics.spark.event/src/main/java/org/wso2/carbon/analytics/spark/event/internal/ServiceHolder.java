@@ -15,15 +15,24 @@
  */
 package org.wso2.carbon.analytics.spark.event.internal;
 
+import org.wso2.carbon.event.processor.manager.core.EventManagementService;
+import org.wso2.carbon.event.processor.manager.core.EventPublisherManagementService;
 import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.wso2.carbon.ntask.core.service.TaskService;
 
 /**
- * This class holds the OSGI services registered with Declarative service component.
+ * This class holds the OSGI services registered with declarative service component.
  */
 public class ServiceHolder {
 
     private static EventStreamService eventStreamService;
-
+    
+    private static TaskService taskService;
+    
+    private static EventManagementService eventManagementService;
+    
+    private static EventPublisherManagementService eventPublisherManagementService;
+    
     private ServiceHolder() {
         /**
          * Avoid instantiation of this class.
@@ -37,4 +46,29 @@ public class ServiceHolder {
     public static void setEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.eventStreamService = eventStreamService;
     }
+
+    public static TaskService getTaskService() {
+        return taskService;
+    }
+
+    public static void setTaskService(TaskService taskService) {
+        ServiceHolder.taskService = taskService;
+    }
+    
+    public static EventManagementService getEventManagementService() {
+        return eventManagementService;
+    }
+
+    public static void setEventManagementService(EventManagementService eventManagementService) {
+        ServiceHolder.eventManagementService = eventManagementService;
+    }
+    
+    public static void setEventPublisherManagementService(EventPublisherManagementService eventPublisherManagementService) {
+        ServiceHolder.eventPublisherManagementService = eventPublisherManagementService;
+    }
+    
+    public static EventPublisherManagementService getEventPublisherManagementService() {
+        return eventPublisherManagementService;
+    }
+    
 }

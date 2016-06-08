@@ -17,8 +17,6 @@
  */
 package org.wso2.carbon.analytics.spark.event;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.sources.BaseRelation;
@@ -36,43 +34,29 @@ import java.io.Serializable;
  * Extends <code>org.apache.spark.sql.sources.BaseRelation</code>
  */
 public class StreamRelation extends BaseRelation implements InsertableRelation, Serializable {
-    private static final Log log = LogFactory.getLog(StreamRelation.class);
+
     private static final long serialVersionUID = 1628290158392312871L;
 
     private SQLContext sqlContext;
+    
     private StructType schema;
+    
     private String streamId;
+    
     private int tenantId;
-    private String receiverURLSet;
-    private String authURLSet;
-    private String username;
-    private String password;
-
-    public StreamRelation(int tenantId,SQLContext sqlContext, String streamId,String payloadString) {
+    
+    public StreamRelation(int tenantId,SQLContext sqlContext, String streamId, String payloadString) {
         this.tenantId = tenantId;
         this.sqlContext = sqlContext;
         this.streamId = streamId;
-        this.schema = new StructType(extractFieldsFromString(payloadString));
-    }
-
-    public StreamRelation(int tenantId, SQLContext sqlContext, String streamId, String payloadString,
-                          String receiverURLSet, String authURLSet, String username, String password) {
-        this.tenantId = tenantId;
-        this.sqlContext = sqlContext;
-        this.streamId = streamId;
-        this.schema = new StructType(extractFieldsFromString(payloadString));
-        this.receiverURLSet = receiverURLSet;
-        this.authURLSet = authURLSet;
-        this.username = username;
-        this.password = password;
+        this.schema = new StructType(this.extractFieldsFromString(payloadString));
     }
 
     @Override
     public void insert(DataFrame data, boolean b) {
         for (int i = 0; i < data.rdd().partitions().length; i++) {
             data.sqlContext().sparkContext().runJob(data.rdd(),
-                    new EventIteratorFunction(this.tenantId, this.streamId, data.schema(),
-                            receiverURLSet, authURLSet, username, password),
+                    new EventIteratorFunction(this.tenantId, this.streamId),
                     CarbonScalaUtils.getNumberSeq(i, i + 1), false,
                     ClassTag$.MODULE$.Unit());
         }
@@ -103,4 +87,5 @@ public class StreamRelation extends BaseRelation implements InsertableRelation, 
         }
         return resFields;
     }
+    
 }

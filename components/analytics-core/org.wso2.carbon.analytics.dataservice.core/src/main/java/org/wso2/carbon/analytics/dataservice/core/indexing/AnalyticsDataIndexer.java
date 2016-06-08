@@ -1211,9 +1211,13 @@ public class AnalyticsDataIndexer {
             AnalyticsDrillDownRequest drillDownRequest, String rangeField, AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
         int startIndex = drillDownRequest.getRecordStartIndex();
-        if (startIndex < 0 ) throw new AnalyticsIndexException("Start index should be greater than 0");
+        if (startIndex < 0 ) {
+            throw new AnalyticsIndexException("Start index should be greater than 0");
+        }
         int endIndex = startIndex + drillDownRequest.getRecordCount();
-        if (endIndex <= startIndex) throw new AnalyticsIndexException("Record Count should be greater than 0");
+        if (endIndex <= startIndex) {
+            throw new AnalyticsIndexException("Record Count should be greater than 0");
+        }
         Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
         if (this.isClusteringEnabled()) {
             List<List<SearchResultEntry>> sortedResultsPerNode = this.executeIndexLookup(new DrillDownSearchCall(tenantId, drillDownRequest));
@@ -1237,9 +1241,13 @@ public class AnalyticsDataIndexer {
                                                       AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
         int startIndex = drillDownRequest.getRecordStartIndex();
-        if (startIndex < 0 ) throw new AnalyticsIndexException("Start index should be greater than 0");
+        if (startIndex < 0 ) {
+            throw new AnalyticsIndexException("Start index should be greater than 0");
+        }
         int endIndex = startIndex + drillDownRequest.getRecordCount();
-        if (endIndex <= startIndex) throw new AnalyticsIndexException("Record Count should be greater than 0");
+        if (endIndex <= startIndex) {
+            throw new AnalyticsIndexException("Record Count should be greater than 0");
+        }
         List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
         List<List<SearchResultEntry>> sortedResultsPerShard = new ArrayList<>();
         Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());

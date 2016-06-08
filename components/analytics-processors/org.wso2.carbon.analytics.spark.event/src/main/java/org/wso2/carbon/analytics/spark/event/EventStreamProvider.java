@@ -15,22 +15,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.analytics.spark.event;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.sources.RelationProvider;
-import org.wso2.carbon.analytics.spark.event.internal.ServiceHolder;
-import org.wso2.carbon.databridge.commons.AttributeType;
-import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
-import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.base.MultitenantConstants;
+
 import scala.collection.immutable.Map;
 import scala.runtime.AbstractFunction0;
-
-import java.io.Serializable;
 
 /**
  * Implements <code>org.apache.spark.sql.sources.RelationProvider</code>
@@ -38,77 +31,41 @@ import java.io.Serializable;
  * At the event of Spark's CREATE_TABLE query, this provider defines an event stream according  to the parameters
  * provided in the options sections of the query.
  *
- *  At the event of Spark's INSERT_OVERWRITE query, this provider creates events from input table and publishes them
- *  into the stream that has been created previously.
+ * At the event of Spark's INSERT_OVERWRITE query, this provider creates events from input table and publishes them
+ * into the stream that has been created previously.
  */
-public class EventStreamProvider implements RelationProvider, Serializable {
-    private static final Log log = LogFactory.getLog(EventStreamProvider.class);
-    private static final long serialVersionUID = 9219903158801397937L;
+public class EventStreamProvider implements RelationProvider {
+
+    private static final String DEFAULT_VERSION = "1.0.0";
 
     private int tenantId;
+    
     private String streamName;
+    
     private String version;
-    private String description;
-    private String nickname;
+    
     private String payload;
-    private String receiverURLSet;
-    private String authURLSet;
-    private String username;
-    private String password;
 
-    public EventStreamProvider() {
+    public EventStreamProvider() { 
+        try {
+            EventStreamDataStore.initStore();
+        } catch (AnalyticsException e) {
+            throw new RuntimeException("Error in creating event stream provider: " + e.getMessage(), e);
+        }
     }
 
     @Override
     public StreamRelation createRelation(SQLContext sqlContext, Map<String, String> parameters) {
-        setParameters(parameters);
-//        defineStreamIfNotExists();
-
-        return new StreamRelation(tenantId, sqlContext, getStreamId(streamName, version), payload,
-                receiverURLSet, authURLSet, username, password);
+        this.setParameters(parameters);
+        return new StreamRelation(this.tenantId, sqlContext, this.getStreamId(this.streamName, this.version), this.payload);
     }
 
     private void setParameters(Map<String, String> parameters) {
-        this.tenantId = Integer.parseInt(extractValuesFromMap(EventingConstants.TENANT_ID, parameters, "-1234"));
+        this.tenantId = Integer.parseInt(extractValuesFromMap(EventingConstants.TENANT_ID, parameters, 
+                "" + MultitenantConstants.SUPER_TENANT_ID));
         this.streamName = extractValuesFromMap(EventingConstants.STREAM_NAME, parameters, "");
-        this.version = extractValuesFromMap(EventingConstants.VERSION, parameters, "1.0.0");
-        this.description = extractValuesFromMap(EventingConstants.DESCRIPTION, parameters, "");
-        this.nickname = extractValuesFromMap(EventingConstants.NICKNAME, parameters, "");
+        this.version = extractValuesFromMap(EventingConstants.VERSION, parameters, DEFAULT_VERSION);
         this.payload = extractValuesFromMap(EventingConstants.PAYLOAD, parameters, "");
-        this.receiverURLSet = extractValuesFromMap(EventingConstants.receiverURLSet, parameters, "");
-        this.authURLSet = extractValuesFromMap(EventingConstants.authURLSet, parameters, null);
-        this.username = extractValuesFromMap(EventingConstants.username, parameters, "");
-        this.password = extractValuesFromMap(EventingConstants.password, parameters, "");
-    }
-
-    private void defineStreamIfNotExists() {
-        if (!this.streamName.isEmpty()) {
-            StreamDefinition streamDefinition = null;
-            try {
-                streamDefinition = new StreamDefinition(streamName, version);
-                streamDefinition.setDescription(this.description);
-                streamDefinition.setNickName(this.nickname);
-                if (payload != null && !payload.isEmpty()) {
-                    String[] fields = payload.split(",");
-                    String name, type;
-                    String[] tokens;
-                    for (String field : fields) {
-                        tokens = field.trim().split(" ");
-                        name = tokens[0].trim();
-                        type = tokens[1].trim().toUpperCase();
-                        streamDefinition.addPayloadData(name, AttributeType.valueOf(type));
-                    }
-                }
-                ServiceHolder.getEventStreamService().addEventStreamDefinition(streamDefinition);
-            } catch (MalformedStreamDefinitionException e) {
-                log.error("An error occurred while creating the stream definition : " + streamName, e);
-            } catch (EventStreamConfigurationException e) {
-                log.error("Invalid stream configuration", e);
-            }
-        } else {
-            throw new RuntimeException("Empty " + EventingConstants.STREAM_NAME);
-        }
-
     }
 
     private String getStreamId(String streamName, String version) {

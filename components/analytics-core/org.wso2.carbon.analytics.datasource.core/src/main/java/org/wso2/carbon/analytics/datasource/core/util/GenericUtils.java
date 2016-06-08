@@ -602,14 +602,6 @@ public class GenericUtils {
         globalCustomRepo = null;
     }
 
-//    public static boolean isCarbonServer() {
-//        try {
-//            return CarbonUtils.getCarbonHome() != null;
-//        } catch (Throwable e) {
-//            return false;
-//        }
-//    }
-
     public static String streamToTableName(String streamName) {
         return streamName.replace('.', '_');
     }
@@ -772,7 +764,7 @@ public class GenericUtils {
         String carbonHome = null;
         try {
             carbonHome = CarbonUtils.getCarbonHome();
-        } catch (Throwable e) { 
+        } catch (Exception e) { 
             if (log.isDebugEnabled()) {
                 log.debug("Error in getting Carbon home for path resolve: " + e.getMessage(), e);
             }

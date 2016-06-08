@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.analytics.eventsink.subscriber;
 
+import org.wso2.carbon.analytics.eventsink.internal.jmx.EventCounter;
 import org.wso2.carbon.analytics.eventsink.internal.queue.AnalyticsEventQueueManager;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -45,6 +46,7 @@ public class AnalyticsWSO2EventConsumer implements WSO2EventConsumer {
     @Override
     public void onEvent(Event event) {
         AnalyticsEventQueueManager.getInstance().put(tenantId, event);
+        EventCounter.incrementAndGet();
     }
 
     @Override

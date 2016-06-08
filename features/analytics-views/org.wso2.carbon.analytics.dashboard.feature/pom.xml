@@ -33,11 +33,6 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.dashboard.server.feature</artifactId>
-            <type>zip</type>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.dashboard.ui.feature</artifactId>
             <type>zip</type>
         </dependency>
@@ -63,9 +58,6 @@
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
                             </importFeatures>
                             <includedFeatures>
-                                <includedFeatureDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.dashboard.server.feature:${carbon.analytics.version}
-                                </includedFeatureDef>
                                 <includedFeatureDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.dashboard.ui.feature:${carbon.analytics.version}
                                 </includedFeatureDef>

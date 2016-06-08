@@ -15,18 +15,20 @@
  */
 package org.wso2.carbon.analytics.spark.event;
 
+/**
+ * Event stream relation provider related constants.
+ */
 public class EventingConstants {
 
-    //EventStream relation constants
     public static final String TENANT_ID = "tenantId";
     public static final String STREAM_NAME = "streamName";
     public static final String VERSION = "version";
-    public static final String DESCRIPTION = "description";
-    public static final String NICKNAME = "nickname";
     public static final String PAYLOAD = "payload";
-    public static final String receiverURLSet = "receiverURL";
-    public static final String authURLSet = "authURL";
-    public static final String username = "username";
-    public static final String password = "password";
-    public static final String THRIFT_AGENT_TYPE = "Thrift";
+    public static final String STREAM_ID = "streamId";
+    public static final String ANALYTICS_SPARK_EVENTING_TASK_TYPE = "ANALYTICS_SPARK_EVENTING";
+    public static final String ANALYTICS_SPARK_EVENTING_TASK_NAME = "STORE_EVENT_ROUTER_TASK";
+    public static final String DISABLE_EVENT_SINK_SYS_PROP = "disableEventSink";
+    public static final String DISABLE_SPARK_EVENTING_TASK_SYS_PROP = "disableSparkEventingTask";
+    public static final int SPARK_EVENTING_TASK_RUN_INTERVAL_MS = 10000;
+    
 }

@@ -55,7 +55,6 @@ import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.event.stream.core.EventStreamService;
-import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -137,7 +136,7 @@ public class AnalyticsWebService extends AbstractAdmin {
     public void removeStreamDefinition(String name, String version) throws AnalyticsWebServiceException {
         try {
             eventStreamService.removeEventStreamDefinition(name, version);
-        } catch (EventStreamConfigurationException e) {
+        } catch (Exception e) {
             logger.error("Unable to remove stream definition: [" + name + ":" + version + "]" + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to remove stream definition: [" + name + ":" + version + "], " +
                     e.getMessage(), e);

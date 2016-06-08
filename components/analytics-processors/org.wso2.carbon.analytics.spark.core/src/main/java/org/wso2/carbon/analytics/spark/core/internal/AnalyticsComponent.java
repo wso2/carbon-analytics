@@ -26,8 +26,11 @@ import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.CarbonAnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.SparkScriptCAppDeployer;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
+import org.wso2.carbon.analytics.spark.core.internal.jmx.AnalyticsScriptLastExecutionStartTime;
+import org.wso2.carbon.analytics.spark.core.internal.jmx.IncrementalLastProcessedTimestamp;
 import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
+import org.wso2.carbon.analytics.spark.utils.ComputeClasspath;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.service.TaskService;
@@ -35,6 +38,10 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.utils.CarbonUtils;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.net.SocketException;
 
 /**
@@ -93,6 +100,23 @@ public class AnalyticsComponent {
         } catch (Exception ex) {
             log.error("Error in registering the analytics processor service! ", ex);
         }
+        try {
+            MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
+            String lastProcessedTimestamp = "org.wso2.carbon:00=analytics,01=LAST_PROCESSED_TIMESTAMP";
+            ObjectName lastProcessedTimestampMbean = new ObjectName(lastProcessedTimestamp);
+            if (!platformMBeanServer.isRegistered(lastProcessedTimestampMbean)) {
+                IncrementalLastProcessedTimestamp processedTimestampBean = new IncrementalLastProcessedTimestamp();
+                platformMBeanServer.registerMBean(processedTimestampBean, lastProcessedTimestampMbean);
+            }
+            String lastExecutionStartTime = "org.wso2.carbon:00=analytics,01=ANALYTICS_SCRIPT_LAST_EXECUTION_START_TIME";
+            ObjectName lastExecutionStartTimeMbean = new ObjectName(lastExecutionStartTime);
+            if (!platformMBeanServer.isRegistered(lastExecutionStartTimeMbean)) {
+                AnalyticsScriptLastExecutionStartTime analyticsScriptLastExecutionStartTime = new AnalyticsScriptLastExecutionStartTime();
+                platformMBeanServer.registerMBean(analyticsScriptLastExecutionStartTime, lastExecutionStartTimeMbean);
+            }
+        } catch (Exception e) {
+            log.error("Unable to create EventCounter stat MBean: " + e.getMessage(), e);
+        }
     }
 
     protected void deactivate(ComponentContext ctx) {
@@ -147,9 +171,18 @@ public class AnalyticsComponent {
             } else {
                 ServiceHolder.addCarbonUDFs(carbonUDF);
             }
+
+            addCarbonUDFJarToSparkClasspath(carbonUDF.getClass());
         } catch (AnalyticsUDFException e) {
             log.error("Error while registering UDFs from OSGI components: " + e.getMessage(), e);
         }
+    }
+
+    private void addCarbonUDFJarToSparkClasspath(Class carbonUDFClass) {
+        String[] jarPath = carbonUDFClass.getProtectionDomain().getCodeSource().getLocation().getPath()
+                .split(File.separator);
+        String jarName = jarPath[jarPath.length-1].split("_")[0];
+        ComputeClasspath.addAdditionalJarToClasspath(jarName);
     }
 
     protected void removeCarbonUDFs(CarbonUDF carbonUDF) {

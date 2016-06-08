@@ -17,8 +17,6 @@
 */
 package org.wso2.carbon.analytics.spark.core.internal;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -49,7 +47,6 @@ public class ServiceHolder {
          */
     }
 
-    private static final Log log = LogFactory.getLog(ServiceHolder.class);
     private static TaskService taskService;
 
     private static AnalyticsDataService analyticsDataService;
@@ -62,7 +59,7 @@ public class ServiceHolder {
 
     private static SparkAnalyticsExecutor analyticskExecutor;
 
-    private static Map<String, CarbonUDF> carbonUDFs = new HashMap();
+    private static Map<String, CarbonUDF> carbonUDFs = new HashMap<>();
 
     private static boolean analyticsExecutionEnabled = true;
 

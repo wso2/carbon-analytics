@@ -37,6 +37,8 @@ import java.util.List;
  */
 public class AnalyticsTableProcessor extends HttpServlet {
 
+    private static final long serialVersionUID = -8592513244152763351L;
+
     /**
      * Get the all tables for tenant or check table exists
      *
@@ -125,14 +127,13 @@ public class AnalyticsTableProcessor extends HttpServlet {
                     if (!securityEnabled){
                         if (recordStoreName == null){
                             ServiceHolder.getAnalyticsDataService().createTable(tenantId, tableName);
-                        }else {
+                        } else {
                             ServiceHolder.getAnalyticsDataService().createTable(tenantId, recordStoreName, tableName);
                         }
-                    }
-                    else {
+                    } else {
                         if (recordStoreName == null){
                             ServiceHolder.getSecureAnalyticsDataService().createTable(userName, tableName);
-                        }else {
+                        } else {
                             ServiceHolder.getSecureAnalyticsDataService().createTable(userName, recordStoreName, tableName);
                         }
                     }
