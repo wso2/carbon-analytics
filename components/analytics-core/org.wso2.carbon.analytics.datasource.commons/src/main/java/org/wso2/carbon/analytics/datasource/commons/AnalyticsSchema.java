@@ -20,10 +20,10 @@ package org.wso2.carbon.analytics.datasource.commons;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class represents a schema for the analytics tables.
@@ -71,7 +71,7 @@ public class AnalyticsSchema implements Serializable {
 
     public Map<String, ColumnDefinition> getIndexedColumns() {
         if (indexedColumns == null) {
-            indexedColumns = new HashMap<>();
+            indexedColumns = new ConcurrentHashMap<>();
             if (columns != null) {
                 for (Map.Entry<String, ColumnDefinition> entry : columns.entrySet()) {
                     if (entry.getValue().isIndexed()) {
