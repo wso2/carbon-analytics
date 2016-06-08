@@ -667,7 +667,7 @@ public class AnalyticsJSServiceConnector {
                 if (logger.isDebugEnabled()) {
                     for (DrillDownRangeBean rangeBean : ranges) {
                         logger.debug("Drilldown Range count Result -- Range Label: " + rangeBean.getLabel() + " from :" +
-                                     rangeBean.getFrom() + " to : " + rangeBean.getTo() + " score : " + rangeBean.getScoreCount());
+                                     rangeBean.getFrom() + " to : " + rangeBean.getTo() + " score : " + rangeBean.getCount());
                     }
                 }
                 return handleResponse(ResponseStatus.SUCCESS, gson.toJson(ranges));
