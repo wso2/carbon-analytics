@@ -267,9 +267,11 @@ public class Utils {
 
     private static Map<String, List<String>> createCategoryPathBeans(List<DrillDownPathBean> categories) {
         Map<String, List<String>> beans = new HashMap<>();
-        for (DrillDownPathBean category : categories) {
-            List<String> path = new ArrayList<>(Arrays.asList(category.getPath()));
-            beans.put(category.getFieldName(), path);
+        if (categories != null) {
+            for (DrillDownPathBean category : categories) {
+                List<String> path = new ArrayList<>(Arrays.asList(category.getPath()));
+                beans.put(category.getFieldName(), path);
+            }
         }
         return beans;
     }
@@ -651,5 +653,21 @@ public class Utils {
             return true;
         }
         return false;
+    }
+
+    public static List<DrillDownRangeBean> getDrilldownRangeBean(
+            List<AnalyticsDrillDownRange> searchResults) {
+        List<DrillDownRangeBean> rangeBeans = new ArrayList<>();
+        if (searchResults != null) {
+            for (AnalyticsDrillDownRange range : searchResults) {
+                rangeBeans.add(createDrilldownRangeBean(range));
+            }
+        }
+        return rangeBeans;
+    }
+
+    private static DrillDownRangeBean createDrilldownRangeBean(AnalyticsDrillDownRange range) {
+        DrillDownRangeBean bean = new DrillDownRangeBean(range.getLabel(), range.getFrom(), range.getTo(), range.getScore());
+        return  bean;
     }
 }

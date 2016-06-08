@@ -209,6 +209,17 @@ public class AnalyticsCachedJSServiceConnector extends AnalyticsJSServiceConnect
         }
         return result;
     }
+
+    @Override
+    public ResponseBean drillDownRangeCount(String username, String tableName, String queryAsString) {
+        String cacheItemId = this.calculateCacheItemId("drillDownRangeCount", tableName, queryAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.drillDownRangeCount(username, tableName, queryAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
     
     /**
      * This represents the cache used to hold the data.

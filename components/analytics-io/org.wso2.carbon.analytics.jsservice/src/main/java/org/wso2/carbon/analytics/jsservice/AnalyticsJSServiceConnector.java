@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
@@ -40,6 +41,7 @@ import org.wso2.carbon.analytics.jsservice.beans.AggregateRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.jsservice.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.ColumnKeyValueBean;
+import org.wso2.carbon.analytics.jsservice.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.jsservice.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.EventBean;
 import org.wso2.carbon.analytics.jsservice.beans.IdsWithColumnsBean;
@@ -618,12 +620,12 @@ public class AnalyticsJSServiceConnector {
 
     public ResponseBean drillDownSearch(String username, String tableName, String queryAsString) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Invoking drillDownCategories for tableName : " + tableName);
+            logger.debug("Invoking drillDownSearch for tableName : " + tableName);
         }
         if (queryAsString != null && !queryAsString.isEmpty()) {
             try {
                 DrillDownRequestBean queryBean =
-                        gson.fromJson(queryAsString,DrillDownRequestBean.class);
+                        gson.fromJson(queryAsString, DrillDownRequestBean.class);
                 AnalyticsDrillDownRequest request =
                         Utils.createDrillDownSearchRequest(tableName, queryBean);
                 List<SearchResultEntry> searchResults =
@@ -645,6 +647,39 @@ public class AnalyticsJSServiceConnector {
             }
         } else {
             return handleResponse(ResponseStatus.FAILED, "drilldownSearch parameters " +
+                                                         "are not provided");
+        }
+    }
+
+    public ResponseBean drillDownRangeCount(String username, String tableName, String queryAsString) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking drillDownRangeCount for tableName : " + tableName);
+        }
+        if (queryAsString != null && !queryAsString.isEmpty()) {
+            try {
+                DrillDownRequestBean queryBean =
+                        gson.fromJson(queryAsString, DrillDownRequestBean.class);
+                AnalyticsDrillDownRequest request =
+                        Utils.createDrillDownSearchRequest(tableName, queryBean);
+                List<AnalyticsDrillDownRange> searchResults =
+                        analyticsDataAPI.drillDownRangeCount(username, request);
+                List<DrillDownRangeBean> ranges = Utils.getDrilldownRangeBean(searchResults);
+                if (logger.isDebugEnabled()) {
+                    for (DrillDownRangeBean rangeBean : ranges) {
+                        logger.debug("Drilldown Range count Result -- Range Label: " + rangeBean.getLabel() + " from :" +
+                                     rangeBean.getFrom() + " to : " + rangeBean.getTo() + " score : " + rangeBean.getScoreCount());
+                    }
+                }
+                return handleResponse(ResponseStatus.SUCCESS, gson.toJson(ranges));
+            } catch (Exception e) {
+                logger.error("Failed to perform DrilldownRangeCount on table: " + tableName + " : " +
+                             e.getMessage(), e);
+                return handleResponse(ResponseStatus.FAILED,
+                                      "Failed to perform DrilldownRangeCount on table: " +
+                                      tableName + ": " + e.getMessage());
+            }
+        } else {
+            return handleResponse(ResponseStatus.FAILED, "drilldownRangeCount parameters " +
                                                          "are not provided");
         }
     }

@@ -751,7 +751,7 @@ public class AnalyticsDataIndexer {
                     } else {
                         AnalyticsDrillDownRange newRange = entryMap.get(range.getLabel());
                         entryMap.put(range.getLabel(), new AnalyticsDrillDownRange(range.getLabel(),
-                                                                                   range.getFrom(), range.getTo(), range.getScore() + newRange.getScore()));
+                                range.getFrom(), range.getTo(), range.getScore() + newRange.getScore()));
                     }
                 }
             }
