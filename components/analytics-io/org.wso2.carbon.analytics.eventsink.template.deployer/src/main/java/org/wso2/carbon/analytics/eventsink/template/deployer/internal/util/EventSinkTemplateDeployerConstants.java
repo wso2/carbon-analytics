@@ -27,4 +27,25 @@ public class EventSinkTemplateDeployerConstants {
     public static final String META_INFO_COLLECTION_PATH = ExecutionManagerConstants.DEPLOYER_META_INFO_PATH
                                                            + RegistryConstants.PATH_SEPARATOR + EVENT_SINK_DEPLOYER_TYPE;
 
+    public static final String ARTIFACT_ID_TO_COLUMN_DEF_KEYS_COLLECTION_PATH = META_INFO_COLLECTION_PATH
+                                                                                + RegistryConstants.PATH_SEPARATOR + "artifactID-to-column-def-keys";
+
+    public static final String ARTIFACT_ID_TO_STREAM_IDS_COLLECTION_PATH = META_INFO_COLLECTION_PATH
+                                                                                + RegistryConstants.PATH_SEPARATOR + "artifactID-to-streamIDs";
+
+    public static final String STREAM_ID_TO_ARTIFACT_IDS_COLLECTION_PATH = META_INFO_COLLECTION_PATH
+                                                                           + RegistryConstants.PATH_SEPARATOR + "streamID-to-artifactIDs";
+
+    public static final String COLUMN_DEF_KEY_TO_ARTIFACT_IDS_COLLECTION_PATH = META_INFO_COLLECTION_PATH
+                                                                           + RegistryConstants.PATH_SEPARATOR + "column-def-key-to-artifactIDs";
+
+    public static final String COLUMN_DEF_KEY_TO_COLUMN_DEF_HASH_RESOURCE_PATH = META_INFO_COLLECTION_PATH
+                                                                                + RegistryConstants.PATH_SEPARATOR + "column-def-key-to-column-def-hash";
+
+    public static final String COLUMN_DEF_KEY_SEPARATOR = "  ";     //double space
+
+    //single space. Using space because this needs to be a restricted char for stream names. At the same time, should be allowed as a registry property value.
+    public static final String COLUMN_KEY_COMPONENT_SEPARATOR = " ";
+
+    public static final String SEPARATOR = ",";
 }

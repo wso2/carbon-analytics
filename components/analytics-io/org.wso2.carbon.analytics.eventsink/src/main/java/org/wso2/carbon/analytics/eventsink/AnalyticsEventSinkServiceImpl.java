@@ -21,6 +21,8 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
 import org.wso2.carbon.analytics.eventsink.internal.AnalyticsEventStoreManager;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkUtil;
+import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
+import org.wso2.carbon.analytics.eventsink.subscriber.AnalyticsEventStreamListener;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
 import java.util.List;
@@ -115,5 +117,10 @@ public class AnalyticsEventSinkServiceImpl implements AnalyticsEventSinkService 
     public AnalyticsEventStore getEventStore(int tenantId, String streamName) {
         String eventStoreName = AnalyticsEventSinkUtil.generateAnalyticsTableName(streamName);
         return AnalyticsEventStoreManager.getInstance().getAnalyticsEventStore(tenantId, eventStoreName);
+    }
+
+    @Override
+    public AnalyticsEventStreamListener getAnalyticsEventStreamListener() {
+        return ServiceHolder.getAnalyticsEventStreamListener();
     }
 }
