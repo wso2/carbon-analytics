@@ -1,0 +1,23 @@
+{
+    "info": {
+        "id": "table-chart",
+        "name": "Table Chart"
+    },
+    "config": [
+        {
+            "fieldLabel": "Key",
+            "fieldName": "key",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "Color domain",
+            "fieldName": "color",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"]
+        }
+    ],
+    "common-libs" : ["wso2gadgets","chart-utils"],
+    "chart-libs" : ["d3.min","vega","VizGrammar.min"]
+}
+
