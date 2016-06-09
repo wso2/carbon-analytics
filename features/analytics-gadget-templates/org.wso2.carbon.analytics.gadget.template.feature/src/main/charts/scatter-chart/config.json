@@ -1,7 +1,7 @@
 {
     "info": {
-        "id": "area-chart",
-        "name": "Area Chart"
+        "id": "scatter-chart",
+        "name": "Scatter Chart"
     },
     "config": [
         {
@@ -23,10 +23,10 @@
             "valueSet": ["$COLUMN_NAMES"]
         },
         {
-            "fieldLabel": "Chart mode",
-            "fieldName": "mode",
+            "fieldLabel": "Size domain",
+            "fieldName": "size",
             "fieldType": "dropdown",
-            "valueSet": ["stack", "group"]
+            "valueSet": ["$COLUMN_NAMES"]
         }
     ],
     "common-libs" : ["wso2gadgets","chart-utils"],

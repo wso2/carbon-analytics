@@ -24,7 +24,7 @@ var getConfig, validate, isProviderRequired, draw, update;
      * @param schema
      */
     getConfig = function(schema) {
-        var chartConf = require(CHART_LOCATION + '/area-chart/config.json').config;
+        var chartConf = require(CHART_LOCATION + '/table-chart/config.json').config;
         /*
          dynamic logic goes here
          */
@@ -32,6 +32,7 @@ var getConfig, validate, isProviderRequired, draw, update;
         var columns = [];
 
         columns.push("None");
+        columns.push("All");
         for(var i=0; i < schema.length; i++) {
             columns.push(schema[i]["fieldName"]);
         }
@@ -69,7 +70,17 @@ var getConfig, validate, isProviderRequired, draw, update;
      * @param data
      */
     draw = function(placeholder, chartConfig, _schema, data) {
+
         var schema = toVizGrammarSchema(_schema);
+
+        var columns = [];
+
+        for(var i=0; i < _schema.length; i++) {
+            columns.push(_schema[i]["fieldName"]);
+        }
+
+        chartConfig.columns = columns;
+
         var view = {
             id: "chart-0",
             schema: schema,
@@ -77,7 +88,6 @@ var getConfig, validate, isProviderRequired, draw, update;
             data: function() {
                 if(data) {
                     var result = [];
-                    console.log(data);
                     data.forEach(function(item) {
                         var row = [];
                         schema[0].metadata.names.forEach(function(name) {
@@ -85,7 +95,6 @@ var getConfig, validate, isProviderRequired, draw, update;
                         });
                         result.push(row);
                     });
-                    console.log(result);
                     wso2gadgets.onDataReady(result);
                 }
             }
@@ -111,20 +120,22 @@ var getConfig, validate, isProviderRequired, draw, update;
 
     buildChartConfig = function (_chartConfig) {
         var conf = {};
-        conf.x = _chartConfig.x;
         conf.charts = [];
         conf.charts[0] = {
-            type : "area",
-            y: _chartConfig.y
+            type : "table",
+            key : _chartConfig.key
         };
 
-        if (_chartConfig.color != "None") {
+        if (_chartConfig.color == "All") {
+            conf.charts[0].color = "*";
+        } else if (_chartConfig.color != "None") {
             conf.charts[0].color = _chartConfig.color;
-            conf.charts[0].mode = _chartConfig.mode;
         }
+        
+        conf.charts[0].columns = _chartConfig.columns;
 
         return conf;
     };
 
-    
+
 }());

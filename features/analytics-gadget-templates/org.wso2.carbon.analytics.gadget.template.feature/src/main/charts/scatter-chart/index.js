@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,24 +24,24 @@ var getConfig, validate, isProviderRequired, draw, update;
      * @param schema
      */
     getConfig = function(schema) {
-        var chartConf = require(CHART_LOCATION + '/area-chart/config.json').config;
+        var chartConf = require(CHART_LOCATION + '/scatter-chart/config.json').config;
         /*
          dynamic logic goes here
          */
 
-        var columns = [];
+         var columns = [];
 
-        columns.push("None");
-        for(var i=0; i < schema.length; i++) {
+         columns.push("None");
+         for(var i=0; i < schema.length; i++) {
             columns.push(schema[i]["fieldName"]);
-        }
+         }
 
         for(var i=0; i < chartConf.length; i++) {
-            if (chartConf[i]["fieldName"] == "color") {
+            if (chartConf[i]["fieldName"] == "color" 
+                || chartConf[i]["fieldName"] == "size" ) {
                 chartConf[i]["valueSet"] = columns;
-                break;
             }
-        }
+        }     
 
         return chartConf;
     };
@@ -114,13 +114,16 @@ var getConfig, validate, isProviderRequired, draw, update;
         conf.x = _chartConfig.x;
         conf.charts = [];
         conf.charts[0] = {
-            type : "area",
+            type : "scatter",
             y: _chartConfig.y
         };
 
         if (_chartConfig.color != "None") {
             conf.charts[0].color = _chartConfig.color;
-            conf.charts[0].mode = _chartConfig.mode;
+        }
+
+        if (_chartConfig.size != "None") {
+            conf.charts[0].size = _chartConfig.size;
         }
 
         return conf;
