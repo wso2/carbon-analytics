@@ -33,5 +33,7 @@ public interface EventSync {
     public boolean isContinueProcess();
 
     public void setContinueProcess(boolean isContinue);
+
+    public String getOriginalEventStreamId();
 }
 

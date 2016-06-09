@@ -380,6 +380,11 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         this.isContinue = isContinue;
     }
 
+    @Override
+    public String getOriginalEventStreamId() {
+        return streamDefinition.getStreamId();
+    }
+
     public void prepareDestroy() {
         if (EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA &&
                 EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo()

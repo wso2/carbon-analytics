@@ -158,7 +158,7 @@ public class EventHandler {
                                 log.debug("Event Received to :" + streamId);
                             }
                             if (eventSync != null) {
-                                eventSync.process(EventManagementUtil.getWso2Event(eventSync.getStreamDefinition(), timestamp, event));
+                                eventSync.process(EventManagementUtil.getWso2Event(eventSync.getOriginalEventStreamId(), eventSync.getStreamDefinition(), timestamp, event));
                             }
 
                         } catch (Exception e) {
