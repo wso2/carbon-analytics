@@ -265,6 +265,7 @@
                     <include>carbon-spark-classpath.conf</include>
                     <include>fairscheduler.xml</include>
                     <include>log4j.properties.template</include>
+                    <include>spark-jdbc-config.xml</include>
                     <!-- moved to product-das DAS-110 -->
                     <!--<include>wso2server.sh</include>
                     <include>wso2server.bat</include>
