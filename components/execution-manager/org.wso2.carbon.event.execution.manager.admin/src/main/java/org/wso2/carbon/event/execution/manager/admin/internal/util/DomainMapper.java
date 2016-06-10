@@ -48,7 +48,7 @@ public class DomainMapper {
 
         if (domain != null) {
             domainInfoDTO = new DomainInfoDTO();
-            domainInfoDTO.setDomain(domain.getName());
+            domainInfoDTO.setName(domain.getName());
             domainInfoDTO.setDescription(domain.getDescription());
             domainInfoDTO.setScenarioInfoDTOs(mapScenarios(domain.getScenarios().getScenario()));
         }

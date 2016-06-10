@@ -5,7 +5,7 @@
             <xs:complexType name="DomainInfoDTO">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="domain" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="scenarioInfoDTOs" nillable="true" type="ax2134:ScenarioInfoDTO"/>
                 </xs:sequence>
             </xs:complexType>
@@ -70,6 +70,18 @@
         <xs:schema xmlns:ax2137="http://configuration.dto.admin.manager.execution.event.carbon.wso2.org/xsd" xmlns:ax2135="http://domain.dto.admin.manager.execution.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.manager.execution.event.carbon.wso2.org">
             <xs:import namespace="http://domain.dto.admin.manager.execution.event.carbon.wso2.org/xsd"/>
             <xs:import namespace="http://configuration.dto.admin.manager.execution.event.carbon.wso2.org/xsd"/>
+            <xs:element name="getAllDomainInfos">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllDomainInfosResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2134:DomainInfoDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="getDomainInfo">
                 <xs:complexType>
                     <xs:sequence>
@@ -81,18 +93,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" nillable="true" type="ax2134:DomainInfoDTO"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllDomainInfos">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllDomainInfosResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2134:DomainInfoDTO"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -110,17 +110,18 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="saveConfiguration">
+            <xs:element name="getConfiguration">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="configuration" nillable="true" type="ax2137:ScenarioConfigurationDTO"/>
+                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="configName" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="saveConfigurationResponse">
+            <xs:element name="getConfigurationResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2137:ScenarioConfigurationDTO"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -139,18 +140,17 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getConfiguration">
+            <xs:element name="saveConfiguration">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="configName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="configuration" nillable="true" type="ax2137:ScenarioConfigurationDTO"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getConfigurationResponse">
+            <xs:element name="saveConfigurationResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2137:ScenarioConfigurationDTO"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>

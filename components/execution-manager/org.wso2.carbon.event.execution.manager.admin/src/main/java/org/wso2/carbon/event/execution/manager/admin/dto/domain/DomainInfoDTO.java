@@ -20,16 +20,16 @@ package org.wso2.carbon.event.execution.manager.admin.dto.domain;
  */
 public class DomainInfoDTO {
 
-    private String domain;
+    private String name;
     private String description;
     private ScenarioInfoDTO[] scenarioInfoDTOs;
 
-    public String getDomain() {
-        return domain;
+    public String getName() {
+        return name;
     }
 
-    public void setDomain(String domain) {
-        this.domain = domain;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
