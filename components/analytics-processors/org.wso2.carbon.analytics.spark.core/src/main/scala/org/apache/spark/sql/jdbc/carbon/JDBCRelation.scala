@@ -21,7 +21,7 @@ package org.apache.spark.sql.jdbc.carbon
 import java.util.Properties
 import javax.sql.DataSource
 
-import org.apache.commons.logging.{LogFactory, Log}
+import org.apache.commons.logging.{Log, LogFactory}
 import org.apache.spark.Partition
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.expressions.Row
@@ -30,19 +30,19 @@ import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils
-import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 object JDBCRelation {
   /**
-   * Given a partitioning schematic (a column of integral type, a number of
-   * partitions, and upper and lower bounds on the column's value), generate
-   * WHERE clauses for each partition so that each row in the table appears
-   * exactly once.  The parameters minValue and maxValue are advisory in that
-   * incorrect values may cause the partitioning to be poor, but no data
-   * will fail to be represented.
-   */
+    * Given a partitioning schematic (a column of integral type, a number of
+    * partitions, and upper and lower bounds on the column's value), generate
+    * WHERE clauses for each partition so that each row in the table appears
+    * exactly once.  The parameters minValue and maxValue are advisory in that
+    * incorrect values may cause the partitioning to be poor, but no data
+    * will fail to be represented.
+    */
   def columnPartition(partitioning: JDBCPartitioningInfo): Array[Partition] = {
     if (partitioning == null) {
       return Array[Partition](JDBCPartition(null, 0))
@@ -56,7 +56,7 @@ object JDBCRelation {
     // Overflow and silliness can happen if you subtract then divide.
     // Here we get a little roundoff, but that's (hopefully) OK.
     val stride: Long = (partitioning.upperBound / numPartitions
-                        - partitioning.lowerBound / numPartitions)
+      - partitioning.lowerBound / numPartitions)
     var i: Int = 0
     var currentValue: Long = partitioning.lowerBound
     var ans = new ArrayBuffer[Partition]()
@@ -87,21 +87,43 @@ object JDBCRelation {
   }
 }
 
+/**
+  * Class representing the Relation Provider for the Carbon Spark JDBC implementation
+  */
 class AnalyticsJDBCRelationProvider extends RelationProvider {
-  /** Returns a new base relation with the given parameters. */
+
+  val DATASOURCE = "dataSource"
+  val TABLE_NAME = "tableName"
+  val SCHEMA = "schema"
+  val PRIMARY_KEYS = "primaryKeys"
+
+  private final val log: Log = LogFactory.getLog(classOf[AnalyticsJDBCRelationProvider])
+
   override def createRelation(
                                sqlContext: SQLContext,
                                parameters: Map[String, String]): BaseRelation = {
-    val dataSource = parameters.getOrElse("dataSource", sys.error("Option 'dataSource' not specified"))
-    val tableName = parameters.getOrElse("tableName", sys.error("Option 'tableName' not specified"))
+
+    val dataSource = parameters.getOrElse(DATASOURCE, sys.error("Option 'dataSource' not specified"))
+    val tableName = parameters.getOrElse(TABLE_NAME, sys.error("Option 'tableName' not specified"))
+    val schemaString = parameters.getOrElse(SCHEMA, sys.error("Option 'schema' not specified"))
+    val primaryKeys = parameters.getOrElse(PRIMARY_KEYS, "")
     val partitionColumn = parameters.getOrElse("partitionColumn", null)
     val lowerBound = parameters.getOrElse("lowerBound", null)
     val upperBound = parameters.getOrElse("upperBound", null)
     val numPartitions = parameters.getOrElse("numPartitions", null)
 
     if (partitionColumn != null
-        && (lowerBound == null || upperBound == null || numPartitions == null)) {
+      && (lowerBound == null || upperBound == null || numPartitions == null)) {
       sys.error("Partitioning incompletely specified")
+    }
+    val formattedSchema = CarbonJDBCUtils.constructElementList(schemaString, primaryKeys)
+    try {
+      CarbonJDBCUtils.checkAndCreateTable(dataSource, tableName, formattedSchema, primaryKeys)
+    }
+    catch {
+      case e: Exception =>
+        log.error("Error in checking/creating table " + tableName + " : ", e.getMessage, e)
+        throw new RuntimeException(e.getMessage, e)
     }
 
     val partitionInfo = if (partitionColumn == null) {
@@ -116,26 +138,28 @@ class AnalyticsJDBCRelationProvider extends RelationProvider {
     val parts = JDBCRelation.columnPartition(partitionInfo)
     val properties = new Properties() // Additional properties that we will pass to getConnection
     parameters.foreach(kv => properties.setProperty(kv._1, kv._2))
-    JDBCRelation(dataSource, tableName, parts)(sqlContext)
+    CarbonJDBCRelation(dataSource, tableName, formattedSchema, primaryKeys, parts)(sqlContext)
   }
 }
 
-case class JDBCRelation(
-                         dataSource: String,
-                         tableName: String,
-                         parts: Array[Partition])
-                       (@transient val sqlContext: SQLContext)
+case class CarbonJDBCRelation(
+                               dataSource: String,
+                               tableName: String,
+                               formattedSchema: mutable.MutableList[(String, String, Boolean, Boolean)],
+                               primaryKeys: String,
+                               parts: Array[Partition])
+                             (@transient val sqlContext: SQLContext)
   extends BaseRelation
-          with PrunedFilteredScan
-          with InsertableRelation {
+    with PrunedFilteredScan
+    with InsertableRelation {
+
+  private final val log: Log = LogFactory.getLog(classOf[CarbonJDBCRelation])
 
   override val needConversion: Boolean = false
 
-  private final val log: Log = LogFactory.getLog(classOf[JDBCRelation])
-
   override val schema: StructType = {
     try {
-      JDBCRDDCarbonUtils.resolveTable(dataSource, tableName)
+      CarbonJDBCUtils.resolveSchema(formattedSchema)
     }
     catch {
       case e: Exception =>
@@ -146,7 +170,7 @@ case class JDBCRelation(
 
   override def buildScan(requiredColumns: Array[String], filters: Array[Filter]): RDD[Row] = {
     try {
-      JDBCRDDCarbonUtils.scanTable(
+      CarbonJDBCUtils.scanTable(
         sqlContext.sparkContext,
         schema,
         dataSource,
@@ -165,28 +189,14 @@ case class JDBCRelation(
   override def insert(data: DataFrame, overwrite: Boolean): Unit = {
     try {
       val conn = GenericUtils.loadGlobalDataSource(dataSource).asInstanceOf[DataSource].getConnection
-      conn.setAutoCommit(false)
-
       try {
-        var tableExists = JdbcUtils.tableExists(conn, tableName)
-
-        if (overwrite && tableExists) {
-          JdbcUtils.dropTable(conn, tableName)
-          tableExists = false
-        }
-
-        // Create the table if the table didn't exist.
-        if (!tableExists) {
-          val schema = JDBCWriteDetails.schemaString(data, conn.getMetaData.getURL)
-          val sql = s"CREATE TABLE $tableName ($schema)"
-          conn.prepareStatement(sql).executeUpdate()
-          conn.commit()
+        if (overwrite) {
+          CarbonJDBCUtils.truncateTable(conn, tableName)
         }
       } finally {
         conn.close()
       }
-
-      JDBCWriteDetails.saveTable(data, dataSource, tableName)
+      JDBCWriteDetails.saveTable(data, dataSource, tableName, primaryKeys, overwrite)
     }
     catch {
       case e: Exception =>
