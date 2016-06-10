@@ -35,5 +35,6 @@ public class AnalyticsEventTableConstants {
     public static final String ANNOTATION_WAIT_FOR_INDEXING = "wait.for.indexing";
     
     public static final String ANNOTATION_MAX_SEARCH_RESULT_COUNT = "max.search.result.count";
-            
+
+    public static final String ANNOTATION_RECORD_StORE = "record.store";
 }
