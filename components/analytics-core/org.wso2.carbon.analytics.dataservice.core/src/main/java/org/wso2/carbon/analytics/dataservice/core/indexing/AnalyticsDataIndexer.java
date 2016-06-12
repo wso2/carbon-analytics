@@ -527,7 +527,6 @@ public class AnalyticsDataIndexer {
         String validatedQuery;
         if (query == null || query.isEmpty()) {
             validatedQuery = "*:*";
-            log.info("Lucene filtering query is not given, So matching all values.");
         } else {
             validatedQuery = query;
         }
