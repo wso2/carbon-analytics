@@ -32,7 +32,6 @@ import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.jdbc.carbon.AnalyticsJDBCRelationProvider;
-import org.apache.spark.sql.jdbc.carbon.DialectRegister;
 import org.apache.spark.util.Utils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.Constants;
@@ -42,11 +41,7 @@ import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionCall;
-import org.wso2.carbon.analytics.spark.core.deploy.AnalyticsRecoveryModeFactory;
-import org.wso2.carbon.analytics.spark.core.deploy.CheckElectedLeaderExecutionCall;
-import org.wso2.carbon.analytics.spark.core.deploy.ElectLeaderExecutionCall;
-import org.wso2.carbon.analytics.spark.core.deploy.InitClientExecutionCall;
-import org.wso2.carbon.analytics.spark.core.deploy.StartWorkerExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.*;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsRelationProvider;
@@ -70,16 +65,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -152,11 +138,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.redundantMasterCount = this.sparkConf.getInt(AnalyticsConstants.CARBON_SPARK_MASTER_COUNT, 1);
 
         this.registerShorthandStrings();
-        this.registerSqlDialects();
-    }
-
-    private void registerSqlDialects() {
-        DialectRegister.register();
     }
 
     /**

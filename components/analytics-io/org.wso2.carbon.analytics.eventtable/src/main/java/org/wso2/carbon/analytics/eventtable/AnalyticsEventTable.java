@@ -106,6 +106,8 @@ public class AnalyticsEventTable implements EventTable {
     
     private boolean indicesAvailable;
 
+    private String recordStore;
+
     @Override
     public void init(TableDefinition tableDefinition, ExecutionPlanContext executionPlanContext) {
         Annotation fromAnnotation = AnnotationHelper.getAnnotation(SiddhiConstants.ANNOTATION_FROM,
@@ -139,6 +141,7 @@ public class AnalyticsEventTable implements EventTable {
         } else {
             this.maxSearchResultCount = -1;
         }
+        this.recordStore = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_RECORD_StORE);
         try {
             this.tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         } catch (Error e) {
@@ -197,8 +200,25 @@ public class AnalyticsEventTable implements EventTable {
             }
             cols.add(new ColumnDefinition(attr.getName(), colType));
         }
+
         List<String> primaryKeys = AnalyticsDataServiceUtils.tokenizeAndTrimToList(this.primaryKeys, ",");
-        ServiceHolder.getAnalyticsDataService().createTable(this.tenantId, this.tableName);
+
+        try {
+            if (!ServiceHolder.getAnalyticsDataService().tableExists(this.tenantId, this.tableName)) {
+                log.debug(this.tableName + " table does not exists. Hence creating it");
+                if (this.recordStore != null && this.recordStore.length() > 0) {
+                    if (!ServiceHolder.getAnalyticsDataService().listRecordStoreNames().contains(this.recordStore)) {
+                        throw new AnalyticsException("Unknown record store name " + this.recordStore);
+                    }
+                    ServiceHolder.getAnalyticsDataService().createTable(this.tenantId, this.recordStore, this.tableName);
+                } else {
+                    ServiceHolder.getAnalyticsDataService().createTable(this.tenantId, this.tableName);
+                }
+            }
+        } catch (AnalyticsException e) {
+            throw new IllegalStateException("Error while accessing table " + this.tableName + " : " + e.getMessage(), e);
+        }
+
         AnalyticsSchema schema;
         if (this.mergeSchema) {
             schema = ServiceHolder.getAnalyticsDataService().getTableSchema(this.tenantId, this.tableName);
