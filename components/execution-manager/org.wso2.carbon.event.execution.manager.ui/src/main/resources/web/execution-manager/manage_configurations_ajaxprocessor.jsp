@@ -2,7 +2,7 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.ui.ExecutionManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ScenarioConfigurationDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ConfigurationParameterDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.StreamMappingDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.AttributeMappingDTO" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
@@ -40,7 +40,7 @@
     String templateType = request.getParameter("templateType");
     String valueSeparator = "::";
 
-    ParameterDTO[] parameters;
+    ConfigurationParameterDTO[] parameters;
 
     ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
     try {
@@ -56,15 +56,15 @@
             scenarioConfigurationDTO.setType(templateType);
 
             if (parametersJson.length() < 1) {
-               parameters = new ParameterDTO[0];
+               parameters = new ConfigurationParameterDTO[0];
 
             } else {
                 String[] parameterStrings = parametersJson.split(",");
-                parameters = new ParameterDTO[parameterStrings.length];
+                parameters = new ConfigurationParameterDTO[parameterStrings.length];
                 int index = 0;
 
                 for (String parameterString : parameterStrings) {
-                    ParameterDTO parameterDTO = new ParameterDTO();
+                    ConfigurationParameterDTO parameterDTO = new ConfigurationParameterDTO();
                     parameterDTO.setName(parameterString.split(valueSeparator)[0]);
                     parameterDTO.setValue(parameterString.split(valueSeparator)[1]);
                     parameters[index] = parameterDTO;
@@ -72,7 +72,7 @@
                 }
             }
 
-            scenarioConfigurationDTO.setParameterDTOs(parameters);
+            scenarioConfigurationDTO.setConfigurationParameterDTOs(parameters);
 
             //toStreamIDArray.length defines the number of stream mappings per configuration
             String[] toStreamIDArray = proxy.saveConfiguration(scenarioConfigurationDTO);

@@ -19,9 +19,9 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ScenarioConfigurationDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ScenarioInfoDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.ParameterDTOE" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.DomainParameterDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.domain.xsd.DomainInfoDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ConfigurationParameterDTO" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
 <%@ page import="org.owasp.encoder.Encode" %>
 
@@ -234,17 +234,17 @@
             <%
               int indexParam = 0;
 
-              if (currentScenario.getParameterDTOs() != null) {
-                for (ParameterDTOE parameter : currentScenario.getParameterDTOs()) {
+              if (currentScenario.getDomainParameterDTOs() != null) {
+                for (DomainParameterDTO parameter : currentScenario.getDomainParameterDTOs()) {
 
                     if (parameter == null) {
                         continue;
                     }
                     if (!isExistingConfig) {
                         parameterValue = parameter.getDefaultValue().trim();
-                    } else if (scenarioConfigurationDTO.getParameterDTOs() != null) {
+                    } else if (scenarioConfigurationDTO.getConfigurationParameterDTOs() != null) {
 
-                        for (ParameterDTO param : scenarioConfigurationDTO.getParameterDTOs()) {
+                        for (ConfigurationParameterDTO param : scenarioConfigurationDTO.getConfigurationParameterDTOs()) {
                             if (param.getName().equals(parameter.getName())) {
                                 parameterValue = param.getValue().trim();
                                 break;
@@ -306,7 +306,7 @@
                                 + parameter.getName() + "').value";
 
                         indexParam++;
-                        if (indexParam < currentScenario.getParameterDTOs().length) {
+                        if (indexParam < currentScenario.getDomainParameterDTOs().length) {
                             parameterString += "+ ',' +";
                         }
 
