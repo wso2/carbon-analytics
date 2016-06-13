@@ -28,7 +28,7 @@ public class ScenarioConfigurationDTO {
 
     private String description;
 
-    private ParameterDTO[] parameterDTOs;
+    private ConfigurationParameterDTO[] configurationParameterDTOs;
 
     private StreamMappingDTO[] streamMappingDTOs;
 
@@ -64,12 +64,12 @@ public class ScenarioConfigurationDTO {
         this.description = description;
     }
 
-    public ParameterDTO[] getParameterDTOs() {
-        return parameterDTOs;
+    public ConfigurationParameterDTO[] getConfigurationParameterDTOs() {
+        return configurationParameterDTOs;
     }
 
-    public void setParameterDTOs(ParameterDTO[] parameterDTOs) {
-        this.parameterDTOs = parameterDTOs;
+    public void setConfigurationParameterDTOs(ConfigurationParameterDTO[] configurationParameterDTOs) {
+        this.configurationParameterDTOs = configurationParameterDTOs;
     }
 
     public StreamMappingDTO[] getStreamMappingDTOs() {
