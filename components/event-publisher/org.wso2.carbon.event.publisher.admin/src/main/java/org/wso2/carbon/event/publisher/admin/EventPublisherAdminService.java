@@ -456,7 +456,19 @@ public class EventPublisherAdminService extends AbstractAdmin {
         return true;
     }
 
+    @Deprecated
     public boolean deployTextEventPublisherConfiguration(String eventPublisherName,
+                                                          String streamNameWithVersion,
+                                                          String eventAdapterType,
+                                                          String textData,
+                                                          BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                          String dataFrom, boolean mappingEnabled)
+            throws AxisFault {
+        return deployCacheableTextEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType,
+                textData, outputPropertyConfiguration, dataFrom, 15, mappingEnabled);
+    }
+
+    public boolean deployCacheableTextEventPublisherConfiguration(String eventPublisherName,
                                                          String streamNameWithVersion,
                                                          String eventAdapterType,
                                                          String textData,
@@ -478,9 +490,6 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 constructOutputAdapterRelatedConfigs(eventPublisherName, eventAdapterType, outputPropertyConfiguration,
                         eventPublisherConfiguration, EventPublisherConstants.EF_TEXT_MAPPING_TYPE);
 
-                if (cacheTimeoutDuration < 0) {
-                    cacheTimeoutDuration = 0;
-                }
 
                 TextOutputMapping textOutputMapping = new TextOutputMapping();
                 textOutputMapping.setCustomMappingEnabled(mappingEnabled);
@@ -515,7 +524,19 @@ public class EventPublisherAdminService extends AbstractAdmin {
         return true;
     }
 
+    @Deprecated
     public boolean deployXmlEventPublisherConfiguration(String eventPublisherName,
+                                                         String streamNameWithVersion,
+                                                         String eventAdapterType,
+                                                         String textData,
+                                                         BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                         String dataFrom, boolean mappingEnabled)
+            throws AxisFault {
+        return deployCacheableXmlEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType,
+                textData, outputPropertyConfiguration, dataFrom, 15, mappingEnabled);
+    }
+
+    public boolean deployCacheableXmlEventPublisherConfiguration(String eventPublisherName,
                                                         String streamNameWithVersion,
                                                         String eventAdapterType,
                                                         String textData,
@@ -542,9 +563,6 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 List<String> outputEventAttributes = new ArrayList<String>();
 
                 if (mappingEnabled) {
-                    if (cacheTimeoutDuration < 0) {
-                        cacheTimeoutDuration = 0;
-                    }
                     xmlOutputMapping.setMappingXMLText(textData);
                     xmlOutputMapping.setRegistryResource(validateRegistrySource(dataFrom));
                     xmlOutputMapping.setCacheTimeoutDuration(cacheTimeoutDuration);
@@ -625,7 +643,19 @@ public class EventPublisherAdminService extends AbstractAdmin {
         return true;
     }
 
+    @Deprecated
     public boolean deployJsonEventPublisherConfiguration(String eventPublisherName,
+                                                        String streamNameWithVersion,
+                                                        String eventAdapterType,
+                                                        String textData,
+                                                        BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                        String dataFrom, boolean mappingEnabled)
+            throws AxisFault {
+        return deployCacheableJsonEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType,
+                textData, outputPropertyConfiguration, dataFrom, 15, mappingEnabled);
+    }
+
+    public boolean deployCacheableJsonEventPublisherConfiguration(String eventPublisherName,
                                                          String streamNameWithVersion,
                                                          String eventAdapterType,
                                                          String jsonData,
@@ -653,9 +683,6 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 List<String> outputEventAttributes = new ArrayList<String>();
 
                 if (mappingEnabled) {
-                    if (cacheTimeoutDuration < 0) {
-                        cacheTimeoutDuration = 0;
-                    }
                     jsonOutputMapping.setRegistryResource(validateRegistrySource(dataFrom));
                     jsonOutputMapping.setMappingText(jsonData);
                     jsonOutputMapping.setCacheTimeoutDuration(cacheTimeoutDuration);

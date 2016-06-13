@@ -140,7 +140,7 @@
             long cacheTimeoutDuration = Long.parseLong(request.getParameter("cacheTimeoutDuration"));
 
             // add event adapter via admin service
-            stub.deployTextEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType, dataSet, eventPublisherProperties, dataFrom, cacheTimeoutDuration, customMappingEnabled);
+            stub.deployCacheableTextEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType, dataSet, eventPublisherProperties, dataFrom, cacheTimeoutDuration, customMappingEnabled);
             msg = "true";
 
         } else if (mappingType.equals("xml")) {
@@ -149,7 +149,7 @@
             long cacheTimeoutDuration = Long.parseLong(request.getParameter("cacheTimeoutDuration"));
 
             // add event adapter via admin service
-            stub.deployXmlEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType, dataSet, eventPublisherProperties, dataFrom, cacheTimeoutDuration, customMappingEnabled);
+            stub.deployCacheableXmlEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType, dataSet, eventPublisherProperties, dataFrom, cacheTimeoutDuration, customMappingEnabled);
             msg = "true";
 
         } else if (mappingType.equals("map")) {
@@ -186,7 +186,7 @@
             long cacheTimeoutDuration = Long.parseLong(request.getParameter("cacheTimeoutDuration"));
 
             // add event adapter via admin service
-            stub.deployJsonEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType, dataSet, eventPublisherProperties, dataFrom, cacheTimeoutDuration, customMappingEnabled);
+            stub.deployCacheableJsonEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType, dataSet, eventPublisherProperties, dataFrom, cacheTimeoutDuration, customMappingEnabled);
             msg = "true";
         }
 
