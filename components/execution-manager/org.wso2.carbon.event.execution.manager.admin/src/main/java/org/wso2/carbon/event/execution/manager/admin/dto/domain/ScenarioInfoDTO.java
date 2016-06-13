@@ -3,7 +3,7 @@ package org.wso2.carbon.event.execution.manager.admin.dto.domain;
 public class ScenarioInfoDTO {
     private String type;
     private String description;
-    private ParameterDTO[] parameterDTOs;
+    private DomainParameterDTO[] domainParameterDTOs;
 
     public String getType() {
         return type;
@@ -21,11 +21,11 @@ public class ScenarioInfoDTO {
         this.description = description;
     }
 
-    public ParameterDTO[] getParameterDTOs() {
-        return parameterDTOs;
+    public DomainParameterDTO[] getDomainParameterDTOs() {
+        return domainParameterDTOs;
     }
 
-    public void setParameterDTOs(ParameterDTO[] parameterDTOs) {
-        this.parameterDTOs = parameterDTOs;
+    public void setDomainParameterDTOs(DomainParameterDTO[] domainParameterDTOs) {
+        this.domainParameterDTOs = domainParameterDTOs;
     }
 }
