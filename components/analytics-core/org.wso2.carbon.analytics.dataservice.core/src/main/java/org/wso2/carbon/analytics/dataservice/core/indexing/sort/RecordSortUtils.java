@@ -53,10 +53,18 @@ public class RecordSortUtils {
                                                                        List<List<SearchResultEntry>> unsortedResults)
             throws AnalyticsIndexException {
 
+        List<List<SearchResultEntry>> unsortedResultsAfterRemovingEmpties = new ArrayList<List<SearchResultEntry>>();
+        for (List<SearchResultEntry> searchResultEntries : unsortedResults) {
+            // remove entries with no search results
+            if (searchResultEntries.size() > 0) {
+                unsortedResultsAfterRemovingEmpties.add(searchResultEntries);
+            }
+        }
+        
         if (sortByFields != null && !sortByFields.isEmpty()) {
             List<String> ids = new ArrayList<>();
             Map<String, SearchResultEntry> unsortedSearchResultEntries = new HashMap<>();
-            for (List<SearchResultEntry> searchResultEntries : unsortedResults) {
+            for (List<SearchResultEntry> searchResultEntries : unsortedResultsAfterRemovingEmpties) {
                 for (SearchResultEntry searchResultEntry : searchResultEntries) {
                     ids.add(searchResultEntry.getId());
                     unsortedSearchResultEntries.put(searchResultEntry.getId(), searchResultEntry);
@@ -64,7 +72,7 @@ public class RecordSortUtils {
             }
             try {
                 AnalyticsDataResponse response = ads.get(tenantId, tableName, 1, null, ids);
-                List<List<Record>> sortedRecordListsPerNode = getSortedRecordListsPerNode(ads, unsortedResults, response);
+                List<List<Record>> sortedRecordListsPerNode = getSortedRecordListsPerNode(ads, unsortedResultsAfterRemovingEmpties, response);
                 List<Record> records = getSortedList(sortedRecordListsPerNode, indices, sortByFields);
                 return getFinalSortedSearchResultEntries(unsortedSearchResultEntries, records);
             } catch (AnalyticsException e) {
@@ -72,7 +80,7 @@ public class RecordSortUtils {
             }
         } else {
             List<SearchResultEntry> sortedSearchResultEntries = new ArrayList<>();
-            for (List<SearchResultEntry> searchResultEntries : unsortedResults) {
+            for (List<SearchResultEntry> searchResultEntries : unsortedResultsAfterRemovingEmpties) {
                 sortedSearchResultEntries.addAll(searchResultEntries);
             }
             Collections.sort(sortedSearchResultEntries);
@@ -100,7 +108,9 @@ public class RecordSortUtils {
         for (List<SearchResultEntry> searchResultEntries : unsortedResults) {
             List<Record> records = new ArrayList<>();
             for (SearchResultEntry entry : searchResultEntries) {
-                records.add(unsortedRecordMap.get(entry.getId()));
+                if (unsortedRecordMap.containsKey(entry.getId())) {
+                    records.add(unsortedRecordMap.get(entry.getId()));
+                }
             }
             sortedRecordsSubLists.add(records);
         }
