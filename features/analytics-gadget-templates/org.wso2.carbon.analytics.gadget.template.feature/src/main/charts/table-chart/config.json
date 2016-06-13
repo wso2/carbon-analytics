@@ -15,9 +15,14 @@
             "fieldName": "color",
             "fieldType": "dropdown",
             "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "Enable grid",
+            "fieldName": "grid",
+            "fieldType": "checkbox"
         }
     ],
     "common-libs" : ["wso2gadgets","chart-utils"],
-    "chart-libs" : ["d3.min","vega","VizGrammar.min"]
+    "chart-libs" : ["d3.min","vega","VizGrammar.min","jquery.dataTables.min"]
 }
 
