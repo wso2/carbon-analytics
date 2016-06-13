@@ -80,19 +80,18 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
      */
     getConfig = function() {
         var formConfig = require(PROVIDERS_LOCATION + '/' + PROVIDER_NAME + '/config.json');
-        var datasourceCfg = {
-            "fieldLabel": "Event Table",
-            "fieldName": "tableName",
-            "fieldType": "dropDown"
-        };
         var tables;
         try {
-            tables = connector.getTableList(loggedInUser).getMessage();
-            datasourceCfg['valueSet'] = JSON.parse(tables);
+            tables = JSON.parse(connector.getTableList(loggedInUser).getMessage());
         } catch (e) {
             log.error(e);
         }
-        formConfig.config.push(datasourceCfg);
+        var configs = formConfig.config;
+        configs.forEach(function(config) {
+            if (config.fieldName === TABLE_NAME) {
+                config.valueSet = tables;
+            }
+        });
         return formConfig;
     }
 
@@ -125,12 +124,12 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
         var result = connector.getTableSchema(loggedInUser, tableName).getMessage();
         result = JSON.parse(result);
 
-        var columns = result.columns;       
+        var columns = result.columns;
         Object.getOwnPropertyNames(columns).forEach(function(name, idx, array) {
-          schema.push( {
-            fieldName : name,
-            fieldType: columns[name]['type']
-          });
+            schema.push({
+                fieldName: name,
+                fieldType: columns[name]['type']
+            });
         });
         // log.info(schema);
         return schema;
@@ -141,13 +140,29 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
      * @param providerConfig
      * @param limit
      */
-    getData = function (providerConfig,limit) {
+    getData = function(providerConfig, limit) {
         var tableName = providerConfig.tableName;
-        var from = JS_MIN_VALUE;
-        var to = JS_MAX_VALUE;
-        var result = connector.getRecordsByRange(loggedInUser, tableName, from, to, 0, 10, null).getMessage();
-        result = JSON.parse(result);
+        var query = providerConfig.query;
+        var limit = 100;
+        if (providerConfig.limit) {
+            limit = providerConfig.limit;
+        }
+        var result;
+        //if there's a filter present, we should perform a Lucene search instead of reading the table
+        if (query) {
+            var filter = {
+                "query": query,
+                "start": 0,
+                "count": limit
+            };
+            result = connector.search(loggedInUser, tableName, stringify(filter)).getMessage();
+        } else {
+            var from = JS_MIN_VALUE;
+            var to = JS_MAX_VALUE;
+            result = connector.getRecordsByRange(loggedInUser, tableName, from, to, 0, limit, null).getMessage();
 
+        }
+        result = JSON.parse(result);
         var data = [];
         for (var i = 0; i < result.length; i++) {
             var values = result[i].values;
