@@ -70,9 +70,6 @@
                                 <bundleDef>
                                     org.wso2.carbon.analytics-common:org.wso2.carbon.event.input.adapter.jms:${carbon.analytics.common.version}
                                 </bundleDef>
-                                <bundleDef>
-                                    org.apache.axis2.transport:axis2-transport-jms:${axis2-transports.version}
-                                </bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}
