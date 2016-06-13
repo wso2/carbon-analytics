@@ -19,6 +19,7 @@ package org.wso2.carbon.event.processor.manager.core.config;
 
 import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisherConfig;
 import org.wso2.carbon.event.processor.manager.commons.utils.HostAndPort;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.Serializable;
 
@@ -57,6 +58,8 @@ public class HAConfiguration implements Serializable {
     private String memberUuid;
     private boolean isActive = false;
 
+    private static final int portOffset = Integer.parseInt(CarbonUtils.getServerConfiguration().getFirstProperty("Ports.Offset"));
+
     public boolean isActive() {
         return isActive;
     }
@@ -86,7 +89,7 @@ public class HAConfiguration implements Serializable {
     }
 
     public void setLocalPresenterConfig(String host, int port) {
-        this.localPresenterConfig = new HostAndPort(host, port);
+        this.localPresenterConfig = new HostAndPort(host, port + portOffset);
     }
 
     public HostAndPort getManagementConfig() {
@@ -98,11 +101,11 @@ public class HAConfiguration implements Serializable {
     }
 
     public void setManagement(String host, int port) {
-        this.managementConfig = new HostAndPort(host, port);
+        this.managementConfig = new HostAndPort(host, port + portOffset);
     }
 
     public void setEventSyncConfig(String host, int port) {
-        this.eventSyncConfig = new HostAndPort(host, port);
+        this.eventSyncConfig = new HostAndPort(host, port + portOffset);
     }
 
     public String getMemberUuid() {
