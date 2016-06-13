@@ -25,7 +25,7 @@ import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkServiceImpl;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventStoreCAppDeployer;
 import org.wso2.carbon.analytics.eventsink.internal.jmx.QueueEventBufferSizeCalculator;
-import org.wso2.carbon.analytics.eventsink.internal.jmx.StreamEventReceiverCounter;
+import org.wso2.carbon.analytics.eventsink.internal.jmx.EventReceiverCounter;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
 import org.wso2.carbon.analytics.eventsink.subscriber.AnalyticsEventStreamListener;
@@ -90,7 +90,7 @@ public class AnalyticsEventSinkComponent {
             String eventCounterObject = "org.wso2.carbon:00=analytics,01=EVENT_COUNTER";
             ObjectName eventCounterMbean = new ObjectName(eventCounterObject);
             if (!platformMBeanServer.isRegistered(eventCounterMbean)) {
-                StreamEventReceiverCounter counter = new StreamEventReceiverCounter();
+                EventReceiverCounter counter = new EventReceiverCounter();
                 platformMBeanServer.registerMBean(counter, eventCounterMbean);
             }
             String queueBufferSize = "org.wso2.carbon:00=analytics,01=RECEIVER_REMAINING_QUEUE_BUFFER_SIZE_IN_BYTES";

@@ -214,8 +214,12 @@ public class AnalyticsDSConnector {
         int iteration = 0;
         for (Attribute attribute : attributes) {
             if (AnalyticsEventSinkConstants.PAYLOAD_TIMESTAMP.equals(attribute.getName())) {
-                timestamp = (long) values[iteration];
-                continue;
+                if (values[iteration] != null) {
+                    timestamp = (long) values[iteration];
+                    continue;
+                } else {
+                    log.error("Timestamp value is null.");
+                }
             }
             String attributeKey = getAttributeKey(type, attribute.getName());
             Object recordValue = getRecordValue(schema, attributeKey, values[iteration], false);
