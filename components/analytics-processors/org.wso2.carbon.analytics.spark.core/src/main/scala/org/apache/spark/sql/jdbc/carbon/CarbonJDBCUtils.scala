@@ -140,14 +140,14 @@ object CarbonJDBCUtils {
       }
 
       rootStmt = rootStmt.replace(COLUMNS_KEYS_PLACEHOLDER, columns)
-      if (indices.length > 2) {
-        indexStmt = indexStmt.replace(INDICES_PLACEHOLDER, indices)
-      }
 
       //Setting autocommit to false so that table and index creation take place as a single transaction
       conn.setAutoCommit(false)
       conn.prepareStatement(rootStmt).execute()
-      conn.prepareStatement(indexStmt).execute()
+      if (indices.nonEmpty) {
+        indexStmt = indexStmt.replace(INDICES_PLACEHOLDER, indices)
+        conn.prepareStatement(indexStmt).execute()
+      }
       conn.commit()
       committed = true
     } catch {
