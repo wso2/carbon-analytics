@@ -455,6 +455,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
         return true;
     }
 
+    // Deprecated method
     public boolean deployTextEventPublisherConfiguration(String eventPublisherName,
                                                           String streamNameWithVersion,
                                                           String eventAdapterType,
@@ -522,6 +523,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
         return true;
     }
 
+    // Deprecated method
     public boolean deployXmlEventPublisherConfiguration(String eventPublisherName,
                                                          String streamNameWithVersion,
                                                          String eventAdapterType,
@@ -640,6 +642,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
         return true;
     }
 
+    // Deprecated method
     public boolean deployJsonEventPublisherConfiguration(String eventPublisherName,
                                                         String streamNameWithVersion,
                                                         String eventAdapterType,
