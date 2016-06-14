@@ -1362,7 +1362,6 @@
 
         <spark.sql.version.range>[1.4.2.wso2v1,1.5.0)</spark.sql.version.range>
 
-	<guava.version.range>[15.0.0, 16.0.0)</guava.version.range>
     </properties>
 
     <pluginRepositories>
