@@ -25,6 +25,7 @@ import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.isE
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,8 +43,10 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.rdd.CompressedEventAnalyticsRDD;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants.IncrementalWindowUnit;
 import org.wso2.carbon.analytics.spark.core.util.CarbonScalaUtils;
 
+import org.wso2.carbon.analytics.spark.core.util.IncrementalUtils;
 import scala.reflect.ClassTag$;
 
 /**
@@ -61,8 +64,8 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
     private String recordStore;
     private boolean incEnable;
     private String incID;
-    private long incWindowSizeMS;
     private int incBuffer;
+    private IncrementalWindowUnit windowUnit;
     
     public CompressedEventAnalyticsRelation() {
     }
@@ -135,9 +138,8 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
                 startTime = ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(this.tenantId,
                     this.incID, true);
                 if (startTime > 0) {
-                    if (this.incWindowSizeMS != 0) {
-                        startTime -= startTime % this.incWindowSizeMS;
-                        startTime -= this.incBuffer * this.incWindowSizeMS;
+                    if (this.windowUnit != null) {
+                        startTime = IncrementalUtils.getIncrementalStartTime(startTime, windowUnit, incBuffer);
                     } else {
                         startTime += 1;
                     }
@@ -208,11 +210,11 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
             String[] splits = incParamStr.split("\\s*,\\s*");
             if (splits.length == 2) {
                 this.incID = splits[0];
-                this.incWindowSizeMS = Long.parseLong(splits[1]) * 1000;
+                this.windowUnit = IncrementalWindowUnit.valueOf(splits[1].toUpperCase());
                 this.incBuffer = 1;
             } else if (splits.length == 3) {
                 this.incID = splits[0];
-                this.incWindowSizeMS = Long.parseLong(splits[1]) * 1000;
+                this.windowUnit = IncrementalWindowUnit.valueOf(splits[1].toUpperCase());
                 this.incBuffer = Integer.parseInt(splits[2]);
             } else {
                 String msg = "Error while setting incremental processing parameters : " + incParamStr;

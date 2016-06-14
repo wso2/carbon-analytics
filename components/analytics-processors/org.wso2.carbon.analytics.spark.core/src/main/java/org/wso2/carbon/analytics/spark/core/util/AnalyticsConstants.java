@@ -151,4 +151,14 @@ public class AnalyticsConstants {
     public static final String FAULT_COUNT_ATTRIBUTE = "faultCount";
     public static final String HASHCODE_ATTRIBUTE = "hashCode";
     public static final String HOST_ATTRIBUTE = "host";
+
+    public enum IncrementalWindowUnit {
+        SECOND,
+        MINUTE,
+        HOUR,
+        DAY,
+        MONTH,
+        YEAR
+    }
+
 }
