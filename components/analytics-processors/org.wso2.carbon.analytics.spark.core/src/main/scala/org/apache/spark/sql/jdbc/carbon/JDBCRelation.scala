@@ -92,10 +92,7 @@ object JDBCRelation {
   */
 class AnalyticsJDBCRelationProvider extends RelationProvider {
 
-  val DATASOURCE = "dataSource"
-  val TABLE_NAME = "tableName"
-  val SCHEMA = "schema"
-  val PRIMARY_KEYS = "primaryKeys"
+  import CarbonJDBCConstants._
 
   private final val log: Log = LogFactory.getLog(classOf[AnalyticsJDBCRelationProvider])
 

@@ -176,7 +176,7 @@ package object carbon {
       */
     def insertStatement(conn: Connection, table: String, rddSchema: StructType, qConf: SparkJDBCQueryConfigEntry):
     PreparedStatement = {
-      import CarbonJDBCUtils._
+      import CarbonJDBCConstants._
       var sql = qConf.getRecordInsertQuery.replace(TABLE_NAME_PLACEHOLDER, table)
       val params = new StringBuilder
 
@@ -199,7 +199,7 @@ package object carbon {
     def mergeStatement(conn: Connection, table: String, primaryKeys: String, rddSchema: StructType,
                        qConf: SparkJDBCQueryConfigEntry):
     PreparedStatement = {
-      import CarbonJDBCUtils._
+      import CarbonJDBCConstants._
       var sql = qConf.getRecordMergeQuery.replace(TABLE_NAME_PLACEHOLDER, table)
 
       val pKeys = primaryKeys.split("\\s*,\\s*")          // {{KEYS}}
