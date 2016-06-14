@@ -46,4 +46,6 @@ public final class PropertyAttributeTypeConstants {
     public static final String PROPERTY_CORRELATION_PREFIX = "correlation_";
 
     public static final String ARBITRARY_MAP_PREFIX = "arbitrary_";
+
+    public static final long DEFAULT_REGISTRY_RESOURCE_CACHE_TIMEOUT = 15;    // In minutes
 }

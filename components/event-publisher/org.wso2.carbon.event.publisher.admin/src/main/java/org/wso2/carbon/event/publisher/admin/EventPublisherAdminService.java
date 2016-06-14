@@ -38,7 +38,6 @@ import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.config.mapping.*;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 
-import javax.naming.ConfigurationException;
 import java.util.*;
 
 public class EventPublisherAdminService extends AbstractAdmin {
@@ -465,7 +464,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                                                           String dataFrom, boolean mappingEnabled)
             throws AxisFault {
         return deployCacheableTextEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType,
-                textData, outputPropertyConfiguration, dataFrom, 15, mappingEnabled);
+                textData, outputPropertyConfiguration, dataFrom, PropertyAttributeTypeConstants.DEFAULT_REGISTRY_RESOURCE_CACHE_TIMEOUT, mappingEnabled);
     }
 
     public boolean deployCacheableTextEventPublisherConfiguration(String eventPublisherName,
@@ -533,7 +532,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                                                          String dataFrom, boolean mappingEnabled)
             throws AxisFault {
         return deployCacheableXmlEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType,
-                textData, outputPropertyConfiguration, dataFrom, 15, mappingEnabled);
+                textData, outputPropertyConfiguration, dataFrom, PropertyAttributeTypeConstants.DEFAULT_REGISTRY_RESOURCE_CACHE_TIMEOUT, mappingEnabled);
     }
 
     public boolean deployCacheableXmlEventPublisherConfiguration(String eventPublisherName,
@@ -652,7 +651,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                                                         String dataFrom, boolean mappingEnabled)
             throws AxisFault {
         return deployCacheableJsonEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType,
-                textData, outputPropertyConfiguration, dataFrom, 15, mappingEnabled);
+                textData, outputPropertyConfiguration, dataFrom, PropertyAttributeTypeConstants.DEFAULT_REGISTRY_RESOURCE_CACHE_TIMEOUT, mappingEnabled);
     }
 
     public boolean deployCacheableJsonEventPublisherConfiguration(String eventPublisherName,
