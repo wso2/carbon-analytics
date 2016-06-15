@@ -87,6 +87,9 @@
                         <Export-Package>!org.wso2.carbon.analytics.eventtable.internal.*,
                             org.wso2.carbon.analytics.eventtable.*
                         </Export-Package>
+			<Import-Package>com.google.common.cache;version="${guava.import.version}",
+					*;resolution:=optional
+			</Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
