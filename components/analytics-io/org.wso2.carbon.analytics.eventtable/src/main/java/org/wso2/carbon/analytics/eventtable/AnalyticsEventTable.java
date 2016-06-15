@@ -30,6 +30,7 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.eventtable.internal.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
@@ -69,6 +70,9 @@ import org.wso2.siddhi.query.api.expression.math.Multiply;
 import org.wso2.siddhi.query.api.expression.math.Subtract;
 import org.wso2.siddhi.query.api.util.AnnotationHelper;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.Weigher;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -78,6 +82,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class implements the Siddhi event table interface {@link EventTable} for analytics tables.
@@ -105,8 +110,16 @@ public class AnalyticsEventTable implements EventTable {
     private int maxSearchResultCount;
     
     private boolean indicesAvailable;
-
+    
+    private boolean caching;
+    
+    private int cacheTimeoutSeconds;
+    
+    private long cacheSizeBytes;
+    
     private String recordStore;
+    
+    private Map<String, List<Record>> cache;
 
     @Override
     public void init(TableDefinition tableDefinition, ExecutionPlanContext executionPlanContext) {
@@ -141,13 +154,55 @@ public class AnalyticsEventTable implements EventTable {
         } else {
             this.maxSearchResultCount = -1;
         }
+        
+        String cachingProp = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_CACHING);
+        if (cachingProp != null) {
+            this.caching = Boolean.parseBoolean(cachingProp.trim());
+        } else {
+            this.caching = true;
+        }
+        
+        String cacheTimeoutSecsProp = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_CACHE_TIMEOUT_SECONDS);
+        if (cacheTimeoutSecsProp != null) {
+            this.cacheTimeoutSeconds = Integer.parseInt(cacheTimeoutSecsProp.trim());
+            if (this.cacheTimeoutSeconds == -1) {
+                this.cacheTimeoutSeconds = Integer.MAX_VALUE;
+            }
+        } else {
+            this.cacheTimeoutSeconds = AnalyticsEventTableConstants.DEFAULT_CACHE_TIMEOUT;
+        }
+        
+        String cacheSizeBytesProp = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_CACHE_SIZE_BYTES);
+        if (cacheSizeBytesProp != null) {
+            this.cacheSizeBytes = Integer.parseInt(cacheSizeBytesProp.trim());
+        } else {
+            this.cacheSizeBytes = AnalyticsEventTableConstants.DEFAULT_CACHE_SIZE;
+        }
+        
         this.recordStore = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_RECORD_StORE);
         try {
             this.tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         } catch (Error e) {
             /* this would never happens in real server runtime, caught for unit tests */
             this.tenantId = -1;
-        }        
+        }
+        
+        /* initialize caching if enabled */
+        this.initCaching();
+    }
+    
+    private void initCaching() {
+        if (!this.caching) {
+            return;
+        }
+        this.cache = CacheBuilder.newBuilder().maximumWeight(
+                this.cacheSizeBytes).weigher(
+                    new Weigher<String, List<Record>>() {
+                        public int weigh(String key, List<Record> value) {
+                            return GenericUtils.serializeObject(value).length;
+                        }
+                    }).expireAfterWrite(this.cacheTimeoutSeconds, 
+                TimeUnit.SECONDS).build().asMap();
     }
     
     private void checkAndProcessPostInit() {
@@ -307,6 +362,14 @@ public class AnalyticsEventTable implements EventTable {
     @Override
     public void overwriteOrAdd(ComplexEventChunk complexEventChunk, Operator operator, int[] mappingPosition) {
         this.update(complexEventChunk, operator, mappingPosition);
+    }
+    
+    public boolean isCaching() {
+        return caching;
+    }
+    
+    public Map<String, List<Record>> getCache() {
+        return cache;
     }
 
     /**
@@ -687,16 +750,20 @@ public class AnalyticsEventTable implements EventTable {
         }
         
         private List<Record> findRecords(ComplexEvent matchingEvent, Object candidateEvents, 
-                StreamEventCloner streamEventCloner) {
+                StreamEventCloner streamEventCloner) {            
+            long start = 0;
+            if (log.isDebugEnabled()) {
+                start = System.currentTimeMillis();
+            }
             List<Record> records;
             if (this.pkMatchCompatible) {
                 /* if no one else complained, check with primary key candidates */
                 this.pkMatchCompatible = this.checkPrimaryKeyCompatibleWithCandidates();
             }
             if (this.returnAllRecords) {
-                records = AnalyticsEventTableUtils.getAllRecords(this.tenantId, this.tableName);
+                records = this.getAllRecords();
             } else if (this.pkMatchCompatible) {
-                Record record = this.getRecordWithEventValues(this.tenantId, this.tableName, matchingEvent);
+                Record record = this.getRecordWithEventValues(matchingEvent);
                 if (record == null) {
                     records = new ArrayList<>(0);
                 } else {
@@ -705,25 +772,87 @@ public class AnalyticsEventTable implements EventTable {
             } else {
                 records = this.executeLuceneQuery(matchingEvent);
             }
+            if (log.isDebugEnabled()) {
+                long end = System.currentTimeMillis();
+                log.debug("Find Records Time: " + (end - start) + " ms.");
+            }
             return records;
         }
         
-        private Record getRecordWithEventValues(int tenantId, String tableName, ComplexEvent event) {
-            try {
-                Map<String, Object> values = new HashMap<>();
-                int expressionExIndex = 0;
-                for (Map.Entry<String, Object> entry : this.primaryKeyRHSValues.entrySet()) {
-                    if (entry.getValue().toString().startsWith(LUCENE_QUERY_PARAM)) {
-                        values.put(entry.getKey(), this.expressionExecs.get(expressionExIndex).execute(event));
-                        expressionExIndex++;
-                    } else {
-                        values.put(entry.getKey(), entry.getValue());
+        private String generateAllRecordsCacheKey() {
+            return AnalyticsEventTableConstants.CACHE_KEY_PREFIX_ALL_RECORDS + this.tenantId + ":" + this.tableName;
+        }
+        
+        private List<Record> getAllRecords() {
+            if (isCaching()) {
+                String key = this.generateAllRecordsCacheKey();
+                List<Record> records = getCache().get(key);
+                if (records == null) {
+                    records = AnalyticsEventTableUtils.getAllRecords(this.tenantId, this.tableName);
+                    getCache().put(key, records);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Cache updated for all records: " + this.tenantId + ":" + this.tableName);
                     }
+                } else if (log.isDebugEnabled()) {
+                    log.debug("Cache HIT for all records: " + this.tenantId + ":" + this.tableName);
                 }
-                List<Map<String, Object>> valuesBatch = new ArrayList<Map<String,Object>>();
-                valuesBatch.add(values);
+                return records;
+            } else {
+                return AnalyticsEventTableUtils.getAllRecords(this.tenantId, this.tableName);
+            } 
+        }
+        
+        private String generatePKCacheKey(List<Map<String, Object>> valuesBatch) {
+            return AnalyticsEventTableConstants.CACHE_KEY_PREFIX_PK + this.tenantId + ":" + this.tableName + ":" + valuesBatch;
+        }
+        
+        private Record getRecordWithEventValues(ComplexEvent event) {
+            List<Map<String, Object>> valuesBatch = this.extractRecordValuesBatchFromEvent(event);
+            if (isCaching()) {
+                String key = this.generatePKCacheKey(valuesBatch);
+                List<Record> records = getCache().get(key);
+                if (records == null) {
+                    Record record = this.getRecordWithEventValuesDirect(valuesBatch);
+                    if (record != null) {
+                        records = Arrays.asList(record);
+                        getCache().put(key, records);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Cache updated for record with values: " + this.tenantId + ":" + this.tableName + " -> " + valuesBatch);
+                        }
+                    }
+                } else if (log.isDebugEnabled()) {
+                    log.debug("Cache HIT for record with values: " + this.tenantId + ":" + this.tableName + " -> " + valuesBatch);
+                }
+                if (records != null && records.size() > 0) {
+                    return records.get(0);
+                } else {
+                    return null;
+                }
+            } else {
+                return this.getRecordWithEventValuesDirect(valuesBatch);
+            }
+        }
+        
+        private List<Map<String, Object>> extractRecordValuesBatchFromEvent(ComplexEvent event) {
+            Map<String, Object> values = new HashMap<>();
+            int expressionExIndex = 0;
+            for (Map.Entry<String, Object> entry : this.primaryKeyRHSValues.entrySet()) {
+                if (entry.getValue().toString().startsWith(LUCENE_QUERY_PARAM)) {
+                    values.put(entry.getKey(), this.expressionExecs.get(expressionExIndex).execute(event));
+                    expressionExIndex++;
+                } else {
+                    values.put(entry.getKey(), entry.getValue());
+                }
+            }
+            List<Map<String, Object>> valuesBatch = new ArrayList<Map<String,Object>>();
+            valuesBatch.add(values);
+            return valuesBatch;
+        }
+        
+        private Record getRecordWithEventValuesDirect(List<Map<String, Object>> valuesBatch) {
+            try {
                 AnalyticsDataResponse resp = ServiceHolder.getAnalyticsDataService().getWithKeyValues(
-                        tenantId, tableName, 1, null, valuesBatch);
+                        this.tenantId, this.tableName, 1, null, valuesBatch);
                 List<Record> records = AnalyticsDataServiceUtils.listRecords(ServiceHolder.getAnalyticsDataService(), resp);
                 if (records.size() > 0) {
                     return records.get(0);
@@ -745,10 +874,33 @@ public class AnalyticsEventTable implements EventTable {
             return query;
         }
         
+        private String generateLuceneQueryCacheKey(String query) {
+            return AnalyticsEventTableConstants.CACHE_KEY_PREFIX_LUCENE + this.tenantId + ":" + this.tableName + ":" + query;
+        }
+        
         private List<Record> executeLuceneQuery(ComplexEvent matchingEvent) {
+            String query = this.getTranslatedLuceneQuery(matchingEvent);
+            if (isCaching()) {
+                String key = this.generateLuceneQueryCacheKey(query);
+                List<Record> records = getCache().get(key);
+                if (records == null) {
+                    records = this.executeLuceneQueryDirect(query);
+                    getCache().put(key, records);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Cache updated for lucene query: " + this.tenantId + ":" + this.tableName + " -> " + query);
+                    }
+                } else if (log.isDebugEnabled()) {
+                    log.debug("Cache HIT for lucene query: " + this.tenantId + ":" + this.tableName + " -> " + query);
+                }
+                return records;
+            } else {
+                return this.executeLuceneQueryDirect(query);
+            }
+        }
+        
+        private List<Record> executeLuceneQueryDirect(String query) {
             try {
                 AnalyticsDataService service = ServiceHolder.getAnalyticsDataService();
-                String query = this.getTranslatedLuceneQuery(matchingEvent);
                 if (log.isDebugEnabled()) {
                     log.debug("Analytics Table Search Query: '" + query + "'");
                 }

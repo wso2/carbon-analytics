@@ -34,7 +34,24 @@ public class AnalyticsEventTableConstants {
     
     public static final String ANNOTATION_WAIT_FOR_INDEXING = "wait.for.indexing";
     
+    public static final String ANNOTATION_CACHING = "caching";
+    
+    public static final String ANNOTATION_CACHE_TIMEOUT_SECONDS = "cache.timeout.seconds";
+    
+    public static final String ANNOTATION_CACHE_SIZE_BYTES = "cache.size.bytes";
+    
     public static final String ANNOTATION_MAX_SEARCH_RESULT_COUNT = "max.search.result.count";
 
     public static final String ANNOTATION_RECORD_StORE = "record.store";
+    
+    public static final int DEFAULT_CACHE_TIMEOUT = 60; // 1 minute
+    
+    public static final int DEFAULT_CACHE_SIZE = 1024 * 1024 * 10; // 10 MB
+    
+    public static final String CACHE_KEY_PREFIX_LUCENE = "@LQ:";
+    
+    public static final String CACHE_KEY_PREFIX_ALL_RECORDS = "@AL:";
+    
+    public static final String CACHE_KEY_PREFIX_PK = "@PK:";
+    
 }
