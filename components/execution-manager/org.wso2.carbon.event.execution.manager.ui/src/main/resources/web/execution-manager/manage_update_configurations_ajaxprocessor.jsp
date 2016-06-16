@@ -398,22 +398,21 @@
                     %>
                     </tbody>
                     <div style="display: none">
-                        <input type="text" id="metaRows"
+                        <input type="text" id="metaRows_<%=i%>"
                                value="<%=metaCounter%>"/>
-                        <input type="text" id="correlationRows"
+                        <input type="text" id="correlationRows_<%=i%>"
                                value="<%=correlationCounter%>"/>
-                        <input type="text" id="payloadRows"
+                        <input type="text" id="payloadRows_<%=i%>"
                                value="<%=payloadCounter%>"/>
                     </div>
                 </table>
             </div>
         </div>
-        <%
-            }
-        %>
-
-        <br class="c-both"/>
-        <hr class="wr-separate"/>
+    <br class="c-both"/>
+    <hr class="wr-separate"/>
+    <%
+        }
+    %>
 
         <div class="action-container">
             <button type="button"

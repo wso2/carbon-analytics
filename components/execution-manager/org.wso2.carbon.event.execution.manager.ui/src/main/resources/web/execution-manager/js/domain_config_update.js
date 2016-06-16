@@ -150,9 +150,9 @@ function getStreamMappingObjectArray(streamMappingArrayLength) {
             return;
         } else {
             if (fromStreamID.localeCompare(toStreamID) != 0) {
-                var metaRows = document.getElementById("metaRows").value;
-                var correlationRows = document.getElementById("correlationRows").value;
-                var payloadRows = document.getElementById("payloadRows").value;
+                var metaRows = document.getElementById("metaRows_" + i).value;
+                var correlationRows = document.getElementById("correlationRows_" + i).value;
+                var payloadRows = document.getElementById("payloadRows_" + i).value;
 
                 var metaData = getStreamMappingValues('meta', i, metaRows);
                 var correlationData = getStreamMappingValues('correlation', i, correlationRows);
