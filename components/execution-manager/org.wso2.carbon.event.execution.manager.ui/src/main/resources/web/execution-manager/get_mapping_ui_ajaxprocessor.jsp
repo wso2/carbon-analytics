@@ -265,11 +265,11 @@
             }
         %>
         <div style="display: none">
-            <input type="text" id="metaRows"
+            <input type="text" id="metaRows_<%=index%>"
                    value="<%=metaCounter%>"/>
-            <input type="text" id="correlationRows"
+            <input type="text" id="correlationRows_<%=index%>"
                    value="<%=correlationCounter%>"/>
-            <input type="text" id="payloadRows"
+            <input type="text" id="payloadRows_<%=index%>"
                    value="<%=payloadCounter%>"/>
         </div>
 
