@@ -28,6 +28,8 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -1171,6 +1173,44 @@ public class AnalyticsResource extends AbstractResource {
 			return Response.ok(GenericUtils.generateTableUUID(tenantId, tableName)).build();
 		} catch (UserStoreException e) {
 			throw new AnalyticsException("Error while getting tenant ID for user: " + username + "[" + e.getMessage() + "]", e);
+		}
+	}
+
+	/**
+	 * To clear table information from in memory cache
+	 *
+	 * @param tableName table Name of which that cache going to clear
+	 * @return the {@link Response} response
+	 * @throws AnalyticsException
+	 */
+	@DELETE
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	@Path("tables/{tableName}/schema-invalidate")
+	public Response clearTableCache(@PathParam("tableName") String tableName,
+									@HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+			throws AnalyticsException {
+		if (logger.isDebugEnabled()) {
+			logger.debug("Invoking schema invalidate for tableName : " + tableName);
+		}
+		AnalyticsDataServiceImpl dataService;
+		Object obj = Utils.getAnalyticsDataService();
+		try {
+			if (obj instanceof AnalyticsDataServiceImpl) {
+				dataService = (AnalyticsDataServiceImpl) obj;
+				RealmService realmService = Utils.getRealmService();
+				String username = authenticate(authHeader);
+				String tenantDomain = MultitenantUtils.getTenantDomain(username);
+				int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+				dataService.invalidateAnalyticsTableInfo(tenantId, tableName);
+				return handleResponse(ResponseStatus.SUCCESS, "Successfully clear cache for table: "
+						+ tableName);
+			} else {
+				return handleResponse(ResponseStatus.FAILED, "Unable to get AnalyticsDataServiceImpl obj to clear cache for table: "
+						+ tableName);
+			}
+		} catch (Exception ex) {
+			throw new AnalyticsException("Unable to invalidate schema for table:" + tableName);
 		}
 	}
 }

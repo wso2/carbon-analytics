@@ -28,6 +28,7 @@ import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
@@ -95,6 +96,22 @@ public class Utils {
             throw new AnalyticsException("RealmService is not available.");
         }
         return realmService;
+    }
+
+    /**
+     * Gets AnalyticsData Service OSGI service instance.
+     *
+     * @return the analytics data service instance.
+     * @throws AnalyticsException
+     */
+    public static AnalyticsDataService getAnalyticsDataService() throws AnalyticsException {
+        AnalyticsDataService analyticsDataService;
+        analyticsDataService = (AnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                .getOSGiService(AnalyticsDataService.class, null);
+        if (analyticsDataService == null) {
+            throw new AnalyticsException("AnalyticsDataService is not available.");
+        }
+        return analyticsDataService;
     }
 
     /**
