@@ -46,4 +46,28 @@
             <timestampType>DATETIME</timestampType>
         </typeMapping>
     </database>
+    <database name="oracle">
+        <tableCreateQuery>CREATE TABLE {{TABLE_NAME}} ({{COLUMNS, PRIMARY_KEYS}})</tableCreateQuery>
+        <tableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} WHERE rownum=1</tableCheckQuery>
+        <tableTruncateQuery>TRUNCATE TABLE {{TABLE_NAME}}</tableTruncateQuery>
+        <indexCreateQuery>CREATE INDEX {{TABLE_NAME}}_INDEX ON {{TABLE_NAME}} ({{INDEX_COLUMNS}})</indexCreateQuery>
+        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} VALUES ({{Q}})</recordInsertQuery>
+        <recordMergeQuery>MERGE INTO {{TABLE_NAME}} dest USING( SELECT  {{Q COLUMN}} FROM dual) src ON({{D.KEY=S.KEY}})
+            WHEN NOT MATCHED THEN INSERT({{COLUMN}}) VALUES({{S.COLUMN}}) WHEN MATCHED THEN UPDATE SET {{D.COLUMN=S.COLUMN - KEY}}</recordMergeQuery>
+        <quoteMark></quoteMark>
+        <typeMapping>
+            <binaryType>BLOB</binaryType>
+            <booleanType>NUMBER(1)</booleanType>
+            <byteType>NUMBER(3)</byteType>
+            <dateType>DATE</dateType>
+            <doubleType>NUMBER(19,4)</doubleType>
+            <floatType>NUMBER(19,4)</floatType>
+            <integerType>NUMBER(10)</integerType>
+            <longType>NUMBER(19)</longType>
+            <nullType>NULL</nullType>
+            <shortType>NUMBER(5)</shortType>
+            <stringType>VARCHAR(254)</stringType>
+            <timestampType>DATE</timestampType>
+        </typeMapping>
+    </database>
 </spark-jdbc-configuration>
