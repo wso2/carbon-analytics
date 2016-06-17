@@ -124,12 +124,11 @@
         </div>
 
     </div>
+    <br class="c-both"/>
+    <hr class="wr-separate"/>
     <%
         }
     %>
-
-    <br class="c-both"/>
-    <hr class="wr-separate"/>
 
     <div class="action-container">
         <button type="button"

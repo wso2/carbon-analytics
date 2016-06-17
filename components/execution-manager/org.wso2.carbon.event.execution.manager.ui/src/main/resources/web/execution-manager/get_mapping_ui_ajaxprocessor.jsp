@@ -78,7 +78,7 @@
         %>
 
         <tr id="metaMappingRow_<%=metaCounter%>">
-            <td>Mapped From :
+            <td class="labelCellPadding">Mapped From :
             </td>
             <td>
                 <select id="metaEventMappingValue_<%=index%><%=metaCounter%>">
@@ -101,7 +101,7 @@
                     %>
                 </select>
             </td>
-            <td>Mapped To :
+            <td class="labelCellPadding">Mapped To :
             </td>
             <td>
                 <input type="text" id="metaEventMappedValue_<%=index%><%=metaCounter%>"
@@ -123,8 +123,8 @@
         %>
             <tr>
                 <td colspan="6">
-                    <div id="noInputMetaEventData">
-                        No Meta Attributes to define
+                    <div class="noDataDiv-plain" id="noInputMetaEventData">
+                        No Meta attributes to define
                     </div>
                 </td>
             </tr>
@@ -147,7 +147,7 @@
         %>
 
         <tr id="correlationMappingRow_<%=correlationCounter%>">
-            <td>Mapped From :
+            <td class="labelCellPadding">Mapped From :
             </td>
             <td>
                 <select id="correlationEventMappingValue_<%=index%><%=correlationCounter%>">
@@ -170,7 +170,7 @@
                     %>
                 </select>
             </td>
-            <td>Mapped To :
+            <td class="labelCellPadding">Mapped To :
             </td>
             <td>
                 <input type="text" id="correlationEventMappedValue_<%=index%><%=correlationCounter%>"
@@ -191,8 +191,8 @@
         %>
             <tr>
                 <td colspan="6">
-                    <div id="noInputCorrelationEventData">
-                        No Correlation Attributes to define
+                    <div class="noDataDiv-plain" id="noInputCorrelationEventData">
+                        No Correlation attributes to define
                     </div>
                 </td>
             </tr>
@@ -213,7 +213,7 @@
         %>
 
         <tr id="payloadMappingRow_<%=payloadCounter%>">
-            <td>Mapped From :
+            <td class="labelCellPadding">Mapped From :
             </td>
             <td>
                 <select id="payloadEventMappingValue_<%=index%><%=payloadCounter%>">
@@ -236,7 +236,7 @@
                     %>
                 </select>
             </td>
-            <td>Mapped To :
+            <td class="labelCellPadding">Mapped To :
             </td>
             <td>
                 <input type="text" id="payloadEventMappedValue_<%=index%><%=payloadCounter%>"
@@ -256,8 +256,8 @@
         %>
             <tr>
                 <td colspan="6">
-                    <div id="noInputPayloadEventData">
-                        No Payload Attributes to define
+                    <div class="noDataDiv-plain" id="noInputPayloadEventData">
+                        No Payload attributes to define
                     </div>
                 </td>
             </tr>
@@ -265,11 +265,11 @@
             }
         %>
         <div style="display: none">
-            <input type="text" id="metaRows"
+            <input type="text" id="metaRows_<%=index%>"
                    value="<%=metaCounter%>"/>
-            <input type="text" id="correlationRows"
+            <input type="text" id="correlationRows_<%=index%>"
                    value="<%=correlationCounter%>"/>
-            <input type="text" id="payloadRows"
+            <input type="text" id="payloadRows_<%=index%>"
                    value="<%=payloadCounter%>"/>
         </div>
 
