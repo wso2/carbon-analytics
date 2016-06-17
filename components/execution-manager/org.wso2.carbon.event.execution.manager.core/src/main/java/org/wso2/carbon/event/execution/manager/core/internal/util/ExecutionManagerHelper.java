@@ -342,7 +342,7 @@ public class ExecutionManagerHelper {
     }
 
     /**
-     * Returns a StreamId which can be as an internal Stream ID in a Siddhi Query.
+     * Returns a StreamId which can be used as an internal Stream ID in a Siddhi Query.
      * @param streamId Stream ID (as in CEP)
      * @return internal Stream ID.
      */
