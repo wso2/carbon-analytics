@@ -25,7 +25,6 @@ import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 
-
 /**
  * @scr.component name="TemplateDeployer.eventSink.component" immediate="true"
  * @scr.reference name="analyticsEventSinkService.service"
@@ -40,11 +39,9 @@ public class EventSinkTemplateDeployerDS {
     private static final Log log = LogFactory.getLog(EventSinkTemplateDeployerDS.class);
 
     protected void activate(ComponentContext context) {
-
         try {
             EventSinkTemplateDeployer templateDeployer = new EventSinkTemplateDeployer();
             context.getBundleContext().registerService(TemplateDeployer.class.getName(), templateDeployer, null);
-
         } catch (RuntimeException e) {
             log.error("Couldn't register EventSinkTemplateDeployer service", e);
         }
@@ -61,7 +58,6 @@ public class EventSinkTemplateDeployerDS {
     protected void setRegistryService(RegistryService registryService) throws
                                                                        RegistryException {
         EventSinkTemplateDeployerValueHolder.setRegistryService(registryService);
-
     }
 
     protected void unsetRegistryService(RegistryService registryService) {
