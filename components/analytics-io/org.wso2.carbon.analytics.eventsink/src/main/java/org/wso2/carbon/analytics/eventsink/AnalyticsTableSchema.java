@@ -82,6 +82,7 @@ public class AnalyticsTableSchema {
         public void setIndexed(boolean indexed) {
             this.indexed = indexed;
         }
+
         @XmlElement(name = "IsFacet")
         public boolean isFacet() {
             return isFacet;
@@ -100,5 +101,13 @@ public class AnalyticsTableSchema {
             this.primaryKey = primaryKey;
         }
 
+        public String getHash() {
+            return new StringBuilder()
+                    .append(this.scoreParam ? "1" : "0")
+                    .append(this.indexed ? "1" : "0")
+                    .append(this.isFacet ? "1" : "0")
+                    .append(this.primaryKey ? "1" : "0").toString();
+
+        }
     }
 }

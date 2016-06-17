@@ -164,4 +164,28 @@ public class AnalyticsEventSinkUtil {
         copySchema.setColumns(columns);
         return copySchema;
     }
+
+    /**
+     * Converts a List of Stream IDs to a String of comma-separated stream IDs.
+     * @param streamIds List of Stream IDs
+     * @return stream IDs as a comma separated list.
+     */
+    public static String getEventSources(List<String> streamIds) {
+        if (streamIds != null || !streamIds.isEmpty()) {
+            StringBuilder stringBuilder = new StringBuilder("");
+            for (String streamId : streamIds) {
+                stringBuilder.append(streamId).append(", ");
+            }
+            if (stringBuilder.length() - 2 ==  stringBuilder.lastIndexOf(", ")) {
+                stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length() - 1);
+            }
+            if (stringBuilder.length() > 0) {
+                return stringBuilder.toString();
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
 }
