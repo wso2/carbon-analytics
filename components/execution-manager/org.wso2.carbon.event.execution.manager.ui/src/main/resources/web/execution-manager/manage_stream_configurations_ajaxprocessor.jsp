@@ -40,12 +40,11 @@
         String[] streamMappingStrings = StringUtils.substringsBetween(valuesInQuotes[0], "{", "}");
 
         List<StreamMappingDTO> streamMappingDTOsList = new ArrayList<StreamMappingDTO>();
-        List<AttributeMappingDTO> attributeMappingDTOsList = new ArrayList<AttributeMappingDTO>();
 
         //iterate through each stream map and get stream map elements
         for (String streamMappingString : streamMappingStrings) {
             StreamMappingDTO streamMappingDTO = new StreamMappingDTO();
-
+            List<AttributeMappingDTO> attributeMappingDTOsList = new ArrayList<AttributeMappingDTO>();
             String[] streamMapElements = streamMappingString.split(",");
             //iterate through each stream map element array
             for (int i = 0; i < streamMapElements.length; i++) {
