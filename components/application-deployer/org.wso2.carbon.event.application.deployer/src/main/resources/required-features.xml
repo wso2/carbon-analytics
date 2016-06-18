@@ -17,15 +17,15 @@
   -->
 <featureSets>
     <featureSet artifactType="event/receiver">
-        <feature id="org.wso2.carbon.event.receiver.feature.group" version="[5.0.0, 5.1.0)"/>
+        <feature id="org.wso2.carbon.event.receiver.feature.group" version="[5.0.0, 5.2.0)"/>
     </featureSet>
     <featureSet artifactType="event/publisher">
-        <feature id="org.wso2.carbon.event.publisher.feature.group" version="[5.0.0, 5.1.0)"/>
+        <feature id="org.wso2.carbon.event.publisher.feature.group" version="[5.0.0, 5.2.0)"/>
     </featureSet>
     <featureSet artifactType="event/execution-plan">
-        <feature id="org.wso2.carbon.event.processor.feature.group" version="[2.0.4, 2.1.0)"/>
+        <feature id="org.wso2.carbon.event.processor.feature.group" version="[2.0.4, 2.2.0)"/>
     </featureSet>
     <featureSet artifactType="event/stream">
-        <feature id="org.wso2.carbon.event.stream.feature.group" version="[5.0.0, 5.1.0)"/>
+        <feature id="org.wso2.carbon.event.stream.feature.group" version="[5.0.0, 5.2.0)"/>
     </featureSet>
 </featureSets>
