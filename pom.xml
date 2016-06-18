@@ -1205,7 +1205,7 @@
     <properties>
 
         <!-- carbon-analytics repo versions -->
-        <carbon.analytics.version>1.0.6-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.version>1.0.6-beta4</carbon.analytics.version>
         <carbon.analytics.imp.pkg.version>[1.0, 2)</carbon.analytics.imp.pkg.version>
 
         <!-- Carbon platform version -->
@@ -1215,8 +1215,8 @@
         <!-- WSO2 repository versions -->
         <carbon.commons.version>4.4.8</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.4, 5)</carbon.commons.imp.pkg.version>
-		<carbon.event-processing.version>2.0.13-SNAPSHOT</carbon.event-processing.version>
-		<carbon.analytics.common.version>5.0.12-SNAPSHOT</carbon.analytics.common.version>
+		<carbon.event-processing.version>2.1.0-alpha</carbon.event-processing.version>
+		<carbon.analytics.common.version>5.1.0-alpha</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[5.0, 6.0)</carbon.analytics.common.imp.pkg.version>
         <carbon.data.version>4.3.4</carbon.data.version>
         <carbon.data.import.pkg.version>[4.3, 5)</carbon.data.import.pkg.version>
@@ -1356,7 +1356,7 @@
         <roaringbitmap.import.version>[0.4.5, 0.5.0)</roaringbitmap.import.version>
         <objenesis.orbit.version>2.1.wso2v1</objenesis.orbit.version>
 
-        <siddhi.version>3.0.6-SNAPSHOT</siddhi.version>
+        <siddhi.version>3.1.0-alpha</siddhi.version>
         <version.noggit>0.6.wso2v1</version.noggit>
         <hector.version>1.0-5</hector.version>
 
