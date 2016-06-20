@@ -44,7 +44,7 @@ public class AnalyticsEventTableConstants {
 
     public static final String ANNOTATION_RECORD_StORE = "record.store";
     
-    public static final int DEFAULT_CACHE_TIMEOUT = 60; // 1 minute
+    public static final int DEFAULT_CACHE_TIMEOUT = 10; // 10 seconds
     
     public static final int DEFAULT_CACHE_SIZE = 1024 * 1024 * 10; // 10 MB
     

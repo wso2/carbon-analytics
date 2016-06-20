@@ -159,7 +159,7 @@ public class AnalyticsEventTable implements EventTable {
         if (cachingProp != null) {
             this.caching = Boolean.parseBoolean(cachingProp.trim());
         } else {
-            this.caching = true;
+            this.caching = false;
         }
         
         String cacheTimeoutSecsProp = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_CACHE_TIMEOUT_SECONDS);
