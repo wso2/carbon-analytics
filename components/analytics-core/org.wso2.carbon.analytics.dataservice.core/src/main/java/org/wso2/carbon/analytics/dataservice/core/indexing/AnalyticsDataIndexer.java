@@ -437,14 +437,14 @@ public class AnalyticsDataIndexer {
         return Math.abs(id.hashCode()) % this.getShardCount();
     }
     
-    private List<Integer> lookupGloballyExistingShardIds()
+    /*private List<Integer> lookupGloballyExistingShardIds()
             throws AnalyticsIndexException {
         List<Integer> result = new ArrayList<>(this.localShards.size());
         for (int shardIndex : this.localShards) {
             result.add(shardIndex);
         }
         return result;
-    }
+    }*/
     
     public List<SearchResultEntry> search(final int tenantId, final String tableName, final String query,
             final int start, final int count, List<SortByField> sortByFields) throws AnalyticsException {
@@ -759,7 +759,7 @@ public class AnalyticsDataIndexer {
             IndexReader indexReader = null;
             try {
                 indexReader = getCombinedIndexReader(this.localShards, tenantId, drillDownRequest.getTableName());
-                finalResult = getAnalyticsDrillDownRanges(tenantId, drillDownRequest);
+                finalResult = getAnalyticsDrillDownRanges(tenantId, this.localShards, drillDownRequest);
             } catch (org.apache.lucene.queryparser.classic.ParseException e) {
                 throw new AnalyticsIndexException("Error while parsing the lucene query: " +
                                                   e.getMessage(), e);
@@ -816,13 +816,13 @@ public class AnalyticsDataIndexer {
         return drillDownRanges;
     }*/
 
-    public List<AnalyticsDrillDownRange> getAnalyticsDrillDownRanges(int tenantId,
+    public List<AnalyticsDrillDownRange> getAnalyticsDrillDownRanges(int tenantId, Set<Integer> localShards,
                                                                      AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException, org.apache.lucene.queryparser.classic.ParseException,
                    IOException {
         Map<String, AnalyticsDrillDownRange> drillDownRanges = new LinkedHashMap<>();
         String rangeField = drillDownRequest.getRangeField();
-        for (int shard : this.getLocalShards()) {
+        for (int shard : localShards) {
             for (AnalyticsDrillDownRange range : drillDownRequest.getRanges()) {
                 double score = this.getDrillDownRecordCountPerShard(tenantId, shard, drillDownRequest, rangeField, range);
                 if (drillDownRanges.get(range.getLabel()) == null) {
@@ -871,7 +871,7 @@ public class AnalyticsDataIndexer {
                 resultEntries.addAll(categoriesPerNode.getCategories());
             }
         } else {
-            CategoryDrillDownResponse response = this.getDrillDownCategories(tenantId, drillDownRequest);
+            CategoryDrillDownResponse response = this.getDrillDownCategories(tenantId, this.localShards, drillDownRequest);
             resultEntries.addAll(response.getCategories());
         }
         List<CategorySearchResultEntry> mergedResult = this.mergeCategoryResults(resultEntries);
@@ -887,7 +887,7 @@ public class AnalyticsDataIndexer {
     /**
      * Different shards/Nodes can contain the same categories, so we need to merge the duplicate categories and sum the scores
      * @param searchResults the List of Category Results which may contain duplicate categories
-     * @return De-dupped List ofcategories
+     * @return De-dupped List of categories
      */
     private List<CategorySearchResultEntry> mergeCategoryResults(List<CategorySearchResultEntry>
                                                                          searchResults) {
@@ -1230,11 +1230,11 @@ public class AnalyticsDataIndexer {
             }
             return resultFacetList.subList(startIndex, endIndex);
         } else {
-            return doDrillDownPerNode(tenantId, drillDownRequest, rangeField, range);
+            return doDrillDownPerNode(tenantId, this.localShards, drillDownRequest, rangeField, range);
         }
     }
 
-    public List<SearchResultEntry> doDrillDownPerNode(int tenantId,
+    public List<SearchResultEntry> doDrillDownPerNode(int tenantId, Set<Integer> localShards,
                                                       AnalyticsDrillDownRequest drillDownRequest,
                                                       String rangeField,
                                                       AnalyticsDrillDownRange range)
@@ -1247,10 +1247,9 @@ public class AnalyticsDataIndexer {
         if (endIndex <= startIndex) {
             throw new AnalyticsIndexException("Record Count should be greater than 0");
         }
-        List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
         List<List<SearchResultEntry>> sortedResultsPerShard = new ArrayList<>();
         Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
-        for (int shardId : taxonomyShardIds) {
+        for (int shardId : localShards) {
             sortedResultsPerShard.add(this.drillDownRecordsPerShard(tenantId, shardId, drillDownRequest, rangeField, range));
         }
         List<SearchResultEntry> sortedSearchResultsPerNode = RecordSortUtils.getSortedSearchResultEntries(tenantId, drillDownRequest.getTableName(),
@@ -1265,15 +1264,14 @@ public class AnalyticsDataIndexer {
         return new ArrayList<>(sortedSearchResultsPerNode.subList(startIndex, endIndex));
     }
 
-    public CategoryDrillDownResponse getDrillDownCategories(int tenantId,
+    public CategoryDrillDownResponse getDrillDownCategories(int tenantId, Set<Integer> localShards,
                    CategoryDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
-        List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
-        return getCategoryDrillDownResponse(tenantId, drillDownRequest, taxonomyShardIds);
+        return getCategoryDrillDownResponse(tenantId, drillDownRequest, localShards);
     }
 
     private CategoryDrillDownResponse getCategoryDrillDownResponse(int tenantId,
                                                                    CategoryDrillDownRequest drillDownRequest,
-                                                                   List<Integer> taxonomyShardIds)
+                                                                   Set<Integer> taxonomyShardIds)
             throws AnalyticsIndexException {
         List<CategorySearchResultEntry> perNodeCategoryReslutEntries = new ArrayList<>();
         for (int shardId : taxonomyShardIds) {
@@ -1295,16 +1293,15 @@ public class AnalyticsDataIndexer {
             }
             return totalCount;
         } else {
-            return doDrillDownCountPerNode(tenantId, drillDownRequest, rangeField, range);
+            return doDrillDownCountPerNode(tenantId, this.localShards, drillDownRequest, rangeField, range);
         }
     }
 
-    public double doDrillDownCountPerNode(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
+    public double doDrillDownCountPerNode(int tenantId, Set<Integer> localShards, AnalyticsDrillDownRequest drillDownRequest,
                                           String rangeField, AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
-        List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
         double totalCount = 0;
-        for (int shardId : taxonomyShardIds) {
+        for (int shardId : localShards) {
             totalCount += this.getDrillDownRecordCountPerShard(tenantId, shardId, drillDownRequest, rangeField, range);
         }
         return totalCount;
@@ -1793,7 +1790,7 @@ public class AnalyticsDataIndexer {
                     finalUniqueCategories.addAll(entry);
                 }
             } else {
-                finalUniqueCategories = getUniqueGroupings(tenantId, aggregateRequest);
+                finalUniqueCategories = getUniqueGroupings(tenantId, this.localShards, aggregateRequest);
             }
             subCategories =  getUniqueSubCategories(aggregateRequest, finalUniqueCategories);
         //    iterator = new StreamingAggregateRecordIterator(tenantId, subCategories, aggregateRequest, indexer);
@@ -1855,15 +1852,14 @@ public class AnalyticsDataIndexer {
         return new NonStreamingAggregateRecordIterator(aggregatedRecords);
     }
 
-    public Set<List<String>> getUniqueGroupings(int tenantId, AggregateRequest aggregateRequest)
+    public Set<List<String>> getUniqueGroupings(int tenantId, Set<Integer> localShards, AggregateRequest aggregateRequest)
             throws AnalyticsIndexException, IOException {
         if (aggregateRequest.getAggregateLevel() >= 0) {
-            List<Integer> taxonomyShardIds = this.lookupGloballyExistingShardIds();
             if (aggregateRequest.getGroupByField() != null && !aggregateRequest.getGroupByField().isEmpty()) {
-                ExecutorService pool = Executors.newFixedThreadPool(taxonomyShardIds.size());
+                ExecutorService pool = Executors.newFixedThreadPool(localShards.size());
                 Set<Future<Set<List<String>>>> perShardUniqueCategories = new HashSet<>();
                 Set<List<String>> finalUniqueCategories = new HashSet<>();
-                for (Integer taxonomyShardId : taxonomyShardIds) {
+                for (Integer taxonomyShardId : localShards) {
                     String tableId = this.generateTableId(tenantId, aggregateRequest.getTableName());
                     Callable<Set<List<String>>> callable = new TaxonomyWorker(tenantId, AnalyticsDataIndexer.this,
                                                                               taxonomyShardId, tableId, aggregateRequest);
@@ -2420,7 +2416,7 @@ public class AnalyticsDataIndexer {
             }
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
-                return adsImpl.getIndexer().doDrillDownPerNode(tenantId, request, null, null);
+                return adsImpl.getIndexer().doDrillDownPerNode(tenantId, this.shardIndices, request, null, null);
             }
             return new ArrayList<>();
         }
@@ -2458,7 +2454,7 @@ public class AnalyticsDataIndexer {
             }
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
-                return adsImpl.getIndexer().doDrillDownCountPerNode(tenantId, request, null, null);
+                return adsImpl.getIndexer().doDrillDownCountPerNode(tenantId, this.shardIndices, request, null, null);
             }
             return 0.0;
         }
@@ -2490,7 +2486,7 @@ public class AnalyticsDataIndexer {
             }
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
-                return adsImpl.getIndexer().getDrillDownCategories(tenantId, request);
+                return adsImpl.getIndexer().getDrillDownCategories(tenantId, this.shardIndices, request);
             }
             return new CategoryDrillDownResponse(new ArrayList<CategorySearchResultEntry>(0));
         }
@@ -2521,7 +2517,7 @@ public class AnalyticsDataIndexer {
             }
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
-                return adsImpl.getIndexer().getAnalyticsDrillDownRanges(tenantId, request);
+                return adsImpl.getIndexer().getAnalyticsDrillDownRanges(tenantId, this.shardIndices, request);
             }
             return new ArrayList<>();
         }
@@ -2552,7 +2548,7 @@ public class AnalyticsDataIndexer {
             }
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
-                return adsImpl.getIndexer().getUniqueGroupings(tenantId, request);
+                return adsImpl.getIndexer().getUniqueGroupings(tenantId, this.shardIndices, request);
             }
             return new HashSet<>();
         }
