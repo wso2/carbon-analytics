@@ -88,7 +88,7 @@ object JDBCRelation {
 }
 
 /**
-  * Class representing the Relation Provider for the Carbon Spark JDBC implementation
+  * Class representing the Relation Provider for the Carbon Spark JDBC implementation.
   */
 class AnalyticsJDBCRelationProvider extends RelationProvider {
 
@@ -186,6 +186,7 @@ case class CarbonJDBCRelation(
   override def insert(data: DataFrame, overwrite: Boolean): Unit = {
     try {
       val conn = GenericUtils.loadGlobalDataSource(dataSource).asInstanceOf[DataSource].getConnection
+      conn.setAutoCommit(false)
       try {
         if (overwrite) {
           CarbonJDBCUtils.truncateTable(conn, tableName)
