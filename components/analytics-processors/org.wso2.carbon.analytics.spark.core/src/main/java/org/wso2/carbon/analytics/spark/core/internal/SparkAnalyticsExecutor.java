@@ -65,6 +65,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -368,7 +369,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             Class udf = carbonUDF.getClass();
             Method[] methods = udf.getDeclaredMethods();
             for (Method method : methods) {
-                analyticsUDFsRegister.registerUDF(udf, method, sqlCtx);
+                if (Modifier.isPublic(method.getModifiers())) {
+                    analyticsUDFsRegister.registerUDF(udf, method, sqlCtx);
+                }
             }
         } else {
             ServiceHolder.addCarbonUDFs(carbonUDF);
@@ -395,7 +398,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     Method[] methods = udf.getDeclaredMethods();
                     for (Method method : methods) {
                         try {
-                            udfAdaptorBuilder.registerUDF(udf, method, sqlCtx);
+                            if (Modifier.isPublic(method.getModifiers())) {
+                                udfAdaptorBuilder.registerUDF(udf, method, sqlCtx);
+                            }
                         } catch (AnalyticsUDFException e) {
                             log.error("Error while registering the UDF method: " + method.getName() + ", " + e.getMessage(), e);
                         }
