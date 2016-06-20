@@ -70,4 +70,28 @@
             <timestampType>DATE</timestampType>
         </typeMapping>
     </database>
+    <database name="Microsoft SQL Server">
+        <tableCreateQuery>CREATE TABLE {{TABLE_NAME}} ({{COLUMNS, PRIMARY_KEYS}})</tableCreateQuery>
+        <tableCheckQuery>SELECT TOP 1 1 from {{TABLE_NAME}}</tableCheckQuery>
+        <tableTruncateQuery>TRUNCATE TABLE {{TABLE_NAME}}</tableTruncateQuery>
+        <indexCreateQuery>CREATE INDEX {{TABLE_NAME}}_INDEX ON {{TABLE_NAME}} ({{INDEX_COLUMNS}})</indexCreateQuery>
+        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} VALUES ({{Q}})</recordInsertQuery>
+        <recordMergeQuery>MERGE {{TABLE_NAME}} AS dest USING (SELECT {{Q}}) AS src ({{COLUMN}}) ON ({{D.KEY=S.KEY}})
+            WHEN MATCHED THEN UPDATE SET {{COLUMN=S.COLUMN}} WHEN NOT MATCHED THEN INSERT({{COLUMN}}) VALUES ({{S.COLUMN}});</recordMergeQuery>
+        <quoteMark></quoteMark>
+        <typeMapping>
+            <binaryType>VARBINARY(max)</binaryType>
+            <booleanType>BIT</booleanType>
+            <byteType>SMALLINT</byteType>
+            <dateType>DATETIME</dateType>
+            <doubleType>FLOAT(32)</doubleType>
+            <floatType>REAL</floatType>
+            <integerType>INTEGER</integerType>
+            <longType>BIGINT</longType>
+            <nullType>NULL</nullType>
+            <shortType>SMALLINT</shortType>
+            <stringType>VARCHAR(254)</stringType>
+            <timestampType>DATETIME</timestampType>
+        </typeMapping>
+    </database>
 </spark-jdbc-configuration>
