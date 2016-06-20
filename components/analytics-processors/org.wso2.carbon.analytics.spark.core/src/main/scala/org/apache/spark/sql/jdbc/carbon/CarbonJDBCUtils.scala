@@ -113,10 +113,11 @@ object CarbonJDBCUtils {
       var index_prefix = ""
 
       for (element <- schema) {
-        //TODO (FUTURE): optionally handle field sizes
         columns.append(field_prefix)
         columns.append(element._1).append(WHITESPACE)
-        element._2.toLowerCase match {
+        // Disregarding any user-specified sizes when matching
+        val dataType = element._2.toLowerCase.split("""\(""")
+        dataType(0) match {
           case SPARK_BINARY_TYPE => columns.append(typeMapping.getBinaryType)
           case SPARK_BOOLEAN_TYPE => columns.append(typeMapping.getBooleanType)
           case SPARK_BYTE_TYPE => columns.append(typeMapping.getByteType)
@@ -127,8 +128,16 @@ object CarbonJDBCUtils {
           case SPARK_LONG_TYPE => columns.append(typeMapping.getLongType)
           case SPARK_NULL_TYPE => columns.append(typeMapping.getNullType)
           case SPARK_SHORT_TYPE => columns.append(typeMapping.getShortType)
-          case SPARK_STRING_TYPE => columns.append(typeMapping.getStringType)
           case SPARK_TIMESTAMP_TYPE => columns.append(typeMapping.getTimestampType)
+          case SPARK_STRING_TYPE =>
+            // Checking if the user is specifying a size AND the type mapping accepts custom sizes
+            if (dataType.length == 2 && typeMapping.getStringType.contains(OPEN_PARENTHESIS)) {
+              val size = dataType(1).replace(CLOSE_PARENTHESIS, "")
+              columns.append(typeMapping.getStringType.split("""\(""")(0)).append(OPEN_PARENTHESIS).append(size)
+                .append(CLOSE_PARENTHESIS)
+            } else {
+              columns.append(typeMapping.getStringType)
+            }
         }
         if (element._4) {
           indices.append(index_prefix)
@@ -233,7 +242,7 @@ object CarbonJDBCUtils {
       var i = 0
       while (i < schema.length) {
         val metadata = new MetadataBuilder().putString("name", schema(i)._1)
-        fields(i) = StructField(schema(i)._1, resolveType(schema(i)._2.toLowerCase), !schema(i)._3, metadata.build())
+        fields(i) = StructField(schema(i)._1, resolveType(schema(i)._2.toLowerCase.split("""\(""")(0)), !schema(i)._3, metadata.build())
         i = i + 1
       }
       new StructType(fields)
