@@ -230,7 +230,7 @@ package object carbon {
           .append(WHITESPACE).append(column)
         sColumn.append(columnPrefix).append(SRC_STRING).append(column)
         columnEqualsSColumn.append(columnPrefix).append(column).append(EQUALS_SIGN)
-          .append(SRC_STRING).append(columnPrefix)
+          .append(SRC_STRING).append(column)
         if (!pKeys.contains(column)) {
           columnEqualsValuesColumn.append(columnEqualsValuesColumnPrefix).append(column)
             .append(EQUALS_SIGN).append(VALUES_STRING)

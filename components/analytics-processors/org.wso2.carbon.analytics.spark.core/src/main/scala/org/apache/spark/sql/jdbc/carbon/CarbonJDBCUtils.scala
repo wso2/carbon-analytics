@@ -95,6 +95,8 @@ object CarbonJDBCUtils {
                           schema: mutable.MutableList[(String, String, Boolean, Boolean)],
                           primaryKeys: String): Unit = {
     val conn: Connection = GenericUtils.loadGlobalDataSource(dataSource).asInstanceOf[DataSource].getConnection
+    //Setting autocommit to false so that table and index creation take place as a single transaction
+    conn.setAutoCommit(false)
     var committed = false
     try {
       val queryConfig = getQueryConfigEntry(conn)
@@ -141,8 +143,6 @@ object CarbonJDBCUtils {
 
       rootStmt = rootStmt.replace(COLUMNS_KEYS_PLACEHOLDER, columns)
 
-      //Setting autocommit to false so that table and index creation take place as a single transaction
-      conn.setAutoCommit(false)
       conn.prepareStatement(rootStmt).execute()
       if (indices.nonEmpty) {
         indexStmt = indexStmt.replace(INDICES_PLACEHOLDER, indices)
