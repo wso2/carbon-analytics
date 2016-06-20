@@ -143,18 +143,16 @@ public class RecordSortUtils {
                                           Map<String, ColumnDefinition> indices) {
         int leftIndex = 0;
         int rightIndex = 0;
-        int sortedListIndex = 0;
         List<Record> sortedList = new ArrayList<>();
 
         while (leftIndex < left.size() && rightIndex < right.size()) {
             if (compare(left.get(leftIndex), right.get(rightIndex), sortByFields, indices) < 0) {
-                sortedList.set(sortedListIndex, left.get(leftIndex));
+                sortedList.add(left.get(leftIndex));
                 leftIndex++;
             } else {
-                sortedList.set(sortedListIndex, right.get(rightIndex));
+                sortedList.add(right.get(rightIndex));
                 rightIndex++;
             }
-            sortedListIndex++;
         }
         List<Record> rest;
         int restIndex;
@@ -166,10 +164,8 @@ public class RecordSortUtils {
             restIndex = leftIndex;
         }
         for (int i = restIndex; i < rest.size(); i++) {
-            sortedList.set(sortedListIndex, rest.get(i));
-            sortedListIndex++;
+            sortedList.add(rest.get(i));
         }
-
         return sortedList;
     }
 
