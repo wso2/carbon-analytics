@@ -104,10 +104,10 @@ class AnalyticsJDBCRelationProvider extends RelationProvider {
     val tableName = parameters.getOrElse(TABLE_NAME, sys.error("Option 'tableName' not specified"))
     val schemaString = parameters.getOrElse(SCHEMA, sys.error("Option 'schema' not specified"))
     val primaryKeys = parameters.getOrElse(PRIMARY_KEYS, "")
-    val partitionColumn = parameters.getOrElse("partitionColumn", null)
-    val lowerBound = parameters.getOrElse("lowerBound", null)
-    val upperBound = parameters.getOrElse("upperBound", null)
-    val numPartitions = parameters.getOrElse("numPartitions", null)
+    val partitionColumn = parameters.getOrElse(PARTITION_COLUMN, null)
+    val lowerBound = parameters.getOrElse(LOWER_BOUND, null)
+    val upperBound = parameters.getOrElse(UPPER_BOUND, null)
+    val numPartitions = parameters.getOrElse(NUM_PARTITIONS, null)
 
     if (partitionColumn != null
       && (lowerBound == null || upperBound == null || numPartitions == null)) {

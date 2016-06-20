@@ -19,6 +19,10 @@ object CarbonJDBCConstants {
   val TABLE_NAME = "tableName"
   val SCHEMA = "schema"
   val PRIMARY_KEYS = "primaryKeys"
+  val PARTITION_COLUMN = "partitionColumn"
+  val LOWER_BOUND = "lowerBound"
+  val UPPER_BOUND = "upperBound"
+  val NUM_PARTITIONS = "numPartitions"
 
   val PRIMARY_KEY_DEF = "PRIMARY KEY"
 
