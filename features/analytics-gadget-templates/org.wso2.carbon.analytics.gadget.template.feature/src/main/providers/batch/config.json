@@ -20,9 +20,5 @@
         "fieldType": "string",
         "isRequired": false,
         "placeholderText": "100"
-    }, {
-        "fieldType": "advanced",
-        "childPartial": "myPartial",
-        "dynamicJS": ["foo"]
     }]
 }

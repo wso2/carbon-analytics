@@ -106,9 +106,9 @@
                 %>
 
                 <div class="col-sm-6">
-                    <a href="domain_configurations_ajaxprocessor.jsp?ordinal=1&domainName=<%=domainDTO.getDomain()%>">
+                    <a href="domain_configurations_ajaxprocessor.jsp?ordinal=1&domainName=<%=domainDTO.getName()%>">
                         <div class="tile green">
-                            <h3 class="title"><%=domainDTO.getDomain()%>
+                            <h3 class="title"><%=domainDTO.getName()%>
                             </h3>
 
                             <p><%=Encode.forHtmlContent(domainDTO.getDescription())%>

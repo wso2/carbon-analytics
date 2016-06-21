@@ -58,8 +58,7 @@ public class RuntimeResourceLoader {
         try {
             return cache.get(path);
         } catch (ExecutionException e) {
-            // pass the orgonal exception as well
-            throw new EventPublisherConfigurationException(e.getCause());
+            throw new EventPublisherConfigurationException("Error in getting cached resource", e);
         }
     }
 }

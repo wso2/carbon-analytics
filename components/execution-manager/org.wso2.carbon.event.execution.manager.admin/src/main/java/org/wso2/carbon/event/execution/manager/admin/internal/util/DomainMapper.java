@@ -16,7 +16,7 @@
 package org.wso2.carbon.event.execution.manager.admin.internal.util;
 
 import org.wso2.carbon.event.execution.manager.admin.dto.domain.DomainInfoDTO;
-import org.wso2.carbon.event.execution.manager.admin.dto.domain.ParameterDTO;
+import org.wso2.carbon.event.execution.manager.admin.dto.domain.DomainParameterDTO;
 import org.wso2.carbon.event.execution.manager.admin.dto.domain.ScenarioInfoDTO;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Domain;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Parameter;
@@ -48,7 +48,7 @@ public class DomainMapper {
 
         if (domain != null) {
             domainInfoDTO = new DomainInfoDTO();
-            domainInfoDTO.setDomain(domain.getName());
+            domainInfoDTO.setName(domain.getName());
             domainInfoDTO.setDescription(domain.getDescription());
             domainInfoDTO.setScenarioInfoDTOs(mapScenarios(domain.getScenarios().getScenario()));
         }
@@ -85,7 +85,7 @@ public class DomainMapper {
             ScenarioInfoDTO scenarioInfoDTO = new ScenarioInfoDTO();
             scenarioInfoDTO.setType(scenario.getType());
             scenarioInfoDTO.setDescription(scenario.getDescription());
-            scenarioInfoDTO.setParameterDTOs(mapParameters(scenario.getParameters().getParameter()));
+            scenarioInfoDTO.setDomainParameterDTOs(mapParameters(scenario.getParameters().getParameter()));
             scenarioInfoDTOs[i] = scenarioInfoDTO;
             i++;
         }
@@ -93,20 +93,20 @@ public class DomainMapper {
     }
 
 
-    private static ParameterDTO[] mapParameters(List<Parameter> parameters) {
-        ParameterDTO[] parameterDTOs = new ParameterDTO[parameters.size()];
+    private static DomainParameterDTO[] mapParameters(List<Parameter> parameters) {
+        DomainParameterDTO[] domainParameterDTOs = new DomainParameterDTO[parameters.size()];
         int i = 0;
         for (Parameter parameter: parameters) {
-            ParameterDTO parameterDTO = new ParameterDTO();
-            parameterDTO.setName(parameter.getName());
-            parameterDTO.setType(parameter.getType());
-            parameterDTO.setDefaultValue(parameter.getDefaultValue());
-            parameterDTO.setDescription(parameter.getDescription());
-            parameterDTO.setDisplayName(parameter.getDisplayName());
-            parameterDTO.setOptions(parameter.getOptions());
-            parameterDTOs[i] = parameterDTO;
+            DomainParameterDTO domainParameterDTO = new DomainParameterDTO();
+            domainParameterDTO.setName(parameter.getName());
+            domainParameterDTO.setType(parameter.getType());
+            domainParameterDTO.setDefaultValue(parameter.getDefaultValue());
+            domainParameterDTO.setDescription(parameter.getDescription());
+            domainParameterDTO.setDisplayName(parameter.getDisplayName());
+            domainParameterDTO.setOptions(parameter.getOptions());
+            domainParameterDTOs[i] = domainParameterDTO;
             i++;
         }
-        return parameterDTOs;
+        return domainParameterDTOs;
     }
 }

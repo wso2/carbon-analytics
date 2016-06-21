@@ -38,7 +38,6 @@ import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.config.mapping.*;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 
-import javax.naming.ConfigurationException;
 import java.util.*;
 
 public class EventPublisherAdminService extends AbstractAdmin {
@@ -456,7 +455,19 @@ public class EventPublisherAdminService extends AbstractAdmin {
         return true;
     }
 
+    // Deprecated method
     public boolean deployTextEventPublisherConfiguration(String eventPublisherName,
+                                                          String streamNameWithVersion,
+                                                          String eventAdapterType,
+                                                          String textData,
+                                                          BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                          String dataFrom, boolean mappingEnabled)
+            throws AxisFault {
+        return deployCacheableTextEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType,
+                textData, outputPropertyConfiguration, dataFrom, PropertyAttributeTypeConstants.DEFAULT_REGISTRY_RESOURCE_CACHE_TIMEOUT, mappingEnabled);
+    }
+
+    public boolean deployCacheableTextEventPublisherConfiguration(String eventPublisherName,
                                                          String streamNameWithVersion,
                                                          String eventAdapterType,
                                                          String textData,
@@ -478,9 +489,6 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 constructOutputAdapterRelatedConfigs(eventPublisherName, eventAdapterType, outputPropertyConfiguration,
                         eventPublisherConfiguration, EventPublisherConstants.EF_TEXT_MAPPING_TYPE);
 
-                if (cacheTimeoutDuration < 0) {
-                    cacheTimeoutDuration = 0;
-                }
 
                 TextOutputMapping textOutputMapping = new TextOutputMapping();
                 textOutputMapping.setCustomMappingEnabled(mappingEnabled);
@@ -515,7 +523,19 @@ public class EventPublisherAdminService extends AbstractAdmin {
         return true;
     }
 
+    // Deprecated method
     public boolean deployXmlEventPublisherConfiguration(String eventPublisherName,
+                                                         String streamNameWithVersion,
+                                                         String eventAdapterType,
+                                                         String textData,
+                                                         BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                         String dataFrom, boolean mappingEnabled)
+            throws AxisFault {
+        return deployCacheableXmlEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType,
+                textData, outputPropertyConfiguration, dataFrom, PropertyAttributeTypeConstants.DEFAULT_REGISTRY_RESOURCE_CACHE_TIMEOUT, mappingEnabled);
+    }
+
+    public boolean deployCacheableXmlEventPublisherConfiguration(String eventPublisherName,
                                                         String streamNameWithVersion,
                                                         String eventAdapterType,
                                                         String textData,
@@ -542,9 +562,6 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 List<String> outputEventAttributes = new ArrayList<String>();
 
                 if (mappingEnabled) {
-                    if (cacheTimeoutDuration < 0) {
-                        cacheTimeoutDuration = 0;
-                    }
                     xmlOutputMapping.setMappingXMLText(textData);
                     xmlOutputMapping.setRegistryResource(validateRegistrySource(dataFrom));
                     xmlOutputMapping.setCacheTimeoutDuration(cacheTimeoutDuration);
@@ -625,7 +642,19 @@ public class EventPublisherAdminService extends AbstractAdmin {
         return true;
     }
 
+    // Deprecated method
     public boolean deployJsonEventPublisherConfiguration(String eventPublisherName,
+                                                        String streamNameWithVersion,
+                                                        String eventAdapterType,
+                                                        String textData,
+                                                        BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                        String dataFrom, boolean mappingEnabled)
+            throws AxisFault {
+        return deployCacheableJsonEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType,
+                textData, outputPropertyConfiguration, dataFrom, PropertyAttributeTypeConstants.DEFAULT_REGISTRY_RESOURCE_CACHE_TIMEOUT, mappingEnabled);
+    }
+
+    public boolean deployCacheableJsonEventPublisherConfiguration(String eventPublisherName,
                                                          String streamNameWithVersion,
                                                          String eventAdapterType,
                                                          String jsonData,
@@ -653,9 +682,6 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 List<String> outputEventAttributes = new ArrayList<String>();
 
                 if (mappingEnabled) {
-                    if (cacheTimeoutDuration < 0) {
-                        cacheTimeoutDuration = 0;
-                    }
                     jsonOutputMapping.setRegistryResource(validateRegistrySource(dataFrom));
                     jsonOutputMapping.setMappingText(jsonData);
                     jsonOutputMapping.setCacheTimeoutDuration(cacheTimeoutDuration);
@@ -886,7 +912,11 @@ public class EventPublisherAdminService extends AbstractAdmin {
 
         mappingTextList.clear();
         while (text.contains("{{") && text.indexOf("}}") > 0) {
-            mappingTextList.add(text.substring(text.indexOf("{{") + 2, text.indexOf("}}")));
+            String property = text.substring(text.indexOf("{{") + 2, text.indexOf("}}"));
+            if(property != null && !property.startsWith(PropertyAttributeTypeConstants.ARBITRARY_MAP_PREFIX)) {
+                // Do not consider arbitrary map properties for validation
+                mappingTextList.add(property);
+            }
             text = text.substring(text.indexOf("}}") + 2);
         }
         return mappingTextList;

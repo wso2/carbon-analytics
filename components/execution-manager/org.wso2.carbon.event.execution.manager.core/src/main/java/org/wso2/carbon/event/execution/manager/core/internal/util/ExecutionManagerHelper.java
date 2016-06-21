@@ -33,6 +33,7 @@ import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
+import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
@@ -63,8 +64,6 @@ public class ExecutionManagerHelper {
     private static final String SELECT = "select ";
     private static final String AS = " as ";
     private static final String INSERT_INTO = "insert into ";
-    private static final String FROM_STREAM = "fromStream";
-    private static final String TO_STREAM = "toStream";
 
     private static enum DefineStreamTypes {IMPORT, EXPORT};
 
@@ -325,22 +324,34 @@ public class ExecutionManagerHelper {
         for (org.wso2.carbon.event.execution.manager.core.structure.configuration.StreamMapping streamMapping: streamMappingList) {
             String fromStreamId = streamMapping.getFrom();
             String toStreamId = streamMapping.getTo();
+            String internalFromStreamId = getInternalStreamId(fromStreamId);
+            String internalToStreamId = getInternalStreamId(toStreamId);
 
-            importStatementBuilder.append(generateDefineStreamStatements(DefineStreamTypes.IMPORT, fromStreamId)).append("\n\n");
-            exportStatementBuilder.append(generateDefineStreamStatements(DefineStreamTypes.EXPORT, toStreamId)).append("\n\n");
+            importStatementBuilder.append(generateDefineStreamStatements(DefineStreamTypes.IMPORT, fromStreamId, internalFromStreamId)).append("\n\n");
+            exportStatementBuilder.append(generateDefineStreamStatements(DefineStreamTypes.EXPORT, toStreamId, internalToStreamId)).append("\n\n");
 
-            queryBuilder.append(FROM).append(FROM_STREAM).append(" \n").append(SELECT);
+            queryBuilder.append(FROM).append(internalFromStreamId).append(" \n").append(SELECT);
             for (AttributeMapping attributeMapping: streamMapping.getAttributeMappings().getAttributeMapping()) {
                 queryBuilder.append(attributeMapping.getFrom()).append(AS).append(attributeMapping.getTo()).append(", ");
             }
             queryBuilder.deleteCharAt(queryBuilder.length() - 2);
-            queryBuilder.append("\n").append(INSERT_INTO).append(TO_STREAM).append(";\n\n");
+            queryBuilder.append("\n").append(INSERT_INTO).append(internalToStreamId).append(";\n\n");
         }
 
         return planNameStatement + importStatementBuilder.toString() + exportStatementBuilder.toString() + queryBuilder.toString();
     }
 
-    private static String generateDefineStreamStatements(DefineStreamTypes type, String streamId)
+    /**
+     * Returns a StreamId which can be used as an internal Stream ID in a Siddhi Query.
+     * @param streamId Stream ID (as in CEP)
+     * @return internal Stream ID.
+     */
+    private static String getInternalStreamId(String streamId) {
+        String internalStreamId = streamId.replace(EventStreamConstants.STREAM_DEFINITION_DELIMITER, "__");
+        return internalStreamId.replace(".", "_");
+    }
+
+    private static String generateDefineStreamStatements(DefineStreamTypes type, String streamId, String internalStreamId)
             throws ExecutionManagerException {
         try {
             StreamDefinition streamDefinition = ExecutionManagerValueHolder.getEventStreamService().getStreamDefinition(streamId);
@@ -348,10 +359,8 @@ public class ExecutionManagerHelper {
                 throw new ExecutionManagerException("No stream has being deployed with Stream ID: " + streamId);
             }
 
-            String siddhiStreamName = (DefineStreamTypes.IMPORT.toString().equals(type.toString())) ? FROM_STREAM : TO_STREAM;
-
             String statement = "@" + type.toString() + "('" + streamId + "')\n";
-            StringBuilder streamDefBuilder = new StringBuilder(DEFINE_STREAM + siddhiStreamName + " (");
+            StringBuilder streamDefBuilder = new StringBuilder(DEFINE_STREAM + internalStreamId + " (");
             if (streamDefinition.getMetaData() != null) {
                 for (Attribute metaAttribute : streamDefinition.getMetaData()) {
                     streamDefBuilder.append(ExecutionManagerConstants.META_PREFIX).append(metaAttribute.getName()).append(" ").append(metaAttribute.getType()).append(", ");
@@ -377,7 +386,6 @@ public class ExecutionManagerHelper {
             throw new ExecutionManagerException("Failed to get stream definition for Stream ID: " + streamId, e);
         }
     }
-
 
     public static void saveToRegistry(ScenarioConfiguration configuration)
             throws ExecutionManagerException {

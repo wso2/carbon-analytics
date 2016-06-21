@@ -15,6 +15,18 @@
  */
 package org.wso2.carbon.event.execution.manager.core;
 
+/**
+ * Template Deployer for Execution Manager.
+ *
+ * "Template Deployer" should not be confused with the Axis2 "Deployer" (org.apache.axis2.deployment.Deployer).
+ * It is frequently being asked as why the Axis2 Deployer cannot be used for this purpose as well.
+ * Here is why:
+ * When we use Execution Manager to deploy an Artifact, before deployment, it may be necessary to do additional tasks.
+ * For example:
+ * - Changing the identifier (not to be confused with @param artifactId) of an Artifact
+ *   (for example, the name of an Execution Plan) to something which is unique across all the Domains.
+ * - Keeping track of meta information to manage Artifact Deployment and Undeployment.
+ */
 public interface TemplateDeployer {
 
     String getType();

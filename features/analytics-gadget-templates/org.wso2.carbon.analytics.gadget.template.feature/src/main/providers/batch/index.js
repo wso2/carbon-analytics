@@ -82,15 +82,15 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
         var formConfig = require(PROVIDERS_LOCATION + '/' + PROVIDER_NAME + '/config.json');
         var tables;
         try {
-            tables =  JSON.parse(connector.getTableList(loggedInUser).getMessage());
+            tables = JSON.parse(connector.getTableList(loggedInUser).getMessage());
         } catch (e) {
             log.error(e);
         }
         var configs = formConfig.config;
         configs.forEach(function(config) {
-          if(config.fieldName === TABLE_NAME) {
-            config.valueSet = tables;
-          }
+            if (config.fieldName === TABLE_NAME) {
+                config.valueSet = tables;
+            }
         });
         return formConfig;
     }
@@ -144,18 +144,23 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
         var tableName = providerConfig.tableName;
         var query = providerConfig.query;
         var limit = 100;
-        if(providerConfig.limit) {
-          limit = providerConfig.limit;
+        if (providerConfig.limit) {
+            limit = providerConfig.limit;
         }
-        log.info("********************** " + query);
         var result;
         //if there's a filter present, we should perform a Lucene search instead of reading the table
         if (query) {
-            result = connector.search(loggedInUser, tableName, query);
+            var filter = {
+                "query": query,
+                "start": 0,
+                "count": limit
+            };
+            result = connector.search(loggedInUser, tableName, stringify(filter)).getMessage();
         } else {
             var from = JS_MIN_VALUE;
             var to = JS_MAX_VALUE;
             result = connector.getRecordsByRange(loggedInUser, tableName, from, to, 0, limit, null).getMessage();
+
         }
         result = JSON.parse(result);
         var data = [];

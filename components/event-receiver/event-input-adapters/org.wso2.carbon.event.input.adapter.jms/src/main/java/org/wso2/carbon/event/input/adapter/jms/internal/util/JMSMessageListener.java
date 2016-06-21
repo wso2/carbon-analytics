@@ -101,6 +101,8 @@ public class JMSMessageListener implements MessageListener {
             log.error(e);
         } catch (UnsupportedEncodingException e) {
             log.error(e);
+        } catch (Throwable t){
+            log.error(t);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }

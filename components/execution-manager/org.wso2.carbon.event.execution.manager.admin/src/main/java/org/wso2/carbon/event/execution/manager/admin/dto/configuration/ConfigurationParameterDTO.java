@@ -18,7 +18,7 @@ package org.wso2.carbon.event.execution.manager.admin.dto.configuration;
 /**
  * DTO class of Parameter for ExecutionManagerAdminService
  */
-public class ParameterDTO {
+public class ConfigurationParameterDTO {
 
     private String name;
 

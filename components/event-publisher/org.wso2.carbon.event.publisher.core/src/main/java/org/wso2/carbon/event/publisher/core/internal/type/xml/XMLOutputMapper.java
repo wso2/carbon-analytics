@@ -30,7 +30,6 @@ import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.config.mapping.XMLOutputMapping;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
-import org.wso2.carbon.event.publisher.core.exception.EventPublisherProcessingException;
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
 import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
 import org.wso2.carbon.event.publisher.core.internal.util.RuntimeResourceLoader;
@@ -50,6 +49,7 @@ public class XMLOutputMapper implements OutputMapper {
     private List<String> mappingTextList;
     private boolean isCustomRegistryPath;
     private final RuntimeResourceLoader runtimeResourceLoader;
+    private final boolean isCustomMappingEnabled;
 
     public XMLOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                            Map<String, Integer> propertyPositionMap,
@@ -60,9 +60,10 @@ public class XMLOutputMapper implements OutputMapper {
 
         XMLOutputMapping outputMapping = (XMLOutputMapping) eventPublisherConfiguration.getOutputMapping();
         this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration(), propertyPositionMap);
+        this.isCustomMappingEnabled = outputMapping.isCustomMappingEnabled();
 
         String mappingText;
-        if (outputMapping.isCustomMappingEnabled()) {
+        if (this.isCustomMappingEnabled) {
             mappingText = getCustomMappingText();
             EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap);
         } else {
@@ -142,71 +143,85 @@ public class XMLOutputMapper implements OutputMapper {
         return actualMappingText;
     }
 
-    private String getPropertyValue(Object[] inputObjArray, String mappingProperty) {
-        if (inputObjArray.length != 0) {
-            int position = propertyPositionMap.get(mappingProperty);
-            Object data = inputObjArray[position];
-            if (data != null) {
-                return data.toString();
-            }
+    private String getPropertyValue(Event event, String mappingProperty) {
+        Object[] eventData = event.getData();
+        Map<String, Object> arbitraryMap = event.getArbitraryDataMap();
+        Integer position = propertyPositionMap.get(mappingProperty);
+        Object data = null;
+
+        if (position != null && eventData.length != 0) {
+            data = eventData[position];
+        } else if (mappingProperty != null && arbitraryMap != null && mappingProperty.startsWith(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX)) {
+            data = arbitraryMap.get(mappingProperty.replaceFirst(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX, ""));
+        }
+        if (data != null) {
+            return data.toString();
         }
         return "";
     }
 
-    private String buildOutputMessage(Object[] eventData)
+    @Override
+    public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
+
+        // Retrieve resource at runtime if it is from registry
+        XMLOutputMapping outputMapping = (XMLOutputMapping) eventPublisherConfiguration.getOutputMapping();
+        if (outputMapping.isRegistryResource()) {
+            String path = outputMapping.getMappingXMLText();
+            if (isCustomRegistryPath) {
+
+                // Retrieve the actual path
+                List<String> pathMappingTextList = generateMappingTextList(path);
+                StringBuilder pathBuilder = new StringBuilder(pathMappingTextList.get(0));
+                for (int i = 1; i < pathMappingTextList.size(); i++) {
+                    if (i % 2 == 0) {
+                        pathBuilder.append(pathMappingTextList.get(i));
+                    } else {
+                        pathBuilder.append(getPropertyValue(event, pathMappingTextList.get(i)));
+                    }
+                }
+                path = pathBuilder.toString();
+            }
+            // Retrieve actual content
+            String actualMappingText = this.runtimeResourceLoader.getResourceContent(path);
+            // Validate XML
+            actualMappingText = validateXML(actualMappingText);
+            this.mappingTextList = generateMappingTextList(actualMappingText);
+        }
 
         StringBuilder eventText = new StringBuilder(mappingTextList.get(0));
         for (int i = 1, size = mappingTextList.size(); i < size; i++) {
             if (i % 2 == 0) {
                 eventText.append(mappingTextList.get(i));
             } else {
-                Object propertyValue = getPropertyValue(eventData, mappingTextList.get(i));
-                if (propertyValue != null) {
-                    eventText.append(propertyValue);
-                } else {
-                    eventText.append("");
-                }
+                eventText.append(getPropertyValue(event, mappingTextList.get(i)));
             }
         }
 
-        return eventText.toString();
-    }
+        String text = eventText.toString();
+        if (!this.isCustomMappingEnabled) {
+            Map<String, Object> arbitraryDataMap = event.getArbitraryDataMap();
+            if (arbitraryDataMap != null && !arbitraryDataMap.isEmpty()) {
+                // Add arbitrary data map to the default template
+                try {
+                    OMFactory factory = OMAbstractFactory.getOMFactory();
+                    OMElement compositeEventElement = AXIOMUtil.stringToOM(text);
+                    OMElement parentPropertyElement = factory.createOMElement(new QName(EventPublisherConstants.EVENT_ARBITRARY_DATA_MAP_TAG));
 
-    @Override
-    public Object convertToMappedInputEvent(Event event)
-            throws EventPublisherConfigurationException {
-        if (event.getData().length > 0) {
-
-            // Retrieve resource at runtime if it is from registry
-            XMLOutputMapping outputMapping = (XMLOutputMapping) eventPublisherConfiguration.getOutputMapping();
-            if (outputMapping.isRegistryResource()) {
-                String path = outputMapping.getMappingXMLText();
-                if (isCustomRegistryPath) {
-
-                    // Retrieve the actual path
-                    List<String> pathMappingTextList = generateMappingTextList(path);
-                    StringBuilder pathBuilder = new StringBuilder(pathMappingTextList.get(0));
-                    for (int i = 1; i < pathMappingTextList.size(); i++) {
-                        if (i % 2 == 0) {
-                            pathBuilder.append(pathMappingTextList.get(i));
-                        } else {
-                            pathBuilder.append(getPropertyValue(event.getData(), pathMappingTextList.get(i)));
-                        }
+                    for (Map.Entry<String, Object> entry : arbitraryDataMap.entrySet()) {
+                        OMElement propertyElement = factory.createOMElement(new QName(entry.getKey()));
+                        propertyElement.setText(entry.getValue().toString());
+                        parentPropertyElement.addChild(propertyElement);
                     }
-                    path = pathBuilder.toString();
+                    compositeEventElement.getFirstElement().addChild(parentPropertyElement);
+                    text = compositeEventElement.toString();
+                } catch (XMLStreamException e) {
+                    log.warn("Error in parsing event XML text", e);
                 }
-                // Retrieve actual content
-                String actualMappingText = this.runtimeResourceLoader.getResourceContent(path);
-                // Validate XML
-                actualMappingText = validateXML(actualMappingText);
-                this.mappingTextList = generateMappingTextList(actualMappingText);
             }
-
-            return buildOutputMessage(event.getData());
-        } else {
-            throw new EventPublisherProcessingException("Input Object array is empty!");
         }
+
+        return text;
     }
 
     @Override

@@ -75,7 +75,7 @@ public class EventManagementUtil {
         return streamDefinition;
     }
 
-    public static Event getWso2Event(org.wso2.carbon.databridge.commons.StreamDefinition streamDefinition, long timestamp, Object[] data) {
+    public static Event getWso2Event(String originalEventStreamId, org.wso2.carbon.databridge.commons.StreamDefinition streamDefinition, long timestamp, Object[] data) {
         int metaAttrCount = streamDefinition.getMetaData() != null ? streamDefinition.getMetaData().size() : 0;
         int correlationAttrCount = streamDefinition.getCorrelationData() != null ? streamDefinition.getCorrelationData().size() : 0;
         int payloadAttrCount = streamDefinition.getPayloadData() != null ? streamDefinition.getPayloadData().size() : 0;
@@ -91,6 +91,6 @@ public class EventManagementUtil {
                 payloadAttrArray[i - (metaAttrCount + correlationAttrCount)] = data[i];
             }
         }
-        return new Event(streamDefinition.getStreamId(), timestamp, metaAttrArray, correlationAttrArray, payloadAttrArray);
+        return new Event(originalEventStreamId, timestamp, metaAttrArray, correlationAttrArray, payloadAttrArray);
     }
 }

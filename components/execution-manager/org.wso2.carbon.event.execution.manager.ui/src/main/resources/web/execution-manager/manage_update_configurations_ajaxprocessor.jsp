@@ -2,7 +2,7 @@
 <%@ page import="org.wso2.carbon.event.execution.manager.stub.ExecutionManagerAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.ui.ExecutionManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ScenarioConfigurationDTO" %>
-<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ParameterDTO" %>
+<%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.ConfigurationParameterDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.StreamMappingDTO" %>
 <%@ page import="org.wso2.carbon.event.execution.manager.admin.dto.configuration.xsd.AttributeMappingDTO" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamAttributeDto" %>
@@ -45,7 +45,7 @@
         String templateType = request.getParameter("templateType");
         String valueSeparator = "::";
 
-        ParameterDTO[] parameters;
+        ConfigurationParameterDTO[] parameters;
 
         ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
         try {
@@ -61,15 +61,15 @@
                 scenarioConfigurationDTO.setType(templateType);
 
                 if (parametersJson.length() < 1) {
-                    parameters = new ParameterDTO[0];
+                    parameters = new ConfigurationParameterDTO[0];
 
                 } else {
                     String[] parameterStrings = parametersJson.split(",");
-                    parameters = new ParameterDTO[parameterStrings.length];
+                    parameters = new ConfigurationParameterDTO[parameterStrings.length];
                     int index = 0;
 
                     for (String parameterString : parameterStrings) {
-                        ParameterDTO parameterDTO = new ParameterDTO();
+                        ConfigurationParameterDTO parameterDTO = new ConfigurationParameterDTO();
                         parameterDTO.setName(parameterString.split(valueSeparator)[0]);
                         parameterDTO.setValue(parameterString.split(valueSeparator)[1]);
                         parameters[index] = parameterDTO;
@@ -77,7 +77,7 @@
                     }
                 }
 
-                scenarioConfigurationDTO.setParameterDTOs(parameters);
+                scenarioConfigurationDTO.setConfigurationParameterDTOs(parameters);
 
                 //toStreamIDArray.length defines the number of stream mappings per configuration
                 String[] toStreamIDArray = proxy.saveConfiguration(scenarioConfigurationDTO);
@@ -202,7 +202,7 @@
                             for (AttributeMappingDTO metaAttributeMappingDTO : metaAttributeMappingDTOList) {
                     %>
                     <tr id="metaMappingRow_<%=metaCounter%>">
-                        <td>Mapped From :
+                        <td class="labelCellPadding">Mapped From :
                         </td>
                         <td>
                             <select id="metaEventMappingValue_<%=i%><%=metaCounter%>">
@@ -229,7 +229,7 @@
                                 %>
                             </select>
                         </td>
-                        <td>Mapped To :
+                        <td class="labelCellPadding">Mapped To :
                         </td>
                         <td>
                             <input type="text" id="metaEventMappedValue_<%=i%><%=metaCounter%>"
@@ -250,8 +250,8 @@
                     %>
                     <tr>
                         <td colspan="6">
-                            <div id="noInputMetaEventData">
-                                No Meta Attributes to define
+                            <div class="noDataDiv-plain" id="noInputMetaEventData">
+                                No Meta attributes to define
                             </div>
                         </td>
                     </tr>
@@ -271,7 +271,7 @@
                             for (AttributeMappingDTO correlationAttributeMappingDTO : correlationAttributeMappingDTOList) {
                     %>
                     <tr id="correlationMappingRow_<%=correlationCounter%>">
-                        <td>Mapped From :
+                        <td class="labelCellPadding">Mapped From :
                         </td>
                         <td>
                             <select id="correlationEventMappingValue_<%=i%><%=correlationCounter%>">
@@ -298,7 +298,7 @@
                                 %>
                             </select>
                         </td>
-                        <td>Mapped To :
+                        <td class="labelCellPadding">Mapped To :
                         </td>
                         <td>
                             <input type="text" id="correlationEventMappedValue_<%=i%><%=correlationCounter%>"
@@ -319,8 +319,8 @@
                     %>
                     <tr>
                         <td colspan="6">
-                            <div id="noInputCorrelationEventData">
-                                No Correlation Attributes to define
+                            <div class="noDataDiv-plain" id="noInputCorrelationEventData">
+                                No Correlation attributes to define
                             </div>
                         </td>
                     </tr>
@@ -340,7 +340,7 @@
                             for (AttributeMappingDTO payloadAttributeMappingDTO : payloadAttributeMappingDTOList) {
                     %>
                     <tr id="payloadMappingRow_<%=payloadCounter%>">
-                        <td>Mapped From :
+                        <td class="labelCellPadding">Mapped From :
                         </td>
                         <td>
                             <select id="payloadEventMappingValue_<%=i%><%=payloadCounter%>">
@@ -367,7 +367,7 @@
                                 %>
                             </select>
                         </td>
-                        <td>Mapped To :
+                        <td class="labelCellPadding">Mapped To :
                         </td>
                         <td>
                             <input type="text" id="payloadEventMappedValue_<%=i%><%=payloadCounter%>"
@@ -388,8 +388,8 @@
                     %>
                     <tr>
                         <td colspan="6">
-                            <div id="noInputPayloadEventData">
-                                No Payload Attributes to define
+                            <div  class="noDataDiv-plain" id="noInputPayloadEventData">
+                                No Payload attributes to define
                             </div>
                         </td>
                     </tr>
@@ -398,22 +398,21 @@
                     %>
                     </tbody>
                     <div style="display: none">
-                        <input type="text" id="metaRows"
+                        <input type="text" id="metaRows_<%=i%>"
                                value="<%=metaCounter%>"/>
-                        <input type="text" id="correlationRows"
+                        <input type="text" id="correlationRows_<%=i%>"
                                value="<%=correlationCounter%>"/>
-                        <input type="text" id="payloadRows"
+                        <input type="text" id="payloadRows_<%=i%>"
                                value="<%=payloadCounter%>"/>
                     </div>
                 </table>
             </div>
         </div>
-        <%
-            }
-        %>
-
-        <br class="c-both"/>
-        <hr class="wr-separate"/>
+    <br class="c-both"/>
+    <hr class="wr-separate"/>
+    <%
+        }
+    %>
 
         <div class="action-container">
             <button type="button"

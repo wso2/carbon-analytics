@@ -44,6 +44,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
     private ReentrantLock threadBarrier = new ReentrantLock();
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
     private boolean isContinue = false;
+    private String originalEventStreamId;
 
     public QueueInputEventDispatcher(int tenantId, String syncId, Lock readLock,
                                      StreamDefinition exportedStreamDefinition,
@@ -52,6 +53,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
         this.tenantId = tenantId;
         this.syncId = syncId;
         this.eventQueue = new BlockingEventQueue(eventQueueSizeMb, eventSyncQueueSize);
+        this.originalEventStreamId = exportedStreamDefinition.getStreamId();
         this.streamDefinition = EventManagementUtil.constructDatabridgeStreamDefinition(syncId, exportedStreamDefinition);
         this.executorService.submit(new QueueInputEventDispatcherWorker());
     }
@@ -116,6 +118,10 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
         this.isContinue = isContinue;
     }
 
+    @Override
+    public String getOriginalEventStreamId() {
+        return originalEventStreamId;
+    }
 
     class QueueInputEventDispatcherWorker implements Runnable {
 
