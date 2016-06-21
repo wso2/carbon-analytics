@@ -27,12 +27,14 @@ public class PersistenceConfiguration implements Serializable {
     private int threadPoolSize;
     private long persistenceTimeInterval;
     private Map propertiesMap = new HashMap();
+    private boolean isPersistenceEnabled;
 
-    public PersistenceConfiguration(String persistenceClass, long persistenceTimeInterval, int threadPoolSize, Map propertiesMap) {
+    public PersistenceConfiguration(String persistenceClass, long persistenceTimeInterval, int threadPoolSize, Map propertiesMap, boolean isPersistenceEnabled) {
         this.persistenceClass = persistenceClass;
         this.persistenceTimeInterval = persistenceTimeInterval;
         this.threadPoolSize = threadPoolSize;
         this.propertiesMap = propertiesMap;
+        this.isPersistenceEnabled = isPersistenceEnabled;
     }
 
     public String getPersistenceClass() {
@@ -49,6 +51,10 @@ public class PersistenceConfiguration implements Serializable {
 
     public Map getPropertiesMap(){
         return propertiesMap;
+    }
+
+    public boolean isPersistenceEnabled(){
+        return isPersistenceEnabled;
     }
 
 }
