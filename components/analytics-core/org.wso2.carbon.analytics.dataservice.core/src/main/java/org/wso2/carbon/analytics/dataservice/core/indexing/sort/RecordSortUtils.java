@@ -128,6 +128,9 @@ public class RecordSortUtils {
     private static List<Record> getSortedList(List<List<Record>> records,
                                               Map<String, ColumnDefinition> indices,
                                               List<SortByField> sortByFields) {
+        if (records.isEmpty()) {
+            return new ArrayList<>();
+        }
         if (records.size() > 1) {
             List<Record> mergeSortedRecords = records.get(0);
             for (int i = 1; i < records.size(); i++) {
