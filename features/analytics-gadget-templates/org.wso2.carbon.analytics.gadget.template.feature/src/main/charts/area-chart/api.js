@@ -51,7 +51,7 @@ var getConfig, validate, isProviderRequired, draw, update;
      * @param chartConfig
      */
     validate = function(chartConfig) {
-
+        return true;
     };
 
     /**
@@ -126,5 +126,5 @@ var getConfig, validate, isProviderRequired, draw, update;
         return conf;
     };
 
-    
+
 }());

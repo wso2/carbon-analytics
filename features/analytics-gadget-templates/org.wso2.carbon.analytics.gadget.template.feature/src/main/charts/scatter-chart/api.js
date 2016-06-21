@@ -58,7 +58,7 @@ var getConfig, validate, isProviderRequired, draw, update;
      * TO be used when provider configuration steps need to be skipped
      */
     isProviderRequired = function() {
-
+        return true;
     }
 
 
