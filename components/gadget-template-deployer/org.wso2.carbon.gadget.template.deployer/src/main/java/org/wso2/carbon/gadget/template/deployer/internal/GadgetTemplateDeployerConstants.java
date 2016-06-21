@@ -31,7 +31,7 @@ public class GadgetTemplateDeployerConstants {
 
     public static final String PROPERTY_TAG = "property";
 
-    public static final String EXECUTION_MANAGER = "execution-manager";
+    public static final String EXECUTION_MANAGER = "template-manager";
 
     public static final String GADGET_TEMPLATES = "gadget-templates";
 
