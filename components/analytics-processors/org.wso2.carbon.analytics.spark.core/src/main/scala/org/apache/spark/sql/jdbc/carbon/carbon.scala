@@ -18,9 +18,11 @@
 
 package org.apache.spark.sql.jdbc
 
-import java.sql.{Connection, PreparedStatement}
-
-import org.apache.spark.Logging
+import java.sql.{Connection, PreparedStatement, SQLException}
+import java.util.Properties
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.sources.Filter
+import org.apache.spark.{Logging, Partition, SparkContext}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row}
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException
@@ -29,7 +31,7 @@ import org.wso2.carbon.analytics.spark.core.sources.AnalyticsDatasourceWrapper
 
 package object carbon {
 
-  object JDBCWriteDetails extends Logging {
+  object CarbonJDBCWrite extends Logging {
 
     /**
       * Saves the RDD to the database in a single transaction.
@@ -65,7 +67,7 @@ package object carbon {
             }
           }
           df.foreachPartition { iterator =>
-            JDBCWriteDetails.savePartition(dsWrapper.getConnection, tableName, primaryKeys, overwrite, iterator, rddSchema, nullTypes)
+            CarbonJDBCWrite.savePartition(dsWrapper.getConnection, tableName, primaryKeys, overwrite, iterator, rddSchema, nullTypes)
           }
         } finally {
           conn.close()
@@ -202,15 +204,15 @@ package object carbon {
       import CarbonJDBCConstants._
       var sql = qConf.getRecordMergeQuery.replace(TABLE_NAME_PLACEHOLDER, table)
 
-      val pKeys = primaryKeys.split("\\s*,\\s*")          // {{KEYS}}
-      val columns = new StringBuilder                     // {{COLUMNS}}
-      val q = new StringBuilder                           // {{Q}}
-      val columnEqualsValuesColumn = new StringBuilder    // {{COLUMN=VALUES(COLUMN) - KEY}}
-      val dColumnEqualsSColumn = new StringBuilder        // {{D.COLUMN=S.COLUMN - KEY}}
-      val qColumn = new StringBuilder                     // {{Q COLUMN}}
-      val sColumn = new StringBuilder                     // {{S.COLUMN}}
-      val columnEqualsSColumn = new StringBuilder         // {{COLUMN=S.COLUMN}}
-      val dKeyEqualsSKey = new StringBuilder              // {{D.KEY=S.KEY}}
+      val pKeys = primaryKeys.split("\\s*,\\s*") // {{KEYS}}
+      val columns = new StringBuilder // {{COLUMNS}}
+      val q = new StringBuilder // {{Q}}
+      val columnEqualsValuesColumn = new StringBuilder // {{COLUMN=VALUES(COLUMN) - KEY}}
+      val dColumnEqualsSColumn = new StringBuilder // {{D.COLUMN=S.COLUMN - KEY}}
+      val qColumn = new StringBuilder // {{Q COLUMN}}
+      val sColumn = new StringBuilder // {{S.COLUMN}}
+      val columnEqualsSColumn = new StringBuilder // {{COLUMN=S.COLUMN}}
+      val dKeyEqualsSKey = new StringBuilder // {{D.KEY=S.KEY}}
 
       var columnPrefix = EMPTY_STRING
       var columnEqualsValuesColumnPrefix = EMPTY_STRING
@@ -254,6 +256,67 @@ package object carbon {
 
       conn.prepareStatement(sql)
     }
+  }
+
+  object CarbonJDBCScan {
+
+    /**
+      * Build and return JDBCRDD from the given information.
+      *
+      * @param sc              Your SparkContext.
+      * @param schema          The Catalyst schema of the underlying database table.
+      * @param dataSource      The class name of the JDBC driver for the given url.
+      * @param fqTable         The fully-qualified table name (or paren'd SQL query) to use.
+      * @param requiredColumns The names of the columns to SELECT.
+      * @param filters         The filters to include in all WHERE clauses.
+      * @param parts           An array of JDBCPartitions specifying partition ids and per-partition WHERE clauses.
+      * @return An RDD representing "SELECT requiredColumns FROM fqTable".
+      */
+    def scanTable(
+                   sc: SparkContext,
+                   schema: StructType,
+                   dataSource: String,
+                   fqTable: String,
+                   requiredColumns: Array[String],
+                   filters: Array[Filter],
+                   parts: Array[Partition]): RDD[Row] = {
+
+      val dsWrapper = new AnalyticsDatasourceWrapper(dataSource)
+      val conn = dsWrapper.getConnection
+      try {
+        val quotedColumns = requiredColumns.map(colName => CarbonJDBCUtils.quoteIdentifier(colName, conn))
+        new JDBCRDD(
+          sc,
+          dsWrapper.getConnection,
+          CarbonJDBCScan.pruneSchema(schema, requiredColumns),
+          fqTable,
+          quotedColumns,
+          filters,
+          parts,
+          new Properties)
+      } catch {
+        case e: SQLException => throw new
+            AnalyticsExecutionException(s"Error while connecting to datasource $dataSource : " + e.getMessage, e)
+        case e: Exception => throw new
+            AnalyticsExecutionException(s"Error while scanning the table $fqTable in datasource $dataSource : " + e.getMessage, e)
+      }
+      finally {
+        conn.close()
+      }
+    }
+
+    /**
+      * Prune all but the specified columns from the specified Catalyst schema.
+      *
+      * @param schema  The Catalyst schema of the master table
+      * @param columns The list of desired columns
+      * @return A Catalyst schema corresponding to columns in the given order.
+      */
+    def pruneSchema(schema: StructType, columns: Array[String]): StructType = {
+      val fieldMap = Map(schema.fields map { x => x.metadata.getString("name") -> x }: _*)
+      new StructType(columns map { name => fieldMap(name) })
+    }
+
   }
 
 }

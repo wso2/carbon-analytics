@@ -111,7 +111,7 @@ class AnalyticsJDBCRelationProvider extends RelationProvider {
 
     if (partitionColumn != null
       && (lowerBound == null || upperBound == null || numPartitions == null)) {
-      sys.error("Partitioning incompletely specified")
+      sys.error("Partitioning improperly specified")
     }
     val formattedSchema = CarbonJDBCUtils.constructElementList(schemaString, primaryKeys)
     try {
@@ -167,7 +167,7 @@ case class CarbonJDBCRelation(
 
   override def buildScan(requiredColumns: Array[String], filters: Array[Filter]): RDD[Row] = {
     try {
-      CarbonJDBCUtils.scanTable(
+      CarbonJDBCScan.scanTable(
         sqlContext.sparkContext,
         schema,
         dataSource,
@@ -194,7 +194,7 @@ case class CarbonJDBCRelation(
       } finally {
         conn.close()
       }
-      JDBCWriteDetails.saveTable(data, dataSource, tableName, primaryKeys, overwrite)
+      CarbonJDBCWrite.saveTable(data, dataSource, tableName, primaryKeys, overwrite)
     }
     catch {
       case e: Exception =>
