@@ -227,33 +227,35 @@ public class AnalyticsEventTable implements EventTable {
         List<ColumnDefinition> cols = new ArrayList<ColumnDefinition>();
         ColumnType colType;
         for (Attribute attr : this.tableDefinition.getAttributeList()) {
-            switch (attr.getType()) {
-            case BOOL:
-                colType = ColumnType.BOOLEAN;
-                break;
-            case DOUBLE:
-                colType = ColumnType.DOUBLE;
-                break;
-            case FLOAT:
-                colType = ColumnType.FLOAT;
-                break;
-            case INT:
-                colType = ColumnType.INTEGER;
-                break;
-            case LONG:
-                colType = ColumnType.LONG;
-                break;
-            case OBJECT:
-                colType = ColumnType.STRING;
-                break;
-            case STRING:
-                colType = ColumnType.STRING;
-                break;
-            default:
-                colType = ColumnType.STRING;
-                break;
+            if (!attr.getName().equals(AnalyticsEventTableConstants.INTERNAL_TIMESTAMP_ATTRIBUTE)) {
+                switch (attr.getType()) {
+                    case BOOL:
+                        colType = ColumnType.BOOLEAN;
+                        break;
+                    case DOUBLE:
+                        colType = ColumnType.DOUBLE;
+                        break;
+                    case FLOAT:
+                        colType = ColumnType.FLOAT;
+                        break;
+                    case INT:
+                        colType = ColumnType.INTEGER;
+                        break;
+                    case LONG:
+                        colType = ColumnType.LONG;
+                        break;
+                    case OBJECT:
+                        colType = ColumnType.STRING;
+                        break;
+                    case STRING:
+                        colType = ColumnType.STRING;
+                        break;
+                    default:
+                        colType = ColumnType.STRING;
+                        break;
+                }
+                cols.add(new ColumnDefinition(attr.getName(), colType));
             }
-            cols.add(new ColumnDefinition(attr.getName(), colType));
         }
 
         List<String> primaryKeys = AnalyticsDataServiceUtils.tokenizeAndTrimToList(this.primaryKeys, ",");

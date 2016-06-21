@@ -53,5 +53,7 @@ public class AnalyticsEventTableConstants {
     public static final String CACHE_KEY_PREFIX_ALL_RECORDS = "@AL:";
     
     public static final String CACHE_KEY_PREFIX_PK = "@PK:";
+
+    public static final String INTERNAL_TIMESTAMP_ATTRIBUTE = "_timestamp";
     
 }

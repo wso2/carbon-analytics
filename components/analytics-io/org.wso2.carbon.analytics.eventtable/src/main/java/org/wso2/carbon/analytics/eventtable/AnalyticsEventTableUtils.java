@@ -17,11 +17,8 @@
 */
 package org.wso2.carbon.analytics.eventtable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -32,10 +29,17 @@ import org.wso2.siddhi.core.event.ComplexEventChunk;
 import org.wso2.siddhi.core.event.stream.StreamEvent;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Utility operations for analytics event table.
  */
 public class AnalyticsEventTableUtils {
+
+    private static Log log = LogFactory.getLog(AnalyticsEventTableUtils.class);
 
     public static void putEvents(int tenantId, String tableName, List<Attribute> attrs, 
             ComplexEventChunk<StreamEvent> addingEventChunk) {
@@ -56,7 +60,19 @@ public class AnalyticsEventTableUtils {
     private static Record streamEventToRecord(int tenantId, String tableName, List<Attribute> attrs,
             StreamEvent event) {
         Map<String, Object> values = streamEventToRecordValues(attrs, event);
-        return new Record(tenantId, tableName, values, event.getTimestamp());
+        Object timestampObj =  values.remove(AnalyticsEventTableConstants.INTERNAL_TIMESTAMP_ATTRIBUTE);
+        if (timestampObj != null) {
+            if (timestampObj instanceof Long) {
+                return new Record(tenantId, tableName, values, (Long) timestampObj);
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("_timestamp in the event table's schema, is not a Long value. Using the event's timestamp..");
+                }
+                return new Record(tenantId, tableName, values, event.getTimestamp());
+            }
+        } else {
+            return new Record(tenantId, tableName, values, event.getTimestamp());
+        }
     }
     
     public static Map<String, Object> streamEventToRecordValues(List<Attribute> attrs, ComplexEvent event) {
@@ -111,7 +127,11 @@ public class AnalyticsEventTableUtils {
         Attribute attr;
         for (int i = 0; i < attrs.size(); i++) {
         	attr = attrs.get(i);
-            data[i] = record.getValue(attr.getName());
+            if (attr.getName().equals(AnalyticsEventTableConstants.INTERNAL_TIMESTAMP_ATTRIBUTE)) {
+                data[i] = record.getTimestamp();
+            } else {
+                data[i] = record.getValue(attr.getName());
+            }
         }
         event.setOutputData(data);
         return event;
