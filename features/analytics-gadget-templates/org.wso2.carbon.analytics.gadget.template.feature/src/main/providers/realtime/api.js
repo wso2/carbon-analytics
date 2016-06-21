@@ -27,6 +27,17 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
     var eventPublisherService = carbon.server.osgiService('org.wso2.carbon.event.publisher.core.EventPublisherService');
     var eventStreamService = carbon.server.osgiService('org.wso2.carbon.event.stream.core.EventStreamService');
 
+    var typeMap = {
+        "bool": "ordinal",
+        "boolean": "ordinal",
+        "string": "ordinal",
+        "int": "linear",
+        "integer": "linear",
+        "long": "linear",
+        "double": "linear",
+        "float": "linear"
+    };
+
     getConfig = function() {
         var formConfig = require(PROVIDERS_LOCATION + '/' + PROVIDER_NAME + '/config.json');
         var datasources = [];
@@ -97,25 +108,28 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
                 var payloadData = eventStreamConfiguration.getStreamDefinition().getPayloadData();
                 if (metaData != null) {
                     for (var i = 0; i < metaData.size(); i++) {
+                        var type = metaData.get(i).getType().toString().toLowerCase();
                         output.push({
                             fieldName: metaData.get(i).getName(),
-                            fieldType: metaData.get(i).getType().toString().toLowerCase()
+                            fieldType: typeMap[type]
                         });
                     }
                 }
                 if (correlationData != null) {
                     for (var i = 0; i < correlationData.size(); i++) {
+                        var type = metaData.get(i).getType().toString().toLowerCase();
                         output.push({
                             fieldName: correlationData.get(i).getName(),
-                            fieldType: correlationData.get(i).getType().toString().toLowerCase()
+                            fieldType: typeMap[type]
                         });
                     }
                 }
                 if (payloadData != null) {
                     for (var i = 0; i < payloadData.size(); i++) {
+                        var type = metaData.get(i).getType().toString().toLowerCase();
                         output.push({
                             fieldName: payloadData.get(i).getName(),
-                            fieldType: payloadData.get(i).getType().toString().toLowerCase()
+                            fieldType: typeMap[type]
                         });
                     }
                 }
