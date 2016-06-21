@@ -40,8 +40,7 @@ package object carbon {
                    df: DataFrame,
                    dataSource: String,
                    tableName: String,
-                   primaryKeys: String,
-                   overwrite: Boolean) {
+                   primaryKeys: String) {
       val rddSchema = df.schema
       val dsWrapper = new AnalyticsDatasourceWrapper(dataSource)
       try {
@@ -67,7 +66,7 @@ package object carbon {
             }
           }
           df.foreachPartition { iterator =>
-            CarbonJDBCWrite.savePartition(dsWrapper.getConnection, tableName, primaryKeys, overwrite, iterator, rddSchema, nullTypes)
+            CarbonJDBCWrite.savePartition(dsWrapper.getConnection, tableName, primaryKeys, iterator, rddSchema, nullTypes)
           }
         } finally {
           conn.close()
@@ -98,7 +97,6 @@ package object carbon {
                        getConnection: () => Connection,
                        table: String,
                        primaryKeys: String,
-                       overwrite: Boolean,
                        iterator: Iterator[Row],
                        rddSchema: StructType,
                        nullTypes: Array[Int]): Iterator[Byte] = {

@@ -194,7 +194,7 @@ case class CarbonJDBCRelation(
       } finally {
         conn.close()
       }
-      CarbonJDBCWrite.saveTable(data, dataSource, tableName, primaryKeys, overwrite)
+      CarbonJDBCWrite.saveTable(data, dataSource, tableName, primaryKeys)
     }
     catch {
       case e: Exception =>
