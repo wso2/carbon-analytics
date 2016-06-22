@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.analytics.spark.core.sources;
 
 import org.apache.commons.logging.Log;
@@ -92,7 +91,7 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
         if (isSchemaProvided()) {
             try {
                 return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, 
-                    this.mergeFlag, sqlContext, generateSchema(), this.incParams);
+                    this.mergeFlag, sqlContext, generateSchema(), this.incParams, false, this.schemaString, "", this.mergeFlag);
             } catch (AnalyticsExecutionException e) {
                 String msg = "Error while generating the schema for the table : " + this.tableName + " : " + e.getMessage();
                 log.error(msg, e);
@@ -100,11 +99,10 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
             }
         } else {
             return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, 
-                this.mergeFlag, sqlContext, this.incParams);
+                this.mergeFlag, sqlContext, this.incParams, false, this.schemaString, "", this.mergeFlag);
         }
     }
     
-
     /**
      * Set the parameters passed in the spark script.
      * 
@@ -306,7 +304,8 @@ public class CompressedEventAnalyticsRelationProvider implements RelationProvide
             throw new RuntimeException(msg, e);
         }
         return new CompressedEventAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, this.mergeFlag,
-            sqlContext, schema, this.incParams);
+            sqlContext, schema, this.incParams, false, // TODO add global tenant access
+            this.schemaString, "", this.mergeFlag);
     }
 
     private void logDebug(String msg) {

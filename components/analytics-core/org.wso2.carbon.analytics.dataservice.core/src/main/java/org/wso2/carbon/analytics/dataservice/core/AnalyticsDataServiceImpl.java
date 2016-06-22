@@ -358,9 +358,34 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public void createTable(int tenantId, String tableName) throws AnalyticsException {
         this.createTable(tenantId, this.primaryARSName, tableName);
     }
-
+    
     @Override
     public void createTable(int tenantId, String recordStoreName, String tableName)
+            throws AnalyticsException {
+        if (this.isGlobalTenantTableAccess(tenantId)) {
+            for (int targetTenantId : this.readTenantIds()) {
+                this.createTableFinal(targetTenantId, recordStoreName, tableName);
+            }
+        } else {
+            this.createTableFinal(tenantId, recordStoreName, tableName);
+        }
+    }
+    
+    public void createTableIfNotExists(int tenantId, String recordStoreName, String tableName) throws AnalyticsException {
+        if (this.isGlobalTenantTableAccess(tenantId)) {
+            for (int targetTenantId : this.readTenantIds()) {
+                if (!this.tableExistsFinal(targetTenantId, tableName)) {
+                    this.createTableFinal(targetTenantId, recordStoreName, tableName);
+                }
+            }
+        } else {
+            if (!this.tableExistsFinal(tenantId, tableName)) {
+                this.createTableFinal(tenantId, recordStoreName, tableName);
+            }
+        }
+    }
+
+    private void createTableFinal(int tenantId, String recordStoreName, String tableName)
             throws AnalyticsException {
         tableName = GenericUtils.normalizeTableName(tableName);
         recordStoreName = recordStoreName.trim();
@@ -533,7 +558,18 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
     
     @Override
-    public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema)
+    public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema) 
+            throws AnalyticsTableNotAvailableException, AnalyticsException {    
+        if (this.isGlobalTenantTableAccess(tenantId)) {
+            for (int targetTenantId : this.readTenantIds()) {
+                this.setTableSchemaFinal(targetTenantId, tableName, schema);
+            }
+        } else {
+            this.setTableSchemaFinal(tenantId, tableName, schema);
+        }
+    }
+    
+    public void setTableSchemaFinal(int tenantId, String tableName, AnalyticsSchema schema)
             throws AnalyticsTableNotAvailableException, AnalyticsException {
         tableName = GenericUtils.normalizeTableName(tableName);
         this.checkInvalidIndexNames(schema.getColumns());
@@ -569,6 +605,23 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
     
     public void invalidateAnalyticsTableInfo(int tenantId, String tableName) {
+        if (this.isGlobalTenantTableAccess(tenantId)) {
+            List<Integer> tids;
+            try {
+                tids = this.readTenantIds();
+            } catch (AnalyticsException e) {
+                throw new RuntimeException("Error in reading tenant ids when analytics table invalidation: " + 
+                        e.getMessage(), e);
+            }
+            for (int targetTenantId : tids) {
+                this.invalidateAnalyticsTableInfoFinal(targetTenantId, tableName);
+            }
+        } else {
+            this.invalidateAnalyticsTableInfoFinal(tenantId, tableName);
+        }
+    }
+    
+    public void invalidateAnalyticsTableInfoFinal(int tenantId, String tableName) {
         tableName = GenericUtils.normalizeTableName(tableName);
         this.tableInfoMap.remove(GenericUtils.calculateTableIdentity(tenantId, tableName));
         this.refreshIndexedTableStoreEntry(tenantId, tableName);
@@ -618,15 +671,46 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         }
     }
     
-    @Override
     public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsTableNotAvailableException,
+            AnalyticsException {
+        if (this.isGlobalTenantTableAccess(tenantId)) {
+            for (int targetTenantId : this.readTenantIds()) {
+                try {
+                    return this.getTableSchemaFinal(targetTenantId, tableName);
+                } catch (AnalyticsTableNotAvailableException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("No table found for tenantId: " + targetTenantId + " tableName: " + tableName);
+                    }
+                }
+            }
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        } else {
+            return this.getTableSchemaFinal(tenantId, tableName);
+        }
+    }
+    
+    public AnalyticsSchema getTableSchemaFinal(int tenantId, String tableName) throws AnalyticsTableNotAvailableException,
             AnalyticsException {
         tableName = GenericUtils.normalizeTableName(tableName);
         return this.lookupTableInfo(tenantId, tableName).getSchema();
     }
-
+    
     @Override
     public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
+        if (this.isGlobalTenantTableAccess(tenantId)) {
+            for (int targetTenantId : this.readTenantIds()) {
+                if (!this.tableExistsFinal(targetTenantId, tableName)) {
+                    return false;
+                }
+            }
+            /* the table in all the tenants was there, if the tenant itself was there */
+            return true;
+        } else {
+            return this.tableExistsFinal(tenantId, tableName);
+        }
+    }
+
+    public boolean tableExistsFinal(int tenantId, String tableName) throws AnalyticsException {
         try {
             tableName = GenericUtils.normalizeTableName(tableName);
             return this.getRecordStoreNameByTable(tenantId, tableName) != null;
@@ -634,9 +718,19 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             return false;
         }
     }
-
+    
     @Override
     public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
+        if (this.isGlobalTenantTableAccess(tenantId)) {
+            for (int targetTenantId : this.readTenantIds()) {
+                this.deleteTableFinal(targetTenantId, tableName);
+            }
+        } else {
+            this.deleteTableFinal(tenantId, tableName);
+        }
+    }
+
+    public void deleteTableFinal(int tenantId, String tableName) throws AnalyticsException {
         tableName = GenericUtils.normalizeTableName(tableName);
         String arsName;
         try {
@@ -777,15 +871,15 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         }
     }
     
-    private boolean isGlobalTenantTableLookup(int tenantId) {
-        return tenantId == Constants.GLOBAL_TENANT_TABLE_LOOKUP_TENANT_ID;
+    private boolean isGlobalTenantTableAccess(int tenantId) {
+        return tenantId == Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID;
     }
     
     @Override
     public AnalyticsDataResponse get(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
             long timeFrom, long timeTo, int recordsFrom, 
             int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        if (this.isGlobalTenantTableLookup(tenantId)) {
+        if (this.isGlobalTenantTableAccess(tenantId)) {
             if (recordsFrom != 0 && recordsCount != Integer.MAX_VALUE) {
                 throw new AnalyticsException("Global analytics data lookup cannot be done on a dataset subset, "
                         + "recordsFrom: " + recordsFrom + " recordsCount: " + recordsCount);
@@ -805,7 +899,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             logger.debug("Global Data Lookup, Tenant Count: " + tenants.size());
         }
         if (tenants.isEmpty()) {
-            throw new AnalyticsTableNotAvailableException(Constants.GLOBAL_TENANT_TABLE_LOOKUP_TENANT_ID, tableName);
+            throw new AnalyticsTableNotAvailableException(Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID, tableName);
         }
         /* here, the assumption is, most of the tenants will have the target table we are looking for,
          * to have a good distribution of partitions */
@@ -817,7 +911,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             } catch (AnalyticsTableNotAvailableException ignore) { /* ignore */ }
         }
         if (responseEntries.isEmpty()) {
-            throw new AnalyticsTableNotAvailableException(Constants.GLOBAL_TENANT_TABLE_LOOKUP_TENANT_ID, tableName);
+            throw new AnalyticsTableNotAvailableException(Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID, tableName);
         }
         if (logger.isDebugEnabled()) {
             logger.debug("Global Data Lookup, Response Entries Count: " + responseEntries.size());

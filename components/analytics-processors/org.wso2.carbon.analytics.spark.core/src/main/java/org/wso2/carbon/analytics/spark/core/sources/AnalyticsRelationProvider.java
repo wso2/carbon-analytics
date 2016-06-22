@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.analytics.spark.core.sources;
 
 import org.apache.commons.logging.Log;
@@ -24,14 +23,10 @@ import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.sources.BaseRelation;
 import org.apache.spark.sql.sources.RelationProvider;
 import org.apache.spark.sql.sources.SchemaRelationProvider;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.Metadata;
-import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
+import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
-import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
@@ -41,15 +36,6 @@ import scala.collection.immutable.Map;
 import scala.runtime.AbstractFunction0;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.isEmptyAnalyticsSchema;
-import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.structTypeFromAnalyticsSchema;
 
 /**
  * This class allows spark to communicate with the the Analytics Dataservice when used in Spark SQL
@@ -69,7 +55,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
     private AnalyticsDataService dataService;
     private String recordStore;
     private boolean mergeFlag;
-    private boolean globalTenantRead;
+    private boolean globalTenantAccess;
     private StructType schemaStruct;
     private String incParams;
 
@@ -95,7 +81,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }
-        if (isSchemaProvided()) {
+        if (AnalyticsCommonUtils.isSchemaProvided(this.schemaString)) {
             try {
                 setSchemaIfProvided();
             } catch (AnalyticsExecutionException e) {
@@ -104,10 +90,12 @@ public class AnalyticsRelationProvider implements RelationProvider,
                 throw new RuntimeException(msg, e);
             }
             return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
-                                         this.schemaStruct, this.incParams, this.globalTenantRead);
+                                         this.schemaStruct, this.incParams, this.globalTenantAccess,
+                                         this.schemaString, this.primaryKeys, this.mergeFlag);
         } else {
             return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
-                                         this.incParams, this.globalTenantRead);
+                                         this.incParams, this.globalTenantAccess,
+                                         this.schemaString, this.primaryKeys, this.mergeFlag);
         }
     }
 
@@ -122,96 +110,45 @@ public class AnalyticsRelationProvider implements RelationProvider,
                                                 AnalyticsConstants.DEFAULT_PROCESSED_DATA_STORE_NAME);
         this.mergeFlag = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.MERGE_SCHEMA,
                                                                    parameters, String.valueOf(true)));
-        this.globalTenantRead = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.GLOBAL_TENANT_READ,
+        this.globalTenantAccess = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.GLOBAL_TENANT_ACCESS,
                 parameters, String.valueOf(false)));
         this.incParams = extractValuesFromMap(AnalyticsConstants.INC_PARAMS, parameters, "");
     }
 
     private void createTableIfNotExist() throws AnalyticsExecutionException {
-        if (!this.tableName.isEmpty()) {
-            try {
-                if (!this.dataService.tableExists(this.tenantId, this.tableName)) {
-                    logDebug(this.tableName + " table does not exists. Hence creating it");
-                    if (!this.dataService.listRecordStoreNames().contains(this.recordStore)) {
-                        throw new AnalyticsExecutionException("Unknown data store name " + this.recordStore);
-                    }
-                    this.dataService.createTable(this.tenantId, this.recordStore, this.tableName);
-                }
-            } catch (AnalyticsException e) {
-                throw new AnalyticsExecutionException("Error while accessing table " + this.tableName + " : " + e.getMessage(), e);
-            }
-        } else if (!this.streamName.isEmpty()) {
-            try {
-                this.tableName = AnalyticsCommonUtils.convertStreamNameToTableName(this.streamName);
-                if (!this.dataService.tableExists(this.tenantId, this.tableName)) {
-                    if (!this.dataService.listRecordStoreNames().contains(this.recordStore)) {
-                        throw new AnalyticsExecutionException("Unknown data store name " + this.recordStore);
-                    }
-                    this.dataService.createTable(this.tenantId, this.recordStore, this.tableName);
-                }
-            } catch (AnalyticsException e) {
-                throw new AnalyticsExecutionException("Error while accessing table " + this.tableName
-                                                      + " : " + e.getMessage(), e);
-            }
-        } else {
-            throw new AnalyticsExecutionException("Empty " + AnalyticsConstants.TABLE_NAME + " OR "
-                                                  + AnalyticsConstants.STREAM_NAME);
+        if (this.tableName.isEmpty()) {
+            this.tableName = AnalyticsCommonUtils.convertStreamNameToTableName(this.streamName);
         }
-
+        if (this.tableName.isEmpty()) {
+            throw new AnalyticsExecutionException("Empty " + AnalyticsConstants.TABLE_NAME + " OR "
+                    + AnalyticsConstants.STREAM_NAME);
+        }
+        int targetTenantId;
+        if (this.globalTenantAccess) {
+            targetTenantId = Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID;
+        } else {
+            targetTenantId = this.tenantId;
+        }
+        this.createTableIfNotExist(targetTenantId, this.tableName);
+    }
+    
+    private void createTableIfNotExist(int targetTenantId, String targetTableName) throws AnalyticsExecutionException {
+        try {
+            AnalyticsCommonUtils.createTableIfNotExists(this.dataService, this.recordStore, targetTenantId, targetTableName);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsExecutionException("Error while accessing table " + targetTableName + " : " + e.getMessage(), e);
+        }
     }
 
     private void setSchemaIfProvided() throws AnalyticsExecutionException {
-        if (isSchemaProvided()) {
-            logDebug("Schema is provided, hence setting the schema in the analytics data service");
-            List<ColumnDefinition> colList = this.createColumnDefinitionsFromString(this.schemaString);
-            List<String> pKeyList;
-            if (!this.primaryKeys.isEmpty()) {
-                pKeyList = this.createPrimaryKeyList(this.primaryKeys);
-            } else {
-                logDebug("No primary keys present, hence setting an empty list");
-                pKeyList = Collections.emptyList();
-            }
-
-            AnalyticsSchema finalSchema = new AnalyticsSchema(colList, pKeyList);
-            if (this.mergeFlag) {
-                logDebug("MergeSchema flag is set. Hence merging the schema with the existing schema");
-                try {
-                    AnalyticsSchema existingSchema = this.dataService.getTableSchema(this.tenantId, this.tableName);
-                    if (!isEmptyAnalyticsSchema(existingSchema)) {
-                        logDebug("There is an existing schema already present. Hence, merging the schemas");
-                        finalSchema = AnalyticsDataServiceUtils.createMergedSchema
-                                (existingSchema, pKeyList, colList, Collections.<String>emptyList());
-                    }
-                } catch (AnalyticsException e) {
-                    throw new AnalyticsExecutionException("Error while reading " + this.tableName + " table schema: " + e.getMessage(), e);
-                }
-            } else {
-                logDebug("MergeSchema flag is not set. Hence using the given schema");
-            }
-
-            try {
-                this.dataService.setTableSchema(this.tenantId, this.tableName, finalSchema);
-            } catch (AnalyticsException e) {
-                throw new AnalyticsExecutionException("Error while setting " + this.tableName + " table schema: " + e.getMessage(), e);
-            }
-
-            StructType tempStruct = structTypeFromAnalyticsSchema(finalSchema);
-            if (this.schemaString.contains(AnalyticsConstants.TIMESTAMP_FIELD)) {
-                this.schemaStruct = tempStruct.merge(new StructType(new StructField[]{new StructField(
-                        AnalyticsConstants.TIMESTAMP_FIELD, DataTypes.LongType, true, Metadata.empty())}));
-            } else {
-                this.schemaStruct = tempStruct;
-            }
-
+        int targetTenantId;
+        if (this.globalTenantAccess) {
+            targetTenantId = Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID;
         } else {
-            if (!this.primaryKeys.isEmpty()) {
-                throw new AnalyticsExecutionException("Primary keys set to an empty Schema");
-            }
+            targetTenantId = this.tenantId;
         }
-    }
-
-    private boolean isSchemaProvided() {
-        return !this.schemaString.isEmpty();
+        this.schemaStruct = AnalyticsCommonUtils.setSchemaIfProvided(this.dataService, this.schemaString, this.globalTenantAccess,
+                this.primaryKeys, this.mergeFlag, targetTenantId, this.tableName);
     }
 
     private String extractValuesFromMap(String key, Map<String, String> map,
@@ -222,94 +159,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
             }
         });
     }
-
-    /**
-     * this method creates a list of column definitions, which will be used to set the schema in the
-     * analytics data service. additionally, it creates a structType object for spark schema
-     *
-     * @param colsStr column string
-     * @return column def list
-     */
-    private List<ColumnDefinition> createColumnDefinitionsFromString(String colsStr)
-            throws AnalyticsExecutionException {
-        String[] strFields = colsStr.split("\\s*,\\s*");
-        ArrayList<ColumnDefinition> resList = new ArrayList<>();
-        for (String strField : strFields) {
-            String[] tokens = strField.trim().split("\\s+");
-
-            if (tokens.length >= 2) {
-                if (isTimestampColumn(tokens)) {
-                    logDebug("if this is a timestamp column, ignore processing that element in " +
-                             "the analytics schema");
-                    continue;
-                }
-
-                AnalyticsSchema.ColumnType type = AnalyticsCommonUtils.stringToColumnType(tokens[1]);
-                switch (tokens.length) {
-                    case 2:
-                        resList.add(new ColumnDefinition(tokens[0], type));
-                        break;
-                    case 3:
-                        if (tokens[2].equalsIgnoreCase(AnalyticsDataServiceUtils.OPTION_IS_INDEXED)) { // if indexed
-                            //This is to be backward compatible with DAS 3.0.1 and DAS 3.0.0, DAS-402
-                            if (tokens[1].toLowerCase().equalsIgnoreCase(AnalyticsConstants.FACET_TYPE)) {
-                                resList.add(new ColumnDefinition(tokens[0], type, true, false, true));
-                            } else {
-                                resList.add(new ColumnDefinition(tokens[0], type, true, false));
-                            }
-                        } else if (tokens[2].equalsIgnoreCase(AnalyticsDataServiceUtils.OPTION_SCORE_PARAM)) { // if score param
-                            if (AnalyticsCommonUtils.isNumericType(type)) { // if score param && numeric type
-                                resList.add(new ColumnDefinition(tokens[0], type, true, true));
-                            } else {
-                                throw new AnalyticsExecutionException("Score-param assigned to a non-numeric ColumnType");
-                            }
-                        } else if (tokens[2].equalsIgnoreCase(AnalyticsDataServiceUtils.OPTION_IS_FACET)) { // if facet,
-                            resList.add(new ColumnDefinition(tokens[0], type, true, false, true));
-
-                        } else {
-                            throw new AnalyticsExecutionException("Invalid option for ColumnType");
-                        }
-                        break;
-                    case 4:
-                        Set<String> indexOptions = new HashSet<>(2);
-                        indexOptions.addAll(Arrays.asList(tokens[2], tokens[3]));
-                        if (indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_FACET) && // if score param and facet
-                                indexOptions.contains(AnalyticsDataServiceUtils.OPTION_SCORE_PARAM)) {
-                            resList.add(new ColumnDefinition(tokens[0], type, true, true, true));
-                        } else if (indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_FACET) &&  //if facet and index
-                                   indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_INDEXED)) {
-                            resList.add(new ColumnDefinition(tokens[0], type, true, false, true));
-                        } else {
-                            throw new AnalyticsExecutionException("Invalid option for ColumnType");
-                        }
-                        break;
-                    default:
-                        throw new AnalyticsExecutionException("Invalid ColumnType");
-                }
-            } else {
-                throw new AnalyticsExecutionException("Invalid ColumnType");
-            }
-        }
-
-        return resList;
-    }
-
-    private boolean isTimestampColumn(String[] tokens) throws AnalyticsExecutionException {
-        if (tokens[0].equalsIgnoreCase(AnalyticsConstants.TIMESTAMP_FIELD)) {
-            if (tokens.length > 3 || tokens.length < 2) {
-                throw new AnalyticsExecutionException("Invalid options for _timestamp");
-            } else if (!tokens[1].equalsIgnoreCase(AnalyticsConstants.LONG_TYPE)) {
-                throw new AnalyticsExecutionException("_timestamp field type must be LONG");
-            }
-            return true;
-        }
-        return false;
-    }
-
-    private List<String> createPrimaryKeyList(String primaryKeyStr) {
-        return new ArrayList<>(Arrays.asList(primaryKeyStr.trim().split("\\s*,\\s*")));
-    }
-
+    
     /**
      * Returns a new base relation with the given parameters and user defined schema.
      * Note: the parameters' keywords are case insensitive and this insensitivity is enforced
@@ -356,33 +206,8 @@ public class AnalyticsRelationProvider implements RelationProvider,
         }
 
         return new AnalyticsRelation(this.tenantId, this.tableName, this.recordStore, sqlContext,
-                                     schema, this.incParams, this.globalTenantRead);
+                                     schema, this.incParams, this.globalTenantAccess,
+                                     this.schemaString, this.primaryKeys, this.mergeFlag);
     }
-
-//    todo: Implement the creatable relation
-
-    /**
-     * Creates a relation with the given parameters based on the contents of the given
-     * DataFrame. The mode specifies the expected behavior of createRelation when
-     * data already exists.
-     * Right now, there are three modes, Append, Overwrite, and ErrorIfExists.
-     * Append mode means that when saving a DataFrame to a data source, if data already exists,
-     * contents of the DataFrame are expected to be appended to existing data.
-     * Overwrite mode means that when saving a DataFrame to a data source, if data already exists,
-     * existing data is expected to be overwritten by the contents of the DataFrame.
-     * ErrorIfExists mode means that when saving a DataFrame to a data source,
-     * if data already exists, an exception is expected to be thrown.
-     */
-//    @Override
-//    public BaseRelation createRelation(SQLContext sqlContext, SaveMode mode,
-//                                       Map<String, String> parameters, DataFrame data) {
-//        //implement this
-//        //extract data from the dataframe, save it using the savemode and create the relation using the first initializer
-//        throw new RuntimeException("Creatable relation is not implemented as yet");
-//    }
-    private void logDebug(String msg) {
-        if (log.isDebugEnabled()) {
-            log.debug(msg);
-        }
-    }
+    
 }

@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.rdd.AnalyticsRDD;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
@@ -69,29 +70,22 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     private boolean incEnable;
     private String incID;
     private int incBuffer;
-    private boolean globalTenantRead;
+    private boolean globalTenantAccess;
     private IncrementalWindowUnit windowUnit;
+    private String schemaString;
+    private String primaryKeys;
+    private boolean mergeFlag;
 
     public AnalyticsRelation() {
     }
 
-    @Deprecated
-    public AnalyticsRelation(int tenantId, String tableName,
-                             SQLContext sqlContext, String schemaString) {
-        this.tenantId = tenantId;
-        this.tableName = tableName;
-        this.sqlContext = sqlContext;
-        this.schema = new StructType(extractFieldsFromString(schemaString));
-    }
-
     public AnalyticsRelation(int tenantId, String recordStore, String tableName,
                              SQLContext sqlContext, String incParams,
-                             boolean globalTenantRead) {
+                             boolean globalTenantAccess, String schemaString, String primaryKeys, boolean mergeFlag) {
         this.tenantId = tenantId;
         this.recordStore = recordStore;
         this.tableName = tableName;
         this.sqlContext = sqlContext;
-
         try {
             AnalyticsSchema analyticsSchema = ServiceHolder.getAnalyticsDataService().getTableSchema(
                     tenantId, tableName);
@@ -108,19 +102,25 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             throw new RuntimeException(msg, e);
         }
         setIncParams(incParams);
-        this.globalTenantRead = globalTenantRead;
+        this.globalTenantAccess = globalTenantAccess;
+        this.schemaString = schemaString;
+        this.primaryKeys = primaryKeys;
+        this.mergeFlag = mergeFlag;
     }
 
     public AnalyticsRelation(int tenantId, String recordStore, String tableName,
                              SQLContext sqlContext, StructType schema, String incParams,
-                             boolean globalTenantRead) {
+                             boolean globalTenantAccess, String schemaString, String primaryKeys, boolean mergeFlag) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.recordStore = recordStore;
         this.sqlContext = sqlContext;
         this.schema = schema;
         setIncParams(incParams);
-        this.globalTenantRead = globalTenantRead;
+        this.globalTenantAccess = globalTenantAccess;
+        this.schemaString = schemaString;
+        this.primaryKeys = primaryKeys;
+        this.mergeFlag = mergeFlag;
     }
 
     private void setIncParams(String incParamStr) {
@@ -168,7 +168,6 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
                         startTime += 1;
                     }
                 }
-
                 endTime = System.currentTimeMillis() + AnalyticsConstants.INC_END_TIME_BUFFER_MS;
             } catch (AnalyticsException e) {
                 throw new RuntimeException(e);
@@ -178,9 +177,9 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             endTime = Long.MAX_VALUE;
         }
         int targetTenantId;
-        if (this.globalTenantRead) {
+        if (this.globalTenantAccess) {
             if (this.tenantId == MultitenantConstants.SUPER_TENANT_ID) {
-                targetTenantId = Constants.GLOBAL_TENANT_TABLE_LOOKUP_TENANT_ID;
+                targetTenantId = Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID;
             } else {
                 throw new RuntimeException("Global tenant read can only be done by the super tenant");
             }
@@ -216,22 +215,28 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     @Override
     public void insert(final DataFrame data, boolean overwrite) {
         AnalyticsDataService dataService = ServiceHolder.getAnalyticsDataService();
+        int targetTenantId;
+        if (this.globalTenantAccess) {
+            targetTenantId = Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID;
+        } else {
+            targetTenantId = this.tenantId;
+        }
         try {
-            AnalyticsSchema tempSchema = dataService.getTableSchema(this.tenantId, this.tableName);
-            if (isEmptyAnalyticsSchema(tempSchema)) {
-                throw new RuntimeException("Unable to insert data to the table as the AnalyticsSchema " +
-                                           "is unavailable for " + this.tableName);
+            AnalyticsSchema tempSchema;
+            try {
+                tempSchema = dataService.getTableSchema(targetTenantId, this.tableName);
+            } catch (AnalyticsTableNotAvailableException e) {
+                tempSchema = null;
             }
-            if (overwrite && dataService.tableExists(this.tenantId, this.tableName)) {
-                dataService.deleteTable(this.tenantId, this.tableName);
+            if (overwrite && !isEmptyAnalyticsSchema(tempSchema)) {                
+                dataService.deleteTable(targetTenantId, this.tableName);
                 if (!dataService.listRecordStoreNames().contains(this.recordStore)) {
-                    throw new RuntimeException("Unknown data store name " + this.recordStore);
+                    throw new RuntimeException("Unknown record store name " + this.recordStore);
                 }
-                dataService.createTable(this.tenantId, this.recordStore, this.tableName);
-                dataService.setTableSchema(this.tenantId, this.tableName, tempSchema);
+                dataService.createTable(targetTenantId, this.recordStore, this.tableName);
+                dataService.setTableSchema(targetTenantId, this.tableName, tempSchema);
             }
-
-            writeDataFrameToDAL(data);
+            this.writeDataFrameToDAL(data);
         } catch (AnalyticsException e) {
             String msg = "Error while inserting data into table " + this.tableName + " : " + e.getMessage();
             log.error(msg, e);
@@ -242,9 +247,10 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     private void writeDataFrameToDAL(DataFrame data) {
         for (int i = 0; i < data.rdd().partitions().length; i++) {
             data.sqlContext().sparkContext().runJob(data.rdd(),
-                                                    new AnalyticsWritingFunction(tenantId, tableName, data.schema()),
-                                                    CarbonScalaUtils.getNumberSeq(i, i + 1), false,
-                                                    ClassTag$.MODULE$.Unit());
+                                                    new AnalyticsWritingFunction(this.tenantId, this.tableName, data.schema(),
+                                                    this.globalTenantAccess, this.schemaString, this.primaryKeys, this.mergeFlag, 
+                                                    this.recordStore), CarbonScalaUtils.getNumberSeq(i, i + 1), 
+                                                    false, ClassTag$.MODULE$.Unit());
         }
     }
 

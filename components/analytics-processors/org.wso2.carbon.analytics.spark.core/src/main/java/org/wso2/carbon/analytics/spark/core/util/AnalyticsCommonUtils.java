@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.analytics.spark.core.util;
 
 import org.apache.commons.logging.Log;
@@ -27,13 +26,19 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 import scala.collection.Iterator;
 
 import javax.lang.model.type.NullType;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -43,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -261,4 +267,167 @@ public class AnalyticsCommonUtils {
     public static StructType structTypeFromAnalyticsSchema(AnalyticsSchema analyticsSchema){
         return new StructType(extractFieldsFromColumns(analyticsSchema.getColumns()));
     }
+    
+    public static void createTableIfNotExists(AnalyticsDataService ads, String recordStore, 
+            int targetTenantId, String targetTableName) throws AnalyticsException {
+        if (!ads.listRecordStoreNames().contains(recordStore)) {
+            throw new AnalyticsExecutionException("Unknown data store name: " + recordStore);
+        }
+        //TODO: take createTableIfNotExists to the interface
+        ((AnalyticsDataServiceImpl) ads).createTableIfNotExists(targetTenantId, recordStore, targetTableName);
+    }
+    
+    public static boolean isSchemaProvided(String schemaString) {
+        return !schemaString.isEmpty();
+    }
+    
+    private static void logDebug(String msg) {
+        if (log.isDebugEnabled()) {
+            log.debug(msg);
+        }
+    }
+    
+    private static List<String> createPrimaryKeyList(String primaryKeyStr) {
+        return new ArrayList<>(Arrays.asList(primaryKeyStr.trim().split("\\s*,\\s*")));
+    }
+    
+    private static boolean isTimestampColumn(String[] tokens) throws AnalyticsExecutionException {
+        if (tokens[0].equalsIgnoreCase(AnalyticsConstants.TIMESTAMP_FIELD)) {
+            if (tokens.length > 3 || tokens.length < 2) {
+                throw new AnalyticsExecutionException("Invalid options for _timestamp");
+            } else if (!tokens[1].equalsIgnoreCase(AnalyticsConstants.LONG_TYPE)) {
+                throw new AnalyticsExecutionException("_timestamp field type must be LONG");
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    private static boolean isTenantFieldColumn(String[] tokens) throws AnalyticsExecutionException {
+        return tokens[0].equalsIgnoreCase(AnalyticsConstants.TENANT_ID_FIELD);
+    }
+    
+    /**
+     * this method creates a list of column definitions, which will be used to set the schema in the
+     * analytics data service. additionally, it creates a structType object for spark schema
+     *
+     * @param colsStr column string
+     * @return column def list
+     */
+    private static List<ColumnDefinition> createColumnDefinitionsFromString(String colsStr, boolean globalTenantAccess)
+            throws AnalyticsExecutionException {
+        String[] strFields = colsStr.split("\\s*,\\s*");
+        ArrayList<ColumnDefinition> resList = new ArrayList<>();
+        for (String strField : strFields) {
+            String[] tokens = strField.trim().split("\\s+");
+            if (tokens.length >= 2) {
+                if (isTimestampColumn(tokens)) {
+                    logDebug("if this is a timestamp column, ignore processing that element in " +
+                             "the analytics schema");
+                    continue;
+                }
+                if (globalTenantAccess && isTenantFieldColumn(tokens)) {
+                    /* skip adding special _tenantId field used in global tenant access to the schema */
+                    continue;
+                }
+                AnalyticsSchema.ColumnType type = AnalyticsCommonUtils.stringToColumnType(tokens[1]);
+                switch (tokens.length) {
+                    case 2:
+                        resList.add(new ColumnDefinition(tokens[0], type));
+                        break;
+                    case 3:
+                        if (tokens[2].equalsIgnoreCase(AnalyticsDataServiceUtils.OPTION_IS_INDEXED)) { // if indexed
+                            //This is to be backward compatible with DAS 3.0.1 and DAS 3.0.0, DAS-402
+                            if (tokens[1].toLowerCase().equalsIgnoreCase(AnalyticsConstants.FACET_TYPE)) {
+                                resList.add(new ColumnDefinition(tokens[0], type, true, false, true));
+                            } else {
+                                resList.add(new ColumnDefinition(tokens[0], type, true, false));
+                            }
+                        } else if (tokens[2].equalsIgnoreCase(AnalyticsDataServiceUtils.OPTION_SCORE_PARAM)) { // if score param
+                            if (AnalyticsCommonUtils.isNumericType(type)) { // if score param && numeric type
+                                resList.add(new ColumnDefinition(tokens[0], type, true, true));
+                            } else {
+                                throw new AnalyticsExecutionException("Score-param assigned to a non-numeric ColumnType");
+                            }
+                        } else if (tokens[2].equalsIgnoreCase(AnalyticsDataServiceUtils.OPTION_IS_FACET)) { // if facet,
+                            resList.add(new ColumnDefinition(tokens[0], type, true, false, true));
+
+                        } else {
+                            throw new AnalyticsExecutionException("Invalid option for ColumnType");
+                        }
+                        break;
+                    case 4:
+                        Set<String> indexOptions = new HashSet<>(2);
+                        indexOptions.addAll(Arrays.asList(tokens[2], tokens[3]));
+                        if (indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_FACET) && // if score param and facet
+                                indexOptions.contains(AnalyticsDataServiceUtils.OPTION_SCORE_PARAM)) {
+                            resList.add(new ColumnDefinition(tokens[0], type, true, true, true));
+                        } else if (indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_FACET) &&  //if facet and index
+                                   indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_INDEXED)) {
+                            resList.add(new ColumnDefinition(tokens[0], type, true, false, true));
+                        } else {
+                            throw new AnalyticsExecutionException("Invalid option for ColumnType");
+                        }
+                        break;
+                    default:
+                        throw new AnalyticsExecutionException("Invalid ColumnType");
+                }
+            } else {
+                throw new AnalyticsExecutionException("Invalid ColumnType");
+            }
+        }
+
+        return resList;
+    }
+    
+    public static StructType setSchemaIfProvided(AnalyticsDataService ads, String schemaString, boolean globalTenantAccess, String primaryKeys, 
+            boolean mergeFlag, int targetTenantId, String targetTableName) throws AnalyticsExecutionException {
+        StructType schemaStruct = null;
+        if (isSchemaProvided(schemaString)) {
+            logDebug("Schema is provided, hence setting the schema in the analytics data service");
+            List<ColumnDefinition> colList = createColumnDefinitionsFromString(schemaString, globalTenantAccess);
+            List<String> pKeyList;
+            if (!primaryKeys.isEmpty()) {
+                pKeyList = createPrimaryKeyList(primaryKeys);
+            } else {
+                logDebug("No primary keys present, hence setting an empty list");
+                pKeyList = Collections.emptyList();
+            }
+
+            AnalyticsSchema finalSchema = new AnalyticsSchema(colList, pKeyList);
+            if (mergeFlag) {
+                logDebug("MergeSchema flag is set. Hence merging the schema with the existing schema");
+                try {
+                    AnalyticsSchema existingSchema = ads.getTableSchema(targetTenantId, targetTableName);
+                    if (!isEmptyAnalyticsSchema(existingSchema)) {
+                        logDebug("There is an existing schema already present. Hence, merging the schemas");
+                        finalSchema = AnalyticsDataServiceUtils.createMergedSchema
+                                (existingSchema, pKeyList, colList, Collections.<String>emptyList());
+                    }
+                } catch (AnalyticsException e) {
+                    throw new AnalyticsExecutionException("Error while reading " + targetTableName + " table schema: " + e.getMessage(), e);
+                }
+            } else {
+                logDebug("MergeSchema flag is not set. Hence using the given schema");
+            }
+            try {
+                ads.setTableSchema(targetTenantId, targetTableName, finalSchema);
+            } catch (AnalyticsException e) {
+                throw new AnalyticsExecutionException("Error while setting " + targetTableName + " table schema: " + e.getMessage(), e);
+            }
+            StructType tempStruct = structTypeFromAnalyticsSchema(finalSchema);
+            if (schemaString.contains(AnalyticsConstants.TIMESTAMP_FIELD)) {
+                schemaStruct = tempStruct.merge(new StructType(new StructField[]{new StructField(
+                        AnalyticsConstants.TIMESTAMP_FIELD, DataTypes.LongType, true, Metadata.empty())}));
+            } else {
+                schemaStruct = tempStruct;
+            }
+        } else {
+            if (!primaryKeys.isEmpty()) {
+                throw new AnalyticsExecutionException("Primary keys set to an empty Schema");
+            }
+        }
+        return schemaStruct;
+    }
+    
 }

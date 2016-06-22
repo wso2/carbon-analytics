@@ -78,7 +78,7 @@ public class AnalyticsConstants {
     public static final String PRIMARY_KEYS = "primaryKeys";
     public static final String RECORD_STORE = "recordStore";
     public static final String MERGE_SCHEMA = "mergeSchema";
-    public static final String GLOBAL_TENANT_READ = "globalTenantRead";    
+    public static final String GLOBAL_TENANT_ACCESS = "globalTenantAccess";    
     public static final String INC_PARAMS = "incrementalParams";
     public static final String TIMESTAMP_FIELD = "_timestamp";
     public static final String TENANT_ID_FIELD = "_tenantId";

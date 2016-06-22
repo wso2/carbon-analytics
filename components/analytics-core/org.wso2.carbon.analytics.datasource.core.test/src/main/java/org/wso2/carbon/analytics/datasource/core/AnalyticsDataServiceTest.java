@@ -335,7 +335,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         records = AnalyticsRecordStoreTest.generateRecords(1, "T2", 1, 5, time, timeOffset);
         this.service.put(records);        
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
-                this.service.get(Constants.GLOBAL_TENANT_TABLE_LOOKUP_TENANT_ID, "T1", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+                this.service.get(Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID, "T1", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 180);
         Assert.assertEquals(outRecords, new HashSet<>(recordsIn));
         this.service.deleteTable(1, "T1");

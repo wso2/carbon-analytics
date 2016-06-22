@@ -51,7 +51,7 @@ public class Constants {
     public static final int REINDEX_WORKER_STOP_WAIT_TIME = 60000;
     public static final int TAXONOMY_WORKER_STOP_WAIT_TIME = 60000;
     public static final int META_INFO_TENANT_ID = -1000;
-    public static final int GLOBAL_TENANT_TABLE_LOOKUP_TENANT_ID = -2000;
+    public static final int GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID = -2000;
     public static final String GLOBAL_SHARD_ALLOCATION_CONFIG_TABLE = "__GLOBAL_SHARD_ALLOCATION_CONFIG__";
     public static final String INDEX_STAGING_DATA_TABLE = "__INDEX_STAGING_DATA__";
     public static final String INDEX_STAGING_DATA_COLUMN = "VALUE";

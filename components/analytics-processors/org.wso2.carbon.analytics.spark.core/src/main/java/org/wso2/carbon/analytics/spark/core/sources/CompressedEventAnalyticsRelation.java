@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.analytics.spark.core.sources;
 
 import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.extractFieldsFromColumns;
@@ -66,6 +65,10 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
     private String incID;
     private int incBuffer;
     private IncrementalWindowUnit windowUnit;
+    private boolean globalTenantAccess;
+    private String schemaString;
+    private String primaryKeys;
+    private boolean mergeFlag;
     
     public CompressedEventAnalyticsRelation() {
     }
@@ -79,14 +82,14 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
      * @param sqlContext    Spark SQl Context
      */
     public CompressedEventAnalyticsRelation(int tenantId, String recordStore, String tableName,
-            boolean schemaMerge, SQLContext sqlContext, String incParams) {
+            boolean schemaMerge, SQLContext sqlContext, String incParams, boolean globalTenantAccess,
+            String schemaString, String primaryKeys, boolean mergeFlag) {
         this.tenantId = tenantId;
         this.recordStore = recordStore;
         this.tableName = tableName;
         this.sqlContext = sqlContext;
         this.schemaMerge = schemaMerge;
         setIncParams(incParams);
-
         try {
             AnalyticsSchema analyticsSchema = ServiceHolder.getAnalyticsDataService().getTableSchema(
                     tenantId, tableName);
@@ -102,6 +105,10 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }
+        this.globalTenantAccess = globalTenantAccess;
+        this.schemaString = schemaString;
+        this.primaryKeys = primaryKeys;
+        this.mergeFlag = mergeFlag;
     }
 
     /**
@@ -114,7 +121,8 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
      * @param schema        Schema of the Table
      */
     public CompressedEventAnalyticsRelation(int tenantId, String recordStore, String tableName,
-            boolean schemaMerge, SQLContext sqlContext, StructType schema, String incParams) {
+            boolean schemaMerge, SQLContext sqlContext, StructType schema, String incParams, boolean globalTenantAccess,
+            String schemaString, String primaryKeys, boolean mergeFlag) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.recordStore = recordStore;
@@ -122,6 +130,10 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
         this.schema = schema;
         this.schemaMerge = schemaMerge;
         setIncParams(incParams);
+        this.globalTenantAccess = globalTenantAccess;
+        this.schemaString = schemaString;
+        this.primaryKeys = primaryKeys;
+        this.mergeFlag = mergeFlag;        
     }
 
     @SuppressWarnings("unchecked")
@@ -199,7 +211,8 @@ public class CompressedEventAnalyticsRelation extends BaseRelation implements Ta
     private void writeDataFrameToDAL(DataFrame data) {
         for (int i = 0; i < data.rdd().partitions().length; i++) {
             data.sqlContext().sparkContext().runJob(data.rdd(), new AnalyticsWritingFunction(tenantId, tableName,
-                data.schema()), CarbonScalaUtils.getNumberSeq(i, i + 1), false, ClassTag$.MODULE$.Unit());
+                data.schema(), this.globalTenantAccess, this.schemaString, this.primaryKeys, this.mergeFlag, 
+                this.recordStore), CarbonScalaUtils.getNumberSeq(i, i + 1), false, ClassTag$.MODULE$.Unit());
         }
     }
     
