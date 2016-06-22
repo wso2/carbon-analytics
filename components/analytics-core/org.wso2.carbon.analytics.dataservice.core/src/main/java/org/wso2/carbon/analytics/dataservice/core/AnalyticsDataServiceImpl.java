@@ -52,6 +52,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutEx
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.ntask.core.TaskManager;
@@ -462,9 +463,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             return new ArrayList<>(0);
         }
         List<Integer> result = new ArrayList<>();
+        int tid;
         for (Record record : records) {
             try {
-                result.add(Integer.parseInt(record.getId()));
+                tid = Integer.parseInt(record.getId());
+                if (tid > 0 || tid == MultitenantConstants.SUPER_TENANT_ID) {
+                    /* we only need the real tenants from this */
+                    result.add(tid);
+                }
             } catch (NumberFormatException e) {
                 throw new AnalyticsException("Corrupted data in global tenant id list: " + record.getId(), e);
             }

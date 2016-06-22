@@ -254,8 +254,5 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         }
     }
 
-
-
-
 }
 
