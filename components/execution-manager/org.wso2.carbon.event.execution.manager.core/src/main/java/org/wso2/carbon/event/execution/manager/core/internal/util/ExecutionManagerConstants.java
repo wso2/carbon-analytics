@@ -27,7 +27,7 @@ public class ExecutionManagerConstants {
 
     // path canged for both cep/spark.
     public static final String TEMPLATE_DOMAIN_PATH = CarbonUtils.getCarbonConfigDirPath()
-            + File.separator + "execution-manager" + File.separator + "domain-template";
+            + File.separator + "template-manager" + File.separator + "domain-template";
 
     public static final String TEMPLATE_CONFIG_PATH = RegistryConstants.PATH_SEPARATOR + "repository"
             + RegistryConstants.PATH_SEPARATOR + "components" + RegistryConstants.PATH_SEPARATOR
