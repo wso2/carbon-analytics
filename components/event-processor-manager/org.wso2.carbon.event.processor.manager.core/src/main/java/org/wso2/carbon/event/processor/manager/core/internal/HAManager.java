@@ -31,6 +31,7 @@ import org.wso2.carbon.event.processor.manager.core.EventPublisherManagementServ
 import org.wso2.carbon.event.processor.manager.core.EventReceiverManagementService;
 import org.wso2.carbon.event.processor.manager.core.Manager;
 import org.wso2.carbon.event.processor.manager.core.config.HAConfiguration;
+import org.wso2.carbon.event.processor.manager.core.config.PersistenceConfiguration;
 import org.wso2.carbon.event.processor.manager.core.exception.EventManagementException;
 import org.wso2.carbon.event.processor.manager.core.internal.ds.EventManagementServiceValueHolder;
 import org.wso2.carbon.event.processor.manager.core.internal.thrift.ManagementServiceClientThriftImpl;
@@ -231,8 +232,8 @@ public class HAManager {
 
         roleToMembershipMap.set(activeId, haConfiguration);
         otherMember = null;
-
-        if (!synced) {
+        PersistenceConfiguration persistenceConfiguration = eventManagementService.getManagementModeInfo().getPersistenceConfiguration();
+        if (!synced && (persistenceConfiguration != null && persistenceConfiguration.isPersistenceEnabled())) {
             // If not already synced, restore to last known state.
             eventProcessorManagementService.restoreLastState();
             log.info("Restored to Last Known State.");

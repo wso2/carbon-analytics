@@ -77,8 +77,10 @@ public class ManagementModeConfigurationLoader {
                     // Set Persist Configurations.
                     OMElement nodeConfig = processingMode
                             .getFirstChildWithName(new QName(ConfigurationConstants.SN_PERSISTENCE_ELEMENT));
-                    if (nodeConfig != null && nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, nodeConfig)) {
-                        managementModeInfo.setPersistenceConfiguration(getPersistConfigurations(nodeConfig));
+
+                    boolean isPersistenceEnabled = nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, nodeConfig);
+                    if (nodeConfig != null && isPersistenceEnabled) {
+                        managementModeInfo.setPersistenceConfiguration(getPersistConfigurations(nodeConfig,isPersistenceEnabled));
                         log.info("CEP started in Persistence enabled HA mode");
                     } else {
                         log.info("CEP started in HA mode");
@@ -138,7 +140,7 @@ public class ManagementModeConfigurationLoader {
         }
     }
 
-    private static PersistenceConfiguration getPersistConfigurations(OMElement persistence) {
+    private static PersistenceConfiguration getPersistConfigurations(OMElement persistence, boolean isPersistenceEnabled) {
         OMElement classElement = persistence.getFirstChildWithName(new QName(ConfigurationConstants.SN_PERSISTENCE_PERSIST_CLASS_ELEMENT));
         Map propertiesMap = new HashMap();
         String className;
@@ -181,7 +183,7 @@ public class ManagementModeConfigurationLoader {
                 poolSize = ConfigurationConstants.SN_DEFAULT_PERSISTENCE_THREAD_POOL_SIZE;
             }
         }
-        return new PersistenceConfiguration(className, timeInterval, poolSize, propertiesMap);
+        return new PersistenceConfiguration(className, timeInterval, poolSize, propertiesMap, isPersistenceEnabled);
 
     }
 

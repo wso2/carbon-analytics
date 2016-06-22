@@ -33,6 +33,17 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
     var JS_MAX_VALUE = "9007199254740992";
     var JS_MIN_VALUE = "-9007199254740992";
 
+    var typeMap = {
+        "bool" : "ordinal",
+        "boolean" : "ordinal",
+        "string" : "ordinal",
+        "int" : "linear",
+        "integer" : "linear",
+        "long" : "linear",
+        "double" : "linear",
+        "float" : "linear"
+    };
+
     var log = new Log();
     var carbon = require('carbon');
     var configs = require('/configs/designer.json');
@@ -126,9 +137,13 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
 
         var columns = result.columns;
         Object.getOwnPropertyNames(columns).forEach(function(name, idx, array) {
+            var type = "ordinal";
+            if(columns[name]['type']) {
+              type = columns[name]['type'];
+            }
             schema.push({
                 fieldName: name,
-                fieldType: columns[name]['type']
+                fieldType: typeMap[type.toLowerCase()]
             });
         });
         // log.info(schema);
