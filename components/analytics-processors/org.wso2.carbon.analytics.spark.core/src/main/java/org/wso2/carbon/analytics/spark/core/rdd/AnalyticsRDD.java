@@ -54,7 +54,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     private static final Log log = LogFactory.getLog(AnalyticsRDD.class);
     private static final long serialVersionUID = 5948588299500227997L;
 
-    private List<String> columns;
+    protected List<String> columns;
     private int tenantId;
     private String tableName;
     private long timeFrom;

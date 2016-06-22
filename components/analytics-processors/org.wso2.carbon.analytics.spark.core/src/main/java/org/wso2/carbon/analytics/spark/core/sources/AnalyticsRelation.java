@@ -259,7 +259,6 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         }
     }
 
-
     protected AnalyticsRDD getAnalyticsRDD(int tenantId, String tableName, List<String> columns, 
             SparkContext sparkContext, Seq<Dependency<?>> deps, ClassTag<Row> evidence, long startTime, long endTime, 
             boolean incEnable, String incID) {

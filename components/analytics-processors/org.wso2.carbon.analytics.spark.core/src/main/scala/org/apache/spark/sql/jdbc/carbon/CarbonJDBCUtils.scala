@@ -64,8 +64,11 @@ object CarbonJDBCUtils {
   def tableExists(conn: Connection, table: String): Boolean = {
     val qConfEntry = getQueryConfigEntry(conn)
     val query = qConfEntry.getTableCheckQuery.replace("{{TABLE_NAME}}", table)
-
-    Try(conn.prepareStatement(query).executeQuery().next()).isSuccess
+    val result = Try(conn.prepareStatement(query).executeQuery().next())
+    if (result.isFailure) {
+      conn.rollback()
+    }
+    result.isSuccess
   }
 
   /**
