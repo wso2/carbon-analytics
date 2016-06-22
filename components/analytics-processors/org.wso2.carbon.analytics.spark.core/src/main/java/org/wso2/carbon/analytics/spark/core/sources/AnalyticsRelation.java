@@ -20,6 +20,8 @@ package org.wso2.carbon.analytics.spark.core.sources;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.spark.Dependency;
+import org.apache.spark.SparkContext;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
@@ -41,12 +43,15 @@ import org.wso2.carbon.analytics.spark.core.util.CarbonScalaUtils;
 import org.wso2.carbon.analytics.spark.core.util.IncrementalUtils;
 import org.wso2.carbon.base.MultitenantConstants;
 
+import scala.collection.Seq;
+import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
 import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.extractFieldsFromColumns;
 import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.extractFieldsFromString;
@@ -186,7 +191,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         } else {
             targetTenantId = this.tenantId;
         }
-        return new AnalyticsRDD(targetTenantId, this.tableName,
+        return getAnalyticsRDD(targetTenantId, this.tableName,
                                 new ArrayList<>(Arrays.asList(this.schema.fieldNames())),
                                 this.sqlContext.sparkContext(), scala.collection.Seq$.MODULE$.empty(),
                                 ClassTag$.MODULE$.<Row>apply(Row.class), startTime, endTime, this.incEnable,
@@ -255,7 +260,10 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     }
 
 
-
-
+    protected AnalyticsRDD getAnalyticsRDD(int tenantId, String tableName, List<String> columns, 
+            SparkContext sparkContext, Seq<Dependency<?>> deps, ClassTag<Row> evidence, long startTime, long endTime, 
+            boolean incEnable, String incID) {
+        return new AnalyticsRDD(tenantId, tableName, columns, sparkContext, deps, evidence, startTime, endTime, incEnable, incID);
+    }
 }
 

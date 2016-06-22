@@ -114,10 +114,11 @@ public class AnalyticsSparkExecutorTest {
         this.service.put(records);
         
         ex.executeQuery(1, "CREATE TEMPORARY TABLE EventsTable USING CompressedEventAnalytics " +
-            "OPTIONS(tableName \"CompressedEventsTable\", schema \"messageFlowId STRING, compotentType STRING, componentId " +
-            "STRING, compotentIndex INT, startTime LONG, endTime LONG, duration FLOAT, beforePayload STRING, afterPayload STRING, " +
-            "contextPropertyMap STRING, transportPropertyMap STRING, children STRING, entryPoint STRING\", " +
-            "dataColumn \"data\")");
+            "OPTIONS(tableName \"CompressedEventsTable\", schema \"messageFlowId STRING, compotentType STRING, " +
+            "componentName STRING, compotentIndex INT, componentId STRING, startTime LONG, endTime LONG, " +
+            "duration FLOAT, beforePayload STRING, afterPayload STRING, contextPropertyMap STRING, " +
+            "transportPropertyMap STRING, children STRING, entryPoint STRING, entryPointHashcode INT, faultCount INT," +
+            " hashCode INT, host STRING\", dataColumn \"data\")");
         
         // Check the rows split
         AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM EventsTable");

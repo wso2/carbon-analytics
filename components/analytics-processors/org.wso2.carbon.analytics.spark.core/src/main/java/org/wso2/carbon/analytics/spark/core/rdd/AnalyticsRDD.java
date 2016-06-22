@@ -86,10 +86,14 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         try {
             Iterator<Record> recordsItr = ServiceHolder.getAnalyticsDataService().readRecords(
                     partition.getRecordStoreName(), partition.getRecordGroup());
-            return new InterruptibleIterator(context, asScalaIterator(new RowRecordIteratorAdaptor(recordsItr, this.tenantId, this.incEnable, this.incID)));
+            return new InterruptibleIterator(context, asScalaIterator(getRowRecordIteratorAdaptor(recordsItr, this.tenantId, this.incEnable, this.incID)));
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+    
+    protected Iterator<Row> getRowRecordIteratorAdaptor(Iterator<Record> recordItr, int tenantId, boolean incEnable, String incID){
+        return new RowRecordIteratorAdaptor(recordItr, tenantId, incEnable, incID);
     }
 
     @Override
