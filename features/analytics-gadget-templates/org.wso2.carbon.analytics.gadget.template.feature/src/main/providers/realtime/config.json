@@ -5,5 +5,5 @@
         "image": ""
     },
     "config" : [],
-    "provider-libs" : ["ws-client"]
+    "provider-libs" : ["ws-client.js"]
 }
