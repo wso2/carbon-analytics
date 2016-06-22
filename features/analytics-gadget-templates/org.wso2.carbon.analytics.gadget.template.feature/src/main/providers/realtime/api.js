@@ -100,6 +100,12 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
     getSchema = function(providerConfig) {
         var streamId = providerConfig["streamName"];
         var output = [];
+
+        output.push({
+            fieldName: "TIMESTAMP",
+            fieldType: "time"
+        });
+
         if (eventStreamService != null) {
             var eventStreamConfiguration = eventStreamService.getEventStreamConfiguration(streamId);
             if (eventStreamConfiguration != null) {

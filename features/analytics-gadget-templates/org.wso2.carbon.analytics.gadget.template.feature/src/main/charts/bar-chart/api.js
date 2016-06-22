@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,7 @@ var getConfig, validate, isProviderRequired, draw, update;
      * @param schema
      */
     getConfig = function(schema) {
-        var chartConf = require(CHART_LOCATION + '/area-chart/config.json').config;
+        var chartConf = require(CHART_LOCATION + '/bar-chart/config.json').config;
         /*
          dynamic logic goes here
          */
@@ -51,7 +51,7 @@ var getConfig, validate, isProviderRequired, draw, update;
      * @param chartConfig
      */
     validate = function(chartConfig) {
-
+        return true;
     };
 
     /**
@@ -114,7 +114,7 @@ var getConfig, validate, isProviderRequired, draw, update;
         conf.x = _chartConfig.x;
         conf.charts = [];
         conf.charts[0] = {
-            type : "area",
+            type : "bar",
             y: _chartConfig.y
         };
 
@@ -126,5 +126,5 @@ var getConfig, validate, isProviderRequired, draw, update;
         return conf;
     };
 
-    
+
 }());

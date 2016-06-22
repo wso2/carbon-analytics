@@ -24,24 +24,24 @@ var getConfig, validate, isProviderRequired, draw, update;
      * @param schema
      */
     getConfig = function(schema) {
-        var chartConf = require(CHART_LOCATION + '/bar-chart/config.json').config;
+        var chartConf = require(CHART_LOCATION + '/scatter-chart/config.json').config;
         /*
          dynamic logic goes here
          */
 
-        var columns = [];
+         var columns = [];
 
-        columns.push("None");
-        for(var i=0; i < schema.length; i++) {
+         columns.push("None");
+         for(var i=0; i < schema.length; i++) {
             columns.push(schema[i]["fieldName"]);
-        }
+         }
 
         for(var i=0; i < chartConf.length; i++) {
-            if (chartConf[i]["fieldName"] == "color") {
+            if (chartConf[i]["fieldName"] == "color" 
+                || chartConf[i]["fieldName"] == "size" ) {
                 chartConf[i]["valueSet"] = columns;
-                break;
             }
-        }
+        }     
 
         return chartConf;
     };
@@ -58,7 +58,7 @@ var getConfig, validate, isProviderRequired, draw, update;
      * TO be used when provider configuration steps need to be skipped
      */
     isProviderRequired = function() {
-
+        return true;
     }
 
 
@@ -114,17 +114,20 @@ var getConfig, validate, isProviderRequired, draw, update;
         conf.x = _chartConfig.x;
         conf.charts = [];
         conf.charts[0] = {
-            type : "bar",
+            type : "scatter",
             y: _chartConfig.y
         };
 
         if (_chartConfig.color != "None") {
             conf.charts[0].color = _chartConfig.color;
-            conf.charts[0].mode = _chartConfig.mode;
+        }
+
+        if (_chartConfig.size != "None") {
+            conf.charts[0].size = _chartConfig.size;
         }
 
         return conf;
     };
 
-
+    
 }());

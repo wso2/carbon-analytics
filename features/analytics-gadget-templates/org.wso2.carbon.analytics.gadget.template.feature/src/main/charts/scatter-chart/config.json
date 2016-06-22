@@ -29,7 +29,11 @@
             "valueSet": ["$COLUMN_NAMES"]
         }
     ],
-    "common-libs" : ["wso2gadgets","chart-utils"],
-    "chart-libs" : ["d3.min","vega","VizGrammar.min"]
+    "imports": {
+        "shared-libs":{
+            "js" :["analytics-wso2_5.0.12/d3.min.js", "analytics-wso2_5.0.12/vega.js",  "analytics-wso2_5.0.12/VizGrammar.min.js",
+                "analytics-wso2_5.0.12/wso2gadgets.js", "analytics-wso2_5.0.12/chart-utils.js"]
+        }
+    }
 }
 
