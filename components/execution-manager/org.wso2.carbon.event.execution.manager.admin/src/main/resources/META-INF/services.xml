@@ -1,11 +1,11 @@
 <!--
-  ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
   ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~ http://www.apache.org/licenses/LICENSE-2.0
   ~
   ~ Unless required by applicable law or agreed to in writing, software
   ~ distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+
 <serviceGroup>
     <service name="ExecutionManagerAdminService" scope="transportsession">
         <transports>
@@ -29,27 +30,12 @@
         <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
                          class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
     </messageReceivers>
-    <operation name="getDomains">
-        <parameter name="AuthorizationAction" locked="true">
-            /permission/admin/manage/execution-manager
-        </parameter>
-    </operation>
-    <operation name="getDomain">
-        <parameter name="AuthorizationAction" locked="true">
-            /permission/admin/manage/execution-manager
-        </parameter>
-    </operation>
-    <operation name="getDomainsInfo">
-        <parameter name="AuthorizationAction" locked="true">
-            /permission/admin/manage/execution-manager
-        </parameter>
-    </operation>
     <operation name="getDomainInfo">
         <parameter name="AuthorizationAction" locked="true">
             /permission/admin/manage/execution-manager
         </parameter>
     </operation>
-    <operation name="getConfigurations">
+    <operation name="getAllDomainInfos">
         <parameter name="AuthorizationAction" locked="true">
             /permission/admin/manage/execution-manager
         </parameter>
@@ -59,12 +45,7 @@
             /permission/admin/manage/execution-manager
         </parameter>
     </operation>
-    <operation name="getConfigurationsInfo">
-        <parameter name="AuthorizationAction" locked="true">
-            /permission/admin/manage/execution-manager
-        </parameter>
-    </operation>
-    <operation name="getConfigurationInfo">
+    <operation name="getConfigurationInfos">
         <parameter name="AuthorizationAction" locked="true">
             /permission/admin/manage/execution-manager
         </parameter>
@@ -75,6 +56,11 @@
         </parameter>
     </operation>
     <operation name="saveConfiguration">
+        <parameter name="AuthorizationAction" locked="true">
+            /permission/admin/manage/execution-manager
+        </parameter>
+    </operation>
+    <operation name="saveStreamMapping">
         <parameter name="AuthorizationAction" locked="true">
             /permission/admin/manage/execution-manager
         </parameter>
