@@ -145,7 +145,7 @@
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
         <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (partition_key, timestamp, data, record_id) VALUES (?, ?, ?, ?)</recordInsertQuery>
         <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET partition_key = ?, timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
-        <!--recordMergeQuery>INSERT INTO {{TABLE_NAME}} (partition_key, timestamp, data, record_id) VALUES (?, ?, ?, ?) ON CONFLICT DO UPDATE partition_key=VALUES(partition_key), timestamp=VALUES(timestamp), data=VALUES(data)</recordMergeQuery-->
+        <!--recordMergeQuery>INSERT INTO {{TABLE_NAME}} (partition_key, timestamp, data, record_id) VALUES (?, ?, ?, ?) ON CONFLICT (record_id) DO UPDATE SET partition_key=EXCLUDED.partition_key, timestamp=EXCLUDED.timestamp, data=EXCLUDED.data</recordMergeQuery-->
         <forwardOnlyReadEnabled>true</forwardOnlyReadEnabled>
         <fetchSize>1000</fetchSize>
         <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE partition_key &gt;= ? and partition_key &lt; ? AND timestamp &gt;= ? AND timestamp &lt; ? OFFSET ? LIMIT ?</recordRetrievalQuery>

@@ -142,7 +142,6 @@ package object carbon {
               }
               i = i + 1
             }
-            // TODO (future): Check if batching is really necessary in this case
             stmt.addBatch()
           }
           stmt.executeBatch();
@@ -211,15 +210,16 @@ package object carbon {
       val sColumn = new StringBuilder // {{S.COLUMN}}
       val columnEqualsSColumn = new StringBuilder // {{COLUMN=S.COLUMN}}
       val dKeyEqualsSKey = new StringBuilder // {{D.KEY=S.KEY}}
+      val columnEqualsExcludedColumn = new StringBuilder // {{COLUMN=EXCLUDED.COLUMN - KEY}}
 
       var columnPrefix = EMPTY_STRING
-      var columnEqualsValuesColumnPrefix = EMPTY_STRING
-      var dKeyEqualsSKeyPrefix = EMPTY_STRING
+      var columnLessKeyPrefix = EMPTY_STRING
+      var keyPrefix = EMPTY_STRING
 
       for (key <- pKeys) {
-        dKeyEqualsSKey.append(dKeyEqualsSKeyPrefix).append(DEST_STRING)
+        dKeyEqualsSKey.append(keyPrefix).append(DEST_STRING)
           .append(key).append(EQUALS_SIGN).append(SRC_STRING).append(key)
-        dKeyEqualsSKeyPrefix = AND_SEPARATOR
+        keyPrefix = AND_SEPARATOR
       }
 
       for (field <- rddSchema.fields) {
@@ -231,14 +231,17 @@ package object carbon {
         sColumn.append(columnPrefix).append(SRC_STRING).append(column)
         columnEqualsSColumn.append(columnPrefix).append(column).append(EQUALS_SIGN)
           .append(SRC_STRING).append(column)
+
         if (!pKeys.contains(column)) {
-          columnEqualsValuesColumn.append(columnEqualsValuesColumnPrefix).append(column)
-            .append(EQUALS_SIGN).append(VALUES_STRING)
+          columnEqualsValuesColumn.append(columnLessKeyPrefix).append(column).append(EQUALS_SIGN).append(VALUES_STRING)
             .append(OPEN_PARENTHESIS).append(column).append(CLOSE_PARENTHESIS)
-          dColumnEqualsSColumn.append(columnEqualsValuesColumnPrefix).append(DEST_STRING)
+          dColumnEqualsSColumn.append(columnLessKeyPrefix).append(DEST_STRING)
             .append(column).append(EQUALS_SIGN).append(SRC_STRING).append(column)
-          columnEqualsValuesColumnPrefix = SEPARATOR
+          columnEqualsExcludedColumn.append(columnLessKeyPrefix).append(column).append(EQUALS_SIGN)
+            .append(EXCLUDED_STRING).append(column)
+          columnLessKeyPrefix = SEPARATOR
         }
+
         columnPrefix = SEPARATOR
       }
 
@@ -251,6 +254,7 @@ package object carbon {
         .replace(COLUMN_EQUALS_S_COLUMN_PLACEHOLDER, columnEqualsSColumn)
         .replace(D_KEY_EQUALS_S_KEY_PLACEHOLDER, dKeyEqualsSKey)
         .replace(KEYS_PLACEHOLDER, primaryKeys)
+        .replace(COLUMN_EQUALS_EXCLUDED_COLUMN_PLACEHOLDER, columnEqualsExcludedColumn)
 
       conn.prepareStatement(sql)
     }
