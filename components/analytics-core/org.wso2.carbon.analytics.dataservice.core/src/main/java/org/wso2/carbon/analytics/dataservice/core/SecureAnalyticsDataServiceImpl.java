@@ -386,6 +386,16 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
         }
         analyticsDataService.createTable(tenantId, recordStoreName, tableName);
     }
+    
+    @Override
+    public void createTableIfNotExists(String username, String recordStoreName, String tableName) throws AnalyticsException {
+        int tenantId = getTenantId(username);
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_CREATE_TABLE)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to create table");
+        }
+        analyticsDataService.createTableIfNotExists(tenantId, recordStoreName, tableName);
+    }
 
     @Override
     public String getRecordStoreNameByTable(String username, String tableName)

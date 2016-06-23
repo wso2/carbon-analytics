@@ -17,7 +17,6 @@
 */
 package org.wso2.carbon.analytics.servlet;
 
-import com.google.gson.GsonBuilder;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
@@ -31,12 +30,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 /**
  * This servlet processes the request to operate the analytics table schema.
  */
 public class AnalyticsTableSchemaProcessor extends HttpServlet {
+
+    private static final long serialVersionUID = 2072033492230159580L;
 
     /**
      * set schema

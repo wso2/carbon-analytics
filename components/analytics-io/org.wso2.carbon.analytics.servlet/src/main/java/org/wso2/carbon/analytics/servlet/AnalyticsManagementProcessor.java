@@ -32,7 +32,6 @@ import java.io.PrintWriter;
 
 /**
  * This servlet intend to process the request which controls overall analytics data api operations.
- *
  */
 public class AnalyticsManagementProcessor extends HttpServlet {
 

@@ -406,6 +406,15 @@ public interface SecureAnalyticsDataService {
      * @throws AnalyticsException
      */
     void createTable(String username, String recordStoreName, String tableName) throws AnalyticsException;
+    
+    /**
+     * Creates the table if it does not already exist in the system.
+     * @param username The username
+     * @param recordStoreName The name of the target record store to store the table at
+     * @param tableName The name of the table to be created
+     * @throws AnalyticsException
+     */
+    public void createTableIfNotExists(String username, String recordStoreName, String tableName) throws AnalyticsException;
 
     /**
      * Returns the record store name given the table information.

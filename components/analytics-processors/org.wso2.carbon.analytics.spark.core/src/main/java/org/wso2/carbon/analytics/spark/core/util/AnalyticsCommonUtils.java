@@ -27,7 +27,6 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
@@ -273,8 +272,7 @@ public class AnalyticsCommonUtils {
         if (!ads.listRecordStoreNames().contains(recordStore)) {
             throw new AnalyticsExecutionException("Unknown data store name: " + recordStore);
         }
-        //TODO: take createTableIfNotExists to the interface
-        ((AnalyticsDataServiceImpl) ads).createTableIfNotExists(targetTenantId, recordStore, targetTableName);
+        ads.createTableIfNotExists(targetTenantId, recordStore, targetTableName);
     }
     
     public static boolean isSchemaProvided(String schemaString) {

@@ -372,6 +372,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         }
     }
     
+    @Override
     public void createTableIfNotExists(int tenantId, String recordStoreName, String tableName) throws AnalyticsException {
         if (this.isGlobalTenantTableAccess(tenantId)) {
             for (int targetTenantId : this.readTenantIds()) {

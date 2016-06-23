@@ -33,6 +33,9 @@ import java.io.IOException;
  * This servlet process the Indexing related operations for remote clients.
  */
 public class AnalyticsIndexProcessor extends HttpServlet {
+
+    private static final long serialVersionUID = -4554701429299921629L;
+
     /**
      * This focuses on changing the wait time for indexing for the given table.
      *

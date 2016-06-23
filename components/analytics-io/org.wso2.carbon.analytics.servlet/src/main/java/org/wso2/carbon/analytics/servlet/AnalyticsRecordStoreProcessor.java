@@ -32,6 +32,8 @@ import java.util.List;
 
 public class AnalyticsRecordStoreProcessor extends HttpServlet {
 
+    private static final long serialVersionUID = 5655324228428424513L;
+
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {

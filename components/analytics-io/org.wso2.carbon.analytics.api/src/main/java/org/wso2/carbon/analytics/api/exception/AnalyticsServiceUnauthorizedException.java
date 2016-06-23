@@ -18,10 +18,12 @@
 */
 package org.wso2.carbon.analytics.api.exception;
 
-/*
+/**
  This exception is thrown when the session is getting expired or the client is holding an invalid session id.
  */
 public class AnalyticsServiceUnauthorizedException extends AnalyticsServiceException {
+
+    private static final long serialVersionUID = -5182716746696644658L;
 
     public AnalyticsServiceUnauthorizedException(String msg) {
         super(msg);
