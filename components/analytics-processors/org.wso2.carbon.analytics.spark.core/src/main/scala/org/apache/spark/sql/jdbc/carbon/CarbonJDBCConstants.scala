@@ -14,6 +14,7 @@ object CarbonJDBCConstants {
   val COLUMN_EQUALS_S_COLUMN_PLACEHOLDER = "{{COLUMN=S.COLUMN}}"
   val D_KEY_EQUALS_S_KEY_PLACEHOLDER = "{{D.KEY=S.KEY}}"
   val KEYS_PLACEHOLDER = "{{KEYS}}"
+  val COLUMN_EQUALS_EXCLUDED_COLUMN_PLACEHOLDER = "{{COLUMN=EXCLUDED.COLUMN - KEY}}"
 
   val DATASOURCE = "dataSource"
   val TABLE_NAME = "tableName"
@@ -42,6 +43,7 @@ object CarbonJDBCConstants {
   val SRC_STRING = "src."
   val DEST_STRING = "dest."
   val VALUES_STRING = "VALUES"
+  val EXCLUDED_STRING = "EXCLUDED."
 
   val EMPTY_STRING = ""
   val WHITESPACE = " "
