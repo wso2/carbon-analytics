@@ -118,7 +118,7 @@ public class AnalyticsSparkExecutorTest {
             "componentName STRING, compotentIndex INT, componentId STRING, startTime LONG, endTime LONG, " +
             "duration FLOAT, beforePayload STRING, afterPayload STRING, contextPropertyMap STRING, " +
             "transportPropertyMap STRING, children STRING, entryPoint STRING, entryPointHashcode INT, faultCount INT," +
-            " hashCode INT, host STRING\", dataColumn \"data\")");
+            " hashCode INT, host STRING, _tenantId INT, _timestamp LONG\")");
         
         // Check the rows split
         AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM EventsTable");

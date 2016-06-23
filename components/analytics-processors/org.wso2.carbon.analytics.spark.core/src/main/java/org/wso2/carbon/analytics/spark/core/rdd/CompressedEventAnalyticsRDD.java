@@ -51,6 +51,7 @@ import com.esotericsoftware.kryo.io.Input;
 public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Serializable {
 
     private static final long serialVersionUID = 5948588299500227997L;
+    List<String> outputColumns;
 
     public CompressedEventAnalyticsRDD() {
         super();
@@ -70,12 +71,13 @@ public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Seriali
             Seq<Dependency<?>> deps, ClassTag<Row> evidence, long timeFrom, long timeTo, boolean incEnable, 
             String incID) {
         super(tenantId, tableName, columns, sc, deps, evidence, timeFrom, timeTo, incEnable, incID);
+        this.outputColumns = columns;
         this.columns = getAllColumns(columns);
     }
     
     @Override
     protected Iterator<Row> getRowRecordIteratorAdaptor(Iterator<Record> recordItr, int tenantId, boolean incEnable, String incID){
-        return new CompressedEventRowRecordIteratorAdaptor(recordItr, tenantId, incEnable, incID);
+        return new CompressedEventRowRecordIteratorAdaptor(recordItr, tenantId, incEnable, incID, this.outputColumns);
     }
 
     /**
@@ -85,11 +87,12 @@ public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Seriali
      * @return
      */
     private List<String> getAllColumns(List<String> columns) {
-        if (!columns.contains(AnalyticsConstants.DATA_COLUMN)) {
-            columns.add(AnalyticsConstants.DATA_COLUMN);
+        List<String> allColumns = new ArrayList<String>(columns);
+        if (!allColumns.contains(AnalyticsConstants.DATA_COLUMN)) {
+            allColumns.add(AnalyticsConstants.DATA_COLUMN);
         }
-        columns.add(AnalyticsConstants.META_FIELD_COMPRESSED);
-        return columns;
+        allColumns.add(AnalyticsConstants.META_FIELD_COMPRESSED);
+        return allColumns;
     }
     
 
@@ -106,8 +109,10 @@ public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Seriali
         private long incMaxTS = Long.MIN_VALUE;
         private int timestampIndex;
         private Kryo kryo = new Kryo();
+        private List<String> columns;
 
-        public CompressedEventRowRecordIteratorAdaptor(Iterator<Record> recordItr, int tenantId, boolean incEnable, String incID) {
+        public CompressedEventRowRecordIteratorAdaptor(Iterator<Record> recordItr, int tenantId, boolean incEnable, String incID, List<String> columns) {
+            this.columns = columns;
             this.recordItr = recordItr;
             this.tenantId = tenantId;
             this.incEnable = incEnable;
@@ -197,8 +202,8 @@ public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Seriali
                 // Iterate over the array of events
                 for (int i = 0; i < eventsList.size(); i++) {
                     // Create a row with extended fields
-                    tempRows.add(RowFactory.create(CompressedEventAnalyticsUtils.getFieldValues(eventsList.get(i), 
-                        payloadsList, i, record.getTimestamp(), host)));
+                    tempRows.add(RowFactory.create(CompressedEventAnalyticsUtils.getFieldValues(this.columns, eventsList.get(i), 
+                        payloadsList, i, record.getTimestamp(), record.getTenantId(), host)));
                 }
             } else {
                 tempRows.add(RowFactory.create(Collections.emptyList().toArray()));
