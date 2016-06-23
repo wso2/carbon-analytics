@@ -59,31 +59,31 @@ public class AnalyticsDataServiceServletDS {
         ServiceHolder.setAuthenticator(new AnalyticsAPIAuthenticator());
         try {
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.MANAGEMENT_SERVICE_URI,
-                    new AnalyticsManagementProcessor(), new Hashtable(),
+                    new AnalyticsManagementProcessor(), new Hashtable<>(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.TABLE_PROCESSOR_SERVICE_URI,
-                    new AnalyticsTableProcessor(), new Hashtable(),
+                    new AnalyticsTableProcessor(), new Hashtable<>(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.SCHEMA_PROCESSOR_SERVICE_URI,
-                    new AnalyticsTableSchemaProcessor(), new Hashtable(),
+                    new AnalyticsTableSchemaProcessor(), new Hashtable<>(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.ANALYTICS_SERVICE_PROCESSOR_URI,
-                    new AnalyticsServiceProcessor(), new Hashtable(),
+                    new AnalyticsServiceProcessor(), new Hashtable<>(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI,
-                    new AnalyticsSearchProcessor(), new Hashtable(),
+                    new AnalyticsSearchProcessor(), new Hashtable<>(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI,
-                    new AnalyticsRecordReadProcessor(), new Hashtable(),
+                    new AnalyticsRecordReadProcessor(), new Hashtable<>(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI,
-                    new AnalyticsRecordProcessor(), new Hashtable(),
+                    new AnalyticsRecordProcessor(), new Hashtable<>(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI,
-                    new AnalyticsIndexProcessor(), new Hashtable(),
+                    new AnalyticsIndexProcessor(), new Hashtable<>(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.ANALYTIC_RECORD_STORE_PROCESSOR_SERVICE_URI,
-                    new AnalyticsRecordStoreProcessor(), new Hashtable(),
+                    new AnalyticsRecordStoreProcessor(), new Hashtable<>(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
         } catch (ServletException | NamespaceException e) {
             log.error("Error while registering the servlet. " + e.getMessage(), e);

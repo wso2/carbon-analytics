@@ -19,9 +19,10 @@ package org.wso2.carbon.analytics.servlet.exception;
 
 /**
  * Exception to indicate the authentication failure of the analytics api remote service.
- *
  */
 public class AnalyticsAPIAuthenticationException extends Exception {
+
+    private static final long serialVersionUID = -240192750847454210L;
 
     public AnalyticsAPIAuthenticationException(String message){
         super(message);
@@ -30,4 +31,5 @@ public class AnalyticsAPIAuthenticationException extends Exception {
     public AnalyticsAPIAuthenticationException(String message, Throwable throwable){
         super(message, throwable);
     }
+    
 }
