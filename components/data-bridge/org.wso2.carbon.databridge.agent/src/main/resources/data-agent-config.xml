@@ -24,6 +24,9 @@
         <!--<TrustSore>src/main/resources/client-truststore.jks</TrustSore>-->
         <!--<TrustSorePassword>wso2carbon</TrustSorePassword>-->
         <QueueSize>131072</QueueSize>
+        <!-- Wait Strategy can be one of blocking, sleeping, yielding, busySpin-->
+        <WaitStrategy>blocking</WaitStrategy>
+        <ImmediateDispatching>true</ImmediateDispatching>
         <BatchSize>200</BatchSize>
         <CorePoolSize>5</CorePoolSize>
         <MaxPoolSize>10</MaxPoolSize>

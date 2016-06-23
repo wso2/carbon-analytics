@@ -66,6 +66,10 @@ public class AgentConfiguration {
 
     private int socketTimeoutMS;
 
+    private boolean immediateDispatching;
+
+    private String waitStrategy = DataEndpointConstants.BLOCKING_WAIT_STRATEGY;
+
     @XmlElement(name = "Name")
     public String getDataEndpointName() {
         return dataEndpointName;
@@ -236,7 +240,7 @@ public class AgentConfiguration {
         }
     }
 
-    @XmlElement( name = "SocketTimeoutMS")
+    @XmlElement(name = "SocketTimeoutMS")
     public int getSocketTimeoutMS() {
         return socketTimeoutMS;
     }
@@ -252,6 +256,24 @@ public class AgentConfiguration {
         } else {
             this.className = null;
         }
+    }
+
+    @XmlElement(name = "ImmediateDispatching")
+    public boolean isImmediateDispatching() {
+        return immediateDispatching;
+    }
+
+    public void setImmediateDispatching(boolean immediateDispatching) {
+        this.immediateDispatching = immediateDispatching;
+    }
+
+    @XmlElement(name = "WaitStrategy")
+    public String getWaitStrategy() {
+        return waitStrategy;
+    }
+
+    public void setWaitStrategy(String waitStrategy) {
+        this.waitStrategy = waitStrategy;
     }
 
     /**

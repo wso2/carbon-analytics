@@ -18,10 +18,16 @@
 package org.wso2.carbon.databridge.agent.endpoint;
 
 
+import com.lmax.disruptor.BlockingWaitStrategy;
+import com.lmax.disruptor.BusySpinWaitStrategy;
 import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.InsufficientCapacityException;
 import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.SleepingWaitStrategy;
+import com.lmax.disruptor.WaitStrategy;
+import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.agent.DataEndpointAgent;
@@ -48,7 +54,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * to hold the list of events that needs to be processed by the endpoints with
  * provided the load balancing, or failover configuration.
  */
-
 public class DataEndpointGroup implements DataEndpointFailureCallback {
     private static final Log log = LogFactory.getLog(DataEndpointGroup.class);
 
@@ -68,6 +73,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private ScheduledExecutorService reconnectionService;
 
+    private boolean immediateDispatching = false;
+
+    private final String disruptorWaitStrategy;
+
     public enum HAType {
         FAILOVER, LOADBALANCE
     }
@@ -77,6 +86,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         this.haType = haType;
         this.reconnectionService = Executors.newScheduledThreadPool(1, new DataBridgeThreadFactory("ReconnectionService"));
         this.reconnectionInterval = agent.getAgentConfiguration().getReconnectionInterval();
+        this.disruptorWaitStrategy = agent.getAgentConfiguration().getWaitStrategy();
+        this.immediateDispatching = agent.getAgentConfiguration().isImmediateDispatching();
         this.eventQueue = new EventQueue(agent.getAgentConfiguration().getQueueSize());
         this.reconnectionService.scheduleAtFixedRate(new ReconnectionTask(), reconnectionInterval,
                 reconnectionInterval, TimeUnit.SECONDS);
@@ -107,9 +118,23 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         private ExecutorService eventQueuePool;
 
         EventQueue(int queueSize) {
+            WaitStrategy waitStrategy;
+            if (disruptorWaitStrategy.equalsIgnoreCase(DataEndpointConstants.YIELDING_WAIT_STRATEGY)) {
+                waitStrategy = new YieldingWaitStrategy();
+            } else if (disruptorWaitStrategy.equalsIgnoreCase(DataEndpointConstants.SLEEPING_WAITING_STRATEGY)) {
+                waitStrategy = new SleepingWaitStrategy();
+            } else if (disruptorWaitStrategy.equalsIgnoreCase(DataEndpointConstants.BUSY_SPIN_WAIT_STRATEGY)) {
+                waitStrategy = new BusySpinWaitStrategy();
+            } else {
+                waitStrategy = new BlockingWaitStrategy();
+            }
             eventQueuePool = Executors.newCachedThreadPool(new DataBridgeThreadFactory("EventQueue"));
-            eventQueueDisruptor = new Disruptor<>(new WrappedEventFactory(), queueSize, eventQueuePool);
-            eventQueueDisruptor.handleEventsWith(new EventQueueWorker());
+            eventQueueDisruptor = new Disruptor<>(new WrappedEventFactory(), queueSize, eventQueuePool, ProducerType.MULTI, waitStrategy);
+            if (immediateDispatching) {
+                eventQueueDisruptor.handleEventsWith(new EventDispatcher());
+            } else {
+                eventQueueDisruptor.handleEventsWith(new EventQueueWorker());
+            }
             this.ringBuffer = eventQueueDisruptor.start();
         }
 
@@ -174,7 +199,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     class EventQueueWorker implements EventHandler<WrappedEventFactory.WrappedEvent> {
 
         @Override
-        public void onEvent(WrappedEventFactory.WrappedEvent wrappedEvent, long sequence, boolean endOfBatch) throws Exception {
+        public void onEvent(WrappedEventFactory.WrappedEvent wrappedEvent, long sequence, boolean endOfBatch) {
             DataEndpoint endpoint = getDataEndpoint(true);
             Event event = wrappedEvent.getEvent();
             if (endpoint != null) {
@@ -191,10 +216,42 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         }
     }
 
+    class EventDispatcher implements EventHandler<WrappedEventFactory.WrappedEvent> {
+
+        @Override
+        public void onEvent(WrappedEventFactory.WrappedEvent wrappedEvent, long sequence, boolean endOfBatch) {
+            try {
+                DataEndpoint endpoint = getDataEndpoint(true);
+                Event event = wrappedEvent.getEvent();
+                if (endpoint != null) {
+                    endpoint.collectAndSendNow(event);
+                    if (endOfBatch) {
+                        flushAllDataEndpointsNow();
+                    }
+                } else {
+                    log.error("Dropping event as DataPublisher is shutting down.");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Data publisher is shutting down, dropping event : " + event);
+                    }
+                }
+            } catch (Throwable t) {
+                log.error("Unexpected error: " + t.getMessage(), t);
+            }
+        }
+    }
+
     private void flushAllDataEndpoints() {
         for (DataEndpoint dataEndpoint : dataEndpoints) {
             if (dataEndpoint.getState().equals(DataEndpoint.State.ACTIVE)) {
                 dataEndpoint.flushEvents();
+            }
+        }
+    }
+
+    private void flushAllDataEndpointsNow() {
+        for (DataEndpoint dataEndpoint : dataEndpoints) {
+            if (dataEndpoint.getState().equals(DataEndpoint.State.ACTIVE)) {
+                dataEndpoint.flushEventsNow();
             }
         }
     }
