@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.event.receiver.core.internal.type.wso2event;
 
-import com.google.common.collect.ObjectArrays;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -49,6 +48,8 @@ public class WSO2EventInputMapper implements InputMapper {
     private StreamDefinition importedStreamDefinition = null;
     private Map<InputDataType, int[]> inputDataTypeSpecificPositionMap = null;
     private boolean arbitraryMapsEnabled = false;
+    private int inputStreamSize = 0;
+    private int outMetaSize = 0, outCorrelationSize = 0, outPayloadSize = 0;
 
     public WSO2EventInputMapper(EventReceiverConfiguration eventReceiverConfiguration,
                                 StreamDefinition exportedStreamDefinition)
@@ -134,22 +135,25 @@ public class WSO2EventInputMapper implements InputMapper {
                     }
                 }
             }
-            int[] metaPositions = new int[metaDataMap.size()];
+            outMetaSize = metaDataMap.size();
+            outCorrelationSize = correlationDataMap.size();
+            outPayloadSize = payloadDataMap.size();
+            int[] metaPositions = new int[outMetaSize];
             for (int i = 0; i < metaPositions.length; i++) {
                 metaPositions[i] = metaDataMap.get(i);
             }
             inputDataTypeSpecificPositionMap.put(InputDataType.META_DATA, metaPositions);
-            int[] correlationPositions = new int[correlationDataMap.size()];
+            int[] correlationPositions = new int[outCorrelationSize];
             for (int i = 0; i < correlationPositions.length; i++) {
                 correlationPositions[i] = correlationDataMap.get(i);
             }
             inputDataTypeSpecificPositionMap.put(InputDataType.CORRELATION_DATA, correlationPositions);
-            int[] payloadPositions = new int[payloadDataMap.size()];
+            int[] payloadPositions = new int[outPayloadSize];
             for (int i = 0; i < payloadPositions.length; i++) {
                 payloadPositions[i] = payloadDataMap.get(i);
             }
             inputDataTypeSpecificPositionMap.put(InputDataType.PAYLOAD_DATA, payloadPositions);
-
+            inputStreamSize = allAttributes.size();
         } else if (importedStreamDefinition != null && (!eventReceiverConfiguration.getInputMapping().isCustomMappingEnabled())) {
             if (importedStreamDefinition.getCorrelationData() != null ? !importedStreamDefinition.getCorrelationData().equals(exportedStreamDefinition.getCorrelationData()) : exportedStreamDefinition.getCorrelationData() != null) {
                 throw new EventReceiverStreamValidationException("Input stream definition : " + importedStreamDefinition + " not matching with output stream definition : " + exportedStreamDefinition + " to create pass-through link ", importedStreamDefinition.getStreamId());
@@ -225,7 +229,6 @@ public class WSO2EventInputMapper implements InputMapper {
         return attributeNamesList;
     }
 
-    //TODO Profile performance of this method
     @Override
     public Object convertToMappedInputEvent(Object obj) throws EventReceiverProcessingException {
         if (obj instanceof Event) {
@@ -234,33 +237,43 @@ public class WSO2EventInputMapper implements InputMapper {
             if (arbitraryMap != null && !arbitraryMap.isEmpty()) {
                 return processArbitraryMap(event);
             } else if (inputDataTypeSpecificPositionMap != null) {
-                List<Object> outMetaAttrList = new ArrayList<>();
-                List<Object> outCorrelationAttrList = new ArrayList<>();
-                List<Object> outPayloadAttrList = new ArrayList<>();
-                Object[] inEventArray = new Object[0];
+                Object[] outMetaAttrArray = new Object[outMetaSize];
+                Object[] outCorrelationAttrArray = new Object[outCorrelationSize];
+                Object[] outPayloadAttrArray = new Object[outPayloadSize];
+                // Construct input event as an array of attributes
+                Object[] inEventArray = new Object[inputStreamSize];
+                int inEventArrayCount = 0;
                 if (event.getMetaData() != null) {
-                    inEventArray = ObjectArrays.concat(inEventArray, event.getMetaData(), Object.class);
+                    for (Object attribute : event.getMetaData()) {
+                        inEventArray[inEventArrayCount++] = attribute;
+                    }
                 }
                 if (event.getCorrelationData() != null) {
-                    inEventArray = ObjectArrays.concat(inEventArray, event.getCorrelationData(), Object.class);
+                    for (Object attribute : event.getCorrelationData()) {
+                        inEventArray[inEventArrayCount++] = attribute;
+                    }
                 }
                 if (event.getPayloadData() != null) {
-                    inEventArray = ObjectArrays.concat(inEventArray, event.getPayloadData(), Object.class);
+                    for (Object attribute : event.getPayloadData()) {
+                        inEventArray[inEventArrayCount++] = attribute;
+                    }
                 }
+                // Finished construction of input event array
+
                 int[] metaPositions = inputDataTypeSpecificPositionMap.get(InputDataType.META_DATA);
-                for (int metaPosition : metaPositions) {
-                    outMetaAttrList.add(inEventArray[metaPosition]);
+                for (int i = 0; i < metaPositions.length; i++) {
+                    outMetaAttrArray[i] = inEventArray[metaPositions[i]];
                 }
                 int[] correlationPositions = inputDataTypeSpecificPositionMap.get(InputDataType.CORRELATION_DATA);
-                for (int correlationPosition : correlationPositions) {
-                    outCorrelationAttrList.add(inEventArray[correlationPosition]);
+                for (int i = 0; i < correlationPositions.length; i++) {
+                    outCorrelationAttrArray[i] = inEventArray[correlationPositions[i]];
                 }
                 int[] payloadPositions = inputDataTypeSpecificPositionMap.get(InputDataType.PAYLOAD_DATA);
-                for (int payloadPosition : payloadPositions) {
-                    outPayloadAttrList.add(inEventArray[payloadPosition]);
+                for (int i = 0; i < payloadPositions.length; i++) {
+                    outPayloadAttrArray[i] = inEventArray[payloadPositions[i]];
                 }
-                return new Event(exportedStreamDefinition.getStreamId(), event.getTimeStamp(), outMetaAttrList.toArray(),
-                        outCorrelationAttrList.toArray(), outPayloadAttrList.toArray());
+                return new Event(exportedStreamDefinition.getStreamId(), event.getTimeStamp(), outMetaAttrArray,
+                        outCorrelationAttrArray, outPayloadAttrArray);
             } else {
                 return null;
             }
