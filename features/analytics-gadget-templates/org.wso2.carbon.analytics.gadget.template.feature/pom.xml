@@ -82,6 +82,11 @@
                                     <targetPath>charts</targetPath>
                                     <filtering>false</filtering>
                                 </resource>
+                                <resource>
+                                    <directory>src/main/libs</directory>
+                                    <targetPath>libs</targetPath>
+                                    <filtering>false</filtering>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>

@@ -75,6 +75,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     private StreamDefinition streamDefinition;
     private boolean isContinue = false;
     private BlockingEventQueue eventQueue;
+    private int inputStreamSize = 0;
 
     public EventPublisher(EventPublisherConfiguration eventPublisherConfiguration)
             throws EventPublisherConfigurationException {
@@ -106,6 +107,10 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         }
 
         this.streamId = inputStreamDefinition.getStreamId();
+        int metaSize = inputStreamDefinition.getMetaData() == null ? 0 : inputStreamDefinition.getMetaData().size();
+        int correlationSize = inputStreamDefinition.getCorrelationData() == null ? 0 : inputStreamDefinition.getCorrelationData().size();
+        int payloadSize = inputStreamDefinition.getPayloadData() == null ? 0 : inputStreamDefinition.getPayloadData().size();
+        this.inputStreamSize = metaSize + correlationSize + payloadSize;
         createPropertyPositionMap(inputStreamDefinition);
         outputMapper = EventPublisherServiceValueHolder.getMappingFactoryMap().get(eventPublisherConfiguration.
                 getOutputMapping().getMappingType()).constructOutputMapper(eventPublisherConfiguration,
@@ -332,6 +337,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
 
     @Override
     public void process(Event event) {
+        //FIXME Can we use an object pool instead of creating a hashmap per each event?? Or can we avoid this initiation if dynamic properties are not enabled??
         Map<String, String> dynamicProperties = new HashMap<String, String>(eventPublisherConfiguration.getToAdapterDynamicProperties());
         Object outObject;
 
@@ -342,11 +348,13 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
             eventCounter.inc();
         }
 
+        org.wso2.siddhi.core.event.Event siddhiEvent = EventPublisherUtil.convertToSiddhiEvent(event, inputStreamSize);
+
         try {
             if (customMappingEnabled) {
-                outObject = outputMapper.convertToMappedInputEvent(EventPublisherUtil.convertToSiddhiEvent(event));
+                outObject = outputMapper.convertToMappedInputEvent(siddhiEvent);
             } else {
-                outObject = outputMapper.convertToTypedInputEvent(EventPublisherUtil.convertToSiddhiEvent(event));
+                outObject = outputMapper.convertToTypedInputEvent(siddhiEvent);
             }
         } catch (EventPublisherConfigurationException e) {
             log.error("Cannot send " + event + " from " + eventPublisherConfiguration.getEventPublisherName(), e);
@@ -358,7 +366,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         }
 
         if (dynamicMessagePropertyEnabled) {
-            changeDynamicEventAdapterMessageProperties(EventPublisherUtil.convertToSiddhiEvent(event).getData(), dynamicProperties);
+            changeDynamicEventAdapterMessageProperties(siddhiEvent.getData(), dynamicProperties);
         }
 
         OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();

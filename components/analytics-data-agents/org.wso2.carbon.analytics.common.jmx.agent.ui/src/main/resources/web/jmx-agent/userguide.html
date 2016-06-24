@@ -20,7 +20,7 @@
 
 <head>
     <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
-    <title>Setting Up JMX Agent for BAM - User Guide</title>
+    <title>Setting Up JMX Agent for DAS - User Guide</title>
     <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all" />
 </head>
 
@@ -30,11 +30,11 @@
 
 
 
-        <h1>Setting Up JMX Agent for BAM</h1>
+        <h1>Setting Up JMX Agent for DAS</h1>
 
         <div class="wiki-content">
 
-            <p><span style="color: rgb(0,0,0);text-decoration: none;">The JMX agent for BAM is used to monitor JMX attributes of a required JMX enabled server (Ex- Carbon based servers) and store the monitored data in BAM. The monitored data is sent to the BAM server using the Thrift API of BAM.&nbsp;</span>
+            <p><span style="color: rgb(0,0,0);text-decoration: none;">The JMX agent for DAS is used to monitor JMX attributes of a required JMX enabled server (Ex- Carbon based servers) and store the monitored data in DAS. The monitored data is sent to the DAS server using the Thrift API of DAS.&nbsp;</span>
             </p>
             <h4 id="SettingUpJMXAgentforBAM-UsingtheJMXagent">Using the JMX agent</h4>
             <ol>
@@ -51,7 +51,7 @@
                         <li>In the Basic information section, enter a unique profile name.</li>
                         <li>In the Data Receiver Information section,</li>
                         <ul>
-                            <li><strong>Receiver address</strong>&nbsp;- The address used to send the data to BAM</li>
+                            <li><strong>Receiver address</strong>&nbsp;- The address used to send the data to DAS</li>
                             <li><strong>Secure address</strong>&nbsp;- The address used to authenticate the data publishing request</li>
                             <li><strong>username</strong>&nbsp;- The username for the data publisher</li>
                             <li><strong>password</strong>&nbsp;- The password for the data publisher</li>
@@ -59,7 +59,7 @@
                         </ul>
                         <li>In the JMX Server Information section,&nbsp;</li>
                         <ul>
-                            <li><strong>server URL -&nbsp;</strong>The JMX server URL. In this example we can use&nbsp;<strong><a rel="nofollow">service:jmx:rmi://localhost:11111/jndi/rmi://localhost:9999/jmxrmi</a></strong>&nbsp;since we&nbsp;will be monitoring BAM it self.</li>
+                            <li><strong>server URL -&nbsp;</strong>The JMX server URL. In this example we can use&nbsp;<strong><a rel="nofollow">service:jmx:rmi://localhost:11111/jndi/rmi://localhost:9999/jmxrmi</a></strong>&nbsp;since we&nbsp;will be monitoring DAS it self.</li>
                             <li><strong>username</strong>&nbsp;- The username for the JMX server</li>
                             <li><strong>password</strong>&nbsp;- The password for the JMX server</li>
                         </ul>

@@ -266,7 +266,7 @@ function addStreamAttribute(dataType) {
         error = "Attribute type field is empty. \n";
     }
 
-    if(!isValidName((attributeName.value).trim())){
+    if(!isValidAttributeName((attributeName.value).trim())){
         error = "Invalid attribute name. \n"
     }
 
@@ -559,6 +559,11 @@ function addStreamAttribute2(dataType, name, type) {
 
 }
 
+function isValidAttributeName(string){
+    var pattern = /^([a-z]|[A-Z]|_|-)([a-z]|[A-Z]|[0-9]|_|-)*$/i;
+    return (pattern.test(string));
+}
+
 function isValidName(string){
     var pattern = /^([a-z]|[A-Z]|_|\.|-)([a-z]|[A-Z]|[0-9]|_|\.|-)*$/i;
     return (pattern.test(string));
@@ -585,12 +590,12 @@ function validateStreamDefinition(streamDefinitionString){
     var noMappingParameters = 1;
     for(i in metaData){
         meta_faultName = metaData[i]["name"];
-        if((meta_faultName != "") && (!isValidName(metaData[i]["name"]))){
+        if((meta_faultName != "") && (!isValidAttributeName(metaData[i]["name"]))){
             noMappingParameters = 0;
             error = "Invalid attribute name.\n" +
                     "Metadata attribute : " + meta_faultName;
         }
-        else if(isValidName(metaData[i]["name"])){
+        else if(isValidAttributeName(metaData[i]["name"])){
             noMappingParameters = 0;
         }
     }
@@ -598,12 +603,12 @@ function validateStreamDefinition(streamDefinitionString){
     var correlation_faultName = "";
     for(i in correlationData){
         correlation_faultName = correlationData[i]["name"];
-        if((correlation_faultName != "") && (!isValidName(correlationData[i]["name"]))){
+        if((correlation_faultName != "") && (!isValidAttributeName(correlationData[i]["name"]))){
             noMappingParameters = 0;
             error = "Invalid attribute name.\n" +
                     "Correlation attribute : " + correlation_faultName;
         }
-        else if(isValidName(correlationData[i]["name"])){
+        else if(isValidAttributeName(correlationData[i]["name"])){
             noMappingParameters = 0;
         }
      }
@@ -611,12 +616,12 @@ function validateStreamDefinition(streamDefinitionString){
     var payload_faultName = "";
     for(i in payloadData){
         payload_faultName = payloadData[i]["name"];
-        if((payload_faultName != "") && (!isValidName(payloadData[i]["name"]))){
+        if((payload_faultName != "") && (!isValidAttributeName(payloadData[i]["name"]))){
             noMappingParameters = 0;
             error = "Invalid attribute name.\n" +
                     "Payload attribute : " + payload_faultName;
         }
-        else if(isValidName(payloadData[i]["name"])){
+        else if(isValidAttributeName(payloadData[i]["name"])){
             noMappingParameters = 0;
         }
      }

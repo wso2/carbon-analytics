@@ -52,7 +52,7 @@ var getConfig, validate, isProviderRequired, draw, update;
      * @param chartConfig
      */
     validate = function(chartConfig) {
-
+        return true;
     };
 
     /**
@@ -72,7 +72,7 @@ var getConfig, validate, isProviderRequired, draw, update;
     draw = function(placeholder, chartConfig, _schema, data) {
 
         var schema = toVizGrammarSchema(_schema);
-
+        var grid = chartConfig.grid;
         var columns = [];
 
         for(var i=0; i < _schema.length; i++) {
@@ -104,6 +104,13 @@ var getConfig, validate, isProviderRequired, draw, update;
         try {
             wso2gadgets.init(placeholder, view);
             var view = wso2gadgets.load("chart-0");
+
+            if (grid) {
+                $(document).ready(function() {
+                    $('#table').DataTable();
+                    } );
+            }
+
         } catch (e) {
             console.error(e);
         }
@@ -123,7 +130,8 @@ var getConfig, validate, isProviderRequired, draw, update;
         conf.charts = [];
         conf.charts[0] = {
             type : "table",
-            key : _chartConfig.key
+            key : _chartConfig.key,
+            grid: _chartConfig.grid
         };
 
         if (_chartConfig.color == "All") {

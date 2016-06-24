@@ -100,6 +100,12 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
     getSchema = function(providerConfig) {
         var streamId = providerConfig["streamName"];
         var output = [];
+
+        output.push({
+            fieldName: "TIMESTAMP",
+            fieldType: "time"
+        });
+
         if (eventStreamService != null) {
             var eventStreamConfiguration = eventStreamService.getEventStreamConfiguration(streamId);
             if (eventStreamConfiguration != null) {
@@ -117,7 +123,7 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
                 }
                 if (correlationData != null) {
                     for (var i = 0; i < correlationData.size(); i++) {
-                        var type = metaData.get(i).getType().toString().toLowerCase();
+                        var type = correlationData.get(i).getType().toString().toLowerCase();
                         output.push({
                             fieldName: correlationData.get(i).getName(),
                             fieldType: typeMap[type]
@@ -126,7 +132,7 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
                 }
                 if (payloadData != null) {
                     for (var i = 0; i < payloadData.size(); i++) {
-                        var type = metaData.get(i).getType().toString().toLowerCase();
+                        var type = payloadData.get(i).getType().toString().toLowerCase();
                         output.push({
                             fieldName: payloadData.get(i).getName(),
                             fieldType: typeMap[type]

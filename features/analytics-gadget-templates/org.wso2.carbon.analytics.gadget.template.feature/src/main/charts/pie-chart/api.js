@@ -24,26 +24,12 @@ var getConfig, validate, isProviderRequired, draw, update;
      * @param schema
      */
     getConfig = function(schema) {
-        var chartConf = require(CHART_LOCATION + '/scatter-chart/config.json').config;
+        var chartConf = require(CHART_LOCATION + '/pie-chart/config.json').config;
         /*
          dynamic logic goes here
          */
-
-         var columns = [];
-
-         columns.push("None");
-         for(var i=0; i < schema.length; i++) {
-            columns.push(schema[i]["fieldName"]);
-         }
-
-        for(var i=0; i < chartConf.length; i++) {
-            if (chartConf[i]["fieldName"] == "color" 
-                || chartConf[i]["fieldName"] == "size" ) {
-                chartConf[i]["valueSet"] = columns;
-            }
-        }     
-
         return chartConf;
+
     };
 
     /**
@@ -51,7 +37,7 @@ var getConfig, validate, isProviderRequired, draw, update;
      * @param chartConfig
      */
     validate = function(chartConfig) {
-
+        return true;
     };
 
     /**
@@ -114,18 +100,10 @@ var getConfig, validate, isProviderRequired, draw, update;
         conf.x = _chartConfig.x;
         conf.charts = [];
         conf.charts[0] = {
-            type : "scatter",
-            y: _chartConfig.y
+            type : "arc",
+            color: _chartConfig.color,
+            mode: "pie"
         };
-
-        if (_chartConfig.color != "None") {
-            conf.charts[0].color = _chartConfig.color;
-        }
-
-        if (_chartConfig.size != "None") {
-            conf.charts[0].size = _chartConfig.size;
-        }
-
         return conf;
     };
 
