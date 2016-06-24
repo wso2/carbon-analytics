@@ -46,8 +46,7 @@
                         <Export-Package>
                             org.wso2.carbon.analytics.dataservice.commons,
                             org.wso2.carbon.analytics.dataservice.commons.*,
-                            org.wso2.carbon.analytics.dataservice.commons.exception,
-                            org.wso2.carbon.analytics.dataservice.commons.exception.*
+                            org.wso2.carbon.analytics.dataservice.commons.exception
                         </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
