@@ -196,7 +196,7 @@ public class JmxTask extends AbstractTask {
 
         StreamDefinition streamDefinition = new StreamDefinition(streamName, version);
         streamDefinition.setDescription("JMX monitoring data");
-        streamDefinition.setNickName("JMX Dump");
+        streamDefinition.setNickName("JMX");
         List<Attribute> metaDataList = getMetaAttributeList();
         streamDefinition.setMetaData(metaDataList);
         List<Attribute> payloadDataList = new ArrayList<>();
