@@ -1,0 +1,87 @@
+{
+  "info": {
+    "id": "rest",
+    "name": "REST Data Source",
+    "image": ""
+  },
+  "config": [
+    {
+      "fieldType": "advanced",
+      "wizard-imports": {
+        "js": [
+          "mainHandler.js"
+        ]
+      }
+    },
+    {
+      "fieldLabel": "Select Authorization Method",
+      "fieldName": "authorizationMethod",
+      "fieldType": "dropDown"
+    },
+    {
+      "fieldLabel": "Username",
+      "fieldName": "username",
+      "fieldType": "string",
+      "defaultValue": "",
+      "isRequired": false
+    },
+    {
+      "fieldLabel": "Password",
+      "fieldName": "password",
+      "fieldType": "password",
+      "defaultValue": "",
+      "isRequired": false
+    },
+    {
+      "fieldLabel": "Auth URL",
+      "fieldName": "authURL",
+      "fieldType": "string",
+      "defaultValue": "",
+      "isRequired": false
+    },
+    {
+      "fieldLabel": "Client Id",
+      "fieldName": "clientId",
+      "fieldType": "string",
+      "defaultValue": "",
+      "isRequired": false
+    },
+    {
+      "fieldLabel": "Client Secret",
+      "fieldName": "clientSecret",
+      "fieldType": "string",
+      "defaultValue": "",
+      "isRequired": false
+    },
+    {
+      "fieldLabel": "Scope",
+      "fieldName": "scope",
+      "fieldType": "string",
+      "defaultValue": "",
+      "isRequired": false
+    },
+    {
+      "fieldType": "advanced",
+      "childPartial": "mainPartial"
+    },
+    {
+      "fieldLabel": "Data Retrieve URL",
+      "fieldName": "DataRetrieveURL",
+      "fieldType": "string",
+      "defaultValue": "",
+      "isRequired": true
+    },
+    {
+      "fieldLabel": "Schema Retrieve URL",
+      "fieldName": "schemaRetrieveURL",
+      "fieldType": "string",
+      "defaultValue": "",
+      "isRequired": true
+    }
+  ],
+  "provider-apis": [
+    "constants.js",
+    "restClientInvoker.jag",
+    "restClientUtil.jag"
+  ]
+}
