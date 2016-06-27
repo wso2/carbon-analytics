@@ -27,13 +27,19 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 public class MINAggregateFunction implements AggregateFunction {
 
     private double minValue;
+    private String[] aggregateFields;
 
     public MINAggregateFunction() {
         minValue = Double.MAX_VALUE;
     }
 
     @Override
-    public void process(RecordContext ctx, String[] aggregateFields)
+    public void setAggregateFields(String[] aggregateFields) throws AnalyticsException {
+        this.aggregateFields = aggregateFields;
+    }
+
+    @Override
+    public void process(RecordContext ctx)
             throws AnalyticsException {
         if (aggregateFields == null || aggregateFields.length == 0) {
             throw new AnalyticsException("Field to be aggregated, is missing");

@@ -24,13 +24,22 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
  * This interface is used to implement custom aggregates over the record fields.
  */
 public interface AggregateFunction {
+
+    /**
+     * This method needs to be called before the process method is called. Use this method to
+     * set the record fields which will be used to calculate the aggregated value. The order of the
+     * record fields matters since it is used in process() method, in the given order.
+     * @param aggregateFields Fields which will be used to calculate the aggregated value
+     * @throws AnalyticsException
+     */
+    public void setAggregateFields(String[] aggregateFields) throws AnalyticsException;
+
     /**
      * Perform aggregation with the current record values.
      * @param ctx Keeps the record values of the current record.
-     * @param aggregateFields user-defined array of fields which will be used for aggregation
      * @throws AnalyticsException
      */
-    public void process(RecordContext ctx, String[] aggregateFields) throws AnalyticsException;
+    public void process(RecordContext ctx) throws AnalyticsException;
 
     /**
      * Returns the aggregated value.

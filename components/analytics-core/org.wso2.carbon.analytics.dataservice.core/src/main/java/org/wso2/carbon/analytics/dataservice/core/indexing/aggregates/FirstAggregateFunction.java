@@ -27,8 +27,15 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 public class FirstAggregateFunction implements AggregateFunction {
 
     private Object firstValue;
+    private String[] aggregateFields;
+
     @Override
-    public void process(RecordContext ctx, String[] aggregateFields)
+    public void setAggregateFields(String[] aggregateFields) throws AnalyticsException {
+        this.aggregateFields = aggregateFields;
+    }
+
+    @Override
+    public void process(RecordContext ctx)
             throws AnalyticsException {
         if (aggregateFields == null || aggregateFields.length == 0) {
             throw new AnalyticsException("Field to be aggregated, is missing");
