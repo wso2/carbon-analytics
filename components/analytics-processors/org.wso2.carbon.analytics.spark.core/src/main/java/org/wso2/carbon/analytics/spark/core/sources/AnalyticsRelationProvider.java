@@ -89,11 +89,11 @@ public class AnalyticsRelationProvider implements RelationProvider,
                 log.error(msg, e);
                 throw new RuntimeException(msg, e);
             }
-            return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
+            return getAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
                                          this.schemaStruct, this.incParams, this.globalTenantAccess,
                                          this.schemaString, this.primaryKeys, this.mergeFlag);
         } else {
-            return new AnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
+            return getAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
                                          this.incParams, this.globalTenantAccess,
                                          this.schemaString, this.primaryKeys, this.mergeFlag);
         }
@@ -205,9 +205,22 @@ public class AnalyticsRelationProvider implements RelationProvider,
             throw new RuntimeException(msg, e);
         }
 
-        return new AnalyticsRelation(this.tenantId, this.tableName, this.recordStore, sqlContext,
+        return getAnalyticsRelation(this.tenantId, this.tableName, this.recordStore, sqlContext,
                                      schema, this.incParams, this.globalTenantAccess,
                                      this.schemaString, this.primaryKeys, this.mergeFlag);
     }
     
+    protected AnalyticsRelation getAnalyticsRelation(int tenantId, String recordStore, String tableName,
+            SQLContext sqlContext, StructType schema, String incParams, boolean globalTenantAccess, 
+            String schemaString, String primaryKeys, boolean mergeFlag) {
+        return new AnalyticsRelation(tenantId, recordStore, tableName, sqlContext, schema, incParams, 
+            globalTenantAccess, schemaString, primaryKeys, mergeFlag);
+    }
+    
+    protected AnalyticsRelation getAnalyticsRelation(int tenantId, String recordStore, String tableName,
+            SQLContext sqlContext, String incParams, boolean globalTenantAccess, String schemaString,
+            String primaryKeys, boolean mergeFlag) {
+        return new AnalyticsRelation(tenantId, recordStore, tableName, sqlContext, incParams, globalTenantAccess,
+            schemaString, primaryKeys, mergeFlag);
+    }
 }

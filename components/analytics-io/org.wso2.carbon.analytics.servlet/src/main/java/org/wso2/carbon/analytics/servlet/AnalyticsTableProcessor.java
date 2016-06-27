@@ -124,18 +124,31 @@ public class AnalyticsTableProcessor extends HttpServlet {
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 String recordStoreName = req.getParameter(AnalyticsAPIConstants.RECORD_STORE_NAME_PARAM);
                 try {
-                    if (!securityEnabled){
-                        if (recordStoreName == null){
+                    if (!securityEnabled) {
+                        if (recordStoreName == null) {
                             ServiceHolder.getAnalyticsDataService().createTable(tenantId, tableName);
                         } else {
                             ServiceHolder.getAnalyticsDataService().createTable(tenantId, recordStoreName, tableName);
                         }
                     } else {
-                        if (recordStoreName == null){
+                        if (recordStoreName == null) {
                             ServiceHolder.getSecureAnalyticsDataService().createTable(userName, tableName);
                         } else {
                             ServiceHolder.getSecureAnalyticsDataService().createTable(userName, recordStoreName, tableName);
                         }
+                    }
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                } catch (AnalyticsException e) {
+                    resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                }
+            } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.CREATE_IF_NOT_EXISTS_TABLE_OPERATION)) {
+                String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
+                String recordStoreName = req.getParameter(AnalyticsAPIConstants.RECORD_STORE_NAME_PARAM);
+                try {
+                    if (!securityEnabled){
+                        ServiceHolder.getAnalyticsDataService().createTableIfNotExists(tenantId, recordStoreName, tableName);
+                    } else {
+                        ServiceHolder.getSecureAnalyticsDataService().createTableIfNotExists(userName, recordStoreName, tableName);
                     }
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {

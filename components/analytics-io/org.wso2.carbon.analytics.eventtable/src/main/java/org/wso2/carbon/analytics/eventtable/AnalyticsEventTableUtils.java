@@ -26,7 +26,9 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.eventtable.internal.ServiceHolder;
 import org.wso2.siddhi.core.event.ComplexEvent;
 import org.wso2.siddhi.core.event.ComplexEventChunk;
+import org.wso2.siddhi.core.event.state.StateEvent;
 import org.wso2.siddhi.core.event.stream.StreamEvent;
+import org.wso2.siddhi.core.util.collection.UpdateAttributeMapper;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
 import java.util.ArrayList;
@@ -41,8 +43,8 @@ public class AnalyticsEventTableUtils {
 
     private static Log log = LogFactory.getLog(AnalyticsEventTableUtils.class);
 
-    public static void putEvents(int tenantId, String tableName, List<Attribute> attrs, 
-            ComplexEventChunk<StreamEvent> addingEventChunk) {
+    public static void putEvents(int tenantId, String tableName, List<Attribute> attrs,
+                                 ComplexEventChunk<StreamEvent> addingEventChunk) {
         List<Record> records = new ArrayList<Record>();
         StreamEvent event;
         while (addingEventChunk.hasNext()) {
@@ -52,15 +54,15 @@ public class AnalyticsEventTableUtils {
         try {
             ServiceHolder.getAnalyticsDataService().put(records);
         } catch (AnalyticsException e) {
-            throw new IllegalStateException("Error in adding records to analytics event table: " + 
+            throw new IllegalStateException("Error in adding records to analytics event table: " +
                     e.getMessage(), e);
         }
     }
-    
+
     private static Record streamEventToRecord(int tenantId, String tableName, List<Attribute> attrs,
-            StreamEvent event) {
-        Map<String, Object> values = streamEventToRecordValues(attrs, event);
-        Object timestampObj =  values.remove(AnalyticsEventTableConstants.INTERNAL_TIMESTAMP_ATTRIBUTE);
+                                              StreamEvent event) {
+        Map<String, Object> values = streamEventToRecordValues(attrs, event, null);
+        Object timestampObj = values.remove(AnalyticsEventTableConstants.INTERNAL_TIMESTAMP_ATTRIBUTE);
         if (timestampObj != null) {
             if (timestampObj instanceof Long) {
                 return new Record(tenantId, tableName, values, (Long) timestampObj);
@@ -74,23 +76,31 @@ public class AnalyticsEventTableUtils {
             return new Record(tenantId, tableName, values, event.getTimestamp());
         }
     }
-    
-    public static Map<String, Object> streamEventToRecordValues(List<Attribute> attrs, ComplexEvent event) {
-        Object[] data = event.getOutputData();
-        if (data == null) {
-            return new HashMap<>(0);
-        }
-        Map<String, Object> values = new HashMap<String, Object>();
-        for (int i = 0; i < attrs.size(); i++) {
-            if (data.length > i) {
-                values.put(attrs.get(i).getName(), data[i]);
-            } else {
-                break;
+
+    public static Map<String, Object> streamEventToRecordValues(List<Attribute> attrs, ComplexEvent event, UpdateAttributeMapper[] updateAttributeMappers) {
+        if (updateAttributeMappers != null) {
+            Map<String, Object> values = new HashMap<String, Object>();
+            for (int i = 0; i < attrs.size(); i++) {
+                values.put(attrs.get(i).getName(), updateAttributeMappers[i].getOutputData((StateEvent) event));
             }
+            return values;
+        } else {
+            Object[] data = event.getOutputData();
+            if (data == null) {
+                return new HashMap<>(0);
+            }
+            Map<String, Object> values = new HashMap<String, Object>();
+            for (int i = 0; i < attrs.size(); i++) {
+                if (data.length > i) {
+                    values.put(attrs.get(i).getName(), data[i]);
+                } else {
+                    break;
+                }
+            }
+            return values;
         }
-        return values;
     }
-    
+
     public static List<Record> getAllRecords(int tenantId, String tableName) {
         try {
             AnalyticsDataResponse resp = ServiceHolder.getAnalyticsDataService().get(
@@ -100,7 +110,7 @@ public class AnalyticsEventTableUtils {
             throw new IllegalStateException("Error in getting event records: " + e.getMessage(), e);
         }
     }
-    
+
     public static void deleteRecords(int tenantId, String tableName, List<Record> records) {
         try {
             List<String> ids = new ArrayList<String>(records.size());
@@ -112,7 +122,7 @@ public class AnalyticsEventTableUtils {
             throw new IllegalStateException("Error in getting deleting records: " + e.getMessage(), e);
         }
     }
-    
+
     public static StreamEvent recordsToStreamEvent(List<Attribute> attrs, List<Record> records) {
         ComplexEventChunk<StreamEvent> eventChunk = new ComplexEventChunk<StreamEvent>(true);
         for (Record record : records) {
@@ -120,13 +130,13 @@ public class AnalyticsEventTableUtils {
         }
         return eventChunk.getFirst();
     }
-    
+
     public static StreamEvent recordToStreamEvent(List<Attribute> attrs, Record record) {
         StreamEvent event = new StreamEvent(0, 0, attrs.size());
         Object[] data = new Object[attrs.size()];
         Attribute attr;
         for (int i = 0; i < attrs.size(); i++) {
-        	attr = attrs.get(i);
+            attr = attrs.get(i);
             if (attr.getName().equals(AnalyticsEventTableConstants.INTERNAL_TIMESTAMP_ATTRIBUTE)) {
                 data[i] = record.getTimestamp();
             } else {
@@ -136,5 +146,5 @@ public class AnalyticsEventTableUtils {
         event.setOutputData(data);
         return event;
     }
-    
+
 }

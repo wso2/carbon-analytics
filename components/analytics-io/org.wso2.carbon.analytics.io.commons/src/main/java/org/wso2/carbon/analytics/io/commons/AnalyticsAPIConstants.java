@@ -64,6 +64,7 @@ public class AnalyticsAPIConstants {
     public static final String RECORD_STORE_NAME = "__recordStoreName";
     public static final String LIST_TABLES_OPERATION = "__list_tables_opr";
     public static final String CREATE_TABLE_OPERATION = "__create_table_opr";
+    public static final String CREATE_IF_NOT_EXISTS_TABLE_OPERATION = "__create_if_not_exists_table_opr";
     public static final String DELETE_TABLE_OPERATION = "__delete_table_opr";
     public static final String PUT_RECORD_OPERATION = "__put_records_opr";
     public static final String SET_SCHEMA_OPERATION = "__set_schema_opr";

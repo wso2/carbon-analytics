@@ -137,6 +137,25 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     }
     
     @Test (dependsOnMethods = "testTableCreateDeleteList")
+    public void testTableCreateTableIfNotExists() throws AnalyticsException {
+        this.service.deleteTable(10, "TABLE1");
+        this.service.createTableIfNotExists(10, "EVENT_STORE", "TABLE1");
+        List<String> tables = this.service.listTables(10);
+        Assert.assertEquals(tables.size(), 1);
+        Assert.assertTrue(new HashSet<>(tables).contains("TABLE1"));
+        Assert.assertTrue(this.service.tableExists(10, "table1"));
+        Assert.assertTrue(this.service.tableExists(10, "TABLE1"));
+        this.service.deleteTable(10, "TABLE1");
+        this.service.createTable(10, "TABLE1");
+        this.service.createTableIfNotExists(10, "EVENT_STORE", "TABLE1");
+        tables = this.service.listTables(10);
+        Assert.assertEquals(tables.size(), 1);
+        Assert.assertTrue(this.service.tableExists(10, "TABLE1"));
+        this.service.deleteTable(10, "TABLE1");
+        Assert.assertEquals(this.service.listTables(10).size(), 0);
+    }
+    
+    @Test (dependsOnMethods = "testTableCreateTableIfNotExists")
     public void testTableSetGetSchema() throws AnalyticsException {
         int tenantId = 105;
         String tableName = "T1";

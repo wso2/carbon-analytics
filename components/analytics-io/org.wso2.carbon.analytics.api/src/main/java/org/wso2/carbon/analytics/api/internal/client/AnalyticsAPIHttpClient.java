@@ -256,7 +256,8 @@ public class AnalyticsAPIHttpClient {
         validateAndAuthenticate(userName, password);
     }
 
-    public void createTable(int tenantId, String username, String recordStoreName, String tableName, boolean securityEnabled) throws AnalyticsServiceException, AnalyticsServiceUnauthorizedException {
+    public void createTable(int tenantId, String username, String recordStoreName, String tableName, 
+            boolean securityEnabled, boolean ifNotExists) throws AnalyticsServiceException, AnalyticsServiceUnauthorizedException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
                 .TABLE_PROCESSOR_SERVICE_URI);
@@ -264,8 +265,11 @@ public class AnalyticsAPIHttpClient {
             HttpPost postMethod = new HttpPost(builder.build().toString());
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants
-                    .CREATE_TABLE_OPERATION));
+            if (ifNotExists) {
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.CREATE_IF_NOT_EXISTS_TABLE_OPERATION));
+            } else {
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.CREATE_TABLE_OPERATION));
+            }
             if (!securityEnabled) {
                 params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
             } else {

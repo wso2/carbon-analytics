@@ -33,7 +33,7 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.dataservice.core</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
@@ -60,7 +60,12 @@
             <groupId>org.wso2.carbon.event-processing</groupId>
             <artifactId>org.wso2.carbon.event.processor.core</artifactId>
         </dependency>
-        
+
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-core</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ndatasource.rdbms</artifactId>

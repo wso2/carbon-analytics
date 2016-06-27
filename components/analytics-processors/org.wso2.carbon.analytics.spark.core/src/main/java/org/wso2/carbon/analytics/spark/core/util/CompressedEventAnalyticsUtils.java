@@ -46,19 +46,25 @@ public class CompressedEventAnalyticsUtils {
      * @param host          Host of the current event
      * @return              Array of values of the fields in the event
      */
-    public static Object[] getFieldValues(List<Object> event, List<PublishingPayload> payloadsList, int eventIndex, 
-            long timestamp, String host) {
-        Object [] fieldsVals = new Object[event.size() + 2];
+    public static Object[] getFieldValues(List<String> columns, List<Object> event, List<PublishingPayload> payloadsList,
+            int eventIndex, long timestamp, int tenantId, String host) {
+        Object [] fieldsVals = new Object[columns.size()];
+        int eventFieldIndex = 0;
         // Adding component attributes
         if (event != null) {
-            for (int i = 0; i < event.size(); i++) {
-                    fieldsVals[i] = event.get(i);;
+            for (int i = 0; i < columns.size(); i++) {
+                if (columns.get(i).equals(AnalyticsConstants.TIMESTAMP_FIELD)) {
+                    fieldsVals[i] = timestamp;
+                } else if (columns.get(i).equals(AnalyticsConstants.TENANT_ID_FIELD)) {
+                    fieldsVals[i] = tenantId;
+                } else if (columns.get(i).equals(AnalyticsConstants.HOST_ATTRIBUTE)) {
+                    fieldsVals[i] = host;
+                } else {
+                    fieldsVals[i] = event.get(eventFieldIndex);
+                    eventFieldIndex++;
+                }
             }
         }
-        
-        //Add the host and timestamp
-        fieldsVals[fieldsVals.length - 2] = host;
-        fieldsVals[fieldsVals.length - 1] = timestamp;
         
         // Adding payloads
         if (payloadsList != null) {

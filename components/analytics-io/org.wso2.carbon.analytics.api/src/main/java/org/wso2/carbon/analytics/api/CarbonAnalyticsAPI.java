@@ -117,12 +117,12 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
                 AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                         analyticsDataConfiguration.getPassword());
                 AnalyticsAPIHttpClient.getInstance().
-                        createTable(tenantId, null, null, tableName, false);
+                        createTable(tenantId, null, null, tableName, false, false);
             } catch (AnalyticsServiceUnauthorizedException ex) {
                 AnalyticsAPIHttpClient.getInstance().invalidateSessionAndAuthenticate(analyticsDataConfiguration.
                         getUsername(), analyticsDataConfiguration.getPassword());
                 AnalyticsAPIHttpClient.getInstance().
-                        createTable(tenantId, null, null, tableName, false);
+                        createTable(tenantId, null, null, tableName, false, false);
             }
         }
     }
@@ -136,11 +136,29 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             try {
                 AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                         analyticsDataConfiguration.getPassword());
-                AnalyticsAPIHttpClient.getInstance().createTable(tenantId, null, recordStoreName, tableName, false);
+                AnalyticsAPIHttpClient.getInstance().createTable(tenantId, null, recordStoreName, tableName, false, false);
             } catch (AnalyticsServiceUnauthorizedException ex) {
                 AnalyticsAPIHttpClient.getInstance().invalidateSessionAndAuthenticate(analyticsDataConfiguration.
                         getUsername(), analyticsDataConfiguration.getPassword());
-                AnalyticsAPIHttpClient.getInstance().createTable(tenantId, null, recordStoreName, tableName, false);
+                AnalyticsAPIHttpClient.getInstance().createTable(tenantId, null, recordStoreName, tableName, false, false);
+            }
+        }
+    }
+    
+
+    @Override
+    public void createTableIfNotExists(int tenantId, String recordStoreName, String tableName) throws AnalyticsException {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
+            ServiceHolder.getAnalyticsDataService().createTableIfNotExists(tenantId, recordStoreName, tableName);
+        } else {
+            try {
+                AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                        analyticsDataConfiguration.getPassword());
+                AnalyticsAPIHttpClient.getInstance().createTable(tenantId, null, recordStoreName, tableName, false, true);
+            } catch (AnalyticsServiceUnauthorizedException ex) {
+                AnalyticsAPIHttpClient.getInstance().invalidateSessionAndAuthenticate(analyticsDataConfiguration.
+                        getUsername(), analyticsDataConfiguration.getPassword());
+                AnalyticsAPIHttpClient.getInstance().createTable(tenantId, null, recordStoreName, tableName, false, true);
             }
         }
     }
@@ -337,12 +355,12 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
                 AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                         analyticsDataConfiguration.getPassword());
                 AnalyticsAPIHttpClient.getInstance().createTable(MultitenantConstants.INVALID_TENANT_ID,
-                        username, null, tableName, true);
+                        username, null, tableName, true, false);
             } catch (AnalyticsServiceUnauthorizedException ex) {
                 AnalyticsAPIHttpClient.getInstance().invalidateSessionAndAuthenticate(analyticsDataConfiguration.
                         getUsername(), analyticsDataConfiguration.getPassword());
                 AnalyticsAPIHttpClient.getInstance().createTable(MultitenantConstants.INVALID_TENANT_ID,
-                        username, null, tableName, true);
+                        username, null, tableName, true, false);
             }
         }
     }
@@ -350,18 +368,38 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     @Override
     public void createTable(String username, String recordStoreName, String tableName) throws AnalyticsException {
         if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
-            ServiceHolder.getSecureAnalyticsDataService().createTable(username, tableName);
+            ServiceHolder.getSecureAnalyticsDataService().createTable(username, recordStoreName, tableName);
         } else {
             try {
                 AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                         analyticsDataConfiguration.getPassword());
                 AnalyticsAPIHttpClient.getInstance().createTable(MultitenantConstants.INVALID_TENANT_ID,
-                        username, recordStoreName, tableName, true);
+                        username, recordStoreName, tableName, true, false);
             } catch (AnalyticsServiceUnauthorizedException ex) {
                 AnalyticsAPIHttpClient.getInstance().invalidateSessionAndAuthenticate(analyticsDataConfiguration.
                         getUsername(), analyticsDataConfiguration.getPassword());
                 AnalyticsAPIHttpClient.getInstance().createTable(MultitenantConstants.INVALID_TENANT_ID,
-                        username, recordStoreName, tableName, true);
+                        username, recordStoreName, tableName, true, false);
+            }
+        }
+    }
+    
+
+    @Override
+    public void createTableIfNotExists(String username, String recordStoreName, String tableName) throws AnalyticsException {
+        if (getOperationMode() == AnalyticsDataConfiguration.Mode.LOCAL) {
+            ServiceHolder.getSecureAnalyticsDataService().createTableIfNotExists(username, recordStoreName, tableName);
+        } else {
+            try {
+                AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                        analyticsDataConfiguration.getPassword());
+                AnalyticsAPIHttpClient.getInstance().createTable(MultitenantConstants.INVALID_TENANT_ID,
+                        username, recordStoreName, tableName, true, true);
+            } catch (AnalyticsServiceUnauthorizedException ex) {
+                AnalyticsAPIHttpClient.getInstance().invalidateSessionAndAuthenticate(analyticsDataConfiguration.
+                        getUsername(), analyticsDataConfiguration.getPassword());
+                AnalyticsAPIHttpClient.getInstance().createTable(MultitenantConstants.INVALID_TENANT_ID,
+                        username, recordStoreName, tableName, true, true);
             }
         }
     }
@@ -1257,4 +1295,5 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             }
         }
     }
+
 }

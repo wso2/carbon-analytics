@@ -31,7 +31,9 @@ import java.io.IOException;
 /**
  * This servlet is processes the requests which is intended to control the analytics data service in the remote node.
  */
-public class AnalyticsServiceProcessor extends HttpServlet{
+public class AnalyticsServiceProcessor extends HttpServlet {
+
+    private static final long serialVersionUID = -1426603086300914710L;
 
     /**
      * Destroy the analytics service.

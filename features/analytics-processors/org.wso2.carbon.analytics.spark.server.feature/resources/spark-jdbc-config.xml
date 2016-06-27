@@ -94,4 +94,27 @@
             <timestampType>DATETIME</timestampType>
         </typeMapping>
     </database>
+    <database name="PostgreSQL">
+        <tableCreateQuery>CREATE TABLE {{TABLE_NAME}} ({{COLUMNS, PRIMARY_KEYS}})</tableCreateQuery>
+        <tableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</tableCheckQuery>
+        <tableTruncateQuery>TRUNCATE TABLE {{TABLE_NAME}}</tableTruncateQuery>
+        <indexCreateQuery>CREATE INDEX {{TABLE_NAME}}_INDEX ON {{TABLE_NAME}} ({{INDEX_COLUMNS}})</indexCreateQuery>
+        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} VALUES ({{Q}})</recordInsertQuery>
+        <recordMergeQuery>INSERT INTO {{TABLE_NAME}} ({{COLUMN}}) VALUES ({{Q}}) ON CONFLICT ({{KEYS}}) DO UPDATE SET {{COLUMN=EXCLUDED.COLUMN - KEY}}</recordMergeQuery>
+        <quoteMark></quoteMark>
+        <typeMapping>
+            <binaryType>BYTEA</binaryType>
+            <booleanType>BOOLEAN</booleanType>
+            <byteType>TINYINT</byteType>
+            <dateType>DATE</dateType>
+            <doubleType>DOUBLE PRECISION</doubleType>
+            <floatType>REAL</floatType>
+            <integerType>INTEGER</integerType>
+            <longType>BIGINT</longType>
+            <nullType>NULL</nullType>
+            <shortType>SMALLINT</shortType>
+            <stringType>VARCHAR(254)</stringType>
+            <timestampType>TIMESTAMP</timestampType>
+        </typeMapping>
+    </database>
 </spark-jdbc-configuration>

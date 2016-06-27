@@ -17,12 +17,9 @@
  */
 package org.wso2.carbon.analytics.spark.core.rdd;
 
-import static scala.collection.JavaConversions.asScalaIterator;
-
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,27 +28,17 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.spark.Dependency;
-import org.apache.spark.InterruptibleIterator;
-import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
-import org.apache.spark.TaskContext;
-import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse.Entry;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
-import org.wso2.carbon.analytics.spark.core.sources.AnalyticsPartition;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.CompressedEventAnalyticsUtils;
 import org.wso2.carbon.analytics.spark.core.util.PublishingPayload;
 
-import scala.collection.JavaConversions;
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
 
@@ -61,20 +48,13 @@ import com.esotericsoftware.kryo.io.Input;
 /**
  * This class represents Spark analytics RDD implementation.
  */
-public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializable {
+public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Serializable {
 
-    private static final Log log = LogFactory.getLog(CompressedEventAnalyticsRDD.class);
     private static final long serialVersionUID = 5948588299500227997L;
-    private List<String> allColumns;
-    private int tenantId;
-    private String tableName;
-    private long timeFrom;
-    private long timeTo;
-    private boolean incEnable;
-    private String incID;
+    List<String> outputColumns;
 
     public CompressedEventAnalyticsRDD() {
-        super(null, null, null);
+        super();
     }
 
     /**
@@ -87,47 +67,17 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
      * @param deps          Scala Sequence
      * @param evidence      Class Tag
      */
-    public CompressedEventAnalyticsRDD(int tenantId, String tableName, List<String> columns, 
-            boolean mergeSchema, SparkContext sc, Seq<Dependency<?>> deps, ClassTag<Row> evidence, long timeFrom,
-            long timeTo, boolean incEnable, String incID) {
-        super(sc, deps, evidence);
-        this.tenantId = tenantId;
-        this.tableName = tableName;
-        this.allColumns = getAllColumns(columns);
-        this.timeFrom = timeFrom;
-        this.timeTo = timeTo;
-        this.incEnable = incEnable;
-        this.incID = incID;
+    public CompressedEventAnalyticsRDD(int tenantId, String tableName, List<String> columns, SparkContext sc, 
+            Seq<Dependency<?>> deps, ClassTag<Row> evidence, long timeFrom, long timeTo, boolean incEnable, 
+            String incID) {
+        super(tenantId, tableName, columns, sc, deps, evidence, timeFrom, timeTo, incEnable, incID);
+        this.outputColumns = columns;
+        this.columns = getAllColumns(columns);
     }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    
     @Override
-    public scala.collection.Iterator<Row> compute(Partition split, TaskContext context) {
-        AnalyticsPartition partition = (AnalyticsPartition) split;
-        try {
-            Iterator<Record> recordsItr = ServiceHolder.getAnalyticsDataService().readRecords(partition
-                .getRecordStoreName(), partition.getRecordGroup());
-            return new InterruptibleIterator(context, asScalaIterator(new RowRecordIteratorAdaptor(recordsItr, 
-                this.tenantId, this.incEnable, this.incID)));
-        } catch (AnalyticsException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public Seq<String> getPreferredLocations(Partition split) {
-        if (split instanceof AnalyticsPartition) {
-            AnalyticsPartition ap = (AnalyticsPartition) split;
-            try {
-                return JavaConversions.asScalaBuffer(Arrays.asList(ap.getRecordGroup().getLocations())).toList();
-            } catch (AnalyticsException e) {
-                log.error("Error in getting preffered location: " + e.getMessage() + " falling back to default impl."
-                    , e);
-                return super.getPreferredLocations(split);
-            }
-        } else {
-            return super.getPreferredLocations(split);
-        }
+    protected Iterator<Row> getRowRecordIteratorAdaptor(Iterator<Record> recordItr, int tenantId, boolean incEnable, String incID){
+        return new CompressedEventRowRecordIteratorAdaptor(recordItr, tenantId, incEnable, incID, this.outputColumns);
     }
 
     /**
@@ -137,41 +87,19 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
      * @return
      */
     private List<String> getAllColumns(List<String> columns) {
-        if (!columns.contains(AnalyticsConstants.DATA_COLUMN)) {
-            columns.add(AnalyticsConstants.DATA_COLUMN);
+        List<String> allColumns = new ArrayList<String>(columns);
+        if (!allColumns.contains(AnalyticsConstants.DATA_COLUMN)) {
+            allColumns.add(AnalyticsConstants.DATA_COLUMN);
         }
-        columns.add(AnalyticsConstants.META_FIELD_COMPRESSED);
-        return columns;
+        allColumns.add(AnalyticsConstants.META_FIELD_COMPRESSED);
+        return allColumns;
     }
     
-    @Override
-    public Partition[] getPartitions() {
-        AnalyticsDataResponse resp;
-        try {
-            resp = ServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName, computePartitions(), 
-                this.allColumns, timeFrom , timeTo, 0, -1);
-        } catch (AnalyticsException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        List<Entry> entries = resp.getEntries();
-        Partition[] result = new Partition[entries.size()];
-        for (int i = 0; i < entries.size(); i++) {
-            result[i] = new AnalyticsPartition(entries.get(i).getRecordStoreName(), entries.get(i).getRecordGroup(), i);
-        }
-        return result;
-    }
-
-    private int computePartitions() throws AnalyticsException {
-        if (ServiceHolder.getAnalyticskExecutor() != null) {
-            return ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint();
-        }
-        return AnalyticsConstants.SPARK_DEFAULT_PARTITION_COUNT;
-    }
 
     /**
      * Row iterator implementation to act as an adaptor for a record iterator.
      */
-    private class RowRecordIteratorAdaptor implements Iterator<Row>, Serializable {
+    private class CompressedEventRowRecordIteratorAdaptor implements Iterator<Row>, Serializable {
         private static final long serialVersionUID = -8866801517386445810L;
         private Iterator<Record> recordItr;
         private Iterator<Row> rows;
@@ -181,8 +109,10 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
         private long incMaxTS = Long.MIN_VALUE;
         private int timestampIndex;
         private Kryo kryo = new Kryo();
+        private List<String> columns;
 
-        public RowRecordIteratorAdaptor(Iterator<Record> recordItr, int tenantId, boolean incEnable, String incID) {
+        public CompressedEventRowRecordIteratorAdaptor(Iterator<Record> recordItr, int tenantId, boolean incEnable, String incID, List<String> columns) {
+            this.columns = columns;
             this.recordItr = recordItr;
             this.tenantId = tenantId;
             this.incEnable = incEnable;
@@ -272,8 +202,8 @@ public class CompressedEventAnalyticsRDD extends RDD<Row> implements Serializabl
                 // Iterate over the array of events
                 for (int i = 0; i < eventsList.size(); i++) {
                     // Create a row with extended fields
-                    tempRows.add(RowFactory.create(CompressedEventAnalyticsUtils.getFieldValues(eventsList.get(i), 
-                        payloadsList, i, record.getTimestamp(), host)));
+                    tempRows.add(RowFactory.create(CompressedEventAnalyticsUtils.getFieldValues(this.columns, eventsList.get(i), 
+                        payloadsList, i, record.getTimestamp(), record.getTenantId(), host)));
                 }
             } else {
                 tempRows.add(RowFactory.create(Collections.emptyList().toArray()));

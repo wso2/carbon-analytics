@@ -278,6 +278,7 @@ public class AnalyticsSearchProcessor extends HttpServlet {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void doSearchMultiTablesWithAggregates(HttpServletRequest req, HttpServletResponse resp,
                                        boolean securityEnabled, int tenantIdParam, String userName)
             throws IOException {
