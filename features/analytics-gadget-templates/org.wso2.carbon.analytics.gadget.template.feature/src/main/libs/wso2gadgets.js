@@ -20,7 +20,7 @@
 
     var wso2gadgets = window.wso2gadgets || {};
     window.wso2gadgets = wso2gadgets;
-   
+
     //Collection of view defintions
     var views = {};
 
@@ -75,11 +75,11 @@
     };
 
     /*
-    * This method needs to be called by interested parties with necessary data in their hands.
-    * data should be in VizGrammar compatible format
-    * drawMode redraw || append. 'redraw' forces the chart to be redrawn with new data while 'append' just adds the new entries in to the chart.
-    * Usually in realtime chart, this method needs to be called with drawMode='append'
-    */
+     * This method needs to be called by interested parties with necessary data in their hands.
+     * data should be in VizGrammar compatible format
+     * drawMode redraw || append. 'redraw' forces the chart to be redrawn with new data while 'append' just adds the new entries in to the chart.
+     * Usually in realtime chart, this method needs to be called with drawMode='append'
+     */
     wso2gadgets.onDataReady = function(data, drawMode) {
         try {
             if (data.length == 0) {
@@ -112,6 +112,7 @@
         }
         $(canvas).empty();
         chart = new vizg(view.schema, view.chartConfig);
+        console.log(chart.getSpec());
         if (view.callbacks && view.callbacks.length > 0) {
             chart.draw(canvas, view.callbacks);
         } else {
@@ -120,6 +121,15 @@
     };
 
     wso2gadgets.update = function(data) {
+
+        data.forEach(function(row, index) {
+            for (var i = 0; i < row.length; i++) {
+                if (!isNaN(Number(row[i]))) {
+                    row[i] = Number(row[i]);
+                }
+            }
+        });
+
         if (chart) {
             chart.insert(data);
         } else {
