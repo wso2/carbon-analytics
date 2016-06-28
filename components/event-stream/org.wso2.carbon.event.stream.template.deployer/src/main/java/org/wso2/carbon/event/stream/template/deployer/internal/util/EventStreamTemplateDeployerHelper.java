@@ -1,7 +1,7 @@
 package org.wso2.carbon.event.stream.template.deployer.internal.util;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
+import org.wso2.carbon.event.template.manager.core.TemplateDeploymentException;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
 import org.wso2.carbon.event.stream.template.deployer.internal.EventStreamTemplateDeployerValueHolder;

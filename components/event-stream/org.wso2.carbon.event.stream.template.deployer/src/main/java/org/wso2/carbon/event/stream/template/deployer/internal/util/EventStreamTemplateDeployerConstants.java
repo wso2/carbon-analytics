@@ -1,6 +1,6 @@
 package org.wso2.carbon.event.stream.template.deployer.internal.util;
 
-import org.wso2.carbon.event.execution.manager.core.internal.util.ExecutionManagerConstants;
+import org.wso2.carbon.event.template.manager.core.internal.util.ExecutionManagerConstants;
 import org.wso2.carbon.registry.core.RegistryConstants;
 
 public class EventStreamTemplateDeployerConstants {
