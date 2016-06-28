@@ -312,19 +312,19 @@ public class AnalyticsCommonUtils {
      * @param colsStr column string
      * @return column def list
      */
-    private static List<ColumnDefinition> createColumnDefinitionsFromString(String colsStr, boolean globalTenantAccess)
+    private static List<ColumnDefinition> createColumnDefinitionsFromString(String colsStr, boolean globalTenantAccess, boolean sparkSchema)
             throws AnalyticsExecutionException {
         String[] strFields = colsStr.split("\\s*,\\s*");
         ArrayList<ColumnDefinition> resList = new ArrayList<>();
         for (String strField : strFields) {
             String[] tokens = strField.trim().split("\\s+");
             if (tokens.length >= 2) {
-                if (isTimestampColumn(tokens)) {
+                if (!sparkSchema && isTimestampColumn(tokens)) {
                     logDebug("if this is a timestamp column, ignore processing that element in " +
                              "the analytics schema");
                     continue;
                 }
-                if (globalTenantAccess && isTenantFieldColumn(tokens)) {
+                if (!sparkSchema && globalTenantAccess && isTenantFieldColumn(tokens)) {
                     /* skip adding special _tenantId field used in global tenant access to the schema */
                     continue;
                 }
@@ -383,7 +383,8 @@ public class AnalyticsCommonUtils {
         StructType schemaStruct = null;
         if (isSchemaProvided(schemaString)) {
             logDebug("Schema is provided, hence setting the schema in the analytics data service");
-            List<ColumnDefinition> colList = createColumnDefinitionsFromString(schemaString, globalTenantAccess);
+            List<ColumnDefinition> analyticsTableColList = createColumnDefinitionsFromString(schemaString, globalTenantAccess, false);
+            List<ColumnDefinition> sparkSchemaColList = createColumnDefinitionsFromString(schemaString, globalTenantAccess, true);
             List<String> pKeyList;
             if (!primaryKeys.isEmpty()) {
                 pKeyList = createPrimaryKeyList(primaryKeys);
@@ -392,15 +393,18 @@ public class AnalyticsCommonUtils {
                 pKeyList = Collections.emptyList();
             }
 
-            AnalyticsSchema finalSchema = new AnalyticsSchema(colList, pKeyList);
+            AnalyticsSchema analyticsTableFinalSchema = new AnalyticsSchema(analyticsTableColList, pKeyList);
+            AnalyticsSchema sparkSchemaTableFinalSchema = new AnalyticsSchema(sparkSchemaColList, pKeyList);
             if (mergeFlag) {
                 logDebug("MergeSchema flag is set. Hence merging the schema with the existing schema");
                 try {
                     AnalyticsSchema existingSchema = ads.getTableSchema(targetTenantId, targetTableName);
                     if (!isEmptyAnalyticsSchema(existingSchema)) {
                         logDebug("There is an existing schema already present. Hence, merging the schemas");
-                        finalSchema = AnalyticsDataServiceUtils.createMergedSchema
-                                (existingSchema, pKeyList, colList, Collections.<String>emptyList());
+                        analyticsTableFinalSchema = AnalyticsDataServiceUtils.createMergedSchema
+                                (existingSchema, pKeyList, analyticsTableColList, Collections.<String>emptyList());
+                        sparkSchemaTableFinalSchema = AnalyticsDataServiceUtils.createMergedSchema
+                                (existingSchema, pKeyList, sparkSchemaColList, Collections.<String>emptyList());
                     }
                 } catch (AnalyticsException e) {
                     throw new AnalyticsExecutionException("Error while reading " + targetTableName + " table schema: " + e.getMessage(), e);
@@ -409,17 +413,11 @@ public class AnalyticsCommonUtils {
                 logDebug("MergeSchema flag is not set. Hence using the given schema");
             }
             try {
-                ads.setTableSchema(targetTenantId, targetTableName, finalSchema);
+                ads.setTableSchema(targetTenantId, targetTableName, analyticsTableFinalSchema);
             } catch (AnalyticsException e) {
                 throw new AnalyticsExecutionException("Error while setting " + targetTableName + " table schema: " + e.getMessage(), e);
             }
-            StructType tempStruct = structTypeFromAnalyticsSchema(finalSchema);
-            if (schemaString.contains(AnalyticsConstants.TIMESTAMP_FIELD)) {
-                schemaStruct = tempStruct.merge(new StructType(new StructField[]{new StructField(
-                        AnalyticsConstants.TIMESTAMP_FIELD, DataTypes.LongType, true, Metadata.empty())}));
-            } else {
-                schemaStruct = tempStruct;
-            }
+            schemaStruct = structTypeFromAnalyticsSchema(sparkSchemaTableFinalSchema);
         } else {
             if (!primaryKeys.isEmpty()) {
                 throw new AnalyticsExecutionException("Primary keys set to an empty Schema");
