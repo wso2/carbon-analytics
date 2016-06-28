@@ -307,7 +307,7 @@
 
                         indexParam++;
                         if (indexParam < currentScenario.getDomainParameterDTOs().length) {
-                            parameterString += "+ ',' +";
+                            parameterString += "+ ',\\n' +";
                         }
 
                     }
