@@ -64,7 +64,7 @@
                 int index = 0;
 
                 for (String parameterString : parameterStrings) {
-                    String[] parameterEntities = parameterString.trim().split(valueSeparator);
+                    String[] parameterEntities = parameterString.split(valueSeparator);
                     ConfigurationParameterDTO parameterDTO = new ConfigurationParameterDTO();
                     parameterDTO.setName(parameterEntities[0]);
                     parameterDTO.setValue(parameterEntities[1]);
