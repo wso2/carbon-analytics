@@ -1,7 +1,7 @@
 package org.wso2.carbon.analytics.spark.template.deployer.internal.util;
 
 import org.wso2.carbon.analytics.spark.template.deployer.internal.data.model.ExecutionParameters;
-import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
+import org.wso2.carbon.event.template.manager.core.TemplateDeploymentException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

@@ -23,9 +23,9 @@ import org.wso2.carbon.analytics.spark.template.deployer.internal.BatchScriptDep
 import org.wso2.carbon.analytics.spark.template.deployer.internal.data.model.ExecutionParameters;
 import org.wso2.carbon.analytics.spark.template.deployer.internal.util.TemplateDeployerHelper;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.execution.manager.core.DeployableTemplate;
-import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
-import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
+import org.wso2.carbon.event.template.manager.core.DeployableTemplate;
+import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
+import org.wso2.carbon.event.template.manager.core.TemplateDeploymentException;
 
 import java.util.List;
 

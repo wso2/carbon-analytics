@@ -24,8 +24,8 @@ import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreExceptio
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
 import org.wso2.carbon.analytics.eventsink.template.deployer.internal.EventSinkTemplateDeployerValueHolder;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.execution.manager.core.DeployableTemplate;
-import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
+import org.wso2.carbon.event.template.manager.core.DeployableTemplate;
+import org.wso2.carbon.event.template.manager.core.TemplateDeploymentException;
 import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;

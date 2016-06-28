@@ -33,7 +33,7 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.event.execution.manager.core</artifactId>
+            <artifactId>org.wso2.carbon.event.template.manager.core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -84,7 +84,7 @@
                               !org.wso2.carbon.analytics.eventsink.template.deployer.internal.*,
                           </Export-Package>
                           <Import-Package>
-                              org.wso2.carbon.event.execution.manager.core,
+                              org.wso2.carbon.event.template.manager.core,
                               *;resolution:=optional,
                           </Import-Package>
 

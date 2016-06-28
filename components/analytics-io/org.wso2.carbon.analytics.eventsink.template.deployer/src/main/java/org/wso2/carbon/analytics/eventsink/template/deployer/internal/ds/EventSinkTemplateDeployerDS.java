@@ -21,7 +21,7 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.analytics.eventsink.template.deployer.EventSinkTemplateDeployer;
 import org.wso2.carbon.analytics.eventsink.template.deployer.internal.EventSinkTemplateDeployerValueHolder;
-import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
+import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 

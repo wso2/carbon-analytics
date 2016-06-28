@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.template.deployer.BatchScriptTemplateDeployer;
-import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
+import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 import org.wso2.carbon.analytics.spark.template.deployer.internal.BatchScriptDeployerValueHolder;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 

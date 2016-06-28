@@ -15,7 +15,7 @@
  */
 package org.wso2.carbon.analytics.eventsink.template.deployer.internal.util;
 
-import org.wso2.carbon.event.execution.manager.core.internal.util.ExecutionManagerConstants;
+import org.wso2.carbon.event.template.manager.core.internal.util.ExecutionManagerConstants;
 import org.wso2.carbon.registry.core.RegistryConstants;
 
 public class EventSinkTemplateDeployerConstants {
