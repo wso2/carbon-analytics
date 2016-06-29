@@ -15,7 +15,7 @@
  */
 package org.wso2.carbon.analytics.eventsink.template.deployer.internal.util;
 
-import org.wso2.carbon.event.template.manager.core.internal.util.ExecutionManagerConstants;
+import org.wso2.carbon.event.template.manager.core.internal.util.TemplateManagerConstants;
 import org.wso2.carbon.registry.core.RegistryConstants;
 
 public class EventSinkTemplateDeployerConstants {
@@ -24,7 +24,7 @@ public class EventSinkTemplateDeployerConstants {
 
     public static final String EVENT_SINK_DEPLOYER_TYPE = "eventsink";
 
-    public static final String META_INFO_COLLECTION_PATH = ExecutionManagerConstants.DEPLOYER_META_INFO_PATH
+    public static final String META_INFO_COLLECTION_PATH = TemplateManagerConstants.DEPLOYER_META_INFO_PATH
                                                            + RegistryConstants.PATH_SEPARATOR + EVENT_SINK_DEPLOYER_TYPE;
 
     public static final String ARTIFACT_ID_TO_COLUMN_DEF_KEYS_COLLECTION_PATH = META_INFO_COLLECTION_PATH
