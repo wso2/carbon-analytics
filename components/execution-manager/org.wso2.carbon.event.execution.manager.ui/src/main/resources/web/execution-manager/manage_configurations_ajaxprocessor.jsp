@@ -59,14 +59,15 @@
                parameters = new ConfigurationParameterDTO[0];
 
             } else {
-                String[] parameterStrings = parametersJson.split(",");
+                String[] parameterStrings = parametersJson.split(",\n");
                 parameters = new ConfigurationParameterDTO[parameterStrings.length];
                 int index = 0;
 
                 for (String parameterString : parameterStrings) {
+                    String[] parameterEntities = parameterString.split(valueSeparator);
                     ConfigurationParameterDTO parameterDTO = new ConfigurationParameterDTO();
-                    parameterDTO.setName(parameterString.split(valueSeparator)[0]);
-                    parameterDTO.setValue(parameterString.split(valueSeparator)[1]);
+                    parameterDTO.setName(parameterEntities[0]);
+                    parameterDTO.setValue(parameterEntities[1]);
                     parameters[index] = parameterDTO;
                     index++;
                 }
