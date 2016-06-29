@@ -36,6 +36,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
+import org.wso2.carbon.base.MultitenantConstants;
 
 import javax.naming.NamingException;
 
@@ -710,7 +711,99 @@ public class AnalyticsSparkExecutorTest {
         
         System.out.println(testString("end : merge table schema test"));
     }
-
+    
+    @Test (expectedExceptions = Exception.class)
+    public void testGlobalTenantReadNonMTFail() throws Exception {
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Stats USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Stats\"," +
+                "schema \"name STRING, count INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                ")");
+        ex.executeQuery(1, "SELECT * FROM Stats");
+    }
+    
+    @Test (expectedExceptions = Exception.class)
+    public void testGlobalTenantWriteNonMTFail() throws Exception {
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Stats USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Stats\"," +
+                "schema \"name STRING, count INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                ")");
+        ex.executeQuery(1, "INSERT INTO TABLE Stats SELECT \"api1\", 5, 1;");
+    }
+    
+    @Test
+    public void testGlobalTenantAccess() throws AnalyticsException {
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "CREATE TEMPORARY TABLE Stats USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Stats\"," +
+                "schema \"name STRING, count INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                ")");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "SELECT * FROM Stats");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api1\", 5, 1;");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api2\", 10, 1;");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api1\", 14, 2;");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api3\", 15, 2;");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "SELECT * FROM Stats");
+//        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10000, -1, -1);
+//        this.service.deleteTable(1, "Log");
+//        this.service.createTable(1, "Log");
+//        this.service.put(records);
+//        this.service.deleteTable(1, "Log2");
+//        this.service.deleteTable(1, "Log3");
+//        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+//                           "OPTIONS" +
+//                           "(tableName \"Log\"," +
+//                           "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
+//                           ")");
+//        long start = System.currentTimeMillis();
+//        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log2 USING CarbonAnalytics " +
+//                           "OPTIONS" +
+//                           "(tableName \"Log2\"," +
+//                           "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"," +
+//                           "primaryKeys \"ip, log\"" +
+//                           ")");
+//
+//        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log2 USING CarbonAnalytics " +
+//                           "OPTIONS" +
+//                           "(tableName \"Log2\"," +
+//                           "schema \"server_name STRING -i, ip STRING, tenant INTEGER -sp, sequence LONG, log STRING\"," +
+//                           "primaryKeys \"ip, log\"" +
+//                           ")");
+//
+//        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log3 USING CarbonAnalytics " +
+//                           "OPTIONS" +
+//                           "(tableName \"Log3\"," +
+//                           "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
+//                           ")");
+//        long end = System.currentTimeMillis();
+//        System.out.println("* Spark SQL define table time: " + (end - start) + " ms.");
+//        ex.executeQuery(1, "INSERT INTO TABLE Log2 SELECT * FROM Log");
+//        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM Log2");
+//        Assert.assertEquals(result.getRows().size(), 10000);
+//        //with the given composite primary key, it should just update the next insert
+//        start = System.currentTimeMillis();
+//        ex.executeQuery(1, "INSERT INTO TABLE Log2 SELECT * FROM Log");
+//        end = System.currentTimeMillis();
+//        System.out.println("* Spark SQL insert/update table time: " + (end - start) + " ms.");
+//        result = ex.executeQuery(1, "SELECT * FROM Log2");
+//        Assert.assertEquals(result.getRows().size(), 10000);
+//        //insert to a table without a primary key
+//        ex.executeQuery(1, "INSERT INTO TABLE Log3 SELECT * FROM Log");
+//        result = ex.executeQuery(1, "SELECT * FROM Log3");
+//        Assert.assertEquals(result.getRows().size(), 10000);
+//        ex.executeQuery(1, "INSERT INTO TABLE Log3 SELECT * FROM Log");
+//        result = ex.executeQuery(1, "SELECT * FROM Log3");
+//        Assert.assertEquals(result.getRows().size(), 20000);
+//
+//        this.service.deleteTable(1, "Log");
+//        this.service.deleteTable(1, "Log2");
+//        this.service.deleteTable(1, "Log3");
+//        System.out.println(testString("end : insert table test "));
+    }
 
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {

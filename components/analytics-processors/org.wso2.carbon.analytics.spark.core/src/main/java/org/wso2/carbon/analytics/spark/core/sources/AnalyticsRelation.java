@@ -222,7 +222,11 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         AnalyticsDataService dataService = ServiceHolder.getAnalyticsDataService();
         int targetTenantId;
         if (this.globalTenantAccess) {
-            targetTenantId = Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID;
+            if (this.tenantId == MultitenantConstants.SUPER_TENANT_ID) {
+                targetTenantId = Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID;
+            } else {
+                throw new RuntimeException("Global tenant write can only be done by the super tenant");
+            }
         } else {
             targetTenantId = this.tenantId;
         }
