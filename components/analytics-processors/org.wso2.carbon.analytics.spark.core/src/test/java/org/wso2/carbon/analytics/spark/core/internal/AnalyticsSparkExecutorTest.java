@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.analytics.spark.core.internal;
 
 import org.apache.commons.io.IOUtils;
@@ -27,6 +26,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -47,6 +47,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -713,6 +714,16 @@ public class AnalyticsSparkExecutorTest {
     }
     
     @Test (expectedExceptions = Exception.class)
+    public void testGlobalTenantCreateNonMTFail() throws Exception {
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Stats USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Stats\"," +
+                "schema \"name STRING, count INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                ")");
+    }
+    
+    @Test (expectedExceptions = Exception.class)
     public void testGlobalTenantReadNonMTFail() throws Exception {
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
         ex.executeQuery(1, "CREATE TEMPORARY TABLE Stats USING CarbonAnalytics " +
@@ -734,75 +745,92 @@ public class AnalyticsSparkExecutorTest {
         ex.executeQuery(1, "INSERT INTO TABLE Stats SELECT \"api1\", 5, 1;");
     }
     
+    private List<Object> generateObjList(Object... objs) {
+        List<Object> result = new ArrayList<>(objs.length);
+        for  (Object obj : objs) {
+            result.add(obj);
+        }
+        return result;
+    }
+    
     @Test
     public void testGlobalTenantAccess() throws AnalyticsException {
+        this.service.deleteTable(1, "Stats");
+        this.service.deleteTable(2, "Stats");
+        this.service.deleteTable(1, "StatsSummary");
+        this.service.deleteTable(2, "StatsSummary");
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "CREATE TEMPORARY TABLE Stats USING CarbonAnalytics " +
                 "OPTIONS" +
                 "(tableName \"Stats\"," +
-                "schema \"name STRING, count INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                "schema \"name STRING, cnt INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
                 ")");
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "SELECT * FROM Stats");
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api1\", 5, 1;");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api1\", 7, 1;");
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api2\", 10, 1;");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api2\", 14, 1;");
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api1\", 14, 2;");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api1\", 2, 2;");
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api3\", 15, 2;");
-        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "SELECT * FROM Stats");
-//        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10000, -1, -1);
-//        this.service.deleteTable(1, "Log");
-//        this.service.createTable(1, "Log");
-//        this.service.put(records);
-//        this.service.deleteTable(1, "Log2");
-//        this.service.deleteTable(1, "Log3");
-//        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
-//                           "OPTIONS" +
-//                           "(tableName \"Log\"," +
-//                           "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
-//                           ")");
-//        long start = System.currentTimeMillis();
-//        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log2 USING CarbonAnalytics " +
-//                           "OPTIONS" +
-//                           "(tableName \"Log2\"," +
-//                           "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"," +
-//                           "primaryKeys \"ip, log\"" +
-//                           ")");
-//
-//        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log2 USING CarbonAnalytics " +
-//                           "OPTIONS" +
-//                           "(tableName \"Log2\"," +
-//                           "schema \"server_name STRING -i, ip STRING, tenant INTEGER -sp, sequence LONG, log STRING\"," +
-//                           "primaryKeys \"ip, log\"" +
-//                           ")");
-//
-//        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log3 USING CarbonAnalytics " +
-//                           "OPTIONS" +
-//                           "(tableName \"Log3\"," +
-//                           "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
-//                           ")");
-//        long end = System.currentTimeMillis();
-//        System.out.println("* Spark SQL define table time: " + (end - start) + " ms.");
-//        ex.executeQuery(1, "INSERT INTO TABLE Log2 SELECT * FROM Log");
-//        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM Log2");
-//        Assert.assertEquals(result.getRows().size(), 10000);
-//        //with the given composite primary key, it should just update the next insert
-//        start = System.currentTimeMillis();
-//        ex.executeQuery(1, "INSERT INTO TABLE Log2 SELECT * FROM Log");
-//        end = System.currentTimeMillis();
-//        System.out.println("* Spark SQL insert/update table time: " + (end - start) + " ms.");
-//        result = ex.executeQuery(1, "SELECT * FROM Log2");
-//        Assert.assertEquals(result.getRows().size(), 10000);
-//        //insert to a table without a primary key
-//        ex.executeQuery(1, "INSERT INTO TABLE Log3 SELECT * FROM Log");
-//        result = ex.executeQuery(1, "SELECT * FROM Log3");
-//        Assert.assertEquals(result.getRows().size(), 10000);
-//        ex.executeQuery(1, "INSERT INTO TABLE Log3 SELECT * FROM Log");
-//        result = ex.executeQuery(1, "SELECT * FROM Log3");
-//        Assert.assertEquals(result.getRows().size(), 20000);
-//
-//        this.service.deleteTable(1, "Log");
-//        this.service.deleteTable(1, "Log2");
-//        this.service.deleteTable(1, "Log3");
-//        System.out.println(testString("end : insert table test "));
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api3\", 5, 2;");
+        
+        List<Record> res1 = AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(1, "Stats", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        List<Record> res2 = AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(2, "Stats", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(res1.size(), 4);
+        Assert.assertEquals(res2.size(), 4);
+        
+        AnalyticsQueryResult res = ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "SELECT * FROM Stats");
+        Assert.assertTrue(Arrays.asList(res.getColumns()).contains("_tenantId"));
+        List<List<Object>> expectedRes =  new ArrayList<>();
+        expectedRes.add(this.generateObjList("api1", 5, 1));
+        expectedRes.add(this.generateObjList("api1", 7, 1));
+        expectedRes.add(this.generateObjList("api2", 10, 1));
+        expectedRes.add(this.generateObjList("api2", 14, 1));
+        expectedRes.add(this.generateObjList("api1", 14, 2));
+        expectedRes.add(this.generateObjList("api1", 2, 2));
+        expectedRes.add(this.generateObjList("api3", 15, 2));
+        expectedRes.add(this.generateObjList("api3", 5, 2));
+        Assert.assertEquals(new HashSet<>(res.getRows()), new HashSet<>(expectedRes));
+        
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "CREATE TEMPORARY TABLE StatsSummary USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"StatsSummary\"," +
+                "schema \"name STRING, cnt INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                ")");
+        
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE StatsSummary SELECT name, SUM(cnt), _tenantId FROM Stats GROUP BY name, _tenantId");
+        
+        res1 = AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(1, "StatsSummary", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        res2 = AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(2, "StatsSummary", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(res1.size(), 2);
+        Assert.assertEquals(res2.size(), 2);
+        
+        Record res1rec1, res1rec2, res2rec1, res2rec2;
+        if (res1.get(0).getValue("name").equals("api1")) {
+            res1rec1 = res1.get(0);
+            res1rec2 = res1.get(1);
+        } else {
+            res1rec1 = res1.get(1);
+            res1rec2 = res1.get(0);
+        }
+        if (res2.get(0).getValue("name").equals("api1")) {
+            res2rec1 = res2.get(0);
+            res2rec2 = res2.get(1);
+        } else {
+            res2rec1 = res2.get(1);
+            res2rec2 = res2.get(0);
+        }
+        
+        Assert.assertEquals(res1rec1.getValue("cnt"), 12);
+        Assert.assertEquals(res1rec2.getValue("cnt"), 24);
+        Assert.assertEquals(res2rec1.getValue("cnt"), 16);
+        Assert.assertEquals(res2rec2.getValue("cnt"), 20);
+        
+        this.service.deleteTable(1, "Stats");
+        this.service.deleteTable(2, "Stats");
+        this.service.deleteTable(1, "StatsSummary");
+        this.service.deleteTable(2, "StatsSummary");
     }
 
     @BeforeClass
