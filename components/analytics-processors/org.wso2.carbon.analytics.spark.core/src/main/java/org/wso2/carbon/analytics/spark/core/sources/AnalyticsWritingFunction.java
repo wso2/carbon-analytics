@@ -24,6 +24,7 @@ import org.apache.spark.sql.types.StructType;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.core.Constants;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
@@ -154,7 +155,7 @@ public class AnalyticsWritingFunction extends AbstractFunction1<Iterator<Row>, B
                     ads.put(recordsBatch);
                 } catch (AnalyticsTableNotAvailableException e) {
                     Record firstRecord = recordsBatch.get(0);
-                    this.createTableAndSetSchema(ads, firstRecord.getTenantId(), firstRecord.getTableName());
+                    this.createTargetTableAndSetSchema(ads, firstRecord.getTenantId(), firstRecord.getTableName());
                     ads.put(recordsBatch);
                 }
             }
@@ -165,11 +166,12 @@ public class AnalyticsWritingFunction extends AbstractFunction1<Iterator<Row>, B
         }
     }
     
-    private void createTableAndSetSchema(AnalyticsDataService ads, int targetTenantId, 
+    protected void createTargetTableAndSetSchema(AnalyticsDataService ads, int targetTenantId, 
             String targetTableName) throws AnalyticsException {
         AnalyticsCommonUtils.createTableIfNotExists(ads, this.recordStore, targetTenantId, targetTableName);
-        AnalyticsCommonUtils.setSchemaIfProvided(ads, this.schemaString, this.globalTenantAccess, this.primaryKeys, 
-                this.mergeFlag, targetTenantId, targetTableName);
+        AnalyticsSchema schema = AnalyticsCommonUtils.createAnalyticsTableSchema(ads, targetTenantId, targetTableName, this.schemaString, 
+                this.primaryKeys, this.globalTenantAccess, this.mergeFlag, false);
+        ads.setTableSchema(targetTenantId, targetTableName, schema);
     }
 
     private Record convertRowAndSchemaToRecord(Row row, StructType schema, boolean global) {

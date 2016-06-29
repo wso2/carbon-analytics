@@ -50,11 +50,9 @@ import scala.reflect.ClassTag$;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 
 import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.extractFieldsFromColumns;
-import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.extractFieldsFromString;
 import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.isEmptyAnalyticsSchema;
 import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.isEmptySchema;
 

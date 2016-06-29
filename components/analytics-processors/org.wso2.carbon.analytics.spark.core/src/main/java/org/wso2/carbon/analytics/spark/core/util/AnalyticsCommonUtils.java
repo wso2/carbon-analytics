@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 import scala.collection.Iterator;
@@ -378,52 +379,46 @@ public class AnalyticsCommonUtils {
         return resList;
     }
     
-    public static StructType setSchemaIfProvided(AnalyticsDataService ads, String schemaString, boolean globalTenantAccess, String primaryKeys, 
-            boolean mergeFlag, int targetTenantId, String targetTableName) throws AnalyticsExecutionException {
-        StructType schemaStruct = null;
-        if (isSchemaProvided(schemaString)) {
-            logDebug("Schema is provided, hence setting the schema in the analytics data service");
-            List<ColumnDefinition> analyticsTableColList = createColumnDefinitionsFromString(schemaString, globalTenantAccess, false);
-            List<ColumnDefinition> sparkSchemaColList = createColumnDefinitionsFromString(schemaString, globalTenantAccess, true);
-            List<String> pKeyList;
-            if (!primaryKeys.isEmpty()) {
-                pKeyList = createPrimaryKeyList(primaryKeys);
-            } else {
-                logDebug("No primary keys present, hence setting an empty list");
-                pKeyList = Collections.emptyList();
-            }
-
-            AnalyticsSchema analyticsTableFinalSchema = new AnalyticsSchema(analyticsTableColList, pKeyList);
-            AnalyticsSchema sparkSchemaTableFinalSchema = new AnalyticsSchema(sparkSchemaColList, pKeyList);
-            if (mergeFlag) {
-                logDebug("MergeSchema flag is set. Hence merging the schema with the existing schema");
-                try {
-                    AnalyticsSchema existingSchema = ads.getTableSchema(targetTenantId, targetTableName);
-                    if (!isEmptyAnalyticsSchema(existingSchema)) {
-                        logDebug("There is an existing schema already present. Hence, merging the schemas");
-                        analyticsTableFinalSchema = AnalyticsDataServiceUtils.createMergedSchema
-                                (existingSchema, pKeyList, analyticsTableColList, Collections.<String>emptyList());
-                        sparkSchemaTableFinalSchema = AnalyticsDataServiceUtils.createMergedSchema
-                                (existingSchema, pKeyList, sparkSchemaColList, Collections.<String>emptyList());
-                    }
-                } catch (AnalyticsException e) {
-                    throw new AnalyticsExecutionException("Error while reading " + targetTableName + " table schema: " + e.getMessage(), e);
-                }
-            } else {
-                logDebug("MergeSchema flag is not set. Hence using the given schema");
-            }
-            try {
-                ads.setTableSchema(targetTenantId, targetTableName, analyticsTableFinalSchema);
-            } catch (AnalyticsException e) {
-                throw new AnalyticsExecutionException("Error while setting " + targetTableName + " table schema: " + e.getMessage(), e);
-            }
-            schemaStruct = structTypeFromAnalyticsSchema(sparkSchemaTableFinalSchema);
+    public static StructType createSparkSchemaStruct(AnalyticsDataService ads, int targetTenantId, String targetTableName, 
+            String schemaString, String primaryKeys, boolean globalTenantAccess, boolean mergeFlag) throws AnalyticsException {
+        AnalyticsSchema schema = createAnalyticsTableSchema(ads, targetTenantId, targetTableName, schemaString, 
+                primaryKeys, globalTenantAccess, mergeFlag, true);
+        return structTypeFromAnalyticsSchema(schema);
+    }
+    
+    public static AnalyticsSchema createAnalyticsTableSchema(AnalyticsDataService ads, int targetTenantId, String targetTableName, 
+            String schemaString, String primaryKeys, boolean globalTenantAccess, boolean mergeFlag, boolean sparkSchema) throws AnalyticsException {
+        List<String> pKeyList;
+        if (!primaryKeys.isEmpty()) {
+            pKeyList = createPrimaryKeyList(primaryKeys);
         } else {
-            if (!primaryKeys.isEmpty()) {
-                throw new AnalyticsExecutionException("Primary keys set to an empty Schema");
+            pKeyList = Collections.emptyList();
+        }
+        List<ColumnDefinition> schemaColList = createColumnDefinitionsFromString(schemaString, globalTenantAccess, sparkSchema);
+        AnalyticsSchema schema = new AnalyticsSchema(schemaColList, pKeyList);
+        if (mergeFlag) {
+            schema = createMergedSchema(ads, targetTenantId, targetTableName, schema);
+        }
+        return schema;
+    }
+    
+    private static AnalyticsSchema createMergedSchema(AnalyticsDataService ads, int targetTenantId, 
+            String targetTableName, AnalyticsSchema schema) throws AnalyticsException {
+        AnalyticsSchema existingSchema = null;
+        try {
+            existingSchema = ads.getTableSchema(targetTenantId, targetTableName);
+        } catch (AnalyticsTableNotAvailableException ignore) {
+            /* ignore */
+            if (log.isDebugEnabled()) {
+                log.debug("Table not found when merging schema => " + targetTenantId + ":" + targetTableName);
             }
         }
-        return schemaStruct;
+        if (!isEmptyAnalyticsSchema(existingSchema)) {
+            return AnalyticsDataServiceUtils.createMergedSchema(existingSchema, schema.getPrimaryKeys(), 
+                    new ArrayList<>(schema.getColumns().values()), Collections.<String>emptyList());
+        } else {
+            return schema;
+        }
     }
     
 }

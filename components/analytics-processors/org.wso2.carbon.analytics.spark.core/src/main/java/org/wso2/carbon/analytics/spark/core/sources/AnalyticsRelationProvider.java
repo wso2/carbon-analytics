@@ -146,6 +146,18 @@ public class AnalyticsRelationProvider implements RelationProvider,
         }
     }
 
+    protected AnalyticsSchema createAnalyticsTableSchema(AnalyticsDataService ads, int targetTenantId, String targetTableName, 
+            String schemaString, String primaryKeys, boolean globalTenantAccess, boolean mergeFlag) throws AnalyticsException {
+        return AnalyticsCommonUtils.createAnalyticsTableSchema(ads, targetTenantId, targetTableName, schemaString, 
+                primaryKeys, globalTenantAccess, mergeFlag, false);
+    }
+    
+    protected StructType createSparkSchemaStruct(AnalyticsDataService ads, int targetTenantId, String targetTableName, 
+            String schemaString, String primaryKeys, boolean globalTenantAccess, boolean mergeFlag) throws AnalyticsException {
+        return AnalyticsCommonUtils.createSparkSchemaStruct(ads, targetTenantId, targetTableName, schemaString, 
+                primaryKeys, globalTenantAccess, mergeFlag);
+    }
+    
     private void setSchemaIfProvided() throws AnalyticsExecutionException {
         int targetTenantId;
         if (this.globalTenantAccess) {
@@ -153,8 +165,17 @@ public class AnalyticsRelationProvider implements RelationProvider,
         } else {
             targetTenantId = this.tenantId;
         }
-        this.schemaStruct = AnalyticsCommonUtils.setSchemaIfProvided(this.dataService, this.schemaString, this.globalTenantAccess,
-                this.primaryKeys, this.mergeFlag, targetTenantId, this.tableName);
+        try {
+            AnalyticsSchema schema = this.createAnalyticsTableSchema(this.dataService, targetTenantId, this.tableName, 
+                    this.schemaString, this.primaryKeys, this.globalTenantAccess, this.mergeFlag);
+            if (schema != null) {
+                this.dataService.setTableSchema(targetTenantId, this.tableName, schema);                
+            }
+            this.schemaStruct = this.createSparkSchemaStruct(this.dataService, targetTenantId, 
+                    this.tableName, this.schemaString, this.primaryKeys, this.globalTenantAccess, this.mergeFlag);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsExecutionException("Error in setting provided schema: " + e.getMessage(), e);
+        }        
     }
 
     private String extractValuesFromMap(String key, Map<String, String> map,
