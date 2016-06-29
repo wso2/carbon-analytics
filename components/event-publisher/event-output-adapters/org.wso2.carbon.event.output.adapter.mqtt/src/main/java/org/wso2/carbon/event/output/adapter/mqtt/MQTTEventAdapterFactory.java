@@ -65,6 +65,7 @@ public class MQTTEventAdapterFactory extends OutputEventAdapterFactory {
         //Broker Password
         Property password = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD);
         password.setSecured(true);
+        password.setEncrypted(true);
         password.setDisplayName(
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD));
         password.setRequired(false);

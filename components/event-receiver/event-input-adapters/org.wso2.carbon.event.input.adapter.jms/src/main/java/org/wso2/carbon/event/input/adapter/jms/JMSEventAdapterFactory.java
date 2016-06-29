@@ -95,6 +95,7 @@ public class JMSEventAdapterFactory extends InputEventAdapterFactory {
         // JNDI Password
         Property passwordProperty = new Property(JMSEventAdapterConstants.ADAPTER_JMS_PASSWORD);
         passwordProperty.setSecured(true);
+        passwordProperty.setEncrypted(true);
         passwordProperty.setDisplayName(
                 resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_PASSWORD));
         propertyList.add(passwordProperty);
@@ -149,7 +150,7 @@ public class JMSEventAdapterFactory extends InputEventAdapterFactory {
         jmsSecuredProperties.setDisplayName(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_SECURED_PROPERTIES));
         jmsSecuredProperties.setHint(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_SECURED_PROPERTIES_HINT));
         jmsSecuredProperties.setRequired(false);
-        jmsSecuredProperties.setSecured(true);
+        jmsSecuredProperties.setEncrypted(true);
         propertyList.add(jmsSecuredProperties);
 
         return propertyList;

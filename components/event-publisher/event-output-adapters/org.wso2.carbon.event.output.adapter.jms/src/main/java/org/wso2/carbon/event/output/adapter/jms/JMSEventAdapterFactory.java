@@ -82,6 +82,7 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
         // JNDI Password
         Property passwordProperty = new Property(JMSEventAdapterConstants.ADAPTER_JMS_PASSWORD);
         passwordProperty.setSecured(true);
+        passwordProperty.setEncrypted(true);
         passwordProperty.setDisplayName(
                 resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_PASSWORD));
 

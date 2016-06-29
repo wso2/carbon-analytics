@@ -66,6 +66,7 @@ public class SoapEventAdapterFactory extends OutputEventAdapterFactory {
         // Password
         Property passwordProperty = new Property(SoapEventAdapterConstants.ADAPTER_CONF_SOAP_PASSWORD);
         passwordProperty.setSecured(true);
+        passwordProperty.setEncrypted(true);
         passwordProperty.setDisplayName(
                 resourceBundle.getString(SoapEventAdapterConstants.ADAPTER_CONF_SOAP_PASSWORD));
 

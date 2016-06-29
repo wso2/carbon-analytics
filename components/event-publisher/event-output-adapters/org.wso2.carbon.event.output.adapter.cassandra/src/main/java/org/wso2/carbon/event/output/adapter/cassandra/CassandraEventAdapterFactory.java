@@ -75,6 +75,7 @@ public class CassandraEventAdapterFactory extends OutputEventAdapterFactory {
         password.setDisplayName(
                 resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_PASSWORD));
         password.setSecured(true);
+        password.setEncrypted(true);
         propertyList.add(password);
 
         // key space
