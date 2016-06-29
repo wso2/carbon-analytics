@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionExceptio
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
+
 import scala.collection.immutable.Map;
 import scala.runtime.AbstractFunction0;
 
@@ -147,8 +148,15 @@ public class AnalyticsRelationProvider implements RelationProvider,
         } else {
             targetTenantId = this.tenantId;
         }
-        this.schemaStruct = AnalyticsCommonUtils.setSchemaIfProvided(this.dataService, this.schemaString, this.globalTenantAccess,
-                this.primaryKeys, this.mergeFlag, targetTenantId, this.tableName);
+        this.schemaStruct = this.setSchema(this.dataService, this.schemaString, this.globalTenantAccess,
+            this.primaryKeys, this.mergeFlag, targetTenantId, this.tableName);
+    }
+    
+    protected StructType setSchema(AnalyticsDataService ads, String schemaString, boolean globalTenantAccess,
+            String primaryKeys, boolean mergeFlag, int targetTenantId, String targetTableName) 
+                    throws AnalyticsExecutionException {
+        return AnalyticsCommonUtils.setSchemaIfProvided(ads, schemaString, globalTenantAccess, primaryKeys, 
+            mergeFlag, targetTenantId, targetTableName);
     }
 
     private String extractValuesFromMap(String key, Map<String, String> map,

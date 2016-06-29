@@ -23,6 +23,9 @@ import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.sources.RelationProvider;
 import org.apache.spark.sql.sources.SchemaRelationProvider;
 import org.apache.spark.sql.types.StructType;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 
 /**
  * This class allows spark to communicate with the the Analytics Dataservice when used in Spark SQL
@@ -36,6 +39,14 @@ public class CompressedEventAnalyticsRelationProvider extends AnalyticsRelationP
         super();
     }
 
+    @Override
+    protected StructType setSchema(AnalyticsDataService ads, String schemaString, boolean globalTenantAccess,
+        String primaryKeys, boolean mergeFlag, int targetTenantId, String targetTableName) 
+                throws AnalyticsExecutionException {
+    return AnalyticsCommonUtils.getSchemaIfProvided(ads, schemaString, globalTenantAccess, primaryKeys, 
+        mergeFlag, targetTenantId, targetTableName);
+}
+    
     @Override
     protected AnalyticsRelation getAnalyticsRelation(int tenantId, String recordStore, String tableName,
             SQLContext sqlContext, StructType schema, String incParams, boolean globalTenantAccess, String schemaString,

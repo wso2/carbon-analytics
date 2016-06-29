@@ -378,8 +378,48 @@ public class AnalyticsCommonUtils {
         return resList;
     }
     
-    public static StructType setSchemaIfProvided(AnalyticsDataService ads, String schemaString, boolean globalTenantAccess, String primaryKeys, 
-            boolean mergeFlag, int targetTenantId, String targetTableName) throws AnalyticsExecutionException {
+    /**
+     * Update the analytics table schema with the provided schema string, and return spark schema.
+     * 
+     * @param ads                   Analytics Data Service
+     * @param schemaString          Provided Schema string
+     * @param globalTenantAccess    flag to indicate global tenant access
+     * @param primaryKeys           Primary Keys
+     * @param mergeFlag             Flag indicating whether to merge schema
+     * @param targetTenantId        Tenant Id for the target table
+     * @param targetTableName       Target table name
+     * @return                      Spark schema
+     * @throws                      AnalyticsExecutionException
+     */
+    public static StructType setSchemaIfProvided(AnalyticsDataService ads, String schemaString, 
+            boolean globalTenantAccess, String primaryKeys, boolean mergeFlag, int targetTenantId, 
+            String targetTableName) throws AnalyticsExecutionException {
+        return createSchemaIfProvided(ads, schemaString, globalTenantAccess, primaryKeys, mergeFlag, targetTenantId,
+            targetTableName, true);
+    }
+    
+    /**
+     * Get the spark schema, given the schema string.
+     * 
+     * @param ads                   Analytics Data Service
+     * @param schemaString          Provided Schema string
+     * @param globalTenantAccess    flag to indicate global tenant access
+     * @param primaryKeys           Primary Keys
+     * @param mergeFlag             Flag indicating whether to merge schema
+     * @param targetTenantId        Tenant Id for the target table
+     * @param targetTableName       Target table name
+     * @return                      Spark schema
+     * @throws                      AnalyticsExecutionException
+     */
+    public static StructType getSchemaIfProvided(AnalyticsDataService ads, String schemaString, 
+            boolean globalTenantAccess, String primaryKeys, boolean mergeFlag, int targetTenantId, 
+            String targetTableName) throws AnalyticsExecutionException {
+        return createSchemaIfProvided(ads, schemaString, globalTenantAccess, primaryKeys, mergeFlag, targetTenantId,
+            targetTableName, false);
+    }
+    
+    private static StructType createSchemaIfProvided(AnalyticsDataService ads, String schemaString, boolean globalTenantAccess, String primaryKeys, 
+            boolean mergeFlag, int targetTenantId, String targetTableName, boolean updateAnalyticsTableSchema) throws AnalyticsExecutionException {
         StructType schemaStruct = null;
         if (isSchemaProvided(schemaString)) {
             logDebug("Schema is provided, hence setting the schema in the analytics data service");
@@ -412,10 +452,12 @@ public class AnalyticsCommonUtils {
             } else {
                 logDebug("MergeSchema flag is not set. Hence using the given schema");
             }
-            try {
-                ads.setTableSchema(targetTenantId, targetTableName, analyticsTableFinalSchema);
-            } catch (AnalyticsException e) {
-                throw new AnalyticsExecutionException("Error while setting " + targetTableName + " table schema: " + e.getMessage(), e);
+            if (updateAnalyticsTableSchema) {
+                try {
+                    ads.setTableSchema(targetTenantId, targetTableName, analyticsTableFinalSchema);
+                } catch (AnalyticsException e) {
+                    throw new AnalyticsExecutionException("Error while setting " + targetTableName + " table schema: " + e.getMessage(), e);
+                }
             }
             schemaStruct = structTypeFromAnalyticsSchema(sparkSchemaTableFinalSchema);
         } else {
