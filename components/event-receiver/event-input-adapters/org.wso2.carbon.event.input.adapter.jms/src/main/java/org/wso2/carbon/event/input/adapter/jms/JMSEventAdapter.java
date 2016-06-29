@@ -130,6 +130,9 @@ public class JMSEventAdapter implements InputEventAdapter {
         Map<String, String> jmsProperties = this.extractProperties(eventAdapterConfiguration.getProperties().get(
                 JMSEventAdapterConstants.ADAPTER_PROPERTIES));
 
+        Map<String, String> jmsSecuredProperties = this.extractProperties(eventAdapterConfiguration.getProperties().get(
+                JMSEventAdapterConstants.ADAPTER_SECURED_PROPERTIES));
+
         if (jmsProperties != null) {
             adapterProperties.remove(JMSEventAdapterConstants.ADAPTER_PROPERTIES);
             adapterProperties.putAll(jmsProperties);
@@ -153,6 +156,10 @@ public class JMSEventAdapter implements InputEventAdapter {
             }
         }
 
+        if(jmsSecuredProperties != null){
+            adapterProperties.remove(JMSEventAdapterConstants.ADAPTER_SECURED_PROPERTIES);
+            adapterProperties.putAll(jmsSecuredProperties);
+        }
 
         destination = eventAdapterConfiguration.getProperties().get(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION);
 

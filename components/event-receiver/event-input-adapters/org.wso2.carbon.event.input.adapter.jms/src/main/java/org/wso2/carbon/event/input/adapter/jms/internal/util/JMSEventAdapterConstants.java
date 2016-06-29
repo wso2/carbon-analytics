@@ -49,7 +49,9 @@ public class JMSEventAdapterConstants {
     public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
     public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
     public static final String ADAPTER_PROPERTIES = "jms.properties";
+    public static final String ADAPTER_SECURED_PROPERTIES = "jms.secured.properties";
     public static final String ADAPTER_PROPERTIES_HINT = "jms.properties.hint";
+    public static final String ADAPTER_SECURED_PROPERTIES_HINT = "jms.secured.properties.hint";
     public static final String PROPERTY_SEPARATOR = ",";
     public static final String ENTRY_SEPARATOR = ":";
     public static final String ADAPTER_JMS_CONCURRENT_CONSUMERS = "transport.jms.ConcurrentConsumers";
