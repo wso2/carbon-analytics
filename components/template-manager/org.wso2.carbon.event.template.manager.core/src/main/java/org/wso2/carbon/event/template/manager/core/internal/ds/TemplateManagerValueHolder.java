@@ -15,7 +15,7 @@
  */
 package org.wso2.carbon.event.template.manager.core.internal.ds;
 
-import org.wso2.carbon.event.template.manager.core.ExecutionManagerService;
+import org.wso2.carbon.event.template.manager.core.TemplateManagerService;
 import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -23,13 +23,13 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Class consist of the values holders of RegistryService, EventStreamService, ExecutionManagerService
+ * Class consist of the values holders of RegistryService, EventStreamService, TemplateManagerService
  * and EventProcessorService which are required for the service operations
  */
-public class ExecutionManagerValueHolder {
+public class TemplateManagerValueHolder {
 
     private static RegistryService registryService;
-    private static ExecutionManagerService executionManagerService;
+    private static TemplateManagerService templateManagerService;
     private static ConcurrentHashMap<String, TemplateDeployer> templateDeployers = new ConcurrentHashMap();
     private static EventStreamService eventStreamService;
 
@@ -37,24 +37,24 @@ public class ExecutionManagerValueHolder {
     /**
      * To avoid instantiating
      */
-    private ExecutionManagerValueHolder() {
+    private TemplateManagerValueHolder() {
 
     }
 
     public static void setRegistryService(RegistryService registryService) {
-        ExecutionManagerValueHolder.registryService = registryService;
+        TemplateManagerValueHolder.registryService = registryService;
     }
 
     public static RegistryService getRegistryService() {
-        return ExecutionManagerValueHolder.registryService;
+        return TemplateManagerValueHolder.registryService;
     }
 
-    public static ExecutionManagerService getExecutionManagerService() {
-        return ExecutionManagerValueHolder.executionManagerService;
+    public static TemplateManagerService getTemplateManagerService() {
+        return TemplateManagerValueHolder.templateManagerService;
     }
 
-    public static void setExecutionManagerService(ExecutionManagerService executionManagerService) {
-        ExecutionManagerValueHolder.executionManagerService = executionManagerService;
+    public static void setTemplateManagerService(TemplateManagerService templateManagerService) {
+        TemplateManagerValueHolder.templateManagerService = templateManagerService;
     }
 
     public static ConcurrentHashMap<String, TemplateDeployer> getTemplateDeployers() {
@@ -62,10 +62,10 @@ public class ExecutionManagerValueHolder {
     }
 
     public static void setEventStreamService(EventStreamService eventStreamService) {
-        ExecutionManagerValueHolder.eventStreamService = eventStreamService;
+        TemplateManagerValueHolder.eventStreamService = eventStreamService;
     }
 
     public static EventStreamService getEventStreamService() {
-        return ExecutionManagerValueHolder.eventStreamService;
+        return TemplateManagerValueHolder.eventStreamService;
     }
 }

@@ -16,7 +16,7 @@
 package org.wso2.carbon.event.template.manager.admin.dto.configuration;
 
 /**
- * DTO class of Parameter for ExecutionManagerAdminService
+ * DTO class of Parameter for TemplateManagerAdminService
  */
 public class ConfigurationParameterDTO {
 

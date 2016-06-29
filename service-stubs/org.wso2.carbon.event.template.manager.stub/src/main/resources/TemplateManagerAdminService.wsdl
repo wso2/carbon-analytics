@@ -15,7 +15,7 @@
   -->
 
 <wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://admin.manager.template.event.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:ax2146="http://domain.dto.admin.manager.template.event.carbon.wso2.org/xsd" xmlns:ax2148="http://configuration.dto.admin.manager.template.event.carbon.wso2.org/xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://admin.manager.template.event.carbon.wso2.org">
-    <wsdl:documentation>ExecutionManagerAdminService</wsdl:documentation>
+    <wsdl:documentation>TemplateManagerAdminService</wsdl:documentation>
     <wsdl:types>
         <xs:schema xmlns:ax2147="http://domain.dto.admin.manager.template.event.carbon.wso2.org/xsd" xmlns:ax2149="http://configuration.dto.admin.manager.template.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.manager.template.event.carbon.wso2.org">
             <xs:import namespace="http://domain.dto.admin.manager.template.event.carbon.wso2.org/xsd"/>
@@ -230,7 +230,7 @@
     <wsdl:message name="getConfigurationResponse">
         <wsdl:part name="parameters" element="ns:getConfigurationResponse"/>
     </wsdl:message>
-    <wsdl:portType name="ExecutionManagerAdminServicePortType">
+    <wsdl:portType name="TemplateManagerAdminServicePortType">
         <wsdl:operation name="getConfigurationInfos">
             <wsdl:input message="ns:getConfigurationInfosRequest" wsaw:Action="urn:getConfigurationInfos"/>
             <wsdl:output message="ns:getConfigurationInfosResponse" wsaw:Action="urn:getConfigurationInfosResponse"/>
@@ -260,7 +260,7 @@
             <wsdl:output message="ns:getConfigurationResponse" wsaw:Action="urn:getConfigurationResponse"/>
         </wsdl:operation>
     </wsdl:portType>
-    <wsdl:binding name="ExecutionManagerAdminServiceSoap11Binding" type="ns:ExecutionManagerAdminServicePortType">
+    <wsdl:binding name="TemplateManagerAdminServiceSoap11Binding" type="ns:TemplateManagerAdminServicePortType">
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
         <wsdl:operation name="getConfigurationInfos">
             <soap:operation soapAction="urn:getConfigurationInfos" style="document"/>
@@ -326,7 +326,7 @@
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
-    <wsdl:binding name="ExecutionManagerAdminServiceSoap12Binding" type="ns:ExecutionManagerAdminServicePortType">
+    <wsdl:binding name="TemplateManagerAdminServiceSoap12Binding" type="ns:TemplateManagerAdminServicePortType">
         <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
         <wsdl:operation name="getConfigurationInfos">
             <soap12:operation soapAction="urn:getConfigurationInfos" style="document"/>
@@ -392,7 +392,7 @@
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
-    <wsdl:binding name="ExecutionManagerAdminServiceHttpBinding" type="ns:ExecutionManagerAdminServicePortType">
+    <wsdl:binding name="TemplateManagerAdminServiceHttpBinding" type="ns:TemplateManagerAdminServicePortType">
         <http:binding verb="POST"/>
         <wsdl:operation name="getConfigurationInfos">
             <http:operation location="getConfigurationInfos"/>
@@ -458,15 +458,15 @@
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
-    <wsdl:service name="ExecutionManagerAdminService">
-        <wsdl:port name="ExecutionManagerAdminServiceHttpsSoap11Endpoint" binding="ns:ExecutionManagerAdminServiceSoap11Binding">
-            <soap:address location="https://10.100.7.55:9543/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsSoap11Endpoint/"/>
+    <wsdl:service name="TemplateManagerAdminService">
+        <wsdl:port name="TemplateManagerAdminServiceHttpsSoap11Endpoint" binding="ns:TemplateManagerAdminServiceSoap11Binding">
+            <soap:address location="https://10.100.7.55:9543/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsSoap11Endpoint/"/>
         </wsdl:port>
-        <wsdl:port name="ExecutionManagerAdminServiceHttpsSoap12Endpoint" binding="ns:ExecutionManagerAdminServiceSoap12Binding">
-            <soap12:address location="https://10.100.7.55:9543/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsSoap12Endpoint/"/>
+        <wsdl:port name="TemplateManagerAdminServiceHttpsSoap12Endpoint" binding="ns:TemplateManagerAdminServiceSoap12Binding">
+            <soap12:address location="https://10.100.7.55:9543/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsSoap12Endpoint/"/>
         </wsdl:port>
-        <wsdl:port name="ExecutionManagerAdminServiceHttpsEndpoint" binding="ns:ExecutionManagerAdminServiceHttpBinding">
-            <http:address location="https://10.100.7.55:9543/services/ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsEndpoint/"/>
+        <wsdl:port name="TemplateManagerAdminServiceHttpsEndpoint" binding="ns:TemplateManagerAdminServiceHttpBinding">
+            <http:address location="https://10.100.7.55:9543/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsEndpoint/"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

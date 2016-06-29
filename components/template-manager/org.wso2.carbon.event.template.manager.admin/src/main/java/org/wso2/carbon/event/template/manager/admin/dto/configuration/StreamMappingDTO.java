@@ -1,7 +1,7 @@
 package org.wso2.carbon.event.template.manager.admin.dto.configuration;
 
 /**
- * DTO class of StreamMapping for ExecutionManagerAdminService
+ * DTO class of StreamMapping for TemplateManagerAdminService
  */
 public class StreamMappingDTO {
 

@@ -48,7 +48,7 @@ public class TemplateDeployerServiceTrackerDS {
     protected void setTemplateDeployer(
             TemplateDeployer templateDeployer) {
         try {
-            ExecutionManagerValueHolder.getTemplateDeployers().put(templateDeployer.getType(), templateDeployer);
+            TemplateManagerValueHolder.getTemplateDeployers().put(templateDeployer.getType(), templateDeployer);
         } catch (Throwable t) {
             log.error(t);
         }
@@ -56,7 +56,7 @@ public class TemplateDeployerServiceTrackerDS {
 
     protected void unSetTemplateDeployer(
             TemplateDeployer templateDeployer) {
-        ExecutionManagerValueHolder.getTemplateDeployers().remove(templateDeployer.getType());
+        TemplateManagerValueHolder.getTemplateDeployers().remove(templateDeployer.getType());
     }
 }
 

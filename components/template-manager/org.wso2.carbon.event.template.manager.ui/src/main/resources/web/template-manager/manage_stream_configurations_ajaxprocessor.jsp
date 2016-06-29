@@ -16,15 +16,15 @@
   ~ under the License.
   --%>
 
-<%@ page import="org.wso2.carbon.event.template.manager.stub.ExecutionManagerAdminServiceStub" %>
-<%@ page import="org.wso2.carbon.event.template.manager.ui.ExecutionManagerUIUtils" %>
+<%@ page import="org.wso2.carbon.event.template.manager.stub.TemplateManagerAdminServiceStub" %>
+<%@ page import="org.wso2.carbon.event.template.manager.ui.TemplateManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.template.manager.admin.dto.configuration.xsd.AttributeMappingDTO" %>
 <%@ page import="org.wso2.carbon.event.template.manager.admin.dto.configuration.xsd.StreamMappingDTO" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.wso2.carbon.event.template.manager.ui.ExecutionManagerUIConstants" %>
+<%@ page import="org.wso2.carbon.event.template.manager.ui.TemplateManagerUIConstants" %>
 
 <%
     try {
@@ -32,7 +32,7 @@
         String configuration = request.getParameter("configurationName");
         String streamMappingObjectArray = request.getParameter("streamMappingObjectArray");
 
-        ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
+        TemplateManagerAdminServiceStub proxy = TemplateManagerUIUtils.getTemplateManagerAdminService(config, session);
         //extract stream mapping strings from json string
         String[] valuesInQuotes = StringUtils.substringsBetween(streamMappingObjectArray, "[", "]");
 

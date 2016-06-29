@@ -16,18 +16,18 @@
 package org.wso2.carbon.event.template.manager.admin.internal.ds;
 
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.event.template.manager.core.ExecutionManagerService;
+import org.wso2.carbon.event.template.manager.core.TemplateManagerService;
 
 /**
  * This class is used to get the EventProcessor service.
  *
- * @scr.component name="org.wso2.carbon.event.template.manager.admin.ExecutionManagerAdminService" immediate="true"
- * @scr.reference name="executionManagerService.service"
- * interface="org.wso2.carbon.event.template.manager.core.ExecutionManagerService" cardinality="1..1"
- * policy="dynamic" bind="setExecutionManagerService" unbind="unsetExecutionManagerService"
+ * @scr.component name="org.wso2.carbon.event.template.manager.admin.TemplateManagerAdminService" immediate="true"
+ * @scr.reference name="templateManagerService.service"
+ * interface="org.wso2.carbon.event.template.manager.core.TemplateManagerService" cardinality="1..1"
+ * policy="dynamic" bind="setTemplateManagerService" unbind="unsetTemplateManagerService"
  */
 
-public class ExecutionManagerAdminServiceDS {
+public class TemplateManagerAdminServiceDS {
 
     /**
      * Will be invoked when activating the service
@@ -38,12 +38,12 @@ public class ExecutionManagerAdminServiceDS {
 
     }
 
-    protected void setExecutionManagerService(ExecutionManagerService executionManagerService) {
-        ExecutionManagerAdminServiceValueHolder.setExecutionManagerService(executionManagerService);
+    protected void setTemplateManagerService(TemplateManagerService templateManagerService) {
+        TemplateManagerAdminServiceValueHolder.setTemplateManagerService(templateManagerService);
     }
 
-    protected void unsetExecutionManagerService(ExecutionManagerService executionManagerService) {
-        ExecutionManagerAdminServiceValueHolder.setExecutionManagerService(null);
+    protected void unsetTemplateManagerService(TemplateManagerService templateManagerService) {
+        TemplateManagerAdminServiceValueHolder.setTemplateManagerService(null);
     }
 
 }

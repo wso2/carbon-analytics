@@ -1,7 +1,7 @@
 package org.wso2.carbon.event.template.manager.admin.dto.domain;
 
 /**
- * DTO class of CommonArtifact for ExecutionManagerAdminService
+ * DTO class of CommonArtifact for TemplateManagerAdminService
  */
 public class CommonArtifactDTO {
     private String type;

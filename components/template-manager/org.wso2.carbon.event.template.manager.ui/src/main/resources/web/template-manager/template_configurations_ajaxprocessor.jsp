@@ -15,8 +15,8 @@
   --%>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page import="org.wso2.carbon.event.template.manager.ui.ExecutionManagerUIUtils" %>
-<%@ page import="org.wso2.carbon.event.template.manager.stub.ExecutionManagerAdminServiceStub" %>
+<%@ page import="org.wso2.carbon.event.template.manager.ui.TemplateManagerUIUtils" %>
+<%@ page import="org.wso2.carbon.event.template.manager.stub.TemplateManagerAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.template.manager.admin.dto.configuration.xsd.ScenarioConfigurationDTO" %>
 <%@ page import="org.wso2.carbon.event.template.manager.admin.dto.domain.xsd.ScenarioInfoDTO" %>
 <%@ page import="org.wso2.carbon.event.template.manager.admin.dto.domain.xsd.DomainParameterDTO" %>
@@ -111,8 +111,8 @@
 
     try {
 
-        ExecutionManagerAdminServiceStub proxy =
-                ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
+        TemplateManagerAdminServiceStub proxy =
+                TemplateManagerUIUtils.getTemplateManagerAdminService(config, session);
         DomainInfoDTO domain =
                 proxy.getDomainInfo(domainName);
 

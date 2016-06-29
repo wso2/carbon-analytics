@@ -15,11 +15,11 @@
   -->
 
 <serviceGroup>
-    <service name="ExecutionManagerAdminService" scope="transportsession">
+    <service name="TemplateManagerAdminService" scope="transportsession">
         <transports>
             <transport>https</transport>
         </transports>
-        <parameter name="ServiceClass">org.wso2.carbon.event.template.manager.admin.ExecutionManagerAdminService
+        <parameter name="ServiceClass">org.wso2.carbon.event.template.manager.admin.TemplateManagerAdminService
         </parameter>
     </service>
     <messageReceivers>

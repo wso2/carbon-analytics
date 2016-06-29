@@ -16,7 +16,7 @@
 package org.wso2.carbon.event.template.manager.admin.dto.domain;
 
 /**
- * DTO class of Template for ExecutionManagerAdminService
+ * DTO class of Template for TemplateManagerAdminService
  */
 public class TemplateDTO {
 

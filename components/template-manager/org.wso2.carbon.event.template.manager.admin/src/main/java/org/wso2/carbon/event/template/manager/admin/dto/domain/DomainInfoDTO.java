@@ -16,7 +16,7 @@
 package org.wso2.carbon.event.template.manager.admin.dto.domain;
 
 /**
- * DTO class of TemplateDomainInfo for ExecutionManagerAdminService. This only consists required information to display
+ * DTO class of TemplateDomainInfo for TemplateManagerAdminService. This only consists required information to display
  */
 public class DomainInfoDTO {
 

@@ -17,9 +17,9 @@
  */
 package org.wso2.carbon.event.template.manager.ui;
 
-public final class ExecutionManagerUIConstants {
+public final class TemplateManagerUIConstants {
 
-    private ExecutionManagerUIConstants() {
+    private TemplateManagerUIConstants() {
     }
 
     public static final String PROPERTY_META_PREFIX = "meta_";

@@ -22,7 +22,7 @@
             <i18n-key>execution.menu</i18n-key>
             <i18n-bundle>org.wso2.carbon.event.template.manager.ui.i18n.Resources</i18n-bundle>
             <parent-menu>dashboard_main_menu</parent-menu>
-            <link>../template-manager/execution_manager.jsp</link>
+            <link>../template-manager/template_manager.jsp</link>
             <region>region1</region>
             <order>10</order>
             <style-class>manage</style-class>

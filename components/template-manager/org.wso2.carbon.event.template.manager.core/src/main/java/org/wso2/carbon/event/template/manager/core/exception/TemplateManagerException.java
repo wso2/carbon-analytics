@@ -15,19 +15,19 @@
  */
 package org.wso2.carbon.event.template.manager.core.exception;
 
-public class ExecutionManagerException extends Exception {
-    public ExecutionManagerException() {
+public class TemplateManagerException extends Exception {
+    public TemplateManagerException() {
     }
 
-    public ExecutionManagerException(String message) {
+    public TemplateManagerException(String message) {
         super(message);
     }
 
-    public ExecutionManagerException(String message, Throwable cause) {
+    public TemplateManagerException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ExecutionManagerException(Throwable cause) {
+    public TemplateManagerException(Throwable cause) {
         super(cause);
     }
 }

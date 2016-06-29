@@ -17,7 +17,7 @@
 
     <ManagementPermissions>
         <ManagementPermission>
-            <DisplayName>Execution Manager</DisplayName>
+            <DisplayName>Template Manager</DisplayName>
             <ResourceId>/permission/admin/manage/template-manager</ResourceId>
         </ManagementPermission>
     </ManagementPermissions>

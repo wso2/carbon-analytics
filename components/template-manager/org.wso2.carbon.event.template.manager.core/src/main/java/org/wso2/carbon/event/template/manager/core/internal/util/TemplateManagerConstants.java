@@ -23,7 +23,7 @@ import java.io.File;
 /**
  * Consist of the constants required for EventManagerService
  */
-public class ExecutionManagerConstants {
+public class TemplateManagerConstants {
 
     // path canged for both cep/spark.
     public static final String TEMPLATE_DOMAIN_PATH = CarbonUtils.getCarbonConfigDirPath()
@@ -58,6 +58,6 @@ public class ExecutionManagerConstants {
     /**
      * To avoid instantiating
      */
-    private ExecutionManagerConstants() {
+    private TemplateManagerConstants() {
     }
 }

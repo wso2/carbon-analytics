@@ -19,13 +19,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.template.manager.core.DeployableTemplate;
-import org.wso2.carbon.event.template.manager.core.ExecutionManagerService;
+import org.wso2.carbon.event.template.manager.core.TemplateManagerService;
 import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.template.manager.core.TemplateDeploymentException;
-import org.wso2.carbon.event.template.manager.core.exception.ExecutionManagerException;
-import org.wso2.carbon.event.template.manager.core.internal.ds.ExecutionManagerValueHolder;
-import org.wso2.carbon.event.template.manager.core.internal.util.ExecutionManagerConstants;
-import org.wso2.carbon.event.template.manager.core.internal.util.ExecutionManagerHelper;
+import org.wso2.carbon.event.template.manager.core.exception.TemplateManagerException;
+import org.wso2.carbon.event.template.manager.core.internal.ds.TemplateManagerValueHolder;
+import org.wso2.carbon.event.template.manager.core.internal.util.TemplateManagerConstants;
+import org.wso2.carbon.event.template.manager.core.internal.util.TemplateManagerHelper;
 import org.wso2.carbon.event.template.manager.core.structure.configuration.ScenarioConfiguration;
 import org.wso2.carbon.event.template.manager.core.structure.configuration.StreamMapping;
 import org.wso2.carbon.event.template.manager.core.structure.configuration.StreamMappings;
@@ -46,32 +46,32 @@ import java.util.Map;
 
 
 /**
- * Class consist of the implementations of interface ExecutionManagerService
+ * Class consist of the implementations of interface TemplateManagerService
  */
-public class CarbonExecutionManagerService implements ExecutionManagerService {
-    private static final Log log = LogFactory.getLog(CarbonExecutionManagerService.class);
+public class CarbonTemplateManagerService implements TemplateManagerService {
+    private static final Log log = LogFactory.getLog(CarbonTemplateManagerService.class);
 
     private Map<String, Domain> domains;
 
-    public CarbonExecutionManagerService() throws ExecutionManagerException {
+    public CarbonTemplateManagerService() throws TemplateManagerException {
         domains = new HashMap<>();
-        domains = ExecutionManagerHelper.loadDomains();
+        domains = TemplateManagerHelper.loadDomains();
     }
 
 
     @Override
     public List<String> saveConfiguration(ScenarioConfiguration configuration)
-            throws ExecutionManagerException {
+            throws TemplateManagerException {
         try {
             Domain domain = domains.get(configuration.getDomain());
-            ExecutionManagerHelper.saveToRegistry(configuration);
-            ExecutionManagerHelper.deployArtifacts(configuration, domain);
+            TemplateManagerHelper.saveToRegistry(configuration);
+            TemplateManagerHelper.deployArtifacts(configuration, domain);
             //If StreamMappings element is present in the Domain, then need to return those Stream IDs,
             //so the caller (the UI) can prompt the user to map these streams to his own streams.
-            return ExecutionManagerHelper.getStreamIDsToBeMapped(configuration, getDomain(configuration.getDomain()));
+            return TemplateManagerHelper.getStreamIDsToBeMapped(configuration, getDomain(configuration.getDomain()));
         } catch (TemplateDeploymentException e) {
-            ExecutionManagerHelper.deleteConfigWithoutUndeploy(configuration.getDomain(), configuration.getName());
-            throw new ExecutionManagerException("Failed to save Scenario: " + configuration.getName() + ", for Domain: "
+            TemplateManagerHelper.deleteConfigWithoutUndeploy(configuration.getDomain(), configuration.getName());
+            throw new TemplateManagerException("Failed to save Scenario: " + configuration.getName() + ", for Domain: "
                                                 + configuration.getDomain(), e);
         }
     }
@@ -80,41 +80,41 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
     @Override
     public void saveStreamMapping(List<StreamMapping> streamMappingList,
                                   String scenarioConfigName, String domainName)
-            throws ExecutionManagerException {
+            throws TemplateManagerException {
         try {
             //save to registry
-            String resourceCollectionPath = ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
+            String resourceCollectionPath = TemplateManagerConstants.TEMPLATE_CONFIG_PATH
                                             + "/" + domainName;
 
             String resourcePath = resourceCollectionPath + "/"
-                                  + scenarioConfigName + ExecutionManagerConstants.CONFIG_FILE_EXTENSION;
+                                  + scenarioConfigName + TemplateManagerConstants.CONFIG_FILE_EXTENSION;
 
-            ScenarioConfiguration scenarioConfiguration = ExecutionManagerHelper.getConfiguration(resourcePath);
+            ScenarioConfiguration scenarioConfiguration = TemplateManagerHelper.getConfiguration(resourcePath);
 
             StreamMappings streamMappings = new StreamMappings();
             streamMappings.setStreamMapping(streamMappingList);
 
             scenarioConfiguration.setStreamMappings(streamMappings);
-            ExecutionManagerHelper.saveToRegistry(scenarioConfiguration);
+            TemplateManagerHelper.saveToRegistry(scenarioConfiguration);
 
             //deploy execution plan
-            String planName = ExecutionManagerHelper.getStreamMappingPlanId(domainName, scenarioConfigName);
-            String executionPlan = ExecutionManagerHelper.generateExecutionPlan(streamMappingList, planName);
+            String planName = TemplateManagerHelper.getStreamMappingPlanId(domainName, scenarioConfigName);
+            String executionPlan = TemplateManagerHelper.generateExecutionPlan(streamMappingList, planName);
 
             DeployableTemplate deployableTemplate = new DeployableTemplate();
             deployableTemplate.setArtifact(executionPlan);
             deployableTemplate.setConfiguration(scenarioConfiguration);
             deployableTemplate.setArtifactId(planName);
 
-            TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(ExecutionManagerConstants.DEPLOYER_TYPE_REALTIME);
+            TemplateDeployer deployer = TemplateManagerValueHolder.getTemplateDeployers().get(TemplateManagerConstants.DEPLOYER_TYPE_REALTIME);
             if (deployer != null) {
                 deployer.deployArtifact(deployableTemplate);
             } else {
-                throw new ExecutionManagerException("A deployer doesn't exist for template type " + ExecutionManagerConstants.DEPLOYER_TYPE_REALTIME);
+                throw new TemplateManagerException("A deployer doesn't exist for template type " + TemplateManagerConstants.DEPLOYER_TYPE_REALTIME);
             }
 
         } catch (TemplateDeploymentException e) {
-            throw new ExecutionManagerException("Failed to deploy stream-mapping-execution plan, hence event flow will " +
+            throw new TemplateManagerException("Failed to deploy stream-mapping-execution plan, hence event flow will " +
                     "not be complete for Template Configuration: " + scenarioConfigName + " in domain: " + domainName, e);
         }
     }
@@ -128,13 +128,13 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
 
     @Override
     public Collection<ScenarioConfiguration> getConfigurations(String domainName)
-            throws ExecutionManagerException {
+            throws TemplateManagerException {
         Collection<ScenarioConfiguration> scenarioConfigurations = new ArrayList<ScenarioConfiguration>();
 
-        String domainFilePath = ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
+        String domainFilePath = TemplateManagerConstants.TEMPLATE_CONFIG_PATH
                 + "/" + domainName;
         try {
-            Registry registry = ExecutionManagerValueHolder.getRegistryService()
+            Registry registry = TemplateManagerValueHolder.getRegistryService()
                     .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
 
             if (registry.resourceExists(domainFilePath)) {
@@ -146,8 +146,8 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
                 }
             }
         } catch (RegistryException e) {
-            throw new ExecutionManagerException("Registry exception occurred when accessing files at "
-                    + ExecutionManagerConstants.TEMPLATE_CONFIG_PATH, e);
+            throw new TemplateManagerException("Registry exception occurred when accessing files at "
+                    + TemplateManagerConstants.TEMPLATE_CONFIG_PATH, e);
         }
         return scenarioConfigurations;
 
@@ -160,9 +160,9 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
      * @param scenarioConfigurations ScenarioConfiguration collection which needs to be loaded
      */
     private void loadConfigurations(String[] filePaths, Collection<ScenarioConfiguration> scenarioConfigurations)
-            throws ExecutionManagerException {
+            throws TemplateManagerException {
         for (String filePath : filePaths) {
-            scenarioConfigurations.add(ExecutionManagerHelper.getConfiguration(filePath));
+            scenarioConfigurations.add(TemplateManagerHelper.getConfiguration(filePath));
         }
     }
 
@@ -173,15 +173,15 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
 
     @Override
     public ScenarioConfiguration getConfiguration(String domainName, String configName)
-            throws ExecutionManagerException {
-        return ExecutionManagerHelper.getConfiguration(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
+            throws TemplateManagerException {
+        return TemplateManagerHelper.getConfiguration(TemplateManagerConstants.TEMPLATE_CONFIG_PATH
                 + "/" + domainName
                 + "/" + configName
-                + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
+                + TemplateManagerConstants.CONFIG_FILE_EXTENSION);
     }
 
     @Override
-    public void deleteConfiguration(String domainName, String configName) throws ExecutionManagerException {
+    public void deleteConfiguration(String domainName, String configName) throws TemplateManagerException {
         /*
             First try to delete from registry if any exception occur, it will be logged.
             Then try to un deploy execution plan and log errors occur.
@@ -190,16 +190,16 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
         ScenarioConfiguration scenarioConfig = null;
         try {
             // need to distinguish the type to delegate to the pluggable deployer.
-            scenarioConfig = ExecutionManagerHelper.getConfiguration(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
+            scenarioConfig = TemplateManagerHelper.getConfiguration(TemplateManagerConstants.TEMPLATE_CONFIG_PATH
                     + RegistryConstants.PATH_SEPARATOR + domainName
                     + RegistryConstants.PATH_SEPARATOR + configName
-                    + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
+                    + TemplateManagerConstants.CONFIG_FILE_EXTENSION);
 
-            Registry registry = ExecutionManagerValueHolder.getRegistryService()
+            Registry registry = TemplateManagerValueHolder.getRegistryService()
                     .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
 
-            registry.delete(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH + RegistryConstants.PATH_SEPARATOR
-                    + domainName + RegistryConstants.PATH_SEPARATOR + configName + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
+            registry.delete(TemplateManagerConstants.TEMPLATE_CONFIG_PATH + RegistryConstants.PATH_SEPARATOR
+                    + domainName + RegistryConstants.PATH_SEPARATOR + configName + TemplateManagerConstants.CONFIG_FILE_EXTENSION);
         } catch (RegistryException e) {
             log.error("Configuration exception when deleting registry configuration file "
                     + configName + " of Domain " + domainName, e);           //todo: propagate to UI
@@ -219,14 +219,14 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
                         } else {
                             artifactCount++;
                         }
-                        String artifactId = ExecutionManagerHelper.getTemplatedArtifactId(domainName, scenario.getType(), configName, artifactType, artifactCount);
-                        ExecutionManagerHelper.unDeployExistingArtifact(artifactId, template.getType());
+                        String artifactId = TemplateManagerHelper.getTemplatedArtifactId(domainName, scenario.getType(), configName, artifactType, artifactCount);
+                        TemplateManagerHelper.unDeployExistingArtifact(artifactId, template.getType());
                         artifactTypeCountingMap.put(artifactType, artifactCount);
                     }
 
                     //undeploy stream-mapping execution plan
-                    String streamMappingPlanName = ExecutionManagerHelper.getStreamMappingPlanId(domainName, scenarioConfig.getName());
-                    ExecutionManagerHelper.unDeployExistingArtifact(streamMappingPlanName, ExecutionManagerConstants.DEPLOYER_TYPE_REALTIME);
+                    String streamMappingPlanName = TemplateManagerHelper.getStreamMappingPlanId(domainName, scenarioConfig.getName());
+                    TemplateManagerHelper.unDeployExistingArtifact(streamMappingPlanName, TemplateManagerConstants.DEPLOYER_TYPE_REALTIME);
                     break;
                 }
             }
@@ -242,8 +242,8 @@ public class CarbonExecutionManagerService implements ExecutionManagerService {
                     } else {
                         artifactCount++;
                     }
-                    String artifactId = ExecutionManagerHelper.getCommonArtifactId(domainName, artifactType, artifactCount);
-                    ExecutionManagerHelper.unDeployExistingArtifact(artifactId, artifactType);
+                    String artifactId = TemplateManagerHelper.getCommonArtifactId(domainName, artifactType, artifactCount);
+                    TemplateManagerHelper.unDeployExistingArtifact(artifactId, artifactType);
                     artifactTypeCountingMap.put(artifactType, artifactCount);
                 }
             }

@@ -20,7 +20,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
-import org.wso2.carbon.event.template.manager.stub.ExecutionManagerAdminServiceStub;
+import org.wso2.carbon.event.template.manager.stub.TemplateManagerAdminServiceStub;
 import org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub;
 import org.apache.axis2.AxisFault;
 import org.wso2.carbon.ui.CarbonUIUtil;
@@ -32,31 +32,31 @@ import javax.servlet.http.HttpSession;
 /**
  * Consist of the required UI utility methods
  */
-public class ExecutionManagerUIUtils {
+public class TemplateManagerUIUtils {
 
     /**
      * To avoid instantiating
      */
-    private ExecutionManagerUIUtils() {
+    private TemplateManagerUIUtils() {
     }
 
     /**
-     * Provides created  ExecutionManagerAdminServiceStub object
+     * Provides created  TemplateManagerAdminServiceStub object
      *
      * @param config  Servlet Configuration
      * @param session Http Session
-     * @return Created ExecutionManagerAdminServiceStub object
+     * @return Created TemplateManagerAdminServiceStub object
      * @throws AxisFault
      */
-    public static ExecutionManagerAdminServiceStub getExecutionManagerAdminService(
+    public static TemplateManagerAdminServiceStub getTemplateManagerAdminService(
             ServletConfig config, HttpSession session)
             throws AxisFault {
         ConfigurationContext configContext = (ConfigurationContext) config.getServletContext()
                 .getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
         //Server URL which is defined in the server.xml
         String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(),
-                session) + "ExecutionManagerAdminService.ExecutionManagerAdminServiceHttpsSoap12Endpoint";
-        ExecutionManagerAdminServiceStub stub = new ExecutionManagerAdminServiceStub(configContext, serverURL);
+                session) + "TemplateManagerAdminService.TemplateManagerAdminServiceHttpsSoap12Endpoint";
+        TemplateManagerAdminServiceStub stub = new TemplateManagerAdminServiceStub(configContext, serverURL);
 
         String cookie = (String) session.getAttribute(org.wso2.carbon.utils.ServerConstants.ADMIN_SERVICE_COOKIE);
 
@@ -74,7 +74,7 @@ public class ExecutionManagerUIUtils {
      *
      * @param config  Servlet Configuration
      * @param session Http Session
-     * @return Created ExecutionManagerAdminServiceStub object
+     * @return Created TemplateManagerAdminServiceStub object
      * @throws AxisFault
      */
     public static AuthenticationAdminStub getAuthenticationAdminService(

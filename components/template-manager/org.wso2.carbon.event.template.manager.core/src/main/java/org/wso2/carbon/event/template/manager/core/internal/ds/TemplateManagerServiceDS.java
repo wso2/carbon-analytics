@@ -18,9 +18,9 @@ package org.wso2.carbon.event.template.manager.core.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.event.template.manager.core.ExecutionManagerService;
-import org.wso2.carbon.event.template.manager.core.exception.ExecutionManagerException;
-import org.wso2.carbon.event.template.manager.core.internal.CarbonExecutionManagerService;
+import org.wso2.carbon.event.template.manager.core.TemplateManagerService;
+import org.wso2.carbon.event.template.manager.core.exception.TemplateManagerException;
+import org.wso2.carbon.event.template.manager.core.internal.CarbonTemplateManagerService;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -28,7 +28,7 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 /**
  * This class is used to get the EventProcessor service.
  *
- * @scr.component name="org.wso2.carbon.event.template.manager.core.ExecutionManagerService" immediate="true"
+ * @scr.component name="org.wso2.carbon.event.template.manager.core.TemplateManagerService" immediate="true"
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService"
  * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
@@ -36,42 +36,42 @@ import org.wso2.carbon.registry.core.service.RegistryService;
  * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
  * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  */
-public class ExecutionManagerServiceDS {
-    private static final Log log = LogFactory.getLog(ExecutionManagerServiceDS.class);
+public class TemplateManagerServiceDS {
+    private static final Log log = LogFactory.getLog(TemplateManagerServiceDS.class);
 
     protected void activate(ComponentContext context) {
 
         try {
-            ExecutionManagerService executionManagerService = new CarbonExecutionManagerService();
-            context.getBundleContext().registerService(ExecutionManagerService.class.getName(),
-                    executionManagerService, null);
-            ExecutionManagerValueHolder.setExecutionManagerService(executionManagerService);
+            TemplateManagerService templateManagerService = new CarbonTemplateManagerService();
+            context.getBundleContext().registerService(TemplateManagerService.class.getName(),
+                    templateManagerService, null);
+            TemplateManagerValueHolder.setTemplateManagerService(templateManagerService);
 
             if (log.isDebugEnabled()) {
                 log.debug("Execution manager core service deployed successfully");
             }
         } catch (RuntimeException e) {
             log.error("Execution manager core service cannot be deployed ", e);
-        } catch (ExecutionManagerException e) {
+        } catch (TemplateManagerException e) {
             log.error("Execution manager core service cannot be deployed", e);
         }
     }
 
     protected void setRegistryService(RegistryService registryService) throws RegistryException {
-        ExecutionManagerValueHolder.setRegistryService(registryService);
+        TemplateManagerValueHolder.setRegistryService(registryService);
 
     }
 
     protected void unsetRegistryService(RegistryService registryService) {
-        ExecutionManagerValueHolder.setRegistryService(null);
+        TemplateManagerValueHolder.setRegistryService(null);
     }
 
     protected void setEventStreamService(EventStreamService eventStreamService) {
-        ExecutionManagerValueHolder.setEventStreamService(eventStreamService);
+        TemplateManagerValueHolder.setEventStreamService(eventStreamService);
     }
 
     protected void unsetEventStreamService(EventStreamService eventStreamService) {
-        ExecutionManagerValueHolder.setEventStreamService(null);
+        TemplateManagerValueHolder.setEventStreamService(null);
     }
 
 }

@@ -15,27 +15,27 @@
  */
 package org.wso2.carbon.event.template.manager.admin.internal.ds;
 
-import org.wso2.carbon.event.template.manager.core.ExecutionManagerService;
+import org.wso2.carbon.event.template.manager.core.TemplateManagerService;
 
 /**
- * Consist of ExecutionManagerService which requires by ExecutionAdminService
+ * Consist of TemplateManagerService which requires by ExecutionAdminService
  */
-public class ExecutionManagerAdminServiceValueHolder {
+public class TemplateManagerAdminServiceValueHolder {
 
-    private static ExecutionManagerService executionManagerService;
+    private static TemplateManagerService templateManagerService;
 
     /**
      * To avoid instantiating
      */
-    private ExecutionManagerAdminServiceValueHolder() {
+    private TemplateManagerAdminServiceValueHolder() {
     }
 
-    public static ExecutionManagerService getCarbonExecutionManagerService() {
-        return executionManagerService;
+    public static TemplateManagerService getCarbonTemplateManagerService() {
+        return templateManagerService;
     }
 
-    public static void setExecutionManagerService(ExecutionManagerService executionManagerService) {
-        ExecutionManagerAdminServiceValueHolder.executionManagerService = executionManagerService;
+    public static void setTemplateManagerService(TemplateManagerService templateManagerService) {
+        TemplateManagerAdminServiceValueHolder.templateManagerService = templateManagerService;
     }
 
 }

@@ -42,7 +42,7 @@ public class DomainMapper {
      * @param domain Domain object needs to be mapped
      * @return Mapped DomainInfoDTO object
      */
-    public static DomainInfoDTO mapExecutionManagerTemplate(
+    public static DomainInfoDTO mapTemplateManagerTemplate(
             Domain domain) {
         DomainInfoDTO domainInfoDTO = null;
 
@@ -63,7 +63,7 @@ public class DomainMapper {
      * @param domains List of Domain objects needs to be mapped
      * @return Mapped array of DomainInfoDTO objects
      */
-    public static DomainInfoDTO[] mapExecutionManagerTemplates(
+    public static DomainInfoDTO[] mapTemplateManagerTemplates(
             List<Domain> domains) {
         DomainInfoDTO[] domainInfoDTO = null;
 
@@ -71,7 +71,7 @@ public class DomainMapper {
             domainInfoDTO = new DomainInfoDTO[domains.size()];
 
             for (int i = 0; i < domainInfoDTO.length; i++) {
-                domainInfoDTO[i] = mapExecutionManagerTemplate(domains.get(i));
+                domainInfoDTO[i] = mapTemplateManagerTemplate(domains.get(i));
             }
         }
         return domainInfoDTO;

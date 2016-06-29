@@ -13,10 +13,10 @@
   ~ specific language governing permissions and limitations under the License.
   --%>
 <%@ page import="org.wso2.carbon.authenticator.stub.AuthenticationAdminStub" %>
-<%@ page import="org.wso2.carbon.event.template.manager.ui.ExecutionManagerUIUtils" %>
+<%@ page import="org.wso2.carbon.event.template.manager.ui.TemplateManagerUIUtils" %>
 
 <%
-    AuthenticationAdminStub stub = ExecutionManagerUIUtils.getAuthenticationAdminService(config, session);
+    AuthenticationAdminStub stub = TemplateManagerUIUtils.getAuthenticationAdminService(config, session);
     stub.logout();
     response.sendRedirect("../admin/login.jsp");
 %>

@@ -17,9 +17,9 @@
   --%>
 <%@ page import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamDefinitionDto" %>
-<%@ page import="org.wso2.carbon.event.template.manager.ui.ExecutionManagerUIUtils" %>
+<%@ page import="org.wso2.carbon.event.template.manager.ui.TemplateManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamAttributeDto" %>
-<%@ page import="org.wso2.carbon.event.template.manager.ui.ExecutionManagerUIConstants" %>
+<%@ page import="org.wso2.carbon.event.template.manager.ui.TemplateManagerUIConstants" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
@@ -29,7 +29,7 @@
         String fromStreamId = request.getParameter("fromStreamNameWithVersion");
         String toStreamId = request.getParameter("toStreamNameWithVersion");
         String index = request.getParameter("index");
-        EventStreamAdminServiceStub eventStreamAdminServiceStub = ExecutionManagerUIUtils.getEventStreamAdminService(config, session, request);
+        EventStreamAdminServiceStub eventStreamAdminServiceStub = TemplateManagerUIUtils.getEventStreamAdminService(config, session, request);
         EventStreamDefinitionDto toStreamDefinitionDto = eventStreamAdminServiceStub.getStreamDefinitionDto(toStreamId);
         EventStreamDefinitionDto fromStreamDefinitionDto = eventStreamAdminServiceStub.getStreamDefinitionDto(fromStreamId);
 
@@ -37,7 +37,7 @@
         //get meta data
         if (fromStreamDefinitionDto.getMetaData() != null) {
             for (EventStreamAttributeDto fromStreamMetaAttribute : fromStreamDefinitionDto.getMetaData()) {
-                fromStreamMetaAttribute.setAttributeName(ExecutionManagerUIConstants.PROPERTY_META_PREFIX
+                fromStreamMetaAttribute.setAttributeName(TemplateManagerUIConstants.PROPERTY_META_PREFIX
                                                                 + fromStreamMetaAttribute.getAttributeName());
                 fromStreamAttributeArray.add(fromStreamMetaAttribute);
             }
@@ -45,7 +45,7 @@
         //get correlation data
         if (fromStreamDefinitionDto.getCorrelationData() != null) {
             for (EventStreamAttributeDto fromStreamCorrelationAttribute : fromStreamDefinitionDto.getCorrelationData()) {
-                fromStreamCorrelationAttribute.setAttributeName(ExecutionManagerUIConstants.PROPERTY_CORRELATION_PREFIX
+                fromStreamCorrelationAttribute.setAttributeName(TemplateManagerUIConstants.PROPERTY_CORRELATION_PREFIX
                                                                 + fromStreamCorrelationAttribute.getAttributeName());
                 fromStreamAttributeArray.add(fromStreamCorrelationAttribute);
             }
@@ -73,7 +73,7 @@
             int metaCounter = 0;
             if (toStreamDefinitionDto.getMetaData() != null) {
                 for (EventStreamAttributeDto metaAttribute : toStreamDefinitionDto.getMetaData()) {
-                    metaAttribute.setAttributeName(ExecutionManagerUIConstants.PROPERTY_META_PREFIX
+                    metaAttribute.setAttributeName(TemplateManagerUIConstants.PROPERTY_META_PREFIX
                             + metaAttribute.getAttributeName());
         %>
 
@@ -142,7 +142,7 @@
             int correlationCounter = 0;
             if (toStreamDefinitionDto.getCorrelationData() != null) {
                 for (EventStreamAttributeDto correlationAttribute : toStreamDefinitionDto.getCorrelationData()) {
-                    correlationAttribute.setAttributeName(ExecutionManagerUIConstants.PROPERTY_CORRELATION_PREFIX
+                    correlationAttribute.setAttributeName(TemplateManagerUIConstants.PROPERTY_CORRELATION_PREFIX
                             + correlationAttribute.getAttributeName());
         %>
 

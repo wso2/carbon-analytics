@@ -22,26 +22,26 @@ import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.event.template.manager.admin.dto.configuration.ScenarioConfigurationDTO;
 import org.wso2.carbon.event.template.manager.admin.dto.configuration.ScenarioConfigurationInfoDTO;
 import org.wso2.carbon.event.template.manager.admin.dto.domain.DomainInfoDTO;
-import org.wso2.carbon.event.template.manager.admin.internal.ds.ExecutionManagerAdminServiceValueHolder;
+import org.wso2.carbon.event.template.manager.admin.internal.ds.TemplateManagerAdminServiceValueHolder;
 import org.wso2.carbon.event.template.manager.admin.internal.util.ConfigurationMapper;
 import org.wso2.carbon.event.template.manager.admin.internal.util.DomainMapper;
-import org.wso2.carbon.event.template.manager.core.exception.ExecutionManagerException;
+import org.wso2.carbon.event.template.manager.core.exception.TemplateManagerException;
 import org.wso2.carbon.event.template.manager.core.structure.domain.Domain;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Consist of the methods exposed by ExecutionManagerAdminService
+ * Consist of the methods exposed by TemplateManagerAdminService
  */
-public class ExecutionManagerAdminService extends AbstractAdmin {
+public class TemplateManagerAdminService extends AbstractAdmin {
 
-    private static final Log log = LogFactory.getLog(ExecutionManagerAdminService.class);
+    private static final Log log = LogFactory.getLog(TemplateManagerAdminService.class);
 
     /**
      * Default Constructor
      */
-    public ExecutionManagerAdminService() {
+    public TemplateManagerAdminService() {
 
     }
 
@@ -56,7 +56,7 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      */
     public DomainInfoDTO getDomainInfo(String domainName) throws AxisFault {
         try {
-            return DomainMapper.mapExecutionManagerTemplate(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
+            return DomainMapper.mapTemplateManagerTemplate(TemplateManagerAdminServiceValueHolder.getCarbonTemplateManagerService()
                                                                     .getDomain(domainName));
         } catch (Throwable e) {
             log.error("Error occurred when getting domain " + domainName, e);
@@ -73,8 +73,8 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      */
     public DomainInfoDTO[] getAllDomainInfos() throws AxisFault {
         try {
-            return DomainMapper.mapExecutionManagerTemplates(new ArrayList
-                    <Domain>(ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService().getAllDomains()));
+            return DomainMapper.mapTemplateManagerTemplates(new ArrayList
+                    <Domain>(TemplateManagerAdminServiceValueHolder.getCarbonTemplateManagerService().getAllDomains()));
         } catch (Throwable e) {
             log.error("Error occurred when getting all domains ", e);
             throw new AxisFault(e.getMessage(), e);
@@ -92,9 +92,9 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      */
     public ScenarioConfigurationDTO getConfiguration(String domainName, String configName) throws AxisFault {
         try {
-            return ConfigurationMapper.mapConfiguration(ExecutionManagerAdminServiceValueHolder
-                    .getCarbonExecutionManagerService().getConfiguration(domainName, configName));
-        } catch (ExecutionManagerException e) {
+            return ConfigurationMapper.mapConfiguration(TemplateManagerAdminServiceValueHolder
+                    .getCarbonTemplateManagerService().getConfiguration(domainName, configName));
+        } catch (TemplateManagerException e) {
             log.error("Error occurred when getting template configuration " + configName, e);
             throw new AxisFault(e.getMessage());
         }
@@ -112,9 +112,9 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
     public ScenarioConfigurationInfoDTO[] getConfigurationInfos(String domainName) throws AxisFault {
         try {
             return ConfigurationMapper.mapConfigurationsInfo(new ArrayList<>(
-                    ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
+                    TemplateManagerAdminServiceValueHolder.getCarbonTemplateManagerService()
                             .getConfigurations(domainName)));
-        } catch (ExecutionManagerException e) {
+        } catch (TemplateManagerException e) {
             log.error("Error occurred when getting configurations for domain " + domainName, e);
             throw new AxisFault(e.getMessage());
         }
@@ -129,10 +129,10 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      */
     public boolean deleteConfiguration(String domainName, String configName) throws AxisFault {
         try {
-            ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
+            TemplateManagerAdminServiceValueHolder.getCarbonTemplateManagerService()
                     .deleteConfiguration(domainName, configName);
             return true;
-        } catch (ExecutionManagerException e) {
+        } catch (TemplateManagerException e) {
             log.error("Error occurred when deleting configuration " + configName, e);
             throw new AxisFault(e.getMessage(), e);
         }
@@ -148,14 +148,14 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
      */
     public String[] saveConfiguration(ScenarioConfigurationDTO configuration) throws AxisFault {
         try {
-            List<String> streamIdList = ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
+            List<String> streamIdList = TemplateManagerAdminServiceValueHolder.getCarbonTemplateManagerService()
                     .saveConfiguration(ConfigurationMapper.mapConfiguration(configuration));
             if (streamIdList != null) {
                return streamIdList.toArray(new String[0]);
             } else {
                 return null;
             }
-        } catch (ExecutionManagerException e) {
+        } catch (TemplateManagerException e) {
             log.error("Error occurred when saving configuration " + configuration.getName(), e);
             throw new AxisFault(e.getMessage(), e);
         }
@@ -178,11 +178,11 @@ public class ExecutionManagerAdminService extends AbstractAdmin {
             org.wso2.carbon.event.template.manager.admin.dto.configuration.StreamMappingDTO[]
                     streamMappingDTOs, String configName, String domainName) throws AxisFault {
         try {
-            ExecutionManagerAdminServiceValueHolder.getCarbonExecutionManagerService()
+            TemplateManagerAdminServiceValueHolder.getCarbonTemplateManagerService()
                     .saveStreamMapping(ConfigurationMapper.mapStreamMapping(streamMappingDTOs)
                             , configName, domainName);
             return true;
-        } catch (ExecutionManagerException e) {
+        } catch (TemplateManagerException e) {
             log.error("Error occurred when saving configuration " + configName + " in domain " + domainName + " with stream mappings", e);
             throw new AxisFault(e.getMessage(), e);
         }

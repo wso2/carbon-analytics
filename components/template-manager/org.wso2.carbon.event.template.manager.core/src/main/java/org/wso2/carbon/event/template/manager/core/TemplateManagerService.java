@@ -15,7 +15,7 @@
  */
 package org.wso2.carbon.event.template.manager.core;
 
-import org.wso2.carbon.event.template.manager.core.exception.ExecutionManagerException;
+import org.wso2.carbon.event.template.manager.core.exception.TemplateManagerException;
 import org.wso2.carbon.event.template.manager.core.structure.configuration.ScenarioConfiguration;
 import org.wso2.carbon.event.template.manager.core.structure.configuration.StreamMapping;
 import org.wso2.carbon.event.template.manager.core.structure.domain.Domain;
@@ -24,16 +24,16 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Interface consist of service methods which will be exposed by the ExecutionManagerService
+ * Interface consist of service methods which will be exposed by the TemplateManagerService
  */
-public interface ExecutionManagerService {
+public interface TemplateManagerService {
 
     /**
      * save template configuration xml files in wso2 carbon registry
      *
      * @param configuration configuration object which needs to be saved
      */
-    public List<String> saveConfiguration(ScenarioConfiguration configuration) throws ExecutionManagerException;
+    public List<String> saveConfiguration(ScenarioConfiguration configuration) throws TemplateManagerException;
 
 
     /**
@@ -45,7 +45,7 @@ public interface ExecutionManagerService {
      */
     public void saveStreamMapping(List<StreamMapping> streamMappingList, String scenarioConfigName,
                                   String domainName)
-            throws ExecutionManagerException;
+            throws TemplateManagerException;
 
 
     /**
@@ -62,7 +62,7 @@ public interface ExecutionManagerService {
      * @return Domain list
      */
     public Collection<ScenarioConfiguration> getConfigurations(String domainName)
-            throws ExecutionManagerException;
+            throws TemplateManagerException;
 
     /**
      * get information of a specific domain
@@ -80,7 +80,7 @@ public interface ExecutionManagerService {
      * @param configName configuration name
      * @return TemplateConfig object
      */
-    public ScenarioConfiguration getConfiguration(String domainName, String configName)  throws ExecutionManagerException;
+    public ScenarioConfiguration getConfiguration(String domainName, String configName)  throws TemplateManagerException;
 
     /**
      * delete specified scenario configuration when its name is given
@@ -88,6 +88,6 @@ public interface ExecutionManagerService {
      * @param domainName domain name
      * @param configName template configuration name
      */
-    public void deleteConfiguration(String domainName, String configName) throws ExecutionManagerException;
+    public void deleteConfiguration(String domainName, String configName) throws TemplateManagerException;
 
 }

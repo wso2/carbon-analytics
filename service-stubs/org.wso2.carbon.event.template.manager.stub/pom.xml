@@ -61,7 +61,7 @@
                                     <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar" />
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg line="-uri src/main/resources/ExecutionManagerAdminService.wsdl -u -uw -o target/generated-code -ns2p http://admin.manager.template.event.carbon.wso2.org=org.wso2.carbon.event.template.manager.stub,http://dto.admin.manager.execution.event.carbon.wso2.org/xsd=org.wso2.carbon.event.template.manager.stub.types" />
+                                    <arg line="-uri src/main/resources/TemplateManagerAdminService.wsdl -u -uw -o target/generated-code -ns2p http://admin.manager.template.event.carbon.wso2.org=org.wso2.carbon.event.template.manager.stub,http://dto.admin.manager.execution.event.carbon.wso2.org/xsd=org.wso2.carbon.event.template.manager.stub.types" />
                                     <classpath refid="wsdl2java.classpath" />
                                 </java>
                             </tasks>

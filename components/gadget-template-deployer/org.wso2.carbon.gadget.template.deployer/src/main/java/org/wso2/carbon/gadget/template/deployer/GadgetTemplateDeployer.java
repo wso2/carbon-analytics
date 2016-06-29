@@ -141,7 +141,7 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
 
         // Copy the static files
         String path = new StringBuilder(CarbonUtils.getCarbonConfigDirPath())
-                .append(File.separator).append(GadgetTemplateDeployerConstants.EXECUTION_MANAGER).append(File.separator)
+                .append(File.separator).append(GadgetTemplateDeployerConstants.TEMPLATE_MANAGER).append(File.separator)
                 .append(GadgetTemplateDeployerConstants.GADGET_TEMPLATES).append(File.separator)
                 .append(properties.get(GadgetTemplateDeployerConstants.TEMPLATE_DIRECTORY)).toString();
         File templateDirectory = new File(path);

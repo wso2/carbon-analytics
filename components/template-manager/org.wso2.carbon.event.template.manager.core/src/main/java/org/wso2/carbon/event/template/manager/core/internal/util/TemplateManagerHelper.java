@@ -23,8 +23,8 @@ import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.template.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.template.manager.core.TemplateDeploymentException;
-import org.wso2.carbon.event.template.manager.core.exception.ExecutionManagerException;
-import org.wso2.carbon.event.template.manager.core.internal.ds.ExecutionManagerValueHolder;
+import org.wso2.carbon.event.template.manager.core.exception.TemplateManagerException;
+import org.wso2.carbon.event.template.manager.core.internal.ds.TemplateManagerValueHolder;
 import org.wso2.carbon.event.template.manager.core.structure.configuration.AttributeMapping;
 import org.wso2.carbon.event.template.manager.core.structure.configuration.ScenarioConfiguration;
 import org.wso2.carbon.event.template.manager.core.structure.domain.Artifact;
@@ -55,9 +55,9 @@ import java.util.Map;
  * Class consist of the helper methods which are required to deal with domain templates stored in the file directory,
  * configurations stored as resources in the registry, deploy execution plans and deploy streams
  */
-public class ExecutionManagerHelper {
+public class TemplateManagerHelper {
 
-    private static final Log log = LogFactory.getLog(ExecutionManagerHelper.class);
+    private static final Log log = LogFactory.getLog(TemplateManagerHelper.class);
     private static final String EXECUTION_PLAN_NAME_ANNOTATION = "@Plan:name";
     private static final String DEFINE_STREAM = "define stream ";
     private static final String FROM = "from ";
@@ -70,7 +70,7 @@ public class ExecutionManagerHelper {
     /**
      * To avoid instantiating
      */
-    private ExecutionManagerHelper() {
+    private TemplateManagerHelper() {
     }
 
     /**
@@ -78,7 +78,7 @@ public class ExecutionManagerHelper {
      */
     public static Map<String, Domain> loadDomains() {
         //Get domain template folder and load all the domain template files
-        File folder = new File(ExecutionManagerConstants.TEMPLATE_DOMAIN_PATH);
+        File folder = new File(TemplateManagerConstants.TEMPLATE_DOMAIN_PATH);
         Map<String, Domain> domains = new HashMap<>();
 
         File[] files = folder.listFiles();
@@ -89,7 +89,7 @@ public class ExecutionManagerHelper {
                     if (domain != null) {
                         try {
                             validateTemplateDomainConfig(domain);
-                        } catch (ExecutionManagerException e) {
+                        } catch (TemplateManagerException e) {
                             //In case an invalid template configuration is found, this loader logs
                             // an error message and aborts loading that particular template domain config.
                             //However, this will load all the valid template domain configurations.
@@ -157,16 +157,16 @@ public class ExecutionManagerHelper {
      * Validity criteria - It should have at least one Template configuration.
      *
      * @param domain Domain object which needs to be validated.
-     * @throws ExecutionManagerException
+     * @throws TemplateManagerException
      */
     public static void validateTemplateDomainConfig(Domain domain)
-            throws ExecutionManagerException {
+            throws TemplateManagerException {
         if (domain.getScenarios() == null ||
             domain.getScenarios().getScenario() == null ||
             domain.getScenarios().getScenario().isEmpty()) {
             //It is required to have at least one ScenarioConfiguration.
             //Having only a set of common artifacts is not a valid use case.
-            throw new ExecutionManagerException("There are no template configurations in the domain " + domain.getName());
+            throw new TemplateManagerException("There are no template configurations in the domain " + domain.getName());
         }
     }
 
@@ -191,13 +191,13 @@ public class ExecutionManagerHelper {
                     } else {
                         artifactCount++;
                     }
-                    String artifactId = ExecutionManagerHelper.getCommonArtifactId(domain.getName(), artifactType, artifactCount);
+                    String artifactId = TemplateManagerHelper.getCommonArtifactId(domain.getName(), artifactType, artifactCount);
 
                     DeployableTemplate deployableTemplate = new DeployableTemplate();
                     deployableTemplate.setArtifact(artifact.getValue());
                     deployableTemplate.setConfiguration(configuration);
                     deployableTemplate.setArtifactId(artifactId);
-                    TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(artifact.getType());
+                    TemplateDeployer deployer = TemplateManagerValueHolder.getTemplateDeployers().get(artifact.getType());
                     if (deployer != null) {
                         deployer.deployIfNotDoneAlready(deployableTemplate);
                         artifactTypeCountingMap.put(artifactType, artifactCount);
@@ -218,9 +218,9 @@ public class ExecutionManagerHelper {
                     } else {
                         artifactCount++;
                     }
-                    String artifactId = ExecutionManagerHelper.getTemplatedArtifactId(domain.getName(),
-                                                                                      scenario.getType(), configuration.getName(), artifactType, artifactCount);
-                    TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(template.getType());
+                    String artifactId = TemplateManagerHelper.getTemplatedArtifactId(domain.getName(),
+                            scenario.getType(), configuration.getName(), artifactType, artifactCount);
+                    TemplateDeployer deployer = TemplateManagerValueHolder.getTemplateDeployers().get(template.getType());
                     if (deployer != null) {
                             DeployableTemplate deployableTemplate = new DeployableTemplate();
                             String updatedScript = updateArtifactParameters(configuration, template.getValue());
@@ -251,7 +251,7 @@ public class ExecutionManagerHelper {
         //Script parameters will be replaced with given configuration parameters
         if (config.getParameterMap() != null && script != null) {
             for (Map.Entry parameterMapEntry : config.getParameterMap().entrySet()) {
-                updatedScript = updatedScript.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
+                updatedScript = updatedScript.replaceAll(TemplateManagerConstants.REGEX_NAME_VALUE
                                                          + parameterMapEntry.getKey().toString(), parameterMapEntry.getValue().toString());
             }
         }
@@ -267,7 +267,7 @@ public class ExecutionManagerHelper {
      */
     public static void unDeployExistingArtifact(String artifactId, String type)
             throws TemplateDeploymentException {
-        TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(type);
+        TemplateDeployer deployer = TemplateManagerValueHolder.getTemplateDeployers().get(type);
         deployer.undeployArtifact(artifactId);
     }
 
@@ -290,7 +290,7 @@ public class ExecutionManagerHelper {
                     for (StreamMapping streamMapping: scenario.getStreamMappings().getStreamMapping()) {
                         String toStream = streamMapping.getTo();
                         for (Map.Entry entry: configuration.getParameterMap().entrySet()) {
-                            toStream = toStream.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
+                            toStream = toStream.replaceAll(TemplateManagerConstants.REGEX_NAME_VALUE
                                                            + entry.getKey().toString(), entry.getValue().toString());
                         }
                         streamIdList.add(toStream);
@@ -313,7 +313,7 @@ public class ExecutionManagerHelper {
     public static String generateExecutionPlan(
             List<org.wso2.carbon.event.template.manager.core.structure.configuration.StreamMapping> streamMappingList,
             String planName)
-            throws ExecutionManagerException {
+            throws TemplateManagerException {
         //@Plan:name() statement
         String planNameStatement = EXECUTION_PLAN_NAME_ANNOTATION + "('" + planName + "') \n\n";
 
@@ -352,23 +352,23 @@ public class ExecutionManagerHelper {
     }
 
     private static String generateDefineStreamStatements(DefineStreamTypes type, String streamId, String internalStreamId)
-            throws ExecutionManagerException {
+            throws TemplateManagerException {
         try {
-            StreamDefinition streamDefinition = ExecutionManagerValueHolder.getEventStreamService().getStreamDefinition(streamId);
+            StreamDefinition streamDefinition = TemplateManagerValueHolder.getEventStreamService().getStreamDefinition(streamId);
             if (streamDefinition == null) {
-                throw new ExecutionManagerException("No stream has being deployed with Stream ID: " + streamId);
+                throw new TemplateManagerException("No stream has being deployed with Stream ID: " + streamId);
             }
 
             String statement = "@" + type.toString() + "('" + streamId + "')\n";
             StringBuilder streamDefBuilder = new StringBuilder(DEFINE_STREAM + internalStreamId + " (");
             if (streamDefinition.getMetaData() != null) {
                 for (Attribute metaAttribute : streamDefinition.getMetaData()) {
-                    streamDefBuilder.append(ExecutionManagerConstants.META_PREFIX).append(metaAttribute.getName()).append(" ").append(metaAttribute.getType()).append(", ");
+                    streamDefBuilder.append(TemplateManagerConstants.META_PREFIX).append(metaAttribute.getName()).append(" ").append(metaAttribute.getType()).append(", ");
                 }
             }
             if (streamDefinition.getCorrelationData() != null) {
                 for (Attribute corrAttribute : streamDefinition.getCorrelationData()) {
-                    streamDefBuilder.append(ExecutionManagerConstants.CORRELATION_PREFIX).append(corrAttribute.getName()).append(" ").append(corrAttribute.getType()).append(", ");
+                    streamDefBuilder.append(TemplateManagerConstants.CORRELATION_PREFIX).append(corrAttribute.getName()).append(" ").append(corrAttribute.getType()).append(", ");
                 }
             }
             if (streamDefinition.getPayloadData() != null) {
@@ -383,29 +383,29 @@ public class ExecutionManagerHelper {
             statement += toStreamDefinitionStr;
             return statement;
         } catch (EventStreamConfigurationException e) {
-            throw new ExecutionManagerException("Failed to get stream definition for Stream ID: " + streamId, e);
+            throw new TemplateManagerException("Failed to get stream definition for Stream ID: " + streamId, e);
         }
     }
 
     public static void saveToRegistry(ScenarioConfiguration configuration)
-            throws ExecutionManagerException {
+            throws TemplateManagerException {
         try {
-            Registry registry = ExecutionManagerValueHolder.getRegistryService()
+            Registry registry = TemplateManagerValueHolder.getRegistryService()
                     .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
 
             StringWriter fileContent = new StringWriter();
             JAXBContext jaxbContext = JAXBContext.newInstance(ScenarioConfiguration.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, ExecutionManagerConstants.DEFAULT_CHARSET);
+            jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, TemplateManagerConstants.DEFAULT_CHARSET);
 
             jaxbMarshaller.marshal(configuration, fileContent);
             Resource resource = registry.newResource();
             resource.setContent(fileContent.toString());
-            String resourceCollectionPath = ExecutionManagerConstants.TEMPLATE_CONFIG_PATH
+            String resourceCollectionPath = TemplateManagerConstants.TEMPLATE_CONFIG_PATH
                                             + "/" + configuration.getDomain();
 
             String resourcePath = resourceCollectionPath + "/"
-                                  + configuration.getName() + ExecutionManagerConstants.CONFIG_FILE_EXTENSION;
+                                  + configuration.getName() + TemplateManagerConstants.CONFIG_FILE_EXTENSION;
 
             //Collection directory will be created if it is not exist in the registry
             if (!registry.resourceExists(resourceCollectionPath)) {
@@ -418,10 +418,10 @@ public class ExecutionManagerHelper {
             resource.setMediaType("application/xml");
             registry.put(resourcePath, resource);
         } catch (JAXBException e) {
-            throw new ExecutionManagerException("Could not marshall Scenario: " + configuration.getName() + ", for Domain: "
+            throw new TemplateManagerException("Could not marshall Scenario: " + configuration.getName() + ", for Domain: "
                                                 + configuration.getDomain() + ". Could not save to registry.", e);
         } catch (RegistryException e) {
-            throw new ExecutionManagerException("Could not save Scenario: " + configuration.getName() + ", for Domain: "
+            throw new TemplateManagerException("Could not save Scenario: " + configuration.getName() + ", for Domain: "
                                                 + configuration.getDomain() + ", to the registry.", e);
         }
     }
@@ -436,15 +436,15 @@ public class ExecutionManagerHelper {
      * @throws RegistryException
      */
     public static void deleteConfigWithoutUndeploy(String domainName, String configName)
-            throws ExecutionManagerException {
+            throws TemplateManagerException {
         try {
-        Registry registry = ExecutionManagerValueHolder.getRegistryService()
+        Registry registry = TemplateManagerValueHolder.getRegistryService()
                 .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
 
-        registry.delete(ExecutionManagerConstants.TEMPLATE_CONFIG_PATH + RegistryConstants.PATH_SEPARATOR
-                        + domainName + RegistryConstants.PATH_SEPARATOR + configName + ExecutionManagerConstants.CONFIG_FILE_EXTENSION);
+        registry.delete(TemplateManagerConstants.TEMPLATE_CONFIG_PATH + RegistryConstants.PATH_SEPARATOR
+                        + domainName + RegistryConstants.PATH_SEPARATOR + configName + TemplateManagerConstants.CONFIG_FILE_EXTENSION);
         } catch (RegistryException e) {
-            throw new ExecutionManagerException("Failed to delete scenario from the registry. Scenario name: " + configName
+            throw new TemplateManagerException("Failed to delete scenario from the registry. Scenario name: " + configName
                                                 + ", Domain name: " + domainName, e);
         }
     }
@@ -457,11 +457,11 @@ public class ExecutionManagerHelper {
      * @return available configurations
      */
     public static ScenarioConfiguration getConfiguration(String path)
-            throws ExecutionManagerException {
+            throws TemplateManagerException {
 
         ScenarioConfiguration scenarioConfiguration = null;
         try {
-            Registry registry = ExecutionManagerValueHolder.getRegistryService().getConfigSystemRegistry(PrivilegedCarbonContext
+            Registry registry = TemplateManagerValueHolder.getRegistryService().getConfigSystemRegistry(PrivilegedCarbonContext
                                                                                                                  .getThreadLocalCarbonContext().getTenantId());
 
             if (registry.resourceExists(path)) {
@@ -471,8 +471,8 @@ public class ExecutionManagerHelper {
                 }
             }
         } catch (RegistryException e) {
-            throw new ExecutionManagerException("Registry exception occurred when accessing files at "
-                                                + ExecutionManagerConstants.TEMPLATE_CONFIG_PATH, e);
+            throw new TemplateManagerException("Registry exception occurred when accessing files at "
+                                                + TemplateManagerConstants.TEMPLATE_CONFIG_PATH, e);
         }
 
         return scenarioConfiguration;
@@ -491,9 +491,9 @@ public class ExecutionManagerHelper {
     public static String getTemplatedArtifactId(String domainName, String scenarioName,
                                                 String scenarioConfigName, String artifactType,
                                                 int sequenceNumber) {
-        return domainName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR
-               + scenarioName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + scenarioConfigName
-               + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + artifactType + sequenceNumber;
+        return domainName + TemplateManagerConstants.CONFIG_NAME_SEPARATOR
+               + scenarioName + TemplateManagerConstants.CONFIG_NAME_SEPARATOR + scenarioConfigName
+               + TemplateManagerConstants.CONFIG_NAME_SEPARATOR + artifactType + sequenceNumber;
     }
 
     /**
@@ -503,8 +503,8 @@ public class ExecutionManagerHelper {
      * @return
      */
     public static String getStreamMappingPlanId(String domainName, String scenarioConfigName) {
-        return domainName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + scenarioConfigName
-                          + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + ExecutionManagerConstants.STREAM_MAPPING_PLAN_SUFFIX;
+        return domainName + TemplateManagerConstants.CONFIG_NAME_SEPARATOR + scenarioConfigName
+                          + TemplateManagerConstants.CONFIG_NAME_SEPARATOR + TemplateManagerConstants.STREAM_MAPPING_PLAN_SUFFIX;
     }
 
     /**
@@ -516,6 +516,6 @@ public class ExecutionManagerHelper {
      */
     public static String getCommonArtifactId(String domainName, String artifactType,
                                                 int sequenceNumber) {
-        return domainName + ExecutionManagerConstants.CONFIG_NAME_SEPARATOR + artifactType + sequenceNumber;
+        return domainName + TemplateManagerConstants.CONFIG_NAME_SEPARATOR + artifactType + sequenceNumber;
     }
 }

@@ -1,6 +1,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
-<%@ page import="org.wso2.carbon.event.template.manager.stub.ExecutionManagerAdminServiceStub" %>
-<%@ page import="org.wso2.carbon.event.template.manager.ui.ExecutionManagerUIUtils" %>
+<%@ page import="org.wso2.carbon.event.template.manager.stub.TemplateManagerAdminServiceStub" %>
+<%@ page import="org.wso2.carbon.event.template.manager.ui.TemplateManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.template.manager.admin.dto.configuration.xsd.ScenarioConfigurationDTO" %>
 <%@ page import="org.wso2.carbon.event.template.manager.admin.dto.configuration.xsd.ConfigurationParameterDTO" %>
 <%@ page import="org.wso2.carbon.event.template.manager.admin.dto.configuration.xsd.StreamMappingDTO" %>
@@ -42,7 +42,7 @@
 
     ConfigurationParameterDTO[] parameters;
 
-    ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
+    TemplateManagerAdminServiceStub proxy = TemplateManagerUIUtils.getTemplateManagerAdminService(config, session);
     try {
         if (saveType.equals("delete")) {
             proxy.deleteConfiguration(domainName, configuration);
@@ -82,7 +82,7 @@
                 String toStreamNameID="";
                 String fromStreamNameID="";
 
-                EventStreamAdminServiceStub eventStreamAdminServiceStub = ExecutionManagerUIUtils.getEventStreamAdminService(config,
+                EventStreamAdminServiceStub eventStreamAdminServiceStub = TemplateManagerUIUtils.getEventStreamAdminService(config,
                         session, request);
                 String[] fromStreamIds = eventStreamAdminServiceStub.getStreamNames();
 

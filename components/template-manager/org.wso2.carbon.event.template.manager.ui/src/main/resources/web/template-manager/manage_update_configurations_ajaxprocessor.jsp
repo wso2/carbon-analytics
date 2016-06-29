@@ -1,6 +1,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
-<%@ page import="org.wso2.carbon.event.template.manager.stub.ExecutionManagerAdminServiceStub" %>
-<%@ page import="org.wso2.carbon.event.template.manager.ui.ExecutionManagerUIUtils" %>
+<%@ page import="org.wso2.carbon.event.template.manager.stub.TemplateManagerAdminServiceStub" %>
+<%@ page import="org.wso2.carbon.event.template.manager.ui.TemplateManagerUIUtils" %>
 <%@ page import="org.wso2.carbon.event.template.manager.admin.dto.configuration.xsd.ScenarioConfigurationDTO" %>
 <%@ page import="org.wso2.carbon.event.template.manager.admin.dto.configuration.xsd.ConfigurationParameterDTO" %>
 <%@ page import="org.wso2.carbon.event.template.manager.admin.dto.configuration.xsd.StreamMappingDTO" %>
@@ -10,7 +10,7 @@
 <%@ page import="org.apache.axis2.AxisFault" %>
 <%@ page import="java.util.Arrays" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub" %>
-<%@ page import="org.wso2.carbon.event.template.manager.ui.ExecutionManagerUIConstants" %>
+<%@ page import="org.wso2.carbon.event.template.manager.ui.TemplateManagerUIConstants" %>
 <%@ page import="java.util.ArrayList" %>
 
 <%--
@@ -47,7 +47,7 @@
 
         ConfigurationParameterDTO[] parameters;
 
-        ExecutionManagerAdminServiceStub proxy = ExecutionManagerUIUtils.getExecutionManagerAdminService(config, session);
+        TemplateManagerAdminServiceStub proxy = TemplateManagerUIUtils.getTemplateManagerAdminService(config, session);
         try {
             if (saveType.equals("delete")) {
                 proxy.deleteConfiguration(domainName, configuration);
@@ -88,7 +88,7 @@
                     String fromStreamNameID = "";
                     StreamMappingDTO[] streamMappingDTOs = null;
 
-                    EventStreamAdminServiceStub eventStreamAdminServiceStub = ExecutionManagerUIUtils.getEventStreamAdminService(config,
+                    EventStreamAdminServiceStub eventStreamAdminServiceStub = TemplateManagerUIUtils.getEventStreamAdminService(config,
                             session, request);
                     String[] fromStreamIds = eventStreamAdminServiceStub.getStreamNames();
 
@@ -148,10 +148,10 @@
                     ArrayList<AttributeMappingDTO> payloadAttributeMappingDTOList = new ArrayList<AttributeMappingDTO>();
 
                     for (AttributeMappingDTO attributeMappingDTO : attributeMappingDTOs) {
-                        if (attributeMappingDTO.getToAttribute().startsWith(ExecutionManagerUIConstants.PROPERTY_META_PREFIX)) {
+                        if (attributeMappingDTO.getToAttribute().startsWith(TemplateManagerUIConstants.PROPERTY_META_PREFIX)) {
                             //set meta data
                             metaAttributeMappingDTOList.add(attributeMappingDTO);
-                        } else if (attributeMappingDTO.getToAttribute().startsWith(ExecutionManagerUIConstants.PROPERTY_CORRELATION_PREFIX)) {
+                        } else if (attributeMappingDTO.getToAttribute().startsWith(TemplateManagerUIConstants.PROPERTY_CORRELATION_PREFIX)) {
                             //set correlation data
                             correlationAttributeMappingDTOList.add(attributeMappingDTO);
                         } else {
@@ -166,14 +166,14 @@
                     if (fromStreamDefinitionDto.getMetaData() != null) {
                         //get meta data
                         for (EventStreamAttributeDto fromStreamMetaAttribute : fromStreamDefinitionDto.getMetaData()) {
-                            fromStreamMetaAttribute.setAttributeName(ExecutionManagerUIConstants.PROPERTY_META_PREFIX + fromStreamMetaAttribute.getAttributeName());
+                            fromStreamMetaAttribute.setAttributeName(TemplateManagerUIConstants.PROPERTY_META_PREFIX + fromStreamMetaAttribute.getAttributeName());
                             fromStreamAttributeArray.add(fromStreamMetaAttribute);
                         }
                     }
                     if (fromStreamDefinitionDto.getCorrelationData() != null) {
                         //get correlation data
                         for (EventStreamAttributeDto fromStreamCorrelationAttribute : fromStreamDefinitionDto.getCorrelationData()) {
-                            fromStreamCorrelationAttribute.setAttributeName(ExecutionManagerUIConstants.PROPERTY_CORRELATION_PREFIX + fromStreamCorrelationAttribute.getAttributeName());
+                            fromStreamCorrelationAttribute.setAttributeName(TemplateManagerUIConstants.PROPERTY_CORRELATION_PREFIX + fromStreamCorrelationAttribute.getAttributeName());
                             fromStreamAttributeArray.add(fromStreamCorrelationAttribute);
                         }
                     }
