@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterMan
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
@@ -110,26 +111,58 @@ public class AnalyticsSparkExecutorTest {
     public void testCreateTableUsingCompressedEventAnalytics() throws AnalyticsException, Exception {
         log.info(testString("start : create temp table using Compressed Event Analytics test"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
-        List<Record> records = generateRecordsForCompressedEventAnalytics(1, "CompressedEventsTable", false);
         this.service.deleteTable(1, "CompressedEventsTable");
         this.service.createTable(1, "CompressedEventsTable");
+        // Set schema
+        List<ColumnDefinition> columns = new ArrayList<ColumnDefinition>();
+        columns.add(new ColumnDefinition("meta_compressed", ColumnType.BOOLEAN));
+        columns.add(new ColumnDefinition("flowData", ColumnType.STRING));
+        AnalyticsSchema compressedEventsTableSchema = new  AnalyticsSchema(columns, null);
+        this.service.setTableSchema(1, "CompressedEventsTable", compressedEventsTableSchema);
+        // Put sample records to the table
+        List<Record> records = generateRecordsForCompressedEventAnalytics(1, "CompressedEventsTable", false);
         this.service.put(records);
-        
         ex.executeQuery(1, "CREATE TEMPORARY TABLE EventsTable USING CompressedEventAnalytics " +
             "OPTIONS(tableName \"CompressedEventsTable\", schema \"messageFlowId STRING, compotentType STRING, " +
             "componentName STRING, compotentIndex INT, componentId STRING, startTime LONG, endTime LONG, " +
             "duration FLOAT, beforePayload STRING, afterPayload STRING, contextPropertyMap STRING, " +
             "transportPropertyMap STRING, children STRING, entryPoint STRING, entryPointHashcode INT, faultCount INT," +
             " hashCode INT, host STRING, _tenantId INT, _timestamp LONG\")");
-        
         // Check the rows split
         AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM EventsTable");
         log.info(result);
         Assert.assertEquals(result.getRows().size(), 54, "Incorrect number of rows after spliting");
-        
-        result = ex.executeQuery(1, "SELECT * FROM EventsTable WHERE messageFlowId=\"urn_uuid_f403b0b6-4431-4a83-935d-c7b72867a111\"");
-        Assert.assertEquals(result.getRows().size(), 27, "Incorrect number of rows after spliting");
-        
+        // Check attribute count in a single event
+        Assert.assertEquals(result.getRows().get(0).size(), 20, "Incorrect number of fileds in an event, after " +
+                "decompressing");
+        result = ex.executeQuery(1, "SELECT * FROM EventsTable WHERE messageFlowId=\"urn_uuid_f403b0b6-4431-4a83-" +
+                "935d-c7b72867a111\"");
+        List<List<Object>> rowResults = result.getRows();
+        Assert.assertEquals(rowResults.size(), 27, "Incorrect number of rows after spliting");
+        // check the content of the decompressed events
+        log.info("Checking row content after decompressing..");
+        for (int i = 0 ; i < rowResults.size() ; i++) {
+            List<Object> fields = rowResults.get(i);
+            Assert.assertEquals(fields.get(0), "urn_uuid_f403b0b6-4431-4a83-935d-c7b72867a111", "Incorrect message Id");
+            String componentType;
+            if (i == 0) {
+                componentType = "Proxy Service";
+            } else {
+                componentType = "Mediator";
+            }
+            Assert.assertEquals(fields.get(1), componentType, "Incorrect component type.");
+            Assert.assertEquals(fields.get(2), "compName"+i, "Incorrect component name.");
+            Assert.assertEquals((int)fields.get(3), i, "Incorrect component index.");
+            Assert.assertEquals(fields.get(4), "compId"+i, "Incorrect component Id.");
+            //This is a stats-only event. Hence payload/properties should be null
+            for(int j = 8 ; j < 12 ; j++) {
+                Assert.assertEquals(fields.get(j), null, "Incorrect payloads/properties.");
+            }
+        }
+        // Check whether the original schema has been changed
+        AnalyticsSchema schema = this.service.getTableSchema(1, "CompressedEventsTable");
+        Map<String, ColumnDefinition> schemaCols = schema.getColumns();
+        Assert.assertEquals(schemaCols.size(), 2, "Compressed Events table's schema has changed after decompressing");
         this.service.deleteTable(1, "CompressedEventsTable");
         log.info(testString("end : create temp table using Compressed Event Analytics test"));
     }
