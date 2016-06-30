@@ -37,11 +37,11 @@ var getConfig, validate, isProviderRequired, draw, update;
          }
 
         for(var i=0; i < chartConf.length; i++) {
-            if (chartConf[i]["fieldName"] == "color" 
+            if (chartConf[i]["fieldName"] == "color"
                 || chartConf[i]["fieldName"] == "size" ) {
                 chartConf[i]["valueSet"] = columns;
             }
-        }     
+        }
 
         return chartConf;
     };
@@ -51,14 +51,14 @@ var getConfig, validate, isProviderRequired, draw, update;
      * @param chartConfig
      */
     validate = function(chartConfig) {
-
+        return true;
     };
 
     /**
      * TO be used when provider configuration steps need to be skipped
      */
     isProviderRequired = function() {
-        return true;
+
     }
 
 
@@ -129,5 +129,5 @@ var getConfig, validate, isProviderRequired, draw, update;
         return conf;
     };
 
-    
+
 }());
