@@ -22,7 +22,7 @@
     <parent>
         <artifactId>event-publisher-feature</artifactId>
         <groupId>org.wso2.carbon.analytics-common</groupId>
-        <version>5.1.0-beta</version>
+        <version>5.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
