@@ -1,0 +1,28 @@
+.titledChartContent {
+	top: 0px;
+  	position: absolute !important;
+   	color:steelblue !important;
+   	font-size:18px !important;
+}
+
+.valdChartContent {
+	top: -10px;
+	position: absolute !important;
+   	color:steelblue !important;
+   	font-size:50px !important;
+}
+
+
+.diffdChartContent {
+	top: 70px;
+	position: absolute !important;
+   	color:#ff944d !important;
+   	font-size:12px !important;
+}
+
+.diffPercentagedChartContent {
+	top: 80px;
+	position: absolute !important;
+   	color:#ff944d !important;
+   	font-size:12px !important;
+}
