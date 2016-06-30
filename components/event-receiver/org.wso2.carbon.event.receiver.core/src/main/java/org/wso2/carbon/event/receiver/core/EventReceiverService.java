@@ -34,7 +34,7 @@ public interface EventReceiverService {
     /**
      * Updates the event receiver according to the passed in {@link EventReceiverConfiguration}
      *
-     * @param originalEventReceiverName the original name of the event receiver
+     * @param eventReceiverConfigXml the XML configuration of the event receiver as a string
      * @param originalEventReceiverName the original name of the event receiver
      */
     public void editActiveEventReceiverConfiguration(String eventReceiverConfigXml,
@@ -139,5 +139,20 @@ public interface EventReceiverService {
     @Deprecated
     public String getEventReceiverStatusAsString(String filename);
 
+    /**
+     * Deploys the Event Receiver, as specified in the {@code eventReceiverConfigXml}.
+     *
+     * @param eventReceiverConfigXml Event Receiver Configuration, in XML format.
+     * @throws EventReceiverConfigurationException
+     */
     public void deployEventReceiverConfiguration(String eventReceiverConfigXml) throws EventReceiverConfigurationException;
+
+    /**
+     * Returns the Event Receiver Name as in the given {@code eventReceiverConfigXml}.
+     *
+     * @param eventReceiverConfigXml Event Receiver Configuration, in XML format.
+     * @return The name of the Event Receiver, as given in the {@code eventReceiverConfigXml}
+     */
+    public String getEventReceiverName(String eventReceiverConfigXml)
+            throws EventReceiverConfigurationException;
 }

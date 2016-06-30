@@ -87,7 +87,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
         try {
             omElement = AXIOMUtil.stringToOM(eventReceiverConfigXml);
         } catch (XMLStreamException e) {
-            throw new EventReceiverConfigurationException("Error parsing XML configuration of event receiver.");
+            throw new EventReceiverConfigurationException("Error parsing XML configuration of event receiver.", e);
         }
         EventReceiverConfigurationHelper.validateEventReceiverConfiguration(omElement);
         String eventReceiverName = EventReceiverConfigurationHelper.getEventReceiverName(omElement);
@@ -100,7 +100,19 @@ public class CarbonEventReceiverService implements EventReceiverService {
         } else {
             throw new EventReceiverConfigurationException("Mapping type of the Event Receiver " + eventReceiverName + " cannot be null");
         }
+    }
 
+    @Override
+    public String getEventReceiverName(String eventReceiverConfigXml)
+            throws EventReceiverConfigurationException {
+        OMElement omElement;
+        try {
+            omElement = AXIOMUtil.stringToOM(eventReceiverConfigXml);
+        } catch (XMLStreamException e) {
+            throw new EventReceiverConfigurationException("Error parsing XML configuration of event receiver.", e);
+        }
+        EventReceiverConfigurationHelper.validateEventReceiverConfiguration(omElement);
+        return EventReceiverConfigurationHelper.getEventReceiverName(omElement);
     }
 
 
