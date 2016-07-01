@@ -34,11 +34,11 @@ public class SearchTreeUIUtil {
     public static String getSearchGraghHTML(ExpressionNode expressionNode) throws InvalidExpressionNodeException {
         Set<String> graphElements = new LinkedHashSet<>();
         searchGraghHTML(expressionNode, graphElements);
-        String fullHTML = "";
+        StringBuilder fullHTML = new StringBuilder();
         for (String element : graphElements) {
-            fullHTML += element;
+            fullHTML.append(element);
         }
-        return fullHTML;
+        return fullHTML.toString();
     }
 
     private static void searchGraghHTML(ExpressionNode expressionNode, Set<String> graphElements)

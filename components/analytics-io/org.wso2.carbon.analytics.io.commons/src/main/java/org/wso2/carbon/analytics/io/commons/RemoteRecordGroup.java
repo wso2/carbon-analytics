@@ -43,7 +43,7 @@ public class RemoteRecordGroup implements RecordGroup {
     }
 
     @Override
-    public String[] getLocations() throws AnalyticsException {
+    public  String[] getLocations() throws AnalyticsException {
         return this.locations;
     }
 

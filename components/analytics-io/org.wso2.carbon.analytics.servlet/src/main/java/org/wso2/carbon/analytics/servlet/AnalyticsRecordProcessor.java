@@ -20,6 +20,8 @@ package org.wso2.carbon.analytics.servlet;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
@@ -45,7 +47,7 @@ import java.util.List;
 public class AnalyticsRecordProcessor extends HttpServlet {
 
     private static final long serialVersionUID = -6519267839269075681L;
-
+    private static final Log log = LogFactory.getLog(AnalyticsRecordProcessor.class);
     /**
      * Get record count
      *
@@ -91,8 +93,8 @@ public class AnalyticsRecordProcessor extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
             } else {
-                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
-                        + " with get request!");
+                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed with get request!");
+                log.error("unsupported operation performed : "+ operation + " with get request!");
             }
         }
     }
@@ -134,8 +136,8 @@ public class AnalyticsRecordProcessor extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
             } else {
-                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
-                        + " with get request!");
+                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed with get request!");
+                log.error("unsupported operation performed : "+ operation + " with get request!");
             }
         }
     }
@@ -190,8 +192,8 @@ public class AnalyticsRecordProcessor extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
             } else {
-                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
-                        + " with get request!");
+                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed with get request!");
+                log.error("unsupported operation performed : "+ operation + " with post request!");
             }
         }
     }

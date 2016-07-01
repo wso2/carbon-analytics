@@ -115,6 +115,7 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -1126,13 +1127,13 @@ public class AnalyticsDataIndexer {
                                                                      range.getFrom(), range.getTo(), true, false);
             } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.FLOAT) {
                 numericRangeQuery = NumericRangeQuery.newFloatRange(rangeField,
-                        new Double(range.getFrom()).floatValue(), new Double(range.getTo()).floatValue(), true, false);
+                        (float)range.getFrom(), (float)range.getTo(), true, false);
             } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.INTEGER) {
                 numericRangeQuery = NumericRangeQuery.newIntRange(rangeField,
-                        new Double(range.getFrom()).intValue(), new Double(range.getTo()).intValue(), true, false);
+                        (int)range.getFrom(),(int)range.getTo(), true, false);
             } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.LONG) {
                 numericRangeQuery = NumericRangeQuery.newLongRange(rangeField,
-                        new Double(range.getFrom()).longValue(), new Double(range.getTo()).longValue(), true, false);
+                        (long)range.getFrom(), (long)range.getTo(), true, false);
             }
         }
         return numericRangeQuery;
@@ -1479,7 +1480,8 @@ public class AnalyticsDataIndexer {
         case STRING:
             doc.add(new TextField(name, obj.toString(), Store.NO));
             //SortedDocValuesField is to sort STRINGs and search without tokenizing
-            doc.add(new SortedDocValuesField(name, new BytesRef(this.trimNonTokenizedIndexStringField(obj.toString()).getBytes())));
+            doc.add(new SortedDocValuesField(name, new BytesRef(this.trimNonTokenizedIndexStringField(obj.toString())
+                                                                        .getBytes(StandardCharsets.UTF_8))));
             doc.add(new StringField(Constants.NON_TOKENIZED_FIELD_PREFIX + name,
                                     this.trimNonTokenizedIndexStringField(obj.toString()), Store.NO));
             break;
@@ -1579,10 +1581,7 @@ public class AnalyticsDataIndexer {
         Map<String, ColumnDefinition> indices;
         try {
             AnalyticsSchema schema = this.indexerInfo.getAnalyticsDataService().getTableSchema(tenantId, tableName);
-            indices = schema.getIndexedColumns();
-            if (indices == null) {
-                indices = new HashMap<>();
-            }
+            indices = schema.getIndexedColumns(); //schema always returns not-null map
         } catch (AnalyticsException e) {
             log.error("Error while looking up table Schema: " + e.getMessage(), e);
             throw new AnalyticsIndexException("Error while looking up Table Schema: " + e.getMessage(), e);
@@ -2114,7 +2113,7 @@ public class AnalyticsDataIndexer {
         }
     }*/
 
-    private class NonStreamingAggregateRecordIterator implements AnalyticsIterator<Record> {
+    private static class NonStreamingAggregateRecordIterator implements AnalyticsIterator<Record> {
 
         private List<Record> records;
         private Iterator<Record> iterator;
@@ -2196,7 +2195,7 @@ public class AnalyticsDataIndexer {
     /**
      * This represents a re-indexing worker, who does index operations in the background.
      */
-    private class ReIndexWorker implements Runnable {
+    private static class ReIndexWorker implements Runnable {
 
         private AnalyticsDataIndexer indexer;
         private String tableName;
@@ -2239,7 +2238,7 @@ public class AnalyticsDataIndexer {
         }
     }
 
-    private class TaxonomyWorker implements Callable<Set<List<String>>> {
+    private static class TaxonomyWorker implements Callable<Set<List<String>>> {
 
         private AggregateRequest aggregateRequest;
         private AnalyticsDataIndexer indexer;

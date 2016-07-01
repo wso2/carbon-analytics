@@ -28,7 +28,6 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
@@ -77,6 +76,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -478,7 +478,7 @@ public class AnalyticsResource extends AbstractResource {
             @Override
             public void write(OutputStream outputStream)
                     throws IOException, WebApplicationException {
-                Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+                Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
                 recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
                 while (iterator.hasNext()) {
                     RecordBean recordBean = Utils.createRecordBean(iterator.next());
@@ -618,7 +618,7 @@ public class AnalyticsResource extends AbstractResource {
             @Override
             public void write(OutputStream outputStream)
                     throws IOException, WebApplicationException {
-                Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+                Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
                 recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
                     while (iterator.hasNext()) {
                         RecordBean recordBean = Utils.createRecordBean(iterator.next());
@@ -1002,7 +1002,7 @@ public class AnalyticsResource extends AbstractResource {
                 @Override
                 public void write(OutputStream outputStream)
                         throws IOException, WebApplicationException {
-                    Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+                    Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
                     recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
                     for (int i=0; i < iterators.size(); i++) {
                         recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
@@ -1057,7 +1057,7 @@ public class AnalyticsResource extends AbstractResource {
                 @Override
                 public void write(OutputStream outputStream)
                         throws IOException, WebApplicationException {
-                    Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+                    Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
                     recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
                     while (iterator.hasNext()) {
                         Record record = iterator.next();

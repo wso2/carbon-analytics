@@ -18,14 +18,15 @@
 
 package org.wso2.carbon.analytics.tools.migration;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import me.prettyprint.cassandra.serializers.*;
+import me.prettyprint.cassandra.serializers.AsciiSerializer;
+import me.prettyprint.cassandra.serializers.BooleanSerializer;
+import me.prettyprint.cassandra.serializers.ByteBufferSerializer;
+import me.prettyprint.cassandra.serializers.BytesArraySerializer;
+import me.prettyprint.cassandra.serializers.DoubleSerializer;
+import me.prettyprint.cassandra.serializers.FloatSerializer;
+import me.prettyprint.cassandra.serializers.IntegerSerializer;
+import me.prettyprint.cassandra.serializers.LongSerializer;
+import me.prettyprint.cassandra.serializers.StringSerializer;
 import me.prettyprint.cassandra.service.CassandraHostConfigurator;
 import me.prettyprint.hector.api.Cluster;
 import me.prettyprint.hector.api.Keyspace;
@@ -38,13 +39,24 @@ import me.prettyprint.hector.api.ddl.KeyspaceDefinition;
 import me.prettyprint.hector.api.factory.HFactory;
 import me.prettyprint.hector.api.query.QueryResult;
 import me.prettyprint.hector.api.query.RangeSlicesQuery;
-
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class represents the Migration functionality, from Cassandra to new DAL.
@@ -161,11 +173,13 @@ public class AnalyticsDataMigrationTool {
         }
         //adding the column definitions into a map <columnName,columnDefinition>
         Map<String, ColumnDefinition> columnDefinitionMap = new HashMap<>();
-        for (ColumnDefinition columnDefinition : columnFamilyDefinition.getColumnMetadata()) {
-            columnDefinitionMap
-                    .put(Charset.defaultCharset().decode(columnDefinition.getName()).toString(), columnDefinition);
+        if (columnFamilyDefinition != null) {
+            for (ColumnDefinition columnDefinition : columnFamilyDefinition.getColumnMetadata()) {
+                columnDefinitionMap
+                        .put(Charset.defaultCharset().decode(columnDefinition.getName()).toString(), columnDefinition);
+            }
         }
-        if (columnDefinitionMap == null) {
+        if (columnDefinitionMap.isEmpty()) {
             System.out.println("The column Family could not be found in the keyspace...");
             System.exit(0);
         }

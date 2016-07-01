@@ -224,27 +224,27 @@ public class Utils {
                     break;
                 }
                 case RecordValueEntryBean.INTEGER: {
-                    recordValueEntryBean.setIntValue(Integer.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setIntValue(Integer.parseInt(String.valueOf(value)));
                     recordValueEntryBean.setType(RecordValueEntryBean.INTEGER);
                     break;
                 }
                 case RecordValueEntryBean.LONG: {
-                    recordValueEntryBean.setLongValue(Long.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setLongValue(Long.parseLong(String.valueOf(value)));
                     recordValueEntryBean.setType(RecordValueEntryBean.LONG);
                     break;
                 }
                 case RecordValueEntryBean.BOOLEAN: {
-                    recordValueEntryBean.setBooleanValue(Boolean.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setBooleanValue(Boolean.parseBoolean(String.valueOf(value)));
                     recordValueEntryBean.setType(RecordValueEntryBean.BOOLEAN);
                     break;
                 }
                 case RecordValueEntryBean.FLOAT: {
-                    recordValueEntryBean.setFloatValue(Float.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setFloatValue(Float.parseFloat(String.valueOf(value)));
                     recordValueEntryBean.setType(RecordValueEntryBean.FLOAT);
                     break;
                 }
                 case RecordValueEntryBean.DOUBLE: {
-                    recordValueEntryBean.setDoubleValue(Double.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setDoubleValue(Double.parseDouble(String.valueOf(value)));
                     recordValueEntryBean.setType(RecordValueEntryBean.DOUBLE);
                     break;
                 }

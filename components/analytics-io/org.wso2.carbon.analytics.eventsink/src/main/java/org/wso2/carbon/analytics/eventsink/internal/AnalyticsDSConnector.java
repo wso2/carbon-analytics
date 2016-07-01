@@ -215,7 +215,7 @@ public class AnalyticsDSConnector {
         for (Attribute attribute : attributes) {
             if (AnalyticsEventSinkConstants.PAYLOAD_TIMESTAMP.equals(attribute.getName())) {
                 if (values[iteration] != null) {
-                    timestamp = (long) values[iteration];
+                    timestamp = (Long) values[iteration];
                     continue;
                 } else {
                     log.error("Timestamp value is null.");

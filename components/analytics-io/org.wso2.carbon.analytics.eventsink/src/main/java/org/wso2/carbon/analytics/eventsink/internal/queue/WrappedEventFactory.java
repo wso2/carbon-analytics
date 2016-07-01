@@ -26,7 +26,7 @@ public class WrappedEventFactory implements EventFactory<WrappedEventFactory.Wra
         return new WrappedEvent();
     }
 
-    public class WrappedEvent {
+    public static class WrappedEvent {
 
         private Event event;
         private int size;

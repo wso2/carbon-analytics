@@ -304,7 +304,8 @@ public class AnalyticsRecordStoreTest {
         }
         this.cleanupT1();
         this.analyticsRS.createTable(7, "T1");
-        int count = (int) (2000 * Math.random()) + 1;
+        Random r = new Random();
+        int count = (r.nextInt(2000)) + 1;
         List<Record> records = generateRecords(7, "T1", 1, count, 15000, 333);
         this.analyticsRS.put(records);
         long res = this.analyticsRS.getRecordCount(7, "T1", Long.MIN_VALUE, Long.MAX_VALUE);

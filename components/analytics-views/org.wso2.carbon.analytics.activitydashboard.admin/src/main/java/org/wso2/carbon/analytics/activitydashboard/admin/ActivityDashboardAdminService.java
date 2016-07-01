@@ -246,9 +246,6 @@ public class ActivityDashboardAdminService extends AbstractAdmin {
 
     private RecordBean getRecordBean(Record record) {
         RecordBean recordBean = new RecordBean();
-        RecordId id = new RecordId();
-        id.setRecordId(record.getId());
-        id.setTableName(record.getTableName());
         recordBean.setTimeStamp(record.getTimestamp());
         Map<String, Object> columns = record.getNotNullValues();
         ColumnEntry[] columnEntries = new ColumnEntry[columns.size()];

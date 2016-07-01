@@ -233,7 +233,7 @@ public class AnalyticsJSServiceConnector {
             if (logger.isDebugEnabled()) {
                 logger.debug("RecordCount for tableName: " + tableName + " is " + recordCount);
             }
-            return handleResponse(ResponseStatus.SUCCESS, (new Long(recordCount)).toString());
+            return handleResponse(ResponseStatus.SUCCESS, Long.toString(recordCount));
         } catch (Exception e) {
             logger.error("Failed to get record count for table: " + tableName + ": " + e.getMessage(), e);
             return handleResponse(ResponseStatus.FAILED, "Failed to get record count for table: " +

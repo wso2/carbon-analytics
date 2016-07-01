@@ -18,6 +18,8 @@
 package org.wso2.carbon.analytics.servlet;
 
 import org.apache.axiom.om.util.Base64;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
@@ -29,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This servlet intend to process the request which controls overall analytics data api operations.
@@ -36,7 +39,7 @@ import java.io.PrintWriter;
 public class AnalyticsManagementProcessor extends HttpServlet {
 
     private static final long serialVersionUID = 1239990860409556231L;
-
+    private static final Log log = LogFactory.getLog(AnalyticsManagementProcessor.class);
     /**
      * Login operation for remote analytics api servlet.
      *
@@ -106,7 +109,8 @@ public class AnalyticsManagementProcessor extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             }
         } else {
-            resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Unavailable operation - " + operation + " provided!");
+            resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Unavailable operation provided!");
+            log.error("unsupported operation performed : "+ operation + " with get request!");
         }
     }
 
@@ -117,7 +121,7 @@ public class AnalyticsManagementProcessor extends HttpServlet {
         if (!authHeader.startsWith("Basic ")) {
             return null;
         }
-        String[] userPassword = new String(Base64.decode(authHeader.substring(6))).split(":");
+        String[] userPassword = new String(Base64.decode(authHeader.substring(6)), StandardCharsets.UTF_8).split(":");
         if (userPassword.length != 2) {
             return null;
         }

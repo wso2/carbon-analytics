@@ -20,6 +20,8 @@ package org.wso2.carbon.analytics.servlet;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateField;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -54,7 +56,7 @@ import java.util.List;
 public class AnalyticsSearchProcessor extends HttpServlet {
 
     private static final long serialVersionUID = 1519852648874078342L;
-
+    private static final Log log = LogFactory.getLog(AnalyticsSearchProcessor.class);
     /**
      * Search the table
      *
@@ -149,8 +151,8 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
             } else {
-                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
-                        + " with get request!");
+                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed with get request!");
+                log.error("unsupported operation performed : "+ operation + " with get request!");
             }
         }
     }
@@ -194,8 +196,8 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                     .equalsIgnoreCase(AnalyticsAPIConstants.SEARCH_MULTITABLES_WITH_AGGREGATES_OPERATION)) {
                 doSearchMultiTablesWithAggregates(req, resp, securityEnabled, tenantIdParam, userName);
             } else {
-                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
-                        + " with get request!");
+                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed with get request!");
+                log.error("unsupported operation performed : "+ operation + " with get request!");
             }
         }
     }

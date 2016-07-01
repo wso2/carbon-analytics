@@ -17,6 +17,9 @@
 */
 package org.wso2.carbon.analytics.servlet;
 
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
@@ -33,6 +36,7 @@ import java.util.List;
 public class AnalyticsRecordStoreProcessor extends HttpServlet {
 
     private static final long serialVersionUID = 5655324228428424513L;
+    private static final Log log = LogFactory.getLog(AnalyticsRecordStoreProcessor.class);
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
@@ -79,8 +83,8 @@ public class AnalyticsRecordStoreProcessor extends HttpServlet {
                 GenericUtils.serializeObject(recordStores, resp.getOutputStream());
                 resp.setStatus(HttpServletResponse.SC_OK);
             } else {
-                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
-                        + " with get request!");
+                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed with get request!");
+                log.error("unsupported operation performed : "+ operation + " with get request!");
             }
         }
     }
