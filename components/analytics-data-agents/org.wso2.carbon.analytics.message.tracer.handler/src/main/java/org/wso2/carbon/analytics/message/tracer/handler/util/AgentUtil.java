@@ -50,13 +50,11 @@ public class AgentUtil {
 
         if ((tracingInfo != null) && (properties != null)) {
             Map<String, String> transportHeaders = new HashMap<String, String>(properties.size());
-            for (String headerName : properties.keySet()) {
-                Object headerValue = properties.get(headerName);
-                if (headerValue != null) {
-                    transportHeaders.put(TRANSPORT_HEADER + headerName, headerValue.toString());
+            for (Map.Entry<String, Object> headerEntry : properties.entrySet()) {
+                if (headerEntry.getValue() != null) {
+                    transportHeaders.put(TRANSPORT_HEADER + headerEntry.getKey(), headerEntry.getValue().toString());
                 }
             }
-
             if (tracingInfo.getAdditionalValues() != null) {
                 tracingInfo.getAdditionalValues().putAll(transportHeaders);
             } else {
