@@ -51,11 +51,11 @@ public class CassandraTokenRange implements Serializable {
         return end;
     }
 
-    public void addHost(Host host) {
+    protected void addHost(Host host) {
         this.hosts.add(host);
     }
 
-    public List<Host> getHosts() {
+    protected List<Host> getHosts() {
         return hosts;
     }
 
