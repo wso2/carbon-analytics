@@ -50,11 +50,9 @@ import scala.reflect.ClassTag$;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 
 import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.extractFieldsFromColumns;
-import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.extractFieldsFromString;
 import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.isEmptyAnalyticsSchema;
 import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.isEmptySchema;
 
@@ -82,35 +80,6 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     private boolean mergeFlag;
 
     public AnalyticsRelation() {
-    }
-
-    public AnalyticsRelation(int tenantId, String recordStore, String tableName,
-                             SQLContext sqlContext, String incParams,
-                             boolean globalTenantAccess, String schemaString, String primaryKeys, boolean mergeFlag) {
-        this.tenantId = tenantId;
-        this.recordStore = recordStore;
-        this.tableName = tableName;
-        this.sqlContext = sqlContext;
-        try {
-            AnalyticsSchema analyticsSchema = ServiceHolder.getAnalyticsDataService().getTableSchema(
-                    tenantId, tableName);
-            if (isEmptyAnalyticsSchema(analyticsSchema)) {
-                log.warn(this.tableName + " table created with an empty schema. Aborting creating the relation");
-                throw new RuntimeException("Analytics Relation created with an empty schema for " +
-                                           "table" + this.tableName);
-            } else {
-                this.schema = new StructType(extractFieldsFromColumns(analyticsSchema.getColumns()));
-            }
-        } catch (AnalyticsException e) {
-            String msg = "Failed to load the schema for table " + tableName + " : " + e.getMessage();
-            log.error(msg, e);
-            throw new RuntimeException(msg, e);
-        }
-        setIncParams(incParams);
-        this.globalTenantAccess = globalTenantAccess;
-        this.schemaString = schemaString;
-        this.primaryKeys = primaryKeys;
-        this.mergeFlag = mergeFlag;
     }
 
     public AnalyticsRelation(int tenantId, String recordStore, String tableName,
@@ -192,10 +161,10 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             targetTenantId = this.tenantId;
         }
         return getAnalyticsRDD(targetTenantId, this.tableName,
-                                new ArrayList<>(Arrays.asList(this.schema.fieldNames())),
-                                this.sqlContext.sparkContext(), scala.collection.Seq$.MODULE$.empty(),
-                                ClassTag$.MODULE$.<Row>apply(Row.class), startTime, endTime, this.incEnable,
-                                this.incID);
+                               new ArrayList<>(Arrays.asList(this.schema.fieldNames())),
+                               this.sqlContext.sparkContext(), (Seq<Dependency<?>>) scala.collection.Seq$.MODULE$.empty(),
+                               ClassTag$.MODULE$.<Row>apply(Row.class), startTime, endTime, this.incEnable,
+                               this.incID);
     }
 
     private void logDebug(String s) {
@@ -222,7 +191,11 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         AnalyticsDataService dataService = ServiceHolder.getAnalyticsDataService();
         int targetTenantId;
         if (this.globalTenantAccess) {
-            targetTenantId = Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID;
+            if (this.tenantId == MultitenantConstants.SUPER_TENANT_ID) {
+                targetTenantId = Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID;
+            } else {
+                throw new RuntimeException("Global tenant write can only be done by the super tenant");
+            }
         } else {
             targetTenantId = this.tenantId;
         }

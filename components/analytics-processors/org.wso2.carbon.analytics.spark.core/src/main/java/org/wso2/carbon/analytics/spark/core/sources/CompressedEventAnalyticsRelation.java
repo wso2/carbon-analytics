@@ -48,20 +48,6 @@ public class CompressedEventAnalyticsRelation extends AnalyticsRelation implemen
      * 
      * @param tenantId      Tenant ID
      * @param recordStore   Record Store name
-     * @param tableName     Name of the table
-     * @param sqlContext    Spark SQl Context
-     */
-    public CompressedEventAnalyticsRelation(int tenantId, String recordStore, String tableName, SQLContext sqlContext,
-            String incParams, boolean globalTenantAccess, String schemaString, String primaryKeys, boolean mergeFlag) {
-        super(tenantId, recordStore, tableName, sqlContext,incParams, globalTenantAccess, schemaString, primaryKeys,
-            mergeFlag);
-    }
-
-    /**
-     * Creates a relation between the spark table and physical DB table.
-     * 
-     * @param tenantId      Tenant ID
-     * @param recordStore   Record Store name
      * @param tableName     Table name
      * @param sqlContext    Spark SQL Context
      * @param schema        Schema of the Table

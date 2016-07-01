@@ -30,7 +30,7 @@ public class SparkJDBCQueryConfigEntry {
 
     private String databaseName;
 
-    private double version;
+    private String version = "";
 
     private String tableCheckQuery;
 
@@ -44,7 +44,7 @@ public class SparkJDBCQueryConfigEntry {
 
     private String recordMergeQuery;
 
-    private String quoteMark;
+    private String quoteMark = "";
 
     private SparkJDBCTypeMapping sparkJDBCTypeMapping;
 
@@ -57,12 +57,12 @@ public class SparkJDBCQueryConfigEntry {
         return databaseName;
     }
 
-    public void setVersion(double version) {
+    public void setVersion(String version) {
         this.version = version;
     }
 
     @XmlAttribute(name = "version")
-    public double getVersion() {
+    public String getVersion() {
         return version;
     }
 

@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionExceptio
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
+import org.wso2.carbon.base.MultitenantConstants;
 import scala.collection.immutable.Map;
 import scala.runtime.AbstractFunction0;
 
@@ -74,6 +75,13 @@ public class AnalyticsRelationProvider implements RelationProvider,
     @Override
     public AnalyticsRelation createRelation(SQLContext sqlContext, Map<String, String> parameters) {
         setParameters(parameters);
+        doTableActions();
+        return getAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
+                                    this.schemaStruct, this.incParams, this.globalTenantAccess,
+                                    this.schemaString, this.primaryKeys, this.mergeFlag);
+    }
+
+    private void doTableActions() {
         try {
             createTableIfNotExist();
         } catch (AnalyticsExecutionException e) {
@@ -81,21 +89,12 @@ public class AnalyticsRelationProvider implements RelationProvider,
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }
-        if (AnalyticsCommonUtils.isSchemaProvided(this.schemaString)) {
-            try {
-                setSchemaIfProvided();
-            } catch (AnalyticsExecutionException e) {
-                String msg = "Error while merging the schema for the table : " + this.tableName + " : " + e.getMessage();
-                log.error(msg, e);
-                throw new RuntimeException(msg, e);
-            }
-            return getAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
-                                         this.schemaStruct, this.incParams, this.globalTenantAccess,
-                                         this.schemaString, this.primaryKeys, this.mergeFlag);
-        } else {
-            return getAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
-                                         this.incParams, this.globalTenantAccess,
-                                         this.schemaString, this.primaryKeys, this.mergeFlag);
+        try {
+            setSchemaIfProvided();
+        } catch (AnalyticsExecutionException e) {
+            String msg = "Error while merging the schema for the table : " + this.tableName + " : " + e.getMessage();
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
         }
     }
 
@@ -111,7 +110,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
         this.mergeFlag = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.MERGE_SCHEMA,
                                                                    parameters, String.valueOf(true)));
         this.globalTenantAccess = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.GLOBAL_TENANT_ACCESS,
-                parameters, String.valueOf(false)));
+                                                                            parameters, String.valueOf(false)));
         this.incParams = extractValuesFromMap(AnalyticsConstants.INC_PARAMS, parameters, "");
     }
 
@@ -121,23 +120,43 @@ public class AnalyticsRelationProvider implements RelationProvider,
         }
         if (this.tableName.isEmpty()) {
             throw new AnalyticsExecutionException("Empty " + AnalyticsConstants.TABLE_NAME + " OR "
-                    + AnalyticsConstants.STREAM_NAME);
+                                                  + AnalyticsConstants.STREAM_NAME);
         }
         int targetTenantId;
         if (this.globalTenantAccess) {
-            targetTenantId = Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID;
+            if (this.tenantId == MultitenantConstants.SUPER_TENANT_ID) {
+                targetTenantId = Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID;
+            } else {
+                throw new RuntimeException("Global tenant write can only be done by the super tenant");
+            }
         } else {
             targetTenantId = this.tenantId;
         }
         this.createTableIfNotExist(targetTenantId, this.tableName);
     }
-    
+
     private void createTableIfNotExist(int targetTenantId, String targetTableName) throws AnalyticsExecutionException {
         try {
             AnalyticsCommonUtils.createTableIfNotExists(this.dataService, this.recordStore, targetTenantId, targetTableName);
         } catch (AnalyticsException e) {
             throw new AnalyticsExecutionException("Error while accessing table " + targetTableName + " : " + e.getMessage(), e);
         }
+    }
+
+    protected AnalyticsSchema createAnalyticsTableSchema(AnalyticsDataService ads, int targetTenantId,
+                                                         String targetTableName,
+                                                         String schemaString, String primaryKeys,
+                                                         boolean globalTenantAccess, boolean mergeFlag)
+            throws AnalyticsException {
+        return AnalyticsCommonUtils.createAnalyticsTableSchema(ads, targetTenantId, targetTableName, schemaString,
+                                                               primaryKeys, globalTenantAccess, mergeFlag, false);
+    }
+
+    protected StructType createSparkSchemaStruct(AnalyticsDataService ads, int targetTenantId, String targetTableName,
+                                                 String schemaString, String primaryKeys, boolean globalTenantAccess,
+                                                 boolean mergeFlag) throws AnalyticsException {
+        return AnalyticsCommonUtils.createSparkSchemaStruct(ads, targetTenantId, targetTableName, schemaString,
+                                                            primaryKeys, globalTenantAccess, mergeFlag);
     }
 
     private void setSchemaIfProvided() throws AnalyticsExecutionException {
@@ -147,8 +166,17 @@ public class AnalyticsRelationProvider implements RelationProvider,
         } else {
             targetTenantId = this.tenantId;
         }
-        this.schemaStruct = AnalyticsCommonUtils.setSchemaIfProvided(this.dataService, this.schemaString, this.globalTenantAccess,
-                this.primaryKeys, this.mergeFlag, targetTenantId, this.tableName);
+        try {
+            AnalyticsSchema schema = this.createAnalyticsTableSchema(this.dataService, targetTenantId, this.tableName,
+                                                                     this.schemaString, this.primaryKeys, this.globalTenantAccess, this.mergeFlag);
+            if (schema != null) {
+                this.dataService.setTableSchema(targetTenantId, this.tableName, schema);
+            }
+            this.schemaStruct = this.createSparkSchemaStruct(this.dataService, targetTenantId,
+                                                             this.tableName, this.schemaString, this.primaryKeys, this.globalTenantAccess, this.mergeFlag);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsExecutionException("Error in setting provided schema: " + e.getMessage(), e);
+        }
     }
 
     private String extractValuesFromMap(String key, Map<String, String> map,
@@ -159,7 +187,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
             }
         });
     }
-    
+
     /**
      * Returns a new base relation with the given parameters and user defined schema.
      * Note: the parameters' keywords are case insensitive and this insensitivity is enforced
@@ -176,21 +204,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
         //This exctracts the schema information, set schema in the ds and create a new analytics relationNOTE: this schema contains comments, which are included in the metadata fields
 
         setParameters(parameters);
-        try {
-            createTableIfNotExist();
-        } catch (AnalyticsExecutionException e) {
-            String msg = "Error while creating the table : " + this.tableName + " : " + e.getMessage();
-            log.error(msg, e);
-            throw new RuntimeException(msg, e);
-        }
-        try {
-            setSchemaIfProvided();
-        } catch (AnalyticsExecutionException e) {
-            String msg = "Error while merging the schema for the table : " + this.tableName + " : " + e.getMessage();
-            log.error(msg, e);
-            throw new RuntimeException(msg, e);
-        }
-
+        doTableActions();
         try {
             AnalyticsSchema schemaFromDS;
             schemaFromDS = dataService.getTableSchema(this.tenantId, this.tableName);
@@ -206,21 +220,16 @@ public class AnalyticsRelationProvider implements RelationProvider,
         }
 
         return getAnalyticsRelation(this.tenantId, this.tableName, this.recordStore, sqlContext,
-                                     schema, this.incParams, this.globalTenantAccess,
-                                     this.schemaString, this.primaryKeys, this.mergeFlag);
+                                    schema, this.incParams, this.globalTenantAccess,
+                                    this.schemaString, this.primaryKeys, this.mergeFlag);
     }
-    
+
+
     protected AnalyticsRelation getAnalyticsRelation(int tenantId, String recordStore, String tableName,
-            SQLContext sqlContext, StructType schema, String incParams, boolean globalTenantAccess, 
-            String schemaString, String primaryKeys, boolean mergeFlag) {
-        return new AnalyticsRelation(tenantId, recordStore, tableName, sqlContext, schema, incParams, 
-            globalTenantAccess, schemaString, primaryKeys, mergeFlag);
-    }
-    
-    protected AnalyticsRelation getAnalyticsRelation(int tenantId, String recordStore, String tableName,
-            SQLContext sqlContext, String incParams, boolean globalTenantAccess, String schemaString,
-            String primaryKeys, boolean mergeFlag) {
-        return new AnalyticsRelation(tenantId, recordStore, tableName, sqlContext, incParams, globalTenantAccess,
-            schemaString, primaryKeys, mergeFlag);
+                                                     SQLContext sqlContext, StructType schema, String incParams,
+                                                     boolean globalTenantAccess,
+                                                     String schemaString, String primaryKeys, boolean mergeFlag) {
+        return new AnalyticsRelation(tenantId, recordStore, tableName, sqlContext, schema, incParams,
+                                     globalTenantAccess, schemaString, primaryKeys, mergeFlag);
     }
 }

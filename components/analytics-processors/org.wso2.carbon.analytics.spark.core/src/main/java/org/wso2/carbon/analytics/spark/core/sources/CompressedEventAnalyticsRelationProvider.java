@@ -23,6 +23,10 @@ import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.sources.RelationProvider;
 import org.apache.spark.sql.sources.SchemaRelationProvider;
 import org.apache.spark.sql.types.StructType;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 
 /**
  * This class allows spark to communicate with the the Analytics Dataservice when used in Spark SQL
@@ -45,10 +49,18 @@ public class CompressedEventAnalyticsRelationProvider extends AnalyticsRelationP
     }
     
     @Override
-    protected AnalyticsRelation getAnalyticsRelation(int tenantId, String recordStore, String tableName,
-            SQLContext sqlContext, String incParams, boolean globalTenantAccess, String schemaString,  String primaryKeys,
-            boolean mergeFlag) {
-        return new CompressedEventAnalyticsRelation(tenantId, recordStore, tableName, sqlContext, incParams, 
-            globalTenantAccess, schemaString, primaryKeys, mergeFlag);
+    protected AnalyticsSchema createAnalyticsTableSchema(AnalyticsDataService ads, int targetTenantId, String targetTableName, 
+            String schemaString, String primaryKeys, boolean globalTenantAccess, boolean mergeFlag) throws AnalyticsException {
+        /* we don't want this provider to update the target analytics table schema */
+        return null;
     }
+    
+    @Override
+    protected StructType createSparkSchemaStruct(AnalyticsDataService ads, int targetTenantId, String targetTableName, 
+            String schemaString, String primaryKeys, boolean globalTenantAccess, boolean mergeFlag) throws AnalyticsException {
+        /* this should not merge with the original analytics table schema, which is the compressed one */
+        return AnalyticsCommonUtils.createSparkSchemaStruct(ads, targetTenantId, targetTableName, schemaString, 
+                primaryKeys, globalTenantAccess, false);
+    }
+    
 }

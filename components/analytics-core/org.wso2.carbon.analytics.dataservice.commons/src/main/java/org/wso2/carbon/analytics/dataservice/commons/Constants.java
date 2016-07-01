@@ -27,10 +27,6 @@ public class Constants {
     public static final String MIN_AGGREGATE = "MIN";
     public static final String MAX_AGGREGATE = "MAX";
     public static final String FIRST_AGGREGATE = "FIRST";
-
-    public final class AggregateOptionalParams {
-        public static final String COUNT = "aggregateCount";
-    }
     
 }
 

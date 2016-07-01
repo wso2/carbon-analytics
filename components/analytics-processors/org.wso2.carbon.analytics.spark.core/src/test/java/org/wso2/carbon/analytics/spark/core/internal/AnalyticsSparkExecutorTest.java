@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.analytics.spark.core.internal;
 
 import org.apache.commons.io.IOUtils;
@@ -27,15 +26,18 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
+import org.wso2.carbon.base.MultitenantConstants;
 
 import javax.naming.NamingException;
 
@@ -46,6 +48,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -108,26 +111,58 @@ public class AnalyticsSparkExecutorTest {
     public void testCreateTableUsingCompressedEventAnalytics() throws AnalyticsException, Exception {
         log.info(testString("start : create temp table using Compressed Event Analytics test"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
-        List<Record> records = generateRecordsForCompressedEventAnalytics(1, "CompressedEventsTable", false);
         this.service.deleteTable(1, "CompressedEventsTable");
         this.service.createTable(1, "CompressedEventsTable");
+        // Set schema
+        List<ColumnDefinition> columns = new ArrayList<ColumnDefinition>();
+        columns.add(new ColumnDefinition("meta_compressed", ColumnType.BOOLEAN));
+        columns.add(new ColumnDefinition("flowData", ColumnType.STRING));
+        AnalyticsSchema compressedEventsTableSchema = new  AnalyticsSchema(columns, null);
+        this.service.setTableSchema(1, "CompressedEventsTable", compressedEventsTableSchema);
+        // Put sample records to the table
+        List<Record> records = generateRecordsForCompressedEventAnalytics(1, "CompressedEventsTable", false);
         this.service.put(records);
-        
         ex.executeQuery(1, "CREATE TEMPORARY TABLE EventsTable USING CompressedEventAnalytics " +
             "OPTIONS(tableName \"CompressedEventsTable\", schema \"messageFlowId STRING, compotentType STRING, " +
             "componentName STRING, compotentIndex INT, componentId STRING, startTime LONG, endTime LONG, " +
             "duration FLOAT, beforePayload STRING, afterPayload STRING, contextPropertyMap STRING, " +
             "transportPropertyMap STRING, children STRING, entryPoint STRING, entryPointHashcode INT, faultCount INT," +
             " hashCode INT, host STRING, _tenantId INT, _timestamp LONG\")");
-        
         // Check the rows split
         AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM EventsTable");
         log.info(result);
         Assert.assertEquals(result.getRows().size(), 54, "Incorrect number of rows after spliting");
-        
-        result = ex.executeQuery(1, "SELECT * FROM EventsTable WHERE messageFlowId=\"urn_uuid_f403b0b6-4431-4a83-935d-c7b72867a111\"");
-        Assert.assertEquals(result.getRows().size(), 27, "Incorrect number of rows after spliting");
-        
+        // Check attribute count in a single event
+        Assert.assertEquals(result.getRows().get(0).size(), 20, "Incorrect number of fileds in an event, after " +
+                "decompressing");
+        result = ex.executeQuery(1, "SELECT * FROM EventsTable WHERE messageFlowId=\"urn_uuid_f403b0b6-4431-4a83-" +
+                "935d-c7b72867a111\"");
+        List<List<Object>> rowResults = result.getRows();
+        Assert.assertEquals(rowResults.size(), 27, "Incorrect number of rows after spliting");
+        // check the content of the decompressed events
+        log.info("Checking row content after decompressing..");
+        for (int i = 0 ; i < rowResults.size() ; i++) {
+            List<Object> fields = rowResults.get(i);
+            Assert.assertEquals(fields.get(0), "urn_uuid_f403b0b6-4431-4a83-935d-c7b72867a111", "Incorrect message Id");
+            String componentType;
+            if (i == 0) {
+                componentType = "Proxy Service";
+            } else {
+                componentType = "Mediator";
+            }
+            Assert.assertEquals(fields.get(1), componentType, "Incorrect component type.");
+            Assert.assertEquals(fields.get(2), "compName"+i, "Incorrect component name.");
+            Assert.assertEquals((int)fields.get(3), i, "Incorrect component index.");
+            Assert.assertEquals(fields.get(4), "compId"+i, "Incorrect component Id.");
+            //This is a stats-only event. Hence payload/properties should be null
+            for(int j = 8 ; j < 12 ; j++) {
+                Assert.assertEquals(fields.get(j), null, "Incorrect payloads/properties.");
+            }
+        }
+        // Check whether the original schema has been changed
+        AnalyticsSchema schema = this.service.getTableSchema(1, "CompressedEventsTable");
+        Map<String, ColumnDefinition> schemaCols = schema.getColumns();
+        Assert.assertEquals(schemaCols.size(), 2, "Compressed Events table's schema has changed after decompressing");
         this.service.deleteTable(1, "CompressedEventsTable");
         log.info(testString("end : create temp table using Compressed Event Analytics test"));
     }
@@ -600,15 +635,15 @@ public class AnalyticsSparkExecutorTest {
                        "(tableName \"Log9\"" +
                        ")";
         boolean success = false;
-        try {
+//        try {
             ex.executeQuery(1, query);
-        } catch (Exception e) {
-            System.out.println("Query failed with : " + e.getMessage());
-            success = true;
-        }
-        Assert.assertTrue(success, "Query did not fail!");
+//        } catch (Exception e) {
+//            System.out.println("Query failed with : " + e.getMessage());
+//            success = true;
+//        }
+//        Assert.assertTrue(success, "Query did not fail!");
 
-        success = false;
+//        success = false;
         try {
             ex.executeQuery(1, "SELECT ip FROM Log9");
         } catch (Exception e) {
@@ -656,9 +691,17 @@ public class AnalyticsSparkExecutorTest {
         AnalyticsSchema schema = this.service.getTableSchema(1, "Log10");
         Assert.assertEquals(schema.getColumns().size(), 6, "Merged schema columns do not match" );
 
-        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT ip FROM Log10");
-        Assert.assertEquals(result.getRows().size(), 10);
-        System.out.println(result);
+        AnalyticsQueryResult result;
+        boolean success = false;
+        try {
+            ex.executeQuery(1, "SELECT ip FROM Log10");
+        } catch (Exception e) {
+            System.out.println("Query failed with : " + e.getMessage());
+            success = true;
+        }
+        Assert.assertTrue(success, "Query did not fail!");
+
+
         result = ex.executeQuery(1, "SELECT * FROM Log10");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
@@ -692,7 +735,7 @@ public class AnalyticsSparkExecutorTest {
         Assert.assertEquals(schema.getColumns().size(), 1, "Merged schema columns do not match" );
 
 
-        boolean success = false;
+        success = false;
         try {
             ex.executeQuery(1, "SELECT ip FROM Log11");
         } catch (Exception e) {
@@ -710,7 +753,126 @@ public class AnalyticsSparkExecutorTest {
         
         System.out.println(testString("end : merge table schema test"));
     }
-
+    
+    @Test (expectedExceptions = Exception.class)
+    public void testGlobalTenantCreateNonMTFail() throws Exception {
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Stats USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Stats\"," +
+                "schema \"name STRING, count INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                ")");
+    }
+    
+    @Test (expectedExceptions = Exception.class)
+    public void testGlobalTenantReadNonMTFail() throws Exception {
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Stats USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Stats\"," +
+                "schema \"name STRING, count INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                ")");
+        ex.executeQuery(1, "SELECT * FROM Stats");
+    }
+    
+    @Test (expectedExceptions = Exception.class)
+    public void testGlobalTenantWriteNonMTFail() throws Exception {
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Stats USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Stats\"," +
+                "schema \"name STRING, count INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                ")");
+        ex.executeQuery(1, "INSERT INTO TABLE Stats SELECT \"api1\", 5, 1;");
+    }
+    
+    private List<Object> generateObjList(Object... objs) {
+        List<Object> result = new ArrayList<>(objs.length);
+        for  (Object obj : objs) {
+            result.add(obj);
+        }
+        return result;
+    }
+    
+    @Test
+    public void testGlobalTenantAccess() throws AnalyticsException {
+        this.service.deleteTable(1, "Stats");
+        this.service.deleteTable(2, "Stats");
+        this.service.deleteTable(1, "StatsSummary");
+        this.service.deleteTable(2, "StatsSummary");
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "CREATE TEMPORARY TABLE Stats USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Stats\"," +
+                "schema \"name STRING, cnt INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                ")");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "SELECT * FROM Stats");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api1\", 5, 1;");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api1\", 7, 1;");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api2\", 10, 1;");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api2\", 14, 1;");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api1\", 14, 2;");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api1\", 2, 2;");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api3\", 15, 2;");
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api3\", 5, 2;");
+        
+        List<Record> res1 = AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(1, "Stats", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        List<Record> res2 = AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(2, "Stats", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(res1.size(), 4);
+        Assert.assertEquals(res2.size(), 4);
+        
+        AnalyticsQueryResult res = ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "SELECT * FROM Stats");
+        Assert.assertTrue(Arrays.asList(res.getColumns()).contains("_tenantId"));
+        List<List<Object>> expectedRes =  new ArrayList<>();
+        expectedRes.add(this.generateObjList("api1", 5, 1));
+        expectedRes.add(this.generateObjList("api1", 7, 1));
+        expectedRes.add(this.generateObjList("api2", 10, 1));
+        expectedRes.add(this.generateObjList("api2", 14, 1));
+        expectedRes.add(this.generateObjList("api1", 14, 2));
+        expectedRes.add(this.generateObjList("api1", 2, 2));
+        expectedRes.add(this.generateObjList("api3", 15, 2));
+        expectedRes.add(this.generateObjList("api3", 5, 2));
+        Assert.assertEquals(new HashSet<>(res.getRows()), new HashSet<>(expectedRes));
+        
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "CREATE TEMPORARY TABLE StatsSummary USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"StatsSummary\"," +
+                "schema \"name STRING, cnt INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                ")");
+        
+        ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE StatsSummary SELECT name, SUM(cnt), _tenantId FROM Stats GROUP BY name, _tenantId");
+        
+        res1 = AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(1, "StatsSummary", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        res2 = AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(2, "StatsSummary", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(res1.size(), 2);
+        Assert.assertEquals(res2.size(), 2);
+        
+        Record res1rec1, res1rec2, res2rec1, res2rec2;
+        if (res1.get(0).getValue("name").equals("api1")) {
+            res1rec1 = res1.get(0);
+            res1rec2 = res1.get(1);
+        } else {
+            res1rec1 = res1.get(1);
+            res1rec2 = res1.get(0);
+        }
+        if (res2.get(0).getValue("name").equals("api1")) {
+            res2rec1 = res2.get(0);
+            res2rec2 = res2.get(1);
+        } else {
+            res2rec1 = res2.get(1);
+            res2rec2 = res2.get(0);
+        }
+        
+        Assert.assertEquals(res1rec1.getValue("cnt"), 12);
+        Assert.assertEquals(res1rec2.getValue("cnt"), 24);
+        Assert.assertEquals(res2rec1.getValue("cnt"), 16);
+        Assert.assertEquals(res2rec2.getValue("cnt"), 20);
+        
+        this.service.deleteTable(1, "Stats");
+        this.service.deleteTable(2, "Stats");
+        this.service.deleteTable(1, "StatsSummary");
+        this.service.deleteTable(2, "StatsSummary");
+    }
 
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {

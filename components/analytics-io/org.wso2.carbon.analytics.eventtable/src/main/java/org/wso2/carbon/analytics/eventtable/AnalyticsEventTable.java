@@ -334,7 +334,7 @@ public class AnalyticsEventTable implements EventTable {
         return finder.contains(matchingEvent, null);
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void delete(ComplexEventChunk deletingEventChunk, Operator operator) {
         operator.delete(deletingEventChunk, null);
@@ -345,14 +345,12 @@ public class AnalyticsEventTable implements EventTable {
         return tableDefinition;
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public void update(ComplexEventChunk<StateEvent> updatingEventChunk, Operator operator,
                        UpdateAttributeMapper[] updateAttributeMappers) {
         operator.update(updatingEventChunk, null, updateAttributeMappers);
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public void overwriteOrAdd(ComplexEventChunk<StateEvent> overwritingOrAddingEventChunk, Operator operator,
                                UpdateAttributeMapper[] updateAttributeMappers,
@@ -899,7 +897,6 @@ public class AnalyticsEventTable implements EventTable {
             checkAndWaitForIndexing();
         }
 
-        @SuppressWarnings("rawtypes")
         @Override
         public void update(ComplexEventChunk<StateEvent> updatingEventChunk, Object candidateEvents,
                            UpdateAttributeMapper[] updateAttributeMappers) {
@@ -920,7 +917,6 @@ public class AnalyticsEventTable implements EventTable {
             }
         }
 
-        @SuppressWarnings("rawtypes")
         @Override
         public ComplexEventChunk<StreamEvent> overwriteOrAdd(ComplexEventChunk<StateEvent> overwritingOrAddingEventChunk,
                                                              Object candidateEvents,
