@@ -224,12 +224,12 @@ public class Utils {
                     break;
                 }
                 case RecordValueEntryBean.INTEGER: {
-                    recordValueEntryBean.setIntValue(Integer.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setIntValue(Integer.parseInt(String.valueOf(value)));
                     recordValueEntryBean.setType(RecordValueEntryBean.INTEGER);
                     break;
                 }
                 case RecordValueEntryBean.LONG: {
-                    recordValueEntryBean.setLongValue(Long.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setLongValue(Long.parseLong(String.valueOf(value)));
                     recordValueEntryBean.setType(RecordValueEntryBean.LONG);
                     break;
                 }
