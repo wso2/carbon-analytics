@@ -303,11 +303,11 @@
             <%
                         parameterString += "'" + parameter.getName() +
                                 "::' + document.getElementById('"
-                                + parameter.getName() + "').value";
+                                + parameter.getName() + "').value.trim()";
 
                         indexParam++;
                         if (indexParam < currentScenario.getDomainParameterDTOs().length) {
-                            parameterString += "+ ',' +";
+                            parameterString += "+ ',\\n' +";
                         }
 
                     }
@@ -322,7 +322,7 @@
                 <button type="button" class="btn btn-default btn-add col-md-2 col-xs-12 pull-right marg-right-15"
                         onclick="saveConfiguration('<%=domainName%>',
                                 document.getElementById('cBoxTemplates').options[document.getElementById('cBoxTemplates').selectedIndex].text,
-                                document.getElementById('txtName').value, document.getElementById('txtDescription').value,'domain_configurations_ajaxprocessor.jsp?domainName=<%=domainName%>',
+                                document.getElementById('txtName').value.trim(), document.getElementById('txtDescription').value.trim(),'domain_configurations_ajaxprocessor.jsp?domainName=<%=domainName%>',
                                 <%=parameterString%>,<%=isStreamMappingUpdate%>)">
                     <fmt:message key='<%=saveButtonText%>'/>
                 </button>

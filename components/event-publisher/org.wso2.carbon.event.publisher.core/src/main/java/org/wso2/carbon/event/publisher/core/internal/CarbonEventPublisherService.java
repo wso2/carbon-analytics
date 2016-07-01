@@ -598,7 +598,7 @@ public class CarbonEventPublisherService implements EventPublisherService {
             List<Property> properties = outputEventAdapterSchema.getStaticPropertyList();
             if (properties != null) {
                 for (Property prop : properties) {
-                    if (prop.isSecured()) {
+                    if (prop.isEncrypted()) {
                         encryptedProperties.add(prop.getPropertyName());
                     }
                 }
@@ -606,7 +606,7 @@ public class CarbonEventPublisherService implements EventPublisherService {
             properties = outputEventAdapterSchema.getDynamicPropertyList();
             if (properties != null) {
                 for (Property prop : properties) {
-                    if (prop.isSecured()) {
+                    if (prop.isEncrypted()) {
                         encryptedProperties.add(prop.getPropertyName());
                     }
                 }

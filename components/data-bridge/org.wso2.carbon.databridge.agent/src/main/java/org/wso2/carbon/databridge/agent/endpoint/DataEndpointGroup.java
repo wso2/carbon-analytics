@@ -398,7 +398,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                 }
             }
             if (!isOneReceiverConnected) {
-                log.info("No receiver is reachable at reconnection, will try to reconnect every " + reconnectionInterval + " sec");
+                log.warn("No receiver is reachable at reconnection, will try to reconnect every " + reconnectionInterval + " sec");
             }
         }
 

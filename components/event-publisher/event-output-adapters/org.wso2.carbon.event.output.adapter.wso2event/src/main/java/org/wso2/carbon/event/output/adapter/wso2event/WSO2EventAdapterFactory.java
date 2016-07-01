@@ -70,6 +70,7 @@ public class WSO2EventAdapterFactory extends OutputEventAdapterFactory {
         Property passwordProperty = new Property(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_PASSWORD);
         passwordProperty.setRequired(true);
         passwordProperty.setSecured(true);
+        passwordProperty.setEncrypted(true);
         passwordProperty.setDisplayName(
                 resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_PASSWORD));
         passwordProperty.setHint(resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_HINT_PASSWORD));

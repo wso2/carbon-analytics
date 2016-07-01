@@ -74,6 +74,7 @@ public class EmailEventAdapterFactory extends InputEventAdapterFactory {
                 resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PASSWORD));
         password.setRequired(true);
         password.setSecured(true);
+        password.setEncrypted(true);
         password.setHint(
                 resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_PASSWORD_HINT));
         propertyList.add(password);

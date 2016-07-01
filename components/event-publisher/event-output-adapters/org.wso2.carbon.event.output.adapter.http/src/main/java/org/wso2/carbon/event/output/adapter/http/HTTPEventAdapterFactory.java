@@ -92,6 +92,7 @@ public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
         passwordProp.setHint(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PASSWORD_HINT));
         passwordProp.setRequired(false);
         passwordProp.setSecured(true);
+        passwordProp.setEncrypted(true);
 
         Property headersProp = new Property(HTTPEventAdapterConstants.ADAPTER_HEADERS);
         headersProp.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_HEADERS));

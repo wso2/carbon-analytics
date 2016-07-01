@@ -24,6 +24,8 @@ public class Property {
     private boolean isRequired = false;
     // property is a password field or not
     private boolean isSecured = false;
+    // property needs encryption or not
+    private boolean isEncrypted = false;
     // display name in ui
     private String displayName;
     // default value of the property
@@ -67,6 +69,10 @@ public class Property {
 
     public void setSecured(boolean secured) {
         isSecured = secured;
+        if(secured){
+            //By default if property is secured then it also set as encrypted
+            setEncrypted(true);
+        }
     }
 
     public String getPropertyName() {
@@ -87,5 +93,13 @@ public class Property {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public boolean isEncrypted() {
+        return isEncrypted;
+    }
+
+    public void setEncrypted(boolean encrypted) {
+        this.isEncrypted = encrypted;
     }
 }
