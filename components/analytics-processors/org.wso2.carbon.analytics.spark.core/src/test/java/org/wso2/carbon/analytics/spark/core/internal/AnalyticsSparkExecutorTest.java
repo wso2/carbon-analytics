@@ -635,15 +635,15 @@ public class AnalyticsSparkExecutorTest {
                        "(tableName \"Log9\"" +
                        ")";
         boolean success = false;
-        try {
+//        try {
             ex.executeQuery(1, query);
-        } catch (Exception e) {
-            System.out.println("Query failed with : " + e.getMessage());
-            success = true;
-        }
-        Assert.assertTrue(success, "Query did not fail!");
+//        } catch (Exception e) {
+//            System.out.println("Query failed with : " + e.getMessage());
+//            success = true;
+//        }
+//        Assert.assertTrue(success, "Query did not fail!");
 
-        success = false;
+//        success = false;
         try {
             ex.executeQuery(1, "SELECT ip FROM Log9");
         } catch (Exception e) {
@@ -691,9 +691,17 @@ public class AnalyticsSparkExecutorTest {
         AnalyticsSchema schema = this.service.getTableSchema(1, "Log10");
         Assert.assertEquals(schema.getColumns().size(), 6, "Merged schema columns do not match" );
 
-        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT ip FROM Log10");
-        Assert.assertEquals(result.getRows().size(), 10);
-        System.out.println(result);
+        AnalyticsQueryResult result;
+        boolean success = false;
+        try {
+            ex.executeQuery(1, "SELECT ip FROM Log10");
+        } catch (Exception e) {
+            System.out.println("Query failed with : " + e.getMessage());
+            success = true;
+        }
+        Assert.assertTrue(success, "Query did not fail!");
+
+
         result = ex.executeQuery(1, "SELECT * FROM Log10");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
@@ -727,7 +735,7 @@ public class AnalyticsSparkExecutorTest {
         Assert.assertEquals(schema.getColumns().size(), 1, "Merged schema columns do not match" );
 
 
-        boolean success = false;
+        success = false;
         try {
             ex.executeQuery(1, "SELECT ip FROM Log11");
         } catch (Exception e) {

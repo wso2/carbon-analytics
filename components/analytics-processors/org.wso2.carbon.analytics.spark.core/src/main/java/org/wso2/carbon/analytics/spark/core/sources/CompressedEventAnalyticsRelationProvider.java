@@ -49,14 +49,6 @@ public class CompressedEventAnalyticsRelationProvider extends AnalyticsRelationP
     }
     
     @Override
-    protected AnalyticsRelation getAnalyticsRelation(int tenantId, String recordStore, String tableName,
-            SQLContext sqlContext, String incParams, boolean globalTenantAccess, String schemaString,  String primaryKeys,
-            boolean mergeFlag) {
-        return new CompressedEventAnalyticsRelation(tenantId, recordStore, tableName, sqlContext, incParams, 
-            globalTenantAccess, schemaString, primaryKeys, mergeFlag);
-    }
-    
-    @Override
     protected AnalyticsSchema createAnalyticsTableSchema(AnalyticsDataService ads, int targetTenantId, String targetTableName, 
             String schemaString, String primaryKeys, boolean globalTenantAccess, boolean mergeFlag) throws AnalyticsException {
         /* we don't want this provider to update the target analytics table schema */
