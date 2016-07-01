@@ -98,7 +98,7 @@ public class GenericUtils {
     private static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
 
     private static DataSourceRepository globalCustomRepo;
-
+    
     private static ThreadLocal<Kryo> kryoTL = new ThreadLocal<Kryo>() {
         protected Kryo initialValue() {
             return new Kryo();
@@ -775,4 +775,5 @@ public class GenericUtils {
         path = path.replace(AnalyticsDataSourceConstants.CARBON_HOME_VAR, carbonHome);
         return path;
     }
+    
 }

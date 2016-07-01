@@ -115,6 +115,7 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -418,7 +419,7 @@ public class AnalyticsDataIndexer {
         return result;
     }
     
-    private void reschuduleWorkers() throws AnalyticsException {
+    private synchronized void reschuduleWorkers() throws AnalyticsException {
         this.stopAndCleanupIndexProcessing();
         if (this.localShards.size() == 0) {
             return;
@@ -433,18 +434,17 @@ public class AnalyticsDataIndexer {
         }
     }
     
-    public int calculateShardId(String id) {
-        return Math.abs(id.hashCode()) % this.getShardCount();
+    public static int abs(int val) {
+        if (val == Integer.MIN_VALUE) {
+            return Integer.MAX_VALUE;
+        } else {
+            return Math.abs(val);
+        }
     }
     
-    /*private List<Integer> lookupGloballyExistingShardIds()
-            throws AnalyticsIndexException {
-        List<Integer> result = new ArrayList<>(this.localShards.size());
-        for (int shardIndex : this.localShards) {
-            result.add(shardIndex);
-        }
-        return result;
-    }*/
+    public int calculateShardId(String id) {
+        return abs(id.hashCode()) % this.getShardCount();
+    }
     
     public List<SearchResultEntry> search(final int tenantId, final String tableName, final String query,
             final int start, final int count, List<SortByField> sortByFields) throws AnalyticsException {
@@ -1479,7 +1479,7 @@ public class AnalyticsDataIndexer {
         case STRING:
             doc.add(new TextField(name, obj.toString(), Store.NO));
             //SortedDocValuesField is to sort STRINGs and search without tokenizing
-            doc.add(new SortedDocValuesField(name, new BytesRef(this.trimNonTokenizedIndexStringField(obj.toString()).getBytes())));
+            doc.add(new SortedDocValuesField(name, new BytesRef(this.trimNonTokenizedIndexStringField(obj.toString()).getBytes(StandardCharsets.UTF_8))));
             doc.add(new StringField(Constants.NON_TOKENIZED_FIELD_PREFIX + name,
                                     this.trimNonTokenizedIndexStringField(obj.toString()), Store.NO));
             break;
@@ -2012,7 +2012,7 @@ public class AnalyticsDataIndexer {
         return ids;
     }
 
-    public void reIndex(int tenantId, String table, long startTime, long endTime)
+    public synchronized void reIndex(int tenantId, String table, long startTime, long endTime)
             throws AnalyticsException {
         if (this.reIndexWorkerExecutor == null) {
             this.reIndexWorkerExecutor = new ThreadPoolExecutor(0, REINDEX_THREAD_COUNT,
@@ -2113,7 +2113,7 @@ public class AnalyticsDataIndexer {
         }
     }*/
 
-    private class NonStreamingAggregateRecordIterator implements AnalyticsIterator<Record> {
+    private static class NonStreamingAggregateRecordIterator implements AnalyticsIterator<Record> {
 
         private List<Record> records;
         private Iterator<Record> iterator;
@@ -2152,6 +2152,7 @@ public class AnalyticsDataIndexer {
         public void remove() {
             //ignored
         }
+        
     }
 
     /**
@@ -2195,7 +2196,7 @@ public class AnalyticsDataIndexer {
     /**
      * This represents a re-indexing worker, who does index operations in the background.
      */
-    private class ReIndexWorker implements Runnable {
+    private static class ReIndexWorker implements Runnable {
 
         private AnalyticsDataIndexer indexer;
         private String tableName;
@@ -2236,9 +2237,10 @@ public class AnalyticsDataIndexer {
                 log.error("Error in re-indexing records: " + e.getMessage(), e);
             }
         }
+        
     }
 
-    private class TaxonomyWorker implements Callable<Set<List<String>>> {
+    private static class TaxonomyWorker implements Callable<Set<List<String>>> {
 
         private AggregateRequest aggregateRequest;
         private AnalyticsDataIndexer indexer;
@@ -2295,7 +2297,9 @@ public class AnalyticsDataIndexer {
                 }
             }
         }
+        
     }
+    
     /**
      * Base class for all index operation lookup calls;
      */
@@ -2426,6 +2430,7 @@ public class AnalyticsDataIndexer {
         public IndexLookupOperationCall<List<SearchResultEntry>> copy() {
             return new DrillDownSearchCall(tenantId, request);
         }
+        
     }
 
     public static class DrillDownSearchCountCall extends IndexLookupOperationCall<Double> {
@@ -2458,6 +2463,7 @@ public class AnalyticsDataIndexer {
             }
             return 0.0;
         }
+        
     }
 
     public static class DrillDownCategoriesCall extends IndexLookupOperationCall<CategoryDrillDownResponse> {
@@ -2490,6 +2496,7 @@ public class AnalyticsDataIndexer {
             }
             return new CategoryDrillDownResponse(new ArrayList<CategorySearchResultEntry>(0));
         }
+        
     }
 
     public static class DrillDownRangeCountCall extends IndexLookupOperationCall<List<AnalyticsDrillDownRange>> {
@@ -2521,6 +2528,7 @@ public class AnalyticsDataIndexer {
             }
             return new ArrayList<>();
         }
+        
     }
 
     public static class SearchWithAggregateCall extends IndexLookupOperationCall<Set<List<String>>> {
@@ -2553,4 +2561,5 @@ public class AnalyticsDataIndexer {
             return new HashSet<>();
         }
     }
+    
 }
