@@ -49,13 +49,7 @@ public class CategorySearchResultEntry implements Comparable<CategorySearchResul
 
     @Override
     public int compareTo(CategorySearchResultEntry obj) {
-        if (this.score > obj.score) {
-            return 1;
-        } else if (this.score < obj.score) {
-            return -1;
-        } else {
-            return 0;
-        }
+        return Double.compare(this.score, obj.getScore());
     }
     
     @Override

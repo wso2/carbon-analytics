@@ -48,13 +48,7 @@ public class SearchResultEntry implements Comparable<SearchResultEntry>, Seriali
 
     @Override
     public int compareTo(SearchResultEntry obj) {
-        if (this.score > obj.score) {
-            return 1;
-        } else if (this.score < obj.score) {
-            return -1;
-        } else {
-            return 0;
-        }
+        return Float.compare(this.score, obj.getScore());
     }
     
     @Override
