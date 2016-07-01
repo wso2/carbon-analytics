@@ -180,7 +180,7 @@ public class AnalyticsComponent {
 
     private void addCarbonUDFJarToSparkClasspath(Class carbonUDFClass) {
         String[] jarPath = carbonUDFClass.getProtectionDomain().getCodeSource().getLocation().getPath()
-                .split(File.separator);
+                .split(File.separatorChar=='\\' ? "\\\\" : File.separator);
         String jarName = jarPath[jarPath.length-1].split("_")[0];
         ComputeClasspath.addAdditionalJarToClasspath(jarName);
     }

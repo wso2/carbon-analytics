@@ -43,17 +43,15 @@ import java.io.Serializable;
  * with the 'USING' keyword
  */
 public class AnalyticsRelationProvider implements RelationProvider,
-                                                  SchemaRelationProvider, Serializable {
+                                                  SchemaRelationProvider {
 
     private static final Log log = LogFactory.getLog(AnalyticsRelationProvider.class);
-    private static final long serialVersionUID = 8688336885845108375L;
 
     private int tenantId;
     private String tableName;
     private String schemaString;
     private String streamName;
     private String primaryKeys;
-    private AnalyticsDataService dataService;
     private String recordStore;
     private boolean mergeFlag;
     private boolean globalTenantAccess;
@@ -61,7 +59,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
     private String incParams;
 
     public AnalyticsRelationProvider() {
-        this.dataService = ServiceHolder.getAnalyticsDataService();
+
     }
 
     /**
@@ -137,7 +135,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
 
     private void createTableIfNotExist(int targetTenantId, String targetTableName) throws AnalyticsExecutionException {
         try {
-            AnalyticsCommonUtils.createTableIfNotExists(this.dataService, this.recordStore, targetTenantId, targetTableName);
+            AnalyticsCommonUtils.createTableIfNotExists(ServiceHolder.getAnalyticsDataService(), this.recordStore, targetTenantId, targetTableName);
         } catch (AnalyticsException e) {
             throw new AnalyticsExecutionException("Error while accessing table " + targetTableName + " : " + e.getMessage(), e);
         }
@@ -167,12 +165,12 @@ public class AnalyticsRelationProvider implements RelationProvider,
             targetTenantId = this.tenantId;
         }
         try {
-            AnalyticsSchema schema = this.createAnalyticsTableSchema(this.dataService, targetTenantId, this.tableName,
+            AnalyticsSchema schema = this.createAnalyticsTableSchema(ServiceHolder.getAnalyticsDataService(), targetTenantId, this.tableName,
                                                                      this.schemaString, this.primaryKeys, this.globalTenantAccess, this.mergeFlag);
             if (schema != null) {
-                this.dataService.setTableSchema(targetTenantId, this.tableName, schema);
+                ServiceHolder.getAnalyticsDataService().setTableSchema(targetTenantId, this.tableName, schema);
             }
-            this.schemaStruct = this.createSparkSchemaStruct(this.dataService, targetTenantId,
+            this.schemaStruct = this.createSparkSchemaStruct(ServiceHolder.getAnalyticsDataService(), targetTenantId,
                                                              this.tableName, this.schemaString, this.primaryKeys, this.globalTenantAccess, this.mergeFlag);
         } catch (AnalyticsException e) {
             throw new AnalyticsExecutionException("Error in setting provided schema: " + e.getMessage(), e);
@@ -207,7 +205,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
         doTableActions();
         try {
             AnalyticsSchema schemaFromDS;
-            schemaFromDS = dataService.getTableSchema(this.tenantId, this.tableName);
+            schemaFromDS = ServiceHolder.getAnalyticsDataService().getTableSchema(this.tenantId, this.tableName);
             if (!AnalyticsCommonUtils.validateSchemaColumns(schema, schemaFromDS)) {
                 String msg = "Incompatible schemas for the table " + this.tableName;
                 log.error(msg);

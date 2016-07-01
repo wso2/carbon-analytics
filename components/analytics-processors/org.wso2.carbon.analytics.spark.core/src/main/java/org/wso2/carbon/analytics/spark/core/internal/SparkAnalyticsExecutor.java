@@ -327,16 +327,12 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private JavaSparkContext initializeSparkContext(SparkConf conf) throws AnalyticsException {
-        JavaSparkContext jsc = null;
+        JavaSparkContext jsc;
         try {
             jsc = new JavaSparkContext(conf);
-        } catch (Exception e) {
-            if (jsc != null) {
-                jsc.stop();
-            }
+        } catch (Throwable e) {
             throw new AnalyticsException("Unable to create analytics client. " + e.getMessage(), e);
         }
-
         return jsc;
     }
 
@@ -381,7 +377,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private void registerUDFs(SQLContext sqlCtx)
             throws AnalyticsUDFException {
         List<String> udfClassNames = new ArrayList<>();
-        this.udfConfiguration.getCustomUDFClass();
         if (!this.udfConfiguration.getCustomUDFClass().isEmpty()) {
             udfClassNames.addAll(this.udfConfiguration.getCustomUDFClass());
         }
@@ -467,15 +462,15 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      */
     private void updateMaster(SparkConf conf) {
         String[] masters = getSparkMastersFromCluster();
-        String url = "spark://";
+        StringBuilder buf = new StringBuilder();
+        buf.append("spark://");
         for (int i = 0; i < masters.length; i++) {
-            if (i == 0) {
-                url = url + masters[i].replace("spark://", "");
-            } else {
-                url = url + "," + masters[i].replace("spark://", "");
+            buf.append(masters[i].replace("spark://", ""));
+            if (i < masters.length-1) {
+                buf.append(" , ");
             }
         }
-        conf.setMaster(url);
+        conf.setMaster(buf.toString());
     }
 
     /**
@@ -822,9 +817,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
 
     private String replaceShorthandStrings(String query) {
-        Set<String> keys = this.shorthandStringsMap.keySet();
-        for (String key : keys) {
-            query = query.replaceFirst("\\b" + key + "\\b", this.shorthandStringsMap.get(key));
+        for (Map.Entry<String, String> entry: this.shorthandStringsMap.entrySet()){
+            query = query.replaceFirst("\\b" + entry.getKey() + "\\b", entry.getValue());
         }
         return query;
     }

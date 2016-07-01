@@ -55,7 +55,7 @@ public class AnalyticsUDFsRegister {
         Class[] parameterTypes = udfMethod.getParameterTypes();
         Type returnType = udfMethod.getGenericReturnType();
         String methodName = udfMethod.getName();
-        int parameterCount = parameterTypes == null ? 0 : parameterTypes.length;
+        int parameterCount = parameterTypes.length;
         switch (parameterCount) {
             case 0: {
                 UDF1 udfAdapter = new UDF0Adaptor(udfClass, methodName, parameterTypes);
