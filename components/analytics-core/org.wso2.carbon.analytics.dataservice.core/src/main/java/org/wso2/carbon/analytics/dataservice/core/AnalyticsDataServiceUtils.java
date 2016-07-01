@@ -62,9 +62,11 @@ public class AnalyticsDataServiceUtils {
             newPrimaryKeys = new HashSet<String>(existingSchema.getPrimaryKeys());
         }
         newPrimaryKeys.addAll(primaryKeys);
-        Map<String, ColumnDefinition> newColumns = existingSchema.getColumns();
-        if (newColumns == null) {
-            newColumns = new LinkedHashMap<String, ColumnDefinition>();
+        Map<String, ColumnDefinition> newColumns;
+        if (existingSchema.getColumns() == null) {
+            newColumns = new LinkedHashMap<>();
+        } else {
+            newColumns = new LinkedHashMap<>(existingSchema.getColumns());
         }
         ColumnDefinition targetColumn;
         for (ColumnDefinition column : columns) {
