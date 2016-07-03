@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.spark.core.util;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -63,5 +64,8 @@ public class AnalyticsQueryResult implements Serializable {
         builder.append("\n");
         return builder.toString();
     }
-    
+
+    public static AnalyticsQueryResult emptyAnalyticsQueryResult(){
+        return new AnalyticsQueryResult(new String[0], Collections.<List<Object>>emptyList());
+    }
 }

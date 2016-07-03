@@ -29,6 +29,7 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,4 +102,10 @@ public class AnalyticsIncrementalMetaStore {
         }
     }
 
+    public void resetIncrementalTimestamps(int tenantId, String id) throws AnalyticsException {
+        this.setLastProcessedTimestamp(tenantId, id, Long.MIN_VALUE, true);
+        this.setLastProcessedTimestamp(tenantId, id, Long.MIN_VALUE, false);
+    }
 }
+
+

@@ -71,6 +71,9 @@ public class AnalyticsConstants {
 
     //Analytics relation strings
     public static final String INC_TABLE_COMMIT = "incremental_table_commit";
+    public static final String INC_TABLE_RESET = "incremental_table_reset";
+    public static final String INC_TABLE_SHOW = "incremental_table_show";
+    public static final String INC_TABLE = "incremental_table_";
     public static final String TENANT_ID = "tenantId";
     public static final String TABLE_NAME = "tableName";
     public static final String SCHEMA_STRING = "schema";

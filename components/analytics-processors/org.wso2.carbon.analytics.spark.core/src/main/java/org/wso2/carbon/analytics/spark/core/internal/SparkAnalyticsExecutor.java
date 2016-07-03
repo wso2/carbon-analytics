@@ -41,7 +41,11 @@ import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionCall;
-import org.wso2.carbon.analytics.spark.core.deploy.*;
+import org.wso2.carbon.analytics.spark.core.deploy.AnalyticsRecoveryModeFactory;
+import org.wso2.carbon.analytics.spark.core.deploy.CheckElectedLeaderExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.ElectLeaderExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.InitClientExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.StartWorkerExecutionCall;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsRelationProvider;
@@ -66,7 +70,15 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -466,7 +478,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         buf.append("spark://");
         for (int i = 0; i < masters.length; i++) {
             buf.append(masters[i].replace("spark://", ""));
-            if (i < masters.length-1) {
+            if (i < masters.length - 1) {
                 buf.append(" , ");
             }
         }
@@ -709,29 +721,20 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    public AnalyticsQueryResult executeQueryLocal(int tenantId, String query)
+    private AnalyticsQueryResult executeQueryLocal(int tenantId, String query)
             throws AnalyticsExecutionException {
         String origQuery = query.trim();
         query = query.trim();
         if (query.endsWith(";")) {
-            query = query.substring(0, query.length() - 1);
+            query = query.substring(0, query.length() - 1).trim();
         }
 
         // process incremental table commit query
         // todo: enable this for multiple tables
         // todo: add an incremental table reset query with wild cards
         // todo: add an incremental table show data query w/ wild cards
-        String[] splits = query.split("\\s+");
-        if (splits.length == 2 && isIncTableCommitQuery(splits[0])) {
-            try {
-                long tempTS = ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp
-                        (tenantId, splits[1], false);
-                ServiceHolder.getIncrementalMetaStore().setLastProcessedTimestamp(tenantId,
-                                                                                  splits[1], tempTS, true);
-                return new AnalyticsQueryResult(new String[0], Collections.<List<Object>>emptyList());
-            } catch (AnalyticsException e) {
-                throw new AnalyticsExecutionException(e.getMessage(), e);
-            }
+        if (checkIncrementalQuery(query)) {
+            return processIncQuery(tenantId, query);
         }
 
         query = encodeQueryWithTenantId(tenantId, query);
@@ -757,8 +760,76 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    private boolean isIncTableCommitQuery(String str) {
-        return str.equalsIgnoreCase(AnalyticsConstants.INC_TABLE_COMMIT);
+    private AnalyticsQueryResult processIncQuery(int tenantId, String query) throws AnalyticsExecutionException {
+        AnalyticsQueryResult result;
+        String[] splits = query.split("(\\s*,\\s*|\\s+)");
+
+        switch (splits[0].toLowerCase()) {
+            case AnalyticsConstants.INC_TABLE_COMMIT:
+                result = processIncTableCommit(tenantId, Arrays.copyOfRange(splits, 1, splits.length));
+                break;
+            case AnalyticsConstants.INC_TABLE_RESET:
+                result = processIncTableReset(tenantId, Arrays.copyOfRange(splits, 1, splits.length));
+                break;
+            case AnalyticsConstants.INC_TABLE_SHOW:
+                result = processIncTableShow(tenantId, Arrays.copyOfRange(splits, 1, splits.length));
+                break;
+            default:
+                throw new AnalyticsExecutionException("Invalid incremental query: " + query);
+        }
+        return result;
+    }
+
+    private AnalyticsQueryResult processIncTableShow(int tenantId, String[] tableIds)
+            throws AnalyticsExecutionException {
+        List<List<Object>> tableResults = new ArrayList<>();
+        for (String tableId : tableIds) {
+            ArrayList<Object> tableResult = new ArrayList<>(3);
+            tableResult.add(tableId);
+            try {
+                tableResult.add(ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(tenantId, tableId, false));
+                tableResult.add(ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(tenantId, tableId, true));
+            } catch (AnalyticsException e) {
+                throw new AnalyticsExecutionException(e.getMessage(), e);
+            }
+            tableResults.add(tableResult);
+        }
+        return new AnalyticsQueryResult(new String[]{"TABLE_ID", "TEMP_VAL", "PRIMARY_VAL"}, tableResults);
+    }
+
+    private AnalyticsQueryResult processIncTableReset(int tenantId, String[] tableIds)
+            throws AnalyticsExecutionException {
+        for (String tableId : tableIds) {
+            try {
+                ServiceHolder.getIncrementalMetaStore().resetIncrementalTimestamps(tenantId, tableId);
+            } catch (AnalyticsException e) {
+                throw new AnalyticsExecutionException(e.getMessage(), e);
+            }
+        }
+        return AnalyticsQueryResult.emptyAnalyticsQueryResult();
+    }
+
+    private AnalyticsQueryResult processIncTableCommit(int tenantId, String[] tableIds)
+            throws AnalyticsExecutionException {
+        List<List<Object>> tableResults = new ArrayList<>();
+        for (String tableId : tableIds) {
+            ArrayList<Object> tableResult = new ArrayList<>(2);
+            tableResult.add(tableId);
+            try {
+                tableResult.add(ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(tenantId, tableId, true));
+                long tempTS = ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(tenantId, tableId, false);
+                ServiceHolder.getIncrementalMetaStore().setLastProcessedTimestamp(tenantId, tableId, tempTS, true);
+                tableResult.add(tempTS);
+            } catch (AnalyticsException e) {
+                throw new AnalyticsExecutionException(e.getMessage(), e);
+            }
+            tableResults.add(tableResult);
+        }
+        return new AnalyticsQueryResult(new String[]{"TABLE_ID", "PREV_PRIMARY_VAL", "NEW_PRIMARY_VAL"}, tableResults);
+    }
+
+    private boolean checkIncrementalQuery(String str) {
+        return str.trim().toLowerCase().startsWith(AnalyticsConstants.INC_TABLE);
     }
 
     private String encodeQueryWithTenantId(int tenantId, String query)
@@ -817,7 +888,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
 
     private String replaceShorthandStrings(String query) {
-        for (Map.Entry<String, String> entry: this.shorthandStringsMap.entrySet()){
+        for (Map.Entry<String, String> entry : this.shorthandStringsMap.entrySet()) {
             query = query.replaceFirst("\\b" + entry.getKey() + "\\b", entry.getValue());
         }
         return query;
