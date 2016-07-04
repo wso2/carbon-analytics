@@ -49,9 +49,15 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
     public void deployArtifact(DeployableTemplate template) throws TemplateDeploymentException {
         String artifactId = null;
         Registry registry;
+        String domain = null;
+        String scenario = null;
         try {
             if (template == null) {
                 throw new TemplateDeploymentException("No artifact received to be deployed.");
+            }
+            if(template.getConfiguration() != null) {
+                domain = template.getConfiguration().getDomain();
+                scenario = template.getConfiguration().getScenario();
             }
             artifactId = template.getArtifactId();
             //clean up resources associated to previously deployed artifact
@@ -72,8 +78,8 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
         }  catch (AnalyticsEventStoreException e) {
             EventSinkTemplateDeployerHelper.cleanRegistryWithUndeploy(artifactId, false);
             throw new TemplateDeploymentException("Failed to deploy eventSink configuration in Domain: "
-                                                  + template.getConfiguration().getDomain() + ", Scenario: "
-                                                  + template.getConfiguration().getScenario() + ". Error occurred in the deployment process.", e);
+                                                  + domain + ", Scenario: "
+                                                  + scenario + ". Error occurred in the deployment process.", e);
         } catch (RegistryException e) {
             throw new TemplateDeploymentException("Could not load the Registry for Tenant Domain: "
                                                   + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true)
