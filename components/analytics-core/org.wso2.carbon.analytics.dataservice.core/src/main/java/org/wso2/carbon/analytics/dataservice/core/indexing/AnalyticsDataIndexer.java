@@ -419,7 +419,7 @@ public class AnalyticsDataIndexer {
         return result;
     }
     
-    private void reschuduleWorkers() throws AnalyticsException {
+    private synchronized void reschuduleWorkers() throws AnalyticsException {
         this.stopAndCleanupIndexProcessing();
         if (this.localShards.size() == 0) {
             return;
@@ -434,18 +434,17 @@ public class AnalyticsDataIndexer {
         }
     }
     
-    public int calculateShardId(String id) {
-        return Math.abs(id.hashCode()) % this.getShardCount();
+    public static int abs(int val) {
+        if (val == Integer.MIN_VALUE) {
+            return Integer.MAX_VALUE;
+        } else {
+            return Math.abs(val);
+        }
     }
     
-    /*private List<Integer> lookupGloballyExistingShardIds()
-            throws AnalyticsIndexException {
-        List<Integer> result = new ArrayList<>(this.localShards.size());
-        for (int shardIndex : this.localShards) {
-            result.add(shardIndex);
-        }
-        return result;
-    }*/
+    public int calculateShardId(String id) {
+        return abs(id.hashCode()) % this.getShardCount();
+    }
     
     public List<SearchResultEntry> search(final int tenantId, final String tableName, final String query,
             final int start, final int count, List<SortByField> sortByFields) throws AnalyticsException {
@@ -1127,13 +1126,13 @@ public class AnalyticsDataIndexer {
                                                                      range.getFrom(), range.getTo(), true, false);
             } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.FLOAT) {
                 numericRangeQuery = NumericRangeQuery.newFloatRange(rangeField,
-                        (float)range.getFrom(), (float)range.getTo(), true, false);
+                        new Double(range.getFrom()).floatValue(), new Double(range.getTo()).floatValue(), true, false);
             } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.INTEGER) {
                 numericRangeQuery = NumericRangeQuery.newIntRange(rangeField,
-                        (int)range.getFrom(),(int)range.getTo(), true, false);
+                        new Double(range.getFrom()).intValue(), new Double(range.getTo()).intValue(), true, false);
             } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.LONG) {
                 numericRangeQuery = NumericRangeQuery.newLongRange(rangeField,
-                        (long)range.getFrom(), (long)range.getTo(), true, false);
+                        new Double(range.getFrom()).longValue(), new Double(range.getTo()).longValue(), true, false);
             }
         }
         return numericRangeQuery;
@@ -1480,8 +1479,7 @@ public class AnalyticsDataIndexer {
         case STRING:
             doc.add(new TextField(name, obj.toString(), Store.NO));
             //SortedDocValuesField is to sort STRINGs and search without tokenizing
-            doc.add(new SortedDocValuesField(name, new BytesRef(this.trimNonTokenizedIndexStringField(obj.toString())
-                                                                        .getBytes(StandardCharsets.UTF_8))));
+            doc.add(new SortedDocValuesField(name, new BytesRef(this.trimNonTokenizedIndexStringField(obj.toString()).getBytes(StandardCharsets.UTF_8))));
             doc.add(new StringField(Constants.NON_TOKENIZED_FIELD_PREFIX + name,
                                     this.trimNonTokenizedIndexStringField(obj.toString()), Store.NO));
             break;
@@ -1927,7 +1925,7 @@ public class AnalyticsDataIndexer {
             for (AggregateField field : aggregateRequest.getFields()) {
                 AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
                 RecordContext recordValues = RecordContext.create(record.getValues());
-                function.process(recordValues);
+                function.process(recordValues, field.getAggregateVariables());
             }
         }
         Map<String, Object> aggregatedValues = generateAggregateRecordValues(path, actualNoOfRecords, aggregateRequest,
@@ -1992,8 +1990,7 @@ public class AnalyticsDataIndexer {
             throws AnalyticsException {
         Map<String, AggregateFunction> perAliasAggregateFunction = new HashMap<>();
         for (AggregateField field : aggregateRequest.getFields()) {
-            AggregateFunction function = getAggregateFunctionFactory().create(field.getAggregateFunction(),
-                                                                              field.getAggregateVariables());
+            AggregateFunction function = getAggregateFunctionFactory().create(field.getAggregateFunction());
             if (function == null) {
                 throw new AnalyticsException("Unknown aggregate function!");
             } else if (field.getAlias() == null || field.getAlias().isEmpty()) {
@@ -2012,7 +2009,7 @@ public class AnalyticsDataIndexer {
         return ids;
     }
 
-    public void reIndex(int tenantId, String table, long startTime, long endTime)
+    public synchronized void reIndex(int tenantId, String table, long startTime, long endTime)
             throws AnalyticsException {
         if (this.reIndexWorkerExecutor == null) {
             this.reIndexWorkerExecutor = new ThreadPoolExecutor(0, REINDEX_THREAD_COUNT,
@@ -2152,6 +2149,7 @@ public class AnalyticsDataIndexer {
         public void remove() {
             //ignored
         }
+        
     }
 
     /**
@@ -2236,6 +2234,7 @@ public class AnalyticsDataIndexer {
                 log.error("Error in re-indexing records: " + e.getMessage(), e);
             }
         }
+        
     }
 
     private static class TaxonomyWorker implements Callable<Set<List<String>>> {
@@ -2295,7 +2294,9 @@ public class AnalyticsDataIndexer {
                 }
             }
         }
+        
     }
+    
     /**
      * Base class for all index operation lookup calls;
      */
@@ -2426,6 +2427,7 @@ public class AnalyticsDataIndexer {
         public IndexLookupOperationCall<List<SearchResultEntry>> copy() {
             return new DrillDownSearchCall(tenantId, request);
         }
+        
     }
 
     public static class DrillDownSearchCountCall extends IndexLookupOperationCall<Double> {
@@ -2458,6 +2460,7 @@ public class AnalyticsDataIndexer {
             }
             return 0.0;
         }
+        
     }
 
     public static class DrillDownCategoriesCall extends IndexLookupOperationCall<CategoryDrillDownResponse> {
@@ -2490,6 +2493,7 @@ public class AnalyticsDataIndexer {
             }
             return new CategoryDrillDownResponse(new ArrayList<CategorySearchResultEntry>(0));
         }
+        
     }
 
     public static class DrillDownRangeCountCall extends IndexLookupOperationCall<List<AnalyticsDrillDownRange>> {
@@ -2521,6 +2525,7 @@ public class AnalyticsDataIndexer {
             }
             return new ArrayList<>();
         }
+        
     }
 
     public static class SearchWithAggregateCall extends IndexLookupOperationCall<Set<List<String>>> {
@@ -2553,4 +2558,5 @@ public class AnalyticsDataIndexer {
             return new HashSet<>();
         }
     }
+    
 }

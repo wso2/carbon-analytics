@@ -30,9 +30,9 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
@@ -40,7 +40,6 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import javax.naming.NamingException;
-
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,33 +55,6 @@ public class AnalyticsSparkExecutorTest {
 
     private static final Log log = LogFactory.getLog(AnalyticsSparkExecutorTest.class);
     private AnalyticsDataService service;
-
-    /**
-     * TEST PLAN
-     * <p/>
-     * 1.a create temp table using CarbonAnalytics, schema in the options - happy
-     * 1.b create temp table using CarbonAnalytics, schema in the options - happy
-     * <p/>
-     * 2.a create temp table using CA, schema inline  - NOT WORKING
-     * 2.b create temp table using CA, schema inline  - NOT WORKING
-     * <p/>
-     * 3. select queries
-     * <p/>
-     * 4. insert queries
-     * <p/>
-     * 5. working multi tenant
-     * <p/>
-     * 6.a super tenant can access other tenants' tables
-     * 6.b other tenants can only access their tables
-     * 6.c other tenants can NOT access other tables
-     * <p/>
-     * 7. spark query filtering using timestamps - happy
-     * <p/>
-     * 8. spark query failing for faulty timestamps - happy
-     *
-     * @throws AnalyticsException
-     */
-
 
     @Test
     public void testCreateTableQuery() throws AnalyticsException {
@@ -106,42 +78,42 @@ public class AnalyticsSparkExecutorTest {
         this.service.deleteTable(1, "Log1");
         System.out.println(testString("end : create temp table test"));
     }
-    
+
     @Test
-    public void testCreateTableUsingCompressedEventAnalytics() throws AnalyticsException, Exception {
+    public void testCreateTableUsingCompressedEventAnalytics() throws Exception {
         log.info(testString("start : create temp table using Compressed Event Analytics test"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
         this.service.deleteTable(1, "CompressedEventsTable");
         this.service.createTable(1, "CompressedEventsTable");
         // Set schema
-        List<ColumnDefinition> columns = new ArrayList<ColumnDefinition>();
+        List<ColumnDefinition> columns = new ArrayList<>();
         columns.add(new ColumnDefinition("meta_compressed", ColumnType.BOOLEAN));
         columns.add(new ColumnDefinition("flowData", ColumnType.STRING));
-        AnalyticsSchema compressedEventsTableSchema = new  AnalyticsSchema(columns, null);
+        AnalyticsSchema compressedEventsTableSchema = new AnalyticsSchema(columns, null);
         this.service.setTableSchema(1, "CompressedEventsTable", compressedEventsTableSchema);
         // Put sample records to the table
         List<Record> records = generateRecordsForCompressedEventAnalytics(1, "CompressedEventsTable", false);
         this.service.put(records);
         ex.executeQuery(1, "CREATE TEMPORARY TABLE EventsTable USING CompressedEventAnalytics " +
-            "OPTIONS(tableName \"CompressedEventsTable\", schema \"messageFlowId STRING, compotentType STRING, " +
-            "componentName STRING, compotentIndex INT, componentId STRING, startTime LONG, endTime LONG, " +
-            "duration FLOAT, beforePayload STRING, afterPayload STRING, contextPropertyMap STRING, " +
-            "transportPropertyMap STRING, children STRING, entryPoint STRING, entryPointHashcode INT, faultCount INT," +
-            " hashCode INT, host STRING, _tenantId INT, _timestamp LONG\")");
+                           "OPTIONS(tableName \"CompressedEventsTable\", schema \"messageFlowId STRING, compotentType STRING, " +
+                           "componentName STRING, compotentIndex INT, componentId STRING, startTime LONG, endTime LONG, " +
+                           "duration FLOAT, beforePayload STRING, afterPayload STRING, contextPropertyMap STRING, " +
+                           "transportPropertyMap STRING, children STRING, entryPoint STRING, entryPointHashcode INT, faultCount INT," +
+                           " hashCode INT, host STRING, _tenantId INT, _timestamp LONG\")");
         // Check the rows split
         AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM EventsTable");
         log.info(result);
         Assert.assertEquals(result.getRows().size(), 54, "Incorrect number of rows after spliting");
         // Check attribute count in a single event
         Assert.assertEquals(result.getRows().get(0).size(), 20, "Incorrect number of fileds in an event, after " +
-                "decompressing");
+                                                                "decompressing");
         result = ex.executeQuery(1, "SELECT * FROM EventsTable WHERE messageFlowId=\"urn_uuid_f403b0b6-4431-4a83-" +
-                "935d-c7b72867a111\"");
+                                    "935d-c7b72867a111\"");
         List<List<Object>> rowResults = result.getRows();
         Assert.assertEquals(rowResults.size(), 27, "Incorrect number of rows after spliting");
         // check the content of the decompressed events
         log.info("Checking row content after decompressing..");
-        for (int i = 0 ; i < rowResults.size() ; i++) {
+        for (int i = 0; i < rowResults.size(); i++) {
             List<Object> fields = rowResults.get(i);
             Assert.assertEquals(fields.get(0), "urn_uuid_f403b0b6-4431-4a83-935d-c7b72867a111", "Incorrect message Id");
             String componentType;
@@ -151,11 +123,11 @@ public class AnalyticsSparkExecutorTest {
                 componentType = "Mediator";
             }
             Assert.assertEquals(fields.get(1), componentType, "Incorrect component type.");
-            Assert.assertEquals(fields.get(2), "compName"+i, "Incorrect component name.");
-            Assert.assertEquals((int)fields.get(3), i, "Incorrect component index.");
-            Assert.assertEquals(fields.get(4), "compId"+i, "Incorrect component Id.");
+            Assert.assertEquals(fields.get(2), "compName" + i, "Incorrect component name.");
+            Assert.assertEquals((int) fields.get(3), i, "Incorrect component index.");
+            Assert.assertEquals(fields.get(4), "compId" + i, "Incorrect component Id.");
             //This is a stats-only event. Hence payload/properties should be null
-            for(int j = 8 ; j < 12 ; j++) {
+            for (int j = 8; j < 12; j++) {
                 Assert.assertEquals(fields.get(j), null, "Incorrect payloads/properties.");
             }
         }
@@ -166,13 +138,13 @@ public class AnalyticsSparkExecutorTest {
         this.service.deleteTable(1, "CompressedEventsTable");
         log.info(testString("end : create temp table using Compressed Event Analytics test"));
     }
-    
-    public List<Record> generateRecordsForCompressedEventAnalytics(int tenantId, String tableName,
-        boolean generateRecordIds) throws Exception {
+
+    private List<Record> generateRecordsForCompressedEventAnalytics(int tenantId, String tableName,
+                                                                    boolean generateRecordIds) throws Exception {
         List<Record> result = new ArrayList<>();
         Map<String, Object> values;
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        String[] sampleData = null;
+        String[] sampleData;
         try {
             sampleData = IOUtils.toString(classLoader.getResourceAsStream("sample-data/CompressedEventData"))
                     .split("\n");
@@ -180,14 +152,14 @@ public class AnalyticsSparkExecutorTest {
             throw new AnalyticsException(e.getMessage());
         }
         long timeTmp;
-        for (int j = 0; j < sampleData.length; j++) {
+        for (String aSampleData : sampleData) {
             values = new HashMap<>();
-            String [] fields = sampleData[j].split(",",2);
+            String[] fields = aSampleData.split(",", 2);
             values.put("meta_compressed", Boolean.parseBoolean(fields[0]));
             values.put("flowData", fields[1]);
             timeTmp = System.currentTimeMillis();
             result.add(new Record(generateRecordIds ? GenericUtils.generateRecordID() : null, tenantId, tableName,
-                values, timeTmp));
+                                  values, timeTmp));
         }
         return result;
     }
@@ -615,13 +587,6 @@ public class AnalyticsSparkExecutorTest {
 //        System.out.println(testString("end : create temp table test"));
 //    }
 
-    private void cleanupTable(int tenantId, String tableName) throws AnalyticsException {
-        if (this.service.tableExists(tenantId, tableName)) {
-            this.service.clearIndexData(tenantId, tableName);
-            this.service.deleteTable(tenantId, tableName);
-        }
-    }
-
     @Test
     public void testCreateTableWithNoSchema() throws AnalyticsException {
         System.out.println(testString("start : create temp table with no schema test"));
@@ -636,7 +601,7 @@ public class AnalyticsSparkExecutorTest {
                        ")";
         boolean success = false;
 //        try {
-            ex.executeQuery(1, query);
+        ex.executeQuery(1, query);
 //        } catch (Exception e) {
 //            System.out.println("Query failed with : " + e.getMessage());
 //            success = true;
@@ -689,7 +654,7 @@ public class AnalyticsSparkExecutorTest {
                            ")");
 
         AnalyticsSchema schema = this.service.getTableSchema(1, "Log10");
-        Assert.assertEquals(schema.getColumns().size(), 6, "Merged schema columns do not match" );
+        Assert.assertEquals(schema.getColumns().size(), 6, "Merged schema columns do not match");
 
         AnalyticsQueryResult result;
         boolean success = false;
@@ -728,11 +693,11 @@ public class AnalyticsSparkExecutorTest {
                            "OPTIONS" +
                            "(tableName \"Log11\"," +
                            "schema \"ip1 int\"," +
-                           "mergeSchema \"false\""+
+                           "mergeSchema \"false\"" +
                            ")");
 
         schema = this.service.getTableSchema(1, "Log11");
-        Assert.assertEquals(schema.getColumns().size(), 1, "Merged schema columns do not match" );
+        Assert.assertEquals(schema.getColumns().size(), 1, "Merged schema columns do not match");
 
 
         success = false;
@@ -749,51 +714,123 @@ public class AnalyticsSparkExecutorTest {
         System.out.println(result);
 
         this.cleanupTable(1, "Log11");
-        
-        
+
+
         System.out.println(testString("end : merge table schema test"));
     }
-    
-    @Test (expectedExceptions = Exception.class)
+
+    @Test
+    public void testIncrementalProcessing() throws AnalyticsException, InterruptedException {
+        String testName = "incremental processing test";
+        System.out.println(testString("start : " + testName));
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log10", 0, 10, 0, 5000);
+        records.addAll(AnalyticsRecordStoreTest.generateRecords(1, "Log11", 0, 10, 0, 5000));
+        this.service.deleteTable(1, "Log10");
+        this.service.deleteTable(1, "Log11");
+        this.service.createTable(1, "Log10");
+        this.service.createTable(1, "Log11");
+        service.put(records);
+
+        List<ColumnDefinition> cols = new ArrayList<>();
+        cols.add(new ColumnDefinition("server_name", AnalyticsSchema.ColumnType.STRING));
+        cols.add(new ColumnDefinition("ip", AnalyticsSchema.ColumnType.STRING));
+        cols.add(new ColumnDefinition("tenant", AnalyticsSchema.ColumnType.INTEGER));
+        cols.add(new ColumnDefinition("sequence", AnalyticsSchema.ColumnType.LONG));
+        cols.add(new ColumnDefinition("summary", AnalyticsSchema.ColumnType.LONG));
+        this.service.setTableSchema(1, "Log10", new AnalyticsSchema(cols, Collections.<String>emptyList()));
+        this.service.setTableSchema(1, "Log11", new AnalyticsSchema(cols, Collections.<String>emptyList()));
+
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log10 USING CarbonAnalytics " +
+                           "OPTIONS" +
+                           "(tableName \"Log10\"," +
+                           "incrementalParams \"L10, SECOND\"" +
+                           ")");
+
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log11 USING CarbonAnalytics " +
+                           "OPTIONS" +
+                           "(tableName \"Log11\"," +
+                           "incrementalParams \"L11, SECOND\"" +
+                           ")");
+
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM Log10");
+        Assert.assertEquals(result.getRows().size(), 10, "Wrong number of rows returned");
+
+        result = ex.executeQuery(1, "SELECT * FROM Log11");
+        Assert.assertEquals(result.getRows().size(), 10, "Wrong number of rows returned");
+
+        result = ex.executeQuery(1, "SELECT * FROM Log10");
+        Assert.assertEquals(result.getRows().size(), 10, "Wrong number of rows returned in the second time");
+
+        result = ex.executeQuery(1, "SELECT * FROM Log11");
+        Assert.assertEquals(result.getRows().size(), 10, "Wrong number of rows returned in the second time");
+
+        result = ex.executeQuery(1, "INCREMENTAL_TABLE_SHOW L10, L11");
+        Assert.assertEquals(result.getRows().size(), 2, "Wrong number of rows returned in incremental table show result");
+        System.out.println(result);
+
+        result = ex.executeQuery(1, "INCREMENTAL_TABLE_COMMIT L10, L11");
+        Assert.assertEquals(result.getRows().size(), 2, "Wrong number of rows returned in incremental table commit result");
+        System.out.println(result);
+
+        result = ex.executeQuery(1, "SELECT * FROM Log10");
+        Assert.assertEquals(result.getRows().size(), 1, "Wrong number of rows returned after incremental table commit");
+        result = ex.executeQuery(1, "SELECT * FROM Log11");
+        Assert.assertEquals(result.getRows().size(), 1, "Wrong number of rows returned after incremental table commit");
+
+        List<Record> newRecords = AnalyticsRecordStoreTest.generateRecords(1, "Log10", 0, 2, 11 * 5000, 5000);
+        newRecords.addAll(AnalyticsRecordStoreTest.generateRecords(1, "Log11", 0, 2, 11 * 5000, 5000));
+        this.service.put(newRecords);
+
+        result = ex.executeQuery(1, "SELECT * FROM Log10");
+        Assert.assertEquals(result.getRows().size(), 3, "Wrong number of rows returned after pushing new data");
+        result = ex.executeQuery(1, "SELECT * FROM Log11");
+        Assert.assertEquals(result.getRows().size(), 3, "Wrong number of rows returned after pushing new data");
+
+        this.cleanupTable(1, "Log10");
+        this.cleanupTable(1, "Log11");
+        this.cleanupIncrementalTable();
+        System.out.println(testString("end : " + testName));
+    }
+
+    @Test(expectedExceptions = Exception.class)
     public void testGlobalTenantCreateNonMTFail() throws Exception {
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
         ex.executeQuery(1, "CREATE TEMPORARY TABLE Stats USING CarbonAnalytics " +
-                "OPTIONS" +
-                "(tableName \"Stats\"," +
-                "schema \"name STRING, count INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
-                ")");
+                           "OPTIONS" +
+                           "(tableName \"Stats\"," +
+                           "schema \"name STRING, count INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                           ")");
     }
-    
-    @Test (expectedExceptions = Exception.class)
+
+    @Test(expectedExceptions = Exception.class)
     public void testGlobalTenantReadNonMTFail() throws Exception {
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
         ex.executeQuery(1, "CREATE TEMPORARY TABLE Stats USING CarbonAnalytics " +
-                "OPTIONS" +
-                "(tableName \"Stats\"," +
-                "schema \"name STRING, count INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
-                ")");
+                           "OPTIONS" +
+                           "(tableName \"Stats\"," +
+                           "schema \"name STRING, count INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                           ")");
         ex.executeQuery(1, "SELECT * FROM Stats");
     }
-    
-    @Test (expectedExceptions = Exception.class)
+
+    @Test(expectedExceptions = Exception.class)
     public void testGlobalTenantWriteNonMTFail() throws Exception {
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
         ex.executeQuery(1, "CREATE TEMPORARY TABLE Stats USING CarbonAnalytics " +
-                "OPTIONS" +
-                "(tableName \"Stats\"," +
-                "schema \"name STRING, count INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
-                ")");
+                           "OPTIONS" +
+                           "(tableName \"Stats\"," +
+                           "schema \"name STRING, count INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                           ")");
         ex.executeQuery(1, "INSERT INTO TABLE Stats SELECT \"api1\", 5, 1;");
     }
-    
+
     private List<Object> generateObjList(Object... objs) {
         List<Object> result = new ArrayList<>(objs.length);
-        for  (Object obj : objs) {
-            result.add(obj);
-        }
+        Collections.addAll(result, objs);
         return result;
     }
-    
+
     @Test
     public void testGlobalTenantAccess() throws AnalyticsException {
         this.service.deleteTable(1, "Stats");
@@ -802,10 +839,10 @@ public class AnalyticsSparkExecutorTest {
         this.service.deleteTable(2, "StatsSummary");
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "CREATE TEMPORARY TABLE Stats USING CarbonAnalytics " +
-                "OPTIONS" +
-                "(tableName \"Stats\"," +
-                "schema \"name STRING, cnt INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
-                ")");
+                                                              "OPTIONS" +
+                                                              "(tableName \"Stats\"," +
+                                                              "schema \"name STRING, cnt INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                                                              ")");
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "SELECT * FROM Stats");
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api1\", 5, 1;");
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api1\", 7, 1;");
@@ -815,15 +852,15 @@ public class AnalyticsSparkExecutorTest {
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api1\", 2, 2;");
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api3\", 15, 2;");
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE Stats SELECT \"api3\", 5, 2;");
-        
+
         List<Record> res1 = AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(1, "Stats", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         List<Record> res2 = AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(2, "Stats", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(res1.size(), 4);
         Assert.assertEquals(res2.size(), 4);
-        
+
         AnalyticsQueryResult res = ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "SELECT * FROM Stats");
         Assert.assertTrue(Arrays.asList(res.getColumns()).contains("_tenantId"));
-        List<List<Object>> expectedRes =  new ArrayList<>();
+        List<List<Object>> expectedRes = new ArrayList<>();
         expectedRes.add(this.generateObjList("api1", 5, 1));
         expectedRes.add(this.generateObjList("api1", 7, 1));
         expectedRes.add(this.generateObjList("api2", 10, 1));
@@ -833,20 +870,20 @@ public class AnalyticsSparkExecutorTest {
         expectedRes.add(this.generateObjList("api3", 15, 2));
         expectedRes.add(this.generateObjList("api3", 5, 2));
         Assert.assertEquals(new HashSet<>(res.getRows()), new HashSet<>(expectedRes));
-        
+
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "CREATE TEMPORARY TABLE StatsSummary USING CarbonAnalytics " +
-                "OPTIONS" +
-                "(tableName \"StatsSummary\"," +
-                "schema \"name STRING, cnt INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
-                ")");
-        
+                                                              "OPTIONS" +
+                                                              "(tableName \"StatsSummary\"," +
+                                                              "schema \"name STRING, cnt INT, _tenantId INTEGER\", globalTenantAccess \"true\"" +
+                                                              ")");
+
         ex.executeQuery(MultitenantConstants.SUPER_TENANT_ID, "INSERT INTO TABLE StatsSummary SELECT name, SUM(cnt), _tenantId FROM Stats GROUP BY name, _tenantId");
-        
+
         res1 = AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(1, "StatsSummary", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         res2 = AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(2, "StatsSummary", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(res1.size(), 2);
         Assert.assertEquals(res2.size(), 2);
-        
+
         Record res1rec1, res1rec2, res2rec1, res2rec2;
         if (res1.get(0).getValue("name").equals("api1")) {
             res1rec1 = res1.get(0);
@@ -862,12 +899,12 @@ public class AnalyticsSparkExecutorTest {
             res2rec1 = res2.get(1);
             res2rec2 = res2.get(0);
         }
-        
+
         Assert.assertEquals(res1rec1.getValue("cnt"), 12);
         Assert.assertEquals(res1rec2.getValue("cnt"), 24);
         Assert.assertEquals(res2rec1.getValue("cnt"), 16);
         Assert.assertEquals(res2rec2.getValue("cnt"), 20);
-        
+
         this.service.deleteTable(1, "Stats");
         this.service.deleteTable(2, "Stats");
         this.service.deleteTable(1, "StatsSummary");
@@ -895,6 +932,17 @@ public class AnalyticsSparkExecutorTest {
 
     private String testString(String str) {
         return "\n************** " + str.toUpperCase() + " **************\n";
+    }
+
+    private void cleanupTable(int tenantId, String tableName) throws AnalyticsException {
+        if (this.service.tableExists(tenantId, tableName)) {
+            this.service.clearIndexData(tenantId, tableName);
+            this.service.deleteTable(tenantId, tableName);
+        }
+    }
+
+    private void cleanupIncrementalTable() throws AnalyticsException {
+        this.cleanupTable(-5000, "__analytics_incremental_meta_table");
     }
 
 

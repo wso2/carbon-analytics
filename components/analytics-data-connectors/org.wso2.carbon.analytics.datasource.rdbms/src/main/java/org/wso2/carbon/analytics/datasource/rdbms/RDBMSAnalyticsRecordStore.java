@@ -166,8 +166,16 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
     
+    private int abs(int val) {
+        if (val == Integer.MIN_VALUE) {
+            return Integer.MAX_VALUE;
+        } else {
+            return Math.abs(val);
+        }
+    }
+    
     private int generatePartitionKey(String id) {
-        return Math.abs(id.hashCode()) % this.getPartitionCount();
+        return this.abs(id.hashCode()) % this.getPartitionCount();
     }
     
     private void populateStatementForAdd(PreparedStatement stmt, 
@@ -679,7 +687,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     /**
      * This class represents the RDBMS result set iterator, which will stream the result records out.
      */
-    private class RDBMSResultSetIterator implements AnalyticsIterator<Record> {
+    private static class RDBMSResultSetIterator implements AnalyticsIterator<Record> {
 
         private int tenantId;
         
@@ -758,7 +766,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
 
         @Override
-        public void finalize() throws Throwable {
+        protected void finalize() throws Throwable {
             /* in the unlikely case, this iterator does not go to the end,
              * we have to make sure the connection is cleaned up */
             RDBMSUtils.cleanupConnection(this.rs, this.stmt, this.conn);
@@ -774,7 +782,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
 
-    public class EmptyResultSetAnalyticsIterator implements AnalyticsIterator<Record>{
+    public static class EmptyResultSetAnalyticsIterator implements AnalyticsIterator<Record> {
 
         @Override
         public void close() throws IOException {
@@ -795,12 +803,13 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         public void remove() {
             /* Nothing to do */
         }
+        
     }
 
     /**
      * This class exposes an array of RecordGroup objects as an Iterator.
      */
-    private class RDBMSRecordIDListIterator implements AnalyticsIterator<Record> {
+    private static class RDBMSRecordIDListIterator implements AnalyticsIterator<Record> {
 
         private RDBMSAnalyticsRecordStore reader;
 

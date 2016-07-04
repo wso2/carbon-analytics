@@ -57,7 +57,7 @@
                 </section>
 
                 <script>
-                    var sparkVersion = '1.3.0';
+                    var sparkVersion = '1.4.1';
                     $(document).ready(function () {
                         /* Start Ptty terminal */
                         $('#terminal').Ptty();
@@ -107,7 +107,23 @@
                                 'incremental_table_commit',
                                 'Commits the incremental table information to the meta table.\n' +
                                 'Ex: incremental_table_commit T1',
-                                'INCREMENTAL_TABLE_COMMIT [incremental ID]',
+                                'INCREMENTAL_TABLE_COMMIT [incremental ID1, incremental ID2, ...]',
+                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
+                        );
+
+                        $.register_command(
+                                'incremental_table_show',
+                                'Shows the incremental meta information of tables.\n' +
+                                'Ex: incremental_table_show T1, T2',
+                                'INCREMENTAL_TABLE_SHOW [incremental ID1, incremental ID2, ...]',
+                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
+                        );
+
+                        $.register_command(
+                                'incremental_table_reset',
+                                'Resets the incremental meta information of tables\n' +
+                                'Ex: incremental_table_reset T1, T2',
+                                'INCREMENTAL_TABLE_RESET [incremental ID1, incremental ID2, ...]',
                                 '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
                         );
 

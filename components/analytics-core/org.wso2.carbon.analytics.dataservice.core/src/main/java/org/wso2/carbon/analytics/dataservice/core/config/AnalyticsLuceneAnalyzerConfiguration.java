@@ -19,9 +19,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
 /**
- * The Class represents the configuration of the lucene analyzer configurations
+ * The Class represents the configuration of the lucene analyzer configurations.
  */
 public class AnalyticsLuceneAnalyzerConfiguration {
+    
 	private String implementation;
 
 	private AnalyticsDataServiceConfigProperty[] properties;
@@ -44,4 +45,5 @@ public class AnalyticsLuceneAnalyzerConfiguration {
 	public void setProperties(AnalyticsDataServiceConfigProperty[] properties) {
 		this.properties = properties;
 	}
+	
 }

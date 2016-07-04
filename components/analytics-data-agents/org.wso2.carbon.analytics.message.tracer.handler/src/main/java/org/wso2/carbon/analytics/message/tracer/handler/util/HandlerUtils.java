@@ -31,10 +31,12 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
+import java.security.SecureRandom;
 import java.util.Map;
 
 public class HandlerUtils {
@@ -47,7 +49,8 @@ public class HandlerUtils {
     }
 
     public static String getUniqueId() {
-        return String.valueOf(System.nanoTime()) + Math.round(Math.random() * 123456789);
+        SecureRandom secRandom = new SecureRandom();
+        return String.valueOf(System.nanoTime()) + Math.round(secRandom.nextFloat() * 123456789);
     }
 
     public static void logTracingInfo(TracingInfo tracingInfo) {
@@ -77,9 +80,11 @@ public class HandlerUtils {
         dbf.setXIncludeAware(false);
         dbf.setExpandEntityReferences(false);
         try {
+            dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             dbf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE, false);
             dbf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
             dbf.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.LOAD_EXTERNAL_DTD_FEATURE, false);
+            dbf.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.DISALLOW_DOCTYPE_DECL_FEATURE, true);
         } catch (ParserConfigurationException e) {
             LOG.error(
                     "Failed to load XML Processor Feature " + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE + " or " +

@@ -18,9 +18,6 @@
  */
 package org.wso2.carbon.analytics.dataservice.core.indexing;
 
-import org.wso2.carbon.analytics.dataservice.core.indexing.IndexNodeCoordinator.LocalShardAddressInfo;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+import org.wso2.carbon.analytics.dataservice.core.indexing.IndexNodeCoordinator.LocalShardAddressInfo;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 /**
  * This class represents the global shard member mapping.
@@ -41,6 +41,8 @@ public class GlobalShardMemberMapping {
     private Map<String, Object> nodeIdMemberMap;
     
     private Map<Integer, Set<String>> shardNodeIdMap;
+    
+    private Random random = new Random();
     
     public GlobalShardMemberMapping(int shardCount, GlobalShardAllocationConfig config) throws AnalyticsException {
         this.shardCount = shardCount;
@@ -75,7 +77,6 @@ public class GlobalShardMemberMapping {
     
     private Object lookupCandidateMemberFromNodeIds(Set<String> nodeIds) {
         List<Object> members = new ArrayList<>(nodeIds.size());
-        Random randomNumberGenerator = new Random();
         Object member;
         for (String nodeId : nodeIds) {
             member = this.nodeIdMemberMap.get(nodeId);
@@ -86,7 +87,7 @@ public class GlobalShardMemberMapping {
         if (members.isEmpty()) {
             return null;
         }
-        return members.get(randomNumberGenerator.nextInt(members.size()));
+        return members.get(AnalyticsDataIndexer.abs(this.random.nextInt()) % members.size());
     }
     
     public Set<String> getNodeIdsForShard(int shardIndex) throws AnalyticsException {

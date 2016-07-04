@@ -68,4 +68,5 @@ public class AnalyticsDataPurgingConfiguration {
     public void setPurgingIncludeTables(AnalyticsDataPurgingIncludeTable[] excludeTables) {
         this.purgingIncludeTables = excludeTables;
     }
+    
 }

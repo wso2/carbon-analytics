@@ -84,7 +84,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
 
     private GlobalShardMemberMapping shardMemberMap;
 
-    private Set<Integer> suppressWarnMessagesInactiveMembers = new HashSet<>();
+    private Set<String> suppressWarnMessagesInactiveMembers = new HashSet<>();
 
     private StagingIndexDataStore stagingIndexDataStore;
 
@@ -391,16 +391,14 @@ public class IndexNodeCoordinator implements GroupEventListener {
                 this.remoteCommunicator.put(member, records);
             }
         } catch (Exception e) {
-            if (member != null) {
-                String msg = "Error in sending remote record batch put to member: " + member + ": " + e.getMessage() +
-                             " -> adding to staging area for later pickup..";
-                if (!this.suppressWarnMessagesInactiveMembers.contains(member.hashCode())) {
-                    log.warn(msg);
-                } else {
-                    log.debug(msg);
-                }
-                this.suppressWarnMessagesInactiveMembers.add(member.hashCode());
+            String msg = "Error in sending remote record batch put to member: " + member + 
+                    " with node id: " + nodeId + ": " + e.getMessage() + " -> adding to staging area for later pickup..";
+            if (!this.suppressWarnMessagesInactiveMembers.contains(nodeId)) {
+                log.warn(msg);
+            } else {
+                log.debug(msg);
             }
+            this.suppressWarnMessagesInactiveMembers.add(nodeId);
             this.checkFailedOperationCountRefresh();
             this.addToStaging(nodeId, records);
         }
@@ -425,16 +423,14 @@ public class IndexNodeCoordinator implements GroupEventListener {
                 this.remoteCommunicator.delete(member, tenantId, tableName, ids);
             }
         } catch (Exception e) {
-            if (member != null) {
-                String msg = "Error in sending remote record batch delete to member: " + member + ": " + e.getMessage() +
-                             " -> adding to staging area for later pickup..";
-                if (!this.suppressWarnMessagesInactiveMembers.contains(member.hashCode())) {
-                    log.warn(msg);
-                } else {
-                    log.debug(msg);
-                }
-                this.suppressWarnMessagesInactiveMembers.add(member.hashCode());
+            String msg = "Error in sending remote record batch delete to member: " + member + 
+                    "with node id: " + nodeId + ": " + e.getMessage() + " -> adding to staging area for later pickup..";
+            if (!this.suppressWarnMessagesInactiveMembers.contains(nodeId)) {
+                log.warn(msg);
+            } else {
+                log.debug(msg);
             }
+            this.suppressWarnMessagesInactiveMembers.add(nodeId);
             this.checkFailedOperationCountRefresh();
             this.addToStaging(nodeId, tenantId, tableName, ids);
         }
