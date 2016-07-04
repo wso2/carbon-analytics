@@ -479,7 +479,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         for (int i = 0; i < masters.length; i++) {
             buf.append(masters[i].replace("spark://", ""));
             if (i < masters.length - 1) {
-                buf.append(" , ");
+                buf.append(",");
             }
         }
         conf.setMaster(buf.toString());
