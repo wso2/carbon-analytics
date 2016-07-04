@@ -38,6 +38,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,7 +126,7 @@ public class EventSinkTemplateDeployerHelper {
                                                              + RegistryConstants.PATH_SEPARATOR + artifactId);
                 String columnDefKeys;
                 if (columnDefKeyResource.getContent() != null) {
-                    columnDefKeys = new String((byte[]) columnDefKeyResource.getContent());
+                    columnDefKeys = new String((byte[]) columnDefKeyResource.getContent(), StandardCharsets.UTF_8);
                     String[] columnDefKeyArr = columnDefKeys.split(EventSinkTemplateDeployerConstants.COLUMN_DEF_KEY_SEPARATOR);
                     for (int i = 0; i < columnDefKeyArr.length; i++) {
                         updateColDefKeyToArtifactIdsMap(registry, columnDefKeyArr[i], artifactId);
@@ -145,7 +146,7 @@ public class EventSinkTemplateDeployerHelper {
                                     + RegistryConstants.PATH_SEPARATOR + columnDefKey)) {
             Resource artifactListResource = registry.get(EventSinkTemplateDeployerConstants.COLUMN_DEF_KEY_TO_ARTIFACT_IDS_COLLECTION_PATH
                                                          + RegistryConstants.PATH_SEPARATOR + columnDefKey);
-            String artifacts = new String((byte[]) artifactListResource.getContent());
+            String artifacts = new String((byte[]) artifactListResource.getContent(), StandardCharsets.UTF_8);
             artifacts = EventSinkTemplateDeployerHelper.removeArtifactIdFromList(artifacts, artifactId);
             if (artifacts.isEmpty()) {
                 registry.delete(EventSinkTemplateDeployerConstants.COLUMN_DEF_KEY_TO_ARTIFACT_IDS_COLLECTION_PATH
@@ -196,7 +197,7 @@ public class EventSinkTemplateDeployerHelper {
             if (columnDefKeyResource.getContent() == null) {
                 columnDefKeys = incomingColKey;
             } else {
-                columnDefKeys = new String((byte[]) columnDefKeyResource.getContent());
+                columnDefKeys = new String((byte[]) columnDefKeyResource.getContent(), StandardCharsets.UTF_8);
                 columnDefKeys += EventSinkTemplateDeployerConstants.COLUMN_DEF_KEY_SEPARATOR + incomingColKey;
             }
             columnDefKeyResource.setMediaType("text/plain");
@@ -254,7 +255,7 @@ public class EventSinkTemplateDeployerHelper {
             }
             String artifactIds;
             if (artifactIdsResource.getContent() != null) {
-                artifactIds = new String((byte[]) artifactIdsResource.getContent());
+                artifactIds = new String((byte[]) artifactIdsResource.getContent(), StandardCharsets.UTF_8);
                 artifactIds += EventSinkTemplateDeployerConstants.SEPARATOR + artifactId;
             } else {
                 artifactIds = artifactId;
@@ -315,7 +316,7 @@ public class EventSinkTemplateDeployerHelper {
         String resourcePath = EventSinkTemplateDeployerConstants.COLUMN_DEF_KEY_TO_ARTIFACT_IDS_COLLECTION_PATH
                               + RegistryConstants.PATH_SEPARATOR + incomingColKey;
         Resource artifactIdResource = registry.get(resourcePath);
-        String artifactIds = new String((byte[]) artifactIdResource.getContent());
+        String artifactIds = new String((byte[]) artifactIdResource.getContent(), StandardCharsets.UTF_8);
         artifactIds += EventSinkTemplateDeployerConstants.SEPARATOR + artifactId;
         artifactIdResource.setContent(artifactIds);
         registry.put(resourcePath, artifactIdResource);
@@ -344,7 +345,7 @@ public class EventSinkTemplateDeployerHelper {
                 Resource streamIdResource = registry.get(artifactIdToStreamIdsResourcePath);
                 String streamIds;
                 if (streamIdResource.getContent() != null) {
-                    streamIds = new String((byte[]) streamIdResource.getContent());
+                    streamIds = new String((byte[]) streamIdResource.getContent(), StandardCharsets.UTF_8);
                     String[] streamIdArr = streamIds.split(EventSinkTemplateDeployerConstants.SEPARATOR);
                     List<String> unsubscriptions = new ArrayList<>();
                     for (int i = 0; i < streamIdArr.length; i++) {
@@ -379,7 +380,7 @@ public class EventSinkTemplateDeployerHelper {
                               + RegistryConstants.PATH_SEPARATOR + streamId;
         if (registry.resourceExists(resourcePath)) {
             Resource artifactListResource = registry.get(resourcePath);
-            String artifacts = new String((byte[]) artifactListResource.getContent());
+            String artifacts = new String((byte[]) artifactListResource.getContent(), StandardCharsets.UTF_8);
             artifacts = EventSinkTemplateDeployerHelper.removeArtifactIdFromList(artifacts, artifactId);
             if (artifacts.isEmpty()) {
                 streamToUnsubscribe = streamId;
