@@ -18,14 +18,57 @@
 
 package org.wso2.carbon.analytics.spark.core.udf;
 
+import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.api.java.UDF1;
+import org.apache.spark.sql.api.java.UDF10;
+import org.apache.spark.sql.api.java.UDF11;
+import org.apache.spark.sql.api.java.UDF12;
+import org.apache.spark.sql.api.java.UDF13;
+import org.apache.spark.sql.api.java.UDF14;
+import org.apache.spark.sql.api.java.UDF15;
+import org.apache.spark.sql.api.java.UDF16;
+import org.apache.spark.sql.api.java.UDF17;
+import org.apache.spark.sql.api.java.UDF18;
+import org.apache.spark.sql.api.java.UDF19;
+import org.apache.spark.sql.api.java.UDF2;
+import org.apache.spark.sql.api.java.UDF20;
+import org.apache.spark.sql.api.java.UDF21;
+import org.apache.spark.sql.api.java.UDF22;
+import org.apache.spark.sql.api.java.UDF3;
+import org.apache.spark.sql.api.java.UDF4;
+import org.apache.spark.sql.api.java.UDF5;
+import org.apache.spark.sql.api.java.UDF6;
+import org.apache.spark.sql.api.java.UDF7;
+import org.apache.spark.sql.api.java.UDF8;
+import org.apache.spark.sql.api.java.UDF9;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF0Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF10Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF11Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF12Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF13Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF14Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF15Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF16Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF17Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF18Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF19Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF1Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF20Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF21Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF22Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF2Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF3Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF4Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF5Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF6Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF7Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF8Adaptor;
+import org.wso2.carbon.analytics.spark.core.udf.adaptor.UDF9Adaptor;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-
-import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.api.java.*;
-import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
-import org.wso2.carbon.analytics.spark.core.udf.adaptor.*;
-import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 
 /**
  * This class creates UDF adaptors and register them based on the number of parameters user has given in the

@@ -39,9 +39,12 @@ public class AnalyticsRecordStoreTest {
 
     private String implementationName;
 
+    private Random randomNumberGenerator;
+
     protected void init(String implementationName, AnalyticsRecordStore analyticsRS) throws AnalyticsException {
         this.implementationName = implementationName;
         this.analyticsRS = analyticsRS;
+        randomNumberGenerator = new Random();
     }
 
     protected void cleanup() throws AnalyticsException {
@@ -304,8 +307,8 @@ public class AnalyticsRecordStoreTest {
         }
         this.cleanupT1();
         this.analyticsRS.createTable(7, "T1");
-        Random r = new Random();
-        int count = (r.nextInt(2000)) + 1;
+
+        int count = (randomNumberGenerator.nextInt(2000)) + 1;
         List<Record> records = generateRecords(7, "T1", 1, count, 15000, 333);
         this.analyticsRS.put(records);
         long res = this.analyticsRS.getRecordCount(7, "T1", Long.MIN_VALUE, Long.MAX_VALUE);

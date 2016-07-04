@@ -18,6 +18,9 @@
  */
 package org.wso2.carbon.analytics.dataservice.core.indexing;
 
+import org.wso2.carbon.analytics.dataservice.core.indexing.IndexNodeCoordinator.LocalShardAddressInfo;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,9 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
-import org.wso2.carbon.analytics.dataservice.core.indexing.IndexNodeCoordinator.LocalShardAddressInfo;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 /**
  * This class represents the global shard member mapping.
