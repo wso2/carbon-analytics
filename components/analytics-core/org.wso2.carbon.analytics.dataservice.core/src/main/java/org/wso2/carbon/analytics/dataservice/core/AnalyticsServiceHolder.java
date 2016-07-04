@@ -40,7 +40,7 @@ public class AnalyticsServiceHolder {
 
     private static AnalyticsClusterManager analyticsClusterManager;
 
-    private static AnalyticsDataService analyticsDataService;
+    private static volatile AnalyticsDataService analyticsDataService;
 
     private static RealmService realmService;
 
@@ -66,7 +66,11 @@ public class AnalyticsServiceHolder {
 
     public static AnalyticsDataService getAnalyticsDataService() {
         if (analyticsDataService == null) {
-            checkAndPopulateCustomAnalyticsDS();
+            synchronized (AnalyticsServiceHolder.class) {
+                if (analyticsDataService == null) {
+                    checkAndPopulateCustomAnalyticsDS();
+                }
+            }
         }
         return analyticsDataService;
     }
