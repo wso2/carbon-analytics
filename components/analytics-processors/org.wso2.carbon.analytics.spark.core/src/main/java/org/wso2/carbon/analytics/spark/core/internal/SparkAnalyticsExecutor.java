@@ -479,7 +479,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         for (int i = 0; i < masters.length; i++) {
             buf.append(masters[i].replace("spark://", ""));
             if (i < masters.length - 1) {
-                buf.append(" , ");
+                buf.append(",");
             }
         }
         conf.setMaster(buf.toString());
@@ -729,17 +729,14 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             query = query.substring(0, query.length() - 1).trim();
         }
 
-        // process incremental table commit query
-        // todo: enable this for multiple tables
-        // todo: add an incremental table reset query with wild cards
-        // todo: add an incremental table show data query w/ wild cards
+        // process incremental queries
         if (checkIncrementalQuery(query)) {
             return processIncQuery(tenantId, query);
         }
 
         query = encodeQueryWithTenantId(tenantId, query);
         if (log.isDebugEnabled()) {
-            log.debug("Executing : " + query);
+            log.debug("Executing : " + origQuery);
         }
 
         long start = System.currentTimeMillis();
