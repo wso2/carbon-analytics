@@ -951,9 +951,7 @@ public class AnalyticsEventTable implements EventTable {
                                 pkMismatch = true;
                             }
                         } else if (rhs != null) {
-                            if (!rhs.equals(lhs)) {
-                                pkMismatch = true;
-                            }
+                            pkMismatch = true;
                         }
                         if (pkMismatch) {
                             throw new IllegalStateException("The primary key cannot be updated, "

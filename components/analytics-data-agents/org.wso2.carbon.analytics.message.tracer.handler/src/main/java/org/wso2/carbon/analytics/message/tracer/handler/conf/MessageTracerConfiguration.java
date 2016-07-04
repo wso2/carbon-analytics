@@ -33,7 +33,7 @@ import java.util.Set;
 @XmlRootElement (name = "MessageTracer")
 public class MessageTracerConfiguration {
 
-    private static Marshaller msgTracingMarshaller;
+    private Marshaller msgTracingMarshaller;
 
     private Set<String> messageTracingEnabledAdminServices;
 

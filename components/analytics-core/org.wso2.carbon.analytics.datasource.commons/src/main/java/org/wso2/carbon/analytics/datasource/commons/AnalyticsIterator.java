@@ -20,6 +20,9 @@ package org.wso2.carbon.analytics.datasource.commons;
 import java.io.Closeable;
 import java.util.Iterator;
 
+/**
+ * This interface represents an analytics iterator which is also capable of closing and releasing its resources.
+ */
 public interface AnalyticsIterator<T> extends Iterator<T>, Closeable {
 
 }

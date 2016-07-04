@@ -104,7 +104,7 @@ package object carbon {
       conn.setAutoCommit(false) // Everything in the same db transaction.
       var committed = false
       try {
-        val qConf = CarbonJDBCUtils.getQueryConfigEntry(conn)
+        val qConf = CarbonJDBCUtils.getQueryConfigEntry(conn, table)
         var stmt: PreparedStatement = null
         if (primaryKeys.length > 0) {
           stmt = mergeStatement(conn, table, primaryKeys, rddSchema, qConf)
@@ -286,7 +286,7 @@ package object carbon {
       val dsWrapper = new AnalyticsDatasourceWrapper(dataSource)
       val conn = dsWrapper.getConnection
       try {
-        val quotedColumns = requiredColumns.map(colName => CarbonJDBCUtils.quoteIdentifier(colName, conn))
+        val quotedColumns = requiredColumns.map(colName => CarbonJDBCUtils.quoteIdentifier(colName, conn, fqTable))
         new JDBCRDD(
           sc,
           dsWrapper.getConnection,

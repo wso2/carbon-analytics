@@ -46,8 +46,8 @@ object CarbonJDBCUtils {
 
   private final val log: Log = LogFactory.getLog(getClass.getName)
 
-  def quoteIdentifier(colName: String, conn: Connection): String = {
-    val quote = getQueryConfigEntry(conn).getQuoteMark
+  def quoteIdentifier(colName: String, conn: Connection, table: String): String = {
+    val quote = getQueryConfigEntry(conn, table).getQuoteMark
     s"$quote$colName$quote"
   }
 
@@ -62,7 +62,7 @@ object CarbonJDBCUtils {
     * Returns true if the table already exists in the JDBC database.
     */
   def tableExists(conn: Connection, table: String): Boolean = {
-    val qConfEntry = getQueryConfigEntry(conn)
+    val qConfEntry = getQueryConfigEntry(conn, table)
     val query = qConfEntry.getTableCheckQuery.replace("{{TABLE_NAME}}", table)
     val result = Try(conn.prepareStatement(query).executeQuery().next())
     if (result.isFailure) {
@@ -74,14 +74,21 @@ object CarbonJDBCUtils {
   /**
     * Returns the matching Spark JDBC query configuration entry JAXB instance for the connection
     */
-  def getQueryConfigEntry(conn: Connection): SparkJDBCQueryConfigEntry = {
+  def getQueryConfigEntry(conn: Connection, table: String): SparkJDBCQueryConfigEntry = {
     val qConf = SparkJDBCUtils.loadQueryConfiguration()
-    var dbType = conn.getMetaData.getDatabaseProductName
-
+    val dmd = conn.getMetaData
+    var dbType = dmd.getDatabaseProductName
+    val dbVersion = dmd.getDatabaseMajorVersion + "." + dmd.getDatabaseMinorVersion
     if (dbType.startsWith("DB2")) {
       dbType = "DB2.*"
     }
-    qConf.getDatabases.find(entry => entry.getDatabaseName.equalsIgnoreCase(dbType)).get
+    //qConf.getDatabases.find(entry => entry.getDatabaseName.equalsIgnoreCase(dbType)).get
+    val entries = qConf.getDatabases.filter(entry => entry.getDatabaseName.equalsIgnoreCase(dbType) && (entry.getVersion.isEmpty
+      || entry.getVersion.equalsIgnoreCase(dbVersion)))
+    if (entries.isEmpty) {
+      throw new AnalyticsExecutionException(s"No suitable query configuration entry found for creating '$table'")
+    }
+    entries(0)
   }
 
   /**
@@ -103,10 +110,10 @@ object CarbonJDBCUtils {
     var committed = false
     try {
       if (tableExists(conn, tableName)) {
-        log.debug(s"Returning without action since table $tableName already exists.")
+        log.debug(s"Returning without action since '$tableName' already exists.")
         return
       }
-      val queryConfig = getQueryConfigEntry(conn)
+      val queryConfig = getQueryConfigEntry(conn, tableName)
       val statements = constructStatements(tableName, schema, queryConfig, primaryKeys)
       conn.prepareStatement(statements._1).execute()
       if (statements._2.nonEmpty) {
@@ -116,9 +123,9 @@ object CarbonJDBCUtils {
       committed = true
     } catch {
       case e: SQLException => throw new
-          AnalyticsExecutionException(s"Error while creating table $tableName on datasource $dataSource : " + e.getMessage, e)
+          AnalyticsExecutionException(s"Error while creating table '$tableName' in $dataSource: " + e.getMessage, e)
       case e: Exception => throw new
-          AnalyticsExecutionException(s"Error while resolving the table $tableName in datasource  $dataSource : " + e.getMessage, e)
+          AnalyticsExecutionException(s"Error while resolving the table '$tableName' in $dataSource: " + e.getMessage, e)
     } finally {
       if (!committed) {
         conn.rollback()
@@ -198,14 +205,14 @@ object CarbonJDBCUtils {
     * Truncates a specified table using the connection provided.
     */
   def truncateTable(conn: Connection, table: String) = {
-    val qConfEntry = getQueryConfigEntry(conn)
+    val qConfEntry = getQueryConfigEntry(conn, table)
     val query = qConfEntry.getTableTruncateQuery.replace("{{TABLE_NAME}}", table)
     try {
       conn.prepareStatement(query).execute()
       conn.commit()
     } catch {
       case e: SQLException => throw new
-          AnalyticsExecutionException(s"Error while truncating table $table : " + e.getMessage, e)
+          AnalyticsExecutionException(s"Error while truncating '$table': " + e.getMessage, e)
     }
 
   }

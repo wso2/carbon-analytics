@@ -38,7 +38,6 @@ import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 import scala.collection.Iterator;
 
 import javax.lang.model.type.NullType;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -215,11 +214,11 @@ public class AnalyticsCommonUtils {
     }
 
     public static boolean isEmptyAnalyticsSchema(AnalyticsSchema analyticsSchema) {
-        return analyticsSchema == null || analyticsSchema.getColumns() == null;
+        return analyticsSchema == null || analyticsSchema.getColumns() == null || analyticsSchema.getColumns().size() == 0;
     }
 
     public static boolean isEmptySchema(StructType schema) {
-        return schema == null || schema.fieldNames() == null;
+        return schema == null || schema.fieldNames() == null || schema.fieldNames().length == 0;
     }
 
     public static StructField[] extractFieldsFromColumns(Map<String, ColumnDefinition> columns) {
@@ -264,32 +263,32 @@ public class AnalyticsCommonUtils {
         return new AnalyticsSchema(colDefs, Collections.<String>emptyList());
     }
 
-    public static StructType structTypeFromAnalyticsSchema(AnalyticsSchema analyticsSchema){
+    public static StructType structTypeFromAnalyticsSchema(AnalyticsSchema analyticsSchema) {
         return new StructType(extractFieldsFromColumns(analyticsSchema.getColumns()));
     }
-    
-    public static void createTableIfNotExists(AnalyticsDataService ads, String recordStore, 
-            int targetTenantId, String targetTableName) throws AnalyticsException {
+
+    public static void createTableIfNotExists(AnalyticsDataService ads, String recordStore,
+                                              int targetTenantId, String targetTableName) throws AnalyticsException {
         if (!ads.listRecordStoreNames().contains(recordStore)) {
             throw new AnalyticsExecutionException("Unknown data store name: " + recordStore);
         }
         ads.createTableIfNotExists(targetTenantId, recordStore, targetTableName);
     }
-    
+
     public static boolean isSchemaProvided(String schemaString) {
         return !schemaString.isEmpty();
     }
-    
+
     private static void logDebug(String msg) {
         if (log.isDebugEnabled()) {
             log.debug(msg);
         }
     }
-    
+
     private static List<String> createPrimaryKeyList(String primaryKeyStr) {
         return new ArrayList<>(Arrays.asList(primaryKeyStr.trim().split("\\s*,\\s*")));
     }
-    
+
     private static boolean isTimestampColumn(String[] tokens) throws AnalyticsExecutionException {
         if (tokens[0].equalsIgnoreCase(AnalyticsConstants.TIMESTAMP_FIELD)) {
             if (tokens.length > 3 || tokens.length < 2) {
@@ -301,11 +300,11 @@ public class AnalyticsCommonUtils {
         }
         return false;
     }
-    
+
     private static boolean isTenantFieldColumn(String[] tokens) throws AnalyticsExecutionException {
         return tokens[0].equalsIgnoreCase(AnalyticsConstants.TENANT_ID_FIELD);
     }
-    
+
     /**
      * this method creates a list of column definitions, which will be used to set the schema in the
      * analytics data service. additionally, it creates a structType object for spark schema
@@ -313,10 +312,16 @@ public class AnalyticsCommonUtils {
      * @param colsStr column string
      * @return column def list
      */
-    private static List<ColumnDefinition> createColumnDefinitionsFromString(String colsStr, boolean globalTenantAccess, boolean sparkSchema)
+    private static List<ColumnDefinition> createColumnDefinitionsFromString(String colsStr, boolean globalTenantAccess,
+                                                                            boolean sparkSchema)
             throws AnalyticsExecutionException {
-        String[] strFields = colsStr.split("\\s*,\\s*");
         ArrayList<ColumnDefinition> resList = new ArrayList<>();
+
+        if (colsStr.trim().isEmpty()) {
+            return resList;
+        }
+
+        String[] strFields = colsStr.split("\\s*,\\s*");
         for (String strField : strFields) {
             String[] tokens = strField.trim().split("\\s+");
             if (tokens.length >= 2) {
@@ -359,7 +364,7 @@ public class AnalyticsCommonUtils {
                         Set<String> indexOptions = new HashSet<>(2);
                         indexOptions.addAll(Arrays.asList(tokens[2], tokens[3]));
                         if (indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_FACET) && // if score param and facet
-                                indexOptions.contains(AnalyticsDataServiceUtils.OPTION_SCORE_PARAM)) {
+                            indexOptions.contains(AnalyticsDataServiceUtils.OPTION_SCORE_PARAM)) {
                             resList.add(new ColumnDefinition(tokens[0], type, true, true, true));
                         } else if (indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_FACET) &&  //if facet and index
                                    indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_INDEXED)) {
@@ -378,16 +383,22 @@ public class AnalyticsCommonUtils {
 
         return resList;
     }
-    
-    public static StructType createSparkSchemaStruct(AnalyticsDataService ads, int targetTenantId, String targetTableName, 
-            String schemaString, String primaryKeys, boolean globalTenantAccess, boolean mergeFlag) throws AnalyticsException {
-        AnalyticsSchema schema = createAnalyticsTableSchema(ads, targetTenantId, targetTableName, schemaString, 
-                primaryKeys, globalTenantAccess, mergeFlag, true);
+
+    public static StructType createSparkSchemaStruct(AnalyticsDataService ads, int targetTenantId,
+                                                     String targetTableName,
+                                                     String schemaString, String primaryKeys,
+                                                     boolean globalTenantAccess, boolean mergeFlag)
+            throws AnalyticsException {
+        AnalyticsSchema schema = createAnalyticsTableSchema(ads, targetTenantId, targetTableName, schemaString,
+                                                            primaryKeys, globalTenantAccess, mergeFlag, true);
         return structTypeFromAnalyticsSchema(schema);
     }
-    
-    public static AnalyticsSchema createAnalyticsTableSchema(AnalyticsDataService ads, int targetTenantId, String targetTableName, 
-            String schemaString, String primaryKeys, boolean globalTenantAccess, boolean mergeFlag, boolean sparkSchema) throws AnalyticsException {
+
+    public static AnalyticsSchema createAnalyticsTableSchema(AnalyticsDataService ads, int targetTenantId,
+                                                             String targetTableName,
+                                                             String schemaString, String primaryKeys,
+                                                             boolean globalTenantAccess, boolean mergeFlag,
+                                                             boolean sparkSchema) throws AnalyticsException {
         List<String> pKeyList;
         if (!primaryKeys.isEmpty()) {
             pKeyList = createPrimaryKeyList(primaryKeys);
@@ -396,14 +407,20 @@ public class AnalyticsCommonUtils {
         }
         List<ColumnDefinition> schemaColList = createColumnDefinitionsFromString(schemaString, globalTenantAccess, sparkSchema);
         AnalyticsSchema schema = new AnalyticsSchema(schemaColList, pKeyList);
+
+        if (sparkSchema && !isEmptyAnalyticsSchema(schema)) {
+            return schema;
+        }
+
         if (mergeFlag) {
             schema = createMergedSchema(ads, targetTenantId, targetTableName, schema);
         }
         return schema;
     }
-    
-    private static AnalyticsSchema createMergedSchema(AnalyticsDataService ads, int targetTenantId, 
-            String targetTableName, AnalyticsSchema schema) throws AnalyticsException {
+
+    private static AnalyticsSchema createMergedSchema(AnalyticsDataService ads, int targetTenantId,
+                                                      String targetTableName, AnalyticsSchema schema)
+            throws AnalyticsException {
         AnalyticsSchema existingSchema = null;
         try {
             existingSchema = ads.getTableSchema(targetTenantId, targetTableName);
@@ -414,11 +431,11 @@ public class AnalyticsCommonUtils {
             }
         }
         if (!isEmptyAnalyticsSchema(existingSchema)) {
-            return AnalyticsDataServiceUtils.createMergedSchema(existingSchema, schema.getPrimaryKeys(), 
-                    new ArrayList<>(schema.getColumns().values()), Collections.<String>emptyList());
+            return AnalyticsDataServiceUtils.createMergedSchema(existingSchema, schema.getPrimaryKeys(),
+                                                                new ArrayList<>(schema.getColumns().values()), Collections.<String>emptyList());
         } else {
             return schema;
         }
     }
-    
+
 }

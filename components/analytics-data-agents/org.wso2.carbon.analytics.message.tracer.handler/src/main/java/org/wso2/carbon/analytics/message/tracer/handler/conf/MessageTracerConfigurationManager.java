@@ -33,13 +33,14 @@ public class MessageTracerConfigurationManager {
 
     private static MessageTracerConfiguration configuration;
 
+    private final static String CONFIG_FILE_PATH = CarbonUtils.getCarbonConfigDirPath() + File.separator + "etc" + File.separator + MSG_TRACER_FILE;
+
     private MessageTracerConfigurationManager() {
     }
 
     public static MessageTracerConfiguration getMessageTracerConfiguration() throws Exception {
         try {
-            File msgTracerConfigFile = new File(CarbonUtils.getCarbonConfigDirPath() + File.separator + "etc" +
-                    File.separator + MSG_TRACER_FILE);
+            File msgTracerConfigFile = new File(CONFIG_FILE_PATH);
             if (msgTracerConfigFile.exists()) {
                 Document doc = HandlerUtils.convertToDocument(msgTracerConfigFile);
                 JAXBContext ctx = JAXBContext.newInstance(MessageTracerConfiguration.class);

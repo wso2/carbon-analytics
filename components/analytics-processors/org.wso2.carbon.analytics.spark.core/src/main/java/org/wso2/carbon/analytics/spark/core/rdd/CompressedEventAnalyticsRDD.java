@@ -51,7 +51,7 @@ import com.esotericsoftware.kryo.io.Input;
 public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Serializable {
 
     private static final long serialVersionUID = 5948588299500227997L;
-    List<String> outputColumns;
+    private List<String> outputColumns;
 
     public CompressedEventAnalyticsRDD() {
         super();
@@ -62,7 +62,6 @@ public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Seriali
      * 
      * @param tenantId      Tenant ID
      * @param tableName     Name of the associated table
-     * @param mergeSchema   Flag to merge the existing schema and the defined schema
      * @param sc            Spark Context
      * @param deps          Scala Sequence
      * @param evidence      Class Tag
@@ -94,12 +93,12 @@ public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Seriali
         allColumns.add(AnalyticsConstants.META_FIELD_COMPRESSED);
         return allColumns;
     }
-    
+
 
     /**
      * Row iterator implementation to act as an adaptor for a record iterator.
      */
-    private class CompressedEventRowRecordIteratorAdaptor implements Iterator<Row>, Serializable {
+    private static class CompressedEventRowRecordIteratorAdaptor implements Iterator<Row>, Serializable {
         private static final long serialVersionUID = -8866801517386445810L;
         private Iterator<Record> recordItr;
         private Iterator<Row> rows;
@@ -117,7 +116,7 @@ public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Seriali
             this.tenantId = tenantId;
             this.incEnable = incEnable;
             this.incID = incID;
-            
+
             /* Class registering precedence matters. Hence intentionally giving a registration ID */
             kryo.register(HashMap.class, 111);
             kryo.register(ArrayList.class, 222);
@@ -143,7 +142,7 @@ public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Seriali
             }
             return hasNext;
         }
-        
+
         private void updateIncProcessingTS() {
             try {
                 long existingIncTS = ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(this.tenantId,
@@ -175,7 +174,7 @@ public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Seriali
 
         /**
          * Converts a DB record to Spark Row(s). Create one ore more rows from a single record.
-         * 
+         *
          * @param record    Record to be converted to row(s)
          */
         @SuppressWarnings("unchecked")
@@ -191,18 +190,18 @@ public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Seriali
                     unzippedByteArray = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(eventsString));
                 }
                 Input input = new Input(unzippedByteArray);
-                
+
                 Map<String, Object> aggregatedEvent = this.kryo.readObject(input, HashMap.class);
                 List<List<Object>> eventsList = (List<List<Object>>) aggregatedEvent.get(
                     AnalyticsConstants.EVENTS_ATTRIBUTE);
                 List<PublishingPayload> payloadsList = (List<PublishingPayload>) aggregatedEvent.get(
                     AnalyticsConstants.PAYLOADS_ATTRIBUTE);
-                
+
                 String host = (String)aggregatedEvent.get(AnalyticsConstants.HOST_ATTRIBUTE);
                 // Iterate over the array of events
                 for (int i = 0; i < eventsList.size(); i++) {
                     // Create a row with extended fields
-                    tempRows.add(RowFactory.create(CompressedEventAnalyticsUtils.getFieldValues(this.columns, eventsList.get(i), 
+                    tempRows.add(RowFactory.create(CompressedEventAnalyticsUtils.getFieldValues(this.columns, eventsList.get(i),
                         payloadsList, i, record.getTimestamp(), record.getTenantId(), host)));
                 }
             } else {
@@ -210,8 +209,8 @@ public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Seriali
             }
             return tempRows.iterator();
         }
-        
-        
+
+
         @Override
         public void remove() {
             this.recordItr.remove();

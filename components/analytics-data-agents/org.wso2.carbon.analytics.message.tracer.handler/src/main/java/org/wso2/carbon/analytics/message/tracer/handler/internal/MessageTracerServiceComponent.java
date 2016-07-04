@@ -51,7 +51,7 @@ public class MessageTracerServiceComponent {
 
     private static final Log LOG = LogFactory.getLog(MessageTracerServiceComponent.class);
 
-    private static ConfigurationContext configurationContext;
+    private ConfigurationContext configurationContext;
 
     private static MessageTracerConfiguration msgTracerConfiguration;
 

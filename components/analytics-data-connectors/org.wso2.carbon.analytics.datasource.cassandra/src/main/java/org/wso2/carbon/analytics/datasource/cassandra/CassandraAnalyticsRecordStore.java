@@ -140,9 +140,9 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         for (CassandraTokenRange token : tokens.values())  {
             this.assignTokenRangeToHost(token, hostTokensMap, hostTokenCounts, maxTokensPerHost);
         }
-        for (Host host : hostTokensMap.keySet()) {
-            String ip = host.getAddress().getHostAddress();
-            List<CassandraTokenRange> hostTokens = hostTokensMap.get(host);
+        for (Map.Entry<Host, List<CassandraTokenRange>> entry : hostTokensMap.entrySet()) {
+            String ip = entry.getKey().getAddress().getHostAddress();
+            List<CassandraTokenRange> hostTokens = entry.getValue();
             int partitionSize = (int) Math.ceil(hostTokens.size() / (double) partitionsPerHost);
             for (List<CassandraTokenRange> hostPartitionTokens : Lists.partition(hostTokens, partitionSize)) {
                 result.add(new TokenRangeRecordGroup(tenantId, tableName, columns,
@@ -774,7 +774,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     /**
      * Cassandra {@link RecordGroup} implementation to be used without partitioning.
      */
-    public class GlobalCassandraRecordGroup implements RecordGroup {
+    public static class GlobalCassandraRecordGroup implements RecordGroup {
 
         private static final long serialVersionUID = 4922546772273816597L;
         

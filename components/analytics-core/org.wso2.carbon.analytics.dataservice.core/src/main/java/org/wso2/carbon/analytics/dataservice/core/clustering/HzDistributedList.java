@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.analytics.dataservice.core.clustering;
 
 import java.util.Arrays;
@@ -31,6 +30,7 @@ import java.util.concurrent.ConcurrentMap;
  * This is a custom List implementation to support distributed Lists in Hazelcast cluster.
  */
 public class HzDistributedList<E> implements List<E> {
+    
     private static String HAZELCAST_LIST_KEY = "DAS_HAZELCAST_LIST_KEY";
     private final ConcurrentMap<Object, E> hzMap;
 
@@ -71,36 +71,30 @@ public class HzDistributedList<E> implements List<E> {
     }
 
     @Override
-    public Object[] toArray() {
-        synchronized (hzMap) {
-            Object[] objects = new Object[hzMap.size()];
-            for (int i = 0; i < size(); i++) {
-                objects[i] = get(i);
-            }
-            return objects;
+    public synchronized Object[] toArray() {
+        Object[] objects = new Object[hzMap.size()];
+        for (int i = 0; i < size(); i++) {
+            objects[i] = get(i);
         }
+        return objects;
     }
 
     @Override
-    public boolean add(E o) {
-        synchronized (hzMap) {
-            int lastIndex = getLastIndex() + 1;
-            this.hzMap.put(HAZELCAST_LIST_KEY + String.valueOf(lastIndex), o);
-            return true;
-        }
+    public synchronized boolean add(E o) {
+        int lastIndex = this.getLastIndex() + 1;
+        this.hzMap.put(HAZELCAST_LIST_KEY + String.valueOf(lastIndex), o);
+        return true;
     }
 
     @Override
-    public boolean remove(Object o) {
-        synchronized (hzMap) {
-            for (int i = 0; i < hzMap.size(); i++) {
-                if (o == this.get(i) || o.equals(this.get(i))) {
-                    this.remove(i);
-                    return true;
-                }
+    public synchronized boolean remove(Object o) {
+        for (int i = 0; i < this.hzMap.size(); i++) {
+            if (o == this.get(i) || o.equals(this.get(i))) {
+                this.remove(i);
+                return true;
             }
-            return false;
         }
+        return false;
     }
 
     @Override
@@ -135,12 +129,12 @@ public class HzDistributedList<E> implements List<E> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T[] toArray(T[] a) {
+    public synchronized <T> T[] toArray(T[] a) {
         // Make a new array of a's runtime type, but my contents:
         if (a.length < hzMap.size()) {
             return (T[]) Arrays.copyOf(toArray(), hzMap.size(), a.getClass());
         }
-        System.arraycopy(toArray(), 0, a, 0, hzMap.size());
+        System.arraycopy(this.toArray(), 0, a, 0, hzMap.size());
         if (a.length > hzMap.size()) {
             a[hzMap.size()] = null;
         }
@@ -152,40 +146,38 @@ public class HzDistributedList<E> implements List<E> {
     }
 
     @Override
-    public E set(int index, E element) {
+    public synchronized E set(int index, E element) {
         E previousObject = this.get(index);
         this.hzMap.put(HAZELCAST_LIST_KEY + String.valueOf(index), element);
         return previousObject;
     }
 
     @Override
-    public void add(int index, E element) {
-        for (int i = getLastIndex(); i <= index; i--) {
+    public synchronized void add(int index, E element) {
+        for (int i = this.getLastIndex(); i <= index; i--) {
             this.hzMap.put(HAZELCAST_LIST_KEY + String.valueOf(i), this.hzMap.get(HAZELCAST_LIST_KEY + String.valueOf(i - 1)));
         }
         this.hzMap.put(HAZELCAST_LIST_KEY + String.valueOf(index), element);
     }
 
     @Override
-    public E remove(int index) {
-        synchronized (hzMap) {
-            E removingObject;
-            removingObject = this.get(index);
-            int lastItem = 0;
-            for (int i = index; i <= getLastIndex(); i++) {
-                E value = this.hzMap.get(HAZELCAST_LIST_KEY + String.valueOf(i + 1));
-                if (value != null) {
-                    this.hzMap.put(HAZELCAST_LIST_KEY + String.valueOf(i), value);
-                }
-                lastItem = i;
+    public synchronized E remove(int index) {
+        E removingObject;
+        removingObject = this.get(index);
+        int lastItem = 0;
+        for (int i = index; i <= getLastIndex(); i++) {
+            E value = this.hzMap.get(HAZELCAST_LIST_KEY + String.valueOf(i + 1));
+            if (value != null) {
+                this.hzMap.put(HAZELCAST_LIST_KEY + String.valueOf(i), value);
             }
-            this.hzMap.remove(HAZELCAST_LIST_KEY + String.valueOf(lastItem));
-            return removingObject;
+            lastItem = i;
         }
+        this.hzMap.remove(HAZELCAST_LIST_KEY + String.valueOf(lastItem));
+        return removingObject;
     }
 
     @Override
-    public int indexOf(Object o) {
+    public synchronized int indexOf(Object o) {
         if (o == null) {
             for (int i = 0; i < size(); i++) {
                 if (this.get(i) == null) {
@@ -203,7 +195,7 @@ public class HzDistributedList<E> implements List<E> {
     }
 
     @Override
-    public int lastIndexOf(Object o) {
+    public synchronized int lastIndexOf(Object o) {
         if (o == null) {
             for (int i = size() - 1; i >= 0; i--) {
                 if (this.get(i) == null) {
@@ -244,35 +236,35 @@ public class HzDistributedList<E> implements List<E> {
      * Iterator implementation.
      */
     private class HzDistributedListIterator<T> implements Iterator<T> {
+        
         int position;       // index of next element to return
 
-        public boolean hasNext() {
+        public synchronized boolean hasNext() {
             return position < size();
         }
 
         @SuppressWarnings("unchecked")
-        public T next() {
-            synchronized (hzMap) {
-                if (position >= size()) {
-                    throw new NoSuchElementException();
-                }
-                T temp = (T) hzMap.get(HAZELCAST_LIST_KEY + String.valueOf(position));
-                position++;
-                return temp;
+        public synchronized T next() {
+            if (this.position >= size()) {
+                throw new NoSuchElementException();
             }
+            T temp = (T) hzMap.get(HAZELCAST_LIST_KEY + String.valueOf(this.position));
+            this.position++;
+            return temp;
         }
 
-        public void remove() {
-            if (position < 0) {
+        public synchronized void remove() {
+            if (this.position < 0) {
                 throw new IllegalStateException();
             }
             try {
-                HzDistributedList.this.remove(position);
-                position--;
+                HzDistributedList.this.remove(this.position);
+                this.position--;
             } catch (IndexOutOfBoundsException ex) {
                 throw new ConcurrentModificationException();
             }
         }
 
     }
+    
 }

@@ -34,7 +34,7 @@ import static org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants.SPARK
  */
 public class SparkJDBCUtils {
 
-    public static String SPARK_JDBC_CONFIG_FILE = "spark-jdbc-config.xml";
+    public static final String SPARK_JDBC_CONFIG_FILE = "spark-jdbc-config.xml";
 
     public static SparkJDBCQueryConfiguration loadQueryConfiguration() throws AnalyticsException {
         try {

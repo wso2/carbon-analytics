@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.wso2.carbon.analytics.dataservice.core.indexing.IndexNodeCoordinator.LocalShardAddressInfo;
@@ -40,6 +41,8 @@ public class GlobalShardMemberMapping {
     private Map<String, Object> nodeIdMemberMap;
     
     private Map<Integer, Set<String>> shardNodeIdMap;
+    
+    private Random random = new Random();
     
     public GlobalShardMemberMapping(int shardCount, GlobalShardAllocationConfig config) throws AnalyticsException {
         this.shardCount = shardCount;
@@ -84,7 +87,7 @@ public class GlobalShardMemberMapping {
         if (members.isEmpty()) {
             return null;
         }
-        return members.get((int) (members.size() * Math.random()));
+        return members.get(AnalyticsDataIndexer.abs(this.random.nextInt()) % members.size());
     }
     
     public Set<String> getNodeIdsForShard(int shardIndex) throws AnalyticsException {
