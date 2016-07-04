@@ -24,30 +24,16 @@ var getConfig, validate, isProviderRequired, draw, update;
      * @param schema
      */
     getConfig = function(schema) {
-        var chartConf = require(CHART_LOCATION + '/scatter-chart/config.json').config;
+        var chartConf = require(CHART_LOCATION + '/number-chart/config.json').config;
         /*
          dynamic logic goes here
          */
-
-         var columns = [];
-
-         columns.push("None");
-         for(var i=0; i < schema.length; i++) {
-            columns.push(schema[i]["fieldName"]);
-         }
-
-        for(var i=0; i < chartConf.length; i++) {
-            if (chartConf[i]["fieldName"] == "color"
-                || chartConf[i]["fieldName"] == "size" ) {
-                chartConf[i]["valueSet"] = columns;
-            }
-        }
-
         return chartConf;
+
     };
 
     /**
-     * validate the user inout for the chart configuration
+     * validate the user inout for the chart configurationx
      * @param chartConfig
      */
     validate = function(chartConfig) {
@@ -114,20 +100,11 @@ var getConfig, validate, isProviderRequired, draw, update;
         conf.x = _chartConfig.x;
         conf.charts = [];
         conf.charts[0] = {
-            type : "scatter",
-            y: _chartConfig.y
+            type : "number",
+            title : _chartConfig.title
         };
-
-        if (_chartConfig.color != "None") {
-            conf.charts[0].color = _chartConfig.color;
-        }
-
-        if (_chartConfig.size != "None") {
-            conf.charts[0].size = _chartConfig.size;
-        }
-
         return conf;
     };
 
-
+    
 }());

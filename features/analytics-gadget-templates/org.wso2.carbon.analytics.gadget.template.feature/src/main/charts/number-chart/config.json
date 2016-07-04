@@ -1,0 +1,28 @@
+{
+    "info": {
+        "id": "number-chart",
+        "name": "Number Chart"
+    },
+    "config": [
+        {
+            "fieldLabel": "X axis",
+            "fieldName": "x",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "Title",
+            "fieldName": "title",
+            "fieldType": "string"
+        }
+    ],
+    "imports": {
+        "shared-libs":{
+            "js" :["analytics-wso2_5.0.12/d3.min.js", "analytics-wso2_5.0.12/vega.js",  "analytics-wso2_5.0.12/VizGrammar.min.js",
+                "analytics-wso2_5.0.12/wso2gadgets.js", "analytics-wso2_5.0.12/chart-utils.js"]
+           
+        },
+         "css" : ["number-chart.css"]
+    }
+}
+
