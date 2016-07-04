@@ -1,4 +1,4 @@
-package org.wso2.carbon.event.receiver.template.deployer.internal.util;
+package org.wso2.carbon.event.publisher.template.deployer.internal.util;
 
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -16,17 +16,17 @@ import org.xml.sax.SAXException;
 import java.io.File;
 import java.io.IOException;
 
-public class EventReceiverTemplateDeployerHelper {
+public class EventPublisherTemplateDeployerHelper {
 
     public static void updateRegistryMaps(Registry registry, String artifactId, String streamId)
             throws RegistryException {
-        Collection infoCollection = registry.get(EventReceiverTemplateDeployerConstants.META_INFO_COLLECTION_PATH, 0, -1);
+        Collection infoCollection = registry.get(EventPublisherTemplateDeployerConstants.META_INFO_COLLECTION_PATH, 0, -1);
         infoCollection.addProperty(artifactId, streamId);
-        registry.put(EventReceiverTemplateDeployerConstants.META_INFO_COLLECTION_PATH, infoCollection);
+        registry.put(EventPublisherTemplateDeployerConstants.META_INFO_COLLECTION_PATH, infoCollection);
 
         Resource mappingResource;
         String mappingResourceContent = null;
-        String mappingResourcePath = EventReceiverTemplateDeployerConstants.
+        String mappingResourcePath = EventPublisherTemplateDeployerConstants.
                                              META_INFO_COLLECTION_PATH + RegistryConstants.PATH_SEPARATOR + streamId;
 
         if (registry.resourceExists(mappingResourcePath)) {
@@ -39,7 +39,7 @@ public class EventReceiverTemplateDeployerHelper {
         if (mappingResourceContent == null) {
             mappingResourceContent = artifactId;
         } else {
-            mappingResourceContent += EventReceiverTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER
+            mappingResourceContent += EventPublisherTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER
                                       + artifactId;
         }
 
@@ -62,10 +62,10 @@ public class EventReceiverTemplateDeployerHelper {
             int afterCommaIndex = mappingResourceContent.indexOf(artifactId) + artifactId.length();
             if (beforeCommaIndex > 0) {
                 mappingResourceContent = mappingResourceContent.replace(
-                        EventReceiverTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER + artifactId, "");
+                        EventPublisherTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER + artifactId, "");
             } else if (afterCommaIndex < mappingResourceContent.length()) {
                 mappingResourceContent = mappingResourceContent.replace(
-                        artifactId + EventReceiverTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER, "");
+                        artifactId + EventPublisherTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER, "");
             } else {
                 mappingResourceContent = mappingResourceContent.replace(artifactId, "");
             }

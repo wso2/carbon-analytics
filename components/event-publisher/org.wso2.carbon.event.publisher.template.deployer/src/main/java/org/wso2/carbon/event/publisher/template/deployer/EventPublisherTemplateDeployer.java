@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.event.receiver.template.deployer;
+
+package org.wso2.carbon.event.publisher.template.deployer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,12 +22,12 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.execution.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
+import org.wso2.carbon.event.publisher.template.deployer.internal.EventPublisherTemplateDeployerValueHolder;
+import org.wso2.carbon.event.publisher.template.deployer.internal.EventPublisherTemplateSaveFailedException;
+import org.wso2.carbon.event.publisher.template.deployer.internal.util.EventPublisherTemplateDeployerConstants;
+import org.wso2.carbon.event.publisher.template.deployer.internal.util.EventPublisherTemplateDeployerHelper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
-import org.wso2.carbon.event.receiver.template.deployer.internal.EventReceiverTemplateDeployerValueHolder;
-import org.wso2.carbon.event.receiver.template.deployer.internal.EventReceiverTemplateSaveFailedException;
-import org.wso2.carbon.event.receiver.template.deployer.internal.util.EventReceiverTemplateDeployerConstants;
-import org.wso2.carbon.event.receiver.template.deployer.internal.util.EventReceiverTemplateDeployerHelper;
 import org.wso2.carbon.registry.core.Collection;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
@@ -42,13 +43,13 @@ import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class EventReceiverTemplateDeployer implements TemplateDeployer {
+public class EventPublisherTemplateDeployer implements TemplateDeployer {
 
-    private static final Log log = LogFactory.getLog(EventReceiverTemplateDeployer.class);
+    private static final Log log = LogFactory.getLog(EventPublisherTemplateDeployer.class);
 
     @Override
     public String getType() {
-        return EventReceiverTemplateDeployerConstants.EVENT_RECEIVER_DEPLOYER_TYPE;
+        return EventPublisherTemplateDeployerConstants.EVENT_RECEIVER_DEPLOYER_TYPE;
     }
 
 
@@ -74,7 +75,7 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
 
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             String receiverConfig = template.getArtifact();
-            receiverName = EventReceiverTemplateDeployerValueHolder.getEventReceiverService().getEventReceiverName(receiverConfig);
+            receiverName = EventPublisherTemplateDeployerValueHolder.getEventReceiverService().getEventReceiverName(receiverConfig);
             String existingReceiverConfigXml = getExistingEventReceiverConfigXml(tenantId, receiverName);
 
             if (existingReceiverConfigXml == null) { //todo: test whether this will be null when the file is not present.
@@ -104,17 +105,17 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
         String artifactId = null;
         try {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-            Registry registry = EventReceiverTemplateDeployerValueHolder.getRegistryService()
+            Registry registry = EventPublisherTemplateDeployerValueHolder.getRegistryService()
                     .getConfigSystemRegistry(tenantId);
 
             String receiverConfig = template.getArtifact();
-            receiverName = EventReceiverTemplateDeployerValueHolder.getEventReceiverService().getEventReceiverName(receiverConfig);
+            receiverName = EventPublisherTemplateDeployerValueHolder.getEventReceiverService().getEventReceiverName(receiverConfig);
 
-            String mappingResourcePath = EventReceiverTemplateDeployerConstants.META_INFO_COLLECTION_PATH + RegistryConstants.PATH_SEPARATOR + receiverName;
+            String mappingResourcePath = EventPublisherTemplateDeployerConstants.META_INFO_COLLECTION_PATH + RegistryConstants.PATH_SEPARATOR + receiverName;
             if (registry.resourceExists(mappingResourcePath)) {
                 String existingReceiverConfigXml = getExistingEventReceiverConfigXml(tenantId, receiverName);  //todo: ATM, not handling existingConfig==null case
-                if (EventReceiverTemplateDeployerHelper.areReceiverConfigXmlsSimilar(receiverConfig, existingReceiverConfigXml)) {
-                    EventReceiverTemplateDeployerHelper.updateRegistryMaps(registry, artifactId, receiverName);
+                if (EventPublisherTemplateDeployerHelper.areReceiverConfigXmlsSimilar(receiverConfig, existingReceiverConfigXml)) {
+                    EventPublisherTemplateDeployerHelper.updateRegistryMaps(registry, artifactId, receiverName);
                     log.info("Event receiver: " + receiverName + " has already being deployed for Artifact ID: " + artifactId);
                 } else {
                     throw new TemplateDeploymentException("Failed to deploy Event Receiver with name: " + receiverName +
@@ -122,7 +123,7 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
                                                           "but different configuration. Artifact ID: " + artifactId);
                 }
             } else {
-                EventReceiverTemplateDeployerHelper.updateRegistryMaps(registry, artifactId, receiverName);
+                EventPublisherTemplateDeployerHelper.updateRegistryMaps(registry, artifactId, receiverName);
                 saveEventReceiver(receiverName, receiverConfig, tenantId);
             }
         }  catch (RegistryException e) {
@@ -135,7 +136,7 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
             throw new TemplateDeploymentException("Could not deploy Event Receiver with name: " + receiverName + ", for Artifact ID: " + artifactId, e);
         } catch (SAXException e) {
             throw new TemplateDeploymentException("Could not deploy Event Receiver with name: " + receiverName + ", for Artifact ID: " + artifactId, e);
-        } catch (EventReceiverTemplateSaveFailedException e) {
+        } catch (EventPublisherTemplateSaveFailedException e) {
             undeployArtifact(artifactId, false);
             throw new TemplateDeploymentException("Could not deploy Event Receiver with name: " + receiverName + ", for Artifact ID: " + artifactId, e);
         }
@@ -146,22 +147,22 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
         String receiverName;
         try {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-            Registry registry = EventReceiverTemplateDeployerValueHolder.getRegistryService()
+            Registry registry = EventPublisherTemplateDeployerValueHolder.getRegistryService()
                     .getConfigSystemRegistry(tenantId);
 
-            if (!registry.resourceExists(EventReceiverTemplateDeployerConstants.META_INFO_COLLECTION_PATH)) {
-                registry.put(EventReceiverTemplateDeployerConstants.META_INFO_COLLECTION_PATH, registry.newCollection());
+            if (!registry.resourceExists(EventPublisherTemplateDeployerConstants.META_INFO_COLLECTION_PATH)) {
+                registry.put(EventPublisherTemplateDeployerConstants.META_INFO_COLLECTION_PATH, registry.newCollection());
             }
 
-            Collection infoCollection = registry.get(EventReceiverTemplateDeployerConstants.META_INFO_COLLECTION_PATH, 0, -1);
+            Collection infoCollection = registry.get(EventPublisherTemplateDeployerConstants.META_INFO_COLLECTION_PATH, 0, -1);
 
             receiverName = infoCollection.getProperty(artifactId);
 
             if (receiverName != null) {
                 infoCollection.removeProperty(artifactId);    //cleaning up the map
-                registry.put(EventReceiverTemplateDeployerConstants.META_INFO_COLLECTION_PATH, infoCollection);
+                registry.put(EventPublisherTemplateDeployerConstants.META_INFO_COLLECTION_PATH, infoCollection);
 
-                String mappingResourcePath = EventReceiverTemplateDeployerConstants.META_INFO_COLLECTION_PATH + RegistryConstants.PATH_SEPARATOR + receiverName;
+                String mappingResourcePath = EventPublisherTemplateDeployerConstants.META_INFO_COLLECTION_PATH + RegistryConstants.PATH_SEPARATOR + receiverName;
                 if (registry.resourceExists(mappingResourcePath)) {
                     try {
                         Resource mappingResource = registry.get(mappingResourcePath);
@@ -172,10 +173,10 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
                         int afterCommaIndex = mappingResourceContent.indexOf(artifactId) + artifactId.length();
                         if (beforeCommaIndex > 0) {
                             mappingResourceContent = mappingResourceContent.replace(
-                                    EventReceiverTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER + artifactId, "");
+                                    EventPublisherTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER + artifactId, "");
                         } else if (afterCommaIndex < mappingResourceContent.length()) {
                             mappingResourceContent = mappingResourceContent.replace(
-                                    artifactId + EventReceiverTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER, "");
+                                    artifactId + EventPublisherTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER, "");
                         } else {
                             mappingResourceContent = mappingResourceContent.replace(artifactId, "");
                         }
@@ -183,7 +184,7 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
                         if (mappingResourceContent.equals("")) {
                             //undeploying existing event receiver
                             if (doDeleteReceiver) {
-                                EventReceiverTemplateDeployerHelper.deleteEventReceiver(tenantId, artifactId);
+                                EventPublisherTemplateDeployerHelper.deleteEventReceiver(tenantId, artifactId);
                             }
                             //deleting mappingResource
                             registry.delete(mappingResourcePath);
@@ -208,7 +209,7 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
     }
 
     private void saveEventReceiver(String receiverName, String eventReceiverConfigXml, int tenantId)
-            throws EventReceiverTemplateSaveFailedException {
+            throws EventPublisherTemplateSaveFailedException {
         OutputStreamWriter writer = null;
         String filePath = MultitenantUtils.getAxis2RepositoryPath(tenantId) +
                           EventReceiverConstants.ER_CONFIG_DIRECTORY + File.separator + receiverName +
@@ -223,13 +224,13 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
             writer.write(eventReceiverConfigXml);
             log.info("Event Receiver : " + receiverName + " saved in the filesystem");
         } catch (IOException e) {
-            throw new EventReceiverTemplateSaveFailedException("Failed to save Event Receiver: " + receiverName, e);
+            throw new EventPublisherTemplateSaveFailedException("Failed to save Event Receiver: " + receiverName, e);
         } finally {
             if (writer != null) {
                 try {
                     writer.flush();
                 } catch (IOException e) {
-                    throw new EventReceiverTemplateSaveFailedException("Failed to save Event Receiver: " + receiverName, e);
+                    throw new EventPublisherTemplateSaveFailedException("Failed to save Event Receiver: " + receiverName, e);
                 }
                 try {
                     writer.close();
