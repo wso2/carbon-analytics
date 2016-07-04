@@ -61,9 +61,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     protected AnalyticsDataService service;
     
     private boolean becameLeader, leaderUpdated;
+
+    private Random randomGenerator;
                
     public void init(AnalyticsDataService service) {
         this.service = service;
+        randomGenerator = new Random();
     }
     
     @Test
@@ -528,7 +531,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
 
     private void writeIndexRecordsWithFacets(int tenantId, String[] tableName, int n, int batch) throws AnalyticsException {
         List<Record> records;
-        Random randomGenerator = new Random();
         if (tableName.length > 1) {
             for (int i = 0; i < n; i++) {
                 int randomNumber = randomGenerator.nextInt(tableName.length);

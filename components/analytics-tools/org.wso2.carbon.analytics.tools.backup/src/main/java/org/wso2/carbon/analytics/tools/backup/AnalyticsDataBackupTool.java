@@ -136,7 +136,10 @@ public class AnalyticsDataBackupTool {
             if (line.getOptionValue(DIR) != null) {
                 baseDir = new File(line.getOptionValue(DIR));
                 if (!baseDir.exists()) {
-                    baseDir.mkdirs();
+                    boolean created = baseDir.mkdirs();
+                    if (!created) {
+                        System.out.println("Failed to create the Directory: " + baseDir.getCanonicalPath());
+                    }
                 }
             } else {
                 baseDir = null;
@@ -230,9 +233,13 @@ public class AnalyticsDataBackupTool {
             }
         } else {
             String[] tables = baseDir.list();
-            System.out.println(tables.length + " table(s) available.");
-            for (String table : tables) {
-                restoreTable(service, tenantId, table, baseDir, timeFrom, timeTo);
+            if (tables != null) {
+                System.out.println(tables.length + " table(s) available.");
+                for (String table : tables) {
+                    restoreTable(service, tenantId, table, baseDir, timeFrom, timeTo);
+                }
+            } else {
+                System.out.println("No tables found in location: " + baseDir.getCanonicalPath());
             }
         }
     }
@@ -260,40 +267,48 @@ public class AnalyticsDataBackupTool {
             File myDir) throws AnalyticsException {
         File[] files = myDir.listFiles();
         int count = 0;
-        for (File file : files) {
-            if (file.getName().equalsIgnoreCase(TABLE_SCHEMA_FILE_NAME)) {
-                continue;
-            }
-            if (count % 5000 == 0) {
-                System.out.print(".");
-            }
-            if (file.isDirectory()) {
-                System.out.println(
-                        file.getAbsolutePath() + "is a directory, which cannot contain record data, skipping.");
-                continue;
-            }
-            try {
-                List<Record> records = readRecordFromFile(file);
-                for (Record record : records) {
-                    if (!table.equals(record.getTableName())) {
-                        System.out.println(
-                                "Invalid record, invalid table name in record compared to " + "current directory: "
-                                        + record.getTableName());
-                    }
+        if (files != null) {
+            for (File file : files) {
+                if (file.getName().equalsIgnoreCase(TABLE_SCHEMA_FILE_NAME)) {
+                    continue;
+                }
+                if (count % 5000 == 0) {
+                    System.out.print(".");
+                }
+                if (file.isDirectory()) {
+                    System.out.println(
+                            file.getAbsolutePath() + "is a directory, which cannot contain record data, skipping.");
+                    continue;
+                }
+                try {
+                    List<Record> records = readRecordFromFile(file);
+                    for (Record record : records) {
+                        if (!table.equals(record.getTableName())) {
+                            System.out.println(
+                                    "Invalid record, invalid table name in record compared to " + "current directory: "
+                                    + record.getTableName());
+                        }
                 /* check timestamp range */
-                    if (!(record.getTimestamp() >= timeFrom && record.getTimestamp() < timeTo)) {
-                        records.remove(record);
+                        if (!(record.getTimestamp() >= timeFrom && record.getTimestamp() < timeTo)) {
+                            records.remove(record);
+                        }
                     }
+                    service.put(records);
+                    if (forceIndexing) {
+                        service.waitForIndexing(INDEX_PROCESS_WAIT_TIME);
+                    }
+                } catch (IOException e) {
+                    System.out.println(
+                            "Error in reading record data from file: " + file.getAbsoluteFile() + ", skipping.");
                 }
-                service.put(records);
-                if (forceIndexing) {
-                    service.waitForIndexing(INDEX_PROCESS_WAIT_TIME);
-                }
-            } catch (IOException e) {
-                System.out.println(
-                        "Error in reading record data from file: " + file.getAbsoluteFile() + ", skipping.");
+                count++;
             }
-            count++;
+        } else {
+            try {
+                System.out.println("No files found related to table '" + table + "', in location: " + myDir.getCanonicalPath());
+            } catch (IOException e) {
+                throw new AnalyticsException("Error while getting the directory path, " + e.getMessage(), e);
+            }
         }
     }
 
@@ -309,7 +324,10 @@ public class AnalyticsDataBackupTool {
             System.out.print("Backing up table '" + table + "'..");
             File myDir = new File(basedir.getAbsolutePath() + File.separator + table);
             if (!myDir.exists()) {
-                myDir.mkdir();
+                boolean created = myDir.mkdir();
+                if (!created) {
+                    System.out.println("Failed to create the Directory: " + myDir.getCanonicalPath());
+                }
             }
             AnalyticsSchema schema = service.getTableSchema(tenantId, table);
             writeTableSchema(schema, myDir.getAbsolutePath());

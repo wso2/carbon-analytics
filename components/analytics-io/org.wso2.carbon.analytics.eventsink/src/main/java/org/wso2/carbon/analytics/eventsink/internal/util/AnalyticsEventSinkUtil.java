@@ -171,7 +171,7 @@ public class AnalyticsEventSinkUtil {
      * @return stream IDs as a comma separated list.
      */
     public static String getEventSources(List<String> streamIds) {
-        if (streamIds != null || !streamIds.isEmpty()) {
+        if (streamIds != null && !streamIds.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder("");
             for (String streamId : streamIds) {
                 stringBuilder.append(streamId).append(", ");

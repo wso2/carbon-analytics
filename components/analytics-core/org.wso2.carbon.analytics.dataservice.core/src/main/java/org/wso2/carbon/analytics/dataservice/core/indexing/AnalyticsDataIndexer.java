@@ -1579,10 +1579,7 @@ public class AnalyticsDataIndexer {
         Map<String, ColumnDefinition> indices;
         try {
             AnalyticsSchema schema = this.indexerInfo.getAnalyticsDataService().getTableSchema(tenantId, tableName);
-            indices = schema.getIndexedColumns();
-            if (indices == null) {
-                indices = new HashMap<>();
-            }
+            indices = schema.getIndexedColumns(); //schema always returns not-null map
         } catch (AnalyticsException e) {
             log.error("Error while looking up table Schema: " + e.getMessage(), e);
             throw new AnalyticsIndexException("Error while looking up Table Schema: " + e.getMessage(), e);
@@ -1928,7 +1925,7 @@ public class AnalyticsDataIndexer {
             for (AggregateField field : aggregateRequest.getFields()) {
                 AggregateFunction function = perAliasAggregateFunction.get(field.getAlias());
                 RecordContext recordValues = RecordContext.create(record.getValues());
-                function.process(recordValues, field.getAggregateVariables());
+                function.process(recordValues);
             }
         }
         Map<String, Object> aggregatedValues = generateAggregateRecordValues(path, actualNoOfRecords, aggregateRequest,
@@ -1993,7 +1990,8 @@ public class AnalyticsDataIndexer {
             throws AnalyticsException {
         Map<String, AggregateFunction> perAliasAggregateFunction = new HashMap<>();
         for (AggregateField field : aggregateRequest.getFields()) {
-            AggregateFunction function = getAggregateFunctionFactory().create(field.getAggregateFunction());
+            AggregateFunction function = getAggregateFunctionFactory().create(field.getAggregateFunction(),
+                                                                              field.getAggregateVariables());
             if (function == null) {
                 throw new AnalyticsException("Unknown aggregate function!");
             } else if (field.getAlias() == null || field.getAlias().isEmpty()) {

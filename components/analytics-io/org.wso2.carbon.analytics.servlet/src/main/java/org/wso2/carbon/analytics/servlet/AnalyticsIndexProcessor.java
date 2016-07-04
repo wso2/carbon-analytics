@@ -17,6 +17,8 @@
 */
 package org.wso2.carbon.analytics.servlet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
@@ -35,7 +37,7 @@ import java.io.IOException;
 public class AnalyticsIndexProcessor extends HttpServlet {
 
     private static final long serialVersionUID = -4554701429299921629L;
-
+    private static Log log = LogFactory.getLog(AnalyticsIndexProcessor.class);
     /**
      * This focuses on changing the wait time for indexing for the given table.
      *
@@ -81,8 +83,8 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                     }
                 }
             } else {
-                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : "
-                                                                      + operation + " with post request!");
+                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed with post request!");
+                log.error("unsupported operation performed : "+ operation + " with post request!");
             }
         }
     }
@@ -121,8 +123,8 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
             } else {
-                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : "
-                        + operation + " with delete request!");
+                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed with delete request!");
+                log.error("unsupported operation performed : "+ operation + " with delete request!");
             }
         }
     }
@@ -168,8 +170,8 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
             } else {
-                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
-                                                                      + " with get request!");
+                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed with get request!");
+                log.error("unsupported operation performed : "+ operation + " with get request!");
             }
         }
     }

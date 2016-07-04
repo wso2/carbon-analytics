@@ -234,17 +234,17 @@ public class Utils {
                     break;
                 }
                 case RecordValueEntryBean.BOOLEAN: {
-                    recordValueEntryBean.setBooleanValue(Boolean.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setBooleanValue(Boolean.parseBoolean(String.valueOf(value)));
                     recordValueEntryBean.setType(RecordValueEntryBean.BOOLEAN);
                     break;
                 }
                 case RecordValueEntryBean.FLOAT: {
-                    recordValueEntryBean.setFloatValue(Float.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setFloatValue(Float.parseFloat(String.valueOf(value)));
                     recordValueEntryBean.setType(RecordValueEntryBean.FLOAT);
                     break;
                 }
                 case RecordValueEntryBean.DOUBLE: {
-                    recordValueEntryBean.setDoubleValue(Double.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setDoubleValue(Double.parseDouble(String.valueOf(value)));
                     recordValueEntryBean.setType(RecordValueEntryBean.DOUBLE);
                     break;
                 }

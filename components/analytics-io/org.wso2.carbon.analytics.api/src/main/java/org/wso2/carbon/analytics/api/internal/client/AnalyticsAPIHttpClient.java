@@ -71,6 +71,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -168,7 +169,7 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.AUTHORIZATION_HEADER, AnalyticsAPIConstants.BASIC_AUTH_HEADER + Base64.encode(
                     (username + AnalyticsAPIConstants.SEPARATOR
-                            + password).getBytes()));
+                            + password).getBytes(StandardCharsets.UTF_8)));
             HttpResponse httpResponse = httpClient.execute(getMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = httpResponse.getStatusLine().toString();
@@ -229,13 +230,13 @@ public class AnalyticsAPIHttpClient {
     private String getResponseString(HttpResponse httpResponse) throws AnalyticsServiceException {
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+            br = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent(), StandardCharsets.UTF_8));
             String readLine;
-            String response = "";
+            StringBuffer response = new StringBuffer();
             while (((readLine = br.readLine()) != null)) {
-                response += readLine;
+                response.append(readLine);
             }
-            return response;
+            return response.toString();
         } catch (IOException e) {
             throw new AnalyticsServiceException("Error while reading the response from the remote service. "
                     + e.getMessage(), e);
@@ -1464,7 +1465,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    private class RecordIterator implements AnalyticsIterator<Record> {
+    private static class RecordIterator implements AnalyticsIterator<Record> {
 
         private List<Record> records;
         private Iterator<Record> iterator;

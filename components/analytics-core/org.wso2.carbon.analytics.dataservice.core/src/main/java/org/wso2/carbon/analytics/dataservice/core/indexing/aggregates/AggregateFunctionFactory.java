@@ -52,7 +52,7 @@ public class AggregateFunctionFactory {
         }
     }
 
-    public AggregateFunction create(String type) throws AnalyticsException {
+    public AggregateFunction create(String type, String[] aggregateFunctionVariables) throws AnalyticsException {
         Class<?> aggregateClass =  this.aggregateFunctions.get(type);
         AggregateFunction aggregateFunction;
         if (aggregateClass != null) {
@@ -60,6 +60,7 @@ public class AggregateFunctionFactory {
                 Constructor<?> aggregateFuncConstructor = aggregateClass.getConstructor();
                 //AggregateFunction classes should have a constructor with a Map<String, Number>
                 aggregateFunction = (AggregateFunction) aggregateFuncConstructor.newInstance();
+                aggregateFunction.setAggregateFields(aggregateFunctionVariables);
             } catch (Exception e) {
                 logger.error("error while creating aggregateFunction," + e.getMessage(), e);
                 throw new AnalyticsException("Error while creating aggregateFunction, " + e.getMessage(), e);

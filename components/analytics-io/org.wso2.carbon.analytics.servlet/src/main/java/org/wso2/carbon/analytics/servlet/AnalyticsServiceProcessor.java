@@ -17,6 +17,8 @@
 */
 package org.wso2.carbon.analytics.servlet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.servlet.internal.ServiceHolder;
@@ -34,7 +36,7 @@ import java.io.IOException;
 public class AnalyticsServiceProcessor extends HttpServlet {
 
     private static final long serialVersionUID = -1426603086300914710L;
-
+    private static final Log log = LogFactory.getLog(AnalyticsServiceProcessor.class);
     /**
      * Destroy the analytics service.
      *
@@ -63,8 +65,8 @@ public class AnalyticsServiceProcessor extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
             } else {
-                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : "
-                        + operation + " with post request!");
+                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed with post request!");
+                log.error("unsupported operation performed : "+ operation + " with post request!");
             }
         }
     }

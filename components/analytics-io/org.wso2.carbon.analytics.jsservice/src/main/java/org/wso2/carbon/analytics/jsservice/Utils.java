@@ -539,7 +539,7 @@ public class Utils {
         AggregateRequest request = new AggregateRequest();
         request.setGroupByField(aggregateRequest.getGroupByField());
         request.setQuery(aggregateRequest.getQuery());
-        if (tableName != null || !tableName.isEmpty()) {
+        if (tableName != null && !tableName.isEmpty()) {
             request.setTableName(tableName);
         } else {
             request.setTableName(aggregateRequest.getTableName());

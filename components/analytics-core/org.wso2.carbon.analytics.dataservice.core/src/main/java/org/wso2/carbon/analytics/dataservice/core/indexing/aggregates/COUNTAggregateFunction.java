@@ -33,7 +33,12 @@ public class COUNTAggregateFunction implements AggregateFunction {
     }
 
     @Override
-    public void process(RecordContext ctx, String[] aggregateFields)
+    public void setAggregateFields(String[] aggregateFields) throws AnalyticsException {
+        //count aggregate does not require any record field, since it is just counting
+    }
+
+    @Override
+    public void process(RecordContext ctx)
             throws AnalyticsException {
             count++;
     }
