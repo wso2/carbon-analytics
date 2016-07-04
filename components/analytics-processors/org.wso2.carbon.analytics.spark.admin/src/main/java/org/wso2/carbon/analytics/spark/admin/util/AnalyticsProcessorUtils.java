@@ -27,13 +27,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class AnalyticsProcessorUtils {
-    public static final String RUNNING_SCRIPTS_MAP = "__RUNNING_SCRIPTS_MAP__";
-    private static ExecutorService executor = null;
-    private static Map<String, String> sessionIds;
+    private static final String RUNNING_SCRIPTS_MAP = "__RUNNING_SCRIPTS_MAP__";
+    private static volatile ExecutorService executor = null;
+    private static volatile Map<String, String> sessionIds;
 
     public static ExecutorService getExecutorServiceInstance() {
         if (executor == null) {
-            executor = Executors.newCachedThreadPool();
+            synchronized (AnalyticsProcessorUtils.class) {
+                if (executor == null) {
+                    executor = Executors.newCachedThreadPool();
+                }
+            }
         }
         return executor;
     }
@@ -41,8 +45,9 @@ public class AnalyticsProcessorUtils {
     public static Map<String, String> getRunningScriptsMap() {
         if (ServiceHolder.getHazelcastInstance() == null) {
             if (sessionIds == null) {
-                sessionIds = new HashMap<String, String>();
-                return sessionIds;
+                synchronized (AnalyticsProcessorUtils.class) {
+                    sessionIds = new HashMap<>();
+                }
             }
             return sessionIds;
         } else {
