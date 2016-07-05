@@ -18,7 +18,7 @@ package org.wso2.carbon.event.stream.template.deployer.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
+import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.event.stream.template.deployer.EventStreamTemplateDeployer;
 import org.wso2.carbon.event.stream.template.deployer.internal.EventStreamTemplateDeployerValueHolder;

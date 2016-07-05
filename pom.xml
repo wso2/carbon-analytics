@@ -43,7 +43,7 @@
         <module>components/event-processor-manager</module>
         <module>components/event-receiver</module>
         <module>components/event-publisher</module>
-        <module>components/execution-manager</module>
+        <module>components/template-manager</module>
         <module>components/gadget-template-deployer</module>
         <module>components/dashboard-template-deployer</module>
         <module>features/event-stream</module>
@@ -55,7 +55,7 @@
         <module>features/event-receiver</module>
         <module>features/event-publisher</module>
         <module>features/event-processor-manager</module>
-        <module>features/execution-manager</module>
+        <module>features/template-manager</module>
         <module>features/spark-common</module>
         <module>features/analytics-gadget-templates</module>
         <module>features/gadget-template-deployer</module>
@@ -371,22 +371,22 @@
             <!--carbon analytics common dependencies start-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.execution.manager.admin</artifactId>
+                <artifactId>org.wso2.carbon.event.template.manager.admin</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.execution.manager.core</artifactId>
+                <artifactId>org.wso2.carbon.event.template.manager.core</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.execution.manager.ui</artifactId>
+                <artifactId>org.wso2.carbon.event.template.manager.ui</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.execution.manager.stub</artifactId>
+                <artifactId>org.wso2.carbon.event.template.manager.stub</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
@@ -825,13 +825,13 @@
             <!--features start-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.execution.manager.server.feature</artifactId>
+                <artifactId>org.wso2.carbon.event.template.manager.server.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.execution.manager.ui.feature</artifactId>
+                <artifactId>org.wso2.carbon.event.template.manager.ui.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
             </dependency>
