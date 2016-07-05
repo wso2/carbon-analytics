@@ -38,7 +38,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.datastax.cassandra</groupId>
+            <groupId>org.wso2.orbit.com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
         </dependency>
 
@@ -83,7 +83,7 @@
                             <bundles>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.cassandra
                                 </bundleDef>
-                                <bundleDef>com.datastax.cassandra:cassandra-driver-core</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.datastax.cassandra:cassandra-driver-core</bundleDef>
                                 <bundleDef>io.netty:netty</bundleDef>
                             </bundles>
                             <importFeatures>

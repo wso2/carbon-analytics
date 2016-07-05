@@ -78,7 +78,7 @@
             <artifactId>antlr-runtime</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.datastax.cassandra</groupId>
+            <groupId>org.wso2.orbit.com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
         </dependency>
         <dependency>
