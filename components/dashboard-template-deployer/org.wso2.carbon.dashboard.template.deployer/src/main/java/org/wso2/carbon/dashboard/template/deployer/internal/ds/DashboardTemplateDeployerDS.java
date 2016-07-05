@@ -20,7 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.dashboard.template.deployer.DashboardTemplateDeployer;
-import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
+import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 
 /**
  * @scr.component name="TemplateDeployer.dashboard.component" immediate="true"

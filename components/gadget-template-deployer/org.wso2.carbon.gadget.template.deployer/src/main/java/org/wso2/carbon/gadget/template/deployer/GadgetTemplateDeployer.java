@@ -23,9 +23,9 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.wso2.carbon.event.execution.manager.core.DeployableTemplate;
-import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
-import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
+import org.wso2.carbon.event.template.manager.core.DeployableTemplate;
+import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
+import org.wso2.carbon.event.template.manager.core.TemplateDeploymentException;
 import org.wso2.carbon.gadget.template.deployer.internal.GadgetTemplateDeployerConstants;
 import org.wso2.carbon.gadget.template.deployer.internal.GadgetTemplateDeployerException;
 import org.wso2.carbon.gadget.template.deployer.internal.util.GadgetTemplateDeployerUtility;
@@ -141,7 +141,7 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
 
         // Copy the static files
         String path = new StringBuilder(CarbonUtils.getCarbonConfigDirPath())
-                .append(File.separator).append(GadgetTemplateDeployerConstants.EXECUTION_MANAGER).append(File.separator)
+                .append(File.separator).append(GadgetTemplateDeployerConstants.TEMPLATE_MANAGER).append(File.separator)
                 .append(GadgetTemplateDeployerConstants.GADGET_TEMPLATES).append(File.separator)
                 .append(properties.get(GadgetTemplateDeployerConstants.TEMPLATE_DIRECTORY)).toString();
         File templateDirectory = new File(path);

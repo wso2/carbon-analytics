@@ -16,7 +16,7 @@
 
 package org.wso2.carbon.dashboard.template.deployer.internal;
 
-import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
+import org.wso2.carbon.event.template.manager.core.TemplateDeploymentException;
 
 public class DashboardTemplateDeployerException extends TemplateDeploymentException {
 
