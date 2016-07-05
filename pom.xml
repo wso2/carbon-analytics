@@ -728,6 +728,11 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.wso2.orbit.com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-scala_2.10</artifactId>
+                <version>${jackson.module.scala.orbit.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
                 <version>${codahale.metrics.version}</version>
@@ -1248,10 +1253,10 @@
         <carbon.analytics.common.version>5.1.0-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
-        <carbon.kernel.version>4.4.2</carbon.kernel.version>
+        <carbon.kernel.version>4.4.6</carbon.kernel.version>
         <!--<carbon.kernel.imp.pkg.version>[4.3.0, 4.4.0)</carbon.kernel.imp.pkg.version>-->
 
-        <carbon.commons.version>4.4.8</carbon.commons.version>
+        <carbon.commons.version>4.5.4</carbon.commons.version>
         <!--<carbon.deployment.version>4.3.1</carbon.deployment.version>-->
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
@@ -1259,7 +1264,7 @@
         <siddhi.version>3.1.0-SNAPSHOT</siddhi.version>
 
         <!-- Carbon metrics version -->
-        <carbon.metrics.version>1.2.0</carbon.metrics.version>
+        <carbon.metrics.version>1.2.2-SNAPSHOT</carbon.metrics.version>
 
         <orbit.version.json>2.0.0.wso2v1</orbit.version.json>
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
@@ -1312,15 +1317,16 @@
         <project.scm.id>my-scm-server</project.scm.id>
 
         <!-- Spark dependency versions start-->
-        <spark.version>1.4.2.wso2v1</spark.version>
-        <spark.imp.pkg.version>[1.4.2,1.5.0)</spark.imp.pkg.version>
-        <hadoop.client.version>2.6.0.wso2v3</hadoop.client.version>
+        <spark.version>1.4.3.wso2v1-SNAPSHOT</spark.version>
+        <spark.imp.pkg.version>[1.4.3,1.5.0)</spark.imp.pkg.version>
+        <hadoop.client.version>2.7.2.wso2v1</hadoop.client.version>
         <json4s.jackson.version>3.2.10.wso2v1</json4s.jackson.version>
         <twitter.chill.version>0.5.0.wso2v1</twitter.chill.version>
         <clearspring.analytics.stream.version>2.2.0.wso2v1</clearspring.analytics.stream.version>
         <kyro.version>2.24.0</kyro.version>
         <akka.version>2.3.4-spark</akka.version>
         <jackson.version>2.4.4</jackson.version>
+        <jackson.module.scala.orbit.version>2.4.4.wso2v1</jackson.module.scala.orbit.version>
         <jackson-annotations.version>2.4.4</jackson-annotations.version>
         <snappy.version>1.1.1.7</snappy.version>
         <org.jboss.netty.version>3.9.0.Final</org.jboss.netty.version>
