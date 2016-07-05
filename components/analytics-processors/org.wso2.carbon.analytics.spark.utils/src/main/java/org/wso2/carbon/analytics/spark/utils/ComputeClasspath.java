@@ -20,13 +20,14 @@ package org.wso2.carbon.analytics.spark.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -37,11 +38,11 @@ public class ComputeClasspath {
 
     private static Set<String> additionalJars = new HashSet<>();
 
-    public static void addAdditionalJarToClasspath(String jarName){
+    public static void addAdditionalJarToClasspath(String jarName) {
         additionalJars.add(jarName);
     }
 
-    public static Set<String> getAdditionalJars(){
+    private static Set<String> getAdditionalJars() {
         return additionalJars;
     }
 
@@ -94,7 +95,7 @@ public class ComputeClasspath {
                                  + File.separator + "carbon-spark-classpath.conf");
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(jarsFile));
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(jarsFile), StandardCharsets.UTF_8));
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
@@ -126,29 +127,30 @@ public class ComputeClasspath {
         File libDir = new File(carbonHome + File.separator + "repository" + File.separator
                                + "components" + File.separator + "lib");
         File[] libJars = listJars(libDir);
-        for (File jar : libJars) {
-            scp = scp + separator + jar.getAbsolutePath();
+        return appendFilesToString(scp, libJars, separator);
+    }
+
+    private static String appendFilesToString(String initialString, File[] files, String separator) {
+        StringBuilder buf = new StringBuilder();
+        buf.append(initialString);
+        for (File file : files) {
+            buf.append(separator);
+            buf.append(file.getAbsolutePath());
         }
-        return scp;
+        return buf.toString();
     }
 
     private static String addJarsFromDropins(String scp, String carbonHome, String separator) {
         File libDir = new File(carbonHome + File.separator + "repository" + File.separator
                                + "components" + File.separator + "dropins");
         File[] libJars = listJars(libDir);
-        for (File jar : libJars) {
-            scp = scp + separator + jar.getAbsolutePath();
-        }
-        return scp;
+        return appendFilesToString(scp, libJars, separator);
     }
 
     private static String addJarsFromEndorsedLib(String scp, String carbonHome, String separator) {
         File libDir = new File(carbonHome + File.separator + "lib" + File.separator + "endorsed");
         File[] libJars = listJars(libDir);
-        for (File jar : libJars) {
-            scp = scp + separator + jar.getAbsolutePath();
-        }
-        return scp;
+        return appendFilesToString(scp, libJars, separator);
     }
 
     private static String addJarsFromConfig(String scp, String carbonHome, String separator)
@@ -158,8 +160,10 @@ public class ComputeClasspath {
                                + File.separator + "external-spark-classpath.conf");
 
         BufferedReader reader = null;
+        StringBuilder buf = new StringBuilder();
+        buf.append(scp);
         try {
-            reader = new BufferedReader(new FileReader(cpFile));
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(cpFile), StandardCharsets.UTF_8));
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
@@ -173,9 +177,13 @@ public class ComputeClasspath {
                 }
 
                 if (fileExists(line)) {
-                    scp = scp + separator + line;
-                } else if (fileExists(carbonHome + File.separator + line)) {
-                    scp = scp + separator + carbonHome + File.separator + line;
+                    buf.append(separator);
+                    buf.append(line);
+                } else if (fileExists(carbonHome + separator + line)) {
+                    buf.append(separator);
+                    buf.append(carbonHome);
+                    buf.append(separator);
+                    buf.append(line);
                 } else {
                     throw new IOException("File not found : " + line);
                 }
@@ -190,7 +198,7 @@ public class ComputeClasspath {
             }
         }
 
-        return scp;
+        return buf.toString();
     }
 
     private static boolean fileExists(String path) {
@@ -218,7 +226,14 @@ public class ComputeClasspath {
         File pluginsDir = new File(carbonHome + File.separator + "repository" + File.separator + "components" +
                                    File.separator + "plugins");
         File[] pluginJars = listJars(pluginsDir);
+        StringBuilder buf = new StringBuilder();
 
+        if (!sparkClasspath.isEmpty()) {
+            buf.append(sparkClasspath);
+            buf.append(separator);
+        }
+
+        int i = 0;
         for (String requiredJar : requiredJars) {
             ArrayList<String> matchingJars = new ArrayList<>();
             for (File pluginJar : pluginJars) {
@@ -235,15 +250,15 @@ public class ComputeClasspath {
             if (matchingJars.size() > 0) {
                 Collections.sort(matchingJars);
                 String topJar = matchingJars.get(matchingJars.size() - 1);
-                if (sparkClasspath.isEmpty()) {
-                    sparkClasspath = topJar;
-                } else {
-                    sparkClasspath = sparkClasspath + separator + topJar;
+                buf.append(topJar);
+                if (i < requiredJars.size() - 1) {
+                    buf.append(separator);
                 }
                 matchingJars.clear();
             }
+            i++;
         }
-        return sparkClasspath;
+        return buf.toString();
     }
 
     private static boolean containsInArray(String[] arr, String str) {

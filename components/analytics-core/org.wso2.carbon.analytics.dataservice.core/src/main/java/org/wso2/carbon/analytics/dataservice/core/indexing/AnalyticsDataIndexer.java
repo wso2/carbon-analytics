@@ -1126,13 +1126,13 @@ public class AnalyticsDataIndexer {
                                                                      range.getFrom(), range.getTo(), true, false);
             } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.FLOAT) {
                 numericRangeQuery = NumericRangeQuery.newFloatRange(rangeField,
-                        new Double(range.getFrom()).floatValue(), new Double(range.getTo()).floatValue(), true, false);
+                                                                    (float)range.getFrom(),(float) range.getTo(), true, false);
             } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.INTEGER) {
                 numericRangeQuery = NumericRangeQuery.newIntRange(rangeField,
-                        new Double(range.getFrom()).intValue(), new Double(range.getTo()).intValue(), true, false);
+                                                                  (int) range.getFrom(),(int) range.getTo(), true, false);
             } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.LONG) {
                 numericRangeQuery = NumericRangeQuery.newLongRange(rangeField,
-                        new Double(range.getFrom()).longValue(), new Double(range.getTo()).longValue(), true, false);
+                                                                   (long) range.getFrom(), (long) range.getTo(), true, false);
             }
         }
         return numericRangeQuery;

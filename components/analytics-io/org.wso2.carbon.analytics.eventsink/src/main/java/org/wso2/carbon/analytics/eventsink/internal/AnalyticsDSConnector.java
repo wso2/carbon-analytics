@@ -136,7 +136,11 @@ public class AnalyticsDSConnector {
     private void startTimeMeasurement() {
         if (isProfilePersistence) {
             if (startTime == 0) {
-                startTime = System.currentTimeMillis();
+                synchronized (this) {
+                    if (startTime == 0) {
+                        startTime = System.currentTimeMillis();
+                    }
+                }
             }
         }
     }
