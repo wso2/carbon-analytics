@@ -176,14 +176,19 @@ public final class HTTPEventAdapter implements InputEventAdapter {
         }
 
         try {
+            String basicAuthEnabledValue = eventAdapterConfiguration.getProperties().get(HTTPEventAdapterConstants.BASIC_AUTH_ENABLED);
+            boolean isBasicAuthEnabled = true;
+            if(basicAuthEnabledValue != null){
+                isBasicAuthEnabled = Boolean.parseBoolean(basicAuthEnabledValue);
+            }
             HttpService httpService = HTTPEventAdapterServiceValueHolder.getHTTPService();
             if (httpService == null) {
                 throw new InputEventAdapterRuntimeException(
                         "HttpService not available, Error in registering endpoint " + endpoint);
             }
             httpService.registerServlet(endpoint, new HTTPMessageServlet(eventAdaptorListener, tenantId,
-                    eventAdapterConfiguration.getProperties().get(HTTPEventAdapterConstants.EXPOSED_TRANSPORTS)),
-                    new Hashtable(), httpService.createDefaultHttpContext());
+                    eventAdapterConfiguration.getProperties().get(HTTPEventAdapterConstants.EXPOSED_TRANSPORTS),
+                    isBasicAuthEnabled), new Hashtable(), httpService.createDefaultHttpContext());
         } catch (ServletException | NamespaceException e) {
             throw new InputEventAdapterRuntimeException("Error in registering endpoint " + endpoint, e);
         }

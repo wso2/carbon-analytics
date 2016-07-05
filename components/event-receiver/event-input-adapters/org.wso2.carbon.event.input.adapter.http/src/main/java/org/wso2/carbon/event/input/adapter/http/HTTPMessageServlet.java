@@ -46,11 +46,13 @@ public class HTTPMessageServlet extends HttpServlet {
     private InputEventAdapterListener eventAdaptorListener;
     private int tenantId;
     private String exposedTransports;
+    private boolean isBasicAuthEnabled;
 
-    public HTTPMessageServlet(InputEventAdapterListener eventAdaptorListener, int tenantId, String exposedTransports) {
+    public HTTPMessageServlet(InputEventAdapterListener eventAdaptorListener, int tenantId, String exposedTransports, boolean isBasicAuthEnabled) {
         this.eventAdaptorListener = eventAdaptorListener;
         this.tenantId = tenantId;
         this.exposedTransports = exposedTransports;
+        this.isBasicAuthEnabled = isBasicAuthEnabled;
     }
 
     private String[] getUserPassword(HttpServletRequest req) {
@@ -134,17 +136,19 @@ public class HTTPMessageServlet extends HttpServlet {
                 log.error("Only Secured endpoint is enabled for requests");
                 return;
             }else {
-                int tenantId = this.checkAuthentication(req);
-                if (tenantId == -1) {
-                    res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
-                    res.setStatus(401);
-                    log.error("Authentication failed for the request");
-                    return;
-                } else if (tenantId != this.tenantId) {
-                    res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
-                    res.setStatus(401);
-                    log.error("Authentication failed for the request");
-                    return;
+                if(isBasicAuthEnabled){
+                    int tenantId = this.checkAuthentication(req);
+                    if (tenantId == -1) {
+                        res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
+                        res.setStatus(401);
+                        log.error("Authentication failed for the request");
+                        return;
+                    } else if (tenantId != this.tenantId) {
+                        res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
+                        res.setStatus(401);
+                        log.error("Authentication failed for the request");
+                        return;
+                    }
                 }
             }
         }else if(exposedTransports.equalsIgnoreCase(HTTPEventAdapterConstants.HTTP)){
@@ -155,17 +159,19 @@ public class HTTPMessageServlet extends HttpServlet {
             }
         }else {
             if(req.isSecure()){
-                int tenantId = this.checkAuthentication(req);
-                if (tenantId == -1) {
-                    res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
-                    res.setStatus(401);
-                    log.error("Authentication failed for the request");
-                    return;
-                } else if (tenantId != this.tenantId) {
-                    res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
-                    res.setStatus(401);
-                    log.error("Authentication failed for the request");
-                    return;
+                if(isBasicAuthEnabled){
+                    int tenantId = this.checkAuthentication(req);
+                    if (tenantId == -1) {
+                        res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
+                        res.setStatus(401);
+                        log.error("Authentication failed for the request");
+                        return;
+                    } else if (tenantId != this.tenantId) {
+                        res.getOutputStream().write(AUTH_FAILURE_RESPONSE.getBytes());
+                        res.setStatus(401);
+                        log.error("Authentication failed for the request");
+                        return;
+                    }
                 }
             }
 
