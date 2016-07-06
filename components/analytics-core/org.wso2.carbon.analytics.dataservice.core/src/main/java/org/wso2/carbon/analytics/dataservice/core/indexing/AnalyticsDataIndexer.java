@@ -203,6 +203,8 @@ public class AnalyticsDataIndexer {
     private boolean indexingStatsEnabled;
     
     private AnalyticsDataIndexingStatsCollector statsCollector;
+    
+    private Map<Integer, Object> indexerLocks = new HashMap<>();
         
     public AnalyticsDataIndexer(AnalyticsIndexerInfo indexerInfo) throws AnalyticsException {
     	this.indexerInfo = indexerInfo;
@@ -224,6 +226,19 @@ public class AnalyticsDataIndexer {
         this.localIndexDataStore = new LocalIndexDataStore(this);
         this.indexNodeCoordinator = new IndexNodeCoordinator(this);
         this.indexNodeCoordinator.init();
+    }
+    
+    private Object getIndexingLockObject(int id) {
+        Object lock = this.indexerLocks.get(id);
+        if (lock == null) {
+            synchronized (this.indexerLocks) {
+                if (lock == null) {
+                    lock = new Object();
+                    this.indexerLocks.put(id, lock);
+                }
+            }
+        }
+        return lock;
     }
     
     public boolean isIndexingStatsEnabled() {
@@ -272,29 +287,35 @@ public class AnalyticsDataIndexer {
         } while (cont);
     }
     
-    /* processIndexOperationsSlice and processIndexOperationsFlushQueue must be synchronized, they are accessed by
-     * indexer threads and wait for indexing tasks, if not done property, index corruption will happen */
-    private synchronized boolean processIndexOperationsSlice(int shardIndex) throws AnalyticsException {
-        long maxBatchSize = this.getShardIndexRecordBatchSize();
-        long processedCount = this.processLocalShardDataQueue(shardIndex, 
-                this.localIndexDataStore.getIndexDataQueue(shardIndex), maxBatchSize)[1];
-        return processedCount >= maxBatchSize;
+    /* processIndexOperationsSlice and processIndexOperationsFlushQueue must be synchronized per shard index, 
+     * they are accessed by indexer threads and wait for indexing tasks, if not done property, index corruption will happen */
+    private boolean processIndexOperationsSlice(int shardIndex) throws AnalyticsException {
+        Object lock = this.getIndexingLockObject(shardIndex);
+        synchronized (lock) {
+            long maxBatchSize = this.getShardIndexRecordBatchSize();
+            long processedCount = this.processLocalShardDataQueue(shardIndex, 
+                    this.localIndexDataStore.getIndexDataQueue(shardIndex), maxBatchSize)[1];
+            return processedCount >= maxBatchSize;
+        }
     }
     
-    /* processIndexOperationsSlice and processIndexOperationsFlushQueue must be synchronized */
-    public synchronized void processIndexOperationsFlushQueue(int shardIndex) throws AnalyticsException {
-        long maxBatchCount = this.getShardIndexRecordBatchSize();
-        LocalIndexDataQueue queue = this.localIndexDataStore.getIndexDataQueue(shardIndex);
-        long queueSizeAtStart = queue.size();
-        long processedCount = 0, tmpCount;
-        do {
-            tmpCount = this.processLocalShardDataQueue(shardIndex, queue, maxBatchCount)[0];
-            if (tmpCount == 0) {
-                /* nothing left in the queue, time to leave */
-                break;
-            }
-            processedCount += tmpCount;
-        } while (processedCount < queueSizeAtStart);
+    /* processIndexOperationsSlice and processIndexOperationsFlushQueue must be synchronized per shard index */
+    public void processIndexOperationsFlushQueue(int shardIndex) throws AnalyticsException {
+        Object lock = this.getIndexingLockObject(shardIndex);
+        synchronized (lock) {
+            long maxBatchCount = this.getShardIndexRecordBatchSize();
+            LocalIndexDataQueue queue = this.localIndexDataStore.getIndexDataQueue(shardIndex);
+            long queueSizeAtStart = queue.size();
+            long processedCount = 0, tmpCount;
+            do {
+                tmpCount = this.processLocalShardDataQueue(shardIndex, queue, maxBatchCount)[0];
+                if (tmpCount == 0) {
+                    /* nothing left in the queue, time to leave */
+                    break;
+                }
+                processedCount += tmpCount;
+            } while (processedCount < queueSizeAtStart);
+        }        
     }
     
     private long[] processLocalShardDataQueue(int shardIndex, LocalIndexDataQueue dataQueue, 

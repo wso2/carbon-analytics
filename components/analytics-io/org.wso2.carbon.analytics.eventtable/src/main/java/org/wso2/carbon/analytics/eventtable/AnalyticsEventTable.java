@@ -309,14 +309,23 @@ public class AnalyticsEventTable implements EventTable {
     public void add(ComplexEventChunk addingEventChunk) {
         this.checkAndProcessPostInit();
         addingEventChunk.reset();
-        AnalyticsEventTableUtils.putEvents(this.tenantId, this.tableName,
+        int count = AnalyticsEventTableUtils.putEvents(this.tenantId, this.tableName,
                 this.tableDefinition.getAttributeList(), addingEventChunk);
+        if (log.isDebugEnabled()) {
+            log.debug("Records added: " + count + " -> " + this.tenantId + ":" + this.tableName);
+        }
         this.checkAndWaitForIndexing();
     }
 
     private void checkAndWaitForIndexing() {
         if (this.waitForIndexing && this.indicesAvailable) {
+            if (log.isDebugEnabled()) {
+                log.debug("Wait for indexing START -> " + this.tenantId + ":" + this.tableName);
+            }
             this.waitForIndexing(this.tenantId, this.tableName);
+            if (log.isDebugEnabled()) {
+                log.debug("Wait for indexing END -> " + this.tenantId + ":" + this.tableName);
+            }
         }
     }
 
@@ -736,7 +745,7 @@ public class AnalyticsEventTable implements EventTable {
             }
             if (log.isDebugEnabled()) {
                 long end = System.currentTimeMillis();
-                log.debug("Find Records Time: " + (end - start) + " ms.");
+                log.debug("Find Records: " + records.size() + ", Time: " + (end - start) + " ms -> " + this.tenantId + ":" + this.tableName);
             }
             return records;
         }
@@ -893,6 +902,9 @@ public class AnalyticsEventTable implements EventTable {
             while (deletingEventChunk.hasNext()) {
                 List<Record> records = this.findRecords(deletingEventChunk.next(), candidateEvents, null);
                 AnalyticsEventTableUtils.deleteRecords(this.tenantId, this.tableName, records);
+                if (log.isDebugEnabled()) {
+                    log.debug("Records deleted: " + records.size() + " -> " + this.tenantId + ":" + this.tableName);
+                }
             }
             checkAndWaitForIndexing();
         }
@@ -910,6 +922,9 @@ public class AnalyticsEventTable implements EventTable {
                     records = this.findRecords(event, candidateEvents, null);
                     this.updateRecordsWithEvent(records, event, updateAttributeMappers);
                     ServiceHolder.getAnalyticsDataService().put(records);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Records updated: " + records.size() + " -> " + this.tenantId + ":" + this.tableName);
+                    }
                 }
                 checkAndWaitForIndexing();
             } catch (AnalyticsException e) {

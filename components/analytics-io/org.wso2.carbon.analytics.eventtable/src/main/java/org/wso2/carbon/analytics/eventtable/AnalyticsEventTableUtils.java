@@ -43,7 +43,7 @@ public class AnalyticsEventTableUtils {
 
     private static Log log = LogFactory.getLog(AnalyticsEventTableUtils.class);
 
-    public static void putEvents(int tenantId, String tableName, List<Attribute> attrs,
+    public static int putEvents(int tenantId, String tableName, List<Attribute> attrs,
                                  ComplexEventChunk<StreamEvent> addingEventChunk) {
         List<Record> records = new ArrayList<Record>();
         StreamEvent event;
@@ -53,6 +53,7 @@ public class AnalyticsEventTableUtils {
         }
         try {
             ServiceHolder.getAnalyticsDataService().put(records);
+            return records.size();
         } catch (AnalyticsException e) {
             throw new IllegalStateException("Error in adding records to analytics event table: " +
                     e.getMessage(), e);

@@ -35,5 +35,5 @@
    <!-- The number of index workers to operate in the current node. This basically results in the number of execution threads created
         to do the indexing operations of the local shards. When this value is increased, the parallel I/O operations being done on the
         system grows larger. So a system which can handle parallel I/O operation could increase this, e.g. SSDs -->
-   <indexWorkerCount>4</indexWorkerCount>
+   <indexWorkerCount>1</indexWorkerCount>
 </analytics-dataservice-configuration>

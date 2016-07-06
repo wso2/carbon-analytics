@@ -41,7 +41,7 @@ public class H2AnalyticsDataServiceClusteredTest extends AnalyticsDataServiceTes
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
         GenericUtils.clearGlobalCustomDataSourceRepo();
-        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf8");
         Hazelcast.shutdownAll();
         AnalyticsServiceHolder.setHazelcastInstance(Hazelcast.newHazelcastInstance());
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
