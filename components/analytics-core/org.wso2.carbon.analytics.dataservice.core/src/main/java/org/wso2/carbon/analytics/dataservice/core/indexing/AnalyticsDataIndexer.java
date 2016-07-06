@@ -135,7 +135,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -189,7 +191,7 @@ public class AnalyticsDataIndexer {
 
     private AggregateFunctionFactory aggregateFunctionFactory;
     
-    private ExecutorService shardWorkerExecutor, reIndexWorkerExecutor;
+    private ExecutorService shardWorkerExecutor, reIndexWorkerExecutor, genericIndexExecutor;
     
     private List<IndexWorker> workers;
 
@@ -216,6 +218,7 @@ public class AnalyticsDataIndexer {
      * @throws AnalyticsException
      */
     public void init() throws AnalyticsException {
+        this.genericIndexExecutor = Executors.newCachedThreadPool();
         if (System.getProperty(ENABLE_INDEXING_STATS_SYS_PROP) != null) {
             this.indexingStatsEnabled = true;
         }
@@ -509,13 +512,12 @@ public class AnalyticsDataIndexer {
             throws AnalyticsIndexException {
         List<SearchResultEntry> results = new ArrayList<>();
         IndexReader reader = null;
-        ExecutorService searchExecutor = Executors.newCachedThreadPool();
         if (count <= 0) {
             log.error("Record Count/Page size is ZERO!. Please set Record count/Page size.");
         }
         try {
             reader = this.getCombinedIndexReader(shardIndices, tenantId, tableName);
-            IndexSearcher searcher = new IndexSearcher(reader, searchExecutor);
+            IndexSearcher searcher = new IndexSearcher(reader, this.genericIndexExecutor);
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, tableName);
             Query indexQuery = getSearchQueryFromString(query, indices);
             TopDocsCollector collector = getTopDocsCollector(start, count, sortByFields, indices);
@@ -541,7 +543,6 @@ public class AnalyticsDataIndexer {
                     log.error("Error in closing the reader: " + e.getMessage(), e);
                 }
             }
-            searchExecutor.shutdown();
         }
     }
 
@@ -1767,6 +1768,7 @@ public class AnalyticsDataIndexer {
         this.localIndexDataStore.close();
         this.indexNodeCoordinator.close();
         this.closeAndRemoveIndexWriters();
+        this.genericIndexExecutor.shutdown();
     }
         
     public void waitForIndexing(long maxWait) throws AnalyticsException, AnalyticsTimeoutException {
@@ -1774,26 +1776,43 @@ public class AnalyticsDataIndexer {
     }
     
     public void waitForIndexingLocal(long maxWait) throws AnalyticsException, AnalyticsTimeoutException {
-        ExecutorService executor = Executors.newFixedThreadPool(this.localShards.size());
+        CompletionService<String> service = new ExecutorCompletionService<>(this.genericIndexExecutor);
         for (int shardIndex : this.localShards) {
             final int si = shardIndex;
-            executor.submit(new Runnable() {
+            service.submit(new Callable<String>() {
                 @Override
-                public void run() {
+                public String call() {
                     try {
                         processIndexOperationsFlushQueue(si);
                     } catch (AnalyticsException e) {
                         log.warn("Error in index operation flushing: " + e.getMessage(), e);
                     }
+                    return null;
                 }
             });
         }
-        executor.shutdown();
         try {
-            if (!executor.awaitTermination(maxWait == -1 ? Integer.MAX_VALUE : maxWait, TimeUnit.MILLISECONDS)) {
+            if (!this.awaitTermination(service, this.localShards.size(), maxWait == -1 ? Integer.MAX_VALUE : maxWait)) {
                 throw new AnalyticsTimeoutException("Timed out waiting for local indexing operations: " + maxWait);
             }
-        } catch (InterruptedException ignore) { }
+        } catch (InterruptedException e) {
+            /* ignore */
+            if (log.isDebugEnabled()) {
+                log.debug("Wait For Indexing Interrupted: " + e.getMessage(), e);
+            }
+        }
+    }
+    
+    private boolean awaitTermination(CompletionService<String> service, int n, long maxWait) throws InterruptedException {
+        long finalTime = System.currentTimeMillis() + maxWait;
+        long timeDiff;
+        for (int i = 0; i < n; i++) {
+            timeDiff = finalTime - System.currentTimeMillis();
+            if (service.poll(timeDiff > 0 ? timeDiff : 1, TimeUnit.MILLISECONDS) == null) {
+                return false;
+            }
+        }
+        return true;
     }
     
     public void waitForIndexing(int tenantId, String tableName, long maxWait) 
@@ -1882,14 +1901,13 @@ public class AnalyticsDataIndexer {
             throws AnalyticsIndexException, IOException {
         if (aggregateRequest.getAggregateLevel() >= 0) {
             if (aggregateRequest.getGroupByField() != null && !aggregateRequest.getGroupByField().isEmpty()) {
-                ExecutorService pool = Executors.newFixedThreadPool(localShards.size());
                 Set<Future<Set<List<String>>>> perShardUniqueCategories = new HashSet<>();
                 Set<List<String>> finalUniqueCategories = new HashSet<>();
                 for (Integer taxonomyShardId : localShards) {
                     String tableId = this.generateTableId(tenantId, aggregateRequest.getTableName());
                     Callable<Set<List<String>>> callable = new TaxonomyWorker(tenantId, AnalyticsDataIndexer.this,
                                                                               taxonomyShardId, tableId, aggregateRequest);
-                    Future<Set<List<String>>> result = pool.submit(callable);
+                    Future<Set<List<String>>> result = this.genericIndexExecutor.submit(callable);
                     perShardUniqueCategories.add(result);
                 }
                 try {
@@ -1901,30 +1919,12 @@ public class AnalyticsDataIndexer {
                     log.error("Error while generating Unique categories for aggregation, " + e.getMessage(), e);
                     throw new AnalyticsIndexException("Error while generating Unique categories for aggregation, " +
                                                       e.getMessage(), e);
-                } finally {
-                    shutdownWorkerThreadPool(pool);
                 }
             } else {
                 return new HashSet<>();
             }
         } else {
             throw new AnalyticsIndexException("Aggregate level cannot be less than zero");
-        }
-    }
-
-    private void shutdownWorkerThreadPool(ExecutorService pool)
-            throws AnalyticsIndexException {
-        if (pool != null) {
-            pool.shutdown();
-        }
-        try {
-            if(pool != null && !pool.awaitTermination(WORKER_TIMEOUT, TimeUnit.SECONDS)) {
-                pool.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            log.error("Error while shutting down the threadpool , " + e.getMessage(), e);
-            throw new AnalyticsIndexException("Error while shutting down the threadpool , " +
-                                              e.getMessage(), e);
         }
     }
 
