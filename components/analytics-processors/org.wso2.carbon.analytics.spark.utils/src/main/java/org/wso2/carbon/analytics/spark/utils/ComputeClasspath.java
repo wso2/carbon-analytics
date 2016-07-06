@@ -179,7 +179,7 @@ public class ComputeClasspath {
                 if (fileExists(line)) {
                     buf.append(separator);
                     buf.append(line);
-                } else if (fileExists(carbonHome + separator + line)) {
+                } else if (fileExists(carbonHome + File.separator + line)) {
                     buf.append(separator);
                     buf.append(carbonHome);
                     buf.append(separator);
