@@ -319,12 +319,15 @@ public class AnalyticsEventTable implements EventTable {
 
     private void checkAndWaitForIndexing() {
         if (this.waitForIndexing && this.indicesAvailable) {
+            long start = 0;
             if (log.isDebugEnabled()) {
                 log.debug("Wait for indexing START -> " + this.tenantId + ":" + this.tableName);
+                start = System.currentTimeMillis();
             }
             this.waitForIndexing(this.tenantId, this.tableName);
             if (log.isDebugEnabled()) {
-                log.debug("Wait for indexing END -> " + this.tenantId + ":" + this.tableName);
+                long end = System.currentTimeMillis();
+                log.debug("Wait for indexing END: " + (end - start) + " ms -> " + this.tenantId + ":" + this.tableName);
             }
         }
     }
