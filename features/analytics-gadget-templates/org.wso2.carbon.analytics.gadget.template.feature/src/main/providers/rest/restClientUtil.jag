@@ -1,0 +1,183 @@
+<%
+/*
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+var restClientUtil = function () {
+
+    var log = new Log();
+    var constants = require("/modules/constants.js");
+    var tokenUtil = require("/modules/tokenUtil.js").tokenUtil;
+    var restClientConstants = require("./constants.js");
+    var module = {};
+
+    /**
+     * Refresh access token based on authorization mechanism
+     * @param providerConfig   rest client provider configuration
+     * @param callBack         this will return http status code based on the response which is taken after retrieving
+     *                         new access token
+     **/
+    module.refreshAccessToken = function (providerConfig, callBack) {
+        var isExecute = false;
+        var payload = {};
+        var authorizationType = providerConfig[restClientConstants.AUTHORIZATION_METHOD];
+        try {
+            switch (authorizationType) {
+                case restClientConstants.NO_AUTH:
+                    break;
+                case restClientConstants.BASIC_AUTH:
+                    payload[restClientConstants.USERNAME] = providerConfig[restClientConstants.USERNAME];
+                    payload[restClientConstants.PASSWORD] = providerConfig[restClientConstants.PASSWORD];
+                    payload[restClientConstants.AUTHORIZATION_METHOD] = authorizationType;
+                    if (payload[restClientConstants.USERNAME] && payload[restClientConstants.USERNAME]) {
+                        isExecute = true;
+                    }
+                    break;
+                case restClientConstants.OAUTH2_PASSWORD_GRANT_TYPE:
+                    payload[restClientConstants.USERNAME] = providerConfig[restClientConstants.USERNAME];
+                    payload[restClientConstants.PASSWORD] = providerConfig[restClientConstants.PASSWORD];
+                    payload[restClientConstants.CLIENT_ID] = providerConfig[restClientConstants.CLIENT_ID];
+                    payload[restClientConstants.CLIENT_SECRET] = providerConfig[restClientConstants.CLIENT_SECRET];
+                    payload[restClientConstants.SCOPE] = providerConfig[restClientConstants.SCOPE];
+                    payload[restClientConstants.AUTH_URL] = providerConfig[restClientConstants.AUTH_URL];
+                    payload[restClientConstants.AUTHORIZATION_METHOD] = authorizationType;
+                    if (payload[restClientConstants.PASSWORD] && payload[restClientConstants.USERNAME]
+                            && payload[restClientConstants.CLIENT_ID] && payload[restClientConstants.CLIENT_SECRET]
+                            && payload[restClientConstants.SCOPE] && payload[restClientConstants.AUTH_URL]) {
+                        isExecute = true;
+                    }
+                    break;
+                case restClientConstants.OAUTH2_CLIENT_CREDENTIALS_GRANT_TYPE:
+                    payload[restClientConstants.CLIENT_ID] = providerConfig[restClientConstants.CLIENT_ID];
+                    payload[restClientConstants.CLIENT_SECRET] = providerConfig[restClientConstants.CLIENT_SECRET];
+                    payload[restClientConstants.SCOPE] = providerConfig[restClientConstants.SCOPE];
+                    payload[restClientConstants.AUTH_URL] = providerConfig[restClientConstants.AUTH_URL];
+                    payload[restClientConstants.AUTHORIZATION_METHOD] = authorizationType;
+                    if (payload[restClientConstants.CLIENT_ID] && payload[restClientConstants.CLIENT_SECRET]
+                            && payload[restClientConstants.SCOPE] && payload[restClientConstants.AUTH_URL]) {
+                        isExecute = true;
+                    }
+                    break;
+            }
+            if (isExecute) {
+                module.execute(payload, function (responseStatus) {
+                    callBack(responseStatus);
+                });
+            } else if (authorizationType != restClientConstants.BASIC_AUTH) {
+                log.error("Can't refresh access token, something wrong with meta data which required for request " +
+                        "access token from authorization server");
+                callBack(constants.HTTP_UNAUTHORIZED);
+            } else {
+                callBack(constants.HTTP_ACCEPTED);
+            }
+        } catch (error) {
+            log.error("Can't refresh access token, " + error);
+        }
+    };
+
+    /**
+     * Execute http request based on authorization method
+     * @param payload   http request payload. This will change according to authorization method
+     * @param callBack  this will return http status code based on the response which is taken after retrieving
+     *                  new access token
+     **/
+    module.execute = function (payload, callBack) {
+        module.requestAccessToken(payload);
+        callBack(response.status);
+    };
+
+    /**
+     * Send request to authorization server and update user's access token
+     * @param payload   http request payload. This will change according to authorization method
+     **/
+    module.requestAccessToken = function (payload) {
+        try {
+            switch (payload.authorizationMethod) {
+                case restClientConstants.BASIC_AUTH:
+                    var encodedClientCredentials = tokenUtil.encode(payload.username + ':' + payload.password);
+                    if (payload.username && payload.password) {
+                        session.put(restClientConstants.REMOTE_SERVER_CREDENTIALS
+                                , module.createAuthorizationHeader(constants.BASIC_PREFIX, encodedClientCredentials));
+                        response.status = constants.HTTP_ACCEPTED;
+                    } else {
+                        response.status = constants.HTTP_USER_NOT_AUTHENTICATED;
+                        response.content = module.sendMessage("Error occurred while requesting access token. Username" +
+                                " or password can't be empty.");
+                        log.error("Error occurred while requesting access token. Username or password can't be empty.");
+                    }
+                    break;
+                case restClientConstants.OAUTH2_PASSWORD_GRANT_TYPE:
+                    var encodedClientCredentials = tokenUtil.encode(payload.clientId + ':' + payload.clientSecret);
+                    var tokenPair = tokenUtil.getTokenWithPasswordGrantType(payload.username, payload.password,
+                            encodedClientCredentials, payload.scope, payload.authURL);
+                    if (tokenPair.accessToken) {
+                        session.put(restClientConstants.REMOTE_SERVER_CREDENTIALS, module.createAuthorizationHeader(
+                                constants.BEARER_PREFIX, tokenPair.accessToken));
+                        response.status = constants.HTTP_ACCEPTED;
+                    } else {
+                        response.status = constants.HTTP_USER_NOT_AUTHENTICATED;
+                        response.content = module.sendMessage("Error while getting access token from authorization " +
+                                "server. Access token can't be empty");
+                        log.error("Error while getting access token from authorization server. Access token can't " +
+                                "be empty");
+                    }
+                    break;
+                case restClientConstants.OAUTH2_CLIENT_CREDENTIALS_GRANT_TYPE:
+                    var encodedClientCredentials = tokenUtil.encode(payload.clientId + ':' + payload.clientSecret);
+                    var tokenPair = tokenUtil.getTokenWithClientSecretType(encodedClientCredentials, payload.scope,
+                            payload.authURL);
+                    if (tokenPair.accessToken) {
+                        session.put(restClientConstants.REMOTE_SERVER_CREDENTIALS, module.createAuthorizationHeader(
+                                constants.BEARER_PREFIX, tokenPair.accessToken));
+                        response.status = constants.HTTP_ACCEPTED;
+                    } else {
+                        response.status = constants.HTTP_USER_NOT_AUTHENTICATED;
+                        response.content = module.sendMessage("Error while getting access token from authorization " +
+                                "server. Access token can't be empty");
+                        log.error("Error while getting access token from authorization server. Access token can't " +
+                                "be empty");
+                    }
+                    break;
+            }
+        } catch (e) {
+            response.status = constants.HTTP_INTERNAL_ERROR;
+            response.content = module.sendMessage(e.message);
+            log.error("Error while requesting access token from authorization server, " + e);
+        }
+    };
+
+    module.sendMessage = function (message) {
+        return {"message": message};
+    }
+
+    /**
+     * Create authorization header based on authorization type
+     * @param type   authorization type
+     * @param token  access token
+     **/
+    module.createAuthorizationHeader = function (type, token) {
+        if (constants.BEARER_PREFIX === type) {
+            return constants.BEARER_PREFIX + token;
+        } else if (constants.BASIC_PREFIX === type) {
+            return constants.BASIC_PREFIX + token;
+        }
+    }
+
+    return module;
+}();
+
+%>
+

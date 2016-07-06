@@ -14,7 +14,6 @@
  */
 package org.wso2.carbon.event.publisher.core.internal.util;
 
-import com.google.common.collect.ObjectArrays;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
@@ -171,16 +170,23 @@ public class EventPublisherUtil {
         return size;
     }
 
-    public static Event convertToSiddhiEvent(org.wso2.carbon.databridge.commons.Event inputEvent) {
-        Object[] data = new Object[0];
+    public static Event convertToSiddhiEvent(org.wso2.carbon.databridge.commons.Event inputEvent, int inputStreamSize) {
+        Object[] data = new Object[inputStreamSize];
+        int dataArrayCount = 0;
         if (inputEvent.getMetaData() != null) {
-            data = ObjectArrays.concat(data, inputEvent.getMetaData(), Object.class);
+            for (Object attribute : inputEvent.getMetaData()) {
+                data[dataArrayCount++] = attribute;
+            }
         }
         if (inputEvent.getCorrelationData() != null) {
-            data = ObjectArrays.concat(data, inputEvent.getCorrelationData(), Object.class);
+            for (Object attribute : inputEvent.getCorrelationData()) {
+                data[dataArrayCount++] = attribute;
+            }
         }
         if (inputEvent.getPayloadData() != null) {
-            data = ObjectArrays.concat(data, inputEvent.getPayloadData(), Object.class);
+            for (Object attribute : inputEvent.getPayloadData()) {
+                data[dataArrayCount++] = attribute;
+            }
         }
         Event event = new Event(inputEvent.getTimeStamp(), data);
         // Unchecked assignment is required to convert Map<String, String> to Map<String, Object>

@@ -82,6 +82,7 @@ public class MQTTEventAdapterFactory extends InputEventAdapterFactory {
         password.setDisplayName(
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD));
         password.setSecured(true);
+        password.setEncrypted(true);
         password.setRequired(false);
         password.setHint(
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD_HINT));

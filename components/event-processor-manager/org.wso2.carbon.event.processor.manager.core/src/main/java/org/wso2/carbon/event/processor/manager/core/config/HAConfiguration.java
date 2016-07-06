@@ -58,7 +58,20 @@ public class HAConfiguration implements Serializable {
     private String memberUuid;
     private boolean isActive = false;
 
-    private static final int portOffset = Integer.parseInt(CarbonUtils.getServerConfiguration().getFirstProperty("Ports.Offset"));
+    private static final int carbonXmlportOffset = Integer.parseInt(CarbonUtils.getServerConfiguration().getFirstProperty("Ports.Offset"));
+
+    // Port offset from -DportOffset option
+    private static final int commandLinePortOffset = Integer.parseInt(System.getProperty("portOffset") == null ? "0" : System.getProperty("portOffset"));
+
+    // Priority should be given to the offset in -DportOffset
+    private static int portOffset = 0;
+    static {
+        if (commandLinePortOffset > 0)
+            portOffset = commandLinePortOffset;
+        else if (carbonXmlportOffset > 0 ){
+            portOffset = carbonXmlportOffset;
+        }
+    }
 
     public boolean isActive() {
         return isActive;

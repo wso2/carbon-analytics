@@ -64,7 +64,17 @@ public class HTTPEventAdapterFactory extends InputEventAdapterFactory {
                 resourceBundle.getString(HTTPEventAdapterConstants.EXPOSED_TRANSPORTS));
         exposedTransportsProperty.setOptions(new String[]{HTTPEventAdapterConstants.HTTPS, HTTPEventAdapterConstants.HTTP, HTTPEventAdapterConstants.LOCAL, HTTPEventAdapterConstants.ALL});
         exposedTransportsProperty.setDefaultValue(HTTPEventAdapterConstants.ALL);
+
+        // Transport Exposed
+        Property basicAuthEnabledProperty = new Property(HTTPEventAdapterConstants.BASIC_AUTH_ENABLED);
+        basicAuthEnabledProperty.setRequired(false);
+        basicAuthEnabledProperty.setOptions(new String[]{"true", "false"});
+        basicAuthEnabledProperty.setDefaultValue("true");
+        basicAuthEnabledProperty.setDisplayName(
+                resourceBundle.getString(HTTPEventAdapterConstants.BASIC_AUTH_ENABLED));
+
         propertyList.add(exposedTransportsProperty);
+        propertyList.add(basicAuthEnabledProperty);
 
         return propertyList;
     }

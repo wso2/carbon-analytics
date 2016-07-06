@@ -16,8 +16,7 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2</groupId>
@@ -29,7 +28,7 @@
     <groupId>org.wso2.carbon.analytics-common</groupId>
     <artifactId>carbon-analytics-common</artifactId>
     <packaging>pom</packaging>
-    <version>5.0.12-SNAPSHOT</version>
+    <version>5.1.0-SNAPSHOT</version>
     <name>WSO2 Carbon - Carbon Analytics Common Aggregator Module</name>
     <url>http://wso2.org</url>
 
@@ -44,7 +43,7 @@
         <module>components/event-processor-manager</module>
         <module>components/event-receiver</module>
         <module>components/event-publisher</module>
-        <module>components/execution-manager</module>
+        <module>components/template-manager</module>
         <module>components/gadget-template-deployer</module>
         <module>components/dashboard-template-deployer</module>
         <module>features/event-stream</module>
@@ -56,7 +55,7 @@
         <module>features/event-receiver</module>
         <module>features/event-publisher</module>
         <module>features/event-processor-manager</module>
-        <module>features/execution-manager</module>
+        <module>features/template-manager</module>
         <module>features/spark-common</module>
         <module>features/analytics-gadget-templates</module>
         <module>features/gadget-template-deployer</module>
@@ -372,22 +371,22 @@
             <!--carbon analytics common dependencies start-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.execution.manager.admin</artifactId>
+                <artifactId>org.wso2.carbon.event.template.manager.admin</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.execution.manager.core</artifactId>
+                <artifactId>org.wso2.carbon.event.template.manager.core</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.execution.manager.ui</artifactId>
+                <artifactId>org.wso2.carbon.event.template.manager.ui</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.execution.manager.stub</artifactId>
+                <artifactId>org.wso2.carbon.event.template.manager.stub</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
@@ -826,13 +825,13 @@
             <!--features start-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.execution.manager.server.feature</artifactId>
+                <artifactId>org.wso2.carbon.event.template.manager.server.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.execution.manager.ui.feature</artifactId>
+                <artifactId>org.wso2.carbon.event.template.manager.ui.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
             </dependency>
@@ -1246,7 +1245,7 @@
     </repositories>
 
     <properties>
-        <carbon.analytics.common.version>5.0.12-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.1.0-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.4.2</carbon.kernel.version>
@@ -1257,7 +1256,7 @@
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
         <!--CEP versions-->
-        <siddhi.version>3.0.6-SNAPSHOT</siddhi.version>
+        <siddhi.version>3.1.0-SNAPSHOT</siddhi.version>
 
         <!-- Carbon metrics version -->
         <carbon.metrics.version>1.2.0</carbon.metrics.version>

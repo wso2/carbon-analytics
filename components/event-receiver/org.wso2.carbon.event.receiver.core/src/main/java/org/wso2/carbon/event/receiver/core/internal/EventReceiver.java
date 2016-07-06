@@ -167,12 +167,6 @@ public class EventReceiver implements EventProducer {
         }
     }
 
-/*
-    public int getTenantId() {
-        return PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-    }
-*/
-
     /**
      * Returns the stream definition that is exported by this event receiver.
      * This stream definition will available to any object that consumes the event receiver service

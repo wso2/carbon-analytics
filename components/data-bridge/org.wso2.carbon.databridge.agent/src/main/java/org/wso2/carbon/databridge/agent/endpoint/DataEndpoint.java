@@ -20,9 +20,9 @@ package org.wso2.carbon.databridge.agent.endpoint;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
+import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
-import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.SessionTimeoutException;
@@ -32,7 +32,9 @@ import org.wso2.carbon.databridge.commons.utils.DataBridgeThreadFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 
 /**
  * Abstract class for DataEndpoint, and this is a main class that needs to be implemented
@@ -62,6 +64,8 @@ public abstract class DataEndpoint {
 
     private State state;
 
+    private Semaphore immediateDispatchSemaphore;
+
     public enum State {
         ACTIVE, UNAVAILABLE, BUSY, INITIALIZING
     }
@@ -80,10 +84,58 @@ public abstract class DataEndpoint {
         }
     }
 
+    void collectAndSendNow(Event event) {
+        events.add(event);
+        if (events.size() >= batchSize) {
+            publishEventsNow();
+        }
+    }
+
     void flushEvents() {
         if (events.size() != 0) {
             threadPoolExecutor.submitJobAndSetState(new Thread(new EventPublisher(events)), this);
             events = new ArrayList<>();
+        }
+    }
+
+    void flushEventsNow() {
+        if (events.size() != 0) {
+            publishEventsNow();
+        }
+    }
+
+    private void publishEventsNow() {
+        EventPublisher eventPublisher = new EventPublisher(events);
+        setStateBusy();
+        acquireImmediateDispatchSemaphore();
+        try {
+            events = new ArrayList<>();
+            eventPublisher.run();
+        } finally {
+            releaseImmediateDispatchSemaphore();
+        }
+    }
+
+    private void acquireImmediateDispatchSemaphore() {
+        boolean acquired = false;
+        do {
+            try {
+                immediateDispatchSemaphore.acquire();
+                acquired = true;
+            } catch (final InterruptedException e) {
+                // Do nothing
+            }
+        } while (!acquired);
+    }
+
+    private void releaseImmediateDispatchSemaphore() {
+        immediateDispatchSemaphore.release();
+    }
+
+    private void setStateBusy() {
+        int permits = immediateDispatchSemaphore.availablePermits();
+        if (permits <= 1) {
+            setState(State.BUSY);
         }
     }
 
@@ -125,7 +177,8 @@ public abstract class DataEndpoint {
                 dataEndpointConfiguration.getReceiverURL());
         this.connectionService = Executors.newSingleThreadExecutor(new DataBridgeThreadFactory("ConnectionService-" +
                 dataEndpointConfiguration.getReceiverURL()));
-        this.maxPoolSize = dataEndpointConfiguration.getCorePoolSize();
+        this.maxPoolSize = dataEndpointConfiguration.getMaxPoolSize();
+        immediateDispatchSemaphore = new Semaphore(maxPoolSize);
         connect();
     }
 
@@ -248,7 +301,7 @@ public abstract class DataEndpoint {
             } catch (Exception ex) {
                 log.error("Unexpected error occurred while sending the event. ", ex);
                 handleFailedEvents();
-            } catch (Throwable t){
+            } catch (Throwable t) {
                 //There can be situations where runtime exceptions/class not found exceptions occur, This block help to catch those exceptions.
                 //No need to retry send events. Deactivating the state would be enough.
                 log.error("Unexpected error occurred while sending events. ", t);

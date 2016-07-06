@@ -78,10 +78,12 @@ public class ManagementModeConfigurationLoader {
                     OMElement nodeConfig = processingMode
                             .getFirstChildWithName(new QName(ConfigurationConstants.SN_PERSISTENCE_ELEMENT));
 
-                    boolean isPersistenceEnabled = nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, nodeConfig);
-                    if (nodeConfig != null && isPersistenceEnabled) {
-                        managementModeInfo.setPersistenceConfiguration(getPersistConfigurations(nodeConfig,isPersistenceEnabled));
-                        log.info("CEP started in Persistence enabled HA mode");
+                    if (nodeConfig != null) {
+                        boolean isPersistenceEnabled = nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, nodeConfig);
+                        if(isPersistenceEnabled){
+                            managementModeInfo.setPersistenceConfiguration(getPersistConfigurations(nodeConfig,isPersistenceEnabled));
+                            log.info("CEP started in Persistence enabled HA mode");
+                        }
                     } else {
                         log.info("CEP started in HA mode");
                     }

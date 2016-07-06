@@ -24,6 +24,11 @@ import java.io.File;
  */
 public class DataEndpointConstants {
 
+    public static final String YIELDING_WAIT_STRATEGY = "yielding";
+    public static final String SLEEPING_WAITING_STRATEGY = "sleeping";
+    public static final String BUSY_SPIN_WAIT_STRATEGY = "busySpin";
+    public static final String BLOCKING_WAIT_STRATEGY = "blocking";
+
     private DataEndpointConstants() {
     }
 

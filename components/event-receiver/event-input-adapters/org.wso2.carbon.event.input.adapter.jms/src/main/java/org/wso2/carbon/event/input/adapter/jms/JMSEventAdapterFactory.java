@@ -86,18 +86,19 @@ public class JMSEventAdapterFactory extends InputEventAdapterFactory {
         propertyList.add(javaNamingProviderUrlProperty);
 
 
-        // JNDI Password
-        Property passwordProperty = new Property(JMSEventAdapterConstants.ADAPTER_JMS_PASSWORD);
-        passwordProperty.setSecured(true);
-        passwordProperty.setDisplayName(
-                resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_PASSWORD));
-        propertyList.add(passwordProperty);
-
         // JNDI Username
         Property userNameProperty = new Property(JMSEventAdapterConstants.ADAPTER_JMS_USERNAME);
         userNameProperty.setDisplayName(
                 resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_USERNAME));
         propertyList.add(userNameProperty);
+
+        // JNDI Password
+        Property passwordProperty = new Property(JMSEventAdapterConstants.ADAPTER_JMS_PASSWORD);
+        passwordProperty.setSecured(true);
+        passwordProperty.setEncrypted(true);
+        passwordProperty.setDisplayName(
+                resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_PASSWORD));
+        propertyList.add(passwordProperty);
 
         // Connection Factory JNDI Name
         Property connectionFactoryNameProperty = new Property(
@@ -144,6 +145,13 @@ public class JMSEventAdapterFactory extends InputEventAdapterFactory {
         jmsProperties.setHint(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_PROPERTIES_HINT));
         jmsProperties.setRequired(false);
         propertyList.add(jmsProperties);
+
+        Property jmsSecuredProperties = new Property(JMSEventAdapterConstants.ADAPTER_SECURED_PROPERTIES);
+        jmsSecuredProperties.setDisplayName(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_SECURED_PROPERTIES));
+        jmsSecuredProperties.setHint(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_SECURED_PROPERTIES_HINT));
+        jmsSecuredProperties.setRequired(false);
+        jmsSecuredProperties.setEncrypted(true);
+        propertyList.add(jmsSecuredProperties);
 
         return propertyList;
     }

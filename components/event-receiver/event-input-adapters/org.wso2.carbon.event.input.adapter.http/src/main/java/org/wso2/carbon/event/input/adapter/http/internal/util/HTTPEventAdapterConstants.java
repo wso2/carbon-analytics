@@ -38,6 +38,7 @@ public final class HTTPEventAdapterConstants {
     public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
     public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
     public static final String EXPOSED_TRANSPORTS = "transports";
+    public static final String BASIC_AUTH_ENABLED = "basicAuthEnabled";
     public static final String HTTPS = "https";
     public static final String HTTP = "http";
     public static final String LOCAL = "local";

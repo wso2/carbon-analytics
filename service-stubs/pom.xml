@@ -23,7 +23,7 @@
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>carbon-analytics-common</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>5.0.12-SNAPSHOT</version>
+        <version>5.1.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -39,7 +39,7 @@
         <module>org.wso2.carbon.event.publisher.stub</module>
         <module>org.wso2.carbon.event.receiver.stub</module>
         <module>org.wso2.carbon.event.statistics.stub</module>
-        <module>org.wso2.carbon.event.execution.manager.stub</module>
+        <module>org.wso2.carbon.event.template.manager.stub</module>
         <module>org.wso2.carbon.event.tracer.stub</module>
         <module>org.wso2.carbon.analytics.common.jmx.agent.stub</module>
         <!-- <module>org.wso2.carbon.analytics.dashboard.stub</module> -->

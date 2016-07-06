@@ -602,7 +602,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
             List<Property> properties = inputEventAdapterSchema.getPropertyList();
             if (properties != null) {
                 for (Property prop : properties) {
-                    if (prop.isSecured()) {
+                    if (prop.isEncrypted()) {
                         encryptedProperties.add(prop.getPropertyName());
                     }
                 }
