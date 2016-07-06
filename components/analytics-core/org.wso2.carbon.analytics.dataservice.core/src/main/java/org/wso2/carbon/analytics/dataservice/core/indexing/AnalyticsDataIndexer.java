@@ -142,6 +142,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class represents the indexing functionality.
@@ -204,7 +205,7 @@ public class AnalyticsDataIndexer {
     
     private AnalyticsDataIndexingStatsCollector statsCollector;
     
-    private Map<Integer, Object> indexerLocks = new HashMap<>();
+    private Map<Integer, ReentrantLock> indexerLocks = new HashMap<>();
         
     public AnalyticsDataIndexer(AnalyticsIndexerInfo indexerInfo) throws AnalyticsException {
     	this.indexerInfo = indexerInfo;
@@ -228,12 +229,13 @@ public class AnalyticsDataIndexer {
         this.indexNodeCoordinator.init();
     }
     
-    private Object getIndexingLockObject(int id) {
-        Object lock = this.indexerLocks.get(id);
+    private ReentrantLock getIndexingLock(int id) {
+        ReentrantLock lock = this.indexerLocks.get(id);
         if (lock == null) {
             synchronized (this.indexerLocks) {
                 if (lock == null) {
-                    lock = new Object();
+                    /* need to be a fair lock, so operations like waitForIndexing will not starve */
+                    lock = new ReentrantLock(true);
                     this.indexerLocks.put(id, lock);
                 }
             }
@@ -290,19 +292,23 @@ public class AnalyticsDataIndexer {
     /* processIndexOperationsSlice and processIndexOperationsFlushQueue must be synchronized per shard index, 
      * they are accessed by indexer threads and wait for indexing tasks, if not done property, index corruption will happen */
     private boolean processIndexOperationsSlice(int shardIndex) throws AnalyticsException {
-        Object lock = this.getIndexingLockObject(shardIndex);
-        synchronized (lock) {
+        ReentrantLock lock = this.getIndexingLock(shardIndex);
+        try {
+            lock.lock();
             long maxBatchSize = this.getShardIndexRecordBatchSize();
             long processedCount = this.processLocalShardDataQueue(shardIndex, 
                     this.localIndexDataStore.getIndexDataQueue(shardIndex), maxBatchSize)[1];
             return processedCount >= maxBatchSize;
+        } finally {
+            lock.unlock();
         }
     }
     
     /* processIndexOperationsSlice and processIndexOperationsFlushQueue must be synchronized per shard index */
     public void processIndexOperationsFlushQueue(int shardIndex) throws AnalyticsException {
-        Object lock = this.getIndexingLockObject(shardIndex);
-        synchronized (lock) {
+        ReentrantLock lock = this.getIndexingLock(shardIndex);
+        try {
+            lock.lock();
             long maxBatchCount = this.getShardIndexRecordBatchSize();
             LocalIndexDataQueue queue = this.localIndexDataStore.getIndexDataQueue(shardIndex);
             long queueSizeAtStart = queue.size();
@@ -315,7 +321,9 @@ public class AnalyticsDataIndexer {
                 }
                 processedCount += tmpCount;
             } while (processedCount < queueSizeAtStart);
-        }        
+        } finally {
+            lock.unlock();
+        }
     }
     
     private long[] processLocalShardDataQueue(int shardIndex, LocalIndexDataQueue dataQueue, 
