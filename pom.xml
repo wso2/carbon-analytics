@@ -927,7 +927,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.org.apache.hbase</groupId>
-                <artifactId>hbase-client</artifactId>
+                <artifactId>hbase-shaded-client</artifactId>
                 <version>${hbase.client.orbit.version}</version>
             </dependency>
             <dependency>
@@ -1268,11 +1268,11 @@
         <commons.collections.orbit.version>3.2.0.wso2v1</commons.collections.orbit.version>
 
         <!-- Orbits for HBase client -->
-        <hbase.client.version>1.1.2</hbase.client.version>
+        <hbase.client.version>1.2.1</hbase.client.version>
         <hadoop.client.260.version>2.6.0</hadoop.client.260.version>
-        <hbase.client.orbit.version>1.1.2.wso2v1</hbase.client.orbit.version>
+        <hbase.client.orbit.version>1.2.1.wso2v1</hbase.client.orbit.version>
         <hadoop.client.260.orbit.version>2.6.0.wso2v3</hadoop.client.260.orbit.version>
-        <hbase.client.import.version>[1.0.0, 1.2.0)</hbase.client.import.version>
+        <hbase.client.import.version>[1.0.0, 2.0)</hbase.client.import.version>
         <hadoop.client.import.version>[2.6.0, 2.7.0)</hadoop.client.import.version>
 
         <!-- Equinox -->
