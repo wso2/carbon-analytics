@@ -44,9 +44,9 @@ public class AnalyticsEventTableUtils {
     private static Log log = LogFactory.getLog(AnalyticsEventTableUtils.class);
 
     public static int putEvents(int tenantId, String tableName, List<Attribute> attrs,
-                                 ComplexEventChunk<StreamEvent> addingEventChunk) {
+                                 ComplexEventChunk<ComplexEvent> addingEventChunk) {
         List<Record> records = new ArrayList<Record>();
-        StreamEvent event;
+        ComplexEvent event;
         while (addingEventChunk.hasNext()) {
             event = addingEventChunk.next();
             records.add(streamEventToRecord(tenantId, tableName, attrs, event));
@@ -61,7 +61,7 @@ public class AnalyticsEventTableUtils {
     }
 
     private static Record streamEventToRecord(int tenantId, String tableName, List<Attribute> attrs,
-                                              StreamEvent event) {
+                                              ComplexEvent event) {
         Map<String, Object> values = streamEventToRecordValues(attrs, event, null);
         Object timestampObj = values.remove(AnalyticsEventTableConstants.INTERNAL_TIMESTAMP_ATTRIBUTE);
         if (timestampObj != null) {
