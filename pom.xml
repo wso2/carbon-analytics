@@ -1247,6 +1247,16 @@
             </releases>
         </repository>
 
+        <repository>
+            <id>spark-staging</id>
+            <url>https://maven.wso2.org/nexus/content/repositories/orgapachespark-1000/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+        </repository>
+
     </repositories>
 
     <properties>
@@ -1317,7 +1327,7 @@
         <project.scm.id>my-scm-server</project.scm.id>
 
         <!-- Spark dependency versions start-->
-        <spark.version>1.4.3.wso2v1-SNAPSHOT</spark.version>
+        <spark.version>1.4.3.wso2v1</spark.version>
         <spark.imp.pkg.version>[1.4.3,1.5.0)</spark.imp.pkg.version>
         <hadoop.client.version>2.7.2.wso2v1</hadoop.client.version>
         <json4s.jackson.version>3.2.10.wso2v1</json4s.jackson.version>
