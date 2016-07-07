@@ -119,7 +119,11 @@ public class AnalyticsWebService extends AbstractAdmin {
             throws AnalyticsWebServiceException {
         try {
             StreamDefinition streamDefinition = validateAndGetStreamDefinition(name, version);
-            return Utils.getStreamDefinitionBean(streamDefinition);
+            if (streamDefinition != null) {
+                return Utils.getStreamDefinitionBean(streamDefinition);
+            } else {
+                return null;
+            }
         } catch (Exception e) {
             logger.error("unable to get the stream definition: " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("unable to get the stream definition: " + e.getMessage(), e);
