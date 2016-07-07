@@ -39,14 +39,6 @@
             <artifactId>org.wso2.carbon.analytics.datasource.hbase</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.org.apache.hbase</groupId>
-            <artifactId>hbase-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.org.apache.hadoop</groupId>
-            <artifactId>hadoop-client</artifactId>
-        </dependency>
-        <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
         </dependency>

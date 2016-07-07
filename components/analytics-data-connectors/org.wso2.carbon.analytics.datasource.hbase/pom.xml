@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.apache.hbase</groupId>
-            <artifactId>hbase-client</artifactId>
+            <artifactId>hbase-shaded-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.apache.hadoop</groupId>
