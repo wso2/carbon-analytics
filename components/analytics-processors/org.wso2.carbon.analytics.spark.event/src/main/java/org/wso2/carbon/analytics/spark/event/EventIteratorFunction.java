@@ -18,8 +18,10 @@
 package org.wso2.carbon.analytics.spark.event;
 
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.types.StructType;
 import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import scala.collection.Iterator;
 import scala.runtime.AbstractFunction1;
 import scala.runtime.BoxedUnit;
@@ -40,35 +42,54 @@ public class EventIteratorFunction extends AbstractFunction1<Iterator<Row>, Boxe
     
     private String streamId;
 
-    public EventIteratorFunction(int tenantId,String streamId) {
+    private StructType sch;
+
+    private boolean globalTenantAccess;
+
+    public EventIteratorFunction(int tenantId, String streamId, StructType sch, boolean globalTenantAccess) {
         this.tenantId = tenantId;
         this.streamId = streamId;
+        this.sch = sch;
+        this.globalTenantAccess = globalTenantAccess;
     }
 
     @Override
     public BoxedUnit apply(Iterator<Row> iterator) {
-        List<List<Object>> storeEntries = new ArrayList<>(Constants.RECORDS_BATCH_SIZE);
+        List<EventRecord> storeEntries = new ArrayList<>(Constants.RECORDS_BATCH_SIZE);
         try {
             while (iterator.hasNext()) {
-                storeEntries.add(this.createStoreEntryFromRow(iterator.next()));
+                storeEntries.add(this.createEventRecordFromRow(iterator.next()));
                 if (storeEntries.size() % Constants.RECORDS_BATCH_SIZE == 0) {
-                    EventStreamDataStore.addToStore(this.tenantId, this.streamId, storeEntries);
+                    EventStreamDataStore.addToStore(storeEntries);
                     storeEntries.clear();
                 }
             }
-            EventStreamDataStore.addToStore(this.tenantId, this.streamId, storeEntries);
+            EventStreamDataStore.addToStore(storeEntries);
         } catch (AnalyticsException e) {
             throw new RuntimeException("Error in writing event store entires: " + e.getMessage(), e);
         }
         return BoxedUnit.UNIT;
     }
 
-    private List<Object> createStoreEntryFromRow(Row row) {
+    private EventRecord createEventRecordFromRow(Row row) {
+        String[] colNames = sch.fieldNames();
+        boolean globalTenantProcessed = false;
+        int targetTenantId = this.tenantId;
         List<Object> result = new ArrayList<Object>(row.length());
         for (int i = 0; i < row.length(); i++) {
-            result.add(row.get(i));
+            if (this.globalTenantAccess && colNames[i].equals(AnalyticsConstants.TENANT_ID_FIELD)) {
+                targetTenantId = row.getInt(i);
+                globalTenantProcessed = true;
+            } else {
+                result.add(row.get(i));
+            }
         }
-        return result;
+        if (this.globalTenantAccess && !globalTenantProcessed) {
+            throw new RuntimeException("The field '" + AnalyticsConstants.TENANT_ID_FIELD + "' is not found in row: " + row +
+                    " with schema: " + this.sch + " when creating a global tenant access record");
+        }
+
+        return new EventRecord(targetTenantId, this.streamId, result);
     }
-    
+
 }

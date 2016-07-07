@@ -50,11 +50,12 @@ public class EventStreamDataStore {
         AnalyticsServiceHolder.getAnalyticsDataService().createTable(META_TABLE_TID, EVENT_STREAM_DATA_STORE_TABLE);
     }
     
-    public static void addToStore(int tenantId, String streamId, List<List<Object>> payloadDataEntries) throws AnalyticsException {
+    public static void addToStore(List<EventRecord> eventRecordList) throws AnalyticsException {
         AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
-        List<Record> records = new ArrayList<>(payloadDataEntries.size());
-        for (List<Object> payloadDataEntry : payloadDataEntries) {
-            records.add(new Record(META_TABLE_TID, EVENT_STREAM_DATA_STORE_TABLE, createValues(tenantId, streamId, payloadDataEntry)));
+        List<Record> records = new ArrayList<>(eventRecordList.size());
+        for (EventRecord eventRecord : eventRecordList) {
+            records.add(new Record(META_TABLE_TID, EVENT_STREAM_DATA_STORE_TABLE,
+                    createValues(eventRecord.getTenantId(), eventRecord.getStreamId(), eventRecord.getPayloadEntries())));
         }
         if (records.size() > 0) {
             ads.put(records);

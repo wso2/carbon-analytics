@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.spark.event;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.sources.RelationProvider;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import scala.collection.immutable.Map;
@@ -46,6 +47,8 @@ public class EventStreamProvider implements RelationProvider {
     
     private String payload;
 
+    private boolean globalTenantAccess;
+
     public EventStreamProvider() { 
         try {
             EventStreamDataStore.initStore();
@@ -57,7 +60,7 @@ public class EventStreamProvider implements RelationProvider {
     @Override
     public StreamRelation createRelation(SQLContext sqlContext, Map<String, String> parameters) {
         this.setParameters(parameters);
-        return new StreamRelation(this.tenantId, sqlContext, this.getStreamId(this.streamName, this.version), this.payload);
+        return new StreamRelation(this.tenantId, sqlContext, this.getStreamId(this.streamName, this.version), this.payload, this.globalTenantAccess);
     }
 
     private void setParameters(Map<String, String> parameters) {
@@ -66,6 +69,8 @@ public class EventStreamProvider implements RelationProvider {
         this.streamName = extractValuesFromMap(EventingConstants.STREAM_NAME, parameters, "");
         this.version = extractValuesFromMap(EventingConstants.VERSION, parameters, DEFAULT_VERSION);
         this.payload = extractValuesFromMap(EventingConstants.PAYLOAD, parameters, "");
+        this.globalTenantAccess = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.GLOBAL_TENANT_ACCESS,
+                parameters, String.valueOf(false)));
     }
 
     private String getStreamId(String streamName, String version) {

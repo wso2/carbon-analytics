@@ -44,11 +44,14 @@ public class StreamRelation extends BaseRelation implements InsertableRelation, 
     private String streamId;
     
     private int tenantId;
-    
-    public StreamRelation(int tenantId,SQLContext sqlContext, String streamId, String payloadString) {
+
+    private boolean globalTenantAccess;
+
+    public StreamRelation(int tenantId,SQLContext sqlContext, String streamId, String payloadString, boolean globalTenantAccess) {
         this.tenantId = tenantId;
         this.sqlContext = sqlContext;
         this.streamId = streamId;
+        this.globalTenantAccess = globalTenantAccess;
         this.schema = new StructType(this.extractFieldsFromString(payloadString));
     }
 
@@ -56,7 +59,7 @@ public class StreamRelation extends BaseRelation implements InsertableRelation, 
     public void insert(DataFrame data, boolean b) {
         for (int i = 0; i < data.rdd().partitions().length; i++) {
             data.sqlContext().sparkContext().runJob(data.rdd(),
-                    new EventIteratorFunction(this.tenantId, this.streamId),
+                    new EventIteratorFunction(this.tenantId, this.streamId, data.schema(), this.globalTenantAccess),
                     CarbonScalaUtils.getNumberSeq(i, i + 1), false,
                     ClassTag$.MODULE$.Unit());
         }
