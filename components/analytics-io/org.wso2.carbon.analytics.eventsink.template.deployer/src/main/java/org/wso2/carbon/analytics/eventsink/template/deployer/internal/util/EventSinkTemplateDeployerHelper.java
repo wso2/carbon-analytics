@@ -18,6 +18,7 @@ package org.wso2.carbon.analytics.eventsink.template.deployer.internal.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventStore;
 import org.wso2.carbon.analytics.eventsink.AnalyticsTableSchema;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
@@ -66,6 +67,7 @@ public class EventSinkTemplateDeployerHelper {
 
     public static void deleteEventSinkConfigurationFile(int tenantId, String streamName)
             throws TemplateDeploymentException {
+        streamName = GenericUtils.checkAndReturnPath(streamName);
         File eventSinkFile = new File(MultitenantUtils.getAxis2RepositoryPath(tenantId) +
                                       AnalyticsEventSinkConstants.DEPLOYMENT_DIR_NAME + File.separator + streamName +
                                       AnalyticsEventSinkConstants.DEPLOYMENT_FILE_EXT);

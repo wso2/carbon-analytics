@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.spark.core.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.AnalyticsTask;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
@@ -204,6 +205,7 @@ public class AnalyticsPersistenceManager {
      * @throws AnalyticsPersistenceException
      */
     private String getScriptLocation(String scriptName) throws AnalyticsPersistenceException {
+        scriptName = GenericUtils.checkAndReturnPath(scriptName);
         return AnalyticsConstants.ANALYTICS_SCRIPTS_LOCATION + RegistryConstants.PATH_SEPARATOR + scriptName +
                 AnalyticsConstants.SCRIPT_EXTENSION_SEPARATOR + AnalyticsConstants.SCRIPT_EXTENSION;
     }

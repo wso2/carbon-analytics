@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.eventsink.internal.util;
 
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventStore;
 import org.wso2.carbon.analytics.eventsink.AnalyticsTableSchema;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
@@ -83,6 +84,7 @@ public class AnalyticsEventSinkUtil {
     }
 
     public static String getAnalyticsEventStoreName(String deploymentFileName) {
+        deploymentFileName = GenericUtils.checkAndReturnPath(deploymentFileName);
         if (deploymentFileName.contains(AnalyticsEventSinkConstants.DEPLOYMENT_FILE_EXT)) {
             return deploymentFileName.substring(0, deploymentFileName.length() -
                     AnalyticsEventSinkConstants.DEPLOYMENT_FILE_EXT.length());

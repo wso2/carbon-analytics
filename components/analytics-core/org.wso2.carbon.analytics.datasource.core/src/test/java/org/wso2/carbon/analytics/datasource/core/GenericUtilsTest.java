@@ -225,4 +225,54 @@ public class GenericUtilsTest {
         System.out.println("Object Deserialize Input Stream TPS: " + (count) / (double) (end - start) * 1000.0);
     }
     
+    @Test (expectedExceptions = Exception.class)
+    public void testCheckAndReturnPathInvalid1() throws Exception {
+        GenericUtils.checkAndReturnPath("abc/../../xyz");
+    }
+    
+    @Test (expectedExceptions = Exception.class)
+    public void testCheckAndReturnPathInvalid2() throws Exception {
+        GenericUtils.checkAndReturnPath("../xyz");
+    }
+    
+    @Test (expectedExceptions = Exception.class)
+    public void testCheckAndReturnPathInvalid3() throws Exception {
+        GenericUtils.checkAndReturnPath("..\\xyz");
+    }
+    
+    @Test (expectedExceptions = Exception.class)
+    public void testCheckAndReturnPathInvalid4() throws Exception {
+        GenericUtils.checkAndReturnPath("abc\\..\\..\\xyz");
+    }
+    
+    @Test
+    public void testCheckAndReturnPathValid1() throws Exception {
+        Assert.assertEquals(GenericUtils.checkAndReturnPath("abc"), "abc");
+    }
+    
+    @Test
+    public void testCheckAndReturnPathValid2() throws Exception {
+        Assert.assertEquals(GenericUtils.checkAndReturnPath("abc/x/y/x"), "abc/x/y/x");
+    }
+    
+    @Test
+    public void testCheckAndReturnPathValid3() throws Exception {
+        Assert.assertEquals(GenericUtils.checkAndReturnPath("abc\\x\\y\\x"), "abc\\x\\y\\x");
+    }
+    
+    @Test
+    public void testCheckAndReturnPathValid4() throws Exception {
+        Assert.assertEquals(GenericUtils.checkAndReturnPath("abc.txt"), "abc.txt");
+    }
+    
+    @Test
+    public void testCheckAndReturnPathValid5() throws Exception {
+        Assert.assertEquals(GenericUtils.checkAndReturnPath("/xyz/abc.txt"), "/xyz/abc.txt");
+    }
+    
+    @Test
+    public void testCheckAndReturnPathValid6() throws Exception {
+        Assert.assertEquals(GenericUtils.checkAndReturnPath("\\xyz\\abc.txt"), "\\xyz\\abc.txt");
+    }
+    
 }

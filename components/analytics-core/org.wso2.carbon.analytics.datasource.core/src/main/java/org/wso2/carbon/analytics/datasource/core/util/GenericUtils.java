@@ -776,4 +776,17 @@ public class GenericUtils {
         return path;
     }
     
+    /**
+     * Validates path components to be used in registry/file paths, throw a {@link RuntimeException} if the input
+     * is invalid.
+     * @param path The path component
+     * @return The same path if the given value is valid
+     */
+    public static String checkAndReturnPath(String path) {
+        if (path.contains("../") || path.contains("..\\")) {
+            throw new RuntimeException("Invalid input path generated, the input cannot contain backtracking path elements");
+        }
+        return path;
+    }
+    
 }
