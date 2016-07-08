@@ -339,7 +339,7 @@ public class EventReceiverUtil {
 
     public static void validateFilePath(String file) throws EventReceiverConfigurationException {
 
-        Path baseDirPath = Paths.get(EventAdapterUtil.getAxisConfiguration().getRepository() + File.separator + EventReceiverConstants.ER_CONFIG_DIRECTORY);
+        Path baseDirPath = Paths.get(EventAdapterUtil.getAxisConfiguration().getRepository().getPath() + File.separator + EventReceiverConstants.ER_CONFIG_DIRECTORY);
         Path path = Paths.get(file);
         Path resolvedPath = baseDirPath.resolve(path).normalize();
 

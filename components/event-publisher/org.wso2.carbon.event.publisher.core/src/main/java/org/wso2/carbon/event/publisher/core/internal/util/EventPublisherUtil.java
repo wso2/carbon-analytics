@@ -231,7 +231,7 @@ public class EventPublisherUtil {
 
     public static void validateFilePath(String file) throws EventPublisherConfigurationException {
 
-        Path baseDirPath = Paths.get(EventAdapterUtil.getAxisConfiguration().getRepository() + File.separator + EventPublisherConstants.EF_CONFIG_DIRECTORY);
+        Path baseDirPath = Paths.get(EventAdapterUtil.getAxisConfiguration().getRepository().getPath() + File.separator + EventPublisherConstants.EF_CONFIG_DIRECTORY);
         Path path = Paths.get(file);
         Path resolvedPath = baseDirPath.resolve(path).normalize();
 
