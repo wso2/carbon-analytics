@@ -1435,16 +1435,6 @@
             </releases>
         </repository>
 
-        <!--todo: remove this-->
-        <repository>
-            <id>spark-staging</id>
-            <url>https://maven.wso2.org/nexus/content/repositories/orgapachespark-1000/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-        </repository>
     </repositories>
 
 </project>
