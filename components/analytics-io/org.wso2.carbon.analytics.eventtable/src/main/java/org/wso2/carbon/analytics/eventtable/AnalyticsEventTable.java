@@ -957,8 +957,9 @@ public class AnalyticsEventTable implements EventTable {
                 throw new IllegalStateException(e.getMessage(), e);
             }
             Object lhs, rhs;
-            boolean pkMismatch;
+            boolean pkMismatch, tsSet;
             for (Record record : records) {
+                tsSet = false;
                 for (Entry<String, Object> entry : values.entrySet()) {
                     if (pks != null && pks.contains(entry.getKey())) {
                         lhs = entry.getValue();
@@ -977,9 +978,15 @@ public class AnalyticsEventTable implements EventTable {
                                     record.getValues() + " PKs: " + pks);
                         }
                     }
-                    if (record.getValues().containsKey(entry.getKey())) {
+                    if (entry.getKey().equals(AnalyticsEventTableConstants.INTERNAL_TIMESTAMP_ATTRIBUTE)) {
+                        record.setTimestamp((Long) entry.getValue());
+                        tsSet = true;
+                    } else if (record.getValues().containsKey(entry.getKey())) {
                         record.getValues().put(entry.getKey(), entry.getValue());
                     }
+                }
+                if (!tsSet) {
+                    record.setTimestamp(event.getTimestamp());
                 }
             }
         }

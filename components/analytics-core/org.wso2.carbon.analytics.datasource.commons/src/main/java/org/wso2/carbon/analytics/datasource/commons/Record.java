@@ -97,6 +97,10 @@ public class Record implements Serializable {
         return timestamp;
     }
     
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+    
     /**
      * Equality is checked not with the field order in mind, if all the columns' key/value pairs match,
      * the records are the same. The persistence media of a record doesn't have to maintain the order of the
