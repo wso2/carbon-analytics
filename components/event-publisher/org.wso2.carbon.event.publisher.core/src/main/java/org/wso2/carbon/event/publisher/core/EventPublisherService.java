@@ -179,4 +179,14 @@ public interface EventPublisherService {
     public void setTraceEnabled(String eventPublisherName, boolean traceEnabled)
             throws EventPublisherConfigurationException;
 
+    /**
+     * Returns the Event Publisher Name as in the given {@code eventPublisherConfigXml}.
+     *
+     * @param eventPublisherConfigXml Event Publisher Configuration, in XML format.
+     * @return The name of the Event Publisher, as given in the {@code eventPublisherConfigXml}
+     * @throws EventPublisherConfigurationException
+     */
+    public String getEventPublisherName(String eventPublisherConfigXml)
+            throws EventPublisherConfigurationException;
+
 }

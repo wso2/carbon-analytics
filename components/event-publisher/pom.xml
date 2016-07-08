@@ -38,6 +38,7 @@
         <module>org.wso2.carbon.event.publisher.core</module>
         <module>org.wso2.carbon.event.publisher.admin</module>
         <module>org.wso2.carbon.event.publisher.ui</module>
+        <module>org.wso2.carbon.event.publisher.template.deployer</module>
         <module>event-output-adapters</module>
     </modules>
 
