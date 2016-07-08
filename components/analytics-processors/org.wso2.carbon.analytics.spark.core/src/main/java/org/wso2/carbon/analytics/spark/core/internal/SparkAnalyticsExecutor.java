@@ -97,6 +97,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private SparkConf sparkConf;
 
+    private JavaSparkContext jsc;
+
     private SQLContext sqlCtx;
 
     private String myHost;
@@ -345,6 +347,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         } catch (Throwable e) {
             throw new AnalyticsException("Unable to create analytics client. " + e.getMessage(), e);
         }
+        ServiceHolder.setJavaSparkContext(jsc);
         return jsc;
     }
 
@@ -422,7 +425,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     /**
      * this method starts a spark master with a given parameters.
      */
-    public synchronized void startMaster() throws AnalyticsClusterException {
+    private synchronized void startMaster() throws AnalyticsClusterException {
         if (!this.masterActive) {
             String host = this.myHost;
             int port = this.sparkConf.getInt(AnalyticsConstants.SPARK_MASTER_PORT, 7077 + this.portOffset);
@@ -1085,7 +1088,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         // master, performs the relevant operations needed to get the spark cluster up again.
     }
 
-    public int getWorkerCount() {
+    private int getWorkerCount() {
         return workerCount;
     }
 
@@ -1111,7 +1114,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    public boolean executeOnMembersChangeForLeaderFlow(boolean removedMember) {
+    private boolean executeOnMembersChangeForLeaderFlow(boolean removedMember) {
         this.logDebug("Execute On Members Change For Leader Flow");
         try {
             this.workerCount = AnalyticsServiceHolder.getAnalyticsClusterManager().getMembers(CLUSTER_GROUP_NAME).size();
