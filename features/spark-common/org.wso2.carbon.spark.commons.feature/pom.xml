@@ -104,7 +104,7 @@
             <artifactId>jackson-annotations</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
+            <groupId>org.wso2.orbit.com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-scala_2.10</artifactId>
         </dependency>
         <dependency>
@@ -263,7 +263,7 @@
                                 <bundleDef>com.fasterxml.jackson.core:jackson-core</bundleDef>
                                 <bundleDef>com.fasterxml.jackson.core:jackson-annotations
                                 </bundleDef>
-                                <bundleDef>com.fasterxml.jackson.module:jackson-module-scala_2.10
+                                <bundleDef>org.wso2.orbit.com.fasterxml.jackson.module:jackson-module-scala_2.10
                                 </bundleDef>
                                 <bundleDef>org.wso2.orbit.com.typesafe:config</bundleDef>
                                 <bundleDef>org.spark-project.protobuf:protobuf-java</bundleDef>

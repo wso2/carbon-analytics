@@ -112,7 +112,6 @@
         }
         $(canvas).empty();
         chart = new vizg(view.schema, view.chartConfig);
-        console.log(chart.getSpec());
         if (view.callbacks && view.callbacks.length > 0) {
             chart.draw(canvas, view.callbacks);
         } else {

@@ -19,6 +19,7 @@ package org.wso2.carbon.gadget.template.deployer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xerces.impl.Constants;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -67,7 +68,7 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
         Map<String, String> artifacts = new HashMap<>();
         Map<String, String> properties = new HashMap<>();
 
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory factory = getSecuredDocumentBuilder();
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new InputSource(new StringReader(content)));
@@ -115,7 +116,9 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
             throw new GadgetTemplateDeployerException("Artifact does not contain " + GadgetTemplateDeployerConstants.DIRECTORY_NAME + " property.");
         }
 
-        File destination = new File(GadgetTemplateDeployerUtility.getGadgetArtifactPath() + properties.get(GadgetTemplateDeployerConstants.DIRECTORY_NAME));
+        String gadgetArtifactPath = GadgetTemplateDeployerUtility.getGadgetArtifactPath();
+        File destination = new File(gadgetArtifactPath + properties.get(GadgetTemplateDeployerConstants.DIRECTORY_NAME));
+        GadgetTemplateDeployerUtility.validatePath(gadgetArtifactPath, destination.getAbsolutePath());
 
         // Store the directory name for the artifact id
         Registry registry = GadgetTemplateDeployerUtility.getRegistry();
@@ -140,11 +143,11 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
         }
 
         // Copy the static files
-        String path = new StringBuilder(CarbonUtils.getCarbonConfigDirPath())
+        String templateParentDir = new StringBuilder(CarbonUtils.getCarbonConfigDirPath())
                 .append(File.separator).append(GadgetTemplateDeployerConstants.TEMPLATE_MANAGER).append(File.separator)
-                .append(GadgetTemplateDeployerConstants.GADGET_TEMPLATES).append(File.separator)
-                .append(properties.get(GadgetTemplateDeployerConstants.TEMPLATE_DIRECTORY)).toString();
-        File templateDirectory = new File(path);
+                .append(GadgetTemplateDeployerConstants.GADGET_TEMPLATES).toString();
+        File templateDirectory = new File(templateParentDir, properties.get(GadgetTemplateDeployerConstants.TEMPLATE_DIRECTORY));
+        GadgetTemplateDeployerUtility.validatePath(templateParentDir, templateDirectory.getAbsolutePath());
 
         // Copy all the default templates
         try {
@@ -157,6 +160,7 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
         for (Map.Entry<String, String> entry : artifacts.entrySet()) {
             String fileName = entry.getKey();
             File targetFile = new File(destination, fileName);
+            GadgetTemplateDeployerUtility.validatePath(destination.getAbsolutePath(), targetFile.getAbsolutePath());
             FileWriter writer = null;
             try {
                 writer = new FileWriter(targetFile);
@@ -173,7 +177,6 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
                 }
             }
         }
-
         log.info("Deployed successfully gadget: " + artifactId);
     }
 
@@ -226,7 +229,9 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
                     }
 
                     if (!isSharedGadgetDirectory) {
-                        File destination = new File(GadgetTemplateDeployerUtility.getGadgetArtifactPath() + directory);
+                        String gadgetArtifactPath = GadgetTemplateDeployerUtility.getGadgetArtifactPath();
+                        File destination = new File(gadgetArtifactPath + directory);
+                        GadgetTemplateDeployerUtility.validatePath(gadgetArtifactPath, destination.getAbsolutePath());
                         try {
                             FileUtils.deleteDirectory(destination);
                         } catch (IOException e) {
@@ -248,5 +253,28 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
         } catch (RegistryException e) {
             throw new GadgetTemplateDeployerException("Failed to access resource at: " + GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH + " from registry", e);
         }
+    }
+
+    private static DocumentBuilderFactory getSecuredDocumentBuilder() {
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        dbf.setXIncludeAware(false);
+        dbf.setExpandEntityReferences(false);
+        try {
+            dbf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE, false);
+            dbf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
+            dbf.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.LOAD_EXTERNAL_DTD_FEATURE, false);
+        } catch (ParserConfigurationException e) {
+            log.error(
+                    "Failed to load XML Processor Feature " + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE + " or " +
+                            Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE + " or " + Constants.LOAD_EXTERNAL_DTD_FEATURE);
+        }
+
+        org.apache.xerces.util.SecurityManager securityManager = new org.apache.xerces.util.SecurityManager();
+        securityManager.setEntityExpansionLimit(GadgetTemplateDeployerConstants.ENTITY_EXPANSION_LIMIT);
+        dbf.setAttribute(Constants.XERCES_PROPERTY_PREFIX + Constants.SECURITY_MANAGER_PROPERTY, securityManager);
+
+        return dbf;
     }
 }

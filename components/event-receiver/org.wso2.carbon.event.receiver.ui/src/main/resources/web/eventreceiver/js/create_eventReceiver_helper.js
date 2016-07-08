@@ -184,22 +184,22 @@ function loadMappingUiElements() {
     var outerDiv = document.getElementById("outerDiv");
     outerDiv.innerHTML = "";
 
-    jQuery.ajax({
-        type: "POST",
-        url: "../eventreceiver/get_mapping_ui_ajaxprocessor.jsp?mappingType=" + inputMappingType + "&streamNameWithVersion=" + streamNameWithVersion,
-        data: {},
-        contentType: "text/html; charset=utf-8",
-        dataType: "text",
-        success: function (ui_content) {
+    new Ajax.Request('../eventreceiver/get_mapping_ui_ajaxprocessor.jsp', {
+        method: 'POST',
+        asynchronous: false,
+        parameters: {
+            mappingType: inputMappingType,
+            streamNameWithVersion: streamNameWithVersion
+        },
+        onSuccess: function (ui_content) {
             if (ui_content != null) {
-                outerDiv.innerHTML = ui_content;
+                outerDiv.innerHTML = ui_content.responseText.trim();
                 if (inputMappingType == "text") {
                     updateAttributeType();
                 }
             }
         }
-    });
-
+    })
 }
 
 

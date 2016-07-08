@@ -7,6 +7,7 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="java.io.IOException" %>
 <%@ page import="java.rmi.RemoteException" %>
+<%@ page import="java.util.Map" %>
 
 <%
     if (!"post".equalsIgnoreCase(request.getMethod())) {
