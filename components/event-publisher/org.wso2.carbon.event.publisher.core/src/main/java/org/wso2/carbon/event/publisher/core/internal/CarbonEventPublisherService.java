@@ -103,6 +103,19 @@ public class CarbonEventPublisherService implements EventPublisherService {
     }
 
     @Override
+    public String getEventPublisherName(String eventPublisherConfigXml)
+            throws EventPublisherConfigurationException {
+        OMElement omElement;
+        try {
+            omElement = AXIOMUtil.stringToOM(eventPublisherConfigXml);
+        } catch (XMLStreamException e) {
+            throw new EventPublisherConfigurationException("Error parsing XML configuration of event publisher.", e);
+        }
+        EventPublisherConfigurationHelper.validateEventPublisherConfiguration(omElement);
+        return EventPublisherConfigurationHelper.getEventPublisherName(omElement);
+    }
+
+    @Override
     public void undeployActiveEventPublisherConfiguration(String eventPublisherName)
             throws EventPublisherConfigurationException {
 

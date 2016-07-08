@@ -15,20 +15,20 @@
  */
 package org.wso2.carbon.event.publisher.template.deployer.internal;
 
-import org.wso2.carbon.event.receiver.core.EventReceiverService;
+import org.wso2.carbon.event.publisher.core.EventPublisherService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 
 public class EventPublisherTemplateDeployerValueHolder {
 
-    private static EventReceiverService eventReceiverService;
+    private static EventPublisherService eventPublisherService;
     private static RegistryService registryService;
 
-    public static void setEventReceiverService(EventReceiverService eventReceiverService) {
-        EventPublisherTemplateDeployerValueHolder.eventReceiverService = eventReceiverService;
+    public static void setEventPublisherService(EventPublisherService eventPublisherService) {
+        EventPublisherTemplateDeployerValueHolder.eventPublisherService = eventPublisherService;
     }
 
-    public static EventReceiverService getEventReceiverService() {
-        return EventPublisherTemplateDeployerValueHolder.eventReceiverService;
+    public static EventPublisherService getEventPublisherService() {
+        return EventPublisherTemplateDeployerValueHolder.eventPublisherService;
     }
 
     public static void setRegistryService(RegistryService registryService) {

@@ -152,6 +152,7 @@ public interface EventReceiverService {
      *
      * @param eventReceiverConfigXml Event Receiver Configuration, in XML format.
      * @return The name of the Event Receiver, as given in the {@code eventReceiverConfigXml}
+     * @throws EventReceiverConfigurationException
      */
     public String getEventReceiverName(String eventReceiverConfigXml)
             throws EventReceiverConfigurationException;

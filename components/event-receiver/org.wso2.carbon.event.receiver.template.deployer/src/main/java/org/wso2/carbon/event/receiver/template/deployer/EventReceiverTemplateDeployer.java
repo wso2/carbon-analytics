@@ -77,7 +77,7 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
             receiverName = EventReceiverTemplateDeployerValueHolder.getEventReceiverService().getEventReceiverName(receiverConfig);
             String existingReceiverConfigXml = getExistingEventReceiverConfigXml(tenantId, receiverName);
 
-            if (existingReceiverConfigXml == null) { //todo: test whether this will be null when the file is not present.
+            if (existingReceiverConfigXml == null) {
                 deployArtifact(template);
             }  else {
                 log.info("Common-Artifact Event Receiver with name: " + receiverName + " of Domain " + template.getConfiguration().getDomain()
@@ -101,7 +101,7 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
 
     private void deployNewArtifact(DeployableTemplate template) throws TemplateDeploymentException {
         String receiverName = null;
-        String artifactId = null;
+        String artifactId = template.getArtifactId();
         try {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             Registry registry = EventReceiverTemplateDeployerValueHolder.getRegistryService()
@@ -112,14 +112,14 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
 
             String mappingResourcePath = EventReceiverTemplateDeployerConstants.META_INFO_COLLECTION_PATH + RegistryConstants.PATH_SEPARATOR + receiverName;
             if (registry.resourceExists(mappingResourcePath)) {
-                String existingReceiverConfigXml = getExistingEventReceiverConfigXml(tenantId, receiverName);  //todo: ATM, not handling existingConfig==null case
+                String existingReceiverConfigXml = getExistingEventReceiverConfigXml(tenantId, receiverName);  //not handling existingConfig==null case because that will make this component too complicated.
                 if (EventReceiverTemplateDeployerHelper.areReceiverConfigXmlsSimilar(receiverConfig, existingReceiverConfigXml)) {
                     EventReceiverTemplateDeployerHelper.updateRegistryMaps(registry, artifactId, receiverName);
-                    log.info("Event receiver: " + receiverName + " has already being deployed for Artifact ID: " + artifactId);
+                    log.info("[Artifact ID: " + artifactId + "] Event receiver: " + receiverName + " has already being deployed.");
                 } else {
-                    throw new TemplateDeploymentException("Failed to deploy Event Receiver with name: " + receiverName +
+                    throw new TemplateDeploymentException("[Artifact ID: " + artifactId + "] Failed to deploy Event Receiver with name: " + receiverName +
                                                           ", as there exists another Event Receiver with the same name " +
-                                                          "but different configuration. Artifact ID: " + artifactId);
+                                                          "but different configuration.");
                 }
             } else {
                 EventReceiverTemplateDeployerHelper.updateRegistryMaps(registry, artifactId, receiverName);
@@ -130,7 +130,7 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
                                                   + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true)
                                                   + ", when deploying Event Receiver for artifact ID: " + template.getArtifactId(), e);
         } catch (EventReceiverConfigurationException e) {
-            throw new TemplateDeploymentException("Could not deploy Event Receiver with name: " + receiverName + ", for Artifact ID: " + artifactId, e);//todo
+            throw new TemplateDeploymentException("Could not deploy Event Receiver with name: " + receiverName + ", for Artifact ID: " + artifactId, e);
         } catch (IOException e) {
             throw new TemplateDeploymentException("Could not deploy Event Receiver with name: " + receiverName + ", for Artifact ID: " + artifactId, e);
         } catch (SAXException e) {
@@ -172,10 +172,10 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
                         int afterCommaIndex = mappingResourceContent.indexOf(artifactId) + artifactId.length();
                         if (beforeCommaIndex > 0) {
                             mappingResourceContent = mappingResourceContent.replace(
-                                    EventReceiverTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER + artifactId, "");
+                                    EventReceiverTemplateDeployerConstants.META_INFO_RECEIVER_NAME_SEPARATER + artifactId, "");
                         } else if (afterCommaIndex < mappingResourceContent.length()) {
                             mappingResourceContent = mappingResourceContent.replace(
-                                    artifactId + EventReceiverTemplateDeployerConstants.META_INFO_STREAM_NAME_SEPARATER, "");
+                                    artifactId + EventReceiverTemplateDeployerConstants.META_INFO_RECEIVER_NAME_SEPARATER, "");
                         } else {
                             mappingResourceContent = mappingResourceContent.replace(artifactId, "");
                         }
@@ -183,7 +183,7 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
                         if (mappingResourceContent.equals("")) {
                             //undeploying existing event receiver
                             if (doDeleteReceiver) {
-                                EventReceiverTemplateDeployerHelper.deleteEventReceiver(tenantId, artifactId);
+                                EventReceiverTemplateDeployerHelper.deleteEventReceiver(tenantId, receiverName);
                             }
                             //deleting mappingResource
                             registry.delete(mappingResourcePath);
@@ -194,10 +194,8 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
                     } catch (RegistryException e) {
                         throw new TemplateDeploymentException("Could not load the Registry for Tenant Domain: "
                                                               + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true)
-                                                              + ", when trying to undeploy Event Stream with artifact ID: " + artifactId, e);
+                                                              + ", when trying to undeploy Event Receiver with artifact ID: " + artifactId, e);
                     }
-                } else {
-                    log.warn("Registry data in inconsistent. Resource '" + mappingResourcePath + "' which needs to be deleted is not found.");
                 }
             }
         } catch (RegistryException e) {
@@ -233,9 +231,9 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
                 }
                 try {
                     writer.close();
-                } catch (IOException e) {     //todo: review
+                } catch (IOException e) {
                     log.warn("Failed to close Output Stream Writer for File: " + receiverName +
-                             EventReceiverConstants.ER_CONFIG_FILE_EXTENSION_WITH_DOT);
+                             EventReceiverConstants.ER_CONFIG_FILE_EXTENSION_WITH_DOT + "\n" + e.getMessage());
                 }
             }
         }

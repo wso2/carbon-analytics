@@ -7,7 +7,7 @@ public class EventReceiverTemplateDeployerConstants {
     public static final String META_INFO_COLLECTION_PATH = ExecutionManagerConstants.DEPLOYER_META_INFO_PATH
                                                            + RegistryConstants.PATH_SEPARATOR
                                                            + EventReceiverTemplateDeployerConstants.EVENT_RECEIVER_DEPLOYER_TYPE;
-    public static final String META_INFO_STREAM_NAME_SEPARATER = ",";
+    public static final String META_INFO_RECEIVER_NAME_SEPARATER = ",";
 
     public static final String EVENT_RECEIVER_DEPLOYER_TYPE = "eventreceiver";
 }

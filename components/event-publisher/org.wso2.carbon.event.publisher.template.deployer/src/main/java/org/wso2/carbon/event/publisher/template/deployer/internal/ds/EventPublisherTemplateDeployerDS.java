@@ -19,18 +19,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
+import org.wso2.carbon.event.publisher.core.EventPublisherService;
 import org.wso2.carbon.event.publisher.template.deployer.EventPublisherTemplateDeployer;
 import org.wso2.carbon.event.publisher.template.deployer.internal.EventPublisherTemplateDeployerValueHolder;
-import org.wso2.carbon.event.receiver.core.EventReceiverService;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 
 
 /**
  * @scr.component name="TemplateDeployer.eventPublisher.component" immediate="true"
- * @scr.reference name="eventReceiverService.service"
- * interface="org.wso2.carbon.event.receiver.core.EventReceiverService" cardinality="1..1"
- * policy="dynamic" bind="setEventReceiverService" unbind="unsetEventReceiverService"
+ * @scr.reference name="eventPublisherService.service"
+ * interface="org.wso2.carbon.event.publisher.core.EventPublisherService" cardinality="1..1"
+ * policy="dynamic" bind="setEventPublisherService" unbind="unsetEventPublisherService"
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService"
  * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
@@ -48,12 +48,12 @@ public class EventPublisherTemplateDeployerDS {
         }
     }
 
-    protected void setEventReceiverService(EventReceiverService eventReceiverService) {
-        EventPublisherTemplateDeployerValueHolder.setEventReceiverService(eventReceiverService);
+    protected void setEventPublisherService(EventPublisherService eventPublisherService) {
+        EventPublisherTemplateDeployerValueHolder.setEventPublisherService(eventPublisherService);
     }
 
-    protected void unsetEventReceiverService(EventReceiverService eventReceiverService) {
-        EventPublisherTemplateDeployerValueHolder.setEventReceiverService(null);
+    protected void unsetEventPublisherService(EventPublisherService eventPublisherService) {
+        EventPublisherTemplateDeployerValueHolder.setEventPublisherService(null);
     }
 
     protected void setRegistryService(RegistryService registryService) throws
