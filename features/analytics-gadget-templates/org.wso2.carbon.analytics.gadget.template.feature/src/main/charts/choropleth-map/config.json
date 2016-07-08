@@ -1,7 +1,7 @@
 {
     "info": {
-        "id": "donut-chart",
-        "name": "Donut Chart"
+        "id": "choropleth-map",
+        "name": "Choropleth Map"
     },
     "config": [
         {
@@ -11,16 +11,22 @@
             "valueSet": ["$COLUMN_NAMES"]
         },
         {
-            "fieldLabel": "Color domain",
-            "fieldName": "color",
+            "fieldLabel": "Y axis",
+            "fieldName": "y",
             "fieldType": "dropdown",
             "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "Map type",
+            "fieldName": "mapType",
+            "fieldType": "dropdown",
+            "valueSet": ["world","usa","europe"]
         }
     ],
     "imports": {
         "shared-libs":{
             "js" :["analytics-wso2/d3.min.js", "analytics-wso2/vega.js",  "analytics-wso2/VizGrammar.min.js",
-                "analytics-wso2/wso2gadgets.js", "analytics-wso2/chart-utils.js"]
+                   "analytics-wso2/wso2gadgets.js", "analytics-wso2/chart-utils.js"]
         }
     }
 }
