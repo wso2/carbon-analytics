@@ -37,6 +37,7 @@ import org.wso2.carbon.event.stream.core.WSO2EventListConsumer;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.event.stream.core.exception.StreamDefinitionAlreadyDefinedException;
 import org.wso2.carbon.event.stream.core.internal.ds.EventStreamServiceValueHolder;
+import org.wso2.carbon.event.stream.core.internal.util.CarbonEventStreamUtil;
 import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
 import org.wso2.carbon.event.stream.core.internal.util.SampleEventGenerator;
 import org.wso2.carbon.event.stream.core.internal.util.helper.EventStreamConfigurationFileSystemInvoker;
@@ -227,6 +228,7 @@ public class CarbonEventStreamService implements EventStreamService {
             String filePath = directoryPath + File.separator +
                     streamDefinition.getName() + EventStreamConstants.STREAM_DEFINITION_FILE_DELIMITER
                     + streamDefinition.getVersion() + EventStreamConstants.STREAM_DEFINITION_FILE_EXTENSION;
+            CarbonEventStreamUtil.validatePath(directoryPath, filePath);
             StreamDefinition streamDefinitionOld = getStreamDefinition(streamDefinition.getStreamId());
             if (streamDefinitionOld != null) {
                 if (!(streamDefinitionOld.equals(streamDefinition))) {

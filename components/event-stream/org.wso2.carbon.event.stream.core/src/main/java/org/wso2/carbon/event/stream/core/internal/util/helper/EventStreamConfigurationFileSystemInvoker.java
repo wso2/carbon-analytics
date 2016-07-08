@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.stream.core.EventStreamDeployer;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
+import org.wso2.carbon.event.stream.core.internal.util.CarbonEventStreamUtil;
 import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
 
 import java.io.File;
@@ -66,6 +67,7 @@ public class EventStreamConfigurationFileSystemInvoker {
             String directoryPath =  new File(axisConfig.getRepository().getPath())
                     .getAbsolutePath() + File.separator + EventStreamConstants.EVENT_STREAMS;
             String filePath =  directoryPath + File.separator + fileName;
+            CarbonEventStreamUtil.validatePath(directoryPath, filePath);
             File file = new File(filePath);
             if (file.exists()) {
                 EventStreamDeployer deployer = (EventStreamDeployer)((DeploymentEngine) axisConfig.getConfigurator()).
