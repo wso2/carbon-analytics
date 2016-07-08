@@ -120,7 +120,6 @@ public class CarbonEventPublisherService implements EventPublisherService {
     public void undeployInactiveEventPublisherConfiguration(String filename)
             throws EventPublisherConfigurationException {
 
-        validateFilePath(filename);
         EventPublisherConfigurationFilesystemInvoker.delete(filename);
     }
 
@@ -130,7 +129,6 @@ public class CarbonEventPublisherService implements EventPublisherService {
             String filename)
             throws EventPublisherConfigurationException {
 
-        validateFilePath(filename);
         editEventPublisherConfiguration(filename, eventPublisherConfiguration, null);
     }
 
@@ -209,7 +207,7 @@ public class CarbonEventPublisherService implements EventPublisherService {
     @Override
     public String getInactiveEventPublisherConfigurationContent(String filename)
             throws EventPublisherConfigurationException {
-        validateFilePath(filename);
+
         return EventPublisherConfigurationFilesystemInvoker.readEventPublisherConfigurationFile(filename);
     }
 
@@ -613,12 +611,6 @@ public class CarbonEventPublisherService implements EventPublisherService {
             }
         }
         return encryptedProperties;
-    }
-
-    private void validateFilePath(String file) throws EventPublisherConfigurationException {
-        if (file.contains("../") || file.contains("..\\")) {
-            throw new EventPublisherConfigurationException("File name contains restricted path elements. " + file);
-        }
     }
 
 }
