@@ -117,7 +117,7 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
                         var type = metaData.get(i).getType().toString().toLowerCase();
                         output.push({
                             fieldName: metaData.get(i).getName(),
-                            fieldType: typeMap[type]
+                            fieldType: typeMap[type.toLowerCase()]
                         });
                     }
                 }
@@ -126,7 +126,7 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
                         var type = correlationData.get(i).getType().toString().toLowerCase();
                         output.push({
                             fieldName: correlationData.get(i).getName(),
-                            fieldType: typeMap[type]
+                            fieldType: typeMap[type.toLowerCase()]
                         });
                     }
                 }
@@ -135,7 +135,7 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
                         var type = payloadData.get(i).getType().toString().toLowerCase();
                         output.push({
                             fieldName: payloadData.get(i).getName(),
-                            fieldType: typeMap[type]
+                            fieldType: typeMap[type.toLowerCase()]
                         });
                     }
                 }

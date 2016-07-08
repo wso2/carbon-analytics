@@ -91,6 +91,7 @@ public class EventPublisherConfigurationFilesystemInvoker {
         AxisConfiguration axisConfiguration = EventPublisherUtil.getAxisConfiguration();
         EventPublisherDeployer eventPublisherDeployer = (EventPublisherDeployer) getDeployer(axisConfiguration, EventPublisherConstants.EF_CONFIG_DIRECTORY);
         String filePath = getFilePathFromFilename(fileName, axisConfiguration);
+        EventPublisherUtil.validateFilePath(filePath);
         try {
             /* save contents to .xml file */
             BufferedWriter out = new BufferedWriter(new FileWriter(filePath));
@@ -112,6 +113,7 @@ public class EventPublisherConfigurationFilesystemInvoker {
         try {
             AxisConfiguration axisConfiguration = EventPublisherUtil.getAxisConfiguration();
             String filePath = getFilePathFromFilename(fileName, axisConfiguration);
+            EventPublisherUtil.validateFilePath(filePath);
             File file = new File(filePath);
             if (file.exists()) {
                 EventPublisherDeployer deployer = (EventPublisherDeployer) getDeployer(axisConfiguration, EventPublisherConstants.EF_CONFIG_DIRECTORY);
@@ -131,8 +133,9 @@ public class EventPublisherConfigurationFilesystemInvoker {
     }
 
     public static boolean isEventPublisherConfigurationFileExists(String fileName,
-                                                                  AxisConfiguration axisConfiguration) {
+                                                                  AxisConfiguration axisConfiguration) throws EventPublisherConfigurationException{
         String filePath = getFilePathFromFilename(fileName, axisConfiguration);
+        EventPublisherUtil.validateFilePath(filePath);
         File file = new File(filePath);
         return file.exists();
     }
@@ -157,6 +160,7 @@ public class EventPublisherConfigurationFilesystemInvoker {
         try {
             AxisConfiguration axisConfiguration = EventPublisherUtil.getAxisConfiguration();
             String filePath = getFilePathFromFilename(fileName, axisConfiguration);
+            EventPublisherUtil.validateFilePath(filePath);
             bufferedReader = new BufferedReader(new FileReader(filePath));
             String line;
             while ((line = bufferedReader.readLine()) != null) {

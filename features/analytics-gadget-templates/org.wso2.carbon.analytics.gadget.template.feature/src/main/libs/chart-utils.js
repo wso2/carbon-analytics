@@ -27,7 +27,7 @@ var toVizGrammarSchema;
         }];
 
         _schema.forEach(function(field) {
-            schema[0].metadata.names.push(ield["fieldName"]);
+            schema[0].metadata.names.push(field["fieldName"]);
             schema[0].metadata.types.push(field["fieldType"]);
         });
         return schema;

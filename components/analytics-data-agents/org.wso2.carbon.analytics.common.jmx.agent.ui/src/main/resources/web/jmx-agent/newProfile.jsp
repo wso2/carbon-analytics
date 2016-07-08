@@ -13,6 +13,10 @@
 
 
 %>
+<script type="text/javascript" src="../yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="../yui/build/connection/connection-min.js"></script>
+<script type="text/javascript" src="../resources/js/resource_util.js"></script>
+<script type="text/javascript" src="../ajax/js/prototype.js"></script>
 <script type="text/javascript">
 function showJmxMbeans() {
 
@@ -33,11 +37,17 @@ function showJmxMbeans() {
     }
 
 
-    jQuery.ajax({
-                    url:'jmxAttributes_ajaxprocessor.jsp',
-                    data:'requestType=mBeans&jmxServerUrl=' + jQuery("#jmxServerUrl").val() + '&jmxUserName=' + jQuery("#jmxUserName").val() + '&jmxUserPass=' + jQuery("#jmxUserPass").val(),
-                    success:function (data) {
-
+    new Ajax.Request(
+                    '../jmx-agent/jmxAttributes_ajaxprocessor.jsp',{
+                    method : 'POST',
+                    parameters : {
+                        requestType : "mBeans",
+                        jmxServerUrl : jQuery("#jmxServerUrl").val(),
+                        jmxUserName : jQuery("#jmxUserName").val(),
+                        jmxUserPass : jQuery("#jmxUserPass").val()
+                    },
+                    onSuccess:function (msg) {
+                        var data = msg.responseText.trim();
                         //check for exceptions
                         if (data.indexOf("Unauthorized access attempt to JMX operation.") != -1) {
                             CARBON.showErrorDialog("Invalid JMX server credentials");
@@ -81,11 +91,19 @@ function showJmxMbeans() {
 function showJmxMbeanAttributes() {
 
 
-    jQuery.ajax({
-                    url:'jmxAttributes_ajaxprocessor.jsp',
-                    data:'requestType=atributes&mBean=' + jQuery("#mBeansList option:selected").text() + '&jmxServerUrl=' + jQuery("#jmxServerUrl").val() + '&jmxUserName=' + jQuery("#jmxUserName").val() + '&jmxUserPass=' + jQuery("#jmxUserPass").val(),
-                    success:function (data) {
+    new Ajax.Request(
+                    '../jmx-agent/jmxAttributes_ajaxprocessor.jsp',{
+                    method : 'POST',
+                    parameters : {
+                        requestType : "atributes",
+                        mBean : jQuery("#mBeansList option:selected").text(),
+                        jmxServerUrl : jQuery("#jmxServerUrl").val(),
+                        jmxUserName : jQuery("#jmxUserName").val(),
+                        jmxUserPass : jQuery("#jmxUserPass").val()
+                    },
+                    onSuccess:function (msg) {
 
+                        var data = msg.responseText.trim();
                         //check for exceptions
                         if (data.indexOf("Unauthorized access attempt to JMX operation.") != -1) {
                             CARBON.showErrorDialog("Invalid JMX server credentials");
@@ -143,11 +161,15 @@ function changeCronType() {
 //and whether the profile name is formatted correctly
 function checkProfileName() {
 
-    jQuery.ajax({
-                    url:'jmxAttributes_ajaxprocessor.jsp',
-                    data:'requestType=profiles',
-                    success:function (data) {
+    new Ajax.Request(
+                    '../jmx-agent/jmxAttributes_ajaxprocessor.jsp',{
+                    method : 'POST',
+                    parameters : {
+                        requestType : "profiles"
+                    },
+                    onSuccess:function (msg) {
 
+                        var data = msg.responseText.trim();
                         //to remove the unnecessary whitespaces
                         data = data.replace(/(^\s+|\s+$)/g, '');
                         var dataArr = data.split("____");
@@ -197,12 +219,17 @@ function testDataReceiverReceiverURLAvailability() {
         return 0;
     }
 
-    jQuery.ajax({
-                    url:'jmxAttributes_ajaxprocessor.jsp',
-                    data:'requestType=dpAvailability&dpUrl=' + jQuery("#pubAddress").val() + "&pubConnType=" + jQuery("#pubConnType option:selected").val(),
-                    async:true,
-                    success:function (data) {
+    new Ajax.Request(
+                    '../jmx-agent/jmxAttributes_ajaxprocessor.jsp',{
+                    method : 'POST',
+                    parameters : {
+                        requestType : "dpAvailability",
+                        dpUrl : jQuery("#pubAddress").val(),
+                        pubConnType : jQuery("#pubConnType option:selected").val()
+                    },
+                    onSuccess:function (msg) {
 
+                        var data = msg.responseText.trim();
                         //if the DataPublisher is available
                         if (data.indexOf("true") != -1) {
                             CARBON.showInfoDialog("The Data Receiver receiver url is available!");
@@ -223,12 +250,17 @@ function testDataReceiverSecureURLAvailability() {
         return 0;
     }
 
-    jQuery.ajax({
-                    url:'jmxAttributes_ajaxprocessor.jsp',
-                    data:'requestType=dpAvailability&dpUrl=' + jQuery("#pubSecureAddress").val() + "&pubConnType=" + jQuery("#pubSecureConnType option:selected").val(),
-                    async:true,
-                    success:function (data) {
+    new Ajax.Request(
+                    '../jmx-agent/jmxAttributes_ajaxprocessor.jsp',{
+                    method : 'POST',
+                    parameters : {
+                        requestType : "dpAvailability",
+                        dpUrl : jQuery("#pubSecureAddress").val(),
+                        pubConnType : jQuery("#pubSecureConnType option:selected").val()
+                    },
+                    onSuccess:function (msg) {
 
+                        var data = msg.responseText.trim();
                         //if the DataPublisher is available
                         if (data.indexOf("true") != -1) {
                             CARBON.showInfoDialog("The Data Receiver secure url is available!");
@@ -265,7 +297,7 @@ function selectAttribute() {
                        "<td style='word-wrap: break-word;'>" + selectedMBean + " </td>" +
                        "<td title=\"" + selectedAttrValue + "\">" + jQuery("#mBeanAttrs option:selected").text() + " </td>" +
                        "<td><input style=\"width:98%\" type=\"text\" name=\"alias\" value=\"" + selectedMBean + "_" + compositeData[0] + "_" + compositeData[1] + "\" /> " +
-                       "<td> <a href=\"#\" onclick='$(this).parent().parent().remove(); return false;' class=\"icon-a\"><i class=\"icon-delete\"></i>Remove</a></td>" +
+                       "<td> <a href=\"#\" onclick='jQuery(this).parent().parent().remove(); return false;' class=\"icon-a\"><i class=\"icon-delete\"></i>Remove</a></td>" +
                        "</td>" +
                        "</tr>";
         jQuery('#selectedJMXAttrs tbody tr:last').after(htmlText);
@@ -275,7 +307,7 @@ function selectAttribute() {
                        "<td style='word-wrap: break-word;width: 60%' >" + selectedMBean + " </td>" +
                        "<td title=\"" + selectedAttrValue + "\">" + jQuery("#mBeanAttrs option:selected").text() + " </td>" +
                        "<td><input style=\"width:98%\" type=\"text\" name=\"alias\" value=\"" + selectedMBean + "_" + jQuery("#mBeanAttrs option:selected").val() + "\" /> " +
-                       "<td> <a href=\"#\" onclick='$(this).parent().parent().remove(); return false;' class=\"icon-a\"><i class=\"icon-delete\"></i>Remove</a></td>" +
+                       "<td> <a href=\"#\" onclick='jQuery(this).parent().parent().remove(); return false;' class=\"icon-a\"><i class=\"icon-delete\"></i>Remove</a></td>" +
                        "</td>" +
                        "</tr>";
         jQuery('#selectedJMXAttrs tbody tr:last').after(htmlText);
@@ -310,12 +342,15 @@ function selectAttribute() {
 
         //check if the profile name already exists
         var profNameExists = false;
-        jQuery.ajax({
-                        url:'jmxAttributes_ajaxprocessor.jsp',
-                        data:'requestType=profiles',
-                        async:false,
-                        success:function (data) {
+        new Ajax.Request(
+                        '../jmx-agent/jmxAttributes_ajaxprocessor.jsp',{
+                        method : 'POST',
+                        parameters : {
+                            requestType : "profiles"
+                        },
+                        onSuccess:function (msg) {
 
+                            var data = msg.responseText.trim();
                             //to remove the unnecessary whitespaces
                             data = data.replace(/(^\s+|\s+$)/g, '');
                             var dataArr = data.split("____");
@@ -360,22 +395,22 @@ function selectAttribute() {
 
 
         //get the table data
-        var tableRows = $("#selectedJMXAttrs tbody tr");
+        var tableRows = jQuery("#selectedJMXAttrs tbody tr");
         var array = [];
         tableRows.each(function () {
-            var td = $(this).find('td');
+            var td = jQuery(this).find('td');
             var childArray = [];
 
             td.each(function () {
                 //do not add the <td> with the remove attribute link
-                if ($(this).has("a").length) {
+                if (jQuery(this).has("a").length) {
                     return 0;
                 }
-                if ($(this).find("input").length) {
-                    childArray.push($(this).find("input").val());
+                if (jQuery(this).find("input").length) {
+                    childArray.push(jQuery(this).find("input").val());
                 }
-               	else if (!(typeof $(this).attr('title') === 'undefined')) { //if the row cell has title attribute
-                    var data = $(this).attr('title');
+               	else if (!(typeof jQuery(this).attr('title') === 'undefined')) { //if the row cell has title attribute
+                    var data = jQuery(this).attr('title');
                     //check whether it's compositeData
                     var splitData = data.split("______");
                     if (splitData.length > 1) {
@@ -392,7 +427,7 @@ function selectAttribute() {
 
                 else {
                     //slice is there to remove the last space of the MBean
-                    childArray.push($(this).text().slice(0, -1));
+                    childArray.push(jQuery(this).text().slice(0, -1));
                 }
             });
             array.push(childArray);

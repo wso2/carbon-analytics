@@ -24,8 +24,8 @@
     ],
     "imports": {
         "shared-libs":{
-            "js" :["analytics-wso2_5.0.12/d3.min.js", "analytics-wso2_5.0.12/vega.js",  "analytics-wso2_5.0.12/VizGrammar.min.js",
-                "analytics-wso2_5.0.12/wso2gadgets.js", "analytics-wso2_5.0.12/chart-utils.js"]
+            "js" :["analytics-wso2/d3.min.js", "analytics-wso2/vega.js",  "analytics-wso2/VizGrammar.min.js",
+                "analytics-wso2/wso2gadgets.js", "analytics-wso2/chart-utils.js", "jquery.dataTables.min.js"]
         }
     }
 }
