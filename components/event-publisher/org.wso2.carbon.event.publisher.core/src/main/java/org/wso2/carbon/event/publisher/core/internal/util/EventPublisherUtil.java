@@ -17,6 +17,7 @@ package org.wso2.carbon.event.publisher.core.internal.util;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
@@ -27,6 +28,8 @@ import org.wso2.siddhi.core.event.Event;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -224,5 +227,16 @@ public class EventPublisherUtil {
             prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
         }
         return mappingTextList;
+    }
+
+    public static void validateFilePath(String file) throws EventPublisherConfigurationException {
+
+        Path baseDirPath = Paths.get(EventAdapterUtil.getAxisConfiguration().getRepository() + File.separator + EventPublisherConstants.EF_CONFIG_DIRECTORY);
+        Path path = Paths.get(file);
+        Path resolvedPath = baseDirPath.resolve(path).normalize();
+
+        if (! resolvedPath.startsWith(baseDirPath)) {
+            throw new EventPublisherConfigurationException("File name contains restricted path elements. " + file);
+        }
     }
 }

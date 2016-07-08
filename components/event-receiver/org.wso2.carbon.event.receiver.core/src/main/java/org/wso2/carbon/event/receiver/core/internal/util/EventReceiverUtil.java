@@ -22,6 +22,7 @@ import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.event.input.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
 import org.wso2.carbon.event.receiver.core.config.InputMapping;
@@ -30,6 +31,8 @@ import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationE
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -332,4 +335,17 @@ public class EventReceiverUtil {
         }
         return new Event(outStreamDefinition.getStreamId(), System.currentTimeMillis(), metaDataArray, correlationDataArray, payloadDataArray);
     }
+
+
+    public static void validateFilePath(String file) throws EventReceiverConfigurationException {
+
+        Path baseDirPath = Paths.get(EventAdapterUtil.getAxisConfiguration().getRepository() + File.separator + EventReceiverConstants.ER_CONFIG_DIRECTORY);
+        Path path = Paths.get(file);
+        Path resolvedPath = baseDirPath.resolve(path).normalize();
+
+        if (! resolvedPath.startsWith(baseDirPath)) {
+            throw new EventReceiverConfigurationException("File name contains restricted path elements. " + file);
+        }
+    }
+
 }
