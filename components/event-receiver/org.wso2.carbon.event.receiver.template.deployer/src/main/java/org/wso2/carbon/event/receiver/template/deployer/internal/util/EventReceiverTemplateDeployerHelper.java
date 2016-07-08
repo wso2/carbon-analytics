@@ -2,8 +2,8 @@ package org.wso2.carbon.event.receiver.template.deployer.internal.util;
 
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.wso2.carbon.event.execution.manager.core.TemplateDeploymentException;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
+import org.wso2.carbon.event.template.manager.core.TemplateDeploymentException;
 import org.wso2.carbon.registry.core.Collection;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
