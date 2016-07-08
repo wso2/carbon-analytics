@@ -38,6 +38,7 @@
         <module>org.wso2.carbon.event.receiver.core</module>
         <module>org.wso2.carbon.event.receiver.admin</module>
         <module>org.wso2.carbon.event.receiver.ui</module>
+        <module>org.wso2.carbon.event.receiver.template.deployer</module>
         <module>event-input-adapters</module>
     </modules>
 
