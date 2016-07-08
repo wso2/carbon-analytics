@@ -135,7 +135,6 @@
                                 <bundleDef>org.antlr.wso2:antlr-runtime</bundleDef>
                                 <bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>
                                 <bundleDef>io.dropwizard.metrics:metrics-core</bundleDef>
-                                <bundleDef>com.google.guava:guava</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.core
                                 </bundleDef>

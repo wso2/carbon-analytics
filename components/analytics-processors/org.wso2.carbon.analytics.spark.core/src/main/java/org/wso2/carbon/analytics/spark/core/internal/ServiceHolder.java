@@ -17,6 +17,9 @@
 */
 package org.wso2.carbon.analytics.spark.core.internal;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -47,6 +50,7 @@ public class ServiceHolder {
          */
     }
 
+    private static final Log log = LogFactory.getLog(ServiceHolder.class);
     private static TaskService taskService;
 
     private static AnalyticsDataService analyticsDataService;
@@ -70,6 +74,8 @@ public class ServiceHolder {
     private static boolean analyticsStatsEnabled = false;
 
     private static AnalyticsIncrementalMetaStore incrementalMetaStore;
+
+    private static JavaSparkContext javaSparkContext;
 
     public static void setTaskService(TaskService taskService) {
         ServiceHolder.taskService = taskService;
@@ -182,6 +188,14 @@ public class ServiceHolder {
             }
         }
         return incrementalMetaStore;
+    }
+
+    public static JavaSparkContext getJavaSparkContext() {
+        return javaSparkContext;
+    }
+
+    public static void setJavaSparkContext(JavaSparkContext javaSparkContext) {
+        ServiceHolder.javaSparkContext = javaSparkContext;
     }
 
 }
