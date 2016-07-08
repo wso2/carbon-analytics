@@ -19,10 +19,13 @@ package org.wso2.carbon.gadget.template.deployer.internal.util;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.RegistryType;
 import org.wso2.carbon.gadget.template.deployer.internal.GadgetTemplateDeployerConstants;
+import org.wso2.carbon.gadget.template.deployer.internal.GadgetTemplateDeployerException;
 import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class GadgetTemplateDeployerUtility {
 
@@ -54,5 +57,19 @@ public class GadgetTemplateDeployerUtility {
                 .append(GadgetTemplateDeployerConstants.DEFAULT_STORE_TYPE).append(File.separator).append(GadgetTemplateDeployerConstants.ARTIFACT_TYPE)
                 .append(File.separator);
         return sb.toString();
+    }
+
+    /**
+     * Validate the given file path is in the parent directory itself.
+     *
+     * @param parentDirectory
+     * @param filePath
+     */
+    public static void validatePath(String parentDirectory, String filePath) throws GadgetTemplateDeployerException {
+        Path parentPath = Paths.get(parentDirectory);
+        Path subPath = Paths.get(filePath).normalize();
+        if (!subPath.normalize().startsWith(parentPath)) {
+            throw new GadgetTemplateDeployerException("File path is invalid: " + filePath);
+        }
     }
 }

@@ -29,6 +29,7 @@ import org.wso2.carbon.event.receiver.core.config.EventReceiverConfigurationFile
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
+import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
 import org.wso2.carbon.event.receiver.core.internal.util.XmlFormatter;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -84,6 +85,7 @@ public class EventReceiverConfigurationFileSystemInvoker {
             throws EventReceiverConfigurationException {
         EventReceiverDeployer eventReceiverDeployer = EventReceiverConfigurationHelper.getEventReceiverDeployer(EventAdapterUtil.getAxisConfiguration());
         String filePath = getFilePathFromFilename(fileName);
+        EventReceiverUtil.validateFilePath(filePath);
         try {
             /* save contents to .xml file */
             BufferedWriter out = new BufferedWriter(new FileWriter(filePath));
@@ -105,6 +107,7 @@ public class EventReceiverConfigurationFileSystemInvoker {
 
         try {
             String filePath = getFilePathFromFilename(fileName);
+            EventReceiverUtil.validateFilePath(filePath);
             File file = new File(filePath);
             String filename = file.getName();
             if (file.exists()) {
@@ -124,8 +127,9 @@ public class EventReceiverConfigurationFileSystemInvoker {
         }
     }
 
-    public static boolean isFileExists(String fileName) {
+    public static boolean isFileExists(String fileName) throws EventReceiverConfigurationException{
         String filePath = getFilePathFromFilename(fileName);
+        EventReceiverUtil.validateFilePath(filePath);
         File file = new File(filePath);
         return file.exists();
     }
@@ -135,7 +139,9 @@ public class EventReceiverConfigurationFileSystemInvoker {
         BufferedReader bufferedReader = null;
         StringBuilder stringBuilder = new StringBuilder();
         try {
-            bufferedReader = new BufferedReader(new FileReader(getFilePathFromFilename(fileName)));
+            String filePath = getFilePathFromFilename(fileName);
+            EventReceiverUtil.validateFilePath(filePath);
+            bufferedReader = new BufferedReader(new FileReader(filePath));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 stringBuilder.append(line).append("\n");
@@ -159,6 +165,7 @@ public class EventReceiverConfigurationFileSystemInvoker {
     public static void reload(EventReceiverConfigurationFile eventReceiverConfigurationFile)
             throws EventReceiverConfigurationException {
         String filePath = eventReceiverConfigurationFile.getFilePath();
+        EventReceiverUtil.validateFilePath(filePath);
         AxisConfiguration axisConfiguration = EventAdapterUtil.getAxisConfiguration();
         EventReceiverDeployer deployer = EventReceiverConfigurationHelper.getEventReceiverDeployer(axisConfiguration);
         try {
