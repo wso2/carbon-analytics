@@ -18,10 +18,10 @@ package org.wso2.carbon.event.publisher.template.deployer.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.event.execution.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.publisher.core.EventPublisherService;
 import org.wso2.carbon.event.publisher.template.deployer.EventPublisherTemplateDeployer;
 import org.wso2.carbon.event.publisher.template.deployer.internal.EventPublisherTemplateDeployerValueHolder;
+import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 

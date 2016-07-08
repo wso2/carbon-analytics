@@ -19,7 +19,7 @@
     <ManagementPermissions>
         <ManagementPermission>
             <DisplayName>Event publisher template deploy</DisplayName>
-            <ResourceId>/permission/admin/manage/execution-manager</ResourceId>
+            <ResourceId>/permission/admin/manage/template-manager</ResourceId>
         </ManagementPermission>
     </ManagementPermissions>er
 
