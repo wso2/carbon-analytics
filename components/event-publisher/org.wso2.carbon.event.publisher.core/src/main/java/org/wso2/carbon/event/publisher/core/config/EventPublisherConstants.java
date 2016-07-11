@@ -113,4 +113,5 @@ public final class EventPublisherConstants {
     public static final String METRICS_PUBLISHED_EVENTS = "PublishedEvents";
     public static final String METRIC_DELIMITER = ".";
     public static final String METRIC_AGGREGATE_ANNOTATION = "[+]";
+    public static final String TEMP_CARBON_APPS_DIRECTORY = "carbonapps";
 }

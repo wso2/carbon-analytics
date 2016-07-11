@@ -28,6 +28,7 @@ import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
 import org.wso2.carbon.event.receiver.core.config.InputMapping;
 import org.wso2.carbon.event.receiver.core.config.InputMappingAttribute;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -339,12 +340,16 @@ public class EventReceiverUtil {
 
     public static void validateFilePath(String file) throws EventReceiverConfigurationException {
 
-        Path baseDirPath = Paths.get(EventAdapterUtil.getAxisConfiguration().getRepository().getPath() + File.separator + EventReceiverConstants.ER_CONFIG_DIRECTORY);
+        Path baseDirPath = Paths.get(EventAdapterUtil.getAxisConfiguration().getRepository().getPath(), EventReceiverConstants.ER_CONFIG_DIRECTORY);
         Path path = Paths.get(file);
         Path resolvedPath = baseDirPath.resolve(path).normalize();
 
         if (! resolvedPath.startsWith(baseDirPath)) {
-            throw new EventReceiverConfigurationException("File name contains restricted path elements. " + file);
+            // If not valid, test for tmp/carbonapps directory
+            baseDirPath = Paths.get(CarbonUtils.getTmpDir(), EventReceiverConstants.TEMP_CARBON_APPS_DIRECTORY);
+            if (! resolvedPath.startsWith(baseDirPath)) {
+                throw new EventReceiverConfigurationException("File name contains restricted path elements. " + file);
+            }
         }
     }
 
