@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataPurgingConfiguration;
 import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataPurgingIncludeTable;
 import org.wso2.carbon.analytics.dataservice.core.tasks.AnalyticsDataPurgingTask;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.application.deployer.AppDeployerConstants;
 import org.wso2.carbon.application.deployer.CarbonApplication;
 import org.wso2.carbon.application.deployer.config.Artifact;
@@ -120,6 +121,7 @@ public class AnalyticsDataPurgingDeployer implements AppDeploymentHandler {
     }
 
     private void deletePurgingTasks(String scriptFilePath) {
+        scriptFilePath = GenericUtils.checkAndReturnPath(scriptFilePath);
         File deploymentFileData = new File(scriptFilePath);
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         log.info("Undeploying purging task : " + deploymentFileData.getName() + " for tenant : " + tenantId);
@@ -142,6 +144,7 @@ public class AnalyticsDataPurgingDeployer implements AppDeploymentHandler {
     }
 
     private void registerPurgingTasks(String scriptFilePath) throws DeploymentException {
+        scriptFilePath = GenericUtils.checkAndReturnPath(scriptFilePath);
         File deploymentFileData = new File(scriptFilePath);
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         log.info("Deploying purging task : " + deploymentFileData.getName() + " for tenant : " + tenantId);
