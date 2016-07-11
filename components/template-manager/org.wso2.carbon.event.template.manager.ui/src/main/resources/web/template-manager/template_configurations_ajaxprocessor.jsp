@@ -182,7 +182,7 @@
                             }
                     %>
                     <option <%=selectedValue%>
-                            value="template_configurations_ajaxprocessor.jsp?configurationName=<%=configurationName%>&domainName=<%=domainName%>&templateType=<%=scenarioInfoDTO.getType()%>">
+                            value="template_configurations_ajaxprocessor.jsp?configurationName=<%=Encode.forHtmlContent(configurationName)%>&domainName=<%=domainName%>&templateType=<%=scenarioInfoDTO.getType()%>">
                         <%=scenarioInfoDTO.getType()%>
                     </option>
                     <%}%>
@@ -207,7 +207,7 @@
 
             <div class="input-control input-full-width col-md-7 text">
                 <input type="text" id="txtName"
-                       value="<%=configurationName%>"
+                       value="<%=Encode.forHtmlAttribute(configurationName)%>"
                         <% if (isExistingConfig) {
                             out.print("readOnly");
                         }%>/>
