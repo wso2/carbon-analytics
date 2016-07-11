@@ -69,8 +69,8 @@ public class EventStreamProvider implements RelationProvider {
         this.streamName = extractValuesFromMap(EventingConstants.STREAM_NAME, parameters, "");
         this.version = extractValuesFromMap(EventingConstants.VERSION, parameters, DEFAULT_VERSION);
         this.payload = extractValuesFromMap(EventingConstants.PAYLOAD, parameters, "");
-        this.globalTenantAccess = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.GLOBAL_TENANT_ACCESS,
-                parameters, String.valueOf(false)));
+        this.globalTenantAccess = this.tenantId == MultitenantConstants.SUPER_TENANT_ID &&
+                Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.GLOBAL_TENANT_ACCESS, parameters, String.valueOf(false)));
     }
 
     private String getStreamId(String streamName, String version) {
