@@ -221,10 +221,21 @@ public class IndexNodeCoordinator implements GroupEventListener {
         return !this.extractExistingLocalShardsFromGlobal().isEmpty();
     }
 
+    private void removeMyNodeFromIndexingConfigurations() throws AnalyticsException {
+        Set<Integer> shards = this.extractExistingLocalShardsFromGlobal();
+        for (int shardIndex : shards) {
+            this.globalShardAllocationConfig.removeNodeIdFromShard(shardIndex, this.myNodeId);
+        }
+        this.syncLocalWithGlobal();
+    }
+    
     public void init() throws AnalyticsException {
         this.populateMyNodeId();
         this.indexingNode = checkIfIndexingNode();
         boolean indexingNodeDisabling = !this.indexingNode && this.currentNodeAllocatedShardsGlobally();
+        if (indexingNodeDisabling) {
+            this.removeMyNodeFromIndexingConfigurations();
+        }
         this.initClustering();
         if (this.indexingNode) {
             this.initShardAllocation();
