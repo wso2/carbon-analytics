@@ -619,6 +619,9 @@ public class AnalyticsDataIndexer {
                 case STRING:
                     type = SortField.Type.STRING;
                     break;
+                case BOOLEAN:
+                    type = SortField.Type.STRING; //This is, because booleans are indexed as strings
+                    break;
                 case INTEGER:
                     type = SortField.Type.INT;
                     break;
@@ -1547,6 +1550,7 @@ public class AnalyticsDataIndexer {
             break;
         case BOOLEAN:
             doc.add(new StringField(name, obj.toString(), Store.NO));
+            doc.add(new SortedDocValuesField(name, new BytesRef(this.trimNonTokenizedIndexStringField(obj.toString()).getBytes(StandardCharsets.UTF_8))));
             break;
         default:
             break;
