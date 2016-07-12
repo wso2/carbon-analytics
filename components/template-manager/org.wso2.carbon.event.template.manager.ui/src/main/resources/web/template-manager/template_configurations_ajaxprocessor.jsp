@@ -40,7 +40,7 @@
     <link href="css/common.css" rel="stylesheet">
     <link href="css/custom.css" rel="stylesheet">
     <script src="js/jquery.min.js"></script>
-    <script type="text/javascript" src="js/domain_config_update.js"></script> \
+    <script type="text/javascript" src="js/domain_config_update.js"></script>
     <script type="text/javascript" src="../admin/js/csrfPrevention.js"></script>
     <!--[if lt IE 9]>
     <script src="js/html5shiv.min.js"></script>
@@ -182,7 +182,7 @@
                             }
                     %>
                     <option <%=selectedValue%>
-                            value="template_configurations_ajaxprocessor.jsp?configurationName=<%=configurationName%>&domainName=<%=domainName%>&templateType=<%=scenarioInfoDTO.getType()%>">
+                            value="template_configurations_ajaxprocessor.jsp?configurationName=<%=Encode.forHtmlContent(configurationName)%>&domainName=<%=domainName%>&templateType=<%=scenarioInfoDTO.getType()%>">
                         <%=scenarioInfoDTO.getType()%>
                     </option>
                     <%}%>
@@ -207,7 +207,7 @@
 
             <div class="input-control input-full-width col-md-7 text">
                 <input type="text" id="txtName"
-                       value="<%=configurationName%>"
+                       value="<%=Encode.forHtmlAttribute(configurationName)%>"
                         <% if (isExistingConfig) {
                             out.print("readOnly");
                         }%>/>

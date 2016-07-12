@@ -23,6 +23,7 @@ import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
+import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.siddhi.core.event.Event;
 
@@ -236,7 +237,11 @@ public class EventPublisherUtil {
         Path resolvedPath = baseDirPath.resolve(path).normalize();
 
         if (! resolvedPath.startsWith(baseDirPath)) {
-            throw new EventPublisherConfigurationException("File name contains restricted path elements. " + file);
+            // If not valid, test for tmp/carbonapps directory
+            baseDirPath = Paths.get(CarbonUtils.getTmpDir(), EventPublisherConstants.TEMP_CARBON_APPS_DIRECTORY);
+            if (! resolvedPath.startsWith(baseDirPath)) {
+                throw new EventPublisherConfigurationException("File name contains restricted path elements. " + file);
+            }
         }
     }
 }

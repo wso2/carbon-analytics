@@ -36,6 +36,7 @@
     <link href="css/custom.css" rel="stylesheet">
     <script src="js/jquery.min.js"></script>
     <script src="js/domain_config_update.js"></script>
+    <script type="text/javascript" src="../admin/js/csrfPrevention.js"></script>
 
     <!--[if lt IE 9]>
     <script src="js/html5shiv.min.js"></script>
@@ -107,7 +108,7 @@
             <div class="container col-md-12">
                 <ol class="breadcrumb">
                     <li><a href="domains_ajaxprocessor.jsp"> <fmt:message key='application.name'/></a></li>
-                    <li class="active"><%=(request.getParameter("domainName"))%>
+                    <li class="active"><%=(Encode.forHtmlContent(request.getParameter("domainName")))%>
                     </li>
                 </ol>
             </div>
@@ -116,7 +117,7 @@
             <div class="container col-md-12 marg-top-20">
                 <div class="action-container">
                     <button id="" type="button"
-                            onclick="location.href = 'template_configurations_ajaxprocessor.jsp?ordinal=1&domainName=<%=request.getParameter("domainName")%>';"
+                            onclick="location.href = 'template_configurations_ajaxprocessor.jsp?ordinal=1&domainName=<%=Encode.forHtmlContent(request.getParameter("domainName"))%>';"
                             class="btn btn-default btn-add col-md-2 col-xs-12 pull-left">Create New Scenario
                     </button>
                 </div>
