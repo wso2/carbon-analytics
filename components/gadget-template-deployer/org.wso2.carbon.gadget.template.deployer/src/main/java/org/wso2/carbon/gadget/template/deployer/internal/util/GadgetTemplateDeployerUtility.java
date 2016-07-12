@@ -68,8 +68,12 @@ public class GadgetTemplateDeployerUtility {
     public static void validatePath(String parentDirectory, String filePath) throws GadgetTemplateDeployerException {
         Path parentPath = Paths.get(parentDirectory);
         Path subPath = Paths.get(filePath).normalize();
-        if (!subPath.normalize().startsWith(parentPath)) {
-            throw new GadgetTemplateDeployerException("File path is invalid: " + filePath);
+        if (!subPath.startsWith(parentPath)) {
+            // If not valid, test for tmp/carbonapps directory
+            parentPath = Paths.get(CarbonUtils.getTmpDir(), GadgetTemplateDeployerConstants.TEMP_CARBON_APPS_DIRECTORY);
+            if (!subPath.startsWith(parentPath)) {
+                throw new GadgetTemplateDeployerException("File path is invalid: " + filePath);
+            }
         }
     }
 }
