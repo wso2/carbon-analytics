@@ -102,16 +102,17 @@ function loadMappingFromStreamAttributes(index) {
         var fromStreamNameWithVersion = document.getElementById("fromStreamID_" + index).options[selectedIndex].text;
         var toStreamNameWithVersion = document.getElementById("toStreamID_" + index).value;
 
-        jQuery.ajax({
-            type: "POST",
-            url: "../template-manager/get_mapping_ui_ajaxprocessor.jsp?toStreamNameWithVersion=" + toStreamNameWithVersion + "&fromStreamNameWithVersion=" + fromStreamNameWithVersion + "&index=" + index,
-            data: {},
-            contentType: "text/html; charset=utf-8",
-            dataType: "text",
-            success: function (ui_content) {
-                if (ui_content != null) {
-                    outerDiv.innerHTML = ui_content;
-                }
+    $.ajax({
+        type: "POST",
+        url: "../template-manager/get_mapping_ui_ajaxprocessor.jsp",
+        data: "toStreamNameWithVersion=" + toStreamNameWithVersion + "&fromStreamNameWithVersion=" + fromStreamNameWithVersion + "&index=" + index
+    })
+        .error(function () {
+            showErrorDialog("Error occurred when loading mapping configurations");
+        })
+        .then(function (ui_content) {
+            if (ui_content != null) {
+                outerDiv.innerHTML = ui_content;
             }
         });
 }
