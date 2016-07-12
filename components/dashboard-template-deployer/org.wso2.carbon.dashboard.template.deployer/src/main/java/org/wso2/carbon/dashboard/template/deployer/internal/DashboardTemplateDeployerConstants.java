@@ -43,4 +43,6 @@ public class DashboardTemplateDeployerConstants {
 
     public static final String ARTIFACT_DASHBOARD_ID_MAPPING_PATH = "repository" + RegistryConstants.PATH_SEPARATOR + "components" + RegistryConstants.PATH_SEPARATOR +
             "org.wso2.carbon.dashboard.template.deployer" + RegistryConstants.PATH_SEPARATOR + "artifact.dashboard.id.mapping";
+
+    public static final int ENTITY_EXPANSION_LIMIT = 0;
 }

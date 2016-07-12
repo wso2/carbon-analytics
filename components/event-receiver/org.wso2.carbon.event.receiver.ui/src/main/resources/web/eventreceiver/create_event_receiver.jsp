@@ -185,6 +185,14 @@
                 } %>
             </select>
 
+            <% } else {  if(type.equals("password")) { %>
+                <input type="<%=type%>"
+                    name="<%=eventAdapterProperties[index].getKey()%>"
+                    autocomplete="off"
+                    id="<%=propertyId%><%=index%>" class="initE"
+                    style="width:75%"
+                    value="<%= (eventAdapterProperties[index].getDefaultValue()) != null ? eventAdapterProperties[index].getDefaultValue() : "" %>"
+                        />
             <% } else { %>
             <input type="<%=type%>"
                    name="<%=eventAdapterProperties[index].getKey()%>"
@@ -192,8 +200,7 @@
                    style="width:75%"
                    value="<%= (eventAdapterProperties[index].getDefaultValue()) != null ? eventAdapterProperties[index].getDefaultValue() : "" %>"
                     />
-
-            <% }
+            <% }}
 
                 if (eventAdapterProperties[index].getHint() != null) { %>
             <div class="sectionHelp">

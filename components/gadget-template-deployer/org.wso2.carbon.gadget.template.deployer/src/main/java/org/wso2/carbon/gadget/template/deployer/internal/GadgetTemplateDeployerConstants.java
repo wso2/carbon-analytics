@@ -55,4 +55,6 @@ public class GadgetTemplateDeployerConstants {
             "org.wso2.carbon.gadget.template.deployer" + RegistryConstants.PATH_SEPARATOR + "artifact.directory.mapping";
 
     public static final int ENTITY_EXPANSION_LIMIT = 0;
+
+    public static final String TEMP_CARBON_APPS_DIRECTORY = "carbonapps";
 }

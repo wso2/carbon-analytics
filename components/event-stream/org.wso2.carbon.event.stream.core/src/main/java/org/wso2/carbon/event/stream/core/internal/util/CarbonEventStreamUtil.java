@@ -19,6 +19,7 @@
 package org.wso2.carbon.event.stream.core.internal.util;
 
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,8 +34,12 @@ public class CarbonEventStreamUtil {
     public static void validatePath(String parentDirectory, String filePath) throws EventStreamConfigurationException {
         Path parentPath = Paths.get(parentDirectory);
         Path subPath = Paths.get(filePath).normalize();
-        if (!subPath.normalize().startsWith(parentPath)) {
-            throw new EventStreamConfigurationException("File path is invalid: " + filePath);
+        if (!subPath.startsWith(parentPath)) {
+            // If not valid, test for tmp/carbonapps directory
+            parentPath = Paths.get(CarbonUtils.getTmpDir(), "carbonapps");
+            if (!subPath.startsWith(parentPath)) {
+                throw new EventStreamConfigurationException("File path is invalid: " + filePath);
+            }
         }
     }
 }
