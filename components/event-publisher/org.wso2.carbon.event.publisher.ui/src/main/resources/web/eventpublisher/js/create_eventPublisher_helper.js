@@ -114,19 +114,7 @@ function showEventStreamDefinition() {
             streamName: streamNameWithVersion
         },
         onSuccess: function (streamDefinition) {
-            alert(streamDefinition.responseText);
             jQuery('#streamDefinitionText').val(streamDefinition.responseText.trim());
-        }
-    })
-
-    new Ajax.Request('../eventpublisher/get_streamdefinition_ajaxprocessor.jsp', {
-        method: 'POST',
-        asynchronous: false,
-        parameters: {
-            streamName: streamNameWithVersion
-        },
-        onSuccess: function (streamDefinition) {
-            jQuery('#streamDefinitionText').val(streamDefinition.trim());
         }
     })
 
