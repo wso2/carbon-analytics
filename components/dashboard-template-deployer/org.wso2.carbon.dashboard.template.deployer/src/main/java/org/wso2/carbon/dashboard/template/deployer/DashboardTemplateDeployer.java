@@ -18,6 +18,7 @@ package org.wso2.carbon.dashboard.template.deployer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xerces.impl.Constants;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -61,7 +62,7 @@ public class DashboardTemplateDeployer implements TemplateDeployer {
 
         Map<String, String> properties = new HashMap<>();
 
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory factory = getSecuredDocumentBuilder();
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new InputSource(new StringReader(template.getArtifact())));
@@ -214,5 +215,28 @@ public class DashboardTemplateDeployer implements TemplateDeployer {
         } catch (RegistryException e) {
             throw new DashboardTemplateDeployerException("Failed to access resource at: " + DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH + " from registry", e);
         }
+    }
+
+    private static DocumentBuilderFactory getSecuredDocumentBuilder() {
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        dbf.setXIncludeAware(false);
+        dbf.setExpandEntityReferences(false);
+        try {
+            dbf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE, false);
+            dbf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
+            dbf.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.LOAD_EXTERNAL_DTD_FEATURE, false);
+        } catch (ParserConfigurationException e) {
+            log.error(
+                    "Failed to load XML Processor Feature " + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE + " or " +
+                            Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE + " or " + Constants.LOAD_EXTERNAL_DTD_FEATURE);
+        }
+
+        org.apache.xerces.util.SecurityManager securityManager = new org.apache.xerces.util.SecurityManager();
+        securityManager.setEntityExpansionLimit(DashboardTemplateDeployerConstants.ENTITY_EXPANSION_LIMIT);
+        dbf.setAttribute(Constants.XERCES_PROPERTY_PREFIX + Constants.SECURITY_MANAGER_PROPERTY, securityManager);
+
+        return dbf;
     }
 }
