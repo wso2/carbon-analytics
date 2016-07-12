@@ -106,18 +106,17 @@ function showEventStreamDefinition() {
 
     var selectedIndex = document.getElementById("streamIdFilter").selectedIndex;
     var streamNameWithVersion = document.getElementById("streamIdFilter").options[selectedIndex].text;
-    jQuery.ajax({
-        type: "POST",
-        url: "../eventpublisher/get_streamdefinition_ajaxprocessor.jsp?streamName=" + streamNameWithVersion + "",
-        data: {},
-        contentType: "application/json; charset=utf-8",
-        dataType: "text",
-        async: true,
-        success: function (streamDefinition) {
 
-            jQuery('#streamDefinitionText').val(streamDefinition.trim());
+    new Ajax.Request('../eventpublisher/get_streamdefinition_ajaxprocessor.jsp', {
+        method: 'POST',
+        asynchronous: false,
+        parameters: {
+            streamName: streamNameWithVersion
+        },
+        onSuccess: function (streamDefinition) {
+            jQuery('#streamDefinitionText').val(streamDefinition.responseText.trim());
         }
-    });
+    })
 
     selectedIndex = document.getElementById("mappingTypeFilter").selectedIndex;
     var inputMappingType = document.getElementById("mappingTypeFilter").options[selectedIndex].text;
@@ -125,19 +124,19 @@ function showEventStreamDefinition() {
     var outerDiv = document.getElementById("outerDiv");
     outerDiv.innerHTML = "";
 
-    jQuery.ajax({
-        type: "POST",
-        url: "../eventpublisher/get_mapping_ui_ajaxprocessor.jsp?mappingType=" + inputMappingType + "&streamNameWithVersion=" + streamNameWithVersion,
-        data: {},
-        contentType: "text/html; charset=utf-8",
-        dataType: "text",
-        success: function (ui_content) {
+    new Ajax.Request('../eventpublisher/get_mapping_ui_ajaxprocessor.jsp', {
+        method: 'POST',
+        asynchronous: false,
+        parameters: {
+            mappingType: inputMappingType,
+            streamNameWithVersion: streamNameWithVersion
+        },
+        onSuccess: function (ui_content) {
             if (ui_content != null) {
-                outerDiv.innerHTML = ui_content;
+                outerDiv.innerHTML = ui_content.responseText.trim();
             }
         }
-    });
-
+    })
 }
 
 
