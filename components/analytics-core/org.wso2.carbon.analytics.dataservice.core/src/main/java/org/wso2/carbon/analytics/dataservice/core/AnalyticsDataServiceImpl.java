@@ -544,7 +544,11 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public List<String> listRecordStoreNames() {
-        return new ArrayList<String>(this.analyticsRecordStores.keySet());
+        List<String> result = new ArrayList<String>(this.analyticsRecordStores.keySet());
+        /* add the primary record store name as the first one */
+        result.remove(this.primaryARSName);
+        result.add(0, this.primaryARSName);
+        return result;
     }
 
     @Override
