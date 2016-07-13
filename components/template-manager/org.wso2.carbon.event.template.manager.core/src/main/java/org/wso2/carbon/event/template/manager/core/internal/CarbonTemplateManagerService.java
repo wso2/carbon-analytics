@@ -38,6 +38,7 @@ import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 
+import javax.script.ScriptEngine;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -64,11 +65,13 @@ public class CarbonTemplateManagerService implements TemplateManagerService {
             throws TemplateManagerException {
         try {
             Domain domain = domains.get(configuration.getDomain());
+            // JavaScript ScriptEngine
+            ScriptEngine scriptEngine = TemplateManagerHelper.createJavaScriptEngine(domain);
             TemplateManagerHelper.saveToRegistry(configuration);
-            TemplateManagerHelper.deployArtifacts(configuration, domain);
+            TemplateManagerHelper.deployArtifacts(configuration, domain, scriptEngine);
             //If StreamMappings element is present in the Domain, then need to return those Stream IDs,
             //so the caller (the UI) can prompt the user to map these streams to his own streams.
-            return TemplateManagerHelper.getStreamIDsToBeMapped(configuration, getDomain(configuration.getDomain()));
+            return TemplateManagerHelper.getStreamIDsToBeMapped(configuration, getDomain(configuration.getDomain()), scriptEngine);
         } catch (TemplateDeploymentException e) {
             TemplateManagerHelper.deleteConfigWithoutUndeploy(configuration.getDomain(), configuration.getName());
             throw new TemplateManagerException("Failed to save Scenario: " + configuration.getName() + ", for Domain: "
