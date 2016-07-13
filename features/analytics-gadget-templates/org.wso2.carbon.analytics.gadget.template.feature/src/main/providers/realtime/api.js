@@ -144,5 +144,10 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
         return output;
     };
 
+    getData = function(providerConfig,limit) {
+      var data = [];
+      return data;
+    };
+
 
 }());
