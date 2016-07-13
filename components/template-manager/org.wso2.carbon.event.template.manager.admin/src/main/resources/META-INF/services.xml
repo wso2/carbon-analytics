@@ -60,6 +60,11 @@
             /permission/admin/manage/template-manager
         </parameter>
     </operation>
+    <operation name="saveConfigurationWithUpdate">
+        <parameter name="AuthorizationAction" locked="true">
+            /permission/admin/manage/template-manager
+        </parameter>
+    </operation>
     <operation name="saveStreamMapping">
         <parameter name="AuthorizationAction" locked="true">
             /permission/admin/manage/template-manager

@@ -37,6 +37,7 @@
             return;
         }
 
+        boolean isUpdate = "true".equals(request.getParameter("isUpdate")) ? true : false;
         String domainName = request.getParameter("domainName");
         String configuration = request.getParameter("configurationName");
         String saveType = request.getParameter("saveType");
@@ -80,7 +81,7 @@
                 scenarioConfigurationDTO.setConfigurationParameterDTOs(parameters);
 
                 //toStreamIDArray.length defines the number of stream mappings per configuration
-                String[] toStreamIDArray = proxy.saveConfiguration(scenarioConfigurationDTO);
+                String[] toStreamIDArray = proxy.saveConfigurationWithUpdate(scenarioConfigurationDTO, isUpdate);
 
                 //when stream mapping is disabled, stub returns a string array with a null element hence need to check for toStreamIDArray[0]
                 if (toStreamIDArray[0] != null) {
