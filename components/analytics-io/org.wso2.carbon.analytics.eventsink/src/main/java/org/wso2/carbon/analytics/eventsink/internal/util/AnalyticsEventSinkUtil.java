@@ -44,12 +44,14 @@ public class AnalyticsEventSinkUtil {
         return tableName;
     }
 
-    public static AnalyticsSchema getAnalyticsSchema(AnalyticsTableSchema tableSchema) {
+    public static AnalyticsSchema getAnalyticsSchema(AnalyticsTableSchema tableSchema)
+            throws AnalyticsEventStoreException {
         return new AnalyticsSchema(getColumnDefinitions(tableSchema.getColumns()),
                 getPrimaryKeys(tableSchema.getColumns()));
     }
 
-    private static List<ColumnDefinition> getColumnDefinitions(List<AnalyticsTableSchema.Column> columns) {
+    private static List<ColumnDefinition> getColumnDefinitions(List<AnalyticsTableSchema.Column> columns)
+            throws AnalyticsEventStoreException {
         List<ColumnDefinition> schemaColumns = new ArrayList<>();
         if (columns != null) {
             for (AnalyticsTableSchema.Column schemaColumn : columns) {
@@ -61,6 +63,8 @@ public class AnalyticsEventSinkUtil {
                 if (schemaColumn.getType() == AnalyticsSchema.ColumnType.FACET) {
                     columnDefinition.setType(AnalyticsSchema.ColumnType.STRING);
                     columnDefinition.setFacet(true);
+                } else if (schemaColumn.getType() == null) {
+                    throw new AnalyticsEventStoreException("Invalid type for field: " + schemaColumn.getColumnName() + " in eventStore configuration");
                 } else {
                     columnDefinition.setType(schemaColumn.getType());
                     columnDefinition.setFacet(schemaColumn.isFacet());
@@ -106,7 +110,8 @@ public class AnalyticsEventSinkUtil {
         return store;
     }
 
-    private static AnalyticsTableSchema getAnalyticsTableSchema(AnalyticsSchema schema) {
+    private static AnalyticsTableSchema getAnalyticsTableSchema(AnalyticsSchema schema)
+            throws AnalyticsEventStoreException {
         AnalyticsTableSchema tableSchema = new AnalyticsTableSchema();
         List<AnalyticsTableSchema.Column> columns = new ArrayList<>();
         Set<Map.Entry<String, ColumnDefinition>> columnDefs = schema.getColumns().entrySet();
@@ -115,7 +120,11 @@ public class AnalyticsEventSinkUtil {
             analyticsColumn.setColumnName(column.getKey());
             analyticsColumn.setIndexed(column.getValue().isIndexed());
             analyticsColumn.setScoreParam(column.getValue().isScoreParam());
-            analyticsColumn.setType(column.getValue().getType());
+            if (column.getValue().getType() != null) {
+                analyticsColumn.setType(column.getValue().getType());
+            } else {
+                throw new AnalyticsEventStoreException("Invalid type for field: " + column.getKey() + " in eventStore configuration");
+            }
             analyticsColumn.setFacet(column.getValue().isFacet());
             if (schema.getPrimaryKeys().contains(column.getKey())) {
                 analyticsColumn.setPrimaryKey(true);
@@ -144,7 +153,8 @@ public class AnalyticsEventSinkUtil {
         return copyEventSource;
     }
 
-    private static AnalyticsTableSchema copyAnalyticsTableSchema(AnalyticsTableSchema analyticsTableSchema) {
+    private static AnalyticsTableSchema copyAnalyticsTableSchema(AnalyticsTableSchema analyticsTableSchema)
+            throws AnalyticsEventStoreException {
         AnalyticsTableSchema copySchema = new AnalyticsTableSchema();
         List<AnalyticsTableSchema.Column> columns = new ArrayList<>();
         for (AnalyticsTableSchema.Column originalCol : analyticsTableSchema.getColumns()) {
@@ -157,6 +167,8 @@ public class AnalyticsEventSinkUtil {
             if (originalCol.getType() == AnalyticsSchema.ColumnType.FACET) {
                 column.setType(AnalyticsSchema.ColumnType.STRING);
                 column.setFacet(true);
+            } else if (originalCol.getType() == null) {
+                throw new AnalyticsEventStoreException("Invalid type for field: " + originalCol.getColumnName() + " in eventStore configuration");
             } else {
                 column.setType(originalCol.getType());
                 column.setFacet(originalCol.isFacet());
