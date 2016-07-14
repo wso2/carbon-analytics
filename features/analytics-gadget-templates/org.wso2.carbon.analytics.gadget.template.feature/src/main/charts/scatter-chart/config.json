@@ -11,10 +11,22 @@
             "valueSet": ["$COLUMN_NAMES"]
         },
         {
+            "fieldLabel": "X type",
+            "fieldName": "xType",
+            "fieldType": "dropdown",
+            "valueSet": ["default", "ordinal", "linear", "time"]
+        },
+        {
             "fieldLabel": "Y axis",
             "fieldName": "y",
             "fieldType": "dropdown",
             "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "Y type",
+            "fieldName": "yType",
+            "fieldType": "dropdown",
+            "valueSet": ["default", "ordinal", "linear", "time"]
         },
         {
             "fieldLabel": "Color domain",
