@@ -131,14 +131,22 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
     }
 
     private AnalyticsSchema resolveAndMergeSchemata(int tenantId, AnalyticsEventStore eventStoreConfig) throws AnalyticsException {
-        AnalyticsSchema incomingSchema = AnalyticsEventSinkUtil.getAnalyticsSchema(eventStoreConfig.getAnalyticsTableSchema());
-        if (!eventStoreConfig.isMergeSchema()) {
-            return incomingSchema;
+        AnalyticsSchema incomingSchema;
+        try {
+            incomingSchema = AnalyticsEventSinkUtil.getAnalyticsSchema(eventStoreConfig.getAnalyticsTableSchema());
+
+            if (!eventStoreConfig.isMergeSchema()) {
+                return incomingSchema;
+            }
+            AnalyticsSchema liveSchema = ServiceHolder.getAnalyticsDataAPI().getTableSchema(tenantId, eventStoreConfig.getName());
+            return AnalyticsDataServiceUtils.createMergedSchema(liveSchema, incomingSchema.getPrimaryKeys(),
+                                                                new ArrayList<>(incomingSchema.getColumns().values()),
+                                                                new ArrayList<>(incomingSchema.getIndexedColumns().keySet()));
+        } catch (AnalyticsEventStoreException e) {
+            log.error("Error while retrieving the eventStore config for table: " + eventStoreConfig.getName() + ", " + e.getMessage(), e);
+            throw new AnalyticsException("Error while retrieving the eventStore config for stream: " +
+                                         eventStoreConfig.getName() + ", " + e.getMessage(), e);
         }
-        AnalyticsSchema liveSchema = ServiceHolder.getAnalyticsDataAPI().getTableSchema(tenantId, eventStoreConfig.getName());
-        return AnalyticsDataServiceUtils.createMergedSchema(liveSchema, incomingSchema.getPrimaryKeys(),
-                new ArrayList<>(incomingSchema.getColumns().values()),
-                new ArrayList<>(incomingSchema.getIndexedColumns().keySet()));
     }
 
     public void undeploy(String fileName) throws DeploymentException {
