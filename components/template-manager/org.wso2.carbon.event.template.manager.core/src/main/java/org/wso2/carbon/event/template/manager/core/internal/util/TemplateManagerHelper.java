@@ -263,44 +263,49 @@ public class TemplateManagerHelper {
     public static ScriptEngine createJavaScriptEngine(Domain domain) throws TemplateDeploymentException {
 
         ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-        ScriptEngine scriptEngine = scriptEngineManager.getEngineByName(TemplateManagerConstants.JAVASCRIPT_ENGINE);
+        ScriptEngine scriptEngine = scriptEngineManager.getEngineByName(TemplateManagerConstants.JAVASCRIPT_ENGINE_NAME);
 
-        if (domain != null && domain.getScripts() != null && domain.getScripts().getScript() != null) {
-            Path scriptDirectory = Paths.get(TemplateManagerConstants.TEMPLATE_SCRIPT_PATH);
-            if (Files.exists(scriptDirectory, LinkOption.NOFOLLOW_LINKS) && Files.isDirectory(scriptDirectory)) {
-                for (Script script : domain.getScripts().getScript()) {
-                    String src = script.getSrc();
-                    String content = script.getContent();
-                    if (src != null) {
-                        // Evaluate JavaScript file
-                        Path scriptFile = scriptDirectory.resolve(src).normalize();
-                        if (Files.exists(scriptFile, LinkOption.NOFOLLOW_LINKS) && Files.isReadable(scriptFile)) {
-                            if (!scriptFile.startsWith(scriptDirectory)) {
-                                // The script file is not in the permitted directory
-                                throw new TemplateDeploymentException("Script file " + scriptFile.toAbsolutePath() + " is not in the permitted directory " + scriptDirectory.toAbsolutePath());
+        if (scriptEngine == null) {
+            // Exception will be thrown later, only if function calls are used in the template
+            log.warn("JavaScript engine is not available. Function calls in the templates cannot be evaluated");
+        } else {
+            if (domain != null && domain.getScripts() != null && domain.getScripts().getScript() != null) {
+                Path scriptDirectory = Paths.get(TemplateManagerConstants.TEMPLATE_SCRIPT_PATH);
+                if (Files.exists(scriptDirectory, LinkOption.NOFOLLOW_LINKS) && Files.isDirectory(scriptDirectory)) {
+                    for (Script script : domain.getScripts().getScript()) {
+                        String src = script.getSrc();
+                        String content = script.getContent();
+                        if (src != null) {
+                            // Evaluate JavaScript file
+                            Path scriptFile = scriptDirectory.resolve(src).normalize();
+                            if (Files.exists(scriptFile, LinkOption.NOFOLLOW_LINKS) && Files.isReadable(scriptFile)) {
+                                if (!scriptFile.startsWith(scriptDirectory)) {
+                                    // The script file is not in the permitted directory
+                                    throw new TemplateDeploymentException("Script file " + scriptFile.toAbsolutePath() + " is not in the permitted directory " + scriptDirectory.toAbsolutePath());
+                                }
+                                try {
+                                    scriptEngine.eval(Files.newBufferedReader(scriptFile, Charset.defaultCharset()));
+                                } catch (ScriptException e) {
+                                    throw new TemplateDeploymentException("Error in JavaScript " + scriptFile.toAbsolutePath() + ": " + e.getMessage(), e);
+                                } catch (IOException e) {
+                                    throw new TemplateDeploymentException("Error in reading JavaScript file: " + scriptFile.toAbsolutePath());
+                                }
+                            } else {
+                                throw new TemplateDeploymentException("JavaScript file not exist at: " + scriptFile.toAbsolutePath() + " or not readable.");
                             }
+                        }
+                        if (content != null) {
+                            // Evaluate JavaScript content
                             try {
-                                scriptEngine.eval(Files.newBufferedReader(scriptFile, Charset.defaultCharset()));
+                                scriptEngine.eval(content);
                             } catch (ScriptException e) {
-                                throw new TemplateDeploymentException("Error in JavaScript " + scriptFile.toAbsolutePath() + ": " + e.getMessage(), e);
-                            } catch (IOException e) {
-                                throw new TemplateDeploymentException("Error in reading JavaScript file: " + scriptFile.toAbsolutePath());
+                                throw new TemplateDeploymentException("JavaScript declared in " + domain.getName() + " has error", e);
                             }
-                        } else {
-                            throw new TemplateDeploymentException("JavaScript file not exist at: " + scriptFile.toAbsolutePath() + " or not readable.");
                         }
                     }
-                    if (content != null) {
-                        // Evaluate JavaScript content
-                        try {
-                            scriptEngine.eval(content);
-                        } catch (ScriptException e) {
-                            throw new TemplateDeploymentException("JavaScript declared in " + domain.getName() + " has error", e);
-                        }
-                    }
+                } else {
+                    log.warn("Script directory not found at: " + scriptDirectory.toAbsolutePath());
                 }
-            } else {
-                log.warn("Script directory not found at: " + scriptDirectory.toAbsolutePath());
             }
         }
 
@@ -320,12 +325,15 @@ public class TemplateManagerHelper {
      * @throws TemplateDeploymentException if there are any errors in JavaScript function evaluation
      */
     private static String replaceScriptExpressions(String content, ScriptEngine scriptEngine) throws TemplateDeploymentException {
-
         StringBuffer buffer = new StringBuffer();
         Pattern pattern = Pattern.compile(TemplateManagerConstants.TEMPLATE_SCRIPT_REGEX);
         Matcher matcher = pattern.matcher(content);
         final int scriptEvaluatorPrefixLength = TemplateManagerConstants.SCRIPT_EVALUATOR_PREFIX.length();
         final int scriptEvaluatorSuffixLength = TemplateManagerConstants.SCRIPT_EVALUATOR_SUFFIX.length();
+        if (scriptEngine == null && matcher.find()) {   // Do not alter the order of conditions
+            // If script engine is not available and at lest one function call is used, throw the exception
+            throw new TemplateDeploymentException("JavaScript engine is not available in the current JRE to evaluate the function calls given in the template.");
+        }
         while (matcher.find()) {
             String expression = matcher.group();
             int expressionLength = expression.length();
