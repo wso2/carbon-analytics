@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Abstract class for DataEndpoint, and this is a main class that needs to be implemented
@@ -84,13 +85,6 @@ public abstract class DataEndpoint {
         }
     }
 
-    void collectAndSendNow(Event event) {
-        events.add(event);
-        if (events.size() >= batchSize) {
-            publishEventsNow();
-        }
-    }
-
     void flushEvents() {
         if (events.size() != 0) {
             threadPoolExecutor.submitJobAndSetState(new Thread(new EventPublisher(events)), this);
@@ -98,18 +92,13 @@ public abstract class DataEndpoint {
         }
     }
 
-    void flushEventsNow() {
-        if (events.size() != 0) {
-            publishEventsNow();
-        }
-    }
-
-    private void publishEventsNow() {
+    void syncSend(Event event) {
+        List<Event> events = new ArrayList<>(1);
+        events.add(event);
         EventPublisher eventPublisher = new EventPublisher(events);
         setStateBusy();
         acquireImmediateDispatchSemaphore();
         try {
-            events = new ArrayList<>();
             eventPublisher.run();
         } finally {
             releaseImmediateDispatchSemaphore();
@@ -178,7 +167,7 @@ public abstract class DataEndpoint {
         this.connectionService = Executors.newSingleThreadExecutor(new DataBridgeThreadFactory("ConnectionService-" +
                 dataEndpointConfiguration.getReceiverURL()));
         this.maxPoolSize = dataEndpointConfiguration.getMaxPoolSize();
-        immediateDispatchSemaphore = new Semaphore(maxPoolSize);
+        this.immediateDispatchSemaphore = new Semaphore(maxPoolSize);
         connect();
     }
 
@@ -228,7 +217,6 @@ public abstract class DataEndpoint {
      */
     protected abstract void send(Object client, List<Event> events) throws
             DataEndpointException, SessionTimeoutException, UndefinedEventTypeException;
-
 
     protected DataEndpointConfiguration getDataEndpointConfiguration() {
         return this.connectionWorker.getDataEndpointConfiguration();
@@ -356,6 +344,12 @@ public abstract class DataEndpoint {
         connectionWorker.disconnect(getDataEndpointConfiguration());
         connectionService.shutdownNow();
         threadPoolExecutor.shutdownNow();
+        try {
+            connectionService.awaitTermination(10, TimeUnit.SECONDS);
+            threadPoolExecutor.awaitTermination(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+
+        }
         log.info("Completed shutdown for data publisher endpoint URL - " + getDataEndpointConfiguration().getReceiverURL());
     }
 

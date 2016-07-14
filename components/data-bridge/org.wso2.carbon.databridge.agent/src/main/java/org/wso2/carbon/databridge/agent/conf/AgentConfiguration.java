@@ -66,9 +66,7 @@ public class AgentConfiguration {
 
     private int socketTimeoutMS;
 
-    private boolean immediateDispatching;
-
-    private String waitStrategy = DataEndpointConstants.BLOCKING_WAIT_STRATEGY;
+    private String publishingStrategy = DataEndpointConstants.ASYNC_STRATEGY;
 
     @XmlElement(name = "Name")
     public String getDataEndpointName() {
@@ -258,22 +256,13 @@ public class AgentConfiguration {
         }
     }
 
-    @XmlElement(name = "ImmediateDispatching")
-    public boolean isImmediateDispatching() {
-        return immediateDispatching;
+    @XmlElement(name = "PublishingStrategy")
+    public String getPublishingStrategy() {
+        return publishingStrategy;
     }
 
-    public void setImmediateDispatching(boolean immediateDispatching) {
-        this.immediateDispatching = immediateDispatching;
-    }
-
-    @XmlElement(name = "WaitStrategy")
-    public String getWaitStrategy() {
-        return waitStrategy;
-    }
-
-    public void setWaitStrategy(String waitStrategy) {
-        this.waitStrategy = waitStrategy;
+    public void setPublishingStrategy(String publishingStrategy) {
+        this.publishingStrategy = publishingStrategy;
     }
 
     /**

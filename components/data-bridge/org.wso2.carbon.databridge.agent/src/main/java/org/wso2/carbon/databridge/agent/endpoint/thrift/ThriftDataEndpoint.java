@@ -18,9 +18,9 @@
 package org.wso2.carbon.databridge.agent.endpoint.thrift;
 
 import org.apache.thrift.TException;
+import org.wso2.carbon.databridge.agent.endpoint.DataEndpoint;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
-import org.wso2.carbon.databridge.agent.endpoint.DataEndpoint;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.SessionTimeoutException;
 import org.wso2.carbon.databridge.commons.exception.UndefinedEventTypeException;
@@ -35,7 +35,6 @@ import java.util.List;
 
 /**
  * This is the DataEndpoint Implementation for thrift transport.
- *
  */
 public class ThriftDataEndpoint extends DataEndpoint {
 

@@ -546,7 +546,7 @@ public class DataPublisher {
      */
     public void shutdownWithAgent() throws DataEndpointException {
         shutdown();
-        dataEndpointAgent.shutDown();
+        AgentHolder.shutdown();
     }
 }
 
