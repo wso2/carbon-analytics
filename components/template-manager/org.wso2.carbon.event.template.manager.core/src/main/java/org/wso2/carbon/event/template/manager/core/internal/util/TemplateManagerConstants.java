@@ -42,7 +42,7 @@ public class TemplateManagerConstants {
     public static final String TEMPLATE_SCRIPT_PATH = CarbonUtils.getCarbonConfigDirPath()
             + File.separator + "template-manager" + File.separator + "scripts";
 
-    public static final String JAVASCRIPT_ENGINE = "Nashorn";
+    public static final String JAVASCRIPT_ENGINE_NAME = "JavaScript";
 
     public static final String CONFIG_NAME_SEPARATOR = "-";
 
