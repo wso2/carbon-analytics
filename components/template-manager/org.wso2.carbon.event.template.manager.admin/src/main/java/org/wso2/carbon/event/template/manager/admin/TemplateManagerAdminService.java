@@ -139,8 +139,7 @@ public class TemplateManagerAdminService extends AbstractAdmin {
     }
 
     /**
-     * Note: This operation is deprecated. Use saveConfigurationWithUpdate operation instead.
-     * Create or update specified scenario configuration.
+     * Create specified scenario configuration.
      *
      * @param configuration scenario configuration data transfer object which needs to be saved.
      * @return  Stream ID array. In case there are StreamMappings in the Domain (under this particular scenario),
@@ -163,25 +162,24 @@ public class TemplateManagerAdminService extends AbstractAdmin {
     }
 
     /**
-     * Create or update specified scenario configuration.
+     * Edit specified scenario configuration.
      *
-     * @param configuration scenario configuration data transfer object which needs to be saved.
-     * @param isUpdate Whether this is a creation of a configuration or an update to an existing configuration.
+     * @param configuration scenario configuration data transfer object which needs to be edited.
      * @return  Stream ID array. In case there are StreamMappings in the Domain (under this particular scenario),
      * then the "toStream" IDs will be returned. If no StreamMappings present, null will be returned.
      * @throws AxisFault
      */
-    public String[] saveConfigurationWithUpdate(ScenarioConfigurationDTO configuration, boolean isUpdate) throws AxisFault {
+    public String[] editConfiguration(ScenarioConfigurationDTO configuration) throws AxisFault {
         try {
             List<String> streamIdList = TemplateManagerAdminServiceValueHolder.getCarbonTemplateManagerService()
-                    .saveConfiguration(ConfigurationMapper.mapConfiguration(configuration), isUpdate);
+                    .editConfiguration(ConfigurationMapper.mapConfiguration(configuration));
             if (streamIdList != null) {
                 return streamIdList.toArray(new String[0]);
             } else {
                 return null;
             }
         } catch (TemplateManagerException e) {
-            log.error("Error occurred when saving configuration " + configuration.getName(), e);
+            log.error("Error occurred when editing configuration " + configuration.getName(), e);
             throw new AxisFault(e.getMessage(), e);
         }
     }

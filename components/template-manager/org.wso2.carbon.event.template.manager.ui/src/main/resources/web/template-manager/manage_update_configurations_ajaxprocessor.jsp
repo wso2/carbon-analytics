@@ -81,7 +81,12 @@
                 scenarioConfigurationDTO.setConfigurationParameterDTOs(parameters);
 
                 //toStreamIDArray.length defines the number of stream mappings per configuration
-                String[] toStreamIDArray = proxy.saveConfigurationWithUpdate(scenarioConfigurationDTO, isUpdate);
+                String[] toStreamIDArray;
+                if(isUpdate) {
+                    toStreamIDArray = proxy.editConfiguration(scenarioConfigurationDTO);
+                } else {
+                    toStreamIDArray = proxy.saveConfiguration(scenarioConfigurationDTO);
+                }
 
                 //when stream mapping is disabled, stub returns a string array with a null element hence need to check for toStreamIDArray[0]
                 if (toStreamIDArray[0] != null) {

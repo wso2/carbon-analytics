@@ -28,9 +28,9 @@ import java.util.List;
  */
 public interface TemplateManagerService {
 
+
     /**
-     * Note: This method is deprecated. Use saveConfiguration(ScenarioConfiguration configuration, boolean isUpdate) instead.
-     * save template configuration xml files in wso2 carbon registry
+     * Save scenario configuration xml files in wso2 carbon registry
      *
      * @param configuration configuration object which needs to be saved
      */
@@ -38,12 +38,11 @@ public interface TemplateManagerService {
 
 
     /**
-     * save template configuration xml files in wso2 carbon registry
+     * Edit scenario configuration xml files which are stored in wso2 carbon registry
      *
      * @param configuration configuration object which needs to be saved
-     * @param isUpdate indicate whether this saveConfiguration() is called on Update or on Create
      */
-    public List<String> saveConfiguration(ScenarioConfiguration configuration, boolean isUpdate) throws TemplateManagerException;
+    public List<String> editConfiguration(ScenarioConfiguration configuration) throws TemplateManagerException;
 
 
     /**

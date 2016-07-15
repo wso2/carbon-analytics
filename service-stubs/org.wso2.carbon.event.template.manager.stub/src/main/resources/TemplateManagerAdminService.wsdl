@@ -32,35 +32,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getConfigurationInfos">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getConfigurationInfosResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2127:ScenarioConfigurationInfoDTO"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="saveConfigurationWithUpdate">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="configuration" nillable="true" type="ax2127:ScenarioConfigurationDTO"/>
-                        <xs:element minOccurs="0" name="isUpdate" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="saveConfigurationWithUpdateResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="getDomainInfo">
                 <xs:complexType>
                     <xs:sequence>
@@ -72,6 +43,20 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" nillable="true" type="ax2125:DomainInfoDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getConfigurationInfos">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getConfigurationInfosResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2127:ScenarioConfigurationInfoDTO"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -98,6 +83,20 @@
                 </xs:complexType>
             </xs:element>
             <xs:element name="saveConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="configuration" nillable="true" type="ax2127:ScenarioConfigurationDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editConfigurationResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
@@ -227,17 +226,17 @@
     <wsdl:message name="getDomainInfoResponse">
         <wsdl:part name="parameters" element="ns:getDomainInfoResponse"/>
     </wsdl:message>
+    <wsdl:message name="editConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:editConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="editConfigurationResponse">
+        <wsdl:part name="parameters" element="ns:editConfigurationResponse"/>
+    </wsdl:message>
     <wsdl:message name="deleteConfigurationRequest">
         <wsdl:part name="parameters" element="ns:deleteConfiguration"/>
     </wsdl:message>
     <wsdl:message name="deleteConfigurationResponse">
         <wsdl:part name="parameters" element="ns:deleteConfigurationResponse"/>
-    </wsdl:message>
-    <wsdl:message name="saveConfigurationWithUpdateRequest">
-        <wsdl:part name="parameters" element="ns:saveConfigurationWithUpdate"/>
-    </wsdl:message>
-    <wsdl:message name="saveConfigurationWithUpdateResponse">
-        <wsdl:part name="parameters" element="ns:saveConfigurationWithUpdateResponse"/>
     </wsdl:message>
     <wsdl:message name="getAllDomainInfosRequest">
         <wsdl:part name="parameters" element="ns:getAllDomainInfos"/>
@@ -268,13 +267,13 @@
             <wsdl:input message="ns:getDomainInfoRequest" wsaw:Action="urn:getDomainInfo"/>
             <wsdl:output message="ns:getDomainInfoResponse" wsaw:Action="urn:getDomainInfoResponse"/>
         </wsdl:operation>
+        <wsdl:operation name="editConfiguration">
+            <wsdl:input message="ns:editConfigurationRequest" wsaw:Action="urn:editConfiguration"/>
+            <wsdl:output message="ns:editConfigurationResponse" wsaw:Action="urn:editConfigurationResponse"/>
+        </wsdl:operation>
         <wsdl:operation name="deleteConfiguration">
             <wsdl:input message="ns:deleteConfigurationRequest" wsaw:Action="urn:deleteConfiguration"/>
             <wsdl:output message="ns:deleteConfigurationResponse" wsaw:Action="urn:deleteConfigurationResponse"/>
-        </wsdl:operation>
-        <wsdl:operation name="saveConfigurationWithUpdate">
-            <wsdl:input message="ns:saveConfigurationWithUpdateRequest" wsaw:Action="urn:saveConfigurationWithUpdate"/>
-            <wsdl:output message="ns:saveConfigurationWithUpdateResponse" wsaw:Action="urn:saveConfigurationWithUpdateResponse"/>
         </wsdl:operation>
         <wsdl:operation name="getAllDomainInfos">
             <wsdl:input message="ns:getAllDomainInfosRequest" wsaw:Action="urn:getAllDomainInfos"/>
@@ -323,8 +322,8 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="deleteConfiguration">
-            <soap:operation soapAction="urn:deleteConfiguration" style="document"/>
+        <wsdl:operation name="editConfiguration">
+            <soap:operation soapAction="urn:editConfiguration" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -332,8 +331,8 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="saveConfigurationWithUpdate">
-            <soap:operation soapAction="urn:saveConfigurationWithUpdate" style="document"/>
+        <wsdl:operation name="deleteConfiguration">
+            <soap:operation soapAction="urn:deleteConfiguration" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -398,8 +397,8 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="deleteConfiguration">
-            <soap12:operation soapAction="urn:deleteConfiguration" style="document"/>
+        <wsdl:operation name="editConfiguration">
+            <soap12:operation soapAction="urn:editConfiguration" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -407,8 +406,8 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="saveConfigurationWithUpdate">
-            <soap12:operation soapAction="urn:saveConfigurationWithUpdate" style="document"/>
+        <wsdl:operation name="deleteConfiguration">
+            <soap12:operation soapAction="urn:deleteConfiguration" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -473,8 +472,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="deleteConfiguration">
-            <http:operation location="deleteConfiguration"/>
+        <wsdl:operation name="editConfiguration">
+            <http:operation location="editConfiguration"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -482,8 +481,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="saveConfigurationWithUpdate">
-            <http:operation location="saveConfigurationWithUpdate"/>
+        <wsdl:operation name="deleteConfiguration">
+            <http:operation location="deleteConfiguration"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -512,13 +511,13 @@
     </wsdl:binding>
     <wsdl:service name="TemplateManagerAdminService">
         <wsdl:port name="TemplateManagerAdminServiceHttpsSoap11Endpoint" binding="ns:TemplateManagerAdminServiceSoap11Binding">
-            <soap:address location="https://192.168.8.102:9443/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsSoap11Endpoint/"/>
+            <soap:address location="https://10.100.5.59:9443/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsSoap11Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="TemplateManagerAdminServiceHttpsSoap12Endpoint" binding="ns:TemplateManagerAdminServiceSoap12Binding">
-            <soap12:address location="https://192.168.8.102:9443/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsSoap12Endpoint/"/>
+            <soap12:address location="https://10.100.5.59:9443/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsSoap12Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="TemplateManagerAdminServiceHttpsEndpoint" binding="ns:TemplateManagerAdminServiceHttpBinding">
-            <http:address location="https://192.168.8.102:9443/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsEndpoint/"/>
+            <http:address location="https://10.100.5.59:9443/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsEndpoint/"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
