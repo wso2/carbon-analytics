@@ -89,11 +89,16 @@
 <%
     if (request.getParameter("domainName") != null) {
 
+        boolean isUpdate = false;
         String configurationName = "";
         String templateType = "";
         String domainName = "";
         Boolean isExistingConfig = false;
         Boolean isStreamMappingUpdate=false;
+
+        if (request.getParameter("isUpdate") != null) {
+            isUpdate = "true".equals(request.getParameter("isUpdate")) ? true : false;
+        }
 
         if (request.getParameter("configurationName") != null) {
             configurationName = request.getParameter("configurationName");
@@ -182,7 +187,7 @@
                             }
                     %>
                     <option <%=selectedValue%>
-                            value="template_configurations_ajaxprocessor.jsp?configurationName=<%=Encode.forHtmlContent(configurationName)%>&domainName=<%=domainName%>&templateType=<%=scenarioInfoDTO.getType()%>">
+                            value="template_configurations_ajaxprocessor.jsp?isUpdate=<%=isUpdate%>&configurationName=<%=Encode.forHtmlContent(configurationName)%>&domainName=<%=domainName%>&templateType=<%=scenarioInfoDTO.getType()%>">
                         <%=scenarioInfoDTO.getType()%>
                     </option>
                     <%}%>
@@ -321,7 +326,7 @@
 
             <div class="action-container">
                 <button type="button" class="btn btn-default btn-add col-md-2 col-xs-12 pull-right marg-right-15"
-                        onclick="saveConfiguration('<%=domainName%>',
+                        onclick="saveConfiguration(<%=isUpdate%>, '<%=domainName%>',
                                 document.getElementById('cBoxTemplates').options[document.getElementById('cBoxTemplates').selectedIndex].text,
                                 document.getElementById('txtName').value.trim(), document.getElementById('txtDescription').value.trim(),'domain_configurations_ajaxprocessor.jsp?domainName=<%=domainName%>',
                                 <%=parameterString%>,<%=isStreamMappingUpdate%>)">

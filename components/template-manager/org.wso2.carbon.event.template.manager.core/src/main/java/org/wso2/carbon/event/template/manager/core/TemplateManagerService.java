@@ -28,12 +28,21 @@ import java.util.List;
  */
 public interface TemplateManagerService {
 
+
     /**
-     * save template configuration xml files in wso2 carbon registry
+     * Save scenario configuration xml files in wso2 carbon registry
      *
      * @param configuration configuration object which needs to be saved
      */
     public List<String> saveConfiguration(ScenarioConfiguration configuration) throws TemplateManagerException;
+
+
+    /**
+     * Edit scenario configuration xml files which are stored in wso2 carbon registry
+     *
+     * @param configuration configuration object which needs to be saved
+     */
+    public List<String> editConfiguration(ScenarioConfiguration configuration) throws TemplateManagerException;
 
 
     /**

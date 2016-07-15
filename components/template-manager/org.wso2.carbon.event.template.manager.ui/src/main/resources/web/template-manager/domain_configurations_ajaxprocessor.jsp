@@ -117,7 +117,7 @@
             <div class="container col-md-12 marg-top-20">
                 <div class="action-container">
                     <button id="" type="button"
-                            onclick="location.href = 'template_configurations_ajaxprocessor.jsp?ordinal=1&domainName=<%=Encode.forHtmlContent(request.getParameter("domainName"))%>';"
+                            onclick="location.href = 'template_configurations_ajaxprocessor.jsp?isUpdate=false&ordinal=1&domainName=<%=Encode.forHtmlContent(request.getParameter("domainName"))%>';"
                             class="btn btn-default btn-add col-md-2 col-xs-12 pull-left">Create New Scenario
                     </button>
                 </div>
@@ -157,7 +157,7 @@
                                 <i class="glyphicon glyphicon-remove"></i>
                                 <fmt:message key='common.button.delete'/></a></td>
                         <td class="tcenter">
-                            <a href="template_configurations_ajaxprocessor.jsp?configurationName=<%=scenarioConfigurationDTO.getName()%>&domainName=<%=scenarioConfigurationDTO.getDomain()%>&templateType=<%=scenarioConfigurationDTO.getType()%>">
+                            <a href="template_configurations_ajaxprocessor.jsp?isUpdate=true&configurationName=<%=scenarioConfigurationDTO.getName()%>&domainName=<%=scenarioConfigurationDTO.getDomain()%>&templateType=<%=scenarioConfigurationDTO.getType()%>">
                                 <i class="glyphicon glyphicon-cog"></i>
                                 <fmt:message key='common.button.edit'/></a></td>
                     </tr>

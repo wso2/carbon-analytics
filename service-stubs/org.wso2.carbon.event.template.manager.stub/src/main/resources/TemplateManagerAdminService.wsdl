@@ -14,10 +14,10 @@
   ~ limitations under the License.
   -->
 
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://admin.manager.template.event.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:ax2146="http://domain.dto.admin.manager.template.event.carbon.wso2.org/xsd" xmlns:ax2148="http://configuration.dto.admin.manager.template.event.carbon.wso2.org/xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://admin.manager.template.event.carbon.wso2.org">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ax2124="http://domain.dto.admin.manager.template.event.carbon.wso2.org/xsd" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://admin.manager.template.event.carbon.wso2.org" xmlns:ax2126="http://configuration.dto.admin.manager.template.event.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://admin.manager.template.event.carbon.wso2.org">
     <wsdl:documentation>TemplateManagerAdminService</wsdl:documentation>
     <wsdl:types>
-        <xs:schema xmlns:ax2147="http://domain.dto.admin.manager.template.event.carbon.wso2.org/xsd" xmlns:ax2149="http://configuration.dto.admin.manager.template.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.manager.template.event.carbon.wso2.org">
+        <xs:schema xmlns:ax2125="http://domain.dto.admin.manager.template.event.carbon.wso2.org/xsd" xmlns:ax2127="http://configuration.dto.admin.manager.template.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.manager.template.event.carbon.wso2.org">
             <xs:import namespace="http://domain.dto.admin.manager.template.event.carbon.wso2.org/xsd"/>
             <xs:import namespace="http://configuration.dto.admin.manager.template.event.carbon.wso2.org/xsd"/>
             <xs:element name="getAllDomainInfos">
@@ -28,21 +28,7 @@
             <xs:element name="getAllDomainInfosResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2146:DomainInfoDTO"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getConfigurationInfos">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getConfigurationInfosResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2148:ScenarioConfigurationInfoDTO"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2125:DomainInfoDTO"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -56,7 +42,80 @@
             <xs:element name="getDomainInfoResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2146:DomainInfoDTO"/>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2125:DomainInfoDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getConfigurationInfos">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getConfigurationInfosResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2127:ScenarioConfigurationInfoDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="configName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2127:ScenarioConfigurationDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="configuration" nillable="true" type="ax2127:ScenarioConfigurationDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="configuration" nillable="true" type="ax2127:ScenarioConfigurationDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveStreamMapping">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="streamMappingDTOs" nillable="true" type="ax2127:StreamMappingDTO"/>
+                        <xs:element minOccurs="0" name="configName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveStreamMappingResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -75,64 +134,19 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getConfiguration">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="configName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getConfigurationResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2148:ScenarioConfigurationDTO"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="saveStreamMapping">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="streamMappingDTOs" nillable="true" type="ax2148:StreamMappingDTO"/>
-                        <xs:element minOccurs="0" name="configName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="saveStreamMappingResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="saveConfiguration">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="configuration" nillable="true" type="ax2148:ScenarioConfigurationDTO"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="saveConfigurationResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
         </xs:schema>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://domain.dto.admin.manager.template.event.carbon.wso2.org/xsd">
             <xs:complexType name="DomainInfoDTO">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="scenarioInfoDTOs" nillable="true" type="ax2146:ScenarioInfoDTO"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="scenarioInfoDTOs" nillable="true" type="ax2124:ScenarioInfoDTO"/>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="ScenarioInfoDTO">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="domainParameterDTOs" nillable="true" type="ax2146:DomainParameterDTO"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="domainParameterDTOs" nillable="true" type="ax2124:DomainParameterDTO"/>
                     <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
@@ -158,11 +172,11 @@
             </xs:complexType>
             <xs:complexType name="ScenarioConfigurationDTO">
                 <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="configurationParameterDTOs" nillable="true" type="ax2148:ConfigurationParameterDTO"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="configurationParameterDTOs" nillable="true" type="ax2126:ConfigurationParameterDTO"/>
                     <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="domain" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="streamMappingDTOs" nillable="true" type="ax2148:StreamMappingDTO"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="streamMappingDTOs" nillable="true" type="ax2126:StreamMappingDTO"/>
                     <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
@@ -174,7 +188,7 @@
             </xs:complexType>
             <xs:complexType name="StreamMappingDTO">
                 <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="attributeMappingDTOs" nillable="true" type="ax2148:AttributeMappingDTO"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="attributeMappingDTOs" nillable="true" type="ax2126:AttributeMappingDTO"/>
                     <xs:element minOccurs="0" name="fromStream" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="toStream" nillable="true" type="xs:string"/>
                 </xs:sequence>
@@ -212,6 +226,12 @@
     <wsdl:message name="getDomainInfoResponse">
         <wsdl:part name="parameters" element="ns:getDomainInfoResponse"/>
     </wsdl:message>
+    <wsdl:message name="editConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:editConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="editConfigurationResponse">
+        <wsdl:part name="parameters" element="ns:editConfigurationResponse"/>
+    </wsdl:message>
     <wsdl:message name="deleteConfigurationRequest">
         <wsdl:part name="parameters" element="ns:deleteConfiguration"/>
     </wsdl:message>
@@ -246,6 +266,10 @@
         <wsdl:operation name="getDomainInfo">
             <wsdl:input message="ns:getDomainInfoRequest" wsaw:Action="urn:getDomainInfo"/>
             <wsdl:output message="ns:getDomainInfoResponse" wsaw:Action="urn:getDomainInfoResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="editConfiguration">
+            <wsdl:input message="ns:editConfigurationRequest" wsaw:Action="urn:editConfiguration"/>
+            <wsdl:output message="ns:editConfigurationResponse" wsaw:Action="urn:editConfigurationResponse"/>
         </wsdl:operation>
         <wsdl:operation name="deleteConfiguration">
             <wsdl:input message="ns:deleteConfigurationRequest" wsaw:Action="urn:deleteConfiguration"/>
@@ -291,6 +315,15 @@
         </wsdl:operation>
         <wsdl:operation name="getDomainInfo">
             <soap:operation soapAction="urn:getDomainInfo" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editConfiguration">
+            <soap:operation soapAction="urn:editConfiguration" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -364,6 +397,15 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="editConfiguration">
+            <soap12:operation soapAction="urn:editConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="deleteConfiguration">
             <soap12:operation soapAction="urn:deleteConfiguration" style="document"/>
             <wsdl:input>
@@ -430,6 +472,15 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="editConfiguration">
+            <http:operation location="editConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="deleteConfiguration">
             <http:operation location="deleteConfiguration"/>
             <wsdl:input>
@@ -460,13 +511,13 @@
     </wsdl:binding>
     <wsdl:service name="TemplateManagerAdminService">
         <wsdl:port name="TemplateManagerAdminServiceHttpsSoap11Endpoint" binding="ns:TemplateManagerAdminServiceSoap11Binding">
-            <soap:address location="https://10.100.7.55:9543/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsSoap11Endpoint/"/>
+            <soap:address location="https://10.100.5.59:9443/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsSoap11Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="TemplateManagerAdminServiceHttpsSoap12Endpoint" binding="ns:TemplateManagerAdminServiceSoap12Binding">
-            <soap12:address location="https://10.100.7.55:9543/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsSoap12Endpoint/"/>
+            <soap12:address location="https://10.100.5.59:9443/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsSoap12Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="TemplateManagerAdminServiceHttpsEndpoint" binding="ns:TemplateManagerAdminServiceHttpBinding">
-            <http:address location="https://10.100.7.55:9543/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsEndpoint/"/>
+            <http:address location="https://10.100.5.59:9443/services/TemplateManagerAdminService.TemplateManagerAdminServiceHttpsEndpoint/"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
