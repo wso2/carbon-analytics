@@ -24,6 +24,7 @@
 
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
+<%@ taglib uri="http://www.owasp.org/index.php/Category:OWASP_CSRFGuard_Project/Owasp.CsrfGuard.tld" prefix="csrf" %>
 
 <fmt:bundle basename="org.wso2.carbon.analytics.spark.ui.i18n.Resources">
     <carbon:breadcrumb label="analytics_list.menu"
@@ -80,10 +81,10 @@
                         </label>
                         </td>
                         <td>
-                            <form name='executeScript_<%=aScript.getName()%>' action='executeScript.jsp' method='post'>
+                            <form name='executeScript_<%=aScript.getName()%>' action="executeScript.jsp?<csrf:tokenname/>=<csrf:tokenvalue/>" method='post'>
                                 <input type="hidden" name="scriptName" value="<%=aScript.getName()%>"/>
                             </form>
-                            <form name='executeInBackground_<%=aScript.getName()%>' action='executeScriptInBackground.jsp' method='post'>
+                            <form name='executeInBackground_<%=aScript.getName()%>' action="executeScriptInBackground.jsp?<csrf:tokenname/>=<csrf:tokenvalue/>" method='post'>
                                 <input type="hidden" name="scriptName" value="<%=aScript.getName()%>"/>
                             </form>
                             <% if (aScript.getEditable()) {%>
