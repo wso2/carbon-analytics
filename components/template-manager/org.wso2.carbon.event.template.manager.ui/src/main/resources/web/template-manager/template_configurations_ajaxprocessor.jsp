@@ -176,7 +176,7 @@
             <label class="input-label col-md-5"><fmt:message key='template.label.text'/></label>
 
             <div class="input-control input-full-width col-md-7 text">
-                <select id="cBoxTemplates"
+                <select<%=isUpdate ? " disabled" : ""%> id="cBoxTemplates"
                         onchange="document.location.href=document.getElementById('cBoxTemplates').options[document.getElementById('cBoxTemplates').selectedIndex].value">
                     <%
                         for (ScenarioInfoDTO scenarioInfoDTO : domain.getScenarioInfoDTOs()) {
