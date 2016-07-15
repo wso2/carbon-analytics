@@ -19,13 +19,13 @@
 package org.wso2.carbon.databridge.agent;
 
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
-import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
-import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.client.AbstractClientPoolFactory;
 import org.wso2.carbon.databridge.agent.client.AbstractSecureClientPoolFactory;
 import org.wso2.carbon.databridge.agent.client.ClientPool;
 import org.wso2.carbon.databridge.agent.conf.AgentConfiguration;
 import org.wso2.carbon.databridge.agent.endpoint.DataEndpoint;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -104,7 +104,7 @@ public class DataEndpointAgent {
         return securedTransportPool;
     }
 
-    public void shutDown(DataPublisher dataPublisher) {
+    public synchronized void shutDown(DataPublisher dataPublisher) {
         dataPublishers.remove(dataPublisher);
     }
 
@@ -122,14 +122,15 @@ public class DataEndpointAgent {
         }
     }
 
-    public void shutDown() throws DataEndpointException {
-        if (dataPublishers.isEmpty()) {
-            try {
-                transportPool.close();
-                securedTransportPool.close();
-            } catch (Exception e) {
-                throw new DataEndpointException("Error while closing the transport pool", e);
-            }
+    public synchronized void shutDown() throws DataEndpointException {
+        for (DataPublisher dataPublisher : dataPublishers) {
+            dataPublisher.shutdown();
+        }
+        try {
+            transportPool.close();
+            securedTransportPool.close();
+        } catch (Exception e) {
+            throw new DataEndpointException("Error while closing the transport pool", e);
         }
     }
 }

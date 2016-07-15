@@ -19,13 +19,12 @@ package org.wso2.carbon.databridge.agent.endpoint;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
-import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 
 /**
  * DataEndpoint Connection worker class implementation.
- *
  */
 
 public class DataEndpointConnectionWorker implements Runnable {
@@ -63,7 +62,7 @@ public class DataEndpointConnectionWorker implements Runnable {
      * Initialize the data endpoint connection worker.
      * A connection worker can be instantiated only ONE time.
      *
-     * @param dataEndpoint DataEndpoint instance to handle the connection.
+     * @param dataEndpoint              DataEndpoint instance to handle the connection.
      * @param dataEndpointConfiguration DataEndpointConfiguration to handle the connection.
      * @throws DataEndpointException
      */

@@ -11,6 +11,7 @@ public class Domain {
     private String description;
     private CommonArtifacts commonArtifacts;
     private Scenarios scenarios;
+    private Scripts scripts;
 
     @XmlAttribute
     public String getName() {
@@ -51,5 +52,13 @@ public class Domain {
     @XmlElement
     public void setScenarios(Scenarios scenarios) {
         this.scenarios = scenarios;
+    }
+
+    public Scripts getScripts() {
+        return scripts;
+    }
+
+    public void setScripts(Scripts scripts) {
+        this.scripts = scripts;
     }
 }

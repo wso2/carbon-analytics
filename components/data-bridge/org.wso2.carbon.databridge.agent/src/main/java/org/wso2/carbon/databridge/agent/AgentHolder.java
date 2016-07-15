@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.agent.conf.AgentConfiguration;
 import org.wso2.carbon.databridge.agent.conf.DataAgentsConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.utils.CarbonUtils;
 
@@ -157,5 +158,12 @@ public class AgentHolder {
      */
     public static void setConfigPath(String configPath) {
         AgentHolder.configPath = configPath;
+    }
+
+    public synchronized static void shutdown() throws DataEndpointException {
+        for (DataEndpointAgent dataEndpointAgent : instance.dataEndpointAgents.values()) {
+            dataEndpointAgent.shutDown();
+        }
+        instance = null;
     }
 }

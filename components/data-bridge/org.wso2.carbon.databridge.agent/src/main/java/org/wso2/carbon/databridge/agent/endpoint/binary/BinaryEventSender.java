@@ -27,9 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil.assignData;
-import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil.getSize;
-import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil.loadData;
+import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil.*;
 
 /**
  * This is a Util class which does the Binary message transformation for publish, login, logout operations.
@@ -142,7 +140,7 @@ public class BinaryEventSender {
         return eventSize;
     }
 
-    public static  String processResponse(Socket socket) throws Exception {
+    public static String processResponse(Socket socket) throws Exception {
 
         InputStream inputStream = socket.getInputStream();
         BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
@@ -167,7 +165,7 @@ public class BinaryEventSender {
                 //Logging OK response
                 bbuf = ByteBuffer.wrap(loadData(bufferedInputStream, new byte[4]));
                 int sessionIdLength = bbuf.getInt();
-                String sessionId= new String(ByteBuffer.wrap(loadData(bufferedInputStream, new byte[sessionIdLength])).array());
+                String sessionId = new String(ByteBuffer.wrap(loadData(bufferedInputStream, new byte[sessionIdLength])).array());
                 return sessionId;
         }
         return null;

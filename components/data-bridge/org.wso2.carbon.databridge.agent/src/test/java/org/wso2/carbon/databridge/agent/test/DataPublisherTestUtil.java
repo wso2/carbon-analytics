@@ -55,7 +55,7 @@ public class DataPublisherTestUtil {
         System.setProperty("Security.KeyStore.Password", "wso2carbon");
     }
 
-    public static String getDataAgentConfigPath() {
+    public static String getDataAgentConfigPath(String fileName) {
         File filePath = new File("src" + File.separator + "test" + File.separator + "resources");
         if (!filePath.exists()) {
             filePath = new File("components" + File.separator + "data-bridge" + File.separator + "org.wso2.carbon.databridge.agent" + File.separator + "src" + File.separator + "test" + File.separator + "resources");
@@ -66,7 +66,7 @@ public class DataPublisherTestUtil {
         if (!filePath.exists()) {
             filePath = new File("test" + File.separator + "resources");
         }
-        return filePath.getAbsolutePath() + File.separator + "data-agent-config.xml";
+        return filePath.getAbsolutePath() + File.separator + fileName;
     }
 
     public static String getDataBridgeConfigPath() {

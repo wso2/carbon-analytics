@@ -69,7 +69,9 @@ var getConfig, validate, isProviderRequired, draw, update;
      * @param data
      */
     draw = function(placeholder, chartConfig, _schema, data) {
+        _schema = updateUserPrefXYTypes(_schema, chartConfig);
         var schema = toVizGrammarSchema(_schema);
+
         var view = {
             id: "chart-0",
             schema: schema,
@@ -107,11 +109,13 @@ var getConfig, validate, isProviderRequired, draw, update;
      */
     update = function(data) {
         wso2gadgets.onDataReady(data,"append");
-    }
+    };
 
     buildChartConfig = function (_chartConfig) {
         var conf = {};
         conf.x = _chartConfig.x;
+        conf.xType = _chartConfig.xType;
+        conf.yType = _chartConfig.yType;
         conf.charts = [];
         conf.charts[0] = {
             type : "line",

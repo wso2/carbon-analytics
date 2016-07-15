@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class EventPublisher implements WSO2EventConsumer, EventSync {
 
@@ -76,6 +77,11 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     private boolean isContinue = false;
     private BlockingEventQueue eventQueue;
     private int inputStreamSize = 0;
+
+//    private volatile AtomicLong totalLatency = new AtomicLong();
+//    private volatile AtomicLong totalEvents = new AtomicLong();
+//    private double elapseCount = 10000;
+//    private long tempstartTime = System.currentTimeMillis();
 
     public EventPublisher(EventPublisherConfiguration eventPublisherConfiguration)
             throws EventPublisherConfigurationException {
@@ -370,6 +376,24 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         }
 
         OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();
+//
+//        long timestamp = event.getTimeStamp();
+//        long currentTimestamp = System.currentTimeMillis();
+//        event.setTimeStamp(currentTimestamp);
+//        long eventLatency = currentTimestamp - timestamp;
+//        totalLatency.addAndGet(eventLatency);
+//        totalEvents.incrementAndGet();
+//        if (totalEvents.get() % elapseCount == 0) {
+//            double avgLatency = (totalLatency.get() * 1.0) / elapseCount;
+//            double throughput = ((elapseCount * 1.0) / (currentTimestamp - tempstartTime + 0.0)) * 1000;
+//
+//            log.info("Published " + elapseCount + " events with a throughput of " + throughput +
+//                    " events per second || and latency: " + avgLatency);
+//            tempstartTime = currentTimestamp;
+//            totalLatency.set(0);
+//        }
+
+
         eventAdapterService.publish(eventPublisherConfiguration.getEventPublisherName(), dynamicProperties, outObject);
     }
 

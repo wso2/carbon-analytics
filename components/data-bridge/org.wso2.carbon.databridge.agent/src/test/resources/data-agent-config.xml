@@ -24,12 +24,14 @@
         <!--<TrustSore>src/main/resources/client-truststore.jks</TrustSore>-->
         <!--<TrustSorePassword>wso2carbon</TrustSorePassword>-->
         <QueueSize>32768</QueueSize>
+        <!-- Publishing Strategy can be either async or sync-->
+        <PublishingStrategy>async</PublishingStrategy>
         <BatchSize>200</BatchSize>
         <CorePoolSize>5</CorePoolSize>
         <MaxPoolSize>10</MaxPoolSize>
         <SocketTimeoutMS>30000</SocketTimeoutMS>
         <KeepAliveTimeInPool>20</KeepAliveTimeInPool>
-        <ReconnectionInterval>30</ReconnectionInterval>
+        <ReconnectionInterval>10</ReconnectionInterval>
         <MaxTransportPoolSize>250</MaxTransportPoolSize>
         <MaxIdleConnections>250</MaxIdleConnections>
         <EvictionTimePeriod>5500</EvictionTimePeriod>
@@ -45,13 +47,15 @@
         <DataEndpointClass>org.wso2.carbon.databridge.agent.endpoint.binary.BinaryDataEndpoint</DataEndpointClass>
         <!--<TrustSore>src/main/resources/client-truststore.jks</TrustSore>-->
         <!--<TrustSorePassword>wso2carbon</TrustSorePassword>-->
+        <!-- Publishing Strategy can be either async or sync-->
+        <PublishingStrategy>async</PublishingStrategy>
         <QueueSize>32768</QueueSize>
         <BatchSize>200</BatchSize>
         <CorePoolSize>5</CorePoolSize>
         <MaxPoolSize>10</MaxPoolSize>
         <SocketTimeoutMS>30000</SocketTimeoutMS>
         <KeepAliveTimeInPool>20</KeepAliveTimeInPool>
-        <ReconnectionInterval>30</ReconnectionInterval>
+        <ReconnectionInterval>10</ReconnectionInterval>
         <MaxTransportPoolSize>250</MaxTransportPoolSize>
         <MaxIdleConnections>250</MaxIdleConnections>
         <EvictionTimePeriod>5500</EvictionTimePeriod>
