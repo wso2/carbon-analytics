@@ -10,7 +10,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>carbon-analytics</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.6-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <name>WSO2 Carbon - Analytics Platform Aggregator Pom</name>
     <url>http://wso2.org</url>
 
@@ -1205,7 +1205,7 @@
     <properties>
 
         <!-- carbon-analytics repo versions -->
-        <carbon.analytics.version>1.0.6-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.version>1.1.0-SNAPSHOT</carbon.analytics.version>
         <carbon.analytics.imp.pkg.version>[1.0, 2)</carbon.analytics.imp.pkg.version>
 
         <!-- Carbon platform version -->
@@ -1215,7 +1215,7 @@
         <!-- WSO2 repository versions -->
         <carbon.commons.version>4.5.4</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.5, 5)</carbon.commons.imp.pkg.version>
-        <carbon.data.version>4.3.5-SNAPSHOT</carbon.data.version>
+        <carbon.data.version>4.3.5</carbon.data.version>
         <carbon.event-processing.version>2.1.1-SNAPSHOT</carbon.event-processing.version>
         <carbon.analytics.common.version>5.1.1-SNAPSHOT</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[5.0, 6.0)</carbon.analytics.common.imp.pkg.version>
