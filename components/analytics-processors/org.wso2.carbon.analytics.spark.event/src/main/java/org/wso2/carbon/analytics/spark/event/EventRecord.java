@@ -22,15 +22,17 @@ import java.util.List;
 
 public class EventRecord {
     private int tenantId;
-
     private String streamId;
-
     private List<Object> payloadEntries;
+    private List<Object> metaEntries;
+    private List<Object> correlationEntries;
 
-    public EventRecord(int tenantId, String streamId, List<Object> payloadEntries) {
+    public EventRecord(int tenantId, String streamId, List<Object> payloadEntries, List<Object> metaEntries, List<Object> correlationEntries) {
         this.tenantId = tenantId;
         this.streamId = streamId;
         this.payloadEntries = payloadEntries;
+        this.metaEntries = metaEntries;
+        this.correlationEntries = correlationEntries;
     }
 
     public int getTenantId() {
@@ -43,5 +45,13 @@ public class EventRecord {
 
     public List<Object> getPayloadEntries() {
         return payloadEntries;
+    }
+
+    public List<Object> getMetaEntries() {
+        return metaEntries;
+    }
+
+    public List<Object> getCorrelationEntries() {
+        return correlationEntries;
     }
 }

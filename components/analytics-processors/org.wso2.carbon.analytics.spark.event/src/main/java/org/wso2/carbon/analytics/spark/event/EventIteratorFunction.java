@@ -75,13 +75,19 @@ public class EventIteratorFunction extends AbstractFunction1<Iterator<Row>, Boxe
         String[] colNames = sch.fieldNames();
         boolean globalTenantProcessed = false;
         int targetTenantId = this.tenantId;
-        List<Object> result = new ArrayList<Object>(row.length());
+        List<Object> payloadData = new ArrayList<Object>();
+        List<Object> metaData    = new ArrayList<Object>();
+        List<Object> correlationData = new ArrayList<Object>();
         for (int i = 0; i < row.length(); i++) {
             if (this.globalTenantAccess && colNames[i].equals(AnalyticsConstants.TENANT_ID_FIELD)) {
                 targetTenantId = row.getInt(i);
                 globalTenantProcessed = true;
+            } else if (colNames[i].startsWith(EventingConstants.EVENT_META_DATA_PREFIX)) {
+                metaData.add(row.get(i));
+            } else if (colNames[i].startsWith(EventingConstants.EVENT_CORRELATION_DATA_PREFIX)) {
+                correlationData.add(row.get(i));
             } else {
-                result.add(row.get(i));
+                payloadData.add(row.get(i));
             }
         }
         if (this.globalTenantAccess && !globalTenantProcessed) {
@@ -89,7 +95,7 @@ public class EventIteratorFunction extends AbstractFunction1<Iterator<Row>, Boxe
                     " with schema: " + this.sch + " when creating a global tenant access record");
         }
 
-        return new EventRecord(targetTenantId, this.streamId, result);
+        return new EventRecord(targetTenantId, this.streamId, payloadData, metaData, correlationData);
     }
 
 }

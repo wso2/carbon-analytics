@@ -54,8 +54,7 @@ public class EventStreamDataStore {
         AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
         List<Record> records = new ArrayList<>(eventRecordList.size());
         for (EventRecord eventRecord : eventRecordList) {
-            records.add(new Record(META_TABLE_TID, EVENT_STREAM_DATA_STORE_TABLE,
-                    createValues(eventRecord.getTenantId(), eventRecord.getStreamId(), eventRecord.getPayloadEntries())));
+            records.add(new Record(META_TABLE_TID, EVENT_STREAM_DATA_STORE_TABLE, createValues(eventRecord)));
         }
         if (records.size() > 0) {
             ads.put(records);
@@ -75,6 +74,8 @@ public class EventStreamDataStore {
                 Integer tenantId = (Integer) record.getValue(EventingConstants.TENANT_ID);
                 String streamId = (String) record.getValue(EventingConstants.STREAM_ID);
                 List<Object> payload = (List<Object>) record.getValue(EventingConstants.PAYLOAD);
+                List<Object> metaData = (List<Object>) record.getValue(EventingConstants.META_DATA);
+                List<Object> correlationData = (List<Object>) record.getValue(EventingConstants.CORRELATION_DATA);
                 if (tenantId == null || streamId == null || payload == null) {
                     log.warn("Corrupted Spark eventing store record (ignoring): " + record);
                 } else {
@@ -83,7 +84,7 @@ public class EventStreamDataStore {
                         tlist = new ArrayList<>();
                         result.put(tenantId, tlist);
                     }
-                    tlist.add(buildEvent(streamId, payload, record.getTimestamp()));
+                    tlist.add(buildEvent(streamId, payload, metaData, correlationData, record.getTimestamp()));
                 }
                 ids.add(record.getId());
             }
@@ -94,20 +95,25 @@ public class EventStreamDataStore {
             throw new RuntimeException("Error in extracting next event batch in Spark event store: " + e.getMessage(), e);
         }
     }
-    
-    private static Map<String, Object> createValues(int tenantId, String streamId, List<Object> payloadData) {
+
+    private static Map<String, Object> createValues(EventRecord eventRecord) {
         Map<String, Object> result = new HashMap<>();
-        result.put(EventingConstants.TENANT_ID, tenantId);
-        result.put(EventingConstants.STREAM_ID, streamId);
-        result.put(EventingConstants.PAYLOAD, payloadData);
+        result.put(EventingConstants.TENANT_ID, eventRecord.getTenantId());
+        result.put(EventingConstants.STREAM_ID, eventRecord.getStreamId());
+        result.put(EventingConstants.PAYLOAD, eventRecord.getPayloadEntries());
+        result.put(EventingConstants.META_DATA, eventRecord.getMetaEntries());
+        result.put(EventingConstants.CORRELATION_DATA, eventRecord.getCorrelationEntries());
         return result;
     }
     
-    private static Event buildEvent(String streamId, List<Object> payload, long ts) {
+    private static Event buildEvent(String streamId, List<Object> payload,
+                                    List<Object> metaData, List<Object> correlationData, long ts) {
         Event event = new Event();
         event.setTimeStamp(ts);
         event.setStreamId(streamId);
         event.setPayloadData(payload.toArray());
+        event.setMetaData(metaData.toArray());
+        event.setCorrelationData(correlationData.toArray());
         return event;
     }
     
