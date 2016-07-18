@@ -244,6 +244,11 @@ public class WSO2EventOutputMapper implements OutputMapper {
             eventObject.setPayloadData(payloadData.toArray());
         }
 
+        Map map = event.getArbitraryDataMap();
+        if(map != null) {
+            eventObject.setArbitraryDataMap(map);
+        }
+
         return eventObject;
     }
 
