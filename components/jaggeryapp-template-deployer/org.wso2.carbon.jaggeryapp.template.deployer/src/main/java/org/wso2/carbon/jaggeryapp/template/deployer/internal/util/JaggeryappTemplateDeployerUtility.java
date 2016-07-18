@@ -23,10 +23,6 @@ import java.io.File;
 
 public class JaggeryappTemplateDeployerUtility {
 
-    public JaggeryappTemplateDeployerUtility(){
-
-    }
-
     /**
      * Returns the absolute path for the artifact store location.
      *
