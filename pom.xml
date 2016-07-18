@@ -45,6 +45,7 @@
         <module>components/event-publisher</module>
         <module>components/template-manager</module>
         <module>components/gadget-template-deployer</module>
+        <module>components/jaggeryapp-template-deployer</module>
         <module>components/dashboard-template-deployer</module>
         <module>features/event-stream</module>
         <module>features/data-bridge</module>
@@ -60,6 +61,7 @@
         <module>features/analytics-gadget-templates</module>
         <module>features/gadget-template-deployer</module>
         <module>features/dashboard-template-deployer</module>
+        <module>features/jaggeryapp-template-deployer</module>
     </modules>
 
     <dependencyManagement>
@@ -596,6 +598,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.gadget.template.deployer</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.jaggeryapp.template.deployer</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
