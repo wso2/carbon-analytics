@@ -55,7 +55,7 @@ import java.util.List;
  */
 public class AnalyticsDataBackupTool {
 
-    private static final String TIME_PATTERN = "yy-mm-dd-hh:mm:ss";
+    private static final String TIME_PATTERN = "yy-MM-dd-HH:mm:ss";
     private static final String DIR = "dir";
     private static final String TABLES = "tables";
     private static final String TIMETO = "timeTo";
