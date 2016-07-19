@@ -42,10 +42,12 @@
         String scriptName = Encode.forHtmlContent(request.getParameter("scriptName"));
         String editableParam = Encode.forHtmlContent(request.getParameter("editable"));
         boolean editable = true;
-        if (editableParam != null) {
+        if (editableParam != null && !editableParam.equals("null")) { // checks string "null" since owasp encode null values to "null"
             editable = Boolean.parseBoolean(editableParam);
         }
-        boolean isExistingScript = scriptName != null && !scriptName.trim().isEmpty();
+
+        // checks string "null" since owasp encode null values to "null"
+        boolean isExistingScript = scriptName != null && !scriptName.trim().isEmpty() && !scriptName.equals("null");
         String scriptContent = "";
         String cronExp = "";
         AnalyticsExecutionClient client = new AnalyticsExecutionClient(cookie, serverURL, configContext);

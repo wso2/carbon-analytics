@@ -60,7 +60,7 @@
             } else {
                 results = client.executeScript(scriptName);
             }
-        } else if (null != scriptContent && !scriptContent.trim().isEmpty()) {
+        } else if (null != scriptContent && !scriptContent.trim().isEmpty() && !scriptContent.equals("null")) { // checks string "null" since owasp encode null values to "null"
             results = client.executeScriptContent(scriptContent);
         }
 %>

@@ -67,7 +67,7 @@
             </div>
         <%
             }
-        } else if (null != scriptContent && !scriptContent.trim().isEmpty()) {
+        } else if (null != scriptContent && !scriptContent.trim().isEmpty() && !scriptContent.equals("null")) {
             client.executeScriptContentInBackground(scriptContent);
         %>
             <div id="returnedResults">
