@@ -31,6 +31,7 @@ import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterMan
 import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunction;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
+import org.wso2.carbon.ndatasource.core.DataSourceService;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.user.core.service.RealmService;
 
@@ -48,6 +49,8 @@ import org.wso2.carbon.user.core.service.RealmService;
  * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
  * @scr.reference name="analytics.aggregates" interface="org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunction"
  * cardinality="0..n" policy="dynamic" bind="addAggregateFunction" unbind="removeAggregateFunctions"
+ * @scr.reference name="datasource.service" interface="org.wso2.carbon.ndatasource.core.DataSourceService"
+ * cardinality="1..1" policy="dynamic"  bind="setDataSourceService" unbind="unsetDataSourceService"
  */
 public class AnalyticsDataServiceComponent {
 
@@ -138,6 +141,19 @@ public class AnalyticsDataServiceComponent {
     protected void unsetTaskService(TaskService taskService) {
         if (log.isDebugEnabled()) {
             log.debug("Unsetting the Task Service");
+        }
+    }
+
+    protected void setDataSourceService(DataSourceService dataSourceService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Setting the Datasource Service");
+        }
+        AnalyticsServiceHolder.setDataSourceService(dataSourceService);
+    }
+
+    protected void unsetDataSourceService(DataSourceService dataSourceService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Unsetting the DataSource Service");
         }
     }
 

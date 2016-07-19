@@ -25,6 +25,7 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.ndatasource.core.DataSourceService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -193,5 +194,19 @@ public class AnalyticsDataServiceUtils {
             /* ignored */
         }
     }
-    
+
+    /**
+     * This method is used to identify if the current JVM in which the AnalyticsDataService is instantiated,
+     * is a carbon server or not.
+     * @return true if its a carbon server
+     */
+    public static boolean isCarbonServer() {
+        boolean isCarbonServer = true;
+        DataSourceService dataSourceService = AnalyticsServiceHolder.getDataSourceService();
+        if (dataSourceService == null) {
+            isCarbonServer = false;
+        }
+        return isCarbonServer;
+    }
+
 }

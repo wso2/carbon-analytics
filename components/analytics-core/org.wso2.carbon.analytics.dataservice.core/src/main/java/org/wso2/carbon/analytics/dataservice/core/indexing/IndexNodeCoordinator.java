@@ -233,7 +233,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.populateMyNodeId();
         this.indexingNode = checkIfIndexingNode();
         boolean indexingNodeDisabling = !this.indexingNode && this.currentNodeAllocatedShardsGlobally();
-        if (indexingNodeDisabling) {
+        if (indexingNodeDisabling && AnalyticsDataServiceUtils.isCarbonServer()) {
             this.removeMyNodeFromIndexingConfigurations();
         }
         this.initClustering();

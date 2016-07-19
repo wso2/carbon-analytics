@@ -23,6 +23,7 @@ import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterMan
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunction;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.ndatasource.core.DataSourceService;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.user.core.service.RealmService;
 
@@ -45,6 +46,8 @@ public class AnalyticsServiceHolder {
     private static RealmService realmService;
 
     private static TaskService taskService;
+
+    private static DataSourceService dataSourceService;
 
     private static Map<String, Class<? extends AggregateFunction>> aggregateFunctions = new HashMap<>();
 
@@ -105,6 +108,14 @@ public class AnalyticsServiceHolder {
 
     public static void setTaskService(TaskService taskService) {
         AnalyticsServiceHolder.taskService = taskService;
+    }
+
+    public static void setDataSourceService(DataSourceService dataSourceService) {
+        AnalyticsServiceHolder.dataSourceService = dataSourceService;
+    }
+
+    public  static DataSourceService getDataSourceService() {
+        return dataSourceService;
     }
 
     public static void addAggregateFunction(AggregateFunction aggregateFunction) {
