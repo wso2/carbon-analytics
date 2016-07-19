@@ -81,11 +81,13 @@
                         </label>
                         </td>
                         <td>
-                            <form name='executeScript_<%=aScript.getName()%>' action="executeScript.jsp?<csrf:tokenname/>=<csrf:tokenvalue/>" method='post'>
+                            <form name='executeScript_<%=aScript.getName()%>' action="executeScript.jsp" method='post'>
                                 <input type="hidden" name="scriptName" value="<%=aScript.getName()%>"/>
+                                <input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
                             </form>
-                            <form name='executeInBackground_<%=aScript.getName()%>' action="executeScriptInBackground.jsp?<csrf:tokenname/>=<csrf:tokenvalue/>" method='post'>
+                            <form name='executeInBackground_<%=aScript.getName()%>' action="executeScriptInBackground.jsp" method='post'>
                                 <input type="hidden" name="scriptName" value="<%=aScript.getName()%>"/>
+                                <input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
                             </form>
                             <% if (aScript.getEditable()) {%>
                             <a class="icon-link"
