@@ -22,8 +22,6 @@ import org.wso2.carbon.analytics.eventsink.internal.queue.AnalyticsEventQueue;
 import org.wso2.carbon.analytics.eventsink.internal.queue.AnalyticsEventQueueManager;
 
 /**
- * Created on 6/6/16.
- * <p/>
  * Implementation of the QueueEventBufferSizeCalculatorMBean interface.
  */
 public class QueueEventBufferSizeCalculator implements QueueEventBufferSizeCalculatorMBean {
@@ -39,12 +37,12 @@ public class QueueEventBufferSizeCalculator implements QueueEventBufferSizeCalcu
     }
 
     @Override
-    public int getCurrentQueueSize(int tenantId) {
+    public int getRemainingQueueSize(int tenantId) {
         int currentSize = -1;
         AnalyticsEventQueueManager eventQueueManager = AnalyticsEventQueueManager.getInstance();
         AnalyticsEventQueue analyticsEventQueue = eventQueueManager.getAnalyticsEventQueue(tenantId);
         if (analyticsEventQueue != null) {
-            currentSize = analyticsEventQueue.getCurrentQueueSize();
+            currentSize = analyticsEventQueue.getRemainingQueueSize();
         }
         return currentSize;
     }

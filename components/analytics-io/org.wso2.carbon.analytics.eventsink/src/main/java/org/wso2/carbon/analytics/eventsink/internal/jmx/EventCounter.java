@@ -30,8 +30,8 @@ public class EventCounter {
 
     private static AtomicInteger counter = new AtomicInteger(0);
 
-    public static int incrementAndGet() {
-        return counter.incrementAndGet();
+    public static int incrementAndGet(int delta) {
+        return counter.addAndGet(delta);
     }
 
     public static int getCurrentCount() {

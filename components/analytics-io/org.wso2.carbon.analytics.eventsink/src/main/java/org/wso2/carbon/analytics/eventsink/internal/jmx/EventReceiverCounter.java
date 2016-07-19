@@ -19,8 +19,6 @@
 package org.wso2.carbon.analytics.eventsink.internal.jmx;
 
 /**
- * Created on 6/3/16.
- * <p/>
  * This class will hold event receive count for a stream.
  */
 public class EventReceiverCounter implements EventReceiverCounterMBean {

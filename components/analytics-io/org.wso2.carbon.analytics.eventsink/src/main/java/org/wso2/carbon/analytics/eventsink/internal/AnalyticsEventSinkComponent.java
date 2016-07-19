@@ -87,13 +87,13 @@ public class AnalyticsEventSinkComponent {
         }
         try {
             MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
-            String eventCounterObject = "org.wso2.carbon:00=analytics,01=EVENT_COUNTER";
+            String eventCounterObject = "org.wso2.carbon:00=analytics,01=EVENT_PERSISTENCE_COUNTER";
             ObjectName eventCounterMbean = new ObjectName(eventCounterObject);
             if (!platformMBeanServer.isRegistered(eventCounterMbean)) {
                 EventReceiverCounter counter = new EventReceiverCounter();
                 platformMBeanServer.registerMBean(counter, eventCounterMbean);
             }
-            String queueBufferSize = "org.wso2.carbon:00=analytics,01=RECEIVER_REMAINING_QUEUE_BUFFER_SIZE_IN_BYTES";
+            String queueBufferSize = "org.wso2.carbon:00=analytics,01=RECEIVER_REMAINING_PERSISTENCE_QUEUE_BUFFER_SIZE_IN_BYTES";
             ObjectName queueBufferMbean = new ObjectName(queueBufferSize);
             if (!platformMBeanServer.isRegistered(queueBufferMbean)) {
                 QueueEventBufferSizeCalculator counter = new QueueEventBufferSizeCalculator();

@@ -27,6 +27,7 @@ import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.eventsink.internal.jmx.EventCounter;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkUtil;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
@@ -82,6 +83,7 @@ public class AnalyticsDSConnector {
             //In CEP HA setup the same event will be sent along the cluster, and hence only the leader
             // will need to store the event to avoid the duplicate events stored..
             List<Record> records = this.convertEventsToRecord(tenantId, events);
+            EventCounter.incrementAndGet(events.size());
             startTimeMeasurement();
             ServiceHolder.getAnalyticsDataAPI().put(records);
             endTimeMeasurement(records.size());

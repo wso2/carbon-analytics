@@ -46,7 +46,6 @@ public class AnalyticsWSO2EventConsumer implements WSO2EventConsumer {
     @Override
     public void onEvent(Event event) {
         AnalyticsEventQueueManager.getInstance().put(tenantId, event);
-        EventCounter.incrementAndGet();
     }
 
     @Override
