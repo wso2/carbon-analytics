@@ -1,3 +1,4 @@
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
 
 <!--
@@ -30,7 +31,7 @@
             response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
             return;
         }
-        String scriptName = request.getParameter("scriptName");
+        String scriptName = Encode.forHtmlContent(request.getParameter("scriptName"));
     %>
 
     <script type="text/javascript">

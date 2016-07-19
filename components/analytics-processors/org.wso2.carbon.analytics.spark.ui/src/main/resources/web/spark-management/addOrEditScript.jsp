@@ -24,6 +24,7 @@
 <%@ page import="org.wso2.carbon.analytics.spark.admin.stub.AnalyticsProcessorAdminServiceStub" %>
 <%@ page
         import="org.wso2.carbon.analytics.spark.admin.stub.AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException" %>
+<%@page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -38,8 +39,8 @@
                 (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
         String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
 
-        String scriptName = request.getParameter("scriptName");
-        String editableParam = request.getParameter("editable");
+        String scriptName = Encode.forHtmlContent(request.getParameter("scriptName"));
+        String editableParam = Encode.forHtmlContent(request.getParameter("editable"));
         boolean editable = true;
         if (editableParam != null) {
             editable = Boolean.parseBoolean(editableParam);

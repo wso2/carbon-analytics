@@ -5,6 +5,7 @@
 <%@ page import="org.wso2.carbon.analytics.spark.ui.client.AnalyticsExecutionClient" %>
 <%@ page
         import="org.wso2.carbon.analytics.spark.admin.stub.AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <!--
 ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 ~
@@ -38,7 +39,7 @@
         String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
 
         AnalyticsExecutionClient client = new AnalyticsExecutionClient(cookie, serverURL, configContext);
-        String scriptName = request.getParameter("scriptName");
+        String scriptName = Encode.forHtmlContent(request.getParameter("scriptName"));
         try {
             if(client.isAnalyticsTaskExecuting(scriptName)) {
     %>

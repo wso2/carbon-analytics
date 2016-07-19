@@ -1004,6 +1004,13 @@
                 <version>${siddhi.version}</version>
             </dependency>
 
+            <!--OWASP security bundles-->
+            <dependency>
+                <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
+                <artifactId>encoder</artifactId>
+                <version>${encoder.wso2.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -1362,6 +1369,8 @@
         <hector.version>1.0-5</hector.version>
 
         <spark.sql.version.range>[1.4.2.wso2v1,1.5.0)</spark.sql.version.range>
+
+        <encoder.wso2.version>1.2.0.wso2v1</encoder.wso2.version>
 
     </properties>
 

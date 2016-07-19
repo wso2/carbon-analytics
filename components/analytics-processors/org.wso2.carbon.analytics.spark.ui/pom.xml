@@ -121,6 +121,10 @@
             <artifactId>org.wso2.carbon.analytics.spark.admin</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
+            <artifactId>encoder</artifactId>
+        </dependency>
 
     </dependencies>
 

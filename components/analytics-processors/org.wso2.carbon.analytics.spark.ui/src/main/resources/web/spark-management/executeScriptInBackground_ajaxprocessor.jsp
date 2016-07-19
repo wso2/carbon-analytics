@@ -6,6 +6,7 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.analytics.spark.admin.stub.AnalyticsProcessorAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.analytics.spark.ui.client.AnalyticsExecutionClient" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <!--
 ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -36,8 +37,8 @@
             (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
 
-    String scriptName = request.getParameter("scriptName");
-    String scriptContent = request.getParameter("scriptContent");
+    String scriptName = Encode.forHtmlContent(request.getParameter("scriptName"));
+    String scriptContent = Encode.forHtmlContent(request.getParameter("scriptContent"));
     AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] results = null;
     try {
         AnalyticsExecutionClient client = new AnalyticsExecutionClient(cookie, serverURL, configContext);
