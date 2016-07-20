@@ -118,7 +118,7 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
 
         String gadgetArtifactPath = GadgetTemplateDeployerUtility.getGadgetArtifactPath();
         File destination = new File(gadgetArtifactPath + properties.get(GadgetTemplateDeployerConstants.DIRECTORY_NAME));
-        GadgetTemplateDeployerUtility.validatePath(gadgetArtifactPath, destination.getAbsolutePath());
+        GadgetTemplateDeployerUtility.validatePath(properties.get(GadgetTemplateDeployerConstants.DIRECTORY_NAME));
 
         // Store the directory name for the artifact id
         Registry registry = GadgetTemplateDeployerUtility.getRegistry();
@@ -147,7 +147,7 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
                 .append(File.separator).append(GadgetTemplateDeployerConstants.TEMPLATE_MANAGER).append(File.separator)
                 .append(GadgetTemplateDeployerConstants.GADGET_TEMPLATES).toString();
         File templateDirectory = new File(templateParentDir, properties.get(GadgetTemplateDeployerConstants.TEMPLATE_DIRECTORY));
-        GadgetTemplateDeployerUtility.validatePath(templateParentDir, templateDirectory.getAbsolutePath());
+        GadgetTemplateDeployerUtility.validatePath(properties.get(GadgetTemplateDeployerConstants.TEMPLATE_DIRECTORY));
 
         // Copy all the default templates
         try {
@@ -159,8 +159,8 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
         // Save the artifacts
         for (Map.Entry<String, String> entry : artifacts.entrySet()) {
             String fileName = entry.getKey();
+            GadgetTemplateDeployerUtility.validatePath(fileName);
             File targetFile = new File(destination, fileName);
-            GadgetTemplateDeployerUtility.validatePath(destination.getAbsolutePath(), targetFile.getAbsolutePath());
             FileWriter writer = null;
             try {
                 writer = new FileWriter(targetFile);
@@ -231,7 +231,7 @@ public class GadgetTemplateDeployer implements TemplateDeployer {
                     if (!isSharedGadgetDirectory) {
                         String gadgetArtifactPath = GadgetTemplateDeployerUtility.getGadgetArtifactPath();
                         File destination = new File(gadgetArtifactPath + directory);
-                        GadgetTemplateDeployerUtility.validatePath(gadgetArtifactPath, destination.getAbsolutePath());
+                        GadgetTemplateDeployerUtility.validatePath(directory);
                         try {
                             FileUtils.deleteDirectory(destination);
                         } catch (IOException e) {
