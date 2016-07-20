@@ -19,9 +19,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.template.manager.core.DeployableTemplate;
-import org.wso2.carbon.event.template.manager.core.TemplateManagerService;
 import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.template.manager.core.TemplateDeploymentException;
+import org.wso2.carbon.event.template.manager.core.TemplateManagerService;
 import org.wso2.carbon.event.template.manager.core.exception.TemplateManagerException;
 import org.wso2.carbon.event.template.manager.core.internal.ds.TemplateManagerValueHolder;
 import org.wso2.carbon.event.template.manager.core.internal.util.TemplateManagerConstants;
@@ -38,6 +38,7 @@ import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 
+import javax.script.ScriptEngine;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -63,17 +64,27 @@ public class CarbonTemplateManagerService implements TemplateManagerService {
     public List<String> saveConfiguration(ScenarioConfiguration configuration)
             throws TemplateManagerException {
         try {
-            Domain domain = domains.get(configuration.getDomain());
-            TemplateManagerHelper.saveToRegistry(configuration);
-            TemplateManagerHelper.deployArtifacts(configuration, domain);
-            //If StreamMappings element is present in the Domain, then need to return those Stream IDs,
-            //so the caller (the UI) can prompt the user to map these streams to his own streams.
-            return TemplateManagerHelper.getStreamIDsToBeMapped(configuration, getDomain(configuration.getDomain()));
-        } catch (TemplateDeploymentException e) {
-            TemplateManagerHelper.deleteConfigWithoutUndeploy(configuration.getDomain(), configuration.getName());
-            throw new TemplateManagerException("Failed to save Scenario: " + configuration.getName() + ", for Domain: "
-                                                + configuration.getDomain(), e);
+            Registry registry = TemplateManagerValueHolder.getRegistryService()
+                    .getConfigSystemRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            String resourceCollectionPath = TemplateManagerConstants.TEMPLATE_CONFIG_PATH
+                                            + "/" + configuration.getDomain();
+            String resourcePath = resourceCollectionPath + "/"
+                                  + configuration.getName() + TemplateManagerConstants.CONFIG_FILE_EXTENSION;
+            if (registry.resourceExists(resourcePath)) {
+                throw new TemplateManagerException("Could not edit the Scenario because another scenario with same name '"
+                                                   + configuration.getName() + "' already exists.");
+            }
+            return processSaveConfiguration(configuration);
+        }  catch (RegistryException e) {
+            throw new TemplateManagerException("Could not load the registry for Tenant: " +
+                                               PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true), e);
         }
+    }
+
+    @Override
+    public List<String> editConfiguration(ScenarioConfiguration configuration)
+            throws TemplateManagerException {
+        return processSaveConfiguration(configuration);
     }
 
 
@@ -253,4 +264,20 @@ public class CarbonTemplateManagerService implements TemplateManagerService {
         }
     }
 
+    private List<String> processSaveConfiguration(ScenarioConfiguration configuration) throws TemplateManagerException {
+        try {
+            Domain domain = domains.get(configuration.getDomain());
+            TemplateManagerHelper.saveToRegistry(configuration);
+            // JavaScript ScriptEngine
+            ScriptEngine scriptEngine = TemplateManagerHelper.createJavaScriptEngine(domain);
+            TemplateManagerHelper.deployArtifacts(configuration, domain, scriptEngine);
+            //If StreamMappings element is present in the Domain, then need to return those Stream IDs,
+            //so the caller (the UI) can prompt the user to map these streams to his own streams.
+            return TemplateManagerHelper.getStreamIDsToBeMapped(configuration, getDomain(configuration.getDomain()), scriptEngine);
+        } catch (TemplateDeploymentException e) {
+            TemplateManagerHelper.deleteConfigWithoutUndeploy(configuration.getDomain(), configuration.getName());
+            throw new TemplateManagerException("Failed to save Scenario: " + configuration.getName() + ", for Domain: "
+                                               + configuration.getDomain(), e);
+        }
+    }
 }

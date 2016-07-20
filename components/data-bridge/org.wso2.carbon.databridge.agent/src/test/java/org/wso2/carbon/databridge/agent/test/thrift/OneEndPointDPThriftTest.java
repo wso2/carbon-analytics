@@ -19,6 +19,7 @@ package org.wso2.carbon.databridge.agent.test.thrift;
 
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.wso2.carbon.databridge.agent.AgentHolder;
@@ -43,6 +44,7 @@ public class OneEndPointDPThriftTest {
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private ThriftTestServer thriftTestServer;
+    private String agentConfigFileName = "data-agent-config.xml";
 
 
     private static final String STREAM_DEFN = "{" +
@@ -70,6 +72,13 @@ public class OneEndPointDPThriftTest {
         DataPublisherTestUtil.setTrustStoreParams();
     }
 
+    @AfterClass
+    public static void shop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
+        DataPublisher dataPublisher = new DataPublisher("tcp://localhost:8612",
+                "admin", "admin");
+        dataPublisher.shutdownWithAgent();
+    }
+
     private synchronized void startServer(int port) throws DataBridgeException,
             StreamDefinitionStoreException, MalformedStreamDefinitionException {
         thriftTestServer = new ThriftTestServer();
@@ -81,7 +90,7 @@ public class OneEndPointDPThriftTest {
     @Test
     public void testOneDataEndpoint() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
         startServer(7611);
-        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
+        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7611",
                 "ssl://" + hostName + ":7711", "admin", "admin");
@@ -114,7 +123,7 @@ public class OneEndPointDPThriftTest {
             MalformedStreamDefinitionException, DataBridgeException,
             StreamDefinitionStoreException, SocketException {
         startServer(7621);
-        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
+        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7621, ssl://" + hostName + ":7612",
                 "ssl://" + hostName + ":7721, ssl://" + hostName + ":7712", "admin", "admin");
@@ -140,7 +149,7 @@ public class OneEndPointDPThriftTest {
     @Test
     public void testInvalidAuthenticationURLs() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
         boolean expected = false;
-        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
+        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         try {
             DataPublisher dataPublisher = new DataPublisher("thrift", "tcp://" + hostName + ":7611, ssl://" + hostName + ":7612",
@@ -160,7 +169,7 @@ public class OneEndPointDPThriftTest {
             DataBridgeException,
             StreamDefinitionStoreException, SocketException {
         boolean expected = false;
-        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
+        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         try {
             DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7611",
@@ -174,7 +183,7 @@ public class OneEndPointDPThriftTest {
     @Test
     public void testShutdownDataPublisher() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
         startServer(10161);
-        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
+        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":10161",
                 "ssl://" + hostName + ":10261", "admin", "admin");
@@ -204,13 +213,14 @@ public class OneEndPointDPThriftTest {
         dataPublisher.publish(event);
 
         try {
-            Thread.sleep(5000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
         }
 
         Assert.assertEquals(numberOfEventsSent, thriftTestServer.getNumberOfEventsReceived());
         thriftTestServer.resetReceivedEvents();
         thriftTestServer.stop();
+
     }
 
 }

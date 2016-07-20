@@ -14,6 +14,7 @@
   --%>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib uri="http://www.owasp.org/index.php/Category:OWASP_CSRFGuard_Project/Owasp.CsrfGuard.tld" prefix="csrf" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.receiver.ui.i18n.Resources">
 
@@ -30,7 +31,7 @@
 
     <div id="middle">
         <h2><fmt:message key="available.event.receivers"/></h2>
-        <a href="create_event_receiver.jsp"
+        <a href="create_event_receiver.jsp?<csrf:tokenname/>=<csrf:tokenvalue/>"
            style="background-image:url(images/add.gif);"
            class="icon-link"><fmt:message key="add.event.receiver"/>
         </a>

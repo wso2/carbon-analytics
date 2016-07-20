@@ -24,11 +24,6 @@ import java.io.File;
  */
 public class DataEndpointConstants {
 
-    public static final String YIELDING_WAIT_STRATEGY = "yielding";
-    public static final String SLEEPING_WAITING_STRATEGY = "sleeping";
-    public static final String BUSY_SPIN_WAIT_STRATEGY = "busySpin";
-    public static final String BLOCKING_WAIT_STRATEGY = "blocking";
-
     private DataEndpointConstants() {
     }
 
@@ -44,4 +39,8 @@ public class DataEndpointConstants {
 
     public static final String THRIFT_DATA_AGENT_TYPE = "THRIFT";
     public static final String BINARY_DATA_AGENT_TYPE = "BINARY";
+
+    public static final String SYNC_STRATEGY = "sync";
+    public static final String ASYNC_STRATEGY = "async";
+
 }

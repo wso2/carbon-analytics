@@ -31,7 +31,7 @@ function deleteConfiguration(domainName, configurationName, row, tableId) {
     });
 }
 
-function saveConfiguration(domainName, templateType, configurationName, description, redirectURL, parameters ,isStreamMappingUpdate) {
+function saveConfiguration(isUpdate, domainName, templateType, configurationName, description, redirectURL, parameters ,isStreamMappingUpdate) {
 
     if (hasWhiteSpace(configurationName) | configurationName == "") {
         showErrorDialog("Configuration name cannot be empty or consist of white spaces");
@@ -49,7 +49,7 @@ function saveConfiguration(domainName, templateType, configurationName, descript
         $.ajax({
             type: "POST",
             url: postURL,
-            data: "domainName=" + domainName + "&configurationName=" + configurationName + "&templateType="
+            data: "isUpdate=" + isUpdate + "&domainName=" + domainName + "&configurationName=" + configurationName + "&templateType="
             + templateType + "&description=" + description + "&saveType=save" + "&parameters=" + parameters
         })
             .error(function () {

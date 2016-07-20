@@ -19,13 +19,9 @@ package org.wso2.carbon.databridge.agent.endpoint;
 
 
 import com.lmax.disruptor.BlockingWaitStrategy;
-import com.lmax.disruptor.BusySpinWaitStrategy;
 import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.InsufficientCapacityException;
 import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.SleepingWaitStrategy;
-import com.lmax.disruptor.WaitStrategy;
-import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.apache.commons.logging.Log;
@@ -61,7 +57,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private HAType haType;
 
-    private EventQueue eventQueue;
+    private EventQueue eventQueue = null;
 
     private int reconnectionInterval;
 
@@ -73,9 +69,9 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private ScheduledExecutorService reconnectionService;
 
-    private boolean immediateDispatching = false;
+    private final String publishingStrategy;
 
-    private final String disruptorWaitStrategy;
+    private boolean isShutdown = false;
 
     public enum HAType {
         FAILOVER, LOADBALANCE
@@ -86,9 +82,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         this.haType = haType;
         this.reconnectionService = Executors.newScheduledThreadPool(1, new DataBridgeThreadFactory("ReconnectionService"));
         this.reconnectionInterval = agent.getAgentConfiguration().getReconnectionInterval();
-        this.disruptorWaitStrategy = agent.getAgentConfiguration().getWaitStrategy();
-        this.immediateDispatching = agent.getAgentConfiguration().isImmediateDispatching();
-        this.eventQueue = new EventQueue(agent.getAgentConfiguration().getQueueSize());
+        this.publishingStrategy = agent.getAgentConfiguration().getPublishingStrategy();
+        if (!publishingStrategy.equalsIgnoreCase(DataEndpointConstants.SYNC_STRATEGY)) {
+            this.eventQueue = new EventQueue(agent.getAgentConfiguration().getQueueSize());
+        }
         this.reconnectionService.scheduleAtFixedRate(new ReconnectionTask(), reconnectionInterval,
                 reconnectionInterval, TimeUnit.SECONDS);
         currentDataPublisherIndex.set(START_INDEX);
@@ -101,44 +98,95 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     }
 
     public void tryPublish(Event event) throws EventQueueFullException {
-        eventQueue.tryPut(event);
+        if (eventQueue != null) {
+            eventQueue.tryPut(event);
+        } else if (!isShutdown) {
+            trySyncPublish(event);
+        }
     }
 
     public void tryPublish(Event event, long timeoutMS) throws EventQueueFullException {
-        eventQueue.tryPut(event, timeoutMS);
+        if (eventQueue != null) {
+            eventQueue.tryPut(event, timeoutMS);
+        } else if (!isShutdown) {
+            trySyncPublish(event, timeoutMS);
+        }
     }
 
     public void publish(Event event) {
-        eventQueue.put(event);
+        if (eventQueue != null) {
+            eventQueue.put(event);
+        } else if (!isShutdown) {
+            syncPublish(event);
+        }
+    }
+
+    private void trySyncPublish(Event event) {
+        try {
+            DataEndpoint endpoint = getDataEndpoint(false);
+            if (endpoint != null) {
+                endpoint.syncSend(event);
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("DataEndpoint not available, dropping event : " + event);
+                }
+            }
+        } catch (Throwable t) {
+            log.error("Unexpected error: " + t.getMessage(), t);
+        }
+    }
+
+    private void trySyncPublish(Event event, long timeoutMS) {
+        long stopTime = System.currentTimeMillis() + timeoutMS;
+        while (true) {
+            DataEndpoint endpoint = getDataEndpoint(false);
+            if (endpoint != null) {
+                endpoint.syncSend(event);
+                break;
+            }
+            if (stopTime <= System.currentTimeMillis()) {
+                if (log.isDebugEnabled()) {
+                    log.debug("DataEndpoint not available for  last " + timeoutMS + " ms, dropping event : " + event);
+                }
+                break;
+            }
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException ignored) {
+            }
+        }
+    }
+
+    private void syncPublish(Event event) {
+        try {
+            DataEndpoint endpoint = getDataEndpoint(true);
+            if (endpoint != null) {
+                endpoint.syncSend(event);
+            } else {
+                log.error("Dropping event as DataPublisher is shutting down.");
+                if (log.isDebugEnabled()) {
+                    log.debug("Data publisher is shutting down, dropping event : " + event);
+                }
+            }
+        } catch (Throwable t) {
+            log.error("Unexpected error: " + t.getMessage(), t);
+        }
     }
 
     class EventQueue {
-        private RingBuffer<WrappedEventFactory.WrappedEvent> ringBuffer;
-        private Disruptor<WrappedEventFactory.WrappedEvent> eventQueueDisruptor;
-        private ExecutorService eventQueuePool;
+        private RingBuffer<WrappedEventFactory.WrappedEvent> ringBuffer = null;
+        private Disruptor<WrappedEventFactory.WrappedEvent> eventQueueDisruptor = null;
+        private ExecutorService eventQueuePool = null;
 
         EventQueue(int queueSize) {
-            WaitStrategy waitStrategy;
-            if (disruptorWaitStrategy.equalsIgnoreCase(DataEndpointConstants.YIELDING_WAIT_STRATEGY)) {
-                waitStrategy = new YieldingWaitStrategy();
-            } else if (disruptorWaitStrategy.equalsIgnoreCase(DataEndpointConstants.SLEEPING_WAITING_STRATEGY)) {
-                waitStrategy = new SleepingWaitStrategy();
-            } else if (disruptorWaitStrategy.equalsIgnoreCase(DataEndpointConstants.BUSY_SPIN_WAIT_STRATEGY)) {
-                waitStrategy = new BusySpinWaitStrategy();
-            } else {
-                waitStrategy = new BlockingWaitStrategy();
-            }
             eventQueuePool = Executors.newCachedThreadPool(new DataBridgeThreadFactory("EventQueue"));
-            eventQueueDisruptor = new Disruptor<>(new WrappedEventFactory(), queueSize, eventQueuePool, ProducerType.MULTI, waitStrategy);
-            if (immediateDispatching) {
-                eventQueueDisruptor.handleEventsWith(new EventDispatcher());
-            } else {
-                eventQueueDisruptor.handleEventsWith(new EventQueueWorker());
-            }
+            eventQueueDisruptor = new Disruptor<>(new WrappedEventFactory(), queueSize, eventQueuePool, ProducerType.MULTI, new BlockingWaitStrategy());
+            eventQueueDisruptor.handleEventsWith(new EventQueueWorker());
             this.ringBuffer = eventQueueDisruptor.start();
         }
 
         private void tryPut(Event event) throws EventQueueFullException {
+
             long sequence;
             try {
                 sequence = this.ringBuffer.tryNext(1);
@@ -216,42 +264,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         }
     }
 
-    class EventDispatcher implements EventHandler<WrappedEventFactory.WrappedEvent> {
-
-        @Override
-        public void onEvent(WrappedEventFactory.WrappedEvent wrappedEvent, long sequence, boolean endOfBatch) {
-            try {
-                DataEndpoint endpoint = getDataEndpoint(true);
-                Event event = wrappedEvent.getEvent();
-                if (endpoint != null) {
-                    endpoint.collectAndSendNow(event);
-                    if (endOfBatch) {
-                        flushAllDataEndpointsNow();
-                    }
-                } else {
-                    log.error("Dropping event as DataPublisher is shutting down.");
-                    if (log.isDebugEnabled()) {
-                        log.debug("Data publisher is shutting down, dropping event : " + event);
-                    }
-                }
-            } catch (Throwable t) {
-                log.error("Unexpected error: " + t.getMessage(), t);
-            }
-        }
-    }
-
     private void flushAllDataEndpoints() {
         for (DataEndpoint dataEndpoint : dataEndpoints) {
             if (dataEndpoint.getState().equals(DataEndpoint.State.ACTIVE)) {
                 dataEndpoint.flushEvents();
-            }
-        }
-    }
-
-    private void flushAllDataEndpointsNow() {
-        for (DataEndpoint dataEndpoint : dataEndpoints) {
-            if (dataEndpoint.getState().equals(DataEndpoint.State.ACTIVE)) {
-                dataEndpoint.flushEventsNow();
             }
         }
     }
@@ -349,7 +365,11 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         List<Event> unsuccessfulEvents = trySendActiveEndpoints(events);
         for (Event event : unsuccessfulEvents) {
             try {
-                eventQueue.tryPut(event);
+                if (eventQueue != null) {
+                    eventQueue.tryPut(event);
+                } else {
+                    trySyncPublish(event);
+                }
             } catch (EventQueueFullException e) {
                 log.error("Unable to put the event :" + event, e);
             }
@@ -440,7 +460,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     public void shutdown() {
         reconnectionService.shutdownNow();
-        eventQueue.shutdown();
+        if (eventQueue != null) {
+            eventQueue.shutdown();
+        }
+        isShutdown = true;
         for (DataEndpoint dataEndpoint : dataEndpoints) {
             dataEndpoint.shutdown();
         }

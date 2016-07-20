@@ -37,6 +37,7 @@
             return;
         }
 
+        boolean isUpdate = "true".equals(request.getParameter("isUpdate")) ? true : false;
         String domainName = request.getParameter("domainName");
         String configuration = request.getParameter("configurationName");
         String saveType = request.getParameter("saveType");
@@ -64,14 +65,15 @@
                     parameters = new ConfigurationParameterDTO[0];
 
                 } else {
-                    String[] parameterStrings = parametersJson.split(",");
+                    String[] parameterStrings = parametersJson.split(",\n");
                     parameters = new ConfigurationParameterDTO[parameterStrings.length];
                     int index = 0;
 
                     for (String parameterString : parameterStrings) {
+                        String[] parameterEntities = parameterString.trim().split(valueSeparator);
                         ConfigurationParameterDTO parameterDTO = new ConfigurationParameterDTO();
-                        parameterDTO.setName(parameterString.split(valueSeparator)[0]);
-                        parameterDTO.setValue(parameterString.split(valueSeparator)[1]);
+                        parameterDTO.setName(parameterEntities[0]);
+                        parameterDTO.setValue(parameterEntities[1]);
                         parameters[index] = parameterDTO;
                         index++;
                     }
@@ -80,7 +82,12 @@
                 scenarioConfigurationDTO.setConfigurationParameterDTOs(parameters);
 
                 //toStreamIDArray.length defines the number of stream mappings per configuration
-                String[] toStreamIDArray = proxy.saveConfiguration(scenarioConfigurationDTO);
+                String[] toStreamIDArray;
+                if(isUpdate) {
+                    toStreamIDArray = proxy.editConfiguration(scenarioConfigurationDTO);
+                } else {
+                    toStreamIDArray = proxy.saveConfiguration(scenarioConfigurationDTO);
+                }
 
                 //when stream mapping is disabled, stub returns a string array with a null element hence need to check for toStreamIDArray[0]
                 if (toStreamIDArray[0] != null) {
