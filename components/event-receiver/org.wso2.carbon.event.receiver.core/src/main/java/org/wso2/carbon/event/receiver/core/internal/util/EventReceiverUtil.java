@@ -22,18 +22,14 @@ import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.event.input.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
 import org.wso2.carbon.event.receiver.core.config.InputMapping;
 import org.wso2.carbon.event.receiver.core.config.InputMappingAttribute;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
-import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -338,18 +334,9 @@ public class EventReceiverUtil {
     }
 
 
-    public static void validateFilePath(String file) throws EventReceiverConfigurationException {
-
-        Path baseDirPath = Paths.get(EventAdapterUtil.getAxisConfiguration().getRepository().getPath(), EventReceiverConstants.ER_CONFIG_DIRECTORY);
-        Path path = Paths.get(file);
-        Path resolvedPath = baseDirPath.resolve(path).normalize();
-
-        if (! resolvedPath.startsWith(baseDirPath)) {
-            // If not valid, test for tmp/carbonapps directory
-            baseDirPath = Paths.get(CarbonUtils.getTmpDir(), EventReceiverConstants.TEMP_CARBON_APPS_DIRECTORY);
-            if (! resolvedPath.startsWith(baseDirPath)) {
-                throw new EventReceiverConfigurationException("File name contains restricted path elements. " + file);
-            }
+    public static void validateFilePath(String fileName) throws EventReceiverConfigurationException {
+        if (fileName.contains("../") || fileName.contains("..\\")) {
+            throw new EventReceiverConfigurationException("File name contains restricted path elements. " + fileName);
         }
     }
 
