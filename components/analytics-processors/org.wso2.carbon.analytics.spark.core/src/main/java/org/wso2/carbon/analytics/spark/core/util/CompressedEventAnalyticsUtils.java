@@ -47,7 +47,7 @@ public class CompressedEventAnalyticsUtils {
      * @return              Array of values of the fields in the event
      */
     public static Object[] getFieldValues(List<String> columns, List<Object> event, List<PublishingPayload> payloadsList,
-            int eventIndex, long timestamp, int tenantId, String host) {
+            int eventIndex, long timestamp, int _tenantId, int metaTenantId, String host) {
         Object [] fieldsVals = new Object[columns.size()];
         int eventFieldIndex = 0;
         // Adding component attributes
@@ -56,7 +56,9 @@ public class CompressedEventAnalyticsUtils {
                 if (columns.get(i).equals(AnalyticsConstants.TIMESTAMP_FIELD)) {
                     fieldsVals[i] = timestamp;
                 } else if (columns.get(i).equals(AnalyticsConstants.TENANT_ID_FIELD)) {
-                    fieldsVals[i] = tenantId;
+                    fieldsVals[i] = _tenantId;
+                } else if (columns.get(i).equals(AnalyticsConstants.META_FIELD_TENANT_ID)) {
+                    fieldsVals[i] = metaTenantId;
                 } else if (columns.get(i).equals(AnalyticsConstants.HOST_ATTRIBUTE)) {
                     fieldsVals[i] = host;
                 } else {

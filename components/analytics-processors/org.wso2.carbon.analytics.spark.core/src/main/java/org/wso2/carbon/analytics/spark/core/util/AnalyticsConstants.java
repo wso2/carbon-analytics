@@ -133,6 +133,7 @@ public class AnalyticsConstants {
     public static final String COMPRESSED_EVENT_ANALYTICS_SHORTHAND = "CompressedEventAnalytics";
     public static final String DATA_COLUMN = "flowData";
     public static final String META_FIELD_COMPRESSED = "meta_compressed";
+    public static final String META_FIELD_TENANT_ID = "meta_tenantId";
     public static final String EVENTS_ATTRIBUTE = "events";
     public static final String PAYLOADS_ATTRIBUTE = "payloads";
     public static final String EVENT_INDEX_ATTRIBUTE = "eventIndex";

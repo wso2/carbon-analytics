@@ -196,13 +196,20 @@ public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Seriali
                     AnalyticsConstants.EVENTS_ATTRIBUTE);
                 List<PublishingPayload> payloadsList = (List<PublishingPayload>) aggregatedEvent.get(
                     AnalyticsConstants.PAYLOADS_ATTRIBUTE);
-
-                String host = (String)aggregatedEvent.get(AnalyticsConstants.HOST_ATTRIBUTE);
+                
+                int metaTenantId = 0;
+                if (recordVals.containsKey(AnalyticsConstants.META_FIELD_TENANT_ID)) {
+                    metaTenantId = (int) recordVals.get(AnalyticsConstants.META_FIELD_TENANT_ID);
+                }
+                String host = null;
+                if (aggregatedEvent.containsKey(AnalyticsConstants.HOST_ATTRIBUTE)) {
+                    host = aggregatedEvent.get(AnalyticsConstants.HOST_ATTRIBUTE).toString();
+                }
                 // Iterate over the array of events
                 for (int i = 0; i < eventsList.size(); i++) {
                     // Create a row with extended fields
                     tempRows.add(RowFactory.create(CompressedEventAnalyticsUtils.getFieldValues(this.columns, eventsList.get(i),
-                        payloadsList, i, record.getTimestamp(), record.getTenantId(), host)));
+                        payloadsList, i, record.getTimestamp(), record.getTenantId(), metaTenantId, host)));
                 }
             } else {
                 tempRows.add(RowFactory.create(Collections.emptyList().toArray()));
