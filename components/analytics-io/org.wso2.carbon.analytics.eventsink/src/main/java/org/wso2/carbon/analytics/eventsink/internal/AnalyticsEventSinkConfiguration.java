@@ -49,7 +49,7 @@ public class AnalyticsEventSinkConfiguration {
         this.queueSize = queueSize;
     }
 
-    @XmlElement(name = "BatchSize")
+    @XmlElement(name = "maxBatchSize")
     public int getBatchSize() {
         return batchSize;
     }
@@ -67,7 +67,7 @@ public class AnalyticsEventSinkConfiguration {
         this.workerPoolSize = workerPoolSize;
     }
 
-    @XmlElement(name = "MaxQueueCapacity")
+    @XmlElement(name = "maxQueueCapacity")
     public int getMaxQueueCapacity() {
         return maxQueueCapacity;
     }

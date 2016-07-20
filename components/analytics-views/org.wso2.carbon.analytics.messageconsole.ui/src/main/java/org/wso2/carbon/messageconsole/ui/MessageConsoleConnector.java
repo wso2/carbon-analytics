@@ -94,7 +94,6 @@ public class MessageConsoleConnector {
                                                                                                      new ResponseResultSerializer());
     private static final GsonBuilder RESPONSE_ARBITRARY_FIELD_BUILDER = new GsonBuilder().
             registerTypeAdapter(ResponseArbitraryField.class, new ResponseArbitraryFieldsSerializer());
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
     public static final Type STRING_ARRAY_TYPE = new TypeToken<String[]>() {
     }.getType();
     public static final Type FACET_LIST_TYPE = new TypeToken<List<FacetBean>>() {
@@ -194,7 +193,7 @@ public class MessageConsoleConnector {
                 long startingTime = System.currentTimeMillis();
                 AnalyticsDrillDownRequestBean requestBean = getAnalyticsDrillDownRequestBean(tableName, startIndex, pageSize, searchQuery, facetsList);
                 resultRecordBeans = analyticsWebServiceStub.drillDownSearch(requestBean);
-                long searchCount = new Double(analyticsWebServiceStub.drillDownSearchCount(requestBean)).intValue();
+                long searchCount = (long) analyticsWebServiceStub.drillDownSearchCount(requestBean);
                 responseResult.setSearchTime(System.currentTimeMillis() - startingTime);
                 responseResult.setActualRecordCount(searchCount);
                 if (responseResult.getActualRecordCount() > resultCountLimit) {
@@ -284,12 +283,13 @@ public class MessageConsoleConnector {
     }
 
     private Record getRecord(RecordBean recordBean, boolean withDefaultColumn) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
         Record record = new Record();
         if (recordBean != null) {
             List<Column> columns = new ArrayList<>();
             if (withDefaultColumn) {
                 columns.add(new Column(RECORD_ID, recordBean.getId()));
-                columns.add(new Column(TIMESTAMP, DATE_FORMAT.format(new Date(recordBean.getTimestamp()))));
+                columns.add(new Column(TIMESTAMP, dateFormat.format(new Date(recordBean.getTimestamp()))));
             }
             if (recordBean.getValues() != null) {
                 for (RecordValueEntryBean entityBean : recordBean.getValues()) {
@@ -357,7 +357,7 @@ public class MessageConsoleConnector {
                     primaryKeys = Arrays.asList(tableSchema.getPrimaryKeys());
                 }
                 for (SchemaColumnBean resultColumn : tableSchema.getColumns()) {
-                    ResponseTable.Column column = new ResponseTable().new Column();
+                    ResponseTable.Column column = new ResponseTable.Column();
                     column.setName(resultColumn.getColumnName());
                     column.setType(resultColumn.getColumnType());
                     column.setDisplay(true);
@@ -368,14 +368,14 @@ public class MessageConsoleConnector {
                 }
             }
             // Adding recordId column as a hidden field
-            ResponseTable.Column recordId = new ResponseTable().new Column();
+            ResponseTable.Column recordId = new ResponseTable.Column();
             recordId.setName(RECORD_ID);
             recordId.setPrimary(false);
             recordId.setType("STRING");
             recordId.setDisplay(false);
             recordId.setKey(true);
             columns.add(recordId);
-            ResponseTable.Column timestamp = new ResponseTable().new Column();
+            ResponseTable.Column timestamp = new ResponseTable.Column();
             timestamp.setName(TIMESTAMP);
             timestamp.setPrimary(false);
             timestamp.setType("STRING");

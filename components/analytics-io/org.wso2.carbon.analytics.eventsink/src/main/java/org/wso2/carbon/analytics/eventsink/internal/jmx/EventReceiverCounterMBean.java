@@ -20,8 +20,6 @@
 package org.wso2.carbon.analytics.eventsink.internal.jmx;
 
 /**
- * Created on 6/3/16.
- * <p/>
  * This interface will hold number of events receive for all the stream from server start time.
  */
 public interface EventReceiverCounterMBean {

@@ -19,8 +19,6 @@
 package org.wso2.carbon.analytics.spark.core.internal.jmx;
 
 /**
- * Created on 6/7/16.
- *
  * This interface hold operation to get last script execution time.
  */
 public interface AnalyticsScriptLastExecutionStartTimeMBean {

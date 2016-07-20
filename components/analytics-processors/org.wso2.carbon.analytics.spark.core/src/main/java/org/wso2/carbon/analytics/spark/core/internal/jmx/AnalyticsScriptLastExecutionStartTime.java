@@ -19,7 +19,7 @@
 package org.wso2.carbon.analytics.spark.core.internal.jmx;
 
 /**
- * Created on 6/7/16.
+ * Implementation of the AnalyticsScriptLastExecutionStartTimeMBean interface.
  */
 public class AnalyticsScriptLastExecutionStartTime implements AnalyticsScriptLastExecutionStartTimeMBean {
 

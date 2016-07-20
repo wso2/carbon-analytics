@@ -103,11 +103,11 @@ public class AnalyticsEventQueue {
         }
     }
 
-    public int getCurrentQueueSize() {
-        return currentSize.intValue();
+    public int getRemainingQueueSize() {
+        return (int) this.ringBuffer.remainingCapacity();
     }
 
     public long getRemainingBufferCapacity() {
-        return this.ringBuffer.remainingCapacity();
+        return this.maxSize - this.currentSize.get();
     }
 }

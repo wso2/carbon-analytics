@@ -19,8 +19,6 @@
 package org.wso2.carbon.analytics.eventsink.internal.jmx;
 
 /**
- * Created on 6/6/16.
- * <p/>
  * This interface can use to get remaining queue buffer size for given tenant.
  */
 public interface QueueEventBufferSizeCalculatorMBean {
@@ -39,5 +37,5 @@ public interface QueueEventBufferSizeCalculatorMBean {
      * @param tenantId tenant ID
      * @return Current occupied buffer size.
      */
-    int getCurrentQueueSize(int tenantId);
+    int getRemainingQueueSize(int tenantId);
 }

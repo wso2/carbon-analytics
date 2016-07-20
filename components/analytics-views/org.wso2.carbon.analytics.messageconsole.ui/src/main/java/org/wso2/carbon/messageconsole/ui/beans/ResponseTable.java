@@ -57,7 +57,7 @@ public class ResponseTable {
         this.columns = columns;
     }
 
-    public class Column {
+    public static class Column {
 
         private String name;
         private String type;
