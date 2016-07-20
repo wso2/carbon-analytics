@@ -117,13 +117,11 @@ public class JaggeryappTemplateDeployer implements TemplateDeployer {
         }
         String jaggeryArtifactPath = JaggeryappTemplateDeployerUtility.getJaggeryappArtifactPath();
         File destination = new File(jaggeryArtifactPath + properties.get(JaggeryappTemplateDeployerConstants.DIRECTORY_NAME));
-        JaggeryappTemplateDeployerHelper.validateFilePath(jaggeryArtifactPath, destination.getAbsolutePath());
 
         String templateParentDirectory = new StringBuilder(CarbonUtils.getCarbonConfigDirPath())
                 .append(File.separator).append(JaggeryappTemplateDeployerConstants.TEMPLATE_MANAGER).append(File.separator)
                 .append(JaggeryappTemplateDeployerConstants.JAGGERYAPP_TEMPLATES).append(File.separator).toString();
         File templateDirectory = new File(templateParentDirectory + properties.get(JaggeryappTemplateDeployerConstants.TEMPLATE_DIRECTORY));
-        JaggeryappTemplateDeployerHelper.validateFilePath(templateParentDirectory, templateDirectory.getAbsolutePath());
 
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         try {

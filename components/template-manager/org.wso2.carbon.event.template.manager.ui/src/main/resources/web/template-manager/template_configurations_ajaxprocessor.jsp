@@ -187,7 +187,7 @@
                             }
                     %>
                     <option <%=selectedValue%>
-                            value="template_configurations_ajaxprocessor.jsp?isUpdate=<%=isUpdate%>&configurationName=<%=Encode.forHtmlContent(configurationName)%>&domainName=<%=domainName%>&templateType=<%=scenarioInfoDTO.getType()%>">
+                            value="template_configurations_ajaxprocessor.jsp?isUpdate=<%=isUpdate%>&configurationName=<%=Encode.forHtml(configurationName)%>&domainName=<%=domainName%>&templateType=<%=scenarioInfoDTO.getType()%>">
                         <%=scenarioInfoDTO.getType()%>
                     </option>
                     <%}%>
