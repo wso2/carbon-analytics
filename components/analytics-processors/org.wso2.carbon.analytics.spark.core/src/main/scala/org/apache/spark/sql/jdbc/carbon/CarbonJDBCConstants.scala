@@ -26,6 +26,7 @@ object CarbonJDBCConstants {
   val NUM_PARTITIONS = "numPartitions"
 
   val PRIMARY_KEY_DEF = "PRIMARY KEY"
+  val NOT_NULL_DEF = "NOT NULL"
 
   val SPARK_BINARY_TYPE = "binary"
   val SPARK_BOOLEAN_TYPE = "boolean"

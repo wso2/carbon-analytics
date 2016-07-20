@@ -46,6 +46,8 @@ public class SparkJDBCQueryConfigEntry {
 
     private String quoteMark = "";
 
+    private boolean keyExplicitNotNull = false;
+
     private SparkJDBCTypeMapping sparkJDBCTypeMapping;
 
     public void setDatabaseName(String databaseName) {
@@ -122,6 +124,13 @@ public class SparkJDBCQueryConfigEntry {
         this.quoteMark = quoteMark;
     }
 
+    public boolean isKeyExplicitNotNull() {
+        return keyExplicitNotNull;
+    }
+
+    public void setKeyExplicitNotNull(boolean keyExplicitNotNull) {
+        this.keyExplicitNotNull = keyExplicitNotNull;
+    }
 
     @XmlElement(name = "typeMapping")
     public SparkJDBCTypeMapping getSparkJDBCTypeMapping() {

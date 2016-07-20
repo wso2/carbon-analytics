@@ -113,4 +113,27 @@
             <timestampType>TIMESTAMP</timestampType>
         </typeMapping>
     </database>
+    <database name="DB2.*">
+        <tableCreateQuery>CREATE TABLE {{TABLE_NAME}} ({{COLUMNS, PRIMARY_KEYS}})</tableCreateQuery>
+        <tableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} FETCH FIRST 1 ROWS ONLY</tableCheckQuery>
+        <tableTruncateQuery>TRUNCATE TABLE {{TABLE_NAME}} IMMEDIATE</tableTruncateQuery>
+        <indexCreateQuery>CREATE INDEX {{TABLE_NAME}}_INDEX ON {{TABLE_NAME}} ({{INDEX_COLUMNS}})</indexCreateQuery>
+        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} VALUES ({{Q}})</recordInsertQuery>
+        <recordMergeQuery>MERGE INTO {{TABLE_NAME}} AS dest USING (VALUES({{Q}})) AS src ({{COLUMN}}) ON {{D.KEY=S.KEY}} WHEN MATCHED THEN UPDATE SET {{D.COLUMN=S.COLUMN - KEY}} WHEN NOT MATCHED THEN INSERT ({{COLUMN}}) VALUES ({{S.COLUMN}})</recordMergeQuery>
+        <keyExplicitNotNull>true</keyExplicitNotNull>
+        <typeMapping>
+            <binaryType>BLOB(64000)</binaryType>
+            <booleanType>SMALLINT</booleanType>
+            <byteType>SMALLINT</byteType>
+            <dateType>DATE</dateType>
+            <doubleType>DOUBLE</doubleType>
+            <floatType>REAL</floatType>
+            <integerType>INTEGER</integerType>
+            <longType>BIGINT</longType>
+            <nullType>NULL</nullType>
+            <shortType>SMALLINT</shortType>
+            <stringType>VARCHAR(254)</stringType>
+            <timestampType>TIMESTAMP</timestampType>
+        </typeMapping>
+    </database>
 </spark-jdbc-configuration>

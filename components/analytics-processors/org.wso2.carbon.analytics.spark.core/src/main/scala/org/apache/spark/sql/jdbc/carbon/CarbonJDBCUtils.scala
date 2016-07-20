@@ -150,6 +150,7 @@ object CarbonJDBCUtils {
     val indexStmt = queryConfig.getIndexCreateQuery.replace(TABLE_NAME_PLACEHOLDER, tableName)
     val columns = new StringBuilder
     val indices = new StringBuilder
+    val keys = primaryKeys.split("\\s*,\\s*")
 
     // Appending comma separator as prefixes. Blank string added for first element, separator added to subsequent ones.
     var columnPrefix = EMPTY_STRING
@@ -180,6 +181,9 @@ object CarbonJDBCUtils {
               .append(CLOSE_PARENTHESIS)
           } else {
             columns.append(typeMapping.getStringType)
+          }
+          if (queryConfig.isKeyExplicitNotNull && keys.contains(element._1)) {
+            columns.append(WHITESPACE).append(NOT_NULL_DEF)
           }
         case _ => throw new AnalyticsExecutionException("Unrecognized field type found in schema specification.")
       }
