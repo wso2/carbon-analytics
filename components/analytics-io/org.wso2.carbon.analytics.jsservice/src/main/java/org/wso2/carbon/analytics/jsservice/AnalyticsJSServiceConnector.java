@@ -833,7 +833,7 @@ public class AnalyticsJSServiceConnector {
                 response = getResponseMessage(Constants.Status.SUCCESS, 200, message);
                 break;
             case FAILED:
-                response = getResponseMessage(Constants.Status.FAILED, 500, message);
+                response = getResponseMessage(Constants.Status.FAILED, 400, message);
                 break;
             case INVALID:
                 response = getResponseMessage(Constants.Status.FAILED, 400, message);
@@ -848,7 +848,7 @@ public class AnalyticsJSServiceConnector {
                 response = getResponseMessage(Constants.Status.NON_EXISTENT, 404, message);
                 break;
             default:
-                response = getResponseMessage(Constants.Status.FAILED, 500, message);
+                response = getResponseMessage(Constants.Status.FAILED, 400, message);
                 break;
         }
         return response;
