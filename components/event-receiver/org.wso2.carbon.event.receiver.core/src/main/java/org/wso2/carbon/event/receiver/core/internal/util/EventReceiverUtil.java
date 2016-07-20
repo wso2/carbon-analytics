@@ -353,4 +353,19 @@ public class EventReceiverUtil {
         }
     }
 
+    public static Object convertToAttributeType(String attributeValue, Class beanClass) {
+        if (Integer.class == beanClass) {
+            return Integer.parseInt(attributeValue);
+        } else if (Double.class == beanClass) {
+            return Double.parseDouble(attributeValue);
+        } else if (Long.class == beanClass) {
+            return Long.parseLong(attributeValue);
+        } else if (Boolean.class == beanClass) {
+            return Boolean.parseBoolean(attributeValue);
+        } else if (Float.class == beanClass) {
+            return Float.parseFloat(attributeValue);
+        }
+        return attributeValue;
+    }
+
 }
