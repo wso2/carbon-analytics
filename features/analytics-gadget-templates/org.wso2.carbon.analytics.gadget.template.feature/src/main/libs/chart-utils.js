@@ -33,5 +33,19 @@ var toVizGrammarSchema;
         return schema;
     };
 
+    updateUserPrefXYTypes = function(_schema, chartConfig) {
+        _schema.forEach(function(field) {
+            if(field["fieldName"] == chartConfig.x && chartConfig.xType != "default") {
+                field["fieldType"] = chartConfig.xType;
+            }
+
+            if(field["fieldName"] == chartConfig.y && chartConfig.yType != "default") {
+                field["fieldType"] = chartConfig.yType;
+            }
+        });
+
+        return _schema;
+    };
+
 
 }());
