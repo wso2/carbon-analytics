@@ -182,10 +182,10 @@ object CarbonJDBCUtils {
           } else {
             columns.append(typeMapping.getStringType)
           }
-          if (queryConfig.isKeyExplicitNotNull && keys.contains(element._1)) {
-            columns.append(WHITESPACE).append(NOT_NULL_DEF)
-          }
         case _ => throw new AnalyticsExecutionException("Unrecognized field type found in schema specification.")
+      }
+      if (queryConfig.isKeyExplicitNotNull && keys.contains(element._1)) {
+        columns.append(WHITESPACE).append(NOT_NULL_DEF)
       }
       // populating index list
       if (element._4) {
