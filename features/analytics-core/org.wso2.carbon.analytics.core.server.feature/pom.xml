@@ -126,7 +126,7 @@
                             <adviceFile>
                                 <properties>
                                     <propertyDef>org.wso2.carbon.p2.fieldName.type:server</propertyDef>
-                                    <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
+                                    <propertyDef>org.eclipse.equinox.p2.type.group:true</propertyDef>
                                 </properties>
                             </adviceFile>
                             <bundles>
