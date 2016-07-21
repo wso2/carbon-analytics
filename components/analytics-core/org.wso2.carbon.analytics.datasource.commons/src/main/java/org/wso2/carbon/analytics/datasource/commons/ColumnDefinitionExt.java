@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wso2.carbon.analytics.datasource.commons;
 
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
@@ -50,6 +49,7 @@ public class ColumnDefinitionExt extends ColumnDefinition {
         return new ColumnDefinitionExt(colDef.getName(), colDef.getType(), colDef.isIndexed(), colDef.isScoreParam(), colDef.isFacet());
     }
 
+    @Override
     public boolean isFacet() {
         return isFacet;
     }

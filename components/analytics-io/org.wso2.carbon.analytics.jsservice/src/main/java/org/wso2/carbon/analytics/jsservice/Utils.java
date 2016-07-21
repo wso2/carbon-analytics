@@ -303,9 +303,7 @@ public class Utils {
      * @return
      * @throws UnauthenticatedUserException
      */
-    @SuppressWarnings("unchecked")
     public static String[] authenticate(String authHeader) throws UnauthenticatedUserException{
-
         String credentials[];
         if (authHeader != null && authHeader.startsWith(Constants.BASIC_AUTH_HEADER)) {
             // Authorization: Basic base64credentials
@@ -569,6 +567,7 @@ public class Utils {
         return analyticsAggregateFields;
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Record> createList(AnalyticsIterator<Record> iterator) {
         List<Record> records = new ArrayList<>();
         records.addAll(IteratorUtils.toList(iterator));

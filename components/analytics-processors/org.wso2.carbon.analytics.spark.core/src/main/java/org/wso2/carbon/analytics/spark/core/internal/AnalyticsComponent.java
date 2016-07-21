@@ -28,7 +28,6 @@ import org.wso2.carbon.analytics.spark.core.SparkContextServiceImpl;
 import org.wso2.carbon.analytics.spark.core.SparkScriptCAppDeployer;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 import org.wso2.carbon.analytics.spark.core.interfaces.SparkContextService;
-import org.wso2.carbon.analytics.spark.core.sources.AnalyticsIncrementalMetaStore;
 import org.wso2.carbon.analytics.spark.core.internal.jmx.AnalyticsScriptLastExecutionStartTime;
 import org.wso2.carbon.analytics.spark.core.internal.jmx.IncrementalLastProcessedTimestamp;
 import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
@@ -184,6 +183,7 @@ public class AnalyticsComponent {
         }
     }
 
+    @SuppressWarnings("rawtypes")
     private void addCarbonUDFJarToSparkClasspath(Class carbonUDFClass) {
         String[] jarPath = carbonUDFClass.getProtectionDomain().getCodeSource().getLocation().getPath()
                 .split(File.separatorChar=='\\' ? "\\\\" : File.separator);

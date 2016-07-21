@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.analytics.spark.core.internal;
 
 import org.apache.spark.sql.SQLContext;
@@ -23,9 +22,9 @@ import org.apache.spark.sql.SQLContext;
 import java.util.concurrent.Callable;
 
 /**
- * class which executes queries in separate threads
+ * class which executes queries in separate threads.
  */
-public class QueryExecutionTask implements Callable {
+public class QueryExecutionTask implements Callable<Object> {
     private SQLContext ctx;
     private String query;
 
@@ -38,4 +37,5 @@ public class QueryExecutionTask implements Callable {
     public Object call() throws Exception {
         return ctx.sql(query);
     }
+    
 }
