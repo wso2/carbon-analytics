@@ -23,11 +23,13 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse.Entry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinitionExt;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.ndatasource.core.DataSourceService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -54,6 +56,14 @@ public class AnalyticsDataServiceUtils {
         return result;
     }
     
+    private static Map<String, ColumnDefinitionExt> translate(Map<String, ColumnDefinition> colDefs) {
+        Map<String, ColumnDefinitionExt> result = new HashMap<>(colDefs.size());
+        for (Map.Entry<String, ColumnDefinition> colDef : colDefs.entrySet()) {
+            result.put(colDef.getKey(), ColumnDefinitionExt.copy(colDef.getValue()));
+        }
+        return result;
+    }
+    
     public static AnalyticsSchema createMergedSchema(AnalyticsSchema existingSchema, 
             List<String> primaryKeys, List<ColumnDefinition> columns, List<String> indices) {
         Set<String> newPrimaryKeys;
@@ -63,17 +73,17 @@ public class AnalyticsDataServiceUtils {
             newPrimaryKeys = new HashSet<String>(existingSchema.getPrimaryKeys());
         }
         newPrimaryKeys.addAll(primaryKeys);
-        Map<String, ColumnDefinition> newColumns;
+        Map<String, ColumnDefinitionExt> newColumns;
         if (existingSchema.getColumns() == null) {
             newColumns = new LinkedHashMap<>();
         } else {
-            newColumns = new LinkedHashMap<>(existingSchema.getColumns());
+            newColumns = translate(existingSchema.getColumns());
         }
-        ColumnDefinition targetColumn;
+        ColumnDefinitionExt targetColumn;
         for (ColumnDefinition column : columns) {
             targetColumn = newColumns.get(column.getName());
             if (targetColumn == null) {
-                targetColumn = column;
+                targetColumn = ColumnDefinitionExt.copy(column);
                 newColumns.put(targetColumn.getName(), targetColumn);
             } else {
                 if (column.isIndexed()) {
@@ -94,10 +104,10 @@ public class AnalyticsDataServiceUtils {
                 new ArrayList<String>(newPrimaryKeys));
     }
     
-    public static void processIndex(Map<String, ColumnDefinition> indexedColumns, String index) {
+    public static void processIndex(Map<String, ColumnDefinitionExt> indexedColumns, String index) {
         String[] tokens = index.split(" ");
         String name = tokens[0].trim();
-        ColumnDefinition column = indexedColumns.get(name);
+        ColumnDefinitionExt column = indexedColumns.get(name);
         if (column != null) {
             column.setIndexed(true);
             Set<String> options = new HashSet<String>();

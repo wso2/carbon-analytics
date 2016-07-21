@@ -525,15 +525,17 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             throw new AnalyticsException("Table info data does not exist");
         }
         for (Record record : records) {
-            byte[] data = (byte[]) records.get(0).getValue(TABLE_INFO_DATA_COLUMN);
+            byte[] data = (byte[]) record.getValue(TABLE_INFO_DATA_COLUMN);
             if (data == null) {
-                System.out.println("Corrupted analytics table info with table identity: " + record.getId());
+                System.out.println("Corrupted analytics table info with table identity: " + 
+                        record.getId() + " -> " + record.getValues());
             }
             AnalyticsTableInfo tableInfo;
             try {
                 tableInfo = (AnalyticsTableInfo) GenericUtils.deserializeObject(data);
             } catch (Exception e) {
-                System.out.println("Corrupted analytics table info with table identity: " + record.getId());
+                System.out.println("Corrupted analytics table info with table identity: " + 
+                        record.getId() + " -> " + e.getMessage());
                 continue;
             }
             this.writeTenantId(tableInfo.getTenantId());

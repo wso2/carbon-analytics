@@ -21,7 +21,7 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import java.io.Serializable;
 
 /**
- * This class represents a defintion of a column in an analytics schema.
+ * This class represents a definition of a column in an analytics schema.
  */
 public class ColumnDefinition implements Serializable {
 
@@ -34,8 +34,6 @@ public class ColumnDefinition implements Serializable {
     private boolean indexed;
 
     private boolean scoreParam;
-
-    private boolean isFacet;
     
     public ColumnDefinition() { }
     
@@ -44,19 +42,9 @@ public class ColumnDefinition implements Serializable {
     }
     
     public ColumnDefinition(String name, ColumnType type, boolean indexed, boolean scoreParam) {
-        this(name, type, indexed, scoreParam, false);
-    }
-
-    public ColumnDefinition(String name, ColumnType type, boolean indexed, boolean scoreParam, boolean isFacet) {
         this.name = name;
-        if (type != ColumnType.FACET) {
-            this.type = type;
-            this.isFacet = isFacet;
-        } else { //This is to make backward compatible with DAS 3.0.0 and DAS 3.0.1, see DAS-402
-            this.type = ColumnType.STRING;
-            this.isFacet = true;
-        }
-        this.indexed = indexed || isFacet;
+        this.type = type;
+        this.indexed = indexed || this.isFacet();
         this.scoreParam = scoreParam;
     }
 
@@ -75,7 +63,6 @@ public class ColumnDefinition implements Serializable {
     public void setType(AnalyticsSchema.ColumnType type) {
         if (type == ColumnType.FACET) {
             this.type = ColumnType.STRING;
-            this.isFacet = true;
         }
         this.type = type;
     }
@@ -85,7 +72,6 @@ public class ColumnDefinition implements Serializable {
     }
 
     public void setIndexed(boolean indexed) {
-
         if (this.isFacet()) { //This is to make backward compatible with DAS 3.0.0 and DAS 3.0.1, see DAS-402
             this.indexed = true;
             return;
@@ -102,11 +88,7 @@ public class ColumnDefinition implements Serializable {
     }
 
     public boolean isFacet() {
-        return isFacet;
-    }
-
-    public void setFacet(boolean isFacet) {
-        this.isFacet = isFacet;
+        return ColumnType.FACET.equals(this.type);
     }
 
     @Override
@@ -124,4 +106,5 @@ public class ColumnDefinition implements Serializable {
                this.isIndexed() == rhs.isIndexed() && this.isScoreParam() == rhs.isScoreParam() &&
                this.isFacet() == rhs.isFacet();
     }
+    
 }

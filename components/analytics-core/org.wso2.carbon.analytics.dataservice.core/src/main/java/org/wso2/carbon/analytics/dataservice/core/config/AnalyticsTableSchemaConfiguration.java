@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.dataservice.core.config;
 
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinitionExt;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -45,7 +46,7 @@ public class AnalyticsTableSchemaConfiguration {
        List<ColumnDefinition> schemaColumns = new ArrayList<>();
         if (columnDefinitions != null) {
             for (AnalyticsColumnDefinition schemaColumn : columnDefinitions) {
-                ColumnDefinition columnDefinition = new ColumnDefinition();
+                ColumnDefinitionExt columnDefinition = new ColumnDefinitionExt();
                 columnDefinition.setName(schemaColumn.getColumnName());
                 columnDefinition.setIndexed(schemaColumn.isIndexed());
                 columnDefinition.setScoreParam(schemaColumn.isScoreParam());

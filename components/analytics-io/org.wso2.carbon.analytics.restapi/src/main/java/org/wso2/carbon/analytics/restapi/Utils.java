@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinitionExt;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.restapi.beans.AggregateFieldBean;
@@ -363,7 +364,7 @@ public class Utils {
      * @return ColumnType instance
      */
     private static ColumnDefinition getColumnType(String name, ColumnDefinitionBean columnDefinitionBean) {
-        ColumnDefinition columnDefinition = new ColumnDefinition();
+        ColumnDefinitionExt columnDefinition = new ColumnDefinitionExt();
         switch (columnDefinitionBean.getType()) {
             case STRING:
                 columnDefinition.setType(AnalyticsSchema.ColumnType.STRING);

@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.eventsink.internal.util;
 
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinitionExt;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventStore;
 import org.wso2.carbon.analytics.eventsink.AnalyticsTableSchema;
@@ -55,7 +56,7 @@ public class AnalyticsEventSinkUtil {
         List<ColumnDefinition> schemaColumns = new ArrayList<>();
         if (columns != null) {
             for (AnalyticsTableSchema.Column schemaColumn : columns) {
-                ColumnDefinition columnDefinition = new ColumnDefinition();
+                ColumnDefinitionExt columnDefinition = new ColumnDefinitionExt();
                 columnDefinition.setName(schemaColumn.getColumnName());
                 columnDefinition.setIndexed(schemaColumn.isIndexed());
                 columnDefinition.setScoreParam(schemaColumn.isScoreParam());

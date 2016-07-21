@@ -30,6 +30,7 @@ import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinitionExt;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.jsservice.beans.AggregateField;
@@ -118,7 +119,7 @@ public class Utils {
         List<ColumnDefinition> columnDefinitions = new ArrayList<>();
         if (columnBeans != null) {
             for (Map.Entry<String, ColumnDefinitionBean> columnBean : columnBeans.entrySet()) {
-                ColumnDefinition columnDefinition = new ColumnDefinition(columnBean.getKey(),
+                ColumnDefinitionExt columnDefinition = new ColumnDefinitionExt(columnBean.getKey(),
                                                                          getColumnType(columnBean.getValue().getType()),
                                                                          columnBean.getValue().isIndex(),
                                                                          columnBean.getValue().isScoreParam(),

@@ -25,6 +25,7 @@ import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinitionExt;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.webservice.beans.AggregateResponse;
@@ -531,7 +532,7 @@ public class Utils {
         }
         if (columnBeans != null) {
             for (SchemaColumnBean columnBean : columnBeans) {
-                ColumnDefinition columnDefinition = new ColumnDefinition(columnBean.getColumnName(),
+                ColumnDefinitionExt columnDefinition = new ColumnDefinitionExt(columnBean.getColumnName(),
                     getColumnType(columnBean.getColumnType()), columnBean.isIndex(), columnBean.isScoreParam(), columnBean.isFacet());
                 //To make backward compatible with DAS 3.0.0 and DAS 3.0.1, see DAS-402
                 if (columnBean.getColumnType().equalsIgnoreCase(RecordValueEntryBean.FACET)) {

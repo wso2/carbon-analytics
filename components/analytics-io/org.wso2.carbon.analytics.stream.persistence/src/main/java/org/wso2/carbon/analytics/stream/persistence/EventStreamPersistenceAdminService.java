@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinitionExt;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventStore;
 import org.wso2.carbon.analytics.stream.persistence.dto.AnalyticsTable;
@@ -234,7 +235,7 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
     }
 
     private ColumnDefinition getColumnDefinition(AnalyticsTableRecord analyticsTableRecord) {
-        ColumnDefinition columnDefinition = new ColumnDefinition();
+        ColumnDefinitionExt columnDefinition = new ColumnDefinitionExt();
         columnDefinition.setName(analyticsTableRecord.getColumnName());
         if ("FACET".equals(analyticsTableRecord.getColumnType())) {
             columnDefinition.setFacet(true);

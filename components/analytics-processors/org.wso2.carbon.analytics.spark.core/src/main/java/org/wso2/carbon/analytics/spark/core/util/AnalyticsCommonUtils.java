@@ -30,6 +30,7 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinitionExt;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
@@ -343,7 +344,7 @@ public class AnalyticsCommonUtils {
                         if (tokens[2].equalsIgnoreCase(AnalyticsDataServiceUtils.OPTION_IS_INDEXED)) { // if indexed
                             //This is to be backward compatible with DAS 3.0.1 and DAS 3.0.0, DAS-402
                             if (tokens[1].toLowerCase().equalsIgnoreCase(AnalyticsConstants.FACET_TYPE)) {
-                                resList.add(new ColumnDefinition(tokens[0], type, true, false, true));
+                                resList.add(new ColumnDefinitionExt(tokens[0], type, true, false, true));
                             } else {
                                 resList.add(new ColumnDefinition(tokens[0], type, true, false));
                             }
@@ -354,7 +355,7 @@ public class AnalyticsCommonUtils {
                                 throw new AnalyticsExecutionException("Score-param assigned to a non-numeric ColumnType");
                             }
                         } else if (tokens[2].equalsIgnoreCase(AnalyticsDataServiceUtils.OPTION_IS_FACET)) { // if facet,
-                            resList.add(new ColumnDefinition(tokens[0], type, true, false, true));
+                            resList.add(new ColumnDefinitionExt(tokens[0], type, true, false, true));
 
                         } else {
                             throw new AnalyticsExecutionException("Invalid option for ColumnType");
@@ -365,10 +366,10 @@ public class AnalyticsCommonUtils {
                         indexOptions.addAll(Arrays.asList(tokens[2], tokens[3]));
                         if (indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_FACET) && // if score param and facet
                             indexOptions.contains(AnalyticsDataServiceUtils.OPTION_SCORE_PARAM)) {
-                            resList.add(new ColumnDefinition(tokens[0], type, true, true, true));
+                            resList.add(new ColumnDefinitionExt(tokens[0], type, true, true, true));
                         } else if (indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_FACET) &&  //if facet and index
                                    indexOptions.contains(AnalyticsDataServiceUtils.OPTION_IS_INDEXED)) {
-                            resList.add(new ColumnDefinition(tokens[0], type, true, false, true));
+                            resList.add(new ColumnDefinitionExt(tokens[0], type, true, false, true));
                         } else {
                             throw new AnalyticsExecutionException("Invalid option for ColumnType");
                         }
