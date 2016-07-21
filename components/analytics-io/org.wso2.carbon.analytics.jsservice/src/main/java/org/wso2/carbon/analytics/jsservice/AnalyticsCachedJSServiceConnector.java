@@ -76,6 +76,17 @@ public class AnalyticsCachedJSServiceConnector extends AnalyticsJSServiceConnect
         }
         return result;
     }
+
+    @Override
+    public ResponseBean getRecordCount(int tenantId, String tableName) {
+        String cacheItemId = this.calculateCacheItemId("getRecordCount", tableName);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.getRecordCount(tenantId, tableName);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
     
     @Override
     public ResponseBean getRecordsByRange(String username, String tableName, String timeFrom, String timeTo, String recordsFrom,
@@ -84,6 +95,18 @@ public class AnalyticsCachedJSServiceConnector extends AnalyticsJSServiceConnect
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
             result = super.getRecordsByRange(username, tableName, timeFrom, timeTo, recordsFrom, count, columns);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+
+    @Override
+    public ResponseBean getRecordsByRange(int tenantId, String tableName, String timeFrom, String timeTo, String recordsFrom,
+                                          String count, String columns) {
+        String cacheItemId = this.calculateCacheItemId("getRecordsByRange", tableName, timeFrom, timeTo, recordsFrom, count, columns);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.getRecordsByRange(tenantId, tableName, timeFrom, timeTo, recordsFrom, count, columns);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
@@ -99,13 +122,35 @@ public class AnalyticsCachedJSServiceConnector extends AnalyticsJSServiceConnect
         }
         return result;
     }
-    
+
+    @Override
+    public ResponseBean getWithKeyValues(int tenantId, String tableName, String valuesBatch) {
+        String cacheItemId = this.calculateCacheItemId("getWithKeyValues", tableName, valuesBatch);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.getWithKeyValues(tenantId, tableName, valuesBatch);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+
     @Override
     public ResponseBean getRecordsByIds(String username, String tableName, String idsAsString) {
         String cacheItemId = this.calculateCacheItemId("getRecordsByIds", tableName, idsAsString);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
             result = super.getRecordsByIds(username, tableName, idsAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+
+    @Override
+    public ResponseBean getRecordsByIds(int tenantId, String tableName, String idsAsString) {
+        String cacheItemId = this.calculateCacheItemId("getRecordsByIds", tableName, idsAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.getRecordsByIds(tenantId, tableName, idsAsString);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
@@ -121,13 +166,35 @@ public class AnalyticsCachedJSServiceConnector extends AnalyticsJSServiceConnect
         }
         return result;
     }
-    
+
+    @Override
+    public ResponseBean search(int tenantId, String tableName, String queryAsString) {
+        String cacheItemId = this.calculateCacheItemId("search", tableName, queryAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.search(tenantId, tableName, queryAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+
     @Override
     public ResponseBean searchWithAggregates(String username, String tableName, String requestAsString) {
         String cacheItemId = this.calculateCacheItemId("searchWithAggregates", tableName, requestAsString);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
             result = super.searchWithAggregates(username, tableName, requestAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+
+    @Override
+    public ResponseBean searchWithAggregates(int tenantId, String tableName, String requestAsString) {
+        String cacheItemId = this.calculateCacheItemId("searchWithAggregates", tableName, requestAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.searchWithAggregates(tenantId, tableName, requestAsString);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
@@ -143,7 +210,18 @@ public class AnalyticsCachedJSServiceConnector extends AnalyticsJSServiceConnect
         }
         return result;
     }
-    
+
+    @Override
+    public ResponseBean searchMultiTablesWithAggregates(int tenantId, String requestAsString) {
+        String cacheItemId = this.calculateCacheItemId("searchMultiTablesWithAggregates", requestAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.searchMultiTablesWithAggregates(tenantId, requestAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+
     @Override
     public ResponseBean searchCount(String username, String tableName, String queryAsString) {
         String cacheItemId = this.calculateCacheItemId("searchCount", tableName, queryAsString);
@@ -154,7 +232,18 @@ public class AnalyticsCachedJSServiceConnector extends AnalyticsJSServiceConnect
         }
         return result;
     }
-    
+
+    @Override
+    public ResponseBean searchCount(int tenantId, String tableName, String queryAsString) {
+        String cacheItemId = this.calculateCacheItemId("searchCount", tableName, queryAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.searchCount(tenantId, tableName, queryAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+
     @Override
     public ResponseBean getTableSchema(String username, String tableName) {
         String cacheItemId = this.calculateCacheItemId("getTableSchema", tableName);
@@ -165,7 +254,18 @@ public class AnalyticsCachedJSServiceConnector extends AnalyticsJSServiceConnect
         }
         return result;
     }
-    
+
+    @Override
+    public ResponseBean getTableSchema(int tenantId, String tableName) {
+        String cacheItemId = this.calculateCacheItemId("getTableSchema", tableName);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.getTableSchema(tenantId, tableName);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+
     @Override
     public ResponseBean isPaginationSupported(String recordStoreName) {
         String cacheItemId = this.calculateCacheItemId("isPaginationSupported", recordStoreName);
@@ -176,13 +276,24 @@ public class AnalyticsCachedJSServiceConnector extends AnalyticsJSServiceConnect
         }
         return result;
     }
-    
+
     @Override
     public ResponseBean drillDownCategories(String username, String tableName, String queryAsString) {
         String cacheItemId = this.calculateCacheItemId("drillDownCategories", tableName, queryAsString);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
             result = super.drillDownCategories(username, tableName, queryAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+
+    @Override
+    public ResponseBean drillDownCategories(int tenantId, String tableName, String queryAsString) {
+        String cacheItemId = this.calculateCacheItemId("drillDownCategories", tableName, queryAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.drillDownCategories(tenantId, tableName, queryAsString);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
@@ -198,13 +309,35 @@ public class AnalyticsCachedJSServiceConnector extends AnalyticsJSServiceConnect
         }
         return result;
     }
-    
+
+    @Override
+    public ResponseBean drillDownSearch(int tenantId, String tableName, String queryAsString) {
+        String cacheItemId = this.calculateCacheItemId("drillDownSearch", tableName, queryAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.drillDownSearch(tenantId, tableName, queryAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+
     @Override
     public ResponseBean drillDownSearchCount(String username, String tableName, String queryAsString) {
         String cacheItemId = this.calculateCacheItemId("drillDownSearchCount", tableName, queryAsString);
         ResponseBean result = this.lookupCachedValue(cacheItemId);
         if (result == null) {
             result = super.drillDownSearchCount(username, tableName, queryAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+
+    @Override
+    public ResponseBean drillDownSearchCount(int tenantId, String tableName, String queryAsString) {
+        String cacheItemId = this.calculateCacheItemId("drillDownSearchCount", tableName, queryAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.drillDownSearchCount(tenantId, tableName, queryAsString);
             this.setCachedValue(cacheItemId, result);
         }
         return result;
@@ -220,7 +353,18 @@ public class AnalyticsCachedJSServiceConnector extends AnalyticsJSServiceConnect
         }
         return result;
     }
-    
+
+    @Override
+    public ResponseBean drillDownRangeCount(int tenantId, String tableName, String queryAsString) {
+        String cacheItemId = this.calculateCacheItemId("drillDownRangeCount", tableName, queryAsString);
+        ResponseBean result = this.lookupCachedValue(cacheItemId);
+        if (result == null) {
+            result = super.drillDownRangeCount(tenantId, tableName, queryAsString);
+            this.setCachedValue(cacheItemId, result);
+        }
+        return result;
+    }
+
     /**
      * This represents the cache used to hold the data.
      */

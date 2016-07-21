@@ -87,22 +87,37 @@ public class AnalyticsJSServiceConnector {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking tableExists for table: " + tableName);
         }
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
         try {
-            boolean tableExists = analyticsDataAPI.tableExists(username, tableName);
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.tableExists(tenantId, tableName);
+        } catch (UserStoreException e) {
+            logger.error("Failed to check the existance of the table: " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to check the existence of table: " +
+                    tableName + ": " + e.getMessage());
+        }
+    }
+
+    public ResponseBean tableExists(int tenantId, String tableName) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking tableExists for table: " + tableName);
+        }
+        try {
+            boolean tableExists = analyticsDataAPI.tableExists(tenantId, tableName);
             if (logger.isDebugEnabled()) {
-                logger.debug("Table's Existance : " + tableExists);
+                logger.debug("Table's Existence : " + tableExists);
             }
             if (!tableExists) {
-                return handleResponse(ResponseStatus.NON_EXISTENT,
-                                      "Table : " + tableName + " does not exist.");
+                return handleResponse(ResponseStatus.NON_EXISTENT, "Table : " + tableName + " does not exist.");
             }
         } catch (AnalyticsException e) {
             logger.error("Failed to check the existance of the table: " + e.getMessage(), e);
-            return handleResponse(ResponseStatus.FAILED, "Failed to check the existance of table: " +
-                                                         tableName + ": " + e.getMessage());
+            return handleResponse(ResponseStatus.FAILED, "Failed to check the existence of table: " +
+                    tableName + ": " + e.getMessage());
         }
-        return handleResponse(ResponseStatus.SUCCESS,
-                              "Table : " + tableName + " exists.");
+        return handleResponse(ResponseStatus.SUCCESS, "Table : " + tableName + " exists.");
     }
 
     /*This is for tenant specific functionalities. Given the tenant user, start the tenant flow and
@@ -112,22 +127,21 @@ public class AnalyticsJSServiceConnector {
         // get super tenant context and get realm service which is an osgi service
         RealmService realmService = (RealmService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
-        boolean tenantFlowStarted = false;
         try {
-            if (realmService != null) {
-                int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
-                tenantFlowStarted = Utils.startTenantFlow(tenantId);
-            }
-            return this.getStreamDefinition(requestAsString);
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return getStreamDefinition(tenantId, requestAsString);
         } catch (UserStoreException e) {
             logger.error("Failed to add the stream definition: " + e.getMessage(), e);
             return handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
                                                          ": " + e.getMessage());
-        } finally {
-            if (tenantFlowStarted) {
-                PrivilegedCarbonContext.endTenantFlow();
-            }
         }
+    }
+
+    public ResponseBean getStreamDefinition(int tenantId, String requestAsString) {
+        Utils.startTenantFlow(tenantId);
+        ResponseBean streamDefinition = this.getStreamDefinition(requestAsString);
+        PrivilegedCarbonContext.endTenantFlow();
+        return streamDefinition;
     }
 
     public ResponseBean getStreamDefinition(String requestAsString) {
@@ -173,9 +187,22 @@ public class AnalyticsJSServiceConnector {
     }
 
     public ResponseBean getTableList(String username) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.getTableList(tenantId);
+        } catch (UserStoreException e) {
+            logger.error("Unable to get table list:" + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Unable to get table list: " + e.getMessage());
+        }
+    }
+
+    public ResponseBean getTableList(int tenantId) {
         List<String> tableList;
         try {
-            tableList = analyticsDataAPI.listTables(username);
+            tableList = analyticsDataAPI.listTables(tenantId);
         } catch (Exception e) {
             logger.error("Unable to get table list:" + e.getMessage(), e);
             return handleResponse(ResponseStatus.FAILED, "Unable to get table list: " + e.getMessage());
@@ -207,13 +234,27 @@ public class AnalyticsJSServiceConnector {
     }
 
     public ResponseBean getRecordStoreByTable(String username, String tableName) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.getRecordStoreByTable(tenantId, tableName);
+        } catch (UserStoreException e) {
+            logger.error("Unable to get recordStore for table '" + tableName + "': " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Unable to get recordStore for table '" + tableName +
+                    "': " + e.getMessage());
+        }
+    }
+
+    public ResponseBean getRecordStoreByTable(int tenantId, String tableName) {
         String recordStore;
         try {
-            recordStore = analyticsDataAPI.getRecordStoreNameByTable(username, tableName);
+            recordStore = analyticsDataAPI.getRecordStoreNameByTable(tenantId, tableName);
         } catch (Exception e) {
             logger.error("Unable to get recordStore for table '" + tableName + "': " + e.getMessage(), e);
             return handleResponse(ResponseStatus.FAILED, "Unable to get recordStore for table '" + tableName +
-                                                         "': " + e.getMessage());
+                    "': " + e.getMessage());
         }
         if (recordStore == null) {
             if (logger.isDebugEnabled()) {
@@ -225,11 +266,25 @@ public class AnalyticsJSServiceConnector {
     }
 
     public ResponseBean getRecordCount(String username, String tableName) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.getRecordCount(tenantId, tableName);
+        } catch (UserStoreException e) {
+            logger.error("Failed to get record count for table: " + tableName + ": " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to get record count for table: " +
+                    tableName + ": " + e.getMessage());
+        }
+    }
+
+    public ResponseBean getRecordCount(int tenantId, String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getRecordCount for tableName: " + tableName);
         }
         try {
-            long recordCount = analyticsDataAPI.getRecordCount(username, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
+            long recordCount = analyticsDataAPI.getRecordCount(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
             if (logger.isDebugEnabled()) {
                 logger.debug("RecordCount for tableName: " + tableName + " is " + recordCount);
             }
@@ -237,12 +292,27 @@ public class AnalyticsJSServiceConnector {
         } catch (Exception e) {
             logger.error("Failed to get record count for table: " + tableName + ": " + e.getMessage(), e);
             return handleResponse(ResponseStatus.FAILED, "Failed to get record count for table: " +
-                                                         tableName + ": " + e.getMessage());
+                    tableName + ": " + e.getMessage());
         }
     }
 
     public ResponseBean getRecordsByRange(String username, String tableName, String timeFrom, String timeTo, String recordsFrom,
                                     String count, String columns) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.getRecordsByRange(tenantId, tableName, timeFrom, timeTo, recordsFrom, count, columns);
+        } catch (UserStoreException e) {
+            logger.error("failed to get records from table: '" + tableName + "', " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
+                    tableName + "', " + e.getMessage());
+        }
+    }
+
+    public ResponseBean getRecordsByRange(int tenantId, String tableName, String timeFrom, String timeTo, String recordsFrom,
+                                          String count, String columns) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getRecordByRange for tableName: " + tableName);
         }
@@ -256,10 +326,10 @@ public class AnalyticsJSServiceConnector {
             }.getType();
             List<String> columnList = gson.fromJson(columns, columnType);
             columnList = (columnList == null || columnList.isEmpty()) ? null : columnList;
-            response = analyticsDataAPI.get(username, tableName, 1, columnList,
-                                                                              from, to, start, recordCount);
+            response = analyticsDataAPI.get(tenantId, tableName, 1, columnList,
+                    from, to, start, recordCount);
             List<Record> records;
-            if (!analyticsDataAPI.isPaginationSupported(analyticsDataAPI.getRecordStoreNameByTable(username, tableName))) {
+            if (!analyticsDataAPI.isPaginationSupported(analyticsDataAPI.getRecordStoreNameByTable(tenantId, tableName))) {
                 Iterator<org.wso2.carbon.analytics.datasource.commons.Record> itr =
                         AnalyticsDataServiceUtils.responseToIterator(analyticsDataAPI, response);
                 records = new ArrayList<>();
@@ -277,11 +347,25 @@ public class AnalyticsJSServiceConnector {
         } catch (Exception e) {
             logger.error("failed to get records from table: '" + tableName + "', " + e.getMessage(), e);
             return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
-                                                         tableName + "', " + e.getMessage());
+                    tableName + "', " + e.getMessage());
         }
     }
 
     public ResponseBean getWithKeyValues(String username, String tableName, String valuesBatch) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.getWithKeyValues(tenantId, tableName, valuesBatch);
+        } catch (UserStoreException e) {
+            logger.error("failed to get records from table: '" + tableName + "', " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
+                    tableName + "', " + e.getMessage());
+        }
+    }
+
+    public ResponseBean getWithKeyValues(int tenantId, String tableName, String valuesBatch) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getRecordByRange for tableName: " + tableName);
         }
@@ -291,8 +375,8 @@ public class AnalyticsJSServiceConnector {
                 ColumnKeyValueBean columnKeyValueBean = gson.fromJson(valuesBatch, ColumnKeyValueBean.class);
                 List<Map<String, Object>> valueBatchList = columnKeyValueBean.getValueBatches();
                 if (valueBatchList != null && !valueBatchList.isEmpty()) {
-                    response = analyticsDataAPI.getWithKeyValues(username, tableName, 1, columnKeyValueBean.getColumns(),
-                                                                 columnKeyValueBean.getValueBatches());
+                    response = analyticsDataAPI.getWithKeyValues(tenantId, tableName, 1, columnKeyValueBean.getColumns(),
+                            columnKeyValueBean.getValueBatches());
                     List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, response);
                     return handleResponse(ResponseStatus.SUCCESS, gson.toJson(Utils.getRecordBeans(records)));
                 } else {
@@ -304,7 +388,7 @@ public class AnalyticsJSServiceConnector {
         } catch (Exception e) {
             logger.error("failed to get records from table: '" + tableName + "', " + e.getMessage(), e);
             return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
-                                                         tableName + "', " + e.getMessage());
+                    tableName + "', " + e.getMessage());
         }
     }
 
@@ -317,6 +401,20 @@ public class AnalyticsJSServiceConnector {
     }
 
     public ResponseBean getRecordsByIds(String username, String tableName, String idsAsString) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.getRecordsByIds(tenantId, tableName, idsAsString);
+        } catch (UserStoreException e) {
+            logger.error("failed to get records from table: " + tableName + " : " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: " +
+                    tableName + ": " + e.getMessage());
+        }
+    }
+
+    public ResponseBean getRecordsByIds(int tenantId, String tableName, String idsAsString) {
         if (idsAsString != null && !idsAsString.isEmpty()) {
             IdsWithColumnsBean bean = new IdsWithColumnsBean();
             try {
@@ -341,13 +439,13 @@ public class AnalyticsJSServiceConnector {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Invoking getRecordsByIds for tableName: " + tableName);
                 }
-                AnalyticsDataResponse response = analyticsDataAPI.get(username, tableName, 1, bean.getColumns(), bean.getIds());
+                AnalyticsDataResponse response = analyticsDataAPI.get(tenantId, tableName, 1, bean.getColumns(), bean.getIds());
                 List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, response);
                 return handleResponse(ResponseStatus.SUCCESS, gson.toJson(Utils.getRecordBeans(records)));
             } catch (Exception e) {
                 logger.error("failed to get records from table: " + tableName + " : " + e.getMessage(), e);
                 return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: " +
-                                                             tableName + ": " + e.getMessage());
+                        tableName + ": " + e.getMessage());
             }
         } else {
             return handleResponse(ResponseStatus.FAILED, "Id list is empty");
@@ -355,45 +453,74 @@ public class AnalyticsJSServiceConnector {
     }
 
     public ResponseBean clearIndexData(String username, String tableName) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.clearIndexData(tenantId, tableName);
+        } catch (UserStoreException e) {
+            logger.error("Failed to clear indices for table: " + tableName + ": " + e.getMessage());
+            return handleResponse(ResponseStatus.FAILED, "Failed to clear indices for table: " +
+                    tableName + ": " + e.getMessage());
+        }
+    }
+
+    public ResponseBean clearIndexData(int tenantId, String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking clearIndexData for tableName : " +
-                         tableName);
+                    tableName);
         }
         try {
-            analyticsDataAPI.clearIndexData(username, tableName);
+            analyticsDataAPI.clearIndexData(tenantId, tableName);
             return handleResponse(ResponseStatus.SUCCESS, "Successfully cleared indices in table: " +
-                                                          tableName);
+                    tableName);
         } catch (Exception e) {
             logger.error("Failed to clear indices for table: " + tableName + ": " + e.getMessage());
             return handleResponse(ResponseStatus.FAILED, "Failed to clear indices for table: " +
-                                                         tableName + ": " + e.getMessage());
+                    tableName + ": " + e.getMessage());
         }
     }
 
     public ResponseBean search(String username, String tableName, String queryAsString) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.search(tenantId, tableName, queryAsString);
+        } catch (UserStoreException e) {
+            logger.error("Failed to perform search on table: " + tableName + " : " +
+                    e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED,
+                    "Failed to perform search on table: " + tableName + ": " + e.getMessage());
+        }
+    }
+
+    public ResponseBean search(int tenantId, String tableName, String queryAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking search for tableName : " + tableName);
         }
         if (queryAsString != null && !queryAsString.isEmpty()) {
             try {
                 QueryBean queryBean = gson.fromJson(queryAsString, QueryBean.class);
-                List<SearchResultEntry> searchResults = analyticsDataAPI.search(username, tableName, queryBean.getQuery(),
-                                                                            queryBean.getStart(),
-                                                                            queryBean.getCount(),
-                                                                            Utils.getSortedFields(queryBean.getSortBy()));
-                List<RecordBean> recordBeans = getRecordBeans(username, tableName, queryBean.getColumns(), searchResults);
+                List<SearchResultEntry> searchResults = analyticsDataAPI.search(tenantId, tableName, queryBean.getQuery(),
+                        queryBean.getStart(),
+                        queryBean.getCount(),
+                        Utils.getSortedFields(queryBean.getSortBy()));
+                List<RecordBean> recordBeans = getRecordBeans(tenantId, tableName, queryBean.getColumns(), searchResults);
                 if (logger.isDebugEnabled()) {
                     for (RecordBean record : recordBeans) {
                         logger.debug("Search Result -- Record Id: " + record.getId() + " values :" +
-                                     record.toString());
+                                record.toString());
                     }
                 }
                 return handleResponse(ResponseStatus.SUCCESS, gson.toJson(recordBeans));
             } catch (Exception e) {
                 logger.error("Failed to perform search on table: " + tableName + " : " +
-                             e.getMessage(), e);
+                        e.getMessage(), e);
                 return handleResponse(ResponseStatus.FAILED,
-                                      "Failed to perform search on table: " + tableName + ": " + e.getMessage());
+                        "Failed to perform search on table: " + tableName + ": " + e.getMessage());
             }
         } else {
             return handleResponse(ResponseStatus.FAILED, "Search parameters are not provided");
@@ -401,6 +528,22 @@ public class AnalyticsJSServiceConnector {
     }
 
     public ResponseBean searchWithAggregates(String username, String tableName, String requestAsString) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.searchWithAggregates(tenantId, tableName, requestAsString);
+        } catch (UserStoreException e) {
+            logger.error("Failed to perform search with aggregate on table: " + tableName + " : " +
+                    e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED,
+                    "Failed to perform search with aggregate on table: " + tableName + ": " +
+                            e.getMessage());
+        }
+    }
+
+    public ResponseBean searchWithAggregates(int tenantId, String tableName, String requestAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking search with aggregate for tableName : " + tableName);
         }
@@ -408,21 +551,21 @@ public class AnalyticsJSServiceConnector {
             try {
                 AggregateRequestBean aggregateRequest = gson.fromJson(requestAsString, AggregateRequestBean.class);
                 AggregateRequest request = Utils.getAggregateRequest(aggregateRequest, tableName);
-                List<Record> records = Utils.createList(analyticsDataAPI.searchWithAggregates(username, request));
+                List<Record> records = Utils.createList(analyticsDataAPI.searchWithAggregates(tenantId, request));
                 List<RecordBean> recordBeans = Utils.getRecordBeans(records);
                 if (logger.isDebugEnabled()) {
                     for (RecordBean record : recordBeans) {
                         logger.debug("Search Result -- Record Id: " + record.getId() + " values :" +
-                                     record.toString());
+                                record.toString());
                     }
                 }
                 return handleResponse(ResponseStatus.SUCCESS, gson.toJson(recordBeans));
             } catch (Exception e) {
                 logger.error("Failed to perform search with aggregate on table: " + tableName + " : " +
-                             e.getMessage(), e);
+                        e.getMessage(), e);
                 return handleResponse(ResponseStatus.FAILED,
-                                      "Failed to perform search with aggregate on table: " + tableName + ": " +
-                                      e.getMessage());
+                        "Failed to perform search with aggregate on table: " + tableName + ": " +
+                                e.getMessage());
             }
         } else {
             return handleResponse(ResponseStatus.FAILED, "Search parameters are not provided");
@@ -430,21 +573,36 @@ public class AnalyticsJSServiceConnector {
     }
 
     public ResponseBean searchMultiTablesWithAggregates(String username, String requestsAsString) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.searchMultiTablesWithAggregates(tenantId, requestsAsString);
+        } catch (UserStoreException e) {
+            logger.error("Failed to perform search with aggregate on multiple tables: " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED,
+                    "Failed to perform search with aggregate on multiple tables: " + e.getMessage());
+        }
+    }
+
+    public ResponseBean searchMultiTablesWithAggregates(int tenantId, String requestsAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking search with aggregate for multiple tables");
         }
         if (requestsAsString != null && !requestsAsString.isEmpty()) {
             try {
-                Type aggregateRequestsType = new TypeToken<AggregateRequestBean[]>(){}.getType();
+                Type aggregateRequestsType = new TypeToken<AggregateRequestBean[]>() {
+                }.getType();
                 AggregateRequestBean[] aggregateRequests = gson.fromJson(requestsAsString, aggregateRequestsType);
                 AggregateRequest[] requests = Utils.getAggregateRequests(aggregateRequests);
-                List<AnalyticsIterator<Record>> iterators = analyticsDataAPI.searchWithAggregates(username, requests);
+                List<AnalyticsIterator<Record>> iterators = analyticsDataAPI.searchWithAggregates(tenantId, requests);
                 List<List<RecordBean>> aggregatedRecords = Utils.getAggregatedRecordsForMultipleTables(iterators);
                 if (logger.isDebugEnabled()) {
                     for (List<RecordBean> recordsPerTable : aggregatedRecords) {
                         for (RecordBean recordBean : recordsPerTable) {
                             logger.debug("Search Result -- Record Id: " + recordBean.getId() + " values :" +
-                                         recordBean.toString());
+                                    recordBean.toString());
                         }
                     }
                 }
@@ -452,7 +610,7 @@ public class AnalyticsJSServiceConnector {
             } catch (Exception e) {
                 logger.error("Failed to perform search with aggregate on multiple tables: " + e.getMessage(), e);
                 return handleResponse(ResponseStatus.FAILED,
-                                      "Failed to perform search with aggregate on multiple tables: " + e.getMessage());
+                        "Failed to perform search with aggregate on multiple tables: " + e.getMessage());
             }
         } else {
             return handleResponse(ResponseStatus.FAILED, "Search parameters are not provided");
@@ -460,6 +618,21 @@ public class AnalyticsJSServiceConnector {
     }
 
     public ResponseBean reIndex(String username, String tableName, String startTime, String endTime) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.reIndex(tenantId, tableName, startTime, endTime);
+        } catch (UserStoreException e) {
+            logger.error("Failed to re-index records for table: " + tableName +
+                    " : " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED,
+                    " Failed to re-index records for table: " + tableName + ": " + e.getMessage());
+        }
+    }
+
+    public ResponseBean reIndex(int tenantId, String tableName, String startTime, String endTime) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking re-index for tableName : " + tableName);
         }
@@ -467,13 +640,13 @@ public class AnalyticsJSServiceConnector {
             try {
                 long start = Long.parseLong(startTime);
                 long end = Long.parseLong(endTime);
-                analyticsDataAPI.reIndex(username, tableName, start, end);
+                analyticsDataAPI.reIndex(tenantId, tableName, start, end);
                 return handleResponse(ResponseStatus.SUCCESS, "Re-Indexing...");
             } catch (Exception e) {
                 logger.error("Failed to re-index records for table: " + tableName +
-                             " : " + e.getMessage(), e);
+                        " : " + e.getMessage(), e);
                 return handleResponse(ResponseStatus.FAILED,
-                                      " Failed to re-index records for table: " + tableName + ": " + e.getMessage());
+                        " Failed to re-index records for table: " + tableName + ": " + e.getMessage());
             }
         } else {
             return handleResponse(ResponseStatus.FAILED, " Search parameters not provided");
@@ -481,22 +654,37 @@ public class AnalyticsJSServiceConnector {
     }
 
     public ResponseBean searchCount(String username, String tableName, String queryAsString) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.searchCount(tenantId, tableName, queryAsString);
+        } catch (UserStoreException e) {
+            logger.error("Failed to get the record count for table: " + tableName +
+                    " : " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED,
+                    " Failed to get the record count for table: " + tableName + ": " + e.getMessage());
+        }
+    }
+
+    public ResponseBean searchCount(int tenantId, String tableName, String queryAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking search count for tableName : " + tableName);
         }
         if (queryAsString != null && !queryAsString.isEmpty()) {
             try {
                 QueryBean queryBean = gson.fromJson(queryAsString, QueryBean.class);
-                int result = analyticsDataAPI.searchCount(username, tableName, queryBean.getQuery());
+                int result = analyticsDataAPI.searchCount(tenantId, tableName, queryBean.getQuery());
                 if (logger.isDebugEnabled()) {
                     logger.debug("Search count : " + result);
                 }
                 return handleResponse(ResponseStatus.SUCCESS, gson.toJson(result));
             } catch (Exception e) {
                 logger.error("Failed to get the record count for table: " + tableName +
-                             " : " + e.getMessage(), e);
+                        " : " + e.getMessage(), e);
                 return handleResponse(ResponseStatus.FAILED,
-                                      " Failed to get the record count for table: " + tableName + ": " + e.getMessage());
+                        " Failed to get the record count for table: " + tableName + ": " + e.getMessage());
             }
         } else {
             return handleResponse(ResponseStatus.FAILED, " Search parameters not provided");
@@ -518,20 +706,48 @@ public class AnalyticsJSServiceConnector {
     }
 
     public ResponseBean waitForIndexingForTable(String username, String tableName, long seconds) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.waitForIndexingForTable(tenantId, tableName, seconds);
+        } catch (UserStoreException e) {
+            logger.error("Failed to wait till indexing finishes: " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED,
+                    "Failed to wait till indexing finishes: " + e.getMessage());
+        }
+    }
+
+    public ResponseBean waitForIndexingForTable(int tenantId, String tableName, long seconds) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking waiting for indexing - timeout : " + seconds + " seconds for table: " + tableName);
         }
         try {
-            analyticsDataAPI.waitForIndexing(username, tableName, seconds * Constants.MILLISECONDSPERSECOND);
+            analyticsDataAPI.waitForIndexing(tenantId, tableName, seconds * Constants.MILLISECONDSPERSECOND);
             return handleResponse(ResponseStatus.SUCCESS, "Indexing Completed successfully");
         } catch (Exception e) {
             logger.error("Failed to wait till indexing finishes: " + e.getMessage(), e);
             return handleResponse(ResponseStatus.FAILED,
-                                  "Failed to wait till indexing finishes: " + e.getMessage());
+                    "Failed to wait till indexing finishes: " + e.getMessage());
         }
     }
 
     public String setTableSchema(String username, String tableName, String schemaAsString) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.setTableSchema(tenantId, tableName, schemaAsString);
+        } catch (UserStoreException e) {
+            logger.error("Failed to set the table schema for table: " + tableName + " : " + e.getMessage(), e);
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, " Failed to set table schema for table: " +
+                    tableName + ": " + e.getMessage()));
+        }
+    }
+
+    public String setTableSchema(int tenantId, String tableName, String schemaAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking setTableSchema for tableName : " + tableName);
         }
@@ -540,13 +756,13 @@ public class AnalyticsJSServiceConnector {
                 AnalyticsSchemaBean analyticsSchemaBean = gson.fromJson(schemaAsString, AnalyticsSchemaBean.class);
                 AnalyticsSchema
                         analyticsSchema = Utils.getAnalyticsSchema(analyticsSchemaBean);
-                analyticsDataAPI.setTableSchema(username, tableName, analyticsSchema);
+                analyticsDataAPI.setTableSchema(tenantId, tableName, analyticsSchema);
                 return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "Successfully set table schema for table: "
-                                                                          + tableName));
+                        + tableName));
             } catch (Exception e) {
                 logger.error("Failed to set the table schema for table: " + tableName + " : " + e.getMessage(), e);
                 return gson.toJson(handleResponse(ResponseStatus.FAILED, " Failed to set table schema for table: " +
-                                                                         tableName + ": " + e.getMessage()));
+                        tableName + ": " + e.getMessage()));
             }
         } else {
             return gson.toJson(handleResponse(ResponseStatus.FAILED, "Table schema is not provided"));
@@ -554,18 +770,32 @@ public class AnalyticsJSServiceConnector {
     }
 
     public ResponseBean getTableSchema(String username, String tableName) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.getTableSchema(tenantId, tableName);
+        } catch (UserStoreException e) {
+            logger.error("Failed to get the table schema for table: " + tableName + " : " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to get the table schema for table: " +
+                    tableName + ": " + e.getMessage());
+        }
+    }
+
+    public ResponseBean getTableSchema(int tenantId, String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getTableSchema for table : " + tableName);
         }
         try {
             AnalyticsSchema
-                    analyticsSchema = analyticsDataAPI.getTableSchema(username, tableName);
+                    analyticsSchema = analyticsDataAPI.getTableSchema(tenantId, tableName);
             AnalyticsSchemaBean analyticsSchemaBean = Utils.createTableSchemaBean(analyticsSchema);
             return handleResponse(ResponseStatus.SUCCESS, gson.toJson(analyticsSchemaBean));
         } catch (Exception e) {
             logger.error("Failed to get the table schema for table: " + tableName + " : " + e.getMessage(), e);
             return handleResponse(ResponseStatus.FAILED, "Failed to get the table schema for table: " +
-                                                         tableName + ": " + e.getMessage());
+                    tableName + ": " + e.getMessage());
         }
     }
 
@@ -587,38 +817,70 @@ public class AnalyticsJSServiceConnector {
     }
 
     public ResponseBean drillDownCategories(String username, String tableName, String queryAsString) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.drillDownCategories(tenantId, tableName, queryAsString);
+        } catch (UserStoreException e) {
+            logger.error("Failed to perform categoryDrilldown on table: " + tableName + " : " +
+                    e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED,
+                    "Failed to perform Category Drilldown on table: " +
+                            tableName + ": " + e.getMessage());
+        }
+    }
+
+    public ResponseBean drillDownCategories(int tenantId, String tableName, String queryAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drillDownCategories for tableName : " + tableName);
         }
         if (queryAsString != null && !queryAsString.isEmpty()) {
             try {
                 CategoryDrillDownRequestBean queryBean =
-                         gson.fromJson(queryAsString, CategoryDrillDownRequestBean.class);
+                        gson.fromJson(queryAsString, CategoryDrillDownRequestBean.class);
                 CategoryDrillDownRequest requestBean =
                         Utils.createCategoryDrillDownRequest(tableName, queryBean);
                 SubCategories searchResults =
-                        analyticsDataAPI.drillDownCategories(username, requestBean);
+                        analyticsDataAPI.drillDownCategories(tenantId, requestBean);
                 SubCategoriesBean subCategories = Utils.getSubCategories(searchResults);
                 if (logger.isDebugEnabled()) {
                     logger.debug("DrilldownCategory Result -- path: " + Arrays.toString(subCategories.getCategoryPath()) +
-                                 " values :" + subCategories.getCategories());
+                            " values :" + subCategories.getCategories());
 
                 }
                 return handleResponse(ResponseStatus.SUCCESS, gson.toJson(subCategories));
             } catch (Exception e) {
                 logger.error("Failed to perform categoryDrilldown on table: " + tableName + " : " +
-                             e.getMessage(), e);
+                        e.getMessage(), e);
                 return handleResponse(ResponseStatus.FAILED,
-                                      "Failed to perform Category Drilldown on table: " +
-                                      tableName + ": " + e.getMessage());
+                        "Failed to perform Category Drilldown on table: " +
+                                tableName + ": " + e.getMessage());
             }
         } else {
             return handleResponse(ResponseStatus.FAILED, "Category drilldown parameters " +
-                                                         "are not provided");
+                    "are not provided");
         }
     }
 
     public ResponseBean drillDownSearch(String username, String tableName, String queryAsString) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.drillDownSearch(tenantId, tableName, queryAsString);
+        } catch (UserStoreException e) {
+            logger.error("Failed to perform DrilldownSearch on table: " + tableName + " : " +
+                    e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED,
+                    "Failed to perform DrilldownSearch on table: " +
+                            tableName + ": " + e.getMessage());
+        }
+    }
+
+    public ResponseBean drillDownSearch(int tenantId, String tableName, String queryAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drillDownSearch for tableName : " + tableName);
         }
@@ -629,29 +891,45 @@ public class AnalyticsJSServiceConnector {
                 AnalyticsDrillDownRequest request =
                         Utils.createDrillDownSearchRequest(tableName, queryBean);
                 List<SearchResultEntry> searchResults =
-                        analyticsDataAPI.drillDownSearch(username, request);
-                List<RecordBean> recordBeans = getRecordBeans(username, tableName, queryBean.getColumns(), searchResults);
+                        analyticsDataAPI.drillDownSearch(tenantId, request);
+                List<RecordBean> recordBeans = getRecordBeans(tenantId, tableName, queryBean.getColumns(), searchResults);
                 if (logger.isDebugEnabled()) {
                     for (RecordBean record : recordBeans) {
                         logger.debug("Drilldown Search Result -- Record Id: " + record.getId() + " values :" +
-                                     record.toString());
+                                record.toString());
                     }
                 }
                 return handleResponse(ResponseStatus.SUCCESS, gson.toJson(recordBeans));
             } catch (Exception e) {
                 logger.error("Failed to perform DrilldownSearch on table: " + tableName + " : " +
-                             e.getMessage(), e);
+                        e.getMessage(), e);
                 return handleResponse(ResponseStatus.FAILED,
-                                      "Failed to perform DrilldownSearch on table: " +
-                                      tableName + ": " + e.getMessage());
+                        "Failed to perform DrilldownSearch on table: " +
+                                tableName + ": " + e.getMessage());
             }
         } else {
             return handleResponse(ResponseStatus.FAILED, "drilldownSearch parameters " +
-                                                         "are not provided");
+                    "are not provided");
         }
     }
 
     public ResponseBean drillDownRangeCount(String username, String tableName, String queryAsString) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.drillDownRangeCount(tenantId, tableName, queryAsString);
+        } catch (UserStoreException e) {
+            logger.error("Failed to perform DrilldownRangeCount on table: " + tableName + " : " +
+                    e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED,
+                    "Failed to perform DrilldownRangeCount on table: " +
+                            tableName + ": " + e.getMessage());
+        }
+    }
+
+    public ResponseBean drillDownRangeCount(int tenantId, String tableName, String queryAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drillDownRangeCount for tableName : " + tableName);
         }
@@ -662,40 +940,56 @@ public class AnalyticsJSServiceConnector {
                 AnalyticsDrillDownRequest request =
                         Utils.createDrillDownSearchRequest(tableName, queryBean);
                 List<AnalyticsDrillDownRange> searchResults =
-                        analyticsDataAPI.drillDownRangeCount(username, request);
+                        analyticsDataAPI.drillDownRangeCount(tenantId, request);
                 List<DrillDownRangeBean> ranges = Utils.getDrilldownRangeBean(searchResults);
                 if (logger.isDebugEnabled()) {
                     for (DrillDownRangeBean rangeBean : ranges) {
                         logger.debug("Drilldown Range count Result -- Range Label: " + rangeBean.getLabel() + " from :" +
-                                     rangeBean.getFrom() + " to : " + rangeBean.getTo() + " score : " + rangeBean.getCount());
+                                rangeBean.getFrom() + " to : " + rangeBean.getTo() + " score : " + rangeBean.getCount());
                     }
                 }
                 return handleResponse(ResponseStatus.SUCCESS, gson.toJson(ranges));
             } catch (Exception e) {
                 logger.error("Failed to perform DrilldownRangeCount on table: " + tableName + " : " +
-                             e.getMessage(), e);
+                        e.getMessage(), e);
                 return handleResponse(ResponseStatus.FAILED,
-                                      "Failed to perform DrilldownRangeCount on table: " +
-                                      tableName + ": " + e.getMessage());
+                        "Failed to perform DrilldownRangeCount on table: " +
+                                tableName + ": " + e.getMessage());
             }
         } else {
             return handleResponse(ResponseStatus.FAILED, "drilldownRangeCount parameters " +
-                                                         "are not provided");
+                    "are not provided");
         }
     }
 
-    private List<RecordBean> getRecordBeans(String username, String tableName, List<String> columns,
+    private List<RecordBean> getRecordBeans(int tenantId, String tableName, List<String> columns,
                                             List<SearchResultEntry> searchResults)
             throws AnalyticsException {
         List<String> ids = Utils.getIds(searchResults);
         List<String> requiredColumns = (columns == null || columns.isEmpty()) ? null : columns;
-        AnalyticsDataResponse response = analyticsDataAPI.get(username, tableName, 1, requiredColumns, ids);
+        AnalyticsDataResponse response = analyticsDataAPI.get(tenantId, tableName, 1, requiredColumns, ids);
         List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, response);
         Map<String, RecordBean> recordBeanMap = Utils.getRecordBeanKeyedWithIds(records);
         return Utils.getSortedRecordBeans(recordBeanMap, searchResults);
     }
 
     public ResponseBean drillDownSearchCount(String username, String tableName, String queryAsString) {
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        RealmService realmService = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return this.drillDownSearchCount(tenantId, tableName, queryAsString);
+        } catch (UserStoreException e) {
+            logger.error("Failed to perform DrilldownSearch Count on table: " + tableName + " : " +
+                    e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED,
+                    "Failed to perform DrilldownSearch Count on table: " +
+                            tableName + ": " + e.getMessage());
+        }
+    }
+
+    public ResponseBean drillDownSearchCount(int tenantId, String tableName, String queryAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drillDownCategories for tableName : " + tableName);
         }
@@ -706,21 +1000,21 @@ public class AnalyticsJSServiceConnector {
                 AnalyticsDrillDownRequest requestBean =
                         Utils.createDrillDownSearchRequest(tableName, queryBean);
                 double count =
-                        analyticsDataAPI.drillDownSearchCount(username, requestBean);
+                        analyticsDataAPI.drillDownSearchCount(tenantId, requestBean);
                 if (logger.isDebugEnabled()) {
                     logger.debug("Search count Result -- Record Count: " + count);
                 }
                 return handleResponse(ResponseStatus.SUCCESS, gson.toJson(count));
             } catch (Exception e) {
                 logger.error("Failed to perform DrilldownSearch Count on table: " + tableName + " : " +
-                             e.getMessage(), e);
+                        e.getMessage(), e);
                 return handleResponse(ResponseStatus.FAILED,
-                                      "Failed to perform DrilldownSearch Count on table: " +
-                                      tableName + ": " + e.getMessage());
+                        "Failed to perform DrilldownSearch Count on table: " +
+                                tableName + ": " + e.getMessage());
             }
         } else {
             return handleResponse(ResponseStatus.FAILED, "drilldownSearch parameters " +
-                                                         "are not provided");
+                    "are not provided");
         }
     }
 
@@ -747,6 +1041,14 @@ public class AnalyticsJSServiceConnector {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
+    }
+
+    public ResponseBean addStreamDefinition(int tenantId, String streamDefAsString) {
+        Utils.startTenantFlow(tenantId);
+        ResponseBean responseBean = this.addStreamDefinition(streamDefAsString);
+        PrivilegedCarbonContext.endTenantFlow();
+        return responseBean;
+
     }
 
     public ResponseBean addStreamDefinition(String streamDefAsString) {
@@ -793,6 +1095,13 @@ public class AnalyticsJSServiceConnector {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
+    }
+
+    public ResponseBean publishEvent(int tenantId, String eventAsString) {
+        Utils.startTenantFlow(tenantId);
+        ResponseBean responseBean = this.publishEvent(eventAsString);
+        PrivilegedCarbonContext.endTenantFlow();
+        return responseBean;
     }
 
     public ResponseBean publishEvent(String eventAsString) {
