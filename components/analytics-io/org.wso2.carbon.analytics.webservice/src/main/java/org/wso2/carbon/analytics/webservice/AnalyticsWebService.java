@@ -15,7 +15,6 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-
 package org.wso2.carbon.analytics.webservice;
 
 import org.apache.commons.logging.Log;
@@ -68,8 +67,8 @@ import java.util.Map;
  * This will expose some methods in the AnalyticsDataAPI as a web service methods.
  */
 public class AnalyticsWebService extends AbstractAdmin {
+    
     private static final Log logger = LogFactory.getLog(AnalyticsWebService.class);
-    private static final int DEFAULT_NUM_PARTITIONS_HINT = 1;
     private AnalyticsDataAPI analyticsDataAPI;
     private EventStreamService eventStreamService;
     private static final String AT_SIGN = "@";
@@ -215,7 +214,6 @@ public class AnalyticsWebService extends AbstractAdmin {
     public RecordBean[] searchWithAggregates(AnalyticsAggregateRequest request)
             throws AnalyticsWebServiceException {
         try {
-
             AggregateRequest aggregateRequest = Utils.getAggregateRequest(request);
             AnalyticsIterator<Record> iterator= analyticsDataAPI.searchWithAggregates(getUsername(), aggregateRequest);
             List<RecordBean> recordBeans = Utils.createRecordBeans(Utils.createList(iterator));

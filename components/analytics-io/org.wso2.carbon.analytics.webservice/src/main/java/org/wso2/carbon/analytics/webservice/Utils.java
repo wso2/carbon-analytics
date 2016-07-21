@@ -597,7 +597,8 @@ public class Utils {
         return  aggregateFields;
     }
 
-    public static List createList(AnalyticsIterator<Record> iterator) {
+    @SuppressWarnings("unchecked")
+    public static List<Record> createList(AnalyticsIterator<Record> iterator) {
         List<Record> records = new ArrayList<>();
         records.addAll(IteratorUtils.toList(iterator));
         return records;

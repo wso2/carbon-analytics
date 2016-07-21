@@ -104,6 +104,12 @@ public class AnalyticsDataBackupTool {
                 .create(BATCH_SIZE));
         return options;
     }
+    
+    private static void checkAndSetv301MigrationFlag(CommandLine line) {
+        if (line.hasOption(MIGRATE_TABLE_SCHEMA_V30TO31)) {
+            AnalyticsDataServiceImpl.setInitIndexedTableStore(false);
+        }
+    }
 
     public static void main(String[] args) throws Exception {
         // Set $CARBON_HOME
@@ -118,6 +124,7 @@ public class AnalyticsDataBackupTool {
         }
         AnalyticsDataService service = null;
         try {
+            checkAndSetv301MigrationFlag(line);
             service = AnalyticsServiceHolder.getAnalyticsDataService();
             int tenantId = Integer.parseInt(line.getOptionValue(TENANT_ID, "" + MultitenantConstants.SUPER_TENANT_ID));
             Long timeTo = getTime(line, TIMETO);
@@ -467,7 +474,6 @@ public class AnalyticsDataBackupTool {
     private static void migrateTablesV30ToV31(AnalyticsDataService dataService) throws AnalyticsException {
         System.out.println("Starting Analytics Table Migration from v3.x to v3.1+");
         AnalyticsDataServiceImpl ads = ((AnalyticsDataServiceImpl) dataService);
-        AnalyticsDataServiceImpl.setInitIndexedTableStore(false);
         ads.convertTableInfoFromv30Tov31();
         System.out.println("Analytics Table Migration done.");
     }
