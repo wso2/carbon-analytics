@@ -26,7 +26,7 @@ import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 /**
- * Created by niranda on 6/24/15.
+ * Execution all for check elected leader
  */
 public class CheckElectedLeaderExecutionCall implements Callable<Boolean>, Serializable{
 
