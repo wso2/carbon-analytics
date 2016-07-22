@@ -96,6 +96,7 @@ var getConfig, validate, isProviderRequired, draw, update;
         var conf = {};
         conf.x = _chartConfig.x;
         conf.charts = [];
+        conf.maxLength = _chartConfig.maxLength;
         conf.charts[0] = {
             type : "map",
             y: _chartConfig.y,
