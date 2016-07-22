@@ -14,6 +14,7 @@
  */
 package org.wso2.carbon.event.receiver.core.internal.type.xml;
 
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.util.AXIOMUtil;
@@ -242,24 +243,32 @@ public class XMLInputMapper implements InputMapper {
             for (XPathData xpathData : attributeXpathList) {
                 AXIOMXPath xpath = xpathData.getXpath();
                 OMElement omElementResult = null;
+                OMAttribute omAttributeResult = null;
+                Object returnedObj = null;
                 String type = xpathData.getType();
                 try {
                     if (omNamespace != null) {
                         xpath.addNamespaces(eventOMElement);
                     }
-                    omElementResult = (OMElement) xpath.selectSingleNode(eventOMElement);
+                    Object element = xpath.selectSingleNode(eventOMElement);
                     Class<?> beanClass = Class.forName(type);
-                    Object returnedObj = null;
-                    if (omElementResult != null) {
+                    if (element instanceof OMElement) {
+                        omElementResult = (OMElement) element;
                         if (omElementResult.getFirstElement() != null) {
                             returnedObj = omElementResult.toString();
                         } else {
                             returnedObj = BeanUtil.deserialize(beanClass,
                                     omElementResult, reflectionBasedObjectSupplier, null);
                         }
+                    } else if (element instanceof OMAttribute) {
+                        omAttributeResult = (OMAttribute) element;
+                        if (omAttributeResult.getAttributeValue() != null) {
+                            returnedObj = EventReceiverUtil.convertToAttributeType(omAttributeResult.getAttributeValue(), beanClass);
+                        }
+                    } else {
+                        throw new EventReceiverProcessingException("Parsed xpath didn't return an attribute or an element!");
                     }
-
-                    if (omElementResult == null || returnedObj == null) {
+                    if (returnedObj == null) {
                         if (xpathData.getDefaultValue() != null) {
                             if (!beanClass.equals(String.class)) {
                                 Class<?> stringClass = String.class;

@@ -24,8 +24,6 @@ import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class GadgetTemplateDeployerUtility {
 
@@ -62,18 +60,11 @@ public class GadgetTemplateDeployerUtility {
     /**
      * Validate the given file path is in the parent directory itself.
      *
-     * @param parentDirectory
-     * @param filePath
+     * @param fileName
      */
-    public static void validatePath(String parentDirectory, String filePath) throws GadgetTemplateDeployerException {
-        Path parentPath = Paths.get(parentDirectory);
-        Path subPath = Paths.get(filePath).normalize();
-        if (!subPath.startsWith(parentPath)) {
-            // If not valid, test for tmp/carbonapps directory
-            parentPath = Paths.get(CarbonUtils.getTmpDir(), GadgetTemplateDeployerConstants.TEMP_CARBON_APPS_DIRECTORY);
-            if (!subPath.startsWith(parentPath)) {
-                throw new GadgetTemplateDeployerException("File path is invalid: " + filePath);
-            }
+    public static void validatePath(String fileName) throws GadgetTemplateDeployerException {
+        if (fileName.contains("../") || fileName.contains("..\\")) {
+            throw new GadgetTemplateDeployerException("File name contains restricted path elements. " + fileName);
         }
     }
 }

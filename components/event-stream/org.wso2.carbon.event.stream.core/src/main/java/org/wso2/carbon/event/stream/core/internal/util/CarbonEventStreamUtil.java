@@ -19,27 +19,16 @@
 package org.wso2.carbon.event.stream.core.internal.util;
 
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
-import org.wso2.carbon.utils.CarbonUtils;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class CarbonEventStreamUtil {
     /**
      * Validate the given file path is in the parent directory itself.
      *
-     * @param parentDirectory
-     * @param filePath
+     * @param fileName
      */
-    public static void validatePath(String parentDirectory, String filePath) throws EventStreamConfigurationException {
-        Path parentPath = Paths.get(parentDirectory);
-        Path subPath = Paths.get(filePath).normalize();
-        if (!subPath.startsWith(parentPath)) {
-            // If not valid, test for tmp/carbonapps directory
-            parentPath = Paths.get(CarbonUtils.getTmpDir(), "carbonapps");
-            if (!subPath.startsWith(parentPath)) {
-                throw new EventStreamConfigurationException("File path is invalid: " + filePath);
-            }
+    public static void validatePath(String fileName) throws EventStreamConfigurationException {
+        if (fileName.contains("../") || fileName.contains("..\\")) {
+            throw new EventStreamConfigurationException("File name contains restricted path elements. " + fileName);
         }
     }
 }

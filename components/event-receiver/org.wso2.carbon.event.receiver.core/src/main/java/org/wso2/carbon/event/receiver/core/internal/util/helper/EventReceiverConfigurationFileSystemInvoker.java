@@ -84,8 +84,8 @@ public class EventReceiverConfigurationFileSystemInvoker {
     public static void saveAndDeploy(String eventReceiverConfigXml, String fileName)
             throws EventReceiverConfigurationException {
         EventReceiverDeployer eventReceiverDeployer = EventReceiverConfigurationHelper.getEventReceiverDeployer(EventAdapterUtil.getAxisConfiguration());
+        EventReceiverUtil.validateFilePath(fileName);
         String filePath = getFilePathFromFilename(fileName);
-        EventReceiverUtil.validateFilePath(filePath);
         try {
             /* save contents to .xml file */
             BufferedWriter out = new BufferedWriter(new FileWriter(filePath));
@@ -106,8 +106,8 @@ public class EventReceiverConfigurationFileSystemInvoker {
             throws EventReceiverConfigurationException {
 
         try {
+            EventReceiverUtil.validateFilePath(fileName);
             String filePath = getFilePathFromFilename(fileName);
-            EventReceiverUtil.validateFilePath(filePath);
             File file = new File(filePath);
             String filename = file.getName();
             if (file.exists()) {
@@ -128,8 +128,8 @@ public class EventReceiverConfigurationFileSystemInvoker {
     }
 
     public static boolean isFileExists(String fileName) throws EventReceiverConfigurationException{
+        EventReceiverUtil.validateFilePath(fileName);
         String filePath = getFilePathFromFilename(fileName);
-        EventReceiverUtil.validateFilePath(filePath);
         File file = new File(filePath);
         return file.exists();
     }
@@ -139,8 +139,8 @@ public class EventReceiverConfigurationFileSystemInvoker {
         BufferedReader bufferedReader = null;
         StringBuilder stringBuilder = new StringBuilder();
         try {
+            EventReceiverUtil.validateFilePath(fileName);
             String filePath = getFilePathFromFilename(fileName);
-            EventReceiverUtil.validateFilePath(filePath);
             bufferedReader = new BufferedReader(new FileReader(filePath));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
@@ -164,8 +164,8 @@ public class EventReceiverConfigurationFileSystemInvoker {
 
     public static void reload(EventReceiverConfigurationFile eventReceiverConfigurationFile)
             throws EventReceiverConfigurationException {
+        EventReceiverUtil.validateFilePath(eventReceiverConfigurationFile.getFileName());
         String filePath = eventReceiverConfigurationFile.getFilePath();
-        EventReceiverUtil.validateFilePath(filePath);
         AxisConfiguration axisConfiguration = EventAdapterUtil.getAxisConfiguration();
         EventReceiverDeployer deployer = EventReceiverConfigurationHelper.getEventReceiverDeployer(axisConfiguration);
         try {

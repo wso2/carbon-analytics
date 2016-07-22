@@ -23,28 +23,23 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.xerces.impl.Constants;
 import org.wso2.carbon.jaggeryapp.template.deployer.internal.JaggeryappTemplateDeployerConstants;
 import org.wso2.carbon.jaggeryapp.template.deployer.internal.JaggeryappTemplateDeployerException;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class JaggeryappTemplateDeployerHelper {
 
     private static final Log log = LogFactory.getLog(JaggeryappTemplateDeployerHelper.class);
 
+
     /**
      * Validate the given file path is in the parent directory itself.
      *
-     * @param parentDirectory
-     * @param filePath
+     * @param fileName
      */
-    public static void validateFilePath(String parentDirectory, String filePath) throws JaggeryappTemplateDeployerException {
-
-        Path parentPath = Paths.get(parentDirectory);
-        Path subPath = Paths.get(filePath).normalize();
-
-        if (!subPath.normalize().startsWith(parentPath)) {
-            throw new JaggeryappTemplateDeployerException("File name contains restricted path elements. " + filePath);
+    public static void validateFilePath(String fileName) throws JaggeryappTemplateDeployerException {
+        if (fileName.contains("../") || fileName.contains("..\\")) {
+            throw new JaggeryappTemplateDeployerException("File name contains restricted path elements. " + fileName);
         }
     }
 

@@ -228,7 +228,6 @@ public class CarbonEventStreamService implements EventStreamService {
             String filePath = directoryPath + File.separator +
                     streamDefinition.getName() + EventStreamConstants.STREAM_DEFINITION_FILE_DELIMITER
                     + streamDefinition.getVersion() + EventStreamConstants.STREAM_DEFINITION_FILE_EXTENSION;
-            CarbonEventStreamUtil.validatePath(directoryPath, filePath);
             StreamDefinition streamDefinitionOld = getStreamDefinition(streamDefinition.getStreamId());
             if (streamDefinitionOld != null) {
                 if (!(streamDefinitionOld.equals(streamDefinition))) {

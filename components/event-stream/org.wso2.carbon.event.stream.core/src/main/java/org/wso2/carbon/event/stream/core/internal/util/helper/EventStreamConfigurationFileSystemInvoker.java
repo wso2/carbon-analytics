@@ -66,8 +66,8 @@ public class EventStreamConfigurationFileSystemInvoker {
         try {
             String directoryPath =  new File(axisConfig.getRepository().getPath())
                     .getAbsolutePath() + File.separator + EventStreamConstants.EVENT_STREAMS;
+            CarbonEventStreamUtil.validatePath(fileName);
             String filePath =  directoryPath + File.separator + fileName;
-            CarbonEventStreamUtil.validatePath(directoryPath, filePath);
             File file = new File(filePath);
             if (file.exists()) {
                 EventStreamDeployer deployer = (EventStreamDeployer)((DeploymentEngine) axisConfig.getConfigurator()).
