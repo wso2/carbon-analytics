@@ -21,6 +21,8 @@ package org.wso2.carbon.analytics.datasource.core.util;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import com.hazelcast.core.IAtomicLong;
 
 import org.apache.axiom.om.util.Base64;
@@ -138,108 +140,63 @@ public class GenericUtils {
         return path;
     }
 
-    private static int calculateRecordValuesBufferSize(Map<String, Object> values) throws AnalyticsException {
-        int count = 0;
-        String name;
-        Object value;
-        for (Map.Entry<String, Object> entry : values.entrySet()) {
-            name = entry.getKey();
-            value = entry.getValue();
-            count += calculateBufferSizePerElement(name, value);
-        }
-        return count;
-    }
-
     public static byte[] encodeRecordValues(Map<String, Object> values) throws AnalyticsException {
-        ByteBuffer secondaryBuffer = ByteBuffer.allocate(calculateRecordValuesBufferSize(values));
+        ByteArrayDataOutput byteOut = ByteStreams.newDataOutput();
         String name;
         Object value;
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             name = entry.getKey();
             value = entry.getValue();
-            secondaryBuffer.put(encodeElement(name, value));
+            byteOut.write(encodeElement(name, value));
         }
-        return secondaryBuffer.array();
+        return byteOut.toByteArray();
     }
-
+    
     public static byte[] encodeElement(String name, Object value) throws AnalyticsException {
-        ByteBuffer buffer = ByteBuffer.allocate(calculateBufferSizePerElement(name, value));
-        String strVal;
-        boolean boolVal;
-        byte[] binData;
-
-        buffer.putInt(name.getBytes(StandardCharsets.UTF_8).length);
-        buffer.put(name.getBytes(StandardCharsets.UTF_8));
+        ByteArrayDataOutput buffer = ByteStreams.newDataOutput();
+        byte[] nameBytes = name.getBytes(StandardCharsets.UTF_8);
+        buffer.writeInt(nameBytes.length);
+        buffer.write(nameBytes);
         if (value instanceof String) {
-            buffer.put(DATA_TYPE_STRING);
-            strVal = (String) value;
-            buffer.putInt(strVal.getBytes(StandardCharsets.UTF_8).length);
-            buffer.put(strVal.getBytes(StandardCharsets.UTF_8));
+            buffer.write(DATA_TYPE_STRING);
+            String strVal = (String) value;
+            byte[] strBytes = strVal.getBytes(StandardCharsets.UTF_8);
+            buffer.writeInt(strBytes.length);
+            buffer.write(strBytes);
         } else if (value instanceof Long) {
-            buffer.put(DATA_TYPE_LONG);
-            buffer.putLong((Long) value);
+            buffer.write(DATA_TYPE_LONG);
+            buffer.writeLong((Long) value);
         } else if (value instanceof Double) {
-            buffer.put(DATA_TYPE_DOUBLE);
-            buffer.putDouble((Double) value);
+            buffer.write(DATA_TYPE_DOUBLE);
+            buffer.writeDouble((Double) value);
         } else if (value instanceof Boolean) {
-            buffer.put(DATA_TYPE_BOOLEAN);
-            boolVal = (Boolean) value;
+            buffer.write(DATA_TYPE_BOOLEAN);
+            boolean boolVal = (Boolean) value;
             if (boolVal) {
-                buffer.put(BOOLEAN_TRUE);
+                buffer.write(BOOLEAN_TRUE);
             } else {
-                buffer.put(BOOLEAN_FALSE);
+                buffer.write(BOOLEAN_FALSE);
             }
         } else if (value instanceof Integer) {
-            buffer.put(DATA_TYPE_INTEGER);
-            buffer.putInt((Integer) value);
+            buffer.write(DATA_TYPE_INTEGER);
+            buffer.writeInt((Integer) value);
         } else if (value instanceof Float) {
-            buffer.put(DATA_TYPE_FLOAT);
-            buffer.putFloat((Float) value);
+            buffer.write(DATA_TYPE_FLOAT);
+            buffer.writeFloat((Float) value);
         } else if (value instanceof byte[]) {
-            buffer.put(DATA_TYPE_BINARY);
-            binData = (byte[]) value;
-            buffer.putInt(binData.length);
-            buffer.put(binData);
+            buffer.write(DATA_TYPE_BINARY);
+            byte[] binData = (byte[]) value;
+            buffer.writeInt(binData.length);
+            buffer.write(binData);
         } else if (value == null) {
-            buffer.put(DATA_TYPE_NULL);
+            buffer.write(DATA_TYPE_NULL);
         } else {
-            buffer.put(DATA_TYPE_OBJECT);
-            binData = GenericUtils.serializeObject(value);
-            buffer.putInt(binData.length);
-            buffer.put(binData);
+            buffer.write(DATA_TYPE_OBJECT);
+            byte[] binData = GenericUtils.serializeObject(value);
+            buffer.writeInt(binData.length);
+            buffer.write(binData);
         }
-
-        return buffer.array();
-    }
-
-    private static int calculateBufferSizePerElement(String name, Object value) throws AnalyticsException {
-        int count = 0;
-         /* column name length value + data type (including null) */
-        count += Integer.SIZE / 8 + 1;
-            /* column name */
-        count += name.getBytes(StandardCharsets.UTF_8).length;
-        if (value instanceof String) {
-                /* string length + value */
-                count += Integer.SIZE / 8;
-                count += ((String) value).getBytes(StandardCharsets.UTF_8).length;
-            } else if (value instanceof Long) {
-                count += Long.SIZE / 8;
-            } else if (value instanceof Double) {
-                count += Double.SIZE / 8;
-            } else if (value instanceof Boolean) {
-                count += Byte.SIZE / 8;
-            } else if (value instanceof Integer) {
-                count += Integer.SIZE / 8;
-            } else if (value instanceof Float) {
-                count += Float.SIZE / 8;
-            } else if (value instanceof byte[]) {
-                count += Integer.SIZE / 8;
-                count += ((byte[]) value).length;
-            } else if (value != null) {
-                count += Integer.SIZE / 8;
-                count += GenericUtils.serializeObject(value).length;
-            }
-        return count;
+        return buffer.toByteArray();
     }
 
     public static Map<String, Object> decodeRecordValues(byte[] data, Set<String> columns) throws AnalyticsException {
