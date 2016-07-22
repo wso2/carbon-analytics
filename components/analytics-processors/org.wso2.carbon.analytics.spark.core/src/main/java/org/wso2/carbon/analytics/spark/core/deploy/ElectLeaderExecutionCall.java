@@ -26,7 +26,7 @@ import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 /**
- * Created by niranda on 6/24/15.
+ * Execution call for electing a leader
  */
 public class ElectLeaderExecutionCall implements Callable<Integer>, Serializable{
 

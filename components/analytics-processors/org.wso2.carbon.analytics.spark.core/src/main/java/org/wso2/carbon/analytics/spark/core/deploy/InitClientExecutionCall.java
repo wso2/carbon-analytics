@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 /**
- * Created by niranda on 6/24/15.
+ * Execution call for initializing client
  */
 public class InitClientExecutionCall implements Callable<Integer>, Serializable{
 
@@ -36,7 +36,7 @@ public class InitClientExecutionCall implements Callable<Integer>, Serializable{
 
     @Override
     public Integer call() throws Exception {
-        ServiceHolder.getAnalyticskExecutor().initializeAnalyticsClient();
+        ServiceHolder.getAnalyticskExecutor().initializeAnalyticsClientLocal();
         return 0;
     }
 }
