@@ -38,6 +38,7 @@ public class TextOutputMapper implements OutputMapper {
     private boolean isCustomRegistryPath;
     private final RuntimeResourceLoader runtimeResourceLoader;
     private final boolean isCustomMappingEnabled;
+    private String mappingText;
 
     public TextOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                             Map<String, Integer> propertyPositionMap, int tenantId,
@@ -51,7 +52,6 @@ public class TextOutputMapper implements OutputMapper {
         this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration(), propertyPositionMap);
         this.isCustomMappingEnabled = outputMapping.isCustomMappingEnabled();
 
-        String mappingText;
         if (this.isCustomMappingEnabled) {
             mappingText = outputMapping.getMappingText();
             if (outputMapping.isRegistryResource()) {
@@ -60,7 +60,6 @@ public class TextOutputMapper implements OutputMapper {
                     mappingText = this.runtimeResourceLoader.getResourceContent(outputMapping.getMappingText());
                 }
             }
-            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap);
         } else {
             mappingText = generateTemplateTextEvent(streamDefinition);
         }
@@ -103,6 +102,9 @@ public class TextOutputMapper implements OutputMapper {
     public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
 
+        if (this.isCustomMappingEnabled) {
+            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap, event.getArbitraryDataMap());
+        }
         // Retrieve resource at runtime if it is from registry
         TextOutputMapping outputMapping = (TextOutputMapping) eventPublisherConfiguration.getOutputMapping();
         if (outputMapping.isRegistryResource()) {
@@ -140,7 +142,7 @@ public class TextOutputMapper implements OutputMapper {
                 // Add arbitrary data map to the default template
                 eventText.append(EventPublisherConstants.EVENT_ATTRIBUTE_SEPARATOR);
                 for (Map.Entry<String, Object> entry : arbitraryDataMap.entrySet()) {
-                    eventText.append("\n" + EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX + entry.getKey() + EventPublisherConstants.EVENT_ATTRIBUTE_VALUE_SEPARATOR + entry.getValue() + EventPublisherConstants.EVENT_ATTRIBUTE_SEPARATOR);
+                    eventText.append("\n" + entry.getKey() + EventPublisherConstants.EVENT_ATTRIBUTE_VALUE_SEPARATOR + entry.getValue() + EventPublisherConstants.EVENT_ATTRIBUTE_SEPARATOR);
                 }
                 eventText.deleteCharAt(eventText.lastIndexOf(EventPublisherConstants.EVENT_ATTRIBUTE_SEPARATOR));
             }
@@ -163,8 +165,8 @@ public class TextOutputMapper implements OutputMapper {
 
         if (position != null && eventData.length != 0) {
             data = eventData[position];
-        } else if (mappingProperty != null && arbitraryMap != null && mappingProperty.startsWith(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX)) {
-            data = arbitraryMap.get(mappingProperty.replaceFirst(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX, ""));
+        } else if (mappingProperty != null && arbitraryMap != null && arbitraryMap.containsKey(mappingProperty)) {
+            data = arbitraryMap.get(mappingProperty);
         }
         if (data != null) {
             return data.toString();

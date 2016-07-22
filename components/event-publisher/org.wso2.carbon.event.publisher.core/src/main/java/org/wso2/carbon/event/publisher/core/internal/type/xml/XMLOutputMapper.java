@@ -50,6 +50,7 @@ public class XMLOutputMapper implements OutputMapper {
     private boolean isCustomRegistryPath;
     private final RuntimeResourceLoader runtimeResourceLoader;
     private final boolean isCustomMappingEnabled;
+    private String mappingText;
 
     public XMLOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                            Map<String, Integer> propertyPositionMap,
@@ -62,16 +63,14 @@ public class XMLOutputMapper implements OutputMapper {
         this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration(), propertyPositionMap);
         this.isCustomMappingEnabled = outputMapping.isCustomMappingEnabled();
 
-        String mappingText;
         if (this.isCustomMappingEnabled) {
-            mappingText = getCustomMappingText();
-            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap);
+            this.mappingText = getCustomMappingText();
         } else {
-            mappingText = generateTemplateXMLEvent(streamDefinition);
+            this.mappingText = generateTemplateXMLEvent(streamDefinition);
         }
 
         if (!outputMapping.isRegistryResource()) {     // Store only if it is not from registry
-            mappingText = validateXML(mappingText);
+            this.mappingText = validateXML(mappingText);
             this.mappingTextList = generateMappingTextList(mappingText);
         }
     }
@@ -151,8 +150,8 @@ public class XMLOutputMapper implements OutputMapper {
 
         if (position != null && eventData.length != 0) {
             data = eventData[position];
-        } else if (mappingProperty != null && arbitraryMap != null && mappingProperty.startsWith(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX)) {
-            data = arbitraryMap.get(mappingProperty.replaceFirst(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX, ""));
+        } else if (mappingProperty != null && arbitraryMap != null && arbitraryMap.containsKey(mappingProperty)) {
+            data = arbitraryMap.get(mappingProperty);
         }
         if (data != null) {
             return data.toString();
@@ -163,7 +162,9 @@ public class XMLOutputMapper implements OutputMapper {
     @Override
     public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
-
+        if (this.isCustomMappingEnabled) {
+            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap, event.getArbitraryDataMap());
+        }
         // Retrieve resource at runtime if it is from registry
         XMLOutputMapping outputMapping = (XMLOutputMapping) eventPublisherConfiguration.getOutputMapping();
         if (outputMapping.isRegistryResource()) {

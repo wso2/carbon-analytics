@@ -44,9 +44,7 @@ public class RuntimeResourceLoader {
         CacheLoader<String, String> loader = new CacheLoader<String, String>() {
             @Override
             public String load(String path) throws EventPublisherConfigurationException {
-                String content = EventPublisherServiceValueHolder.getCarbonEventPublisherService().getRegistryResourceContent(path);
-                EventPublisherUtil.validateStreamDefinitionWithOutputProperties(content, RuntimeResourceLoader.this.propertyPositionMap);
-                return content;
+                return EventPublisherServiceValueHolder.getCarbonEventPublisherService().getRegistryResourceContent(path);
             }
         };
         // Default time unit is minute
