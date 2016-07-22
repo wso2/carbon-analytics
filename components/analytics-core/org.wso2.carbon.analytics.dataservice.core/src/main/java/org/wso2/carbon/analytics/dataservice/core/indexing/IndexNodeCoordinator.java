@@ -339,7 +339,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         for (Map.Entry<Integer, List<String>> entry : shardedIds.entrySet()) {
             Set<String> nodeIds = this.shardMemberMap.getNodeIdsForShard(entry.getKey());
             for (String nodeId : nodeIds) {
-                if (this.myNodeId.equals(nodeId) && indexingNode ) {
+                if (this.myNodeId.equals(nodeId) && this.indexingNode ) {
                     localIds.addAll(entry.getValue());
                 } else {
                     Object memberNode = this.shardMemberMap.getMemberFromNodeId(nodeId);
@@ -369,7 +369,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         for (Map.Entry<Integer, List<Record>> entry : shardedRecords.entrySet()) {
             Set<String> nodeIds = this.shardMemberMap.getNodeIdsForShard(entry.getKey());
             for (String nodeId : nodeIds) {
-                if (nodeId.equals(this.myNodeId) && indexingNode) {
+                if (nodeId.equals(this.myNodeId) && this.indexingNode) {
                     localRecords.addAll(entry.getValue());
                 } else {
                     Object memberNode = this.shardMemberMap.getMemberFromNodeId(nodeId);
@@ -598,9 +598,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
                 this.stagingIndexDataStore.initStagingTables(this.myNodeId);
             }
         }
-        if (log.isDebugEnabled()) {
-            log.debug("My Index Node ID: " + this.myNodeId);
-        }
+        log.info("My Analytics Node ID: " + this.myNodeId);
     }
 
     @Override
@@ -708,7 +706,9 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.indexer.refreshLocalIndexShards(new HashSet<>(Arrays.asList(
                 this.localShardAllocationConfig.getShardIndices())));
         this.refreshStagingWorkers();
-        this.syncLocalWithGlobal();
+        if (this.indexingNode) {
+            this.syncLocalWithGlobal();
+        }
         log.info("Indexing Initialized: " + (this.isClusteringEnabled() ?
                                              "CLUSTERED " + this.shardMemberMap : "STANDALONE") + " | Current Node Indexing: " +
                  (this.indexingNode ? "Yes" : "No"));
