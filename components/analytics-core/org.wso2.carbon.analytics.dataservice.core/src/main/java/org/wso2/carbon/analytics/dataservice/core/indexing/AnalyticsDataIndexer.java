@@ -529,7 +529,7 @@ public class AnalyticsDataIndexer {
                 results.add(new SearchResultEntry(indexDoc.get(INDEX_ID_INTERNAL_FIELD), doc.score));
             }
             if (log.isDebugEnabled()) {
-                log.debug("Local Search: " + results.size());
+                log.debug("Local Search " + shardIndices + ": " + results.size());
             }
             return results;
         } catch (Exception e) {
@@ -742,7 +742,7 @@ public class AnalyticsDataIndexer {
             searcher.search(indexQuery, collector);
             int result = collector.getTotalHits();
             if (log.isDebugEnabled()) {
-                log.debug("Local Search Count: " + result);
+                log.debug("Local Search Count " + shardIds + ": " + result);
             }
             return result;
         } catch (Exception e) {
