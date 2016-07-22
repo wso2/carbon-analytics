@@ -438,12 +438,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 }
 
                 eventPublisherConfiguration.setOutputMapping(wso2EventOutputMapping);
-
-                if (checkStreamAttributeValidity(outputEventAttributes, streamDefinition)) {
-                    eventPublisherService.deployEventPublisherConfiguration(eventPublisherConfiguration);
-                } else {
-                    throw new AxisFault("Output Stream attributes are not matching with input stream definition ");
-                }
+                eventPublisherService.deployEventPublisherConfiguration(eventPublisherConfiguration);
 
             } catch (EventPublisherConfigurationException e) {
                 log.error(e.getMessage(), e);
@@ -506,12 +501,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                     outputEventAttributes = getOutputMappingPropertyList(textData);
                 }
                 eventPublisherConfiguration.setOutputMapping(textOutputMapping);
-
-                if (checkStreamAttributeValidity(outputEventAttributes, eventPublisherService.getStreamDefinition(streamNameWithVersion))) {
-                    eventPublisherService.deployEventPublisherConfiguration(eventPublisherConfiguration);
-                } else {
-                    throw new AxisFault("Output Stream attributes are not matching with input stream definition ");
-                }
+                eventPublisherService.deployEventPublisherConfiguration(eventPublisherConfiguration);
 
             } catch (EventPublisherConfigurationException e) {
                 log.error(e.getMessage(), e);
@@ -569,12 +559,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 }
 
                 eventPublisherConfiguration.setOutputMapping(xmlOutputMapping);
-
-                if (checkStreamAttributeValidity(outputEventAttributes, eventPublisherService.getStreamDefinition(streamNameWithVersion))) {
-                    eventPublisherService.deployEventPublisherConfiguration(eventPublisherConfiguration);
-                } else {
-                    throw new AxisFault("Output Stream attributes are not matching with input stream definition ");
-                }
+                eventPublisherService.deployEventPublisherConfiguration(eventPublisherConfiguration);
 
             } catch (EventPublisherConfigurationException e) {
                 log.error(e.getMessage(), e);
@@ -625,12 +610,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 }
 
                 eventPublisherConfiguration.setOutputMapping(mapOutputMapping);
-
-                if (checkStreamAttributeValidity(outputEventAttributes, eventPublisherService.getStreamDefinition(streamNameWithVersion))) {
-                    eventPublisherService.deployEventPublisherConfiguration(eventPublisherConfiguration);
-                } else {
-                    throw new AxisFault("Output Stream attributes are not matching with input stream definition ");
-                }
+                eventPublisherService.deployEventPublisherConfiguration(eventPublisherConfiguration);
 
             } catch (EventPublisherConfigurationException ex) {
                 log.error(ex.getMessage(), ex);
@@ -689,12 +669,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 }
 
                 eventPublisherConfiguration.setOutputMapping(jsonOutputMapping);
-
-                if (checkStreamAttributeValidity(outputEventAttributes, eventPublisherService.getStreamDefinition(streamNameWithVersion))) {
-                    eventPublisherService.deployEventPublisherConfiguration(eventPublisherConfiguration);
-                } else {
-                    throw new AxisFault("Output Stream attributes are not matching with input stream definition ");
-                }
+                eventPublisherService.deployEventPublisherConfiguration(eventPublisherConfiguration);
 
             } catch (EventPublisherConfigurationException ex) {
                 log.error(ex.getMessage(), ex);
@@ -828,51 +803,6 @@ public class EventPublisherAdminService extends AbstractAdmin {
             return detailOutputAdapterPropertyDtoArray;
         }
         return new DetailOutputAdapterPropertyDto[0];
-    }
-
-    private boolean checkStreamAttributeValidity(List<String> outputEventAttributes,
-                                                 StreamDefinition streamDefinition) {
-
-        if (streamDefinition != null) {
-            List<String> inComingStreamAttributes = new ArrayList<String>();
-            final String PROPERTY_META_PREFIX = "meta_";
-            final String PROPERTY_CORRELATION_PREFIX = "correlation_";
-
-            List<Attribute> metaAttributeList = streamDefinition.getMetaData();
-            List<Attribute> correlationAttributeList = streamDefinition.getCorrelationData();
-            List<Attribute> payloadAttributeList = streamDefinition.getPayloadData();
-
-
-            if (metaAttributeList != null) {
-                for (Attribute attribute : metaAttributeList) {
-                    inComingStreamAttributes.add(PROPERTY_META_PREFIX + attribute.getName());
-                }
-            }
-            if (correlationAttributeList != null) {
-                for (Attribute attribute : correlationAttributeList) {
-                    inComingStreamAttributes.add(PROPERTY_CORRELATION_PREFIX + attribute.getName());
-                }
-            }
-            if (payloadAttributeList != null) {
-                for (Attribute attribute : payloadAttributeList) {
-                    inComingStreamAttributes.add(attribute.getName());
-                }
-            }
-
-
-            if (outputEventAttributes.size() > 0) {
-                if (inComingStreamAttributes.containsAll(outputEventAttributes)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-            return true;
-        } else {
-            return false;
-        }
-
     }
 
     private String getStreamAttributes(StreamDefinition streamDefinition) {

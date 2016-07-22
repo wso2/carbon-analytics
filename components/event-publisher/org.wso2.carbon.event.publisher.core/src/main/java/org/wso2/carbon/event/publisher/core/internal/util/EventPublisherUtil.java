@@ -195,12 +195,12 @@ public class EventPublisherUtil {
         return event;
     }
 
-    public static void validateStreamDefinitionWithOutputProperties(String actualMappingText, Map<String, Integer> propertyPositionMap)
+    public static void validateStreamDefinitionWithOutputProperties(String actualMappingText, Map<String, Integer> propertyPositionMap, Map<String, Object> arbitraryDataMap)
             throws EventPublisherConfigurationException {
         List<String> mappingProperties = EventPublisherUtil.getOutputMappingPropertyList(actualMappingText);
         for (String property : mappingProperties) {
-            if (!propertyPositionMap.containsKey(property) && (property == null || !property.startsWith(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX))) {
-                throw new EventPublisherStreamValidationException("Property " + property + " is not in the input stream definition.");
+            if (!propertyPositionMap.containsKey(property) && (arbitraryDataMap == null || !arbitraryDataMap.containsKey(property))) {
+                throw new EventPublisherStreamValidationException("Property " + property + " is neither in the input stream attributes nor in runtime arbitrary data map.");
             }
         }
     }

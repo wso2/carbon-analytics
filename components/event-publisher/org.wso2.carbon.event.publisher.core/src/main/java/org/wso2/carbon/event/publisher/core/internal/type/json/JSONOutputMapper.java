@@ -45,6 +45,7 @@ public class JSONOutputMapper implements OutputMapper {
     private boolean isCustomRegistryPath;
     private final RuntimeResourceLoader runtimeResourceLoader;
     private final boolean isCustomMappingEnabled;
+    private final String mappingText;
 
     public JSONOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                             Map<String, Integer> propertyPositionMap, int tenantId,
@@ -58,16 +59,14 @@ public class JSONOutputMapper implements OutputMapper {
         this.runtimeResourceLoader = new RuntimeResourceLoader(outputMapping.getCacheTimeoutDuration(), propertyPositionMap);
         this.isCustomMappingEnabled = outputMapping.isCustomMappingEnabled();
 
-        String mappingText;
         if (this.isCustomMappingEnabled) {
-            mappingText = getCustomMappingText();
-            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap);
+            this.mappingText = getCustomMappingText();
         } else {
-            mappingText = generateJsonEventTemplate(streamDefinition);
+            this.mappingText = generateJsonEventTemplate(streamDefinition);
         }
 
         if (!outputMapping.isRegistryResource()) {     // Store only if it is not from registry
-            this.mappingTextList = generateMappingTextList(mappingText);
+            this.mappingTextList = generateMappingTextList(this.mappingText);
         }
     }
 
@@ -98,6 +97,9 @@ public class JSONOutputMapper implements OutputMapper {
     public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
 
+        if (this.isCustomMappingEnabled) {
+            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap, event.getArbitraryDataMap());
+        }
         // Retrieve resource at runtime if it is from registry
         JSONOutputMapping outputMapping = (JSONOutputMapping) eventPublisherConfiguration.getOutputMapping();
         if (outputMapping.isRegistryResource()) {
@@ -181,8 +183,8 @@ public class JSONOutputMapper implements OutputMapper {
 
         if (position != null && eventData.length != 0) {
             data = eventData[position];
-        } else if (mappingProperty != null && arbitraryMap != null && mappingProperty.startsWith(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX)) {
-            data = arbitraryMap.get(mappingProperty.replaceFirst(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX, ""));
+        } else if (mappingProperty != null && arbitraryMap != null && arbitraryMap.containsKey(mappingProperty)) {
+            data = arbitraryMap.get(mappingProperty);
         }
         return data;
     }
