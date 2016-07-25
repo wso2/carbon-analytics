@@ -33,6 +33,7 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.jdbc.carbon.AnalyticsJDBCRelationProvider;
 import org.apache.spark.util.Utils;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterException;
@@ -675,12 +676,16 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 throw new AnalyticsExecutionException("Error executing analytics query: " + e.getMessage(), e);
             }
         } else {
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+            if (AnalyticsDataServiceUtils.isCarbonServer()) {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+            }
             try {
                 return this.executeQueryLocal(tenantId, query);
             } finally {
-                PrivilegedCarbonContext.endTenantFlow();
+                if (AnalyticsDataServiceUtils.isCarbonServer()) {
+                    PrivilegedCarbonContext.endTenantFlow();
+                }
             }
         }
     }
