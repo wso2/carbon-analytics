@@ -35,11 +35,18 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.databridge.commons</artifactId>
+            <artifactId>org.wso2.carbon.databridge.datapublisher.feature</artifactId>
+            <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.event.stream.core</artifactId>
+            <artifactId>org.wso2.carbon.event.publisher.ui.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.publisher.aggregate.feature</artifactId>
+            <type>zip</type>
         </dependency>
     </dependencies>
 
@@ -67,9 +74,6 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons:${carbon.analytics.common.version}
-                                </bundleDef>
-                                <bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler:${carbon.analytics.version}
                                 </bundleDef>
                             </bundles>
@@ -78,10 +82,13 @@
                                     org.wso2.carbon.core.server:${carbon.kernel.version}
                                 </importFeatureDef>
                                 <importFeatureDef>
-                                    org.wso2.carbon.event.stream:${carbon.analytics.common.version}
+                                    org.wso2.carbon.databridge.datapublisher:${carbon.analytics.common.version}
                                 </importFeatureDef>
                                 <importFeatureDef>
-                                    org.wso2.carbon.event.publisher:${carbon.analytics.common.version}
+                                    org.wso2.carbon.event.publisher.aggregate:${carbon.analytics.common.version}
+                                </importFeatureDef>
+                                <importFeatureDef>
+                                    org.wso2.carbon.event.publisher.ui:${carbon.analytics.common.version}
                                 </importFeatureDef>
                             </importFeatures>
                         </configuration>

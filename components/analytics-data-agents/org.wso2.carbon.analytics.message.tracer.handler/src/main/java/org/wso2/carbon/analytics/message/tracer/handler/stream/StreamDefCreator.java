@@ -32,7 +32,7 @@ public class StreamDefCreator {
     private static final String SERVER_NAME = "server";
     private static final String ACTIVITY_ID = "activity_id";
     private static final String ACTIVITY_STATUS = "status";
-    private static final String streamName = "BAM_MESSAGE_TRACE";
+    private static final String streamName = "DAS_MESSAGE_TRACE";
     private static final String version = "1.0.0";
     private static final String nickName = "MessageTracerAgent";
     private static final String description = "Publish Message Tracing Event";
@@ -50,7 +50,7 @@ public class StreamDefCreator {
 
 
     private static List<Attribute> getMetaDefinitions() {
-        List<Attribute> metaList = new ArrayList<Attribute>(3);
+        List<Attribute> metaList = new ArrayList<>(3);
         metaList.add(new Attribute(MessageTracerConstants.REQUEST_URL, AttributeType.STRING));
         metaList.add(new Attribute(MessageTracerConstants.HOST, AttributeType.STRING));
         metaList.add(new Attribute(SERVER_NAME, AttributeType.STRING));
@@ -58,7 +58,7 @@ public class StreamDefCreator {
     }
 
     private static List<Attribute> getPayloadDefinition() {
-        List<Attribute> payloadList = new ArrayList<Attribute>(8);
+        List<Attribute> payloadList = new ArrayList<>(8);
         payloadList.add(new Attribute(MessageTracerConstants.SERVICE_NAME, AttributeType.STRING));
         payloadList.add(new Attribute(MessageTracerConstants.OPERATION_NAME, AttributeType.STRING));
         payloadList.add(new Attribute(MessageTracerConstants.MSG_DIRECTION, AttributeType.STRING));
@@ -71,7 +71,7 @@ public class StreamDefCreator {
     }
 
     private static List<Attribute> getCorrelationDefinition() {
-        List<Attribute> correlationList = new ArrayList<Attribute>(1);
+        List<Attribute> correlationList = new ArrayList<>(1);
         correlationList.add(new Attribute(ACTIVITY_ID, AttributeType.STRING));
         return correlationList;
     }
