@@ -246,20 +246,25 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     class EventQueueWorker implements EventHandler<WrappedEventFactory.WrappedEvent> {
 
+        boolean isLastEventDropped =false;
         @Override
         public void onEvent(WrappedEventFactory.WrappedEvent wrappedEvent, long sequence, boolean endOfBatch) {
             DataEndpoint endpoint = getDataEndpoint(true);
             Event event = wrappedEvent.getEvent();
             if (endpoint != null) {
+                isLastEventDropped =false;
                 endpoint.collectAndSend(event);
                 if (endOfBatch) {
                     flushAllDataEndpoints();
                 }
             } else {
-                log.error("Dropping event as DataPublisher is shutting down.");
+                if(!isLastEventDropped) {
+                    log.error("Dropping all events as DataPublisher is shutting down.");
+                }
                 if (log.isDebugEnabled()) {
                     log.debug("Data publisher is shutting down, dropping event : " + event);
                 }
+                isLastEventDropped =true;
             }
         }
     }
