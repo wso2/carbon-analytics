@@ -40,4 +40,6 @@ public interface AnalyticsEventSinkService {
 
     AnalyticsEventStore getEventStore(int tenantId, String streamName);
 
+    String generateAnalyticsTableName(String streamName);
+
 }
