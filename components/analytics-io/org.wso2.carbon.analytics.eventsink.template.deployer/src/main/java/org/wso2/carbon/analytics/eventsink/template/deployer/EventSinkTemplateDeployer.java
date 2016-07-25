@@ -66,6 +66,7 @@ public class EventSinkTemplateDeployer implements TemplateDeployer {
             AnalyticsEventStore incomingEventStore = EventSinkTemplateDeployerHelper
                     .unmarshallEventSinkConfig(template);
             List<String> incomingStreamIds = incomingEventStore.getEventSource().getStreamIds();
+            //all the stream IDs have same name hence we can read stream name from any element; here we read from zeroth element.
             String incomingStreamName = incomingStreamIds.get(0).split(EventStreamConstants.STREAM_DEFINITION_DELIMITER)[0];
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             registry = EventSinkTemplateDeployerValueHolder.getRegistryService()

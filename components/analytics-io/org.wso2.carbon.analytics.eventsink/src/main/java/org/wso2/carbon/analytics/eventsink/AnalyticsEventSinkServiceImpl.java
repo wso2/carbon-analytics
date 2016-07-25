@@ -114,4 +114,9 @@ public class AnalyticsEventSinkServiceImpl implements AnalyticsEventSinkService 
         String eventStoreName = AnalyticsEventSinkUtil.generateAnalyticsTableName(streamName);
         return AnalyticsEventStoreManager.getInstance().getAnalyticsEventStore(tenantId, eventStoreName);
     }
+
+    @Override
+    public String generateAnalyticsTableName(String streamName) {
+        return AnalyticsEventSinkUtil.generateAnalyticsTableName(streamName);
+    }
 }
