@@ -116,6 +116,7 @@ var getConfig, validate, isProviderRequired, draw, update;
         conf.x = _chartConfig.x;
         conf.xType = _chartConfig.xType;
         conf.yType = _chartConfig.yType;
+        conf.maxLength = _chartConfig.maxLength;
         conf.charts = [];
         conf.charts[0] = {
             type : "area",

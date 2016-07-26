@@ -133,6 +133,7 @@ var getConfig, validate, isProviderRequired, draw, update;
             key : _chartConfig.key,
             grid: _chartConfig.grid
         };
+        conf.maxLength = _chartConfig.maxLength;
 
         if (_chartConfig.color == "All") {
             conf.charts[0].color = "*";

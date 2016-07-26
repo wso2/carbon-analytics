@@ -45,9 +45,7 @@ public class MapOutputMapper implements OutputMapper {
             EventPublisherConfigurationException {
         this.eventPublisherConfiguration = eventPublisherConfiguration;
         this.propertyPositionMap = propertyPositionMap;
-        if (eventPublisherConfiguration.getOutputMapping().isCustomMappingEnabled()) {
-            validateStreamDefinitionWithOutputProperties();
-        } else {
+        if (!eventPublisherConfiguration.getOutputMapping().isCustomMappingEnabled()) {
             this.streamDefinition = streamDefinition;
             noOfMetaData = streamDefinition.getMetaData() != null ? streamDefinition.getMetaData().size() : 0;
             noOfCorrelationData = streamDefinition.getCorrelationData() != null ? streamDefinition.getCorrelationData().size() : 0;
@@ -56,18 +54,22 @@ public class MapOutputMapper implements OutputMapper {
 
     }
 
-    private void validateStreamDefinitionWithOutputProperties()
+    private void validateStreamDefinitionWithOutputProperties(Map<String, Object> arbitraryDataMap)
             throws EventPublisherConfigurationException {
 
         MapOutputMapping mapOutputMapping = (MapOutputMapping) eventPublisherConfiguration.getOutputMapping();
-        List<EventOutputProperty> outputPropertyConfiguration = mapOutputMapping.getOutputPropertyConfiguration();
 
+        if(!mapOutputMapping.isCustomMappingEnabled()) {
+            return;
+        }
+
+        List<EventOutputProperty> outputPropertyConfiguration = mapOutputMapping.getOutputPropertyConfiguration();
         Iterator<EventOutputProperty> outputPropertyConfigurationIterator = outputPropertyConfiguration.iterator();
         for (; outputPropertyConfigurationIterator.hasNext(); ) {
             EventOutputProperty outputProperty = outputPropertyConfigurationIterator.next();
             String valueOf = outputProperty.getValueOf();
-            if (!propertyPositionMap.containsKey(valueOf) && (valueOf == null || !valueOf.startsWith(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX))) {
-                throw new EventPublisherStreamValidationException("Property " + valueOf + " is not in the input stream definition. ", streamDefinition.getStreamId());
+            if (!propertyPositionMap.containsKey(valueOf) && (arbitraryDataMap == null || !arbitraryDataMap.containsKey(valueOf))) {
+                throw new EventPublisherStreamValidationException("Property " + valueOf + " is neither in the input stream attributes nor in runtime arbitrary data map of ", streamDefinition.getStreamId());
             }
         }
     }
@@ -75,6 +77,8 @@ public class MapOutputMapper implements OutputMapper {
     @Override
     public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
+
+        validateStreamDefinitionWithOutputProperties(event.getArbitraryDataMap());
         Map<Object, Object> eventMapObject = new TreeMap<Object, Object>();
         Object[] eventData = event.getData();
         Map<String, Object> arbitraryDataMap = event.getArbitraryDataMap();
@@ -88,8 +92,8 @@ public class MapOutputMapper implements OutputMapper {
                 Integer position = propertyPositionMap.get(valueOf);
                 if(position != null) {
                     eventMapObject.put(eventOutputProperty.getName(), eventData[position]);
-                } else if (valueOf != null && arbitraryDataMap != null && valueOf.startsWith(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX)) {
-                    eventMapObject.put(eventOutputProperty.getName(), arbitraryDataMap.get(valueOf.replaceFirst(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX, "")));
+                } else if (valueOf != null && arbitraryDataMap != null && arbitraryDataMap.containsKey(valueOf)) {
+                    eventMapObject.put(eventOutputProperty.getName(), arbitraryDataMap.get(valueOf));
                 }
             }
         }
@@ -99,6 +103,7 @@ public class MapOutputMapper implements OutputMapper {
     @Override
     public Object convertToTypedInputEvent(Event event) throws EventPublisherConfigurationException {
 
+        validateStreamDefinitionWithOutputProperties(event.getArbitraryDataMap());
         Map<Object, Object> eventMapObject = new TreeMap<Object, Object>();
         int counter = 0;
         Object[] eventData = event.getData();
@@ -126,7 +131,7 @@ public class MapOutputMapper implements OutputMapper {
         Map<String, Object> arbitraryDataMap = event.getArbitraryDataMap();
         if(arbitraryDataMap != null) {
             for (Map.Entry<String, Object> entry : arbitraryDataMap.entrySet()) {
-                eventMapObject.put(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX + entry.getKey(), entry.getValue());
+                eventMapObject.put(entry.getKey(), entry.getValue());
             }
         }
 

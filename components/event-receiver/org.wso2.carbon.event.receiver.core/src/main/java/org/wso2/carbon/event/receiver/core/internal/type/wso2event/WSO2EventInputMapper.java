@@ -74,6 +74,11 @@ public class WSO2EventInputMapper implements InputMapper {
             }
         }
         this.exportedStreamDefinition = exportedStreamDefinition;
+        if (importedStreamDefinition == null) {
+            // Import stream for custom mapping is not available
+            String fromStream = fromStreamName + EventReceiverConstants.STREAM_NAME_VER_DELIMITER + fromStreamVersion;
+            throw new EventReceiverStreamValidationException("Imported stream " + fromStream + " is not available", fromStream);
+        }
         boolean candidateForArbitraryMaps = isCandidateForArbitraryAttributes(eventReceiverConfiguration.getInputMapping(), importedStreamDefinition);
         if (!candidateForArbitraryMaps) {
             validateInputStreamAttributes();
