@@ -17,6 +17,8 @@ package org.wso2.carbon.event.stream.core.internal.util;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 
+import java.util.Map;
+
 public class EventConverter {
 
     public static Event convertToWSO2Event(org.wso2.siddhi.core.event.Event event, StreamDefinition streamDefinition) {
@@ -61,7 +63,9 @@ public class EventConverter {
     public static org.wso2.siddhi.core.event.Event convertToEvent(Event event, boolean metaFlag, boolean correlationFlag, boolean payloadFlag, int size) {
 
         Object[] eventObject;
-        if (event.getArbitraryDataMap() != null) { // If there is arbitrary data map
+        Map<String, String> arbitraryDataMap = event.getArbitraryDataMap();
+
+        if (arbitraryDataMap != null && (! arbitraryDataMap.isEmpty())) { // If there is arbitrary data map
             eventObject = new Object[size + 1];
             eventObject[size] = event.getArbitraryDataMap();
         } else {
