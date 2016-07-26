@@ -22,7 +22,6 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.template.deployer.internal.EventPublisherTemplateDeployerValueHolder;
-import org.wso2.carbon.event.publisher.template.deployer.internal.EventPublisherTemplateSaveFailedException;
 import org.wso2.carbon.event.publisher.template.deployer.internal.util.EventPublisherTemplateDeployerConstants;
 import org.wso2.carbon.event.publisher.template.deployer.internal.util.EventPublisherTemplateDeployerHelper;
 import org.wso2.carbon.event.template.manager.core.DeployableTemplate;
@@ -37,9 +36,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.xml.sax.SAXException;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -113,7 +110,7 @@ public class EventPublisherTemplateDeployer implements TemplateDeployer {
 
             String mappingResourcePath = EventPublisherTemplateDeployerConstants.META_INFO_COLLECTION_PATH + RegistryConstants.PATH_SEPARATOR + publisherName;
             if (registry.resourceExists(mappingResourcePath)) {
-                String existingPublisherConfigXml = getExistingEventPublisherConfigXml(tenantId, publisherName);  //ot handling existingConfig==null case because handling such user errors will make this component too complicated.
+                String existingPublisherConfigXml = getExistingEventPublisherConfigXml(tenantId, publisherName);  //not handling existingConfig==null case because handling such user errors will make this component too complicated.
                 if (EventPublisherTemplateDeployerHelper.arePublisherConfigXmlsSimilar(publisherConfig, existingPublisherConfigXml)) {
                     EventPublisherTemplateDeployerHelper.updateRegistryMaps(registry, artifactId, publisherName);
                     log.info("[Artifact ID: " + artifactId + "] Event Publisher: " + publisherName + " has already being deployed.");
@@ -124,7 +121,7 @@ public class EventPublisherTemplateDeployer implements TemplateDeployer {
                 }
             } else {
                 EventPublisherTemplateDeployerHelper.updateRegistryMaps(registry, artifactId, publisherName);
-                saveEventPublisher(publisherName, publisherConfig, tenantId);
+                EventPublisherTemplateDeployerValueHolder.getEventPublisherService().deployEventPublisherConfiguration(publisherConfig);
             }
         }  catch (RegistryException e) {
             throw new TemplateDeploymentException("Could not load the Registry for Tenant Domain: "
@@ -135,9 +132,6 @@ public class EventPublisherTemplateDeployer implements TemplateDeployer {
         } catch (IOException e) {
             throw new TemplateDeploymentException("Could not deploy Event Publisher with name: " + publisherName + ", for Artifact ID: " + artifactId, e);
         } catch (SAXException e) {
-            throw new TemplateDeploymentException("Could not deploy Event Publisher with name: " + publisherName + ", for Artifact ID: " + artifactId, e);
-        } catch (EventPublisherTemplateSaveFailedException e) {
-            undeployArtifact(artifactId, false);
             throw new TemplateDeploymentException("Could not deploy Event Publisher with name: " + publisherName + ", for Artifact ID: " + artifactId, e);
         }
     }
@@ -203,41 +197,6 @@ public class EventPublisherTemplateDeployer implements TemplateDeployer {
             throw new TemplateDeploymentException("Could not load the Registry for Tenant Domain: "
                                                   + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true)
                                                   + ", when trying to undeploy Event Publisher for artifact ID: " + artifactId, e);
-        }
-    }
-
-    private void saveEventPublisher(String publisherName, String eventPublisherConfigXml,
-                                    int tenantId)
-            throws EventPublisherTemplateSaveFailedException {
-        OutputStreamWriter writer = null;
-        String filePath = MultitenantUtils.getAxis2RepositoryPath(tenantId) +
-                          EventPublisherConstants.EF_CONFIG_DIRECTORY + File.separator + publisherName +
-                          EventPublisherConstants.EF_CONFIG_FILE_EXTENSION_WITH_DOT;
-        try {
-            /* save contents to .xml file */
-            File file = new File(filePath);
-
-            writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
-
-            // get the content in bytes
-            writer.write(eventPublisherConfigXml);
-            log.info("Event Publisher : " + publisherName + " saved in the filesystem");
-        } catch (IOException e) {
-            throw new EventPublisherTemplateSaveFailedException("Failed to save Event Publisher: " + publisherName, e);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.flush();
-                } catch (IOException e) {
-                    throw new EventPublisherTemplateSaveFailedException("Failed to save Event Publisher: " + publisherName, e);
-                }
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    log.warn("Failed to close Output Stream Writer for File: " + publisherName +
-                             EventPublisherConstants.EF_CONFIG_FILE_EXTENSION_WITH_DOT + "\n" + e.getMessage());
-                }
-            }
         }
     }
 

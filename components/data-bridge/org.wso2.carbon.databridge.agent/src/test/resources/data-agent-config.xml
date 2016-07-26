@@ -31,7 +31,7 @@
         <MaxPoolSize>10</MaxPoolSize>
         <SocketTimeoutMS>30000</SocketTimeoutMS>
         <KeepAliveTimeInPool>20</KeepAliveTimeInPool>
-        <ReconnectionInterval>10</ReconnectionInterval>
+        <ReconnectionInterval>30</ReconnectionInterval>
         <MaxTransportPoolSize>250</MaxTransportPoolSize>
         <MaxIdleConnections>250</MaxIdleConnections>
         <EvictionTimePeriod>5500</EvictionTimePeriod>
@@ -55,7 +55,7 @@
         <MaxPoolSize>10</MaxPoolSize>
         <SocketTimeoutMS>30000</SocketTimeoutMS>
         <KeepAliveTimeInPool>20</KeepAliveTimeInPool>
-        <ReconnectionInterval>10</ReconnectionInterval>
+        <ReconnectionInterval>30</ReconnectionInterval>
         <MaxTransportPoolSize>250</MaxTransportPoolSize>
         <MaxIdleConnections>250</MaxIdleConnections>
         <EvictionTimePeriod>5500</EvictionTimePeriod>
