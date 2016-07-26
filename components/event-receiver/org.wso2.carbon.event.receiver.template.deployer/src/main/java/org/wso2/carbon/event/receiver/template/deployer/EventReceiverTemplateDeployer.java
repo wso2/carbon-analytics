@@ -21,7 +21,6 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
 import org.wso2.carbon.event.receiver.template.deployer.internal.EventReceiverTemplateDeployerValueHolder;
-import org.wso2.carbon.event.receiver.template.deployer.internal.EventReceiverTemplateSaveFailedException;
 import org.wso2.carbon.event.receiver.template.deployer.internal.util.EventReceiverTemplateDeployerConstants;
 import org.wso2.carbon.event.receiver.template.deployer.internal.util.EventReceiverTemplateDeployerHelper;
 import org.wso2.carbon.event.template.manager.core.DeployableTemplate;
@@ -36,9 +35,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.xml.sax.SAXException;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -123,7 +120,7 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
                 }
             } else {
                 EventReceiverTemplateDeployerHelper.updateRegistryMaps(registry, artifactId, receiverName);
-                saveEventReceiver(receiverName, receiverConfig, tenantId);
+                EventReceiverTemplateDeployerValueHolder.getEventReceiverService().deployEventReceiverConfiguration(receiverConfig);
             }
         }  catch (RegistryException e) {
             throw new TemplateDeploymentException("Could not load the Registry for Tenant Domain: "
@@ -134,9 +131,6 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
         } catch (IOException e) {
             throw new TemplateDeploymentException("Could not deploy Event Receiver with name: " + receiverName + ", for Artifact ID: " + artifactId, e);
         } catch (SAXException e) {
-            throw new TemplateDeploymentException("Could not deploy Event Receiver with name: " + receiverName + ", for Artifact ID: " + artifactId, e);
-        } catch (EventReceiverTemplateSaveFailedException e) {
-            undeployArtifact(artifactId, false);
             throw new TemplateDeploymentException("Could not deploy Event Receiver with name: " + receiverName + ", for Artifact ID: " + artifactId, e);
         }
     }
@@ -202,40 +196,6 @@ public class EventReceiverTemplateDeployer implements TemplateDeployer {
             throw new TemplateDeploymentException("Could not load the Registry for Tenant Domain: "
                                                   + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true)
                                                   + ", when trying to undeploy Event Receiver for artifact ID: " + artifactId, e);
-        }
-    }
-
-    private void saveEventReceiver(String receiverName, String eventReceiverConfigXml, int tenantId)
-            throws EventReceiverTemplateSaveFailedException {
-        OutputStreamWriter writer = null;
-        String filePath = MultitenantUtils.getAxis2RepositoryPath(tenantId) +
-                          EventReceiverConstants.ER_CONFIG_DIRECTORY + File.separator + receiverName +
-                          EventReceiverConstants.ER_CONFIG_FILE_EXTENSION_WITH_DOT;
-        try {
-            /* save contents to .xml file */
-            File file = new File(filePath);
-
-            writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
-
-            // get the content in bytes
-            writer.write(eventReceiverConfigXml);
-            log.info("Event Receiver : " + receiverName + " saved in the filesystem");
-        } catch (IOException e) {
-            throw new EventReceiverTemplateSaveFailedException("Failed to save Event Receiver: " + receiverName, e);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.flush();
-                } catch (IOException e) {
-                    throw new EventReceiverTemplateSaveFailedException("Failed to save Event Receiver: " + receiverName, e);
-                }
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    log.warn("Failed to close Output Stream Writer for File: " + receiverName +
-                             EventReceiverConstants.ER_CONFIG_FILE_EXTENSION_WITH_DOT + "\n" + e.getMessage());
-                }
-            }
         }
     }
 
