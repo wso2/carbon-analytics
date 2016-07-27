@@ -182,7 +182,7 @@ public class ComputeClasspath {
                 } else if (fileExists(carbonHome + File.separator + line)) {
                     buf.append(separator);
                     buf.append(carbonHome);
-                    buf.append(separator);
+                    buf.append(File.separator);
                     buf.append(line);
                 } else {
                     throw new IOException("File not found : " + line);
