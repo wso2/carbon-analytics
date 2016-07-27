@@ -65,6 +65,7 @@ public class AnalyticsDSConnector {
     private AtomicInteger totalRecordCounter;
     private long startTime;
     private boolean isProfilePersistence;
+    private int cutoff = 100000;
 
     public AnalyticsDSConnector() {
         gson = new Gson();
@@ -74,6 +75,10 @@ public class AnalyticsDSConnector {
             recordsPersisted = new AtomicInteger();
             totalRecordCounter = new AtomicInteger();
             startTime = 0;
+            String cutoffInput = System.getProperty("persistenceStatsCutoff");
+            if (cutoffInput != null && StringUtils.isNumeric(cutoffInput)) {
+                this.cutoff = Integer.parseInt(cutoffInput);
+            }
         }
     }
 
@@ -93,9 +98,9 @@ public class AnalyticsDSConnector {
     private void endTimeMeasurement(int recordCount) {
         if (isProfilePersistence) {
             recordsPersisted.addAndGet(recordCount);
-            if (recordsPersisted.get() > 100000) {
+            if (recordsPersisted.get() > cutoff) {
                 synchronized (this) {
-                    if (recordsPersisted.get() > 100000) {
+                    if (recordsPersisted.get() > cutoff) {
                         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                         Date date = new Date();
 
@@ -110,7 +115,7 @@ public class AnalyticsDSConnector {
                                 totalRecordCounter + " \n";
                         File file = new File(CarbonUtils.getCarbonHome() + File.separator + "persistence-perf.txt");
                         if (!file.exists()) {
-                            log.info("Creating the performance measurement file at : " + file.getAbsolutePath());
+                            log.info("Creating the data persistence performance measurement log at : " + file.getAbsolutePath());
                         }
                         try {
                             appendToFile(IOUtils.toInputStream(line), file);
