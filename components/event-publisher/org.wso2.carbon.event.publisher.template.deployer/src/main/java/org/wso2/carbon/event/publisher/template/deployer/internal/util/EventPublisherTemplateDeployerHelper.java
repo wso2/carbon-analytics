@@ -2,17 +2,13 @@ package org.wso2.carbon.event.publisher.template.deployer.internal.util;
 
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
-import org.wso2.carbon.event.template.manager.core.TemplateDeploymentException;
 import org.wso2.carbon.registry.core.Collection;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.xml.sax.SAXException;
 
-import java.io.File;
 import java.io.IOException;
 
 public class EventPublisherTemplateDeployerHelper {
@@ -45,20 +41,6 @@ public class EventPublisherTemplateDeployerHelper {
         mappingResource.setMediaType("text/plain");
         mappingResource.setContent(mappingResourceContent);
         registry.put(mappingResourcePath, mappingResource);
-    }
-
-
-    public static void deleteEventPublisher(int tenantId, String publisherName)
-            throws TemplateDeploymentException {
-        File executionPlanFile = new File(MultitenantUtils.getAxis2RepositoryPath(tenantId) +
-                                          EventPublisherConstants.EF_CONFIG_DIRECTORY + File.separator + publisherName +
-                                          EventPublisherConstants.EF_CONFIG_FILE_EXTENSION_WITH_DOT);
-        if (executionPlanFile.exists()) {
-            if (!executionPlanFile.delete()) {
-                throw new TemplateDeploymentException("Unable to successfully delete Event Publisher File : " + executionPlanFile.getName() + " from File System, for Tenant ID : "
-                                                      + tenantId);
-            }
-        }
     }
 
     public static boolean arePublisherConfigXmlsSimilar(String configXml1, String configXml2)
