@@ -19,6 +19,8 @@ package org.wso2.carbon.event.publisher.template.deployer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
+import org.wso2.carbon.event.publisher.core.config.EventPublisherConfigurationFile;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.template.deployer.internal.EventPublisherTemplateDeployerValueHolder;
@@ -70,21 +72,31 @@ public class EventPublisherTemplateDeployer implements TemplateDeployer {
                 throw new TemplateDeploymentException("No artifact received to be deployed.");
             }
 
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             String publisherConfig = template.getArtifact();
             publisherName = EventPublisherTemplateDeployerValueHolder.getEventPublisherService().getEventPublisherName(publisherConfig);
-            String existingPublisherConfigXml = getExistingEventPublisherConfigXml(tenantId, publisherName);
+            boolean isPublisherExist = false;
+            for (EventPublisherConfiguration publisherConfiguration :
+                    EventPublisherTemplateDeployerValueHolder.getEventPublisherService().getAllActiveEventPublisherConfigurations()) {
+                if (publisherName.equals(publisherConfiguration.getEventPublisherName())) {
+                    isPublisherExist = true;
+                }
+            }
+            if (!isPublisherExist) {
+                for (EventPublisherConfigurationFile publisherConfigurationFile :
+                        EventPublisherTemplateDeployerValueHolder.getEventPublisherService().getAllInactiveEventPublisherConfigurations()) {
+                    if (publisherName.equals(publisherConfigurationFile.getEventPublisherName())) {
+                        isPublisherExist = true;
+                    }
+                }
+            }
 
-            if (existingPublisherConfigXml == null) {
+            if (!isPublisherExist) {
                 deployArtifact(template);
-            }  else {
+            } else {
                 log.info("Common-Artifact Event Publisher with name: " + publisherName + " of Domain " + template.getConfiguration().getDomain()
                          + " was not deployed as it is already being deployed.");
             }
         } catch (EventPublisherConfigurationException e) {
-            throw new TemplateDeploymentException("Could not deploy Common-Artifact Event Publisher with name: "
-                                                  + publisherName + ", for Artifact ID: " + template.getArtifactId(), e);
-        } catch (IOException e) {
             throw new TemplateDeploymentException("Could not deploy Common-Artifact Event Publisher with name: "
                                                   + publisherName + ", for Artifact ID: " + template.getArtifactId(), e);
         }
@@ -123,7 +135,7 @@ public class EventPublisherTemplateDeployer implements TemplateDeployer {
                 EventPublisherTemplateDeployerHelper.updateRegistryMaps(registry, artifactId, publisherName);
                 EventPublisherTemplateDeployerValueHolder.getEventPublisherService().deployEventPublisherConfiguration(publisherConfig);
             }
-        }  catch (RegistryException e) {
+        } catch (RegistryException e) {
             throw new TemplateDeploymentException("Could not load the Registry for Tenant Domain: "
                                                   + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true)
                                                   + ", when deploying Event Publisher for artifact ID: " + template.getArtifactId(), e);
@@ -178,7 +190,18 @@ public class EventPublisherTemplateDeployer implements TemplateDeployer {
                         if (mappingResourceContent.equals("")) {
                             //undeploying existing event publisher
                             if (doDeletePublisher) {
-                                EventPublisherTemplateDeployerHelper.deleteEventPublisher(tenantId, publisherName);
+                                boolean isPublisherActive = false;
+                                for (EventPublisherConfiguration publisherConfiguration :
+                                        EventPublisherTemplateDeployerValueHolder.getEventPublisherService().getAllActiveEventPublisherConfigurations()) {
+                                    if (publisherName.equals(publisherConfiguration.getEventPublisherName())) {
+                                        isPublisherActive = true;
+                                    }
+                                }
+                                if (isPublisherActive) {
+                                    EventPublisherTemplateDeployerValueHolder.getEventPublisherService().undeployActiveEventPublisherConfiguration(publisherName);
+                                } else {
+                                    EventPublisherTemplateDeployerValueHolder.getEventPublisherService().undeployInactiveEventPublisherConfiguration(publisherName);
+                                }
                             }
                             //deleting mappingResource
                             registry.delete(mappingResourcePath);
@@ -190,6 +213,8 @@ public class EventPublisherTemplateDeployer implements TemplateDeployer {
                         throw new TemplateDeploymentException("Could not load the Registry for Tenant Domain: "
                                                               + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true)
                                                               + ", when trying to undeploy Event Publisher with artifact ID: " + artifactId, e);
+                    } catch (EventPublisherConfigurationException e) {
+                        throw new TemplateDeploymentException("Failed to undeploy Event Publisher: " + publisherName + ", for Artifact ID: " + artifactId, e);
                     }
                 }
             }
