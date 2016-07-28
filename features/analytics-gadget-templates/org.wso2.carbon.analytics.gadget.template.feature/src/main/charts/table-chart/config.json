@@ -35,7 +35,7 @@
             "css":["bootstrap_3.3.5/css/bootstrap.min.css","analytics-wso2-2.0.0/common.css"]
         },
         "js" : ["jquery.dataTables.min.js"],
-        "css" : ["jquery.dataTables.min.css"]
+        "css" : ["dataTables.bootstrap.min.css"]
     }
 }
 
