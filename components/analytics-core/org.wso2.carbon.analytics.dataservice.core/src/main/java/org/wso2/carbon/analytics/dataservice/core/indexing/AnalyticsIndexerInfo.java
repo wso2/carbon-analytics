@@ -47,6 +47,14 @@ public class AnalyticsIndexerInfo {
     
     private int indexWorkerCount;
 
+    private int maxRAMPerIndexingThreadInMB;
+
+    private double maxRAMBufferForLuceneDocsInMB;
+
+    private boolean useCompoundIndexFile;
+
+    private double maxSegmentMergeSizeInMB;
+
     public Analyzer getLuceneAnalyzer() {
         return luceneAnalyzer;
     }
@@ -126,5 +134,36 @@ public class AnalyticsIndexerInfo {
     public void setIndexWorkerCount(int indexWorkerCount) {
         this.indexWorkerCount = indexWorkerCount;
     }
-    
+
+    public boolean isUseCompoundIndexFile() {
+        return useCompoundIndexFile;
+    }
+
+    public void setUseCompoundIndexFile(boolean useCompoundIndexFile) {
+        this.useCompoundIndexFile = useCompoundIndexFile;
+    }
+
+    public int getMaxRAMPerIndexingThreadInMB() {
+        return maxRAMPerIndexingThreadInMB;
+    }
+
+    public void setMaxRAMPerIndexingThreadInMB(int maxRAMPerIndexingThreadInMB) {
+        this.maxRAMPerIndexingThreadInMB = maxRAMPerIndexingThreadInMB;
+    }
+
+    public double getMaxRAMBufferForLuceneDocsInMB() {
+        return maxRAMBufferForLuceneDocsInMB;
+    }
+
+    public void setMaxRAMBufferForLuceneDocsInMB(double maxRAMBufferForLuceneDocsInMB) {
+        this.maxRAMBufferForLuceneDocsInMB = maxRAMBufferForLuceneDocsInMB;
+    }
+
+    public double getMaxSegmentMergeSizeInMB() {
+        return maxSegmentMergeSizeInMB;
+    }
+
+    public void setMaxSegmentMergeSizeInMB(double maxSegmentMergeSizeInMB) {
+        this.maxSegmentMergeSizeInMB = maxSegmentMergeSizeInMB;
+    }
 }

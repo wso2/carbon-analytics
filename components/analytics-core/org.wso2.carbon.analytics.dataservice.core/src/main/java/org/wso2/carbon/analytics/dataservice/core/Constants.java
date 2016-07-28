@@ -62,6 +62,10 @@ public class Constants {
     public static final int SHARD_INDEX_WORKER_INTERVAL_MIN = 10;
     public static final int SHARD_INDEX_WORKER_INTERVAL_MAX = 60000;
     public static final int DEFAULT_INDEX_WORKER_COUNT = 1;
+    public static final int DEFAULT_MAX_MEMORY_PER_INDEXING_THREAD = 1945;
+    public static final double DEFAULT_MAX_MEMORY_FOR_LUCENE_DOCS = 16;
+    public static final boolean DEFAULT_INDEX_USE_COMPOUND_INDEX_FILE = true;
+    public static final double DEFAULT_INDEX_MAX_MERGE_SEGMENT_SIZE = 2048;
     public static final String DISABLE_INDEXING_ENV_PROP = "disableIndexing";
     public static final String ANALYTICS_INDEXING_GROUP = "__ANALYTICS_INDEXING_GROUP__";
 
@@ -76,5 +80,5 @@ public class Constants {
             + File.separator + "conf" + File.separator + "analytics" + File.separator + "my-node-id.dat";
     public static final String DEFAULT_LOCAL_INDEX_STAGING_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator + "repository"
             + File.separator + "data" + File.separator + "index_staging_queues" + File.separator;
-    
+
 }
