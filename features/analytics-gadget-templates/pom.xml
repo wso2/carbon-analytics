@@ -34,6 +34,10 @@
 
     <modules>
         <module>org.wso2.carbon.analytics.gadget.template.feature</module>
+        <module>org.wso2.carbon.analytics.gadget.chart.template.feature</module>
+        <module>org.wso2.carbon.analytics.gadget.batch.provider.template.feature</module>
+        <module>org.wso2.carbon.analytics.gadget.realtime.provider.template.feature</module>
+        <module>org.wso2.carbon.analytics.gadget.rest.provider.template.feature</module>
     </modules>
 
 </project>

@@ -888,6 +888,30 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.gadget.batch.provider.template.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.gadget.realtime.provider.template.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.gadget.rest.provider.template.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.gadget.chart.template.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.databridge.commons.binary.server.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>

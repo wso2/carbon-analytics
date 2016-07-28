@@ -28,73 +28,37 @@
     <name>WSO2 Carbon - Analytics Gadget Template Feature</name>
     <packaging>pom</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.analytics.gadget.batch.provider.template.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.analytics.gadget.realtime.provider.template.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.analytics.gadget.rest.provider.template.feature</artifactId>
+            <version>5.1.1-SNAPSHOT</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.analytics.gadget.chart.template.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+    </dependencies>
+
+
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>auto-clean</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-                    <execution>
-                        <phase>process-resources</phase>
-                        <configuration>
-                            <target>
-                                <ant antfile="build.xml" target="copy-artifacts" />
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>src/main/resources</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/providers</directory>
-                                    <targetPath>providers</targetPath>
-                                    <filtering>false</filtering>
-                                </resource>
-                                <resource>
-                                    <directory>src/main/charts</directory>
-                                    <targetPath>charts</targetPath>
-                                    <filtering>false</filtering>
-                                </resource>
-                                <resource>
-                                    <directory>src/main/libs</directory>
-                                    <targetPath>libs</targetPath>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
-                <version>1.5.3</version>
+                <version>${carbon.p2.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>p2-feature-generation</id>
@@ -111,6 +75,20 @@
                                     <propertyDef>org.eclipse.equinox.p2.type.group:true</propertyDef>
                                 </properties>
                             </adviceFile>
+                            <includedFeatures>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.analytics.gadget.batch.provider.template.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.analytics.gadget.chart.template.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.analytics.gadget.rest.provider.template.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.analytics.gadget.realtime.provider.template.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                            </includedFeatures>
                         </configuration>
                     </execution>
                 </executions>

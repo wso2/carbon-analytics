@@ -5,7 +5,6 @@
     <property name="res-dir" value="src/main/resources"/>
     <property name="target-dir" value="target"/>
     <property name="providers-dir" value="src/main/providers"/>
-    <property name="charts-dir" value="src/main/charts"/>
 
     <target name="clean">
         <delete dir="${target-dir}"/>
@@ -16,7 +15,6 @@
         <copy todir="${res-dir}">
           <fileset dir="src/main">
               <include name="providers"/>
-              <include name="charts"/>
           </fileset>   
         </copy>
     </target>

@@ -1,0 +1,7 @@
+instructions.configure = \
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.gadget.chart.template_${feature.version}/charts,target:${installFolder}/../../deployment/server/jaggeryapps/portal/extensions/chart-templates,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.gadget.chart.template_${feature.version}/libs,target:${installFolder}/../../deployment/server/jaggeryapps/portal/libs/analytics-wso2-2.0.0,overwrite:true);\
+
+
+
+

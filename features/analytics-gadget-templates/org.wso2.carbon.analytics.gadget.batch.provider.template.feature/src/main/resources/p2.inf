@@ -1,0 +1,5 @@
+instructions.configure = \
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.gadget.batch.provider.template_${feature.version}/providers/batch,target:${installFolder}/../../deployment/server/jaggeryapps/portal/extensions/providers/batch,overwrite:true);\
+
+
+
