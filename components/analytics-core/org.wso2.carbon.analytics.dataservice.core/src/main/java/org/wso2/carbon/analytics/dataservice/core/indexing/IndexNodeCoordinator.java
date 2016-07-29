@@ -108,8 +108,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.shardMemberMap = new GlobalShardMemberMapping(this.indexer.getShardCount(),
                                                            this.globalShardAllocationConfig);
         this.stagingIndexDataStore = new StagingIndexDataStore(this.indexer);
-        this.remoteCommunicator = new RemoteMemberIndexCommunicator();
-
+        this.remoteCommunicator = new RemoteMemberIndexCommunicator(indexer.getAnalyticsIndexerInfo()
+                .getIndexCommunicatorBufferSize());
         this.indexingNode = checkIfIndexingNode();
     }
 

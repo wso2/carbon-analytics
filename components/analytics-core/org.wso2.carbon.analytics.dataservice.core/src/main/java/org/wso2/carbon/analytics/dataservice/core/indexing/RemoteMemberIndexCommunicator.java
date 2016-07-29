@@ -18,13 +18,12 @@
  */
 package org.wso2.carbon.analytics.dataservice.core.indexing;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.lmax.disruptor.BlockingWaitStrategy;
+import com.lmax.disruptor.EventFactory;
+import com.lmax.disruptor.EventHandler;
+import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
@@ -35,12 +34,12 @@ import org.wso2.carbon.analytics.dataservice.core.indexing.IndexNodeCoordinator.
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
-import com.lmax.disruptor.BlockingWaitStrategy;
-import com.lmax.disruptor.EventFactory;
-import com.lmax.disruptor.EventHandler;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.dsl.ProducerType;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This class represents the remote member index message sending functionality in a cluster.
@@ -49,11 +48,15 @@ public class RemoteMemberIndexCommunicator {
     
     private static Log log = LogFactory.getLog(RemoteMemberIndexCommunicator.class);
     
-    private static final int REMOTE_INDEX_COMMUNICATOR_BUFFER_SIZE = 1024;
+    private int remoteIndexerCommunicatorBufferSize;
 
     private ExecutorService executor = Executors.newCachedThreadPool();
     
     private Map<Object, Disruptor<RecordsHolder>> disruptorMap = new HashMap<>();
+
+    public RemoteMemberIndexCommunicator(int remoteIndexerCommunicatorBufferSize) {
+        this.remoteIndexerCommunicatorBufferSize = remoteIndexerCommunicatorBufferSize;
+    }
 
     public void put(Object member, List<Record> records) throws AnalyticsException {
         RingBuffer<RecordsHolder> buffer = this.getRingBuffer(member);
@@ -78,8 +81,8 @@ public class RemoteMemberIndexCommunicator {
             synchronized (this) {
                 disruptor = this.disruptorMap.get(member);
                 if (disruptor == null) {
-                    disruptor = new Disruptor<>(new RecordsEventFactory(), 
-                            REMOTE_INDEX_COMMUNICATOR_BUFFER_SIZE, this.executor, ProducerType.MULTI, 
+                    disruptor = new Disruptor<>(new RecordsEventFactory(),
+                            remoteIndexerCommunicatorBufferSize, this.executor, ProducerType.MULTI,
                             new BlockingWaitStrategy());
                     disruptor.handleEventsWith(new RecordsEventHandler(member));
                     this.disruptorMap.put(member, disruptor);
