@@ -156,7 +156,7 @@ public class AnalyticsDataIndexer {
     
     private static final int MAX_NON_TOKENIZED_INDEX_STRING_SIZE = 1000;
     
-    private static final String ENABLE_INDEXING_STATS_SYS_PROP = "enableIndexingStats";
+    private static final String ENABLE_INDEXING_STATS_SYS_PROP = "profileIndexing";
     
     private static final String INDEX_DATA_FS_BASE_PATH = File.separator + "_data" + 
             File.separator + "index" + File.separator;
