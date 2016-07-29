@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>dashboard-template-deployer-feature</artifactId>
-        <version>5.1.1-SNAPSHOT</version>
+        <version>5.1.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
