@@ -661,6 +661,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             if (subCategories.getCategories() != null) {
                 subCategoriesBean.setCategories(getSearchResultEntryBeans(subCategories));
                 subCategoriesBean.setCategoryCount(subCategories.getCategoryCount());
+                subCategoriesBean.setPath(subCategories.getPath());
             }
         } catch (Exception e) {
             logger.error("Unable to get drill down category information for table[" + drillDownRequest.getTableName() + "] and " +
