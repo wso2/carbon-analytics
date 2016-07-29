@@ -21,6 +21,7 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.exception.SparkScriptDeploymentException;
 import org.wso2.carbon.analytics.spark.core.internal.AnalyticsPersistenceManager;
@@ -69,6 +70,7 @@ public class SparkScriptCAppDeployer implements AppDeploymentHandler {
                 List<CappFile> files = artifact.getFiles();
                 if (files.size() == 1) {
                     String fileName = files.get(0).getName();
+                    fileName = GenericUtils.checkAndReturnPath(fileName);
                     String artifactPath = artifact.getExtractedPath() + File.separator + fileName;
                     try {
                         deploy(artifactPath, carbonApplication.getAppName());
@@ -139,6 +141,7 @@ public class SparkScriptCAppDeployer implements AppDeploymentHandler {
                 if (AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED.
                         equals(artifact.getDeploymentStatus())) {
                     String fileName = artifact.getFiles().get(0).getName();
+                    fileName = GenericUtils.checkAndReturnPath(fileName);
                     String artifactPath = artifact.getExtractedPath() + File.separator + fileName;
                     try {
                         undeploy(artifactPath);
