@@ -74,6 +74,7 @@ public class AnalyticsDataPurgingDeployer implements AppDeploymentHandler {
                 List<CappFile> files = artifact.getFiles();
                 if (files.size() == 1) {
                     String fileName = files.get(0).getName();
+                    fileName = GenericUtils.checkAndReturnPath(fileName);
                     String artifactPath = artifact.getExtractedPath() + File.separator + fileName;
                     try {
                         registerPurgingTasks(artifactPath);
@@ -112,6 +113,7 @@ public class AnalyticsDataPurgingDeployer implements AppDeploymentHandler {
                 }
                 if (AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED.equals(artifact.getDeploymentStatus())) {
                     String fileName = artifact.getFiles().get(0).getName();
+                    fileName = GenericUtils.checkAndReturnPath(fileName);
                     String artifactPath = artifact.getExtractedPath() + File.separator + fileName;
                     deletePurgingTasks(artifactPath);
                     artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_PENDING);
@@ -121,7 +123,6 @@ public class AnalyticsDataPurgingDeployer implements AppDeploymentHandler {
     }
 
     private void deletePurgingTasks(String scriptFilePath) {
-        scriptFilePath = GenericUtils.checkAndReturnPath(scriptFilePath);
         File deploymentFileData = new File(scriptFilePath);
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         log.info("Undeploying purging task : " + deploymentFileData.getName() + " for tenant : " + tenantId);
@@ -144,7 +145,6 @@ public class AnalyticsDataPurgingDeployer implements AppDeploymentHandler {
     }
 
     private void registerPurgingTasks(String scriptFilePath) throws DeploymentException {
-        scriptFilePath = GenericUtils.checkAndReturnPath(scriptFilePath);
         File deploymentFileData = new File(scriptFilePath);
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         log.info("Deploying purging task : " + deploymentFileData.getName() + " for tenant : " + tenantId);
