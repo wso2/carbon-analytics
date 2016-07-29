@@ -638,15 +638,20 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     public int getNumPartitionsHint() throws AnalyticsException {
-        // todo: return the number of executors
         /* all workers will not have the same CPU count, this is just an approximation */
         int workerCount = this.getWorkerCount();
+        int workerCores = this.sparkConf.getInt(AnalyticsConstants.SPARK_WORKER_CORES, 1);
+        int partitionCount = workerCount * workerCores;
 
         if (workerCount == 0) {
             throw new AnalyticsException("Error while calculating NumPartitionsHint. Worker count is zero.");
         }
 
-        return workerCount * Runtime.getRuntime().availableProcessors();
+        if (log.isDebugEnabled()) {
+            log.debug("Partition count: " + partitionCount);
+        }
+
+        return partitionCount;
     }
 
 //    public int getSparkExecutorCountLocal() throws AnalyticsClusterException {
