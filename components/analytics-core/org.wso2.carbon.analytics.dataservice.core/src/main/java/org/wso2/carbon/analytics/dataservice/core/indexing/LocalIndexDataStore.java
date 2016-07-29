@@ -55,7 +55,8 @@ public class LocalIndexDataStore {
     public void refreshLocalIndexShards() throws AnalyticsException {
         this.flushQueues();
         for (int shardIndex : this.indexer.getLocalShards()) {
-            this.indexDataQueues.put(shardIndex, new LocalIndexDataQueue(shardIndex));
+            this.indexDataQueues.put(shardIndex, new LocalIndexDataQueue(shardIndex,
+                    indexer.getAnalyticsIndexerInfo().getIndexQueueCleanupThreshold()));
         }
     }
     
@@ -190,7 +191,7 @@ public class LocalIndexDataStore {
         
         private static final String SECONDARY_QUEUE_SUFFIX = "S";
 
-        private static final int QUEUE_CLEANUP_THRESHOLD = 20971520; // 20 MB
+        private int queueCleanupThreshold;
         
         private IBigQueue primaryQueue;
         
@@ -202,9 +203,10 @@ public class LocalIndexDataStore {
                 
         private long removedDataSize = 0;
         
-        public LocalIndexDataQueue(int shardIndex) throws AnalyticsException {
+        public LocalIndexDataQueue(int shardIndex, int queueCleanupThreshold) throws AnalyticsException {
             this.primaryQueue = this.createQueue(shardIndex + PRIMARY_QUEUE_SUFFIX);
             this.secondaryQueue = this.createQueue(shardIndex + SECONDARY_QUEUE_SUFFIX);
+            this.queueCleanupThreshold = queueCleanupThreshold;
         }
         
         private IBigQueue createQueue(String queueId) throws AnalyticsException {
@@ -273,7 +275,7 @@ public class LocalIndexDataStore {
                 this.secondaryProcessedCount++;
                 IndexOperation indexOp = IndexOperation.fromBytes(data);
                 this.removedDataSize += indexOp.getByteSize();
-                if (this.removedDataSize > QUEUE_CLEANUP_THRESHOLD) {
+                if (this.removedDataSize > queueCleanupThreshold) {
                     this.primaryQueue.gc();
                     this.secondaryQueue.gc();
                     this.removedDataSize = 0;

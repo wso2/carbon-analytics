@@ -62,16 +62,19 @@
         to do the indexing operations of the local shards. When this value is increased, the parallel I/O operations being done on the
         system grows larger. So a system which can handle parallel I/O operation could increase this, e.g. SSDs. -->
    <indexWorkerCount>1</indexWorkerCount>
+   <!--Buffer size (number of messages) of the ringBuffer which is used to send indexing messages in the cluster.
+    Should be a number equals to "2" to the power of n -->
+   <maxIndexerCommunicatorBufferSize>1024</maxIndexerCommunicatorBufferSize>
+    <!--Indexing queue cleanup threshold in bytes-->
+   <indexingQueueCleanupThreshold>209715200</indexingQueueCleanupThreshold>
     <!--The maximum RAM size in MBs allocated for an indexing thread to consume before the thread flushes the documents to the directory-->
-   <maxRAMPerIndexingThreadInMB>1945</maxRAMPerIndexingThreadInMB>
-    <!--The maximum RAM size allocated for lucene documents added, before being flushed to directory-->
-   <maxRAMBufferForLuceneDocsInMB>16</maxRAMBufferForLuceneDocsInMB>
+   <!--<maxRAMPerIndexingThreadInMB>1945</maxRAMPerIndexingThreadInMB>-->
     <!-- Index will be built into a compoundFile if the value is true, making it false will increase the indexing speed
     but will open a lots of file Descriptors-->
-   <useCompoundIndexFile>true</useCompoundIndexFile>
+   <!--<useCompoundIndexFile>true</useCompoundIndexFile>-->
     <!--The largest segment's size which may be merged with other segments. Smaller values (e.g. 50MB) will be good for
     interactive indexing and larger values will be better for batch indexing-->
-   <maxIndexSegmentMergeSizeInMB>2048</maxIndexSegmentMergeSizeInMB>
+   <!--<maxIndexSegmentMergeSizeInMB>2048</maxIndexSegmentMergeSizeInMB>-->
    <!-- Data purging related configuration -->
    <analytics-data-purging>
       <!-- Below entry will indicate purging is enable or not. If user wants to enable data purging for cluster then this property

@@ -55,6 +55,10 @@ public class AnalyticsIndexerInfo {
 
     private double maxSegmentMergeSizeInMB;
 
+    private int indexCommunicatorBufferSize;
+
+    private int indexQueueCleanupThreshold;
+
     public Analyzer getLuceneAnalyzer() {
         return luceneAnalyzer;
     }
@@ -155,8 +159,8 @@ public class AnalyticsIndexerInfo {
         return maxRAMBufferForLuceneDocsInMB;
     }
 
-    public void setMaxRAMBufferForLuceneDocsInMB(double maxRAMBufferForLuceneDocsInMB) {
-        this.maxRAMBufferForLuceneDocsInMB = maxRAMBufferForLuceneDocsInMB;
+    public void setMaxRAMBufferForLuceneDocsInMB(double maxRAMBufferForLuceneDocsInBytes) {
+        this.maxRAMBufferForLuceneDocsInMB = maxRAMBufferForLuceneDocsInBytes / (1024 * 1024);
     }
 
     public double getMaxSegmentMergeSizeInMB() {
@@ -165,5 +169,21 @@ public class AnalyticsIndexerInfo {
 
     public void setMaxSegmentMergeSizeInMB(double maxSegmentMergeSizeInMB) {
         this.maxSegmentMergeSizeInMB = maxSegmentMergeSizeInMB;
+    }
+
+    public int getIndexCommunicatorBufferSize() {
+        return indexCommunicatorBufferSize;
+    }
+
+    public void setIndexCommunicatorBufferSize(int indexCommunicatorBufferSize) {
+        this.indexCommunicatorBufferSize = indexCommunicatorBufferSize;
+    }
+
+    public int getIndexQueueCleanupThreshold() {
+        return indexQueueCleanupThreshold;
+    }
+
+    public void setIndexQueueCleanupThreshold(int indexQueueCleanupThreshold) {
+        this.indexQueueCleanupThreshold = indexQueueCleanupThreshold;
     }
 }

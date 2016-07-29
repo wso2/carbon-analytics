@@ -49,13 +49,15 @@ public class AnalyticsDataServiceConfiguration {
     
     private int indexWorkerCount = Constants.DEFAULT_INDEX_WORKER_COUNT;
 
-    private int maxMemoryPerThreadInMB = Constants.DEFAULT_MAX_MEMORY_PER_INDEXING_THREAD;
+    private int maxIndexerCommunicatorBufferSize = Constants.DEFAULT_MAX_INDEXER_COMMUNICATOR_BUFFER_SIZE;
 
-    private double maxMemoryBufferForLuceneDocsInMB = Constants.DEFAULT_MAX_MEMORY_FOR_LUCENE_DOCS;
+    private int maxMemoryPerThreadInMB = Constants.DEFAULT_MAX_MEMORY_PER_INDEXING_THREAD;
 
     private boolean useCompoundIndexFile = Constants.DEFAULT_INDEX_USE_COMPOUND_INDEX_FILE;
 
     private double maxIndexMergeSizeInMB = Constants.DEFAULT_INDEX_MAX_MERGE_SEGMENT_SIZE;
+
+    private int queueCleanupThreshold = Constants.DEFAULT_INDEXING_QUEUE_CLEANUP_THRESHOLD;
 
     @XmlElement (name = "analytics-record-store", nillable = false)
     public AnalyticsRecordStoreConfiguration[] getAnalyticsRecordStoreConfigurations() {
@@ -147,15 +149,6 @@ public class AnalyticsDataServiceConfiguration {
         this.maxMemoryPerThreadInMB = maxMemoryPerThreadInMB;
     }
 
-    @XmlElement (name = "maxRAMBufferForLuceneDocsInMB")
-    public double getMaxMemoryBufferForLuceneDocsInMB() {
-        return maxMemoryBufferForLuceneDocsInMB;
-    }
-
-    public void setMaxMemoryBufferForLuceneDocsInMB(double maxMemoryBufferForLuceneDocsInMB) {
-        this.maxMemoryBufferForLuceneDocsInMB = maxMemoryBufferForLuceneDocsInMB;
-    }
-
     @XmlElement (name = "useCompoundIndexFile", defaultValue = "" + Constants.DEFAULT_INDEX_USE_COMPOUND_INDEX_FILE)
     public boolean isUseCompoundIndexFile() {
         return useCompoundIndexFile;
@@ -172,6 +165,24 @@ public class AnalyticsDataServiceConfiguration {
 
     public void setMaxSegmentMergeSizeInMB(double maxSegmentMergeSizeInMB) {
         this.maxIndexMergeSizeInMB = maxSegmentMergeSizeInMB;
+    }
+
+    @XmlElement(name = "maxIndexerCommunicatorBufferSize", defaultValue = "" + Constants.DEFAULT_MAX_INDEXER_COMMUNICATOR_BUFFER_SIZE)
+    public int getMaxIndexerCommunicatorBufferSize() {
+        return maxIndexerCommunicatorBufferSize;
+    }
+
+    public void setMaxIndexerCommunicatorBufferSize(int maxIndexerCommunicatorBufferSize) {
+        this.maxIndexerCommunicatorBufferSize = maxIndexerCommunicatorBufferSize;
+    }
+
+    @XmlElement( name = "indexingQueueCleanupThreshold", defaultValue = "" + Constants.DEFAULT_INDEXING_QUEUE_CLEANUP_THRESHOLD)
+    public int getQueueCleanupThreshold() {
+        return queueCleanupThreshold;
+    }
+
+    public void setQueueCleanupThreshold(int queueCleanupThreshold) {
+        this.queueCleanupThreshold = queueCleanupThreshold;
     }
 
     @XmlElement(name = "analytics-data-purging")
