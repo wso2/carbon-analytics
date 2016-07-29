@@ -152,6 +152,10 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         indexerInfo.setIndexStoreLocation(GenericUtils.resolveLocation(Constants.DEFAULT_INDEX_STORE_LOCATION));
         indexerInfo.setIndexReplicationFactor(config.getIndexReplicationFactor());
         indexerInfo.setIndexWorkerCount(this.extractIndexWorkerCount(config));
+        indexerInfo.setMaxRAMBufferForLuceneDocsInMB(config.getMaxMemoryBufferForLuceneDocsInMB());
+        indexerInfo.setMaxRAMPerIndexingThreadInMB(config.getMaxMemoryPerThreadInMB());
+        indexerInfo.setUseCompoundIndexFile(config.isUseCompoundIndexFile());
+        indexerInfo.setMaxSegmentMergeSizeInMB(config.getMaxSegmentMergeSizeInMB());
         this.indexer = new AnalyticsDataIndexer(indexerInfo);
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();

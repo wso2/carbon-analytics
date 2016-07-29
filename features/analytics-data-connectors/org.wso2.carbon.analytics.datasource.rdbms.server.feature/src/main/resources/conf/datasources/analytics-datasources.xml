@@ -24,6 +24,7 @@
                     <initialSize>0</initialSize>
                     <testWhileIdle>true</testWhileIdle>
                     <minEvictableIdleTimeMillis>4000</minEvictableIdleTimeMillis>
+                    <defaultTransactionIsolation>READ_COMMITTED</defaultTransactionIsolation>
                 </configuration>
             </definition>
         </datasource>
@@ -44,6 +45,7 @@
                     <initialSize>0</initialSize>
                     <testWhileIdle>true</testWhileIdle>
                     <minEvictableIdleTimeMillis>4000</minEvictableIdleTimeMillis>
+                    <defaultTransactionIsolation>READ_COMMITTED</defaultTransactionIsolation>
                 </configuration>
             </definition>
         </datasource>

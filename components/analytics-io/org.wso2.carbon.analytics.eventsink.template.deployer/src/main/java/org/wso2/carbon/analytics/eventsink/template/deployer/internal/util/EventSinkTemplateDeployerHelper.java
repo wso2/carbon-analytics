@@ -25,9 +25,9 @@ import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreExceptio
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
 import org.wso2.carbon.analytics.eventsink.template.deployer.internal.EventSinkTemplateDeployerValueHolder;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
 import org.wso2.carbon.event.template.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.template.manager.core.TemplateDeploymentException;
-import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
@@ -69,7 +69,8 @@ public class EventSinkTemplateDeployerHelper {
             throws TemplateDeploymentException {
         streamName = GenericUtils.checkAndReturnPath(streamName);
         File eventSinkFile = new File(MultitenantUtils.getAxis2RepositoryPath(tenantId) +
-                                      AnalyticsEventSinkConstants.DEPLOYMENT_DIR_NAME + File.separator + streamName +
+                                      AnalyticsEventSinkConstants.DEPLOYMENT_DIR_NAME + File.separator +
+                                      EventSinkTemplateDeployerValueHolder.getAnalyticsEventSinkService().generateAnalyticsTableName(streamName) +
                                       AnalyticsEventSinkConstants.DEPLOYMENT_FILE_EXT);
         if (eventSinkFile.exists()) {
             if (!eventSinkFile.delete()) {
@@ -104,7 +105,8 @@ public class EventSinkTemplateDeployerHelper {
     public static AnalyticsEventStore getExistingEventStore(int tenantId, String streamName)
             throws TemplateDeploymentException {
         File eventSinkFile = new File(MultitenantUtils.getAxis2RepositoryPath(tenantId) +
-                                      AnalyticsEventSinkConstants.DEPLOYMENT_DIR_NAME + File.separator + streamName +
+                                      AnalyticsEventSinkConstants.DEPLOYMENT_DIR_NAME + File.separator +
+                                      EventSinkTemplateDeployerValueHolder.getAnalyticsEventSinkService().generateAnalyticsTableName(streamName) +
                                       AnalyticsEventSinkConstants.DEPLOYMENT_FILE_EXT);
         if (eventSinkFile.exists()) {
             try {
@@ -398,6 +400,9 @@ public class EventSinkTemplateDeployerHelper {
     private static void updateEventSourceInExistingEventStore(String streamName, int tenantId, List<String> unsubscriptions)
             throws AnalyticsEventStoreException, TemplateDeploymentException {
         AnalyticsEventStore analyticsEventStore = EventSinkTemplateDeployerHelper.getExistingEventStore(tenantId, streamName);
+        if (analyticsEventStore == null) {   //the event sink has already being undeployed due to streams being undeployed.
+            return;
+        }
         for (String streamId : unsubscriptions) {
             analyticsEventStore.getEventSource().getStreamIds().remove(streamId);
         }

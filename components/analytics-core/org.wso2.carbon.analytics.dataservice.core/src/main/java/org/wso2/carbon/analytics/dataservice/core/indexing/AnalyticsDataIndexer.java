@@ -58,6 +58,7 @@ import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queries.function.ValueSource;
@@ -1654,6 +1655,13 @@ public class AnalyticsDataIndexer {
                 indexWriter = this.indexWriters.get(shardedTableId);
                 if (indexWriter == null) {
                     IndexWriterConfig conf = new IndexWriterConfig(this.indexerInfo.getLuceneAnalyzer());
+                    LogByteSizeMergePolicy mergePolicy = new LogByteSizeMergePolicy();
+                    mergePolicy.setMaxMergeMB(this.indexerInfo.getMaxSegmentMergeSizeInMB());
+                    conf.setRAMBufferSizeMB(this.indexerInfo.getMaxRAMBufferForLuceneDocsInMB());
+                    conf.setRAMPerThreadHardLimitMB(this.indexerInfo.getMaxRAMPerIndexingThreadInMB());
+                    conf.setMaxThreadStates(this.indexerInfo.getIndexWorkerCount());
+                    conf.setUseCompoundFile(this.indexerInfo.isUseCompoundIndexFile());
+                    conf.setMergePolicy(mergePolicy);
                     try {
                         indexWriter = new IndexWriter(this.createDirectory(shardId, tableId), conf);
                         this.indexWriters.put(shardedTableId, indexWriter);
@@ -1674,7 +1682,7 @@ public class AnalyticsDataIndexer {
                 taxonomyWriter = this.indexTaxonomyWriters.get(shardedTableId);
                 if (taxonomyWriter == null) {
                     try {
-                        taxonomyWriter = new DirectoryTaxonomyWriter(this.createDirectory(shardId, 
+                        taxonomyWriter = new DirectoryTaxonomyWriter(this.createDirectory(shardId,
                                 TAXONOMY_INDEX_DATA_FS_BASE_PATH, tableId), 
                                 IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
                         this.indexTaxonomyWriters.put(shardedTableId, taxonomyWriter);

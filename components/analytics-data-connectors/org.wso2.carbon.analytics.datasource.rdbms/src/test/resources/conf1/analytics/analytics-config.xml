@@ -25,6 +25,9 @@
    <!-- The number of index shards, should be equal or higher to the number of indexing nodes that is going to be working,
         ideal count being 'number of indexing nodes * CPU cores' -->
    <shardCount>6</shardCount>
+    <maxRAMPerIndexingThreadInMB>1945</maxRAMPerIndexingThreadInMB>
+    <!--The maximum RAM size allocated for lucene documents added, before being flushed to directory-->
+    <maxRAMBufferForLuceneDocsInMB>512</maxRAMBufferForLuceneDocsInMB>
    <!-- The amount of index data (in bytes) to be processed at a time by a shard index worker. Minimum value is 1000. -->
    <shardIndexRecordBatchSize>20971520</shardIndexRecordBatchSize>
    <!-- The interval in milliseconds, which a shard index processing worker thread will sleep during index processing operations. This setting
@@ -35,5 +38,5 @@
    <!-- The number of index workers to operate in the current node. This basically results in the number of execution threads created
         to do the indexing operations of the local shards. When this value is increased, the parallel I/O operations being done on the
         system grows larger. So a system which can handle parallel I/O operation could increase this, e.g. SSDs -->
-   <indexWorkerCount>4</indexWorkerCount>
+   <indexWorkerCount>8</indexWorkerCount>
 </analytics-dataservice-configuration>

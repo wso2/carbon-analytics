@@ -48,7 +48,15 @@ public class AnalyticsDataServiceConfiguration {
     private int recordsBatchSize = Constants.RECORDS_BATCH_SIZE;
     
     private int indexWorkerCount = Constants.DEFAULT_INDEX_WORKER_COUNT;
-    
+
+    private int maxMemoryPerThreadInMB = Constants.DEFAULT_MAX_MEMORY_PER_INDEXING_THREAD;
+
+    private double maxMemoryBufferForLuceneDocsInMB = Constants.DEFAULT_MAX_MEMORY_FOR_LUCENE_DOCS;
+
+    private boolean useCompoundIndexFile = Constants.DEFAULT_INDEX_USE_COMPOUND_INDEX_FILE;
+
+    private double maxIndexMergeSizeInMB = Constants.DEFAULT_INDEX_MAX_MERGE_SEGMENT_SIZE;
+
     @XmlElement (name = "analytics-record-store", nillable = false)
     public AnalyticsRecordStoreConfiguration[] getAnalyticsRecordStoreConfigurations() {
         return analyticsRecordStoreConfigurations;
@@ -130,6 +138,42 @@ public class AnalyticsDataServiceConfiguration {
         this.indexWorkerCount = indexWorkerCount;
     }
 
+    @XmlElement (name = "maxRAMPerIndexingThreadInMB", defaultValue = "" + Constants.DEFAULT_MAX_MEMORY_PER_INDEXING_THREAD)
+    public int getMaxMemoryPerThreadInMB() {
+        return maxMemoryPerThreadInMB;
+    }
+
+    public void setMaxMemoryPerThreadInMB(int maxMemoryPerThreadInMB) {
+        this.maxMemoryPerThreadInMB = maxMemoryPerThreadInMB;
+    }
+
+    @XmlElement (name = "maxRAMBufferForLuceneDocsInMB")
+    public double getMaxMemoryBufferForLuceneDocsInMB() {
+        return maxMemoryBufferForLuceneDocsInMB;
+    }
+
+    public void setMaxMemoryBufferForLuceneDocsInMB(double maxMemoryBufferForLuceneDocsInMB) {
+        this.maxMemoryBufferForLuceneDocsInMB = maxMemoryBufferForLuceneDocsInMB;
+    }
+
+    @XmlElement (name = "useCompoundIndexFile", defaultValue = "" + Constants.DEFAULT_INDEX_USE_COMPOUND_INDEX_FILE)
+    public boolean isUseCompoundIndexFile() {
+        return useCompoundIndexFile;
+    }
+
+    public void setUseCompoundIndexFile(boolean useCompoundIndexFile) {
+        this.useCompoundIndexFile = useCompoundIndexFile;
+    }
+
+    @XmlElement( name = "maxIndexSegmentMergeSizeInMB", defaultValue = "" + Constants.DEFAULT_INDEX_MAX_MERGE_SEGMENT_SIZE)
+    public double getMaxSegmentMergeSizeInMB() {
+        return maxIndexMergeSizeInMB;
+    }
+
+    public void setMaxSegmentMergeSizeInMB(double maxSegmentMergeSizeInMB) {
+        this.maxIndexMergeSizeInMB = maxSegmentMergeSizeInMB;
+    }
+
     @XmlElement(name = "analytics-data-purging")
     public AnalyticsDataPurgingConfiguration getAnalyticsDataPurgingConfiguration() {
         return analyticsDataPurgingConfiguration;
@@ -139,5 +183,5 @@ public class AnalyticsDataServiceConfiguration {
             AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration) {
         this.analyticsDataPurgingConfiguration = analyticsDataPurgingConfiguration;
     }
-    
+
 }
