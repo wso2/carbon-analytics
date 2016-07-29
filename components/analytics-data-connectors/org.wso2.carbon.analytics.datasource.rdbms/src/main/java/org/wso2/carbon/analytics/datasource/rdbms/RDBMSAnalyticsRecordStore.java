@@ -229,40 +229,39 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             throw e1;
         }
     }
-    
+
 
     private void insertAndUpdateRecordsSimilarSequentially(Connection conn,
                                                            List<Record> records, int tenantId, String tableName) throws SQLException, AnalyticsException {
-        String insertQuery = this.getRecordInsertSQL(tenantId, tableName);
-        String updateQuery = this.getRecordUpdateSQL(tenantId, tableName);
-        for (Record record : records) {
-            try {
-                this.insertOrUpdateRecord(conn, record, insertQuery);
-            } catch (SQLException e) {
-                /* maybe the record is already there, lets try to update */
-                RDBMSUtils.rollbackConnection(conn);
+        PreparedStatement insertStatement = null;
+        PreparedStatement updateStatement = null;
+        try {
+            insertStatement = conn.prepareStatement(this.getRecordInsertSQL(tenantId, tableName));
+            updateStatement = conn.prepareStatement(this.getRecordUpdateSQL(tenantId, tableName));
+            for (Record record : records) {
                 try {
-                    this.insertOrUpdateRecord(conn, record, updateQuery);
-                } catch (SQLException e1) {
-                    log.warn("Error while updating a Record : " + e1.getMessage(), e1);
+                    this.populateStatementForAdd(insertStatement, record);
+                    insertStatement.executeUpdate();
+                    conn.commit();
+                } catch (SQLException e) {
+                /* maybe the record is already there, lets try to update */
                     RDBMSUtils.rollbackConnection(conn);
+                    try {
+                        this.populateStatementForAdd(updateStatement, record);
+                        updateStatement.executeUpdate();
+                        conn.commit();
+                    } catch (SQLException e1) {
+                        log.warn("Error while updating a Record : " + e1.getMessage(), e1);
+                        RDBMSUtils.rollbackConnection(conn);
+                    }
                 }
             }
+        } finally {
+            RDBMSUtils.cleanupConnection(null, insertStatement, null);
+            RDBMSUtils.cleanupConnection(null, updateStatement, null);
         }
     }
 
-    private void insertOrUpdateRecord(Connection conn, Record record, String insertOrUpdateQuery) throws SQLException, AnalyticsException {
-        PreparedStatement stmt = null;
-        try {
-            stmt = conn.prepareStatement(insertOrUpdateQuery);
-            this.populateStatementForAdd(stmt, record);
-            stmt.executeUpdate();
-            conn.commit();
-        } finally {
-            RDBMSUtils.cleanupConnection(null, stmt, null);
-        }
-    }
-    
     private void insertBatchRecordsSimilar(Connection conn, 
             List<Record> records, int tenantId, String tableName) throws SQLException, 
             AnalyticsException, AnalyticsTableNotAvailableException {
