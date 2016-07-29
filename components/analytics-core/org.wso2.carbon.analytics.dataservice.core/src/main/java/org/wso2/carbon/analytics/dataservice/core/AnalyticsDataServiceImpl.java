@@ -222,7 +222,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     private void initDataPurging(AnalyticsDataServiceConfiguration config) {
         boolean dataPurgingEnable = !Boolean.getBoolean(Constants.DISABLE_ANALYTICS_DATA_PURGING_JVM_OPTION);
-        logger.info("Data purging is " + (dataPurgingEnable ? "enabled" : "disabled") + " in this node");
+        logger.info("Current Node Data Purging: " + (dataPurgingEnable ? "Yes" : "No"));
         if (dataPurgingEnable) {
             TaskService taskService = AnalyticsServiceHolder.getTaskService();
             if (taskService != null) {
