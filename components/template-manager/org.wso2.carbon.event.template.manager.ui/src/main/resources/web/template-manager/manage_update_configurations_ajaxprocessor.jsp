@@ -94,6 +94,8 @@
                     String toStreamNameID = "";
                     String fromStreamNameID = "";
                     StreamMappingDTO[] streamMappingDTOs = null;
+                    AttributeMappingDTO[] attributeMappingDTOs=null;
+                    boolean isStreamChanged=false;
 
                     EventStreamAdminServiceStub eventStreamAdminServiceStub = TemplateManagerUIUtils.getEventStreamAdminService(config,
                             session, request);
@@ -108,9 +110,15 @@
                     }
 
                     for (int i = 0; i < toStreamIDArray.length; i++) {
-                        toStreamNameID = streamMappingDTOs[i].getToStream();
-                        fromStreamNameID = streamMappingDTOs[i].getFromStream();
-                        AttributeMappingDTO[] attributeMappingDTOs = streamMappingDTOs[i].getAttributeMappingDTOs();
+                        //Compare return streamID with already saved configuration streamId to check whether streamID has been changed during edit
+                        if (streamMappingDTOs[i].getToStream().equals(toStreamIDArray[i])) {
+                            toStreamNameID = streamMappingDTOs[i].getToStream();
+                            fromStreamNameID = streamMappingDTOs[i].getFromStream();
+                            attributeMappingDTOs = streamMappingDTOs[i].getAttributeMappingDTOs();
+                        } else {
+                            toStreamNameID = toStreamIDArray[i];
+                            isStreamChanged = true;
+                        }
     %>
         <div class="container col-md-12 marg-top-20" id="streamMappingConfigurationID_<%=i%>">
 
@@ -120,9 +128,13 @@
 
             <div class="input-control input-full-width col-md-7 text">
                 <select id="fromStreamID_<%=i%>" onchange="loadMappingFromStreamAttributes(<%=i%>)">
+                    <%if (isStreamChanged == false) {%>
                     <option selected><%=fromStreamNameID%>
                     </option>
+                    <%} else {%>
+                    <option selected disabled>Select an input stream to map</option>
                     <%
+                        }
                         if (fromStreamIds != null) {
                             Arrays.sort(fromStreamIds);
                             for (String aStreamId : fromStreamIds) {
@@ -149,6 +161,7 @@
             <div id="outerDiv_<%=i%>">
 
                 <%
+                    if (isStreamChanged == false) {
                     //process attribute mapping dto to sort meta,correlation and payload attributes
                     ArrayList<AttributeMappingDTO> metaAttributeMappingDTOList = new ArrayList<AttributeMappingDTO>();
                     ArrayList<AttributeMappingDTO> correlationAttributeMappingDTOList = new ArrayList<AttributeMappingDTO>();
@@ -413,6 +426,7 @@
                                value="<%=payloadCounter%>"/>
                     </div>
                 </table>
+                <%}%>
             </div>
         </div>
     <br class="c-both"/>
