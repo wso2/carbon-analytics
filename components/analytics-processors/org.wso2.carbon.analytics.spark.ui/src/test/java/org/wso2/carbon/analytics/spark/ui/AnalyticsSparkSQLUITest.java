@@ -91,7 +91,7 @@ public class AnalyticsSparkSQLUITest {
         AnalyticsQueryResult queryResult = processorService.executeQuery(1, query);
         AnalyticsQueryResultDto queryResultDto = AnalyticsResultConverter.convertResults(queryResult);
         AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto stubDto = getResult(queryResultDto);
-        String result = client.toJsonResult(query, stubDto);
+        String result = client.resultToJson(query, stubDto);
         Assert.assertEquals(result.charAt(0), '{');
         Assert.assertEquals(result.charAt(result.length() - 1), '}');
         System.out.println(result);
@@ -100,7 +100,7 @@ public class AnalyticsSparkSQLUITest {
         queryResult = processorService.executeQuery(1, query);
         queryResultDto = AnalyticsResultConverter.convertResults(queryResult);
         stubDto = getResult(queryResultDto);
-        result = client.toJsonResult(query, stubDto);
+        result = client.resultToJson(query, stubDto);
         System.out.println(result);
         Assert.assertEquals(result.charAt(0), '{');
         Assert.assertEquals(result.charAt(result.length() - 1), '}');
@@ -110,7 +110,7 @@ public class AnalyticsSparkSQLUITest {
         queryResult = processorService.executeQuery(1, query);
         queryResultDto = AnalyticsResultConverter.convertResults(queryResult);
         stubDto = getResult(queryResultDto);
-        result = client.toJsonResult(query, stubDto);
+        result = client.resultToJson(query, stubDto);
         System.out.println(result);
         Assert.assertEquals(result.charAt(0), '{');
         Assert.assertEquals(result.charAt(result.length() - 1), '}');

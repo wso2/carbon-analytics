@@ -617,15 +617,18 @@
                         var p = '<span class="' + command_class + '"><span>' + cbk.ps + '</span>&nbsp;' + value + '</span>';
                         content.append('<div>' + p + '<div id = "' + out_str + '"></div></div>');
 
-                        $(document.getElementById(out_str)).html('<table cellpadding="0" cellspacing="0" ' +
-                                                                 'border="0" class="display" id="' + tbl_str + '">' +
-                                                                 '</table>');
-
-                        $(document.getElementById(tbl_str)).dataTable({
-                                                                          "data": results,
-                                                                          "columns": col_arr,
-                                                                          "searching": false
-                                                                      });
+                        if (data.meta.code== "200") {
+                            $(document.getElementById(out_str)).html('<table cellpadding="0" cellspacing="0" ' +
+                                                                     'border="0" class="display" id="' + tbl_str + '">' +
+                                                                     '</table>');
+                            $(document.getElementById(tbl_str)).dataTable({
+                                                                              "data": results,
+                                                                              "columns": col_arr,
+                                                                              "searching": false
+                                                                          });
+                        } else if (data.meta.code== "400"){
+                            $(document.getElementById(out_str)).html('<div>' + settings.error_prefix + ' ' + results[0]+ ' </div>')
+                        }
                         update_count++;
                         // End loading.
                         loading.fadeOut(300);

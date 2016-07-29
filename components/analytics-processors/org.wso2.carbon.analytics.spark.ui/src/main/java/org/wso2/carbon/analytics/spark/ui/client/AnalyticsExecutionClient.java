@@ -56,10 +56,41 @@ public class AnalyticsExecutionClient {
 
     }
 
-    public String execute(String query) throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+    public String execute(String query){
         query = StringEscapeUtils.unescapeHtml(query);
-        AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto queryResult = stub.executeQuery(query);
-        return toJsonResult(query, queryResult);
+        AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto queryResult;
+        try {
+            queryResult = stub.executeQuery(query);
+        } catch (RemoteException|AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException e) {
+            e.printStackTrace();
+            return errorToJson(query, e.getMessage());
+        }
+        return resultToJson(query, queryResult);
+    }
+
+    private String errorToJson(String query, String message) {
+        JsonObject resObj = new JsonObject();
+
+        JsonObject meta = new JsonObject();
+        meta.addProperty("code", 400);
+        meta.addProperty("responseMessage", "ERROR EXECUTING QUERY : " + query);
+        JsonArray colArray = new JsonArray();
+
+        colArray.add(new JsonPrimitive("ERROR"));
+
+        meta.add("columns", colArray);
+        resObj.add("meta", meta);
+
+        JsonObject response = new JsonObject();
+        JsonArray rows = new JsonArray();
+        JsonArray singleRow = new JsonArray();
+        singleRow.add(new JsonPrimitive(message));
+        rows.add(singleRow);
+
+        response.add("items", rows);
+        resObj.add("response", response);
+
+        return resObj.toString();
     }
 
     public AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] executeScriptContent(String scriptContent) throws RemoteException,
@@ -121,7 +152,7 @@ public class AnalyticsExecutionClient {
         }
     }
 
-    public String toJsonResult(String query, AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto res) {
+    public String resultToJson(String query, AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto res) {
         JsonObject resObj = new JsonObject();
 
         JsonObject meta = new JsonObject();

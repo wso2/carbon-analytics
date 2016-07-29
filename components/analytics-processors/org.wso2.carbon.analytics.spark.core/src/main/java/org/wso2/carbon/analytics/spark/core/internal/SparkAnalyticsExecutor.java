@@ -170,14 +170,14 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             case standaloneSpark:
             case yarn:
             case mesos:
-                log.info("Starting SPARK in the Client mode. Master : " + this.sparkMaster);
+                log.info("Starting SPARK in the Client " + clusterMode.toString() + ". Master : " + this.sparkMaster);
                 if (acm.isClusteringEnabled()) {
                     acm.joinGroup(CLUSTER_GROUP_NAME, this);
                 }
                 initializeAnalyticsClient();
                 break;
             case carbonSpark:
-                log.info("Starting SPARK in the Crbon Clustering mode");
+                log.info("Starting SPARK in the Carbon Clustering mode");
                 this.redundantMasterCount = this.sparkConf.getInt(AnalyticsConstants.CARBON_SPARK_MASTER_COUNT, 2);
 
                 if (this.sparkTableNamesHolder == null) {
@@ -676,22 +676,17 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 throw new AnalyticsExecutionException("Error executing analytics query: " + e.getMessage(), e);
             }
         } else {
-            if (AnalyticsDataServiceUtils.isCarbonServer()) {
-                PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
-            }
-            try {
-                return this.executeQueryLocal(tenantId, query);
-            } finally {
-                if (AnalyticsDataServiceUtils.isCarbonServer()) {
-                    PrivilegedCarbonContext.endTenantFlow();
-                }
-            }
+            return this.executeQueryLocal(tenantId, query);
         }
     }
 
     private AnalyticsQueryResult executeQueryLocal(int tenantId, String query)
             throws AnalyticsExecutionException {
+        if (AnalyticsDataServiceUtils.isCarbonServer()) {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+        }
+
         String origQuery = query.trim();
         query = query.trim();
         if (query.endsWith(";")) {
@@ -722,6 +717,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             long end = System.currentTimeMillis();
             if (ServiceHolder.isAnalyticsStatsEnabled()) {
                 log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
+            }
+
+            if (AnalyticsDataServiceUtils.isCarbonServer()) {
+                PrivilegedCarbonContext.endTenantFlow();
             }
         }
     }
@@ -807,7 +806,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         Pattern p = Pattern.compile("(?i)(?<=(" + AnalyticsConstants.TERM_CREATE +
                                     "\\s" + AnalyticsConstants.TERM_TEMPORARY +
-                                    "\\s" + AnalyticsConstants.TERM_TABLE + "))\\s+\\w+");
+                                    "\\s" + AnalyticsConstants.TERM_TABLE + "))\\s+\\w+" +
+                                    "(?=\\s+" + AnalyticsConstants.TERM_USING + "\\s\\D+\\s+" + AnalyticsConstants.TERM_OPTIONS + "\\s*\\()");
         Matcher m = p.matcher(query.trim());
         if (m.find()) {
             //this is a create table query
@@ -1144,11 +1144,27 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private enum ClusterMode {
-        local,
-        carbonSpark,
-        standaloneSpark,
-        yarn,
-        mesos
+        local("Local"),
+        carbonSpark("Carbon Spark"),
+        standaloneSpark("Standalone Spark"),
+        yarn("Spark on YARN"),
+        mesos("Spark on Mesos");
+
+        private String name;
+
+        ClusterMode(String name) {
+            this.name = name;
+        }
+
+        private String getValue() {
+            return name;
+        }
+
+        @Override
+        public String toString() {
+            return this.getValue();
+        }
+
     }
 
     private ClusterMode getClusterMode(String sparkMaster) throws AnalyticsExecutionException {

@@ -63,6 +63,7 @@ public class AnalyticsConstants {
     public static final String TERM_CREATE = "create";
     public static final String TERM_TEMPORARY = "temporary";
     public static final String TERM_OPTIONS = "options";
+    public static final String TERM_USING = "using";
 
     public static final String SPARK_DEFAULTS_FILE = "spark-defaults.conf";
     public static final String FAIR_SCHEDULER_XML = "fairscheduler.xml";
