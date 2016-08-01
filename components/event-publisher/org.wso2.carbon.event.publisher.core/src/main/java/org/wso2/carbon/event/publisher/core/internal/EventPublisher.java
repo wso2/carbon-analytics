@@ -315,7 +315,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
 
     private void changeDynamicEventAdapterMessageProperties(Object[] eventData, Map<String, String> dynamicProperties, Map<String, Object> arbitraryDataMap) {
         for (String dynamicMessageProperty : dynamicMessagePropertyList) {
-            if (eventData.length != 0 && dynamicMessageProperty != null) {
+            if ((eventData.length != 0 || !arbitraryDataMap.isEmpty()) && dynamicMessageProperty != null) {
                 Integer position = propertyPositionMap.get(dynamicMessageProperty);
                 changePropertyValue(position, dynamicMessageProperty, eventData, dynamicProperties, arbitraryDataMap);
             }
