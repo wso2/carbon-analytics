@@ -16,9 +16,12 @@
 
 package org.wso2.carbon.analytics.dataservice.commons;
 
+import java.io.Serializable;
+
 /**
  * This enum represents the ways we can sort any given field
  */
-public enum SortType {
+public enum SortType  implements Serializable {
+
     ASC, DESC
 }

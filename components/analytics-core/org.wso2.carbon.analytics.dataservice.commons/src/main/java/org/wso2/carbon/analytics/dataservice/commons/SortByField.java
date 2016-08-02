@@ -30,6 +30,10 @@ public class SortByField implements Serializable {
     private String fieldName;
     private SortType sortType;
 
+    public SortByField() {
+
+    }
+
     public SortByField(String field, SortType sortType) {
         this.fieldName = field;
         this.sortType = sortType;
