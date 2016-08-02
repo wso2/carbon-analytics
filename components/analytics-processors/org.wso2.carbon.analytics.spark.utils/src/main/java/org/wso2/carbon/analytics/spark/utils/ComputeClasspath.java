@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.analytics.spark.utils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,6 +37,7 @@ import java.util.Set;
  * this class creates the spark classpath by looking at the plugins folder
  */
 public class ComputeClasspath {
+    private static final Log log = LogFactory.getLog(ComputeClasspath.class);
     private static final String SEP = System.getProperty("os.name").toLowerCase().contains("win") ? ";" : ":";
 
     private static Set<String> additionalJars = new HashSet<>();
@@ -109,13 +113,14 @@ public class ComputeClasspath {
                 result.add(line);
             }
         } catch (IOException e) {
-            // ignore
+            log.warn("carbon-spark-classpath.conf file not found! Using the factory list of Carbon jars");
         } finally {
             try {
-                assert reader != null;
-                reader.close();
+                if (reader != null) {
+                    reader.close();
+                }
             } catch (IOException e) {
-                // throw e;
+                log.error("Unable to close the Buffered Reader for carbon-spark-classpath.conf");
             }
         }
 
@@ -193,7 +198,7 @@ public class ComputeClasspath {
                 try {
                     reader.close();
                 } catch (IOException e) {
-//                        throw e;
+                    log.error("Unable to close the Buffered Reader for external-spark-classpath.conf");
                 }
             }
         }
