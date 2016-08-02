@@ -698,32 +698,34 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             query = query.substring(0, query.length() - 1).trim();
         }
 
-        // process incremental queries
-        if (checkIncrementalQuery(query)) {
-            return processIncQuery(tenantId, query);
-        }
-
-        query = encodeQueryWithTenantId(tenantId, query);
-        if (log.isDebugEnabled()) {
-            log.debug("Executing : " + origQuery);
-        }
-
-        long start = System.currentTimeMillis();
         try {
-            if (this.sqlCtx == null) {
-                throw new AnalyticsExecutionException("Spark SQL Context is not available. " +
-                                                      "Check if the cluster has instantiated properly.");
-            }
-            this.sqlCtx.sparkContext().setLocalProperty(AnalyticsConstants.SPARK_SCHEDULER_POOL,
-                                                        this.sparkConf.get(AnalyticsConstants.SPARK_SCHEDULER_POOL));
-            DataFrame result = this.sqlCtx.sql(query);
-            return toResult(result);
-        } finally {
-            long end = System.currentTimeMillis();
-            if (ServiceHolder.isAnalyticsStatsEnabled()) {
-                log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
+            // process incremental queries
+            if (checkIncrementalQuery(query)) {
+                return processIncQuery(tenantId, query);
             }
 
+            query = encodeQueryWithTenantId(tenantId, query);
+            if (log.isDebugEnabled()) {
+                log.debug("Executing : " + origQuery);
+            }
+
+            long start = System.currentTimeMillis();
+            try {
+                if (this.sqlCtx == null) {
+                    throw new AnalyticsExecutionException("Spark SQL Context is not available. " +
+                                                          "Check if the cluster has instantiated properly.");
+                }
+                this.sqlCtx.sparkContext().setLocalProperty(AnalyticsConstants.SPARK_SCHEDULER_POOL,
+                                                            this.sparkConf.get(AnalyticsConstants.SPARK_SCHEDULER_POOL));
+                DataFrame result = this.sqlCtx.sql(query);
+                return toResult(result);
+            } finally {
+                long end = System.currentTimeMillis();
+                if (ServiceHolder.isAnalyticsStatsEnabled()) {
+                    log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
+                }
+            }
+        } finally {
             if (AnalyticsDataServiceUtils.isCarbonServer()) {
                 PrivilegedCarbonContext.endTenantFlow();
             }
