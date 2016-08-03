@@ -33,10 +33,10 @@ import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.base.MultitenantConstants;
+import scala.collection.JavaConversions;
 import scala.collection.immutable.Map;
-import scala.runtime.AbstractFunction0;
 
-import java.io.Serializable;
+import java.util.HashMap;
 
 /**
  * This class allows spark to communicate with the the Analytics Dataservice when used in Spark SQL
@@ -97,19 +97,31 @@ public class AnalyticsRelationProvider implements RelationProvider,
     }
 
     private void setParameters(Map<String, String> parameters) {
-        this.tenantId = Integer.parseInt(extractValuesFromMap(AnalyticsConstants.TENANT_ID,
-                                                              parameters, "-1234"));
-        this.tableName = extractValuesFromMap(AnalyticsConstants.TABLE_NAME, parameters, "");
-        this.schemaString = extractValuesFromMap(AnalyticsConstants.SCHEMA_STRING, parameters, "");
-        this.streamName = extractValuesFromMap(AnalyticsConstants.STREAM_NAME, parameters, "");
-        this.primaryKeys = extractValuesFromMap(AnalyticsConstants.PRIMARY_KEYS, parameters, "");
-        this.recordStore = extractValuesFromMap(AnalyticsConstants.RECORD_STORE, parameters,
-                                                AnalyticsConstants.DEFAULT_PROCESSED_DATA_STORE_NAME);
-        this.mergeFlag = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.MERGE_SCHEMA,
-                                                                   parameters, String.valueOf(true)));
-        this.globalTenantAccess = Boolean.parseBoolean(extractValuesFromMap(AnalyticsConstants.GLOBAL_TENANT_ACCESS,
-                                                                            parameters, String.valueOf(false)));
-        this.incParams = extractValuesFromMap(AnalyticsConstants.INC_PARAMS, parameters, "");
+        java.util.Map<String, String> jMap = new HashMap<>(JavaConversions.asJavaMap(parameters));
+        this.tenantId = Integer.parseInt(extractAndRemoveValuesFromMap(AnalyticsConstants.TENANT_ID, jMap, "-1234"));
+        this.tableName = extractAndRemoveValuesFromMap(AnalyticsConstants.TABLE_NAME, jMap, "");
+        this.schemaString = extractAndRemoveValuesFromMap(AnalyticsConstants.SCHEMA_STRING, jMap, "");
+        this.streamName = extractAndRemoveValuesFromMap(AnalyticsConstants.STREAM_NAME, jMap, "");
+        this.primaryKeys = extractAndRemoveValuesFromMap(AnalyticsConstants.PRIMARY_KEYS, jMap, "");
+        this.recordStore = extractAndRemoveValuesFromMap(AnalyticsConstants.RECORD_STORE, jMap,
+                                                         AnalyticsConstants.DEFAULT_PROCESSED_DATA_STORE_NAME);
+        this.mergeFlag = Boolean.parseBoolean(extractAndRemoveValuesFromMap(AnalyticsConstants.MERGE_SCHEMA,
+                                                                            jMap, String.valueOf(true)));
+        this.globalTenantAccess = Boolean.parseBoolean(extractAndRemoveValuesFromMap(AnalyticsConstants.GLOBAL_TENANT_ACCESS,
+                                                                                     jMap, String.valueOf(false)));
+        this.incParams = extractAndRemoveValuesFromMap(AnalyticsConstants.INC_PARAMS, jMap, "");
+        checkParameters(jMap);
+    }
+
+    private void checkParameters(java.util.Map<String, String> jMap) {
+        if (jMap.size() > 0) {
+            StringBuilder buf = new StringBuilder();
+            buf.append("Unknown options : ");
+            for (String key : jMap.keySet()) {
+                buf.append(key).append(" ");
+            }
+            throw new RuntimeException(buf.toString());
+        }
     }
 
     private void createTableIfNotExist() throws AnalyticsExecutionException {
@@ -177,14 +189,17 @@ public class AnalyticsRelationProvider implements RelationProvider,
         }
     }
 
-    private String extractValuesFromMap(String key, Map<String, String> map,
-                                        final String defaultVal) {
-        return map.getOrElse(key, new AbstractFunction0<String>() {
-            public String apply() {
-                return defaultVal;
-            }
-        });
+    private String extractAndRemoveValuesFromMap(String key, java.util.Map<String, String> map,
+                                                 final String defaultVal) {
+        String value = map.get(key.toLowerCase());
+        if (value == null) {
+            return defaultVal;
+        } else {
+            map.remove(key.toLowerCase());
+            return value;
+        }
     }
+
 
     /**
      * Returns a new base relation with the given parameters and user defined schema.
