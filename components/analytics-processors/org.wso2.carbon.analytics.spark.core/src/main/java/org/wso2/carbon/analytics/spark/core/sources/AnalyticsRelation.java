@@ -102,7 +102,9 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             this.incEnable = true;
             logDebug("Incremental processing enabled. Setting incremental parameters " + incParamStr);
             String[] splits = incParamStr.split("\\s*,\\s*");
-            if (splits.length == 2) {
+            if (splits.length == 1) {
+                this.incID = splits[0];
+            } else if (splits.length == 2) {
                 this.incID = splits[0];
                 this.windowUnit = IncrementalWindowUnit.valueOf(splits[1].toUpperCase());
                 this.incBuffer = 1;
