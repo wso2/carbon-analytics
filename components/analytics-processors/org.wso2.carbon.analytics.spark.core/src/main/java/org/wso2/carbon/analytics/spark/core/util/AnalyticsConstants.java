@@ -91,7 +91,6 @@ public class AnalyticsConstants {
     public static final String SPARK_JDBC_SHORTHAND_STRING = "CarbonJDBC";
     public static final String TENANT_ID_AND_TABLES_MAP = "tenantIdTablesMap";
     public static final int MAX_RECORDS = 1000;
-    public static final int INC_END_TIME_BUFFER_MS = 5000;
 
 
     //Carbon Spark properties strings
@@ -137,24 +136,6 @@ public class AnalyticsConstants {
     public static final String META_FIELD_TENANT_ID = "meta_tenantId";
     public static final String EVENTS_ATTRIBUTE = "events";
     public static final String PAYLOADS_ATTRIBUTE = "payloads";
-    public static final String EVENT_INDEX_ATTRIBUTE = "eventIndex";
-    public static final String MESSAGE_FLOW_ID_ATTRIBUTE = "messageFlowId";
-    public static final String COMPONENT_INDEX_ATTRIBUTE = "componentIndex";
-    public static final String COMPONENT_NAME_ATTRIBUTE = "componentName";
-    public static final String COMPONENT_TYPE_ATTRIBUTE = "componentType";
-    public static final String COMPONENT_ID_ATTRIBUTE = "componentId";
-    public static final String START_TIME_ATTRIBUTE = "startTime";
-    public static final String END_TIME_ATTRIBUTE = "endTime";
-    public static final String DURATION_ATTRIBUTE = "duration";
-    public static final String AFTER_PAYLOAD_ATTRIBUTE = "afterPayload";
-    public static final String BEFORE_PAYLOAD_ATTRIBUTE = "beforePayload";
-    public static final String CONTEXT_PROPERTIES_ATTRIBUTE = "contextPropertyMap";
-    public static final String TRANSPORT_PROPERTIES_ATTRIBUTE = "transportPropertyMap";
-    public static final String CHILDREN_ATTRIBUTE = "children";
-    public static final String ENTRY_POINT_ATTRIBUTE = "entryPoint";
-    public static final String ENTRY_POINT_HASHCODE_ATTRIBUTE = "entryPointHashcode";
-    public static final String FAULT_COUNT_ATTRIBUTE = "faultCount";
-    public static final String HASHCODE_ATTRIBUTE = "hashCode";
     public static final String HOST_ATTRIBUTE = "host";
 
     public enum IncrementalWindowUnit {

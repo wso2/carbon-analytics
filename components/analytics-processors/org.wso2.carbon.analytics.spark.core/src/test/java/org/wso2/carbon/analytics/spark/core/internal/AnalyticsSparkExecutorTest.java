@@ -99,7 +99,8 @@ public class AnalyticsSparkExecutorTest {
                            "componentName STRING, compotentIndex INT, componentId STRING, startTime LONG, endTime LONG, " +
                            "duration FLOAT, beforePayload STRING, afterPayload STRING, contextPropertyMap STRING, " +
                            "transportPropertyMap STRING, children STRING, entryPoint STRING, entryPointHashcode INT, faultCount INT," +
-                           " hashCode INT, host STRING, _tenantId INT, _timestamp LONG\")");
+                           " hashCode INT, host STRING, _tenantId INT, _timestamp LONG\", " +
+                           "incrementalParams \"EventsTable, SECOND\")");
         // Check the rows split
         AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM EventsTable");
         log.info(result);
@@ -135,6 +136,15 @@ public class AnalyticsSparkExecutorTest {
         AnalyticsSchema schema = this.service.getTableSchema(1, "CompressedEventsTable");
         Map<String, ColumnDefinition> schemaCols = schema.getColumns();
         Assert.assertEquals(schemaCols.size(), 2, "Compressed Events table's schema has changed after decompressing");
+
+        // incremental processing test
+        int beforeCount = ex.executeQuery(1, "SELECT * FROM EventsTable").getRows().size();
+        Assert.assertEquals(beforeCount, 54, "Before count is wrong!");
+        ex.executeQuery(1, "incremental_table_commit EventsTable");
+        int afterCount = ex.executeQuery(1, "SELECT * FROM EventsTable").getRows().size();
+        Assert.assertEquals(afterCount, 27, "After count is wrong!");
+        ex.executeQuery(1, "incremental_table_reset EventsTable");
+
         this.service.deleteTable(1, "CompressedEventsTable");
         log.info(testString("end : create temp table using Compressed Event Analytics test"));
     }
@@ -151,13 +161,13 @@ public class AnalyticsSparkExecutorTest {
         } catch (IOException e) {
             throw new AnalyticsException(e.getMessage());
         }
-        long timeTmp;
+        long timeTmp = System.currentTimeMillis();
         for (String aSampleData : sampleData) {
             values = new HashMap<>();
             String[] fields = aSampleData.split(",", 2);
             values.put("meta_compressed", Boolean.parseBoolean(fields[0]));
             values.put("flowData", fields[1]);
-            timeTmp = System.currentTimeMillis();
+            timeTmp =  timeTmp + 5000;
             result.add(new Record(generateRecordIds ? GenericUtils.generateRecordID() : null, tenantId, tableName,
                                   values, timeTmp));
         }

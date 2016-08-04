@@ -132,7 +132,8 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             log.error(msg);
             throw new RuntimeException(msg);
         }
-        long startTime, endTime;
+        long startTime;
+        long endTime = Long.MAX_VALUE;
         if (this.incEnable) {
             try {
                 startTime = ServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(
@@ -144,13 +145,11 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
                         startTime += 1;
                     }
                 }
-                endTime = System.currentTimeMillis() + AnalyticsConstants.INC_END_TIME_BUFFER_MS;
             } catch (AnalyticsException e) {
                 throw new RuntimeException(e);
             }
         } else {
             startTime = Long.MIN_VALUE;
-            endTime = Long.MAX_VALUE;
         }
         int targetTenantId;
         if (this.globalTenantAccess) {

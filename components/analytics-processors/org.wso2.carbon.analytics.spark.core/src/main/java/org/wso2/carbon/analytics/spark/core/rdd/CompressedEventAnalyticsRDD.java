@@ -116,6 +116,7 @@ public class CompressedEventAnalyticsRDD extends AnalyticsRDD implements Seriali
             this.tenantId = tenantId;
             this.incEnable = incEnable;
             this.incID = incID;
+            this.timestampIndex = columns.indexOf(AnalyticsConstants.TIMESTAMP_FIELD);
 
             /* Class registering precedence matters. Hence intentionally giving a registration ID */
             kryo.register(HashMap.class, 111);
