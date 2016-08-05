@@ -34,14 +34,15 @@ var getConfig, validate, getMode, getSchema, getData, registerCallBackforPush;
     var JS_MIN_VALUE = "-9007199254740992";
 
     var typeMap = {
-        "bool" : "ordinal",
-        "boolean" : "ordinal",
-        "string" : "ordinal",
-        "int" : "linear",
-        "integer" : "linear",
-        "long" : "linear",
-        "double" : "linear",
-        "float" : "linear"
+        "bool" : "string",
+        "boolean" : "string",
+        "string" : "string",
+        "int" : "number",
+        "integer" : "number",
+        "long" : "number",
+        "double" : "number",
+        "float" : "number",
+        "time": "time"
     };
 
     var log = new Log();
