@@ -28,7 +28,7 @@
     <groupId>org.wso2.carbon.analytics-common</groupId>
     <artifactId>carbon-analytics-common</artifactId>
     <packaging>pom</packaging>
-    <version>5.1.1-SNAPSHOT</version>
+    <version>5.1.2-SNAPSHOT</version>
     <name>WSO2 Carbon - Carbon Analytics Common Aggregator Module</name>
     <url>http://wso2.org</url>
 
@@ -1293,20 +1293,10 @@
             </releases>
         </repository>
 
-        <repository>
-            <id>spark-staging</id>
-            <url>https://maven.wso2.org/nexus/content/repositories/orgapachespark-1000/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-        </repository>
-
     </repositories>
 
     <properties>
-        <carbon.analytics.common.version>5.1.1-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.1.2-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.4.7</carbon.kernel.version>
@@ -1317,7 +1307,7 @@
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
         <!--CEP versions-->
-        <siddhi.version>3.1.1-SNAPSHOT</siddhi.version>
+        <siddhi.version>3.1.2-SNAPSHOT</siddhi.version>
 
         <!-- Carbon metrics version -->
         <carbon.metrics.version>1.2.2</carbon.metrics.version>
@@ -1373,7 +1363,7 @@
         <project.scm.id>my-scm-server</project.scm.id>
 
         <!-- Spark dependency versions start-->
-        <spark.version>1.4.3.wso2v1</spark.version>
+        <spark.version>1.4.3.wso2v2</spark.version>
         <spark.imp.pkg.version>[1.4.3,1.5.0)</spark.imp.pkg.version>
         <hadoop.client.version>2.7.2.wso2v1</hadoop.client.version>
         <json4s.jackson.version>3.2.10.wso2v1</json4s.jackson.version>
