@@ -18,6 +18,12 @@ var toVizGrammarSchema;
 
 (function() {
 
+    var typeMap = {
+        "string" : "ordinal",
+        "number" : "linear",
+        "time" : "number"
+    };
+
     toVizGrammarSchema = function(_schema) {
         var schema = [{
             "metadata": {
@@ -28,7 +34,7 @@ var toVizGrammarSchema;
 
         _schema.forEach(function(field) {
             schema[0].metadata.names.push(field["fieldName"]);
-            schema[0].metadata.types.push(field["fieldType"]);
+            schema[0].metadata.types.push(typeMap[field["fieldType"].toLowerCase()]);
         });
         return schema;
     };
