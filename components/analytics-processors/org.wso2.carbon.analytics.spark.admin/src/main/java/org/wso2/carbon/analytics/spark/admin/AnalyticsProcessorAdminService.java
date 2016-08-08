@@ -339,7 +339,7 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
                 return queryResult;
             } catch (AnalyticsExecutionException e) {
                 log.error("Error while executing query : " + query, e);
-                throw new AnalyticsProcessorAdminException("Error while executing query : " + query, e);
+                throw new AnalyticsProcessorAdminException(e);
             }
         } else {
             log.error("No queries provided to execute at tenant id :" + PrivilegedCarbonContext.

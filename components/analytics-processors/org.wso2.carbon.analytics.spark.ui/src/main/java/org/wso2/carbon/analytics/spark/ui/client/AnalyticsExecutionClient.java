@@ -61,7 +61,10 @@ public class AnalyticsExecutionClient {
         AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto queryResult;
         try {
             queryResult = stub.executeQuery(query);
-        } catch (RemoteException|AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException e) {
+        } catch (AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException e) {
+            e.printStackTrace();
+            return errorToJson(query, e.getFaultMessage().getAnalyticsProcessorAdminException().getMessage());
+        } catch (Throwable e){
             e.printStackTrace();
             return errorToJson(query, e.getMessage());
         }
