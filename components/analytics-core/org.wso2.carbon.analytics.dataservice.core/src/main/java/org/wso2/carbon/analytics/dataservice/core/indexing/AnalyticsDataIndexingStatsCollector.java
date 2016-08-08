@@ -38,8 +38,11 @@ public class AnalyticsDataIndexingStatsCollector extends TimerTask {
     
     private static final int INTERVAL = 5000;
     
+    private long lastTime;
+    
     public AnalyticsDataIndexingStatsCollector() {
         Timer timer = new Timer(true);
+        this.lastTime = System.currentTimeMillis();
         timer.scheduleAtFixedRate(this, INTERVAL, INTERVAL);
     }
     
@@ -52,9 +55,11 @@ public class AnalyticsDataIndexingStatsCollector extends TimerTask {
         long recordsProcessed = currentFullCount - this.lastCount.get();
         this.lastCount.set(currentFullCount);
         if (recordsProcessed > 0) {
-            double tps = recordsProcessed / (double) INTERVAL * 1000;
+            long timeInt = System.currentTimeMillis() - this.lastTime;
+            double tps = recordsProcessed / (double) timeInt * 1000;
             log.info("Indexing Statistics TPS: " + tps + ", Full Count: " + currentFullCount);
-        }        
+        }
+        this.lastTime = System.currentTimeMillis();
     }
 
     @Override
