@@ -230,8 +230,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
     
     public void init() throws AnalyticsException {
-        this.populateMyNodeId();
         this.indexingNode = checkIfIndexingNode();
+        this.populateMyNodeId();
         boolean indexingNodeDisabling = !this.indexingNode && this.currentNodeAllocatedShardsGlobally();
         if (indexingNodeDisabling && AnalyticsDataServiceUtils.isCarbonServer()) {
             this.removeMyNodeFromIndexingConfigurations();
@@ -595,7 +595,9 @@ public class IndexNodeCoordinator implements GroupEventListener {
                 } catch (IOException e) {
                     throw new AnalyticsException("Error in writing my node id: " + e.getMessage(), e);
                 }
-                this.stagingIndexDataStore.initStagingTables(this.myNodeId);
+                if (this.indexingNode) {
+                    this.stagingIndexDataStore.initStagingTables(this.myNodeId);
+                }
             }
         }
         log.info("My Analytics Node ID: " + this.myNodeId);
