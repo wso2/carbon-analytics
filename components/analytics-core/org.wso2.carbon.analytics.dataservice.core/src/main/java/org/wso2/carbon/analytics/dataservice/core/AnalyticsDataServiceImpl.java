@@ -155,7 +155,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         indexerInfo.setMaxRAMBufferForLuceneDocsInMB(config.getShardIndexRecordBatchSize());
         indexerInfo.setMaxRAMPerIndexingThreadInMB(config.getMaxMemoryPerThreadInMB());
         indexerInfo.setUseCompoundIndexFile(config.isUseCompoundIndexFile());
-        indexerInfo.setMaxSegmentMergeSizeInMB(config.getMaxSegmentMergeSizeInMB());
         indexerInfo.setIndexCommunicatorBufferSize(config.getMaxIndexerCommunicatorBufferSize());
         indexerInfo.setIndexQueueCleanupThreshold(config.getQueueCleanupThreshold());
         this.indexer = new AnalyticsDataIndexer(indexerInfo);

@@ -53,8 +53,6 @@ public class AnalyticsIndexerInfo {
 
     private boolean useCompoundIndexFile;
 
-    private double maxSegmentMergeSizeInMB;
-
     private int indexCommunicatorBufferSize;
 
     private int indexQueueCleanupThreshold;
@@ -161,14 +159,6 @@ public class AnalyticsIndexerInfo {
 
     public void setMaxRAMBufferForLuceneDocsInMB(double maxRAMBufferForLuceneDocsInBytes) {
         this.maxRAMBufferForLuceneDocsInMB = maxRAMBufferForLuceneDocsInBytes / (1024 * 1024);
-    }
-
-    public double getMaxSegmentMergeSizeInMB() {
-        return maxSegmentMergeSizeInMB;
-    }
-
-    public void setMaxSegmentMergeSizeInMB(double maxSegmentMergeSizeInMB) {
-        this.maxSegmentMergeSizeInMB = maxSegmentMergeSizeInMB;
     }
 
     public int getIndexCommunicatorBufferSize() {

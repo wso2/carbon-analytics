@@ -72,9 +72,6 @@
     <!-- Index will be built into a compoundFile if the value is true, making it false will increase the indexing speed
     but will open a lots of file Descriptors-->
    <!--<useCompoundIndexFile>true</useCompoundIndexFile>-->
-    <!--The largest segment's size which may be merged with other segments. Smaller values (e.g. 50MB) will be good for
-    interactive indexing and larger values will be better for batch indexing-->
-   <!--<maxIndexSegmentMergeSizeInMB>2048</maxIndexSegmentMergeSizeInMB>-->
    <!-- Data purging related configuration -->
    <analytics-data-purging>
       <!-- Below entry will indicate purging is enable or not. If user wants to enable data purging for cluster then this property

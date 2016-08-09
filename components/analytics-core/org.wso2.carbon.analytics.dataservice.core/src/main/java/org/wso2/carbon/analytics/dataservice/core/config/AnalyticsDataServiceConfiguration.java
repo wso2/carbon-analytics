@@ -55,8 +55,6 @@ public class AnalyticsDataServiceConfiguration {
 
     private boolean useCompoundIndexFile = Constants.DEFAULT_INDEX_USE_COMPOUND_INDEX_FILE;
 
-    private double maxIndexMergeSizeInMB = Constants.DEFAULT_INDEX_MAX_MERGE_SEGMENT_SIZE;
-
     private int queueCleanupThreshold = Constants.DEFAULT_INDEXING_QUEUE_CLEANUP_THRESHOLD;
 
     @XmlElement (name = "analytics-record-store", nillable = false)
@@ -156,15 +154,6 @@ public class AnalyticsDataServiceConfiguration {
 
     public void setUseCompoundIndexFile(boolean useCompoundIndexFile) {
         this.useCompoundIndexFile = useCompoundIndexFile;
-    }
-
-    @XmlElement( name = "maxIndexSegmentMergeSizeInMB", defaultValue = "" + Constants.DEFAULT_INDEX_MAX_MERGE_SEGMENT_SIZE)
-    public double getMaxSegmentMergeSizeInMB() {
-        return maxIndexMergeSizeInMB;
-    }
-
-    public void setMaxSegmentMergeSizeInMB(double maxSegmentMergeSizeInMB) {
-        this.maxIndexMergeSizeInMB = maxSegmentMergeSizeInMB;
     }
 
     @XmlElement(name = "maxIndexerCommunicatorBufferSize", defaultValue = "" + Constants.DEFAULT_MAX_INDEXER_COMMUNICATOR_BUFFER_SIZE)
