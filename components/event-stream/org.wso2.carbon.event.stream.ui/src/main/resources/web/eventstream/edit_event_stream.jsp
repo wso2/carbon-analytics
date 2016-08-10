@@ -410,11 +410,15 @@
                         </tr>
                         <tr>
                             <td class="buttonRow">
-                                <input type="button" value="<fmt:message key="edit.event.stream"/>"  onclick="addEventStream(document.getElementById('editEventStream'),'edit', '<%=eventStreamWithVersion%>')"/>
-                                <c:if test="${isAnalyticsPersistenceBackendAvailable}">
-                                    <input type="button" value="<fmt:message key="next.persist.stream"/>"
-                                           onclick="nextPersistView()"/>
-                                </c:if>
+                                <c:choose>
+                                    <c:when test="${isAnalyticsPersistenceBackendAvailable}">
+                                        <input type="button" value="<fmt:message key="next.persist.stream"/>"
+                                               onclick="nextPersistView()"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <input type="button" value="<fmt:message key="edit.event.stream"/>"  onclick="addEventStream(document.getElementById('editEventStream'),'edit', '<%=eventStreamWithVersion%>')"/>
+                                    </c:otherwise>
+                                </c:choose>
                             </td>
                         </tr>
                     </tbody>
