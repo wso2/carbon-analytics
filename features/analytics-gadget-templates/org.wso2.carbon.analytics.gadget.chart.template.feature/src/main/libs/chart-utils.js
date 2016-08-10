@@ -21,7 +21,7 @@ var toVizGrammarSchema;
     var typeMap = {
         "string" : "ordinal",
         "number" : "linear",
-        "time" : "number"
+        "time" : "time"
     };
 
     toVizGrammarSchema = function(_schema) {
