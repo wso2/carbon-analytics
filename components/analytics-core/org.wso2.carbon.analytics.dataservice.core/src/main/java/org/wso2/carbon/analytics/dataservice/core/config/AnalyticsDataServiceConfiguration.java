@@ -51,10 +51,6 @@ public class AnalyticsDataServiceConfiguration {
 
     private int maxIndexerCommunicatorBufferSize = Constants.DEFAULT_MAX_INDEXER_COMMUNICATOR_BUFFER_SIZE;
 
-    private int maxMemoryPerThreadInMB = Constants.DEFAULT_MAX_MEMORY_PER_INDEXING_THREAD;
-
-    private boolean useCompoundIndexFile = Constants.DEFAULT_INDEX_USE_COMPOUND_INDEX_FILE;
-
     private int queueCleanupThreshold = Constants.DEFAULT_INDEXING_QUEUE_CLEANUP_THRESHOLD;
 
     @XmlElement (name = "analytics-record-store", nillable = false)
@@ -136,24 +132,6 @@ public class AnalyticsDataServiceConfiguration {
 
     public void setIndexWorkerCount(int indexWorkerCount) {
         this.indexWorkerCount = indexWorkerCount;
-    }
-
-    @XmlElement (name = "maxRAMPerIndexingThreadInMB", defaultValue = "" + Constants.DEFAULT_MAX_MEMORY_PER_INDEXING_THREAD)
-    public int getMaxMemoryPerThreadInMB() {
-        return maxMemoryPerThreadInMB;
-    }
-
-    public void setMaxMemoryPerThreadInMB(int maxMemoryPerThreadInMB) {
-        this.maxMemoryPerThreadInMB = maxMemoryPerThreadInMB;
-    }
-
-    @XmlElement (name = "useCompoundIndexFile", defaultValue = "" + Constants.DEFAULT_INDEX_USE_COMPOUND_INDEX_FILE)
-    public boolean isUseCompoundIndexFile() {
-        return useCompoundIndexFile;
-    }
-
-    public void setUseCompoundIndexFile(boolean useCompoundIndexFile) {
-        this.useCompoundIndexFile = useCompoundIndexFile;
     }
 
     @XmlElement(name = "maxIndexerCommunicatorBufferSize", defaultValue = "" + Constants.DEFAULT_MAX_INDEXER_COMMUNICATOR_BUFFER_SIZE)

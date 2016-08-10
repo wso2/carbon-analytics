@@ -1585,13 +1585,6 @@ public class AnalyticsDataIndexer {
                 indexWriter = this.indexWriters.get(shardedTableId);
                 if (indexWriter == null) {
                     IndexWriterConfig conf = new IndexWriterConfig(this.indexerInfo.getLuceneAnalyzer());
-                    // Not setting anything to the conf for the time being
-                    /*
-                    conf.setRAMBufferSizeMB(this.indexerInfo.getMaxRAMBufferForLuceneDocsInMB());
-                    conf.setRAMPerThreadHardLimitMB(this.indexerInfo.getMaxRAMPerIndexingThreadInMB());
-                    conf.setMaxThreadStates(this.indexerInfo.getIndexWorkerCount());
-                    conf.setUseCompoundFile(this.indexerInfo.isUseCompoundIndexFile());
-                    */
                     try {
                         indexWriter = new IndexWriter(this.createDirectory(shardId, tableId), conf);
                         this.indexWriters.put(shardedTableId, indexWriter);

@@ -67,11 +67,6 @@
    <maxIndexerCommunicatorBufferSize>1024</maxIndexerCommunicatorBufferSize>
     <!--Indexing queue cleanup threshold in bytes-->
    <indexingQueueCleanupThreshold>209715200</indexingQueueCleanupThreshold>
-    <!--The maximum RAM size in MBs allocated for an indexing thread to consume before the thread flushes the documents to the directory-->
-   <!--<maxRAMPerIndexingThreadInMB>1945</maxRAMPerIndexingThreadInMB>-->
-    <!-- Index will be built into a compoundFile if the value is true, making it false will increase the indexing speed
-    but will open a lots of file Descriptors-->
-   <!--<useCompoundIndexFile>true</useCompoundIndexFile>-->
    <!-- Data purging related configuration -->
    <analytics-data-purging>
       <!-- Below entry will indicate purging is enable or not. If user wants to enable data purging for cluster then this property
