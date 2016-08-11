@@ -20,6 +20,7 @@ package org.wso2.carbon.databridge.agent.endpoint.thrift;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSSLTransportFactory;
+import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.wso2.carbon.databridge.agent.AgentHolder;
@@ -29,6 +30,8 @@ import org.wso2.carbon.databridge.agent.client.AbstractSecureClientPoolFactory;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEventTransmissionService;
+
+import javax.net.ssl.SSLSocket;
 
 
 /**
@@ -52,9 +55,26 @@ public class ThriftSecureClientPoolFactory extends AbstractSecureClientPoolFacto
         if (protocol.equalsIgnoreCase(DataEndpointConfiguration.Protocol.SSL.toString())) {
             int timeout = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.THRIFT_DATA_AGENT_TYPE).
                     getAgentConfiguration().getSocketTimeoutMS();
+            String sslProtocols = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.THRIFT_DATA_AGENT_TYPE).
+                    getAgentConfiguration().getSslEnabledProtocols();
+            String ciphers = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.THRIFT_DATA_AGENT_TYPE).
+                    getAgentConfiguration().getCiphers();
             try {
                 TTransport receiverTransport = TSSLTransportFactory.
                         getClientSocket(hostName, port, timeout, params );
+
+                TSocket tSocket = (TSocket) receiverTransport;
+                SSLSocket sslSocket = (SSLSocket) tSocket.getSocket();
+                if (sslProtocols != null && sslProtocols.length() != 0) {
+                    String [] sslProtocolsArray = sslProtocols.split(",");
+                    sslSocket.setEnabledProtocols(sslProtocolsArray);
+                }
+
+                if (ciphers != null && ciphers.length() != 0) {
+                    String [] ciphersArray = ciphers.split(",");
+                    sslSocket.setEnabledCipherSuites(ciphersArray);
+                }
+
                 TProtocol tProtocol = new TBinaryProtocol(receiverTransport);
                 return new ThriftSecureEventTransmissionService.Client(tProtocol);
             } catch (TTransportException e) {
