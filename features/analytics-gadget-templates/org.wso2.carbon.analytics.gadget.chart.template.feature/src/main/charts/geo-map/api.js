@@ -248,28 +248,39 @@ var useDefaultValueLabel = "Use default";
                 clearFocus();
                 initialScenario = false;
             }
-
             var device = data[i];
             var levelId;
             var objectTypeId;
 
             if (mapChartConfig.type) {
                 device.type = mapChartConfig.type;
+            } else {
+                device.type = device[mapChartConfig.type1];
             }
             if (mapChartConfig.state) {
                 device.state = mapChartConfig.state;
+            } else {
+                device.state = device[mapChartConfig.state1];
             }
             if (mapChartConfig.information) {
                 device.information = mapChartConfig.information;
+            } else {
+                device.information = device[mapChartConfig.information1];
             }
             if (mapChartConfig.speed) {
                 device.speed = mapChartConfig.speed;
+            } else {
+                device.speed = device[mapChartConfig.speed1];
             }
             if (mapChartConfig.heading) {
                 device.heading = mapChartConfig.heading;
+            } else {
+                device.heading = device[mapChartConfig.heading1];
             }
             if (mapChartConfig.level) {
                 device.level = mapChartConfig.level;
+            } else {
+                device.level = device[mapChartConfig.level1];
             }
 
             if(null == device.level){
@@ -283,7 +294,7 @@ var useDefaultValueLabel = "Use default";
             }
 
             if(null == device.type){
-                objectTypeId = "defaultType";
+                objectTypeId = "default";
             } else {
                 objectTypeId = device.type;
                 if (!(objectTypeId in object_type_groups)){
@@ -298,7 +309,7 @@ var useDefaultValueLabel = "Use default";
                 "objectTypeId": objectTypeId,
                 "type": "Feature",
                 "properties": {
-                    "name": device.type,
+                    "name": objectTypeId,
                     "state": device.state,
                     "information": levelId + ": " + device.information,
                     "speed": device.speed,
@@ -406,22 +417,34 @@ var useDefaultValueLabel = "Use default";
         conf.single_marker_mode = false;
 
         if (_chartConfig.type == useDefaultValueLabel) {
-            conf.type = "defaultType";
+            conf.type = "default";
+        } else {
+            conf.type1 = _chartConfig.type;
         }
         if (_chartConfig.state == useDefaultValueLabel) {
             conf.state = "normal";
+        } else {
+            conf.state1 = _chartConfig.state;
         }
         if (_chartConfig.information == useDefaultValueLabel) {
             conf.information = "not available";
+        } else {
+            conf.information1 = _chartConfig.information;
         }
         if (_chartConfig.speed == useDefaultValueLabel) {
-            conf.speed = 0;
+            conf.speed = "0";
+        } else {
+            conf.speed1 = _chartConfig.speed;
         }
         if (_chartConfig.heading == useDefaultValueLabel) {
             conf.heading = 400;
+        } else {
+            conf.heading1 = _chartConfig.heading;
         }
         if (_chartConfig.level == useDefaultValueLabel) {
             conf.level = "defaultLevel";
+        } else {
+            conf.level1 = _chartConfig.level;
         }
         return conf;
     }
