@@ -38,6 +38,7 @@ import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfigu
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServiceImpl;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
 
+import javax.net.ssl.SSLServerSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -98,12 +99,13 @@ public class ThriftDataReceiver {
      */
     public void start(String hostName)
             throws DataBridgeException {
-        startSecureEventTransmission(hostName, thriftDataReceiverConfiguration.getSecureDataReceiverPort(), dataBridgeReceiverService);
+        startSecureEventTransmission(hostName, thriftDataReceiverConfiguration.getSecureDataReceiverPort(),
+                thriftDataReceiverConfiguration.getSslProtocols(), thriftDataReceiverConfiguration.getCiphers(), dataBridgeReceiverService);
         startEventTransmission(hostName, thriftDataReceiverConfiguration.getDataReceiverPort(), dataBridgeReceiverService);
     }
 
 
-    private void startSecureEventTransmission(String hostName, int port,
+    private void startSecureEventTransmission(String hostName, int port, String sslProtocols, String ciphers,
                                               DataBridgeReceiverService dataBridgeReceiverService)
             throws DataBridgeException {
         try {
@@ -124,7 +126,7 @@ public class ThriftDataReceiver {
                 }
             }
 
-            startSecureEventTransmission(hostName, port, keyStore, keyStorePassword, dataBridgeReceiverService);
+            startSecureEventTransmission(hostName, port, sslProtocols, ciphers, keyStore, keyStorePassword, dataBridgeReceiverService);
         } catch (TransportException e) {
             throw new DataBridgeException("Cannot start agent server on port " + port, e);
         } catch (UnknownHostException e) {
@@ -132,7 +134,7 @@ public class ThriftDataReceiver {
         }
     }
 
-    protected void startSecureEventTransmission(String hostName, int port, String keyStore,
+    protected void startSecureEventTransmission(String hostName, int port, String sslProtocols, String ciphers, String keyStore,
                                                 String keyStorePassword,
                                                 DataBridgeReceiverService dataBridgeReceiverService)
             throws TransportException, UnknownHostException {
@@ -145,6 +147,17 @@ public class ThriftDataReceiver {
             InetAddress inetAddress = InetAddress.getByName(hostName);
             serverTransport = TSSLTransportFactory.getServerSocket(
                     port, DataBridgeConstants.CLIENT_TIMEOUT_MS, inetAddress, params);
+            SSLServerSocket sslServerSocket = (javax.net.ssl.SSLServerSocket) serverTransport.getServerSocket();
+            if (sslProtocols != null && sslProtocols.length() != 0) {
+                String [] sslProtocolsArray = sslProtocols.split(",");
+                sslServerSocket.setEnabledProtocols(sslProtocolsArray);
+            }
+
+            if (ciphers != null && ciphers.length() != 0) {
+                String [] ciphersArray = ciphers.split(",");
+                sslServerSocket.setEnabledCipherSuites(ciphersArray);
+            }
+
             log.info("Thrift Server started at " + hostName);
         } catch (TTransportException e) {
             throw new TransportException("Thrift transport exception occurred ", e);

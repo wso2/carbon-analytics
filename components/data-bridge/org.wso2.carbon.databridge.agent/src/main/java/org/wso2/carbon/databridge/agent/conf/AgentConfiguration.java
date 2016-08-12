@@ -68,6 +68,10 @@ public class AgentConfiguration {
 
     private String publishingStrategy = DataEndpointConstants.ASYNC_STRATEGY;
 
+    private String sslEnabledProtocols;
+
+    private String ciphers;
+
     @XmlElement(name = "Name")
     public String getDataEndpointName() {
         return dataEndpointName;
@@ -263,6 +267,24 @@ public class AgentConfiguration {
 
     public void setPublishingStrategy(String publishingStrategy) {
         this.publishingStrategy = publishingStrategy;
+    }
+
+    @XmlElement(name = "sslEnabledProtocols")
+    public String getSslEnabledProtocols() {
+        return sslEnabledProtocols;
+    }
+
+    public void setSslEnabledProtocols(String sslEnabledProtocols) {
+        this.sslEnabledProtocols = sslEnabledProtocols;
+    }
+
+    @XmlElement(name = "ciphers")
+    public String getCiphers() {
+        return ciphers;
+    }
+
+    public void setCiphers(String ciphers) {
+        this.ciphers = ciphers;
     }
 
     /**

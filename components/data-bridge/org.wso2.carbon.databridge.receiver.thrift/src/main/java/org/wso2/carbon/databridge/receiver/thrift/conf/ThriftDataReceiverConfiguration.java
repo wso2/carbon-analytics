@@ -31,6 +31,8 @@ import org.wso2.carbon.utils.CarbonUtils;
 public class ThriftDataReceiverConfiguration {
     private int secureDataReceiverPort;
     private int dataReceiverPort;
+    private String sslProtocols;
+    private String ciphers;
     private String receiverHostName;
 
     public ThriftDataReceiverConfiguration(int defaultSslPort, int defaultPort) {
@@ -48,6 +50,11 @@ public class ThriftDataReceiverConfiguration {
                 CommonThriftConstants.DEFAULT_RECEIVER_PORT).toString()) + portOffset;
         receiverHostName = dataReceiver.getConfiguration(ThriftDataReceiverConstants.RECEIVER_HOST_NAME,
                 ThriftDataReceiverConstants.DEFAULT_HOSTNAME).toString();
+
+        Object sslProtocolObj = dataReceiver.getConfiguration(ThriftDataReceiverConstants.PROTOCOLS_ELEMENT, null);
+        sslProtocols =  sslProtocolObj != null ? sslProtocolObj.toString() : null;
+        Object ciphersObj = dataReceiver.getConfiguration(ThriftDataReceiverConstants.CIPHERS_ELEMENT, null);
+        ciphers =  sslProtocolObj != null ? ciphersObj.toString() : null;
     }
 
     public ThriftDataReceiverConfiguration(int defaultSslPort, int defaultPort,
@@ -85,5 +92,21 @@ public class ThriftDataReceiverConfiguration {
     public int getPortOffset() {
         return CarbonUtils.
                 getPortFromServerConfig(ThriftDataReceiverConstants.CARBON_CONFIG_PORT_OFFSET_NODE) + 1;
+    }
+
+    public String getSslProtocols() {
+        return sslProtocols;
+    }
+
+    public void setSslProtocols(String sslProtocols) {
+        this.sslProtocols = sslProtocols;
+    }
+
+    public String getCiphers() {
+        return ciphers;
+    }
+
+    public void setCiphers(String ciphers) {
+        this.ciphers = ciphers;
     }
 }
