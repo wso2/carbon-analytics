@@ -91,7 +91,19 @@ public class BinaryDataReceiver {
                 (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
         SSLServerSocket sslserversocket =
                 (SSLServerSocket) sslserversocketfactory.createServerSocket(binaryDataReceiverConfiguration.getSSLPort());
-        sslserversocket.setEnabledCipherSuites(sslserversocket.getSupportedCipherSuites());
+
+        String sslProtocols = binaryDataReceiverConfiguration.getSslProtocols();
+        if (sslProtocols != null && sslProtocols.length() != 0) {
+            String [] sslProtocolsArray = sslProtocols.split(",");
+            sslserversocket.setEnabledProtocols(sslProtocolsArray);
+        }
+
+        String ciphers = binaryDataReceiverConfiguration.getCiphers();
+        if (ciphers != null && ciphers.length() != 0) {
+            String [] ciphersArray = ciphers.split(",");
+            sslserversocket.setEnabledCipherSuites(ciphersArray);
+        }
+
         Thread thread = new Thread(new BinarySecureEventServerAcceptor(sslserversocket));
         thread.start();
         log.info("Started Binary SSL Transport on port : " + binaryDataReceiverConfiguration.getSSLPort());
