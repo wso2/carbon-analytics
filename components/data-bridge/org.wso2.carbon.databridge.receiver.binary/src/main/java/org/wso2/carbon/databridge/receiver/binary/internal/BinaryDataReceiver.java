@@ -102,6 +102,8 @@ public class BinaryDataReceiver {
         if (ciphers != null && ciphers.length() != 0) {
             String [] ciphersArray = ciphers.split(",");
             sslserversocket.setEnabledCipherSuites(ciphersArray);
+        } else {
+            sslserversocket.setEnabledCipherSuites(sslserversocket.getSupportedCipherSuites());
         }
 
         Thread thread = new Thread(new BinarySecureEventServerAcceptor(sslserversocket));
