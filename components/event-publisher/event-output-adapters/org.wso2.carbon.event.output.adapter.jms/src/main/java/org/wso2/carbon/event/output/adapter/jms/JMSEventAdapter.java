@@ -169,8 +169,24 @@ public class JMSEventAdapter implements OutputEventAdapter {
             Map<String, String> messageConfig) {
 
         PublisherDetails publisherDetails;
-        Hashtable<String, String> adaptorProperties =
+        Hashtable<String, String> adapterProperties =
                 convertMapToHashTable(outputEventAdaptorConfiguration.getStaticProperties());
+
+        Map<String, String> jmsProperties = this.extractProperties(eventAdapterConfiguration.getStaticProperties().get(
+                JMSEventAdapterConstants.ADAPTER_PROPERTIES));
+
+        Map<String, String> jmsSecuredProperties = this.extractProperties(eventAdapterConfiguration.getStaticProperties().get(
+                JMSEventAdapterConstants.ADAPTER_SECURED_PROPERTIES));
+
+        if (jmsProperties != null) {
+            adapterProperties.remove(JMSEventAdapterConstants.ADAPTER_PROPERTIES);
+            adapterProperties.putAll(jmsProperties);
+        }
+
+        if(jmsSecuredProperties != null){
+            adapterProperties.remove(JMSEventAdapterConstants.ADAPTER_SECURED_PROPERTIES);
+            adapterProperties.putAll(jmsSecuredProperties);
+        }
 
         int maxConnections;
         if (JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_NOT_ALLOWED.equals(
@@ -183,7 +199,7 @@ public class JMSEventAdapter implements OutputEventAdapter {
             maxConnections = JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE;
         }
 
-        JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adaptorProperties, outputEventAdaptorConfiguration.getName(), messageConfig.get(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION), maxConnections);
+        JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adapterProperties, outputEventAdaptorConfiguration.getName(), messageConfig.get(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION), maxConnections);
         JMSMessageSender jmsMessageSender = new JMSMessageSender(jmsConnectionFactory);
         publisherDetails = new PublisherDetails(jmsConnectionFactory, jmsMessageSender, messageConfig);
 
@@ -230,6 +246,26 @@ public class JMSEventAdapter implements OutputEventAdapter {
         }
 
         return table;
+    }
+
+    private Map<String, String> extractProperties(String properties) {
+        if (properties == null || properties.trim().length() == 0) {
+            return null;
+        }
+
+        String[] entries = properties.split(JMSEventAdapterConstants.PROPERTY_SEPARATOR);
+        String[] keyValue;
+        Map<String, String> result = new HashMap<String, String>();
+        for (String property : entries) {
+            try {
+                keyValue = property.split(JMSEventAdapterConstants.ENTRY_SEPARATOR, 2);
+                result.put(keyValue[0].trim(), keyValue[1].trim());
+            } catch (Exception e) {
+                log.warn("JMS property '" + property + "' is not defined in the correct format.", e);
+            }
+        }
+        return result;
+
     }
 
     public class JMSSender implements Runnable {

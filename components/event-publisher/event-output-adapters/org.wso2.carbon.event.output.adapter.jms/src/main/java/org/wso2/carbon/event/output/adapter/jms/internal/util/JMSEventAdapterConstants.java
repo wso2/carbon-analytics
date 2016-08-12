@@ -49,5 +49,10 @@ public class JMSEventAdapterConstants {
     public static final int ADAPTER_EXECUTOR_JOB_QUEUE_SIZE = 2000;
     public static final String HEADER_SEPARATOR = ",";
     public static final String ENTRY_SEPARATOR = ":";
+    public static final String PROPERTY_SEPARATOR = ",";
+    public static final String ADAPTER_PROPERTIES = "jms.properties";
+    public static final String ADAPTER_SECURED_PROPERTIES = "jms.secured.properties";
+    public static final String ADAPTER_PROPERTIES_HINT = "jms.properties.hint";
+    public static final String ADAPTER_SECURED_PROPERTIES_HINT = "jms.secured.properties.hint";
 
 }

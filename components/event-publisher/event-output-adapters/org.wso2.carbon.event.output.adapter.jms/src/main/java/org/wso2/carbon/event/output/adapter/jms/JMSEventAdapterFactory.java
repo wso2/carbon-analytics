@@ -108,6 +108,16 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
         concurrentPublishers.setOptions(new String[]{JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_ALLOWED, JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_NOT_ALLOWED});
         concurrentPublishers.setHint(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_HINT));
 
+        Property jmsProperties = new Property(JMSEventAdapterConstants.ADAPTER_PROPERTIES);
+        jmsProperties.setDisplayName(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_PROPERTIES));
+        jmsProperties.setHint(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_PROPERTIES_HINT));
+        jmsProperties.setRequired(false);
+
+        Property jmsSecuredProperties = new Property(JMSEventAdapterConstants.ADAPTER_SECURED_PROPERTIES);
+        jmsSecuredProperties.setDisplayName(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_SECURED_PROPERTIES));
+        jmsSecuredProperties.setHint(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_SECURED_PROPERTIES_HINT));
+        jmsSecuredProperties.setRequired(false);
+        jmsSecuredProperties.setEncrypted(true);
 
         staticPropertyList.add(initialContextProperty);
         staticPropertyList.add(javaNamingProviderUrlProperty);
@@ -117,6 +127,8 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
         staticPropertyList.add(destinationTypeProperty);
         staticPropertyList.add(topicProperty);
         staticPropertyList.add(concurrentPublishers);
+        staticPropertyList.add(jmsProperties);
+        staticPropertyList.add(jmsSecuredProperties);
 
         return staticPropertyList;
 
