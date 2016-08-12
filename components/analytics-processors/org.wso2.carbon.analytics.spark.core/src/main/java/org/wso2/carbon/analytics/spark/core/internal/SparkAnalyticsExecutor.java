@@ -42,11 +42,7 @@ import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionCall;
-import org.wso2.carbon.analytics.spark.core.deploy.AnalyticsRecoveryModeFactory;
-import org.wso2.carbon.analytics.spark.core.deploy.CheckElectedLeaderExecutionCall;
-import org.wso2.carbon.analytics.spark.core.deploy.ElectLeaderExecutionCall;
-import org.wso2.carbon.analytics.spark.core.deploy.InitClientExecutionCall;
-import org.wso2.carbon.analytics.spark.core.deploy.StartWorkerExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.*;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsRelationProvider;
@@ -61,6 +57,7 @@ import org.wso2.carbon.analytics.spark.core.util.SparkTableNamesHolder;
 import org.wso2.carbon.analytics.spark.utils.ComputeClasspath;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import scala.None$;
 import scala.Option;
 import scala.Tuple2;
@@ -72,15 +69,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -687,6 +676,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private AnalyticsQueryResult executeQueryLocal(int tenantId, String query)
             throws AnalyticsExecutionException {
+
+        if ((tenantId != MultitenantConstants.SUPER_TENANT_ID) && isCarbonJDBCQuery(query)) {
+            throw new RuntimeException("The CarbonJDBC relation provider is not available for tenants.");
+        }
+
         if (AnalyticsDataServiceUtils.isCarbonServer()) {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
@@ -859,6 +853,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 .contains(AnalyticsConstants.COMPRESSED_EVENT_ANALYTICS_SHORTHAND));
     }
 
+    private boolean isCarbonJDBCQuery(String query) {
+        Pattern pattern = Pattern.compile(AnalyticsConstants.TERM_USING + "\\s*" + AnalyticsConstants.SPARK_JDBC_SHORTHAND_STRING);
+        Matcher matcher = pattern.matcher(query.trim());
+        return matcher.find();
+    }
 
     private String replaceShorthandStrings(String query) {
         for (Map.Entry<String, String> entry : this.shorthandStringsMap.entrySet()) {
