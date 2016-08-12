@@ -48,11 +48,25 @@ public class BinarySecureClientPoolFactory extends AbstractSecureClientPoolFacto
         if (protocol.equalsIgnoreCase(DataEndpointConfiguration.Protocol.SSL.toString())) {
             int timeout = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.BINARY_DATA_AGENT_TYPE)
                     .getAgentConfiguration().getSocketTimeoutMS();
+            String sslProtocols = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.BINARY_DATA_AGENT_TYPE).
+                    getAgentConfiguration().getSslEnabledProtocols();
+            String ciphers = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.BINARY_DATA_AGENT_TYPE).
+                    getAgentConfiguration().getCiphers();
+
             try {
                 SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
                 SSLSocket sslSocket = (SSLSocket) sslsocketfactory.createSocket(hostName, port);
                 sslSocket.setSoTimeout(timeout);
-                sslSocket.setEnabledCipherSuites(sslSocket.getSupportedCipherSuites());
+
+                if (sslProtocols != null && sslProtocols.length() != 0) {
+                    String [] sslProtocolsArray = sslProtocols.split(",");
+                    sslSocket.setEnabledProtocols(sslProtocolsArray);
+                }
+
+                if (ciphers != null && ciphers.length() != 0) {
+                    String [] ciphersArray = ciphers.split(",");
+                    sslSocket.setEnabledCipherSuites(ciphersArray);
+                }
                 return sslSocket;
             } catch (IOException e) {
                 throw new DataEndpointException("Error while opening socket to " + hostName + ":" + port + ". " +

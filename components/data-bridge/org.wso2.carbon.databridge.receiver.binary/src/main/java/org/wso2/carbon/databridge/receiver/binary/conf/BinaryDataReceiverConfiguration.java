@@ -30,6 +30,8 @@ public class BinaryDataReceiverConfiguration {
     private int tcpPort;
     private int sizeOfSSLThreadPool;
     private int sizeOfTCPThreadPool;
+    private String sslProtocols;
+    private String ciphers;
 
     public BinaryDataReceiverConfiguration(int sslPort, int tcpPort) {
         this.sslPort = sslPort;
@@ -51,6 +53,11 @@ public class BinaryDataReceiverConfiguration {
         this.sizeOfTCPThreadPool = Integer.parseInt(dataReceiver.getConfiguration(
                 BinaryDataReceiverConstants.TCP_RECEIVER_THREAD_POOL_SIZE,
                 BinaryDataReceiverConstants.DEFAULT_TCP_RECEIVER_THREAD_POOL_SIZE).toString());
+
+        Object sslProtocolObj = dataReceiver.getConfiguration(BinaryDataReceiverConstants.SSL_RECEIVER_PROTOCOLS_CONFIG_NAME, null);
+        sslProtocols =  sslProtocolObj != null ? sslProtocolObj.toString() : null;
+        Object ciphersObj = dataReceiver.getConfiguration(BinaryDataReceiverConstants.SSL_RECEIVER_CIPHERS_CONFIG_NAME, null);
+        ciphers =  sslProtocolObj != null ? ciphersObj.toString() : null;
     }
 
     public int getSSLPort() {
@@ -71,5 +78,13 @@ public class BinaryDataReceiverConfiguration {
 
     private static int getPortOffset() {
         return CarbonUtils.getPortFromServerConfig(BinaryDataReceiverConstants.CARBON_CONFIG_PORT_OFFSET_NODE)+1;
+    }
+
+    public String getSslProtocols() {
+        return sslProtocols;
+    }
+
+    public String getCiphers() {
+        return ciphers;
     }
 }
