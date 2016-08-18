@@ -18,7 +18,7 @@
 
 package org.apache.spark.sql.jdbc
 
-import java.sql.{Connection, PreparedStatement, SQLException}
+import java.sql.{Connection, SQLException}
 import java.util.Properties
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.sources.Filter
@@ -37,16 +37,17 @@ package object carbon {
       * Saves the RDD to the database in a single transaction.
       */
     def saveTable(
-                   df: DataFrame,
+                   frame: DataFrame,
+                   tenantId: Int,
                    dataSource: String,
+                   dsDefinition: String,
                    tableName: String,
                    primaryKeys: String) {
-      val rddSchema = df.schema
-      val dsWrapper = new AnalyticsDatasourceWrapper(dataSource)
+      val rddSchema = frame.schema
+      val dsWrapper = new AnalyticsDatasourceWrapper(tenantId, dataSource, dsDefinition)
       try {
-        val conn = dsWrapper.getConnection
         try {
-          val nullTypes: Array[Int] = df.schema.fields.map { field =>
+          val nullTypes: Array[Int] = frame.schema.fields.map { field =>
             field.dataType match {
               case IntegerType => java.sql.Types.INTEGER
               case LongType => java.sql.Types.BIGINT
@@ -61,15 +62,12 @@ package object carbon {
               case DateType => java.sql.Types.DATE
               case DecimalType.Fixed(precision, scale) => java.sql.Types.NUMERIC
               case DecimalType.Unlimited => java.sql.Types.NUMERIC
-              case _ => throw new IllegalArgumentException(
-                s"Can't translate null value for field $field")
+              case _ => throw new IllegalArgumentException(s"Can't translate null value for field $field")
             }
           }
-          df.foreachPartition { iterator =>
+          frame.foreachPartition { iterator =>
             CarbonJDBCWrite.savePartition(dsWrapper.getConnection, tableName, primaryKeys, iterator, rddSchema, nullTypes)
           }
-        } finally {
-          conn.close()
         }
       }
       catch {
@@ -105,12 +103,13 @@ package object carbon {
       var committed = false
       try {
         val qConf = CarbonJDBCUtils.getQueryConfigEntry(conn, table)
-        var stmt: PreparedStatement = null
+        var sql = ""
         if (primaryKeys.length > 0) {
-          stmt = mergeStatement(conn, table, primaryKeys, rddSchema, qConf)
+          sql = mergeStatement(table, primaryKeys, rddSchema, qConf)
         } else {
-          stmt = insertStatement(conn, table, rddSchema, qConf)
+          sql = insertStatement(table, rddSchema, qConf)
         }
+        val stmt = conn.prepareStatement(sql)
         try {
           while (iterator.hasNext) {
             val row = iterator.next()
@@ -173,10 +172,12 @@ package object carbon {
       * Returns a PreparedStatement that inserts a row into table via conn.
       * Used in situations where unique key constraints are not a concern, or when the table has been created afresh.
       */
-    def insertStatement(conn: Connection, table: String, rddSchema: StructType, qConf: SparkJDBCQueryConfigEntry):
-    PreparedStatement = {
+    def insertStatement(
+                         table: String,
+                         rddSchema: StructType,
+                         qConf: SparkJDBCQueryConfigEntry): String = {
       import CarbonJDBCConstants._
-      var sql = qConf.getRecordInsertQuery.replace(TABLE_NAME_PLACEHOLDER, table)
+      val sql = qConf.getRecordInsertQuery.replace(TABLE_NAME_PLACEHOLDER, table)
       val params = new StringBuilder
 
       var fieldsLeft = rddSchema.fields.length
@@ -187,19 +188,20 @@ package object carbon {
         }
         fieldsLeft = fieldsLeft - 1
       }
-      sql = sql.replace(Q_PLACEHOLDER, params)
-      conn.prepareStatement(sql)
+      sql.replace(Q_PLACEHOLDER, params)
     }
 
     /**
       * Returns a PreparedStatement that merges a row into table via conn.
       * Used in situations where unique key constraints limit the use of a generic row append operation.
       */
-    def mergeStatement(conn: Connection, table: String, primaryKeys: String, rddSchema: StructType,
-                       qConf: SparkJDBCQueryConfigEntry):
-    PreparedStatement = {
+    def mergeStatement(
+                        table: String,
+                        primaryKeys: String,
+                        rddSchema: StructType,
+                        qConf: SparkJDBCQueryConfigEntry): String = {
       import CarbonJDBCConstants._
-      var sql = qConf.getRecordMergeQuery.replace(TABLE_NAME_PLACEHOLDER, table)
+      val sql = qConf.getRecordMergeQuery.replace(TABLE_NAME_PLACEHOLDER, table)
 
       val pKeys = primaryKeys.split("\\s*,\\s*") // {{KEYS}}
       val columns = new StringBuilder // {{COLUMNS}}
@@ -245,7 +247,7 @@ package object carbon {
         columnPrefix = SEPARATOR
       }
 
-      sql = sql.replace(COLUMNS_PLACEHOLDER, columns)
+      sql.replace(COLUMNS_PLACEHOLDER, columns)
         .replace(Q_PLACEHOLDER, q)
         .replace(COLUMN_EQUALS_VALUES_COLUMN_PLACEHOLDER, columnEqualsValuesColumn)
         .replace(D_COLUMN_EQUALS_S_COLUMN_PLACEHOLDER, dColumnEqualsSColumn)
@@ -255,8 +257,6 @@ package object carbon {
         .replace(D_KEY_EQUALS_S_KEY_PLACEHOLDER, dKeyEqualsSKey)
         .replace(KEYS_PLACEHOLDER, primaryKeys)
         .replace(COLUMN_EQUALS_EXCLUDED_COLUMN_PLACEHOLDER, columnEqualsExcludedColumn)
-
-      conn.prepareStatement(sql)
     }
   }
 
@@ -267,7 +267,9 @@ package object carbon {
       *
       * @param sc              Your SparkContext.
       * @param schema          The Catalyst schema of the underlying database table.
+      * @param tenantId        The tenant ID of the calling tenant
       * @param dataSource      The class name of the JDBC driver for the given url.
+      * @param dsDefinition    The Datasource definition in text form
       * @param fqTable         The fully-qualified table name (or paren'd SQL query) to use.
       * @param requiredColumns The names of the columns to SELECT.
       * @param filters         The filters to include in all WHERE clauses.
@@ -277,13 +279,15 @@ package object carbon {
     def scanTable(
                    sc: SparkContext,
                    schema: StructType,
+                   tenantId: Int,
                    dataSource: String,
+                   dsDefinition: String,
                    fqTable: String,
                    requiredColumns: Array[String],
                    filters: Array[Filter],
                    parts: Array[Partition]): RDD[Row] = {
 
-      val dsWrapper = new AnalyticsDatasourceWrapper(dataSource)
+      val dsWrapper = new AnalyticsDatasourceWrapper(tenantId, dataSource, dsDefinition)
       val conn = dsWrapper.getConnection
       try {
         val quotedColumns = requiredColumns.map(colName => CarbonJDBCUtils.quoteIdentifier(colName, conn, fqTable))
