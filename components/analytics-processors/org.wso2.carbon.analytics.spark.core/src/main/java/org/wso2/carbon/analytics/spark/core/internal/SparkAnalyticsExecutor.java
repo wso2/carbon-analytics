@@ -57,6 +57,7 @@ import org.wso2.carbon.analytics.spark.core.util.SparkTableNamesHolder;
 import org.wso2.carbon.analytics.spark.utils.ComputeClasspath;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.CarbonUtils;
+import scala.None;
 import scala.None$;
 import scala.Option;
 import scala.Tuple2;
@@ -358,7 +359,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             int port = this.sparkConf.getInt(AnalyticsConstants.SPARK_MASTER_PORT, 7077 + this.portOffset);
             int webUiPort = this.sparkConf.getInt(AnalyticsConstants.SPARK_MASTER_WEBUI_PORT, 8081 + this.portOffset);
 
-            Master.startSystemAndActor(host, port, webUiPort, this.sparkConf);
+            Master.startRpcEnvAndEndpoint(host, port, webUiPort, this.sparkConf);
 
             log.info("Started SPARK MASTER in spark://" + host + ":" + port + " with webUI port : " + webUiPort);
 
@@ -449,9 +450,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             String[] masters = this.getSparkMastersFromCluster();
             String workerDir = getStringFromSparkConf(AnalyticsConstants.SPARK_WORKER_DIR, "work");
 
-            Worker.startSystemAndActor(workerHost, workerPort, workerUiPort, workerCores,
-                                       Utils.memoryStringToMb(workerMemory), masters, workerDir,
-                                       (Option) None$.MODULE$, this.sparkConf);
+            Worker.startRpcEnvAndEndpoint(workerHost, workerPort, workerUiPort, workerCores,
+                                          Utils.memoryStringToMb(workerMemory), masters, workerDir,
+                                          Option.empty(), this.sparkConf);
 
             log.info("Started SPARK WORKER in " + workerHost + ":" + workerPort + " with webUI port "
                      + workerUiPort + " with Masters " + Arrays.toString(masters));

@@ -18,21 +18,21 @@
 
 package org.wso2.carbon.analytics.spark.core.deploy;
 
-import akka.serialization.Serialization;
 import org.apache.spark.SparkConf;
 import org.apache.spark.deploy.master.LeaderElectable;
 import org.apache.spark.deploy.master.LeaderElectionAgent;
 import org.apache.spark.deploy.master.PersistenceEngine;
 import org.apache.spark.deploy.master.StandaloneRecoveryModeFactory;
+import org.apache.spark.serializer.Serializer;
 
 /**
  * Created by niranda on 6/9/15.
  */
 public class AnalyticsRecoveryModeFactory extends StandaloneRecoveryModeFactory {
 
-    private Serialization serializer;
+    private Serializer serializer;
 
-    public AnalyticsRecoveryModeFactory(SparkConf conf, Serialization serializer) {
+    public AnalyticsRecoveryModeFactory(SparkConf conf, Serializer serializer) {
         super(conf, serializer);
         this.serializer = serializer;
     }

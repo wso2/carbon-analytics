@@ -17,11 +17,12 @@
  */
 package org.wso2.carbon.analytics.spark.core.deploy;
 
-import akka.serialization.Serialization;
-import akka.serialization.Serializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.deploy.master.PersistenceEngine;
+import org.apache.spark.serializer.Serializer;
+import org.apache.spark.serializer.SerializerInstance;
+import org.apache.spark.sql.Row;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
@@ -32,7 +33,9 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
+import scala.reflect.ClassTag$;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -46,22 +49,22 @@ import java.util.Map;
 public class AnalyticsPersistenceEngine extends PersistenceEngine {
 
     private static final Log log = LogFactory.getLog(AnalyticsPersistenceEngine.class);
-    private Serialization serialization;
+    private Serializer serializer;
     private AnalyticsDataService ads;
 
     private static final String SPARK_META_TABLE = "__spark_meta_table";
     private static final String OBJ_COLUMN = "obj_col";
     private int SPARK_TENANT = AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID; // dont use 2 variables
 
-    public AnalyticsPersistenceEngine(Serialization serialization) {
-        this.serialization = serialization;
+    public AnalyticsPersistenceEngine(Serializer serializer) {
+        this.serializer = serializer;
         this.ads = AnalyticsServiceHolder.getAnalyticsDataService();
     }
 
     @Override
     public void persist(String name, Object obj) {
-        Serializer serializer = serialization.findSerializerFor(obj);
-        byte[] serialized = serializer.toBinary(obj);
+        SerializerInstance serializer = this.serializer.newInstance();
+        byte[] serialized = serializer.serialize(obj, ClassTag$.MODULE$.Object()).array();
 
         try {
             if (!ads.tableExists(SPARK_TENANT, SPARK_META_TABLE)) {
@@ -99,8 +102,7 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
     @SuppressWarnings("unchecked")
     @Override
     public <T> Seq<T> read(String prefix, ClassTag<T> evidence$1) {
-        Class<T> clazz = (Class<T>) evidence$1.runtimeClass();
-        Serializer serializer = serialization.findSerializerFor(clazz);
+        SerializerInstance serializer = this.serializer.newInstance();
 
         List<T> objects = new ArrayList<>();
         try {
@@ -113,7 +115,7 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
                     while (iterator.hasNext()) {
                         Record record = iterator.next();
                         if (record.getId().startsWith(prefix)) {
-                            objects.add((T) serializer.fromBinary((byte[]) record.getValue(OBJ_COLUMN), clazz));
+                            objects.add(serializer.deserialize(ByteBuffer.wrap((byte[]) record.getValue(OBJ_COLUMN)), evidence$1));
                         }
                     }
                 }

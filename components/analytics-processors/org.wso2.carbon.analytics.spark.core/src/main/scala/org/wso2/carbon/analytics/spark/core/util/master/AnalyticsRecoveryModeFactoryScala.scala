@@ -18,15 +18,15 @@
 
 package org.wso2.carbon.analytics.spark.core.util.master
 
-import akka.serialization.Serialization
 import org.apache.spark.SparkConf
 import org.apache.spark.deploy.master._
 import org.wso2.carbon.analytics.spark.core.deploy.{AnalyticsPersistenceEngine, AnalyticsLeaderElectionAgent}
+import org.apache.spark.serializer.Serializer
 
 /**
  * Scala version of Recovery mode factory
  */
-class AnalyticsRecoveryModeFactoryScala(conf: SparkConf, serializer: Serialization)
+class AnalyticsRecoveryModeFactoryScala(conf: SparkConf, serializer: Serializer)
   extends StandaloneRecoveryModeFactory(conf, serializer) {
 
   AnalyticsRecoveryModeFactoryScala.instantiationAttempts += 1
