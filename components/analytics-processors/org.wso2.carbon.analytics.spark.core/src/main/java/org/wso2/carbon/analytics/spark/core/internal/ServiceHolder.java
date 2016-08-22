@@ -114,6 +114,10 @@ public class ServiceHolder {
         ServiceHolder.tenantRegistryLoader = tenantRegistryLoader;
     }
 
+    public static TenantRegistryLoader getTenantRegistryLoader() {
+        return ServiceHolder.tenantRegistryLoader;
+    }
+
     public static UserRegistry getTenantConfigRegistry(int tenantId) throws RegistryException {
         if (tenantId == MultitenantConstants.SUPER_TENANT_ID) {
             return ServiceHolder.registryService.getConfigSystemRegistry();

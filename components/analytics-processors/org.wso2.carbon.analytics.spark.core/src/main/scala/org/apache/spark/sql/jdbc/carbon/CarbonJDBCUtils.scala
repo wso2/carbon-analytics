@@ -20,16 +20,8 @@ package org.apache.spark.sql.jdbc.carbon
 
 import java.sql.{Connection, DriverManager, SQLException}
 import java.util.Properties
-import javax.sql.DataSource
-
 import org.apache.commons.logging.{Log, LogFactory}
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.{Partition, SparkContext}
-import org.apache.spark.sql.jdbc.JDBCRDD
-import org.apache.spark.sql.sources.Filter
-import org.apache.spark.sql.types.{ByteType, _}
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils
+import org.apache.spark.sql.types._
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException
 import org.wso2.carbon.analytics.spark.core.jdbc.{SparkJDBCQueryConfigEntry, SparkJDBCUtils}
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsDatasourceWrapper
@@ -101,10 +93,15 @@ object CarbonJDBCUtils {
     * @param primaryKeys The unique keys to be defined for the table
     */
 
-  def checkAndCreateTable(dataSource: String, tableName: String,
-                          schema: mutable.MutableList[(String, String, Boolean, Boolean)],
-                          primaryKeys: String): Unit = {
-    val conn: Connection = GenericUtils.loadGlobalDataSource(dataSource).asInstanceOf[DataSource].getConnection
+  def checkAndCreateTable(
+                           tenantId: Int,
+                           dataSource: String,
+                           dsDefinition: String,
+                           tableName: String,
+                           schema: mutable.MutableList[(String, String, Boolean, Boolean)],
+                           primaryKeys: String): Unit = {
+    val dsWrapper = new AnalyticsDatasourceWrapper(tenantId, dataSource, dsDefinition)
+    val conn: Connection = dsWrapper.getConnection
     //Setting autocommit to false so that table and index creation take place as a single transaction
     conn.setAutoCommit(false)
     var committed = false
