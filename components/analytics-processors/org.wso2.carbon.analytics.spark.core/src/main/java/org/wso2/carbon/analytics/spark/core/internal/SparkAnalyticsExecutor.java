@@ -704,6 +704,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             }
 
             long start = System.currentTimeMillis();
+            boolean success = true;
             try {
                 if (this.sqlCtx == null) {
                     throw new AnalyticsExecutionException("Spark SQL Context is not available. " +
@@ -713,10 +714,17 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                                                             this.sparkConf.get(AnalyticsConstants.SPARK_SCHEDULER_POOL));
                 DataFrame result = this.sqlCtx.sql(query);
                 return toResult(result);
+            } catch (Throwable e){
+                success = false;
+                throw e;
             } finally {
                 long end = System.currentTimeMillis();
                 if (ServiceHolder.isAnalyticsStatsEnabled()) {
-                    log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
+                    if (success) {
+                        log.info("Executed query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
+                    } else {
+                        log.error("Unable to execute query: " + origQuery + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
+                    }
                 }
             }
         } finally {
