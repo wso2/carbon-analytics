@@ -20,7 +20,10 @@ package org.apache.spark.sql.jdbc
 
 import java.sql.{Connection, SQLException}
 import java.util.Properties
+
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.execution.datasources.jdbc.JDBCRDD
 import org.apache.spark.sql.sources.Filter
 import org.apache.spark.{Logging, Partition, SparkContext}
 import org.apache.spark.sql.types._
@@ -285,7 +288,7 @@ package object carbon {
                    fqTable: String,
                    requiredColumns: Array[String],
                    filters: Array[Filter],
-                   parts: Array[Partition]): RDD[Row] = {
+                   parts: Array[Partition]): RDD[InternalRow] = {
 
       val dsWrapper = new AnalyticsDatasourceWrapper(tenantId, dataSource, dsDefinition)
       val conn = dsWrapper.getConnection
@@ -299,6 +302,7 @@ package object carbon {
           quotedColumns,
           filters,
           parts,
+          conn.getMetaData.getURL,
           new Properties)
       } catch {
         case e: SQLException => throw new
