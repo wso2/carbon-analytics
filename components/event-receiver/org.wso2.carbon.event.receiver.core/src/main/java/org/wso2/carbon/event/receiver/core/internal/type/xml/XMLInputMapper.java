@@ -265,8 +265,6 @@ public class XMLInputMapper implements InputMapper {
                         if (omAttributeResult.getAttributeValue() != null) {
                             returnedObj = EventReceiverUtil.convertToAttributeType(omAttributeResult.getAttributeValue(), beanClass);
                         }
-                    } else {
-                        throw new EventReceiverProcessingException("Parsed xpath didn't return an attribute or an element!");
                     }
                     if (returnedObj == null) {
                         if (xpathData.getDefaultValue() != null) {
