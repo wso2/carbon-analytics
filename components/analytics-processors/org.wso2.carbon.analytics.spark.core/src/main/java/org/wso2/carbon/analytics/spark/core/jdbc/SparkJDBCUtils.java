@@ -34,23 +34,29 @@ import static org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants.SPARK
  */
 public class SparkJDBCUtils {
 
-    public static final String SPARK_JDBC_CONFIG_FILE = "spark-jdbc-config.xml";
+    private static final String SPARK_JDBC_CONFIG_FILE = "spark-jdbc-config.xml";
+
+    private static SparkJDBCQueryConfiguration carbonJdbcConfig = null;
 
     public static SparkJDBCQueryConfiguration loadQueryConfiguration() throws AnalyticsException {
-        try {
-            File confFile = new File(GenericUtils.getAnalyticsConfDirectory() + File.separator +
-                    AnalyticsDataSourceConstants.ANALYTICS_CONF_DIR + File.separator + SPARK_CONF_DIR +
-                    File.separator + SPARK_JDBC_CONFIG_FILE);
-            if (!confFile.exists()) {
-                throw new AnalyticsExecutionException("Spark JDBC query configuration file cannot be found at: " +
-                        confFile.getPath());
+        if (SparkJDBCUtils.carbonJdbcConfig != null) {
+            return SparkJDBCUtils.carbonJdbcConfig;
+        } else {
+            try {
+                File confFile = new File(GenericUtils.getAnalyticsConfDirectory() + File.separator +
+                        AnalyticsDataSourceConstants.ANALYTICS_CONF_DIR + File.separator + SPARK_CONF_DIR +
+                        File.separator + SPARK_JDBC_CONFIG_FILE);
+                if (!confFile.exists()) {
+                    throw new AnalyticsExecutionException("Spark JDBC query configuration file cannot be found at: " +
+                            confFile.getPath());
+                }
+                JAXBContext ctx = JAXBContext.newInstance(SparkJDBCQueryConfiguration.class);
+                Unmarshaller unmarshaller = ctx.createUnmarshaller();
+                SparkJDBCUtils.carbonJdbcConfig = (SparkJDBCQueryConfiguration) unmarshaller.unmarshal(confFile);
+                return SparkJDBCUtils.carbonJdbcConfig;
+            } catch (JAXBException e) {
+                throw new AnalyticsException("Error in processing Spark JDBC query configuration: " + e.getMessage(), e);
             }
-            JAXBContext ctx = JAXBContext.newInstance(SparkJDBCQueryConfiguration.class);
-            Unmarshaller unmarshaller = ctx.createUnmarshaller();
-            return (SparkJDBCQueryConfiguration) unmarshaller.unmarshal(confFile);
-        } catch (JAXBException e) {
-            throw new AnalyticsException("Error in processing Spark JDBC query configuration: " + e.getMessage(), e);
         }
     }
-
 }

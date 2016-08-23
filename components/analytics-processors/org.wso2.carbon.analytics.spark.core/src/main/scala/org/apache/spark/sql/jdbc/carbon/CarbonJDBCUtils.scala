@@ -18,8 +18,8 @@
 
 package org.apache.spark.sql.jdbc.carbon
 
-import java.sql.{Connection, DriverManager, SQLException}
-import java.util.Properties
+import java.sql.{Connection, SQLException}
+
 import org.apache.commons.logging.{Log, LogFactory}
 import org.apache.spark.sql.types._
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException
@@ -41,13 +41,6 @@ object CarbonJDBCUtils {
   def quoteIdentifier(colName: String, conn: Connection, table: String): String = {
     val quote = getQueryConfigEntry(conn, table).getQuoteMark
     s"$quote$colName$quote"
-  }
-
-  /**
-    * Establishes a JDBC connection.
-    */
-  def createConnection(url: String, connectionProperties: Properties): Connection = {
-    DriverManager.getConnection(url, connectionProperties)
   }
 
   /**
@@ -74,7 +67,6 @@ object CarbonJDBCUtils {
     if (dbType.startsWith("DB2")) {
       dbType = "DB2.*"
     }
-    //qConf.getDatabases.find(entry => entry.getDatabaseName.equalsIgnoreCase(dbType)).get
     val entries = qConf.getDatabases.filter(entry => entry.getDatabaseName.equalsIgnoreCase(dbType) && (entry.getVersion.isEmpty
       || entry.getVersion.equalsIgnoreCase(dbVersion)))
     if (entries.isEmpty) {
