@@ -97,7 +97,7 @@ public class AnalyticsSparkExecutorTest {
         ex.executeQuery(1, "CREATE TEMPORARY TABLE EventsTable USING CompressedEventAnalytics " +
                            "OPTIONS(tableName \"CompressedEventsTable\", schema \"messageFlowId STRING, compotentType STRING, " +
                            "componentName STRING, compotentIndex INT, componentId STRING, startTime LONG, endTime LONG, " +
-                           "duration FLOAT, beforePayload STRING, afterPayload STRING, contextPropertyMap STRING, " +
+                           "duration LONG, beforePayload STRING, afterPayload STRING, contextPropertyMap STRING, " +
                            "transportPropertyMap STRING, children STRING, entryPoint STRING, entryPointHashcode INT, faultCount INT," +
                            " hashCode INT, host STRING, _tenantId INT, _timestamp LONG\", " +
                            "incrementalParams \"EventsTable, SECOND\")");
@@ -743,11 +743,11 @@ public class AnalyticsSparkExecutorTest {
         service.put(records);
 
         List<ColumnDefinition> cols = new ArrayList<>();
-        cols.add(new ColumnDefinition("server_name", AnalyticsSchema.ColumnType.STRING));
-        cols.add(new ColumnDefinition("ip", AnalyticsSchema.ColumnType.STRING));
-        cols.add(new ColumnDefinition("tenant", AnalyticsSchema.ColumnType.INTEGER));
-        cols.add(new ColumnDefinition("sequence", AnalyticsSchema.ColumnType.LONG));
-        cols.add(new ColumnDefinition("summary", AnalyticsSchema.ColumnType.LONG));
+        cols.add(new ColumnDefinition("server_name", ColumnType.STRING));
+        cols.add(new ColumnDefinition("ip", ColumnType.STRING));
+        cols.add(new ColumnDefinition("tenant", ColumnType.INTEGER));
+        cols.add(new ColumnDefinition("sequence", ColumnType.LONG));
+        cols.add(new ColumnDefinition("summary", ColumnType.STRING));
         this.service.setTableSchema(1, "Log10", new AnalyticsSchema(cols, Collections.<String>emptyList()));
         this.service.setTableSchema(1, "Log11", new AnalyticsSchema(cols, Collections.<String>emptyList()));
 
