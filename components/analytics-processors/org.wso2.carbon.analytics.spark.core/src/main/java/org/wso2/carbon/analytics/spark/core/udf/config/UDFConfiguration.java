@@ -30,6 +30,7 @@ import java.util.List;
 public class UDFConfiguration {
 
     private List<String> customUDFClass;
+    private List<CustomUDAF> customUDAFs;
 
     public UDFConfiguration() {
     }
@@ -42,5 +43,15 @@ public class UDFConfiguration {
 
     public void setCustomUDFClass(List<String> customUDFClass) {
         this.customUDFClass = customUDFClass;
+    }
+
+    @XmlElementWrapper(name = "custom-udaf-classes")
+    @XmlElement(name = "custom-udaf")
+    public List<CustomUDAF> getCustomUDAFs() {
+        return customUDAFs;
+    }
+
+    public void setCustomUDAFs(List<CustomUDAF> customUDAFs) {
+        this.customUDAFs = customUDAFs;
     }
 }
