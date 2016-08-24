@@ -31,6 +31,7 @@ import org.apache.spark.serializer.KryoSerializer;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.expressions.UserDefinedAggregateFunction;
 import org.apache.spark.sql.jdbc.carbon.AnalyticsJDBCRelationProvider;
 import org.apache.spark.util.Utils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
@@ -48,7 +49,9 @@ import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsRelationProvider;
 import org.wso2.carbon.analytics.spark.core.sources.CompressedEventAnalyticsRelationProvider;
 import org.wso2.carbon.analytics.spark.core.udf.AnalyticsUDFsRegister;
+import org.wso2.carbon.analytics.spark.core.udf.CarbonUDAF;
 import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
+import org.wso2.carbon.analytics.spark.core.udf.config.CustomUDAF;
 import org.wso2.carbon.analytics.spark.core.udf.config.UDFConfiguration;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
@@ -57,8 +60,6 @@ import org.wso2.carbon.analytics.spark.core.util.SparkTableNamesHolder;
 import org.wso2.carbon.analytics.spark.utils.ComputeClasspath;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.CarbonUtils;
-import scala.None;
-import scala.None$;
 import scala.Option;
 import scala.Tuple2;
 
@@ -300,6 +301,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private void initializeSqlContext(JavaSparkContext jsc) throws AnalyticsUDFException {
         this.sqlCtx = new SQLContext(jsc);
         registerUDFs(this.sqlCtx);
+        registerUDAFs(this.sqlCtx);
     }
 
     public void registerUDFFromOSGIComponent(CarbonUDF carbonUDF) throws AnalyticsUDFException {
@@ -314,6 +316,40 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             }
         } else {
             ServiceHolder.addCarbonUDFs(carbonUDF);
+        }
+    }
+
+    public void registerUDAFFromOSGIComponent(CarbonUDAF carbonUDAF) throws AnalyticsUDFException {
+        if (this.sqlCtx != null) {
+            AnalyticsUDFsRegister analyticsUDFsRegister = AnalyticsUDFsRegister.getInstance();
+            String name = carbonUDAF.getAlias();
+            Class<? extends UserDefinedAggregateFunction> clazz = carbonUDAF.getClass();
+            analyticsUDFsRegister.registerUDAF(name, clazz, sqlCtx);
+        } else {
+            ServiceHolder.addCarbonUDAFs(carbonUDAF);
+        }
+    }
+
+    private void registerUDAFs(SQLContext sqlCtx) throws AnalyticsUDFException {
+        Map<String, Class<? extends UserDefinedAggregateFunction>> udafMap = new HashMap<>();
+        if (this.udfConfiguration.getCustomUDAFs() != null && !this.udfConfiguration.getCustomUDAFs().isEmpty()) {
+            for (CustomUDAF udaf : this.udfConfiguration.getCustomUDAFs()) {
+                try {
+                    if (!udaf.getAlias().isEmpty() && !udaf.getImplClass().isEmpty()) {
+                        Class<? extends UserDefinedAggregateFunction> clazz = Class.forName(udaf.getImplClass()).asSubclass(UserDefinedAggregateFunction.class);
+                        udafMap.put(udaf.getAlias(), clazz);
+                    }
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (!ServiceHolder.getCarbonUDAFs().isEmpty()) {
+            udafMap.putAll(ServiceHolder.getCarbonUDAFs());
+        }
+        AnalyticsUDFsRegister udafRegister = AnalyticsUDFsRegister.getInstance();
+        for (String udaf : udafMap.keySet()) {
+            udafRegister.registerUDAF(udaf, udafMap.get(udaf), sqlCtx);
         }
     }
 
