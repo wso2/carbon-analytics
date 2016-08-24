@@ -24,4 +24,10 @@
         <class-name>org.wso2.carbon.analytics.spark.core.udf.defaults.TimeNowUDF</class-name>
         <class-name>org.wso2.carbon.analytics.spark.core.udf.facets.FacetUDF</class-name>
     </custom-udf-classes>
+    <custom-udaf-classes>
+        <custom-udaf>
+            <alias>geometricMean</alias>
+            <class-name>org.wso2.carbon.analytics.spark.core.udaf.defaults.GeometricMeanUDAF</class-name>
+        </custom-udaf>
+    </custom-udaf-classes>
 </udf-configuration>
