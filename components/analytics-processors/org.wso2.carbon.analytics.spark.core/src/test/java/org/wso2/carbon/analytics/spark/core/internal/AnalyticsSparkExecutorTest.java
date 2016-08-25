@@ -312,6 +312,28 @@ public class AnalyticsSparkExecutorTest {
     }
 
     @Test
+    public void testSparkUdafTest() throws AnalyticsException, InterruptedException {
+        System.out.println(testString("start : spark udaf test"));
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        this.service.deleteTable(1, "Log5");
+        String query = "CREATE TEMPORARY TABLE Log5 USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Log5\"," +
+                "schema \"member DOUBLE\"" +
+                ")";
+        ex.executeQuery(1, query);
+        for (int i = 1; i < 6; i++) {
+            ex.executeQuery(1, "INSERT INTO TABLE Log5 SELECT " + Math.pow(2, i));
+        }
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT geometricMean(member) FROM Log5");
+        Assert.assertEquals(Math.round(Double.parseDouble(result.getRows().get(0).get(0).toString())), 8L);
+        AnalyticsQueryResult result2 = ex.executeQuery(1, "SELECT harmonicMean(member) FROM Log5");
+        Assert.assertEquals(Math.round(Double.parseDouble(result2.getRows().get(0).get(0).toString()) * 100.0) / 100.0, 5.16);
+        this.cleanupTable(1, "Log5");
+        System.out.println(testString("end : spark udaf test"));
+    }
+
+    @Test
     public void testCreateTableWithColumnOptions() throws AnalyticsException {
         System.out.println(testString("start : create temp table with column options test"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
