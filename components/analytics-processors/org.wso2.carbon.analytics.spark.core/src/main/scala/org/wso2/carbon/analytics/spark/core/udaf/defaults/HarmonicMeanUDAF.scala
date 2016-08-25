@@ -23,7 +23,7 @@ class HarmonicMeanUDAF extends UserDefinedAggregateFunction {
 
   override def initialize(buffer: MutableAggregationBuffer): Unit = {
     buffer(0) = 0L
-    buffer(1) = 1.0
+    buffer(1) = 0.0
     buffer(2) = false
   }
 
@@ -32,25 +32,29 @@ class HarmonicMeanUDAF extends UserDefinedAggregateFunction {
       buffer(2) = true
     } else {
       buffer(0) = buffer.getAs[Long](0) + 1
-      buffer(1) = (1.toDouble / buffer.getAs[Double](1)) + (1.toDouble / input.getAs[Double](0))
+      buffer(1) = buffer.getAs[Double](1) + inv(input.getAs[Double](0))
     }
   }
 
   override def merge(buffer1: MutableAggregationBuffer, buffer2: Row): Unit = {
-    if (buffer1.getAs[Double](1) == 0.toDouble || buffer2.getAs[Double](1) == 0.toDouble || buffer1.getAs[Boolean](2)) {
+    if (buffer2.getAs[Double](1) == 0.toDouble || buffer1.getAs[Boolean](2)) {
       buffer1(2) = true
     } else {
       buffer1(0) = buffer1.getAs[Long](0) + buffer2.getAs[Long](0)
-      buffer1(1) = (1.toDouble / buffer1.getAs[Double](1)) + (1.toDouble / buffer2.getAs[Double](1))
+      buffer1(1) = buffer1.getAs[Double](1) + buffer2.getAs[Double](1)
     }
   }
 
   override def evaluate(buffer: Row): Any = {
-    if (buffer.getDouble(1) == 0.toDouble) {
+    if (buffer.getBoolean(2)) {
       0.toDouble
     } else {
       buffer.getLong(0) / buffer.getDouble(1)
     }
+  }
+
+  def inv(value: Double): Double = {
+    1.toDouble / value
   }
 
 }
