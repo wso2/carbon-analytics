@@ -43,7 +43,12 @@ import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionCall;
-import org.wso2.carbon.analytics.spark.core.deploy.*;
+import org.wso2.carbon.analytics.spark.core.deploy.AnalyticsPersistenceEngine;
+import org.wso2.carbon.analytics.spark.core.deploy.AnalyticsRecoveryModeFactory;
+import org.wso2.carbon.analytics.spark.core.deploy.CheckElectedLeaderExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.ElectLeaderExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.InitClientExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.StartWorkerExecutionCall;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsRelationProvider;
@@ -70,7 +75,15 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -394,6 +407,15 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             String host = this.myHost;
             int port = this.sparkConf.getInt(AnalyticsConstants.SPARK_MASTER_PORT, 7077 + this.portOffset);
             int webUiPort = this.sparkConf.getInt(AnalyticsConstants.SPARK_MASTER_WEBUI_PORT, 8081 + this.portOffset);
+
+            // if the master is the only member in the cluster, cleanup the spark meta table
+            if (acm.isLeader(CLUSTER_GROUP_NAME) && acm.getMembers(CLUSTER_GROUP_NAME).size() == 1) {
+                try {
+                    AnalyticsPersistenceEngine.cleanupSparkMetaTable();
+                } catch (AnalyticsException e) {
+                    throw new AnalyticsClusterException("Unable to cleanup the Spark Meta table", e);
+                }
+            }
 
             Master.startRpcEnvAndEndpoint(host, port, webUiPort, this.sparkConf);
 
@@ -747,7 +769,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                                                             this.sparkConf.get(AnalyticsConstants.SPARK_SCHEDULER_POOL));
                 DataFrame result = this.sqlCtx.sql(query);
                 return toResult(result);
-            } catch (Throwable e){
+            } catch (Throwable e) {
                 success = false;
                 throw e;
             } finally {
