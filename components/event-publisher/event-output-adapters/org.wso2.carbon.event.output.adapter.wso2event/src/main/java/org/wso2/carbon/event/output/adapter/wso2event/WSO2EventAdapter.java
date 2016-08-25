@@ -33,10 +33,19 @@ import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailable
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
+import org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAdapterConstants;
 
 import java.util.Map;
 
-import static org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAdapterConstants.*;
+import static org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAdapterConstants.ADAPTER_CONF_PATH;
+import static org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_AUTHENTICATOR_URL;
+import static org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_PASSWORD;
+import static org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_PROTOCOL;
+import static org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_PUBLISHING_MODE;
+import static org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_PUBLISH_TIMEOUT_MS;
+import static org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_RECEIVER_URL;
+import static org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_USER_NAME;
+import static org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAdapterConstants.ADAPTER_PUBLISHING_MODE_BLOCKING;
 
 public final class WSO2EventAdapter implements OutputEventAdapter {
 
@@ -47,12 +56,61 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
     private boolean isBlockingMode = false;
     private long timeout = 0;
     private int tenantId;
+    private String authUrl;
+    private String receiverUrl;
+    private String protocol;
 
     public WSO2EventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                             Map<String, String> globalProperties) {
 
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
+
+        authUrl = eventAdapterConfiguration.getStaticProperties().get(ADAPTER_CONF_WSO2EVENT_PROP_AUTHENTICATOR_URL);
+        receiverUrl = eventAdapterConfiguration.getStaticProperties().get(ADAPTER_CONF_WSO2EVENT_PROP_RECEIVER_URL);
+        protocol = eventAdapterConfiguration.getStaticProperties().get(ADAPTER_CONF_WSO2EVENT_PROP_PROTOCOL);
+
+        if (receiverUrl == null) {
+            if (protocol.equals(WSO2EventAdapterConstants.ADAPTER_PROTOCOL_THRIFT)) {
+                String defaultTCPUrl = globalProperties.get(WSO2EventAdapterConstants.DEFAULT_THRIFT_TCP_URL);
+                String defaultSSLUrl = globalProperties.get(WSO2EventAdapterConstants.DEFAULT_THRIFT_SSL_URL);
+                if (defaultTCPUrl != null) {
+                    receiverUrl = defaultTCPUrl;
+
+                    if (authUrl == null && defaultSSLUrl != null) {
+                        authUrl = defaultSSLUrl;
+                    }
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("Thirft TCP url is not specified for WSO2Event Publisher " +
+                                  eventAdapterConfiguration.getName() + " ,hence using default thrift url " + defaultTCPUrl);
+                    }
+                } else {
+                    throw new OutputEventAdapterRuntimeException("Cannot deploy WSO2Event Publisher " +
+                                                                 eventAdapterConfiguration.getName() + " , since there is no any thrift url specified in " +
+                                                                 "global/event publisher configuration");
+                }
+            } else {
+                String defaultTCPUrl = globalProperties.get(WSO2EventAdapterConstants.DEFAULT_BINARY_TCP_URL);
+                String defaultSSLUrl = globalProperties.get(WSO2EventAdapterConstants.DEFAULT_BINARY_SSL_URL);
+                if (defaultTCPUrl != null) {
+                    receiverUrl = defaultTCPUrl;
+                    if (authUrl == null && defaultSSLUrl != null) {
+                        authUrl = defaultSSLUrl;
+                    }
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("Thirft TCP url is not specified for WSO2Event Publisher " +
+                                  eventAdapterConfiguration.getName() + " ,hence using default binary url " + defaultTCPUrl);
+                    }
+                } else {
+                    throw new OutputEventAdapterRuntimeException("Cannot deploy WSO2Event Publisher " +
+                                                                 eventAdapterConfiguration.getName() + " , since there is no any binary url specified in " +
+                                                                 "global/event publisher configuration");
+                }
+            }
+        }
+
     }
 
     /**
@@ -79,11 +137,6 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
 
         String userName = eventAdapterConfiguration.getStaticProperties().get(ADAPTER_CONF_WSO2EVENT_PROP_USER_NAME);
         String password = eventAdapterConfiguration.getStaticProperties().get(ADAPTER_CONF_WSO2EVENT_PROP_PASSWORD);
-        String authUrl = eventAdapterConfiguration.getStaticProperties()
-                .get(ADAPTER_CONF_WSO2EVENT_PROP_AUTHENTICATOR_URL);
-        String receiverUrl = eventAdapterConfiguration.getStaticProperties()
-                .get(ADAPTER_CONF_WSO2EVENT_PROP_RECEIVER_URL);
-        String protocol = eventAdapterConfiguration.getStaticProperties().get(ADAPTER_CONF_WSO2EVENT_PROP_PROTOCOL);
         String publishingMode = eventAdapterConfiguration.getStaticProperties()
                 .get(ADAPTER_CONF_WSO2EVENT_PROP_PUBLISHING_MODE);
         String timeoutString = eventAdapterConfiguration.getStaticProperties()

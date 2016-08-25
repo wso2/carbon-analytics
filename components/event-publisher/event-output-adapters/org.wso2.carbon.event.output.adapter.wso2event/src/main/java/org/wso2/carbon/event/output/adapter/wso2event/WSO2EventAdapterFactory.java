@@ -47,7 +47,7 @@ public class WSO2EventAdapterFactory extends OutputEventAdapterFactory {
         Property ipProperty = new Property(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_RECEIVER_URL);
         ipProperty.setDisplayName(
                 resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_RECEIVER_URL));
-        ipProperty.setRequired(true);
+        ipProperty.setRequired(false);
         ipProperty.setHint(resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_HINT_RECEIVER_URL));
 
         // set authenticator url of event adapter
