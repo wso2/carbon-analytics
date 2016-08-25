@@ -4,7 +4,9 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.expressions.{MutableAggregationBuffer, UserDefinedAggregateFunction}
 import org.apache.spark.sql.types._
 
-
+/**
+  * This UDAF could be used to calculate the geometric mean of the given set of numbers.
+  */
 class GeometricMeanUDAF extends UserDefinedAggregateFunction {
 
   override def inputSchema: org.apache.spark.sql.types.StructType =
