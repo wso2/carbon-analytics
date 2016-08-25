@@ -175,8 +175,8 @@ public class ServiceHolder {
         ServiceHolder.carbonUDFs.put(carbonUDF.getClass().getName(), carbonUDF);
     }
 
-    public static void removeCarbonUDFs() {
-        ServiceHolder.carbonUDFs = null;
+    public static void removeCarbonUDFs(CarbonUDF carbonUDF) {
+        ServiceHolder.carbonUDFs.remove(carbonUDF.getClass().getName());
     }
 
     public static Map<String, CarbonUDF> getCarbonUDFs() {
