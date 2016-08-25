@@ -212,7 +212,7 @@ public class AnalyticsComponent {
     }
 
     protected void removeCarbonUDFs(CarbonUDF carbonUDF) {
-        ServiceHolder.removeCarbonUDFs();
+        ServiceHolder.removeCarbonUDFs(carbonUDF);
     }
 
     private void checkAnalyticsEnabled() {
