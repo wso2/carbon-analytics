@@ -57,6 +57,21 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
 
+    }
+
+    /**
+     * Initialises the resource bundle
+     */
+    @Override
+    public void init() throws OutputEventAdapterException {
+        validateOutputEventAdapterConfigurations();
+        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+
+        String configPath = globalProperties.get(WSO2EventAdapterConstants.ADAPTER_CONF_PATH);
+        if (configPath != null) {
+            AgentHolder.setConfigPath(configPath);
+        }
+
         authUrl = eventAdapterConfiguration.getStaticProperties().get(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_AUTHENTICATOR_URL);
         receiverUrl = eventAdapterConfiguration.getStaticProperties().get(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_RECEIVER_URL);
         protocol = eventAdapterConfiguration.getStaticProperties().get(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_PROTOCOL);
@@ -77,7 +92,7 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
                                   eventAdapterConfiguration.getName() + " ,hence using default thrift url " + defaultTCPUrl);
                     }
                 } else {
-                    throw new OutputEventAdapterRuntimeException("Cannot deploy WSO2Event Publisher " +
+                    throw new OutputEventAdapterException("Cannot deploy WSO2Event Publisher " +
                                                                  eventAdapterConfiguration.getName() + " , since there is no any thrift url specified in " +
                                                                  "global/event publisher configuration");
                 }
@@ -95,27 +110,13 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
                                   eventAdapterConfiguration.getName() + " ,hence using default binary url " + defaultTCPUrl);
                     }
                 } else {
-                    throw new OutputEventAdapterRuntimeException("Cannot deploy WSO2Event Publisher " +
+                    throw new OutputEventAdapterException("Cannot deploy WSO2Event Publisher " +
                                                                  eventAdapterConfiguration.getName() + " , since there is no any binary url specified in " +
                                                                  "global/event publisher configuration");
                 }
             }
         }
 
-    }
-
-    /**
-     * Initialises the resource bundle
-     */
-    @Override
-    public void init() throws OutputEventAdapterException {
-        validateOutputEventAdapterConfigurations();
-        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-
-        String configPath = globalProperties.get(WSO2EventAdapterConstants.ADAPTER_CONF_PATH);
-        if (configPath != null) {
-            AgentHolder.setConfigPath(configPath);
-        }
     }
 
     @Override
