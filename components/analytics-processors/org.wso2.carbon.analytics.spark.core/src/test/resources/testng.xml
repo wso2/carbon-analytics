@@ -22,11 +22,12 @@
    <parameter name="mysql.username" value="root"/>
    <parameter name="mysql.password" value="root"/>
    <test name="Analytics Spark Core Tests">
-     <classes>     
+     <classes>
+         <!--todo: re-enable this -->
        <!--<class name="org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtilsTest"/>-->
        <class name="org.wso2.carbon.analytics.spark.core.internal.AnalyticsSparkExecutorTest"/>
-       <class name="org.wso2.carbon.analytics.spark.core.udf.DefaultSparkTest"/>
-       <class name="org.wso2.carbon.analytics.spark.core.udf.FacetSparkTest"/>
+       <!--<class name="org.wso2.carbon.analytics.spark.core.udf.DefaultSparkTest"/>-->
+       <!--<class name="org.wso2.carbon.analytics.spark.core.udf.FacetSparkTest"/>-->
      </classes>
    </test>
 </suite>

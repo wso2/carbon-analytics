@@ -22,11 +22,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.spark.deploy.master.PersistenceEngine;
 import org.apache.spark.serializer.Serializer;
 import org.apache.spark.serializer.SerializerInstance;
-import org.apache.spark.sql.Row;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse.Entry;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
@@ -43,8 +42,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  This class represents the analytics persistence engine which is responsible for persist,
- *  unpersist and read spark failover recovery related data
+ * This class represents the analytics persistence engine which is responsible for persist,
+ * unpersist and read spark failover recovery related data
  */
 public class AnalyticsPersistenceEngine extends PersistenceEngine {
 
@@ -54,7 +53,6 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
 
     private static final String SPARK_META_TABLE = "__spark_meta_table";
     private static final String OBJ_COLUMN = "obj_col";
-    private int SPARK_TENANT = AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID; // dont use 2 variables
 
     public AnalyticsPersistenceEngine(Serializer serializer) {
         this.serializer = serializer;
@@ -67,14 +65,14 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
         byte[] serialized = serializer.serialize(obj, ClassTag$.MODULE$.Object()).array();
 
         try {
-            if (!ads.tableExists(SPARK_TENANT, SPARK_META_TABLE)) {
-                ads.createTable(SPARK_TENANT, SPARK_META_TABLE);
+            if (!ads.tableExists(AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID, SPARK_META_TABLE)) {
+                ads.createTable(AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID, SPARK_META_TABLE);
             }
 
             Map<String, Object> values = new HashMap<>(1);
             values.put(OBJ_COLUMN, serialized);
 
-            Record record = new Record(name, SPARK_TENANT, SPARK_META_TABLE, values);
+            Record record = new Record(name, AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID, SPARK_META_TABLE, values);
             List<Record> records = new ArrayList<>(1);
             records.add(record);
 
@@ -91,7 +89,7 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
         try {
             List<String> recordIds = new ArrayList<>(1);
             recordIds.add(name);
-            ads.delete(SPARK_TENANT, SPARK_META_TABLE, recordIds);
+            ads.delete(AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID, SPARK_META_TABLE, recordIds);
         } catch (AnalyticsException e) {
             String msg = "Error in deleting data from spark meta table: " + e.getMessage();
             log.error(msg, e);
@@ -106,8 +104,8 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
 
         List<T> objects = new ArrayList<>();
         try {
-            if (ads.tableExists(SPARK_TENANT, SPARK_META_TABLE)) { //todo: use AnalyticsDataServiceUtils.listRecords method
-                AnalyticsDataResponse results = ads.get(SPARK_TENANT, SPARK_META_TABLE, 1, null,
+            if (ads.tableExists(AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID, SPARK_META_TABLE)) { //todo: use AnalyticsDataServiceUtils.listRecords method
+                AnalyticsDataResponse results = ads.get(AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID, SPARK_META_TABLE, 1, null,
                                                         Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
                 for (Entry entry : results.getEntries()) {
                     Iterator<Record> iterator = ads.readRecords(entry.getRecordStoreName(), entry.getRecordGroup());
@@ -127,5 +125,10 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
         }
 
         return JavaConversions.asScalaBuffer(objects).toSeq();
+    }
+
+    public static void cleanupSparkMetaTable() throws AnalyticsException {
+        AnalyticsServiceHolder.getAnalyticsDataService().delete(AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID,
+                                                                SPARK_META_TABLE, Long.MIN_VALUE, Long.MAX_VALUE);
     }
 }
