@@ -128,7 +128,10 @@ public class AnalyticsPersistenceEngine extends PersistenceEngine {
     }
 
     public static void cleanupSparkMetaTable() throws AnalyticsException {
-        AnalyticsServiceHolder.getAnalyticsDataService().delete(AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID,
-                                                                SPARK_META_TABLE, Long.MIN_VALUE, Long.MAX_VALUE);
+        if (AnalyticsServiceHolder.getAnalyticsDataService().tableExists(AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID,
+                                                                         SPARK_META_TABLE)) {
+            AnalyticsServiceHolder.getAnalyticsDataService().delete(AnalyticsConstants.SPARK_PERSISTENCE_TENANT_ID,
+                                                                    SPARK_META_TABLE, Long.MIN_VALUE, Long.MAX_VALUE);
+        }
     }
 }

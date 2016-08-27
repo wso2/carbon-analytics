@@ -1378,7 +1378,7 @@
         <jfreechart.version>1.0.13</jfreechart.version>
         <mesos.orbit.version>0.18.1.wso2v1</mesos.orbit.version>
         <google.protobuf.version>2.5.0</google.protobuf.version>
-        <roaringbitmap.version>0.4.5</roaringbitmap.version>
+        <roaringbitmap.version>0.5.11</roaringbitmap.version>
         <roaringbitmap.import.version>[0.4.5, 0.5.0)</roaringbitmap.import.version>
         <objenesis.orbit.version>2.1.wso2v1</objenesis.orbit.version>
 
@@ -1386,7 +1386,7 @@
         <version.noggit>0.6.wso2v1</version.noggit>
         <hector.version>1.0-5</hector.version>
 
-        <spark.sql.version.range>[1.6.2,1.7.0)</spark.sql.version.range>
+        <spark.sql.version.range>[1.6.2,2.0.0)</spark.sql.version.range>
 
         <encoder.wso2.version>1.2.0.wso2v1</encoder.wso2.version>
 

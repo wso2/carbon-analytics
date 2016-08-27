@@ -225,6 +225,15 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             this.startMaster();
         }
 
+        // if the master is the only member in the cluster, cleanup the spark meta table
+            if (acm.getMembers(CLUSTER_GROUP_NAME).size() == 0) {
+                try {
+                    AnalyticsPersistenceEngine.cleanupSparkMetaTable();
+                } catch (AnalyticsException e) {
+                    throw new AnalyticsClusterException("Unable to cleanup the Spark Meta table", e);
+                }
+            }
+
         acm.joinGroup(CLUSTER_GROUP_NAME, this);
         log.info("Member joined the Carbon Analytics Execution cluster : " + localMember);
 
@@ -407,15 +416,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             String host = this.myHost;
             int port = this.sparkConf.getInt(AnalyticsConstants.SPARK_MASTER_PORT, 7077 + this.portOffset);
             int webUiPort = this.sparkConf.getInt(AnalyticsConstants.SPARK_MASTER_WEBUI_PORT, 8081 + this.portOffset);
-
-            // if the master is the only member in the cluster, cleanup the spark meta table
-            if (acm.isLeader(CLUSTER_GROUP_NAME) && acm.getMembers(CLUSTER_GROUP_NAME).size() == 1) {
-                try {
-                    AnalyticsPersistenceEngine.cleanupSparkMetaTable();
-                } catch (AnalyticsException e) {
-                    throw new AnalyticsClusterException("Unable to cleanup the Spark Meta table", e);
-                }
-            }
 
             Master.startRpcEnvAndEndpoint(host, port, webUiPort, this.sparkConf);
 
