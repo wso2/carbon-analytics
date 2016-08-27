@@ -270,11 +270,7 @@
                     <include>yarn/hdfs-site.xml</include>
                     <include>yarn/mapred-site.xml</include>
                     <include>yarn/yarn-site.xml</include>
-                    <!-- moved to product-das DAS-110 -->
-                    <!--<include>wso2server.sh</include>
-                    <include>wso2server.bat</include>
-                    <include>load-spark-env-vars.sh</include>
-                    <include>load-spark-env-vars.bat</include>-->
+                    <include>typesafe-config/reference.conf</include>
                 </includes>
             </resource>
         </resources>
