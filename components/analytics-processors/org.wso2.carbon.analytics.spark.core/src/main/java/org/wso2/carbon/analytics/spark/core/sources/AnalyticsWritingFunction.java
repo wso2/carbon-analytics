@@ -51,6 +51,8 @@ public class AnalyticsWritingFunction extends AbstractFunction1<Iterator<Row>, B
 
     private int tId;
     
+    private int recordBatchSize;
+    
     private String tName;
     
     private StructType sch;
@@ -66,8 +68,9 @@ public class AnalyticsWritingFunction extends AbstractFunction1<Iterator<Row>, B
     private String recordStore;
 
     public AnalyticsWritingFunction(int tId, String tName, StructType sch, boolean globalTenantAccess, 
-            String schemaString, String primaryKeys, boolean mergeFlag, String recordStore) {
+            String schemaString, String primaryKeys, boolean mergeFlag, String recordStore, int recordBatchSize) {
         this.tId = tId;
+        this.recordBatchSize = recordBatchSize;
         this.tName = tName;
         this.sch = sch;
         this.globalTenantAccess = globalTenantAccess;
@@ -98,15 +101,15 @@ public class AnalyticsWritingFunction extends AbstractFunction1<Iterator<Row>, B
      */
     @Override
     public BoxedUnit apply(Iterator<Row> iterator) {
-        List<Row> rows = new ArrayList<>(AnalyticsConstants.MAX_RECORDS);
+        List<Row> rows = new ArrayList<>(recordBatchSize);
         /* we have to invalidate the table information, since here, if some other node
         changes the table information, we cannot know about it (no cluster communication) */
         this.handleAnalyticsTableSchemaInvalidation();
         while (iterator.hasNext()) {
-            if (rows.size() < AnalyticsConstants.MAX_RECORDS) {
+            if (rows.size() < recordBatchSize) {
                 Row row = iterator.next();
                 rows.add(row);
-                if (rows.size() == AnalyticsConstants.MAX_RECORDS) {
+                if (rows.size() == recordBatchSize) {
                     this.recordsPut(rows);
                     rows.clear();
                 }
