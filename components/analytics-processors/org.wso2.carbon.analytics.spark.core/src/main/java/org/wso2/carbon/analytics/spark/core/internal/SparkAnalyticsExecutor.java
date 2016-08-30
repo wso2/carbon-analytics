@@ -658,6 +658,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         } catch (NoSuchElementException e) {
             conf.set("spark.driver.extraClassPath", sparkClasspath);
         }
+
+        conf.setIfMissing(AnalyticsConstants.CARBON_INSERT_BATCH_SIZE, AnalyticsConstants.MAX_RECORDS);
     }
 
     private String getLog4jPropertiesJvmOpt(String analyticsSparkConfDir) {

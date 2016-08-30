@@ -68,6 +68,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     private SQLContext sqlContext;
     private StructType schema;
     private int tenantId;
+    private int recordBatchSize;
     private String tableName;
     private String recordStore;
     private boolean incEnable;
@@ -95,6 +96,10 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         this.schemaString = schemaString;
         this.primaryKeys = primaryKeys;
         this.mergeFlag = mergeFlag;
+
+        this.recordBatchSize = Integer.parseInt(sqlContext.sparkContext().getConf()
+                                                        .get(AnalyticsConstants.CARBON_INSERT_BATCH_SIZE));
+
     }
 
     private void setIncParams(String incParamStr) {
@@ -228,7 +233,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             data.sqlContext().sparkContext().runJob(data.rdd(),
                                                     new AnalyticsWritingFunction(this.tenantId, this.tableName, data.schema(),
                                                     this.globalTenantAccess, this.schemaString, this.primaryKeys, this.mergeFlag, 
-                                                    this.recordStore), CarbonScalaUtils.getNumberSeq(i, i + 1), 
+                                                    this.recordStore, this.recordBatchSize), CarbonScalaUtils.getNumberSeq(i, i + 1),
                                                     false, ClassTag$.MODULE$.Unit());
         }
     }
