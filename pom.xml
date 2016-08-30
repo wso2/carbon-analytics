@@ -1441,7 +1441,7 @@
         <compress.lzf.version>1.0.3</compress.lzf.version>
         <jackson.version>2.4.4</jackson.version>
         <codahale.metrics.version>3.1.2</codahale.metrics.version>
-        <scala.version>2.10.4</scala.version>
+        <scala.version>2.10.5</scala.version>
         <typesafe.version>1.2.1</typesafe.version>
         <minlog.version>1.2.wso2v1</minlog.version>
         <uncommons.maths.version>1.2.2.wso2v1</uncommons.maths.version>
