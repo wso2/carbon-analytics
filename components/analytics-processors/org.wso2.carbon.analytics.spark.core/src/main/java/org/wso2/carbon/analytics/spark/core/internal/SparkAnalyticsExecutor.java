@@ -932,6 +932,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                                 AnalyticsJDBCRelationProvider.class.getName());
         this.addShorthandString(AnalyticsConstants.COMPRESSED_EVENT_ANALYTICS_SHORTHAND,
                                 CompressedEventAnalyticsRelationProvider.class.getName());
+        this.addShorthandString(AnalyticsConstants.SPARK_EVENTS_SHORTHAND_STRING,
+                                "org.wso2.carbon.analytics.spark.event.EventStreamProvider");
+        // NOTE: Had to put the name string here, otherwise it creates a circular dependency
     }
 
     private void addShorthandString(String shorthand, String className) {

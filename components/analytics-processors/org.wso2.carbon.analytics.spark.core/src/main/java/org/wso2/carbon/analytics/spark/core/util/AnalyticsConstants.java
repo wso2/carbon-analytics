@@ -89,6 +89,7 @@ public class AnalyticsConstants {
     public static final String DEFAULT_PROCESSED_DATA_STORE_NAME = "PROCESSED_DATA_STORE";
     public static final String SPARK_SHORTHAND_STRING = "CarbonAnalytics";
     public static final String SPARK_JDBC_SHORTHAND_STRING = "CarbonJDBC";
+    public static final String SPARK_EVENTS_SHORTHAND_STRING = "CarbonEvents";
     public static final String TENANT_ID_AND_TABLES_MAP = "tenantIdTablesMap";
     public static final String MAX_RECORDS = "1000";
 
