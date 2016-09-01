@@ -48,6 +48,11 @@ public final class WSO2EventAdapterConstants {
 
     public static final String ADAPTER_CONF_PATH = "config.path";
 
+    public static final String DEFAULT_THRIFT_TCP_URL = "default.thrift.tcp.url";
+    public static final String DEFAULT_THRIFT_SSL_URL = "default.thrift.ssl.url";
+    public static final String DEFAULT_BINARY_TCP_URL = "default.binary.tcp.url";
+    public static final String DEFAULT_BINARY_SSL_URL = "default.binary.ssl.url";
 
-    ;
+
+
 }
