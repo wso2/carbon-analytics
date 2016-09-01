@@ -808,7 +808,8 @@ public class AnalyticsDataIndexer {
         for (int shardId : shardIds) {
             String tableId = this.generateTableId(tenantId, tableName);
             try {
-                IndexReader reader = DirectoryReader.open(this.lookupIndexWriter(shardId, tableId), true);
+                //ToDo need to find if there is a issue with this adding new 'true', and the meaning of old 'true'. new true is writeALLDeletes. exiseted applyAllDeletes. Check whether ok
+                IndexReader reader = DirectoryReader.open(this.lookupIndexWriter(shardId, tableId), true,true);
                 indexReaders.add(reader);
             } catch (IndexNotFoundException ignore) {
                 /* this can happen if a user just started to index records in a table,
@@ -905,7 +906,7 @@ public class AnalyticsDataIndexer {
                 topDocs = FacetsCollector.search(indexSearcher, drillDownQuery, topResultCount, facetsCollector);
             } else {
                 SortField[] sortFields = createSortFields(drillDownRequest.getSortByFields(), indices);
-                topDocs = FacetsCollector.search(indexSearcher, drillDownQuery, null, topResultCount, new Sort(sortFields),
+                topDocs = FacetsCollector.search(indexSearcher, drillDownQuery, topResultCount, new Sort(sortFields),
                         true, false, facetsCollector);
             }
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
@@ -1055,7 +1056,7 @@ public class AnalyticsDataIndexer {
             DrillDownQuery drillDownQuery = new DrillDownQuery(config, languageQuery);
             if (range != null && rangeField != null) {
                 ColumnDefinition columnDefinition = indices.get(rangeField);
-                NumericRangeQuery<? extends Number> numericRangeQuery = getNumericRangeQuery(rangeField, range, columnDefinition);
+                Query numericRangeQuery = getNumericRangeQuery(rangeField, range, columnDefinition);
                 if (numericRangeQuery == null) {
                     throw new AnalyticsIndexException("RangeField is not a numeric field");
                 }
@@ -1081,22 +1082,19 @@ public class AnalyticsDataIndexer {
         }
     }
 
-    private NumericRangeQuery<? extends Number> getNumericRangeQuery(String rangeField, AnalyticsDrillDownRange range,
+    private Query getNumericRangeQuery(String rangeField, AnalyticsDrillDownRange range,
                                                    ColumnDefinition columnDefinition) {
-        NumericRangeQuery<? extends Number> numericRangeQuery = null;
+        Query numericRangeQuery = null;
         if (columnDefinition != null) {
+            //Todo Add Math.nextDown and Math.nextup for exclusive range in the upper bound. NextDown do not support since 1.8+
             if (columnDefinition.getType() == AnalyticsSchema.ColumnType.DOUBLE) {
-                numericRangeQuery = NumericRangeQuery.newDoubleRange(rangeField,
-                                                                     range.getFrom(), range.getTo(), true, false);
+                numericRangeQuery = DoublePoint.newRangeQuery(rangeField,range.getFrom(),range.getTo());
             } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.FLOAT) {
-                numericRangeQuery = NumericRangeQuery.newFloatRange(rangeField,
-                                                                    (float)range.getFrom(),(float) range.getTo(), true, false);
+                numericRangeQuery = FloatPoint.newRangeQuery(rangeField,(float)range.getFrom(),(float) range.getTo());
             } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.INTEGER) {
-                numericRangeQuery = NumericRangeQuery.newIntRange(rangeField,
-                                                                  (int) range.getFrom(),(int) range.getTo(), true, false);
+                numericRangeQuery = IntPoint.newRangeQuery(rangeField, (int) range.getFrom(),(int) range.getTo());
             } else if (columnDefinition.getType() == AnalyticsSchema.ColumnType.LONG) {
-                numericRangeQuery = NumericRangeQuery.newLongRange(rangeField,
-                                                                   (long) range.getFrom(), (long) range.getTo(), true, false);
+                numericRangeQuery = LongPoint.newRangeQuery(rangeField, (long) range.getFrom(), (long) range.getTo());
             }
         }
         return numericRangeQuery;
@@ -1280,7 +1278,8 @@ public class AnalyticsDataIndexer {
             throws AnalyticsIndexException {
         try {
             String tableId = this.generateTableId(tenantId, drillDownRequest.getTableName());
-            IndexReader indexReader = DirectoryReader.open(this.lookupIndexWriter(shardId, tableId), true);
+            //ToDo new true is writeALLDeletes. exiseted applyAllDeletes. Check whether ok
+            IndexReader indexReader = DirectoryReader.open(this.lookupIndexWriter(shardId, tableId), true,true);
             TaxonomyReader taxonomyReader = new DirectoryTaxonomyReader(this.lookupTaxonomyIndexWriter(shardId, tableId));
             return drillDownRecords(tenantId, drillDownRequest, indexReader, taxonomyReader, rangeField, range);
         } catch (IOException e) {
@@ -1293,7 +1292,8 @@ public class AnalyticsDataIndexer {
             throws AnalyticsIndexException {
         try {
             String tableId = this.generateTableId(tenantId, drillDownRequest.getTableName());
-            IndexReader indexReader = DirectoryReader.open(this.lookupIndexWriter(shardId, tableId), true);
+            //ToDo new true is writeALLDeletes. exiseted applyAllDeletes. Check whether ok
+            IndexReader indexReader = DirectoryReader.open(this.lookupIndexWriter(shardId, tableId), true,true);
             TaxonomyReader taxonomyReader = new DirectoryTaxonomyReader(this.lookupTaxonomyIndexWriter(shardId, tableId));
             return drilldowncategories(tenantId, indexReader, taxonomyReader, drillDownRequest);
         } catch (IOException e) {
@@ -1309,7 +1309,8 @@ public class AnalyticsDataIndexer {
             throws AnalyticsIndexException {
         try {
             String tableId = this.generateTableId(tenantId, drillDownRequest.getTableName());
-            IndexReader indexReader = DirectoryReader.open(this.lookupIndexWriter(shardId, tableId), true);
+            //ToDo new true is writeALLDeletes. exiseted applyAllDeletes. Check whether ok
+            IndexReader indexReader = DirectoryReader.open(this.lookupIndexWriter(shardId, tableId), true,true);
             TaxonomyReader taxonomyReader = new DirectoryTaxonomyReader(this.lookupTaxonomyIndexWriter(shardId, tableId));
             return getDrillDownRecordCount(tenantId, drillDownRequest, indexReader, taxonomyReader, rangeField, range);
         } catch (IOException e) {
@@ -1448,33 +1449,36 @@ public class AnalyticsDataIndexer {
                                     this.trimNonTokenizedIndexStringField(obj.toString()), Store.NO));
             break;
         case INTEGER:
-            numericFieldType = getLuceneNumericFieldType(FieldType.NumericType.INT);
+            //Todo Check whether it's ok
+//            numericFieldType = getLuceneNumericFieldType(FieldType.NumericType.INT);
             if (obj instanceof Number) {
-                doc.add(new IntField(name, ((Number) obj).intValue(), numericFieldType));
+                doc.add(new IntPoint(name,((Number) obj).intValue()));// IntField(name, ((Number) obj).intValue(), numericFieldType));
+                doc.add(new NumericDocValuesField(name,((Number) obj).intValue()));
+
             } else {
                 doc.add(new StringField(name, obj.toString(), Store.NO));
             }
             break;
         case DOUBLE:
-            numericFieldType = getLuceneNumericFieldType(FieldType.NumericType.DOUBLE);
             if (obj instanceof Number) {
-                doc.add(new DoubleField(name, ((Number) obj).doubleValue(), numericFieldType));
+                doc.add(new DoublePoint(name,((Number) obj).doubleValue()));
+                doc.add(new DoubleDocValuesField(name,((Number) obj).doubleValue()));
             } else {
                 doc.add(new StringField(name, obj.toString(), Store.NO));
             }
             break;
         case LONG:
-            numericFieldType = getLuceneNumericFieldType(FieldType.NumericType.LONG);
             if (obj instanceof Number) {
-                doc.add(new LongField(name, ((Number) obj).longValue(), numericFieldType));
+                doc.add(new LongPoint(name, ((Number) obj).longValue()));
+                doc.add(new NumericDocValuesField(name, ((Number) obj).longValue()));
             } else {
                 doc.add(new StringField(name, obj.toString(), Store.NO));
             }
             break;
         case FLOAT:
-            numericFieldType = getLuceneNumericFieldType(FieldType.NumericType.FLOAT);
             if (obj instanceof Number) {
-                doc.add(new FloatField(name, ((Number) obj).floatValue(), numericFieldType));
+                doc.add(new FloatPoint(name, ((Number) obj).floatValue()));
+                doc.add(new FloatDocValuesField(name, ((Number) obj).floatValue()));
             } else {
                 doc.add(new StringField(name, obj.toString(), Store.NO));
             }
@@ -1488,20 +1492,21 @@ public class AnalyticsDataIndexer {
         }
     }
 
-    private FieldType getLuceneNumericFieldType(FieldType.NumericType type) {
-        FieldType fieldType = new FieldType();
-        fieldType.setStored(false);
-        fieldType.setDocValuesType(DocValuesType.NUMERIC);
-        fieldType.setTokenized(true);
-        fieldType.setOmitNorms(true);
-        fieldType.setIndexOptions(IndexOptions.DOCS);
-        fieldType.setNumericType(type);
-        if (type == FieldType.NumericType.FLOAT || type == FieldType.NumericType.INT) {
-            fieldType.setNumericPrecisionStep(NumericUtils.PRECISION_STEP_DEFAULT_32);
-        }
-        fieldType.freeze();
-        return fieldType;
-    }
+    //Todo remove un used function
+//    private FieldType getLuceneNumericFieldType(FieldType.NumericType type) {
+//        FieldType fieldType = new FieldType();
+//        fieldType.setStored(false);
+//        fieldType.setDocValuesType(DocValuesType.NUMERIC);
+//        fieldType.setTokenized(true);
+//        fieldType.setOmitNorms(true);
+//        fieldType.setIndexOptions(IndexOptions.DOCS);
+//        fieldType.setNumericType(type);
+//        if (type == FieldType.NumericType.FLOAT || type == FieldType.NumericType.INT) {
+//            fieldType.setNumericPrecisionStep(NumericUtils.PRECISION_STEP_DEFAULT_32);
+//        }
+//        fieldType.freeze();
+//        return fieldType;
+//    }
 
     private void checkAndAddTaxonomyDocEntries(Document doc,
                                                    String name, Object obj,
@@ -1524,9 +1529,8 @@ public class AnalyticsDataIndexer {
                    TaxonomyWriter taxonomyWriter) throws AnalyticsIndexException, IOException {
         Document doc = new Document();
         FacetsConfig config = new FacetsConfig();
-        FieldType numericFieldType = getLuceneNumericFieldType(FieldType.NumericType.LONG);
         doc.add(new StringField(INDEX_ID_INTERNAL_FIELD, record.getId(), Store.YES));
-        doc.add(new LongField(INDEX_INTERNAL_TIMESTAMP_FIELD, record.getTimestamp(), numericFieldType));
+        doc.add(new LongPoint(INDEX_INTERNAL_TIMESTAMP_FIELD, record.getTimestamp()));
         /* make the best effort to store in the given timestamp, or else, 
          * fall back to a compatible format, or else, lastly, string */
         String name;
@@ -2236,7 +2240,8 @@ public class AnalyticsDataIndexer {
         private void addAllCategoriesToSet(String[] parent, int localAggregateLevel, Set<List<String>> uniqueGroups)
                 throws IOException, AnalyticsException {
             TaxonomyReader taxonomyReader = new DirectoryTaxonomyReader(indexer.lookupTaxonomyIndexWriter(shardId, tableId));
-            IndexReader indexReader = DirectoryReader.open(indexer.lookupIndexWriter(shardId, tableId), true);
+            //ToDo new true is writeALLDeletes. exiseted applyAllDeletes. Check whether ok
+            IndexReader indexReader = DirectoryReader.open(indexer.lookupIndexWriter(shardId, tableId), true,true);
             CategoryDrillDownRequest request = new CategoryDrillDownRequest();
             request.setFieldName(aggregateRequest.getGroupByField());
             request.setPath(parent);
