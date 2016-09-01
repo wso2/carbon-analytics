@@ -671,12 +671,12 @@
                 <version>${twitter.chill.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.clearspring.analytics</groupId>
+                <groupId>org.wso2.orbit.com.clearspring.analytics</groupId>
                 <artifactId>stream</artifactId>
                 <version>${clearspring.analytics.stream.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.netty.wso2</groupId>
+                <groupId>org.wso2.orbit.io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${orbit.version.netty-all}</version>
             </dependency>
@@ -1425,7 +1425,7 @@
         <hadoop.client.version>2.7.2.wso2v1</hadoop.client.version>
         <json4s.jackson.version>3.2.10.wso2v1</json4s.jackson.version>
         <twitter.chill.version>0.5.0.wso2v1</twitter.chill.version>
-        <clearspring.analytics.stream.version>2.2.0.wso2v1</clearspring.analytics.stream.version>
+        <clearspring.analytics.stream.version>2.9.5.wso2v1</clearspring.analytics.stream.version>
         <kyro.version>2.24.0</kyro.version>
         <akka.version>2.3.11</akka.version>
         <jackson.version>2.4.4</jackson.version>

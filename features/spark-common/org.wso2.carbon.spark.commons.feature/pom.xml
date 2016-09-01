@@ -73,7 +73,7 @@
             <artifactId>commons-math3</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.netty.wso2</groupId>
+            <groupId>org.wso2.orbit.io.netty</groupId>
             <artifactId>netty-all</artifactId>
         </dependency>
         <dependency>
@@ -129,7 +129,7 @@
             <artifactId>metrics-jvm</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.clearspring.analytics</groupId>
+            <groupId>org.wso2.orbit.com.clearspring.analytics</groupId>
             <artifactId>stream</artifactId>
         </dependency>
         <dependency>
@@ -287,7 +287,7 @@
                                 </bundleDef>
                                 <bundleDef>org.wso2.json4s:json4s-jackson_2.10</bundleDef>
                                 <bundleDef>org.wso2.twitter:chill_2.10</bundleDef>
-                                <bundleDef>org.wso2.clearspring.analytics:stream</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.clearspring.analytics:stream</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef>
                                 <bundleDef>com.typesafe.akka:akka-remote_2.10</bundleDef>
                                 <bundleDef>com.typesafe.akka:akka-actor_2.10</bundleDef>
@@ -297,7 +297,7 @@
                                 <bundleDef>org.xerial.snappy:snappy-java</bundleDef>
                                 <bundleDef>com.google.guava:guava</bundleDef>
                                 <bundleDef>org.json.wso2:json</bundleDef>
-                                <bundleDef>io.netty.wso2:netty-all</bundleDef>
+                                <bundleDef>org.wso2.orbit.io.netty:netty-all</bundleDef>
                                 <bundleDef>org.scala-lang:scala-library</bundleDef>
                                 <bundleDef>org.scala-lang:scala-reflect</bundleDef>
                                 <bundleDef>com.ning:compress-lzf</bundleDef>
