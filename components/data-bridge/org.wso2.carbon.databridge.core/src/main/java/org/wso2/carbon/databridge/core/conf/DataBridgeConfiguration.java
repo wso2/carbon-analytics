@@ -19,6 +19,8 @@
  */
 package org.wso2.carbon.databridge.core.conf;
 
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
@@ -34,12 +36,16 @@ public class DataBridgeConfiguration {
     private int maxEventBufferCapacity;
     private int eventBufferSize;
     private int clientTimeoutMin;
+    private String keyStoreLocation;
+    private String keyStorePassword;
 
     public DataBridgeConfiguration(){
         this.workerThreads = 10;
         this.clientTimeoutMin = 30;
         this.maxEventBufferCapacity = 50 * (1000000); //50MB
         this.eventBufferSize = 2000;
+        keyStoreLocation = null;
+        keyStorePassword = null;
     }
 
     @XmlElement(name = "dataReceiver")
@@ -54,6 +60,24 @@ public class DataBridgeConfiguration {
     @XmlElement(name = "workerThreads")
     public int getWorkerThreads() {
         return workerThreads;
+    }
+
+    @XmlElement(name = "keyStoreLocation")
+    public String getKeyStoreLocation() {
+        return keyStoreLocation;
+    }
+
+    public void setKeyStoreLocation(String keyStoreLocation) {
+        this.keyStoreLocation = DataBridgeCommonsUtils.replaceSystemProperty(keyStoreLocation);
+    }
+
+    @XmlElement(name = "keyStorePassword")
+    public String getKeyStorePassword() {
+        return keyStorePassword;
+    }
+    
+    public void setKeyStorePassword(String keyStorePassword) {
+        this.keyStorePassword = keyStorePassword;
     }
 
     public void setWorkerThreads(int workerThreads) {

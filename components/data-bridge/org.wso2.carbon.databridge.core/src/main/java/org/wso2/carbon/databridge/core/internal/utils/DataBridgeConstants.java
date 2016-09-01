@@ -36,6 +36,7 @@ public final class DataBridgeConstants {
     public static final String STREAM_DEFINITIONS_XML = "stream-definitions.xml";
     public static final String DATA_BRIDGE_CONFIG_XML = "data-bridge-config.xml";
     public static final String DATA_BRIDGE_NAMESPACE = "http://wso2.org/carbon/databridge";
+    public static final String DATA_BRIDGE_CONF_PASSWORD_ALIAS = "DataBridge.Config.keyStorePassword";
 
     public static final String DATA_BRIDGE_ROOT_ELEMENT = "dataBridgeConfiguration";
     public static final String STREAM_DEFINITION_STORE_ELEMENT = "StreamDefinitionStore";

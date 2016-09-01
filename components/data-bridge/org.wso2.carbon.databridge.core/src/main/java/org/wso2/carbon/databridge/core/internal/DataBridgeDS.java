@@ -79,15 +79,10 @@ public class DataBridgeDS {
      */
     protected void activate(ComponentContext context) {
         try {
-            File file = new File(DataBridgeCoreBuilder.getDatabridgeConfigPath());
-            JAXBContext jaxbContext = JAXBContext.newInstance(DataBridgeConfiguration.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            DataBridgeConfiguration dataBridgeConfiguration = (DataBridgeConfiguration) jaxbUnmarshaller.unmarshal(file);
             if (databridge == null) {
                 AbstractStreamDefinitionStore streamDefinitionStore = DataBridgeServiceValueHolder.getStreamDefinitionStore();
                 databridge = new DataBridge(new CarbonAuthenticationHandler(authenticationService),
-                        streamDefinitionStore, dataBridgeConfiguration);
-                databridge.setInitialConfig(dataBridgeConfiguration);
+                        streamDefinitionStore, DataBridgeCoreBuilder.getDatabridgeConfigPath());
                 try {
                     List<String[]> streamDefinitionStrings = DataBridgeCoreBuilder.loadStreamDefinitionXML();
                     for (String[] streamDefinitionString : streamDefinitionStrings) {
@@ -137,8 +132,6 @@ public class DataBridgeDS {
             }
         }  catch (RuntimeException e) {
             log.error("Error in starting Agent Server ", e);
-        } catch (JAXBException e) {
-            log.error("Error while loading the Databridge configuration. ", e);
         }
     }
 

@@ -18,7 +18,9 @@
 package org.wso2.carbon.databridge.commons.utils;
 
 import org.wso2.carbon.databridge.commons.Event;
+import org.wso2.securevault.SecretResolver;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Set;
@@ -124,4 +126,28 @@ public class DataBridgeCommonsUtils {
     public static int getReferenceSize(){
         return referenceSize;
     }
+
+    public static String replaceSystemProperty(String text) {
+        int indexOfStartingChars = -1;
+        int indexOfClosingBrace;
+
+        while (indexOfStartingChars < text.indexOf("${")
+                && (indexOfStartingChars = text.indexOf("${")) != -1
+                && (indexOfClosingBrace = text.indexOf('}')) != -1) {
+            String sysProp = text.substring(indexOfStartingChars + 2,
+                    indexOfClosingBrace);
+            String propValue = System.getProperty(sysProp);
+            if (propValue != null) {
+                text = text.substring(0, indexOfStartingChars) + propValue
+                        + text.substring(indexOfClosingBrace + 1);
+            }
+            if (sysProp.equals("carbon.home") && propValue != null
+                    && propValue.equals(".")) {
+
+                text = new File(".").getAbsolutePath() + File.separator + text;
+            }
+        }
+        return text;
+    }
+
 }

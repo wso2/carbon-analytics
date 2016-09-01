@@ -31,10 +31,13 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.thrift.service.general.ThriftEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.utils.CommonThriftConstants;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
+import org.wso2.carbon.databridge.core.conf.DataReceiver;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfiguration;
+import org.wso2.carbon.databridge.receiver.thrift.internal.utils.ThriftDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServiceImpl;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
 
@@ -109,23 +112,28 @@ public class ThriftDataReceiver {
                                               DataBridgeReceiverService dataBridgeReceiverService)
             throws DataBridgeException {
         try {
-
-            ServerConfiguration serverConfig = ServerConfiguration.getInstance();
-            String keyStore = serverConfig.getFirstProperty("Security.KeyStore.Location");
+            String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
             if (keyStore == null) {
-                keyStore = System.getProperty("Security.KeyStore.Location");
+                ServerConfiguration serverConfig = ServerConfiguration.getInstance();
+                keyStore = serverConfig.getFirstProperty("Security.KeyStore.Location");
                 if (keyStore == null) {
-                    throw new DataBridgeException("Cannot start agent server, not valid Security.KeyStore.Location is null");
+                    keyStore = System.getProperty("Security.KeyStore.Location");
+                    if (keyStore == null) {
+                        throw new DataBridgeException("Cannot start thrift agent server, not valid Security.KeyStore.Location is null");
+                    }
                 }
             }
-            String keyStorePassword = serverConfig.getFirstProperty("Security.KeyStore.Password");
+            String keyStorePassword = dataBridgeReceiverService.getInitialConfig().getKeyStorePassword();
             if (keyStorePassword == null) {
-                keyStorePassword = System.getProperty("Security.KeyStore.Password");
+                ServerConfiguration serverConfig = ServerConfiguration.getInstance();
+                keyStorePassword = serverConfig.getFirstProperty("Security.KeyStore.Password");
                 if (keyStorePassword == null) {
-                    throw new DataBridgeException("Cannot start agent server, not valid Security.KeyStore.Password is null ");
+                    keyStorePassword = System.getProperty("Security.KeyStore.Password");
+                    if (keyStorePassword == null) {
+                        throw new DataBridgeException("Cannot start thrift agent server, not valid Security.KeyStore.Password is null ");
+                    }
                 }
             }
-
             startSecureEventTransmission(hostName, port, sslProtocols, ciphers, keyStore, keyStorePassword, dataBridgeReceiverService);
         } catch (TransportException e) {
             throw new DataBridgeException("Cannot start agent server on port " + port, e);

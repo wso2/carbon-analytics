@@ -22,8 +22,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConstants;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
+import org.wso2.carbon.databridge.core.conf.DataReceiver;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
+import org.wso2.carbon.databridge.receiver.binary.BinaryDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.binary.BinaryEventConverter;
 import org.wso2.carbon.databridge.receiver.binary.conf.BinaryDataReceiverConfiguration;
 
@@ -70,19 +73,26 @@ public class BinaryDataReceiver {
     }
 
     private void startSecureTransmission() throws IOException, DataBridgeException {
-        ServerConfiguration serverConfig = ServerConfiguration.getInstance();
-        String keyStore = serverConfig.getFirstProperty("Security.KeyStore.Location");
+        String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
         if (keyStore == null) {
-            keyStore = System.getProperty("Security.KeyStore.Location");
+            ServerConfiguration serverConfig = ServerConfiguration.getInstance();
+            keyStore = serverConfig.getFirstProperty("Security.KeyStore.Location");
             if (keyStore == null) {
-                throw new DataBridgeException("Cannot start agent server, not valid Security.KeyStore.Location is null");
+                keyStore = System.getProperty("Security.KeyStore.Location");
+                if (keyStore == null) {
+                    throw new DataBridgeException("Cannot start binary agent server, not valid Security.KeyStore.Location is null");
+                }
             }
         }
-        String keyStorePassword = serverConfig.getFirstProperty("Security.KeyStore.Password");
+        String keyStorePassword = dataBridgeReceiverService.getInitialConfig().getKeyStorePassword();
         if (keyStorePassword == null) {
-            keyStorePassword = System.getProperty("Security.KeyStore.Password");
+            ServerConfiguration serverConfig = ServerConfiguration.getInstance();
+            keyStorePassword = serverConfig.getFirstProperty("Security.KeyStore.Password");
             if (keyStorePassword == null) {
-                throw new DataBridgeException("Cannot start agent server, not valid Security.KeyStore.Password is null ");
+                keyStorePassword = System.getProperty("Security.KeyStore.Password");
+                if (keyStorePassword == null) {
+                    throw new DataBridgeException("Cannot start binary agent server, not valid Security.KeyStore.Password is null ");
+                }
             }
         }
         System.setProperty("javax.net.ssl.keyStore", keyStore);

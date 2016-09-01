@@ -1077,7 +1077,11 @@
                 <artifactId>encoder</artifactId>
                 <version>${encoder.wso2.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.wso2.securevault</groupId>
+                <artifactId>org.wso2.securevault</artifactId>
+                <version>${securevault.wso2.version}</version>
+            </dependency>
             <!--carbon-deployment features start-->
             <!--<dependency>-->
             <!--<groupId>org.wso2.carbon.deployment</groupId>-->
@@ -1301,6 +1305,7 @@
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.4.7</carbon.kernel.version>
         <!--<carbon.kernel.imp.pkg.version>[4.3.0, 4.4.0)</carbon.kernel.imp.pkg.version>-->
+        <securevault.wso2.version>1.0.0-wso2v2</securevault.wso2.version>
 
         <carbon.commons.version>4.5.4</carbon.commons.version>
         <!--<carbon.deployment.version>4.3.1</carbon.deployment.version>-->

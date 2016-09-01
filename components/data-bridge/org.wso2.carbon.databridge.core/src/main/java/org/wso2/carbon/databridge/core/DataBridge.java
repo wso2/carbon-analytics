@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.databridge.core;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,22 +40,19 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.databridge.core.internal.EventDispatcher;
 import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
 import org.wso2.carbon.databridge.core.internal.authentication.Authenticator;
+import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.securevault.SecretResolver;
+import org.wso2.securevault.SecretResolverFactory;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import javax.xml.stream.XMLStreamException;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -93,11 +92,15 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     public DataBridge(AuthenticationHandler authenticationHandler,
                       AbstractStreamDefinitionStore streamDefinitionStore,
                       String dataBridgeConfigPath) {
+        DataBridgeConfiguration dataBridgeConfiguration = null;
         try {
-            File file = new File(dataBridgeConfigPath);
-            JAXBContext jaxbContext = JAXBContext.newInstance(DataBridgeConfiguration.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            DataBridgeConfiguration dataBridgeConfiguration = (DataBridgeConfiguration) jaxbUnmarshaller.unmarshal(file);
+            dataBridgeConfiguration = createDataBridgeConfiguration(dataBridgeConfigPath);
+        } catch (FileNotFoundException e) {
+            log.error("Error while loading the data bridge configuration file : " + dataBridgeConfigPath, e);
+        } catch (XMLStreamException | JAXBException |IOException e) {
+            log.error("Error while reading the data bridge configuration file", e);
+        }
+        this.setInitialConfig(dataBridgeConfiguration);
             this.eventDispatcher = new EventDispatcher(streamDefinitionStore, dataBridgeConfiguration, authenticationHandler);
             this.streamDefinitionStore = streamDefinitionStore;
             authenticatorHandler = authenticationHandler;
@@ -109,9 +112,6 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
                 totalEventCounter = new AtomicInteger();
                 startTime = 0;
             }
-        } catch (JAXBException e) {
-            log.error("Error while loading the data bridge configuration file : " + dataBridgeConfigPath, e);
-        }
     }
 
     public String defineStream(String sessionId, String streamDefinition)
@@ -467,9 +467,50 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         }
     }
 
+    /**
+     * This creates the DataBridgeConfiguration from the data-bridge-config.xml file
+     *
+     * @param configPath
+     * @return DataBridgeConfiguration
+     * @throws FileNotFoundException
+     * @throws XMLStreamException
+     */
+    private DataBridgeConfiguration createDataBridgeConfiguration(String configPath) throws IOException,
+            XMLStreamException, JAXBException {
+        File configFile = new File(configPath);
+        DataBridgeConfiguration dataBridgeConfiguration;
+
+        if (configFile.exists()) {
+            try(FileInputStream fileInputStream = new FileInputStream(configFile)) {
+                JAXBContext jaxbContext = JAXBContext.newInstance(DataBridgeConfiguration.class);
+                Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                dataBridgeConfiguration = (DataBridgeConfiguration) jaxbUnmarshaller.unmarshal(configFile);
+                StAXOMBuilder builder = new StAXOMBuilder(fileInputStream);
+                OMElement configElement = builder.getDocumentElement();
+                SecretResolver secretResolver = SecretResolverFactory.create(configElement, true);
+                if (secretResolver != null && secretResolver.isInitialized()) {
+                    String resolvedPassword = getResolvedPassword(secretResolver,
+                            DataBridgeConstants.DATA_BRIDGE_CONF_PASSWORD_ALIAS);
+                    if (resolvedPassword != null) {
+                        dataBridgeConfiguration.setKeyStorePassword(resolvedPassword);
+                    }
+                }
+                return dataBridgeConfiguration;
+            }
+        } else {
+            log.error("Cannot find data bridge configuration file : " + configPath);
+            return null;
+        }
+    }
+
+    private String getResolvedPassword(SecretResolver secretResolver, String alias) {
+        if (secretResolver.isTokenProtected(alias)) {
+            String resolvedPassword = secretResolver.resolve(alias);
+            if (resolvedPassword != null && !resolvedPassword.isEmpty()) {
+                return resolvedPassword;
+            }
+        }
+        return null;
+    }
 
 }
-
-
-
-
