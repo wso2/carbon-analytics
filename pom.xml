@@ -743,7 +743,7 @@
             </dependency>
 
             <dependency>
-                <groupId>org.wso2.clearspring.analytics</groupId>
+                <groupId>org.wso2.orbit.com.clearspring.analytics</groupId>
                 <artifactId>stream</artifactId>
                 <version>${stream.orbit.version}</version>
             </dependency>
@@ -1370,7 +1370,7 @@
         <protobuf.version>2.5.0-spark</protobuf.version>
         <uncommons.math.orbit.version>1.2.2.wso2v1</uncommons.math.orbit.version>
         <chill.orbit.version>0.5.0.wso2v1</chill.orbit.version>
-        <stream.orbit.version>2.2.0.wso2v1</stream.orbit.version>
+        <stream.orbit.version>2.9.5.wso2v1</stream.orbit.version>
         <guava.version>19.0</guava.version>
         <servelet.api.version>7.0.52.wso2v1</servelet.api.version>
         <servelet.jsp.version>2.2.1</servelet.jsp.version>
@@ -1399,7 +1399,7 @@
         <slf4j.import.version>[1.7.0, 1.8.0)</slf4j.import.version>
         <servlet-api.import.version>[2.5, 3.0)</servlet-api.import.version>
         <chill.import.version>[0.5.0, 0.6.0)</chill.import.version>
-        <stream.import.version>[2.2.0, 2.3.0)</stream.import.version>
+        <stream.import.version>[2.9.5, 3.0.0)</stream.import.version>
         <chill.version>0.5.0</chill.version>
         <json4s.version>3.2.10</json4s.version>
         <stream.version>2.2.0</stream.version>

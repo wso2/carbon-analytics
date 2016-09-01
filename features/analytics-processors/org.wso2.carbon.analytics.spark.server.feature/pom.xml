@@ -134,7 +134,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.wso2.clearspring.analytics</groupId>
+            <groupId>org.wso2.orbit.com.clearspring.analytics</groupId>
             <artifactId>stream</artifactId>
         </dependency>
 

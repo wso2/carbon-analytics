@@ -226,13 +226,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
 
         // if the master is the only member in the cluster, cleanup the spark meta table
-            if (acm.getMembers(CLUSTER_GROUP_NAME).size() == 0) {
-                try {
-                    AnalyticsPersistenceEngine.cleanupSparkMetaTable();
-                } catch (AnalyticsException e) {
-                    throw new AnalyticsClusterException("Unable to cleanup the Spark Meta table", e);
-                }
-            }
+        if (acm.getMembers(CLUSTER_GROUP_NAME).size() == 0) {
+            cleanupSparkMetaTable();
+        }
 
         acm.joinGroup(CLUSTER_GROUP_NAME, this);
         log.info("Member joined the Carbon Analytics Execution cluster : " + localMember);
@@ -248,6 +244,14 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             log.info("Redundant master count reached. Starting Spark client app in " +
                      "the carbon cluster master...");
             this.initializeAnalyticsClient();
+        }
+    }
+
+    private void cleanupSparkMetaTable() throws AnalyticsClusterException {
+        try {
+            AnalyticsPersistenceEngine.cleanupSparkMetaTable();
+        } catch (AnalyticsException e) {
+            throw new AnalyticsClusterException("Unable to cleanup the Spark Meta table", e);
         }
     }
 
