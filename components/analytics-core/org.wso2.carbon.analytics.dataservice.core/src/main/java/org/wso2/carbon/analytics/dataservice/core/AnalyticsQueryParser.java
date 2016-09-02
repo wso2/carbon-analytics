@@ -49,7 +49,7 @@ public class AnalyticsQueryParser extends QueryParser {
         super(null, analyzer);
         this.indices = indices;
     }
-    
+
     @Override
     public Query getRangeQuery(String field, String part1, String part2, boolean si, boolean ei) throws ParseException {
         AnalyticsSchema.ColumnType type = null;
@@ -72,25 +72,48 @@ public class AnalyticsQueryParser extends QueryParser {
             //Todo add the functionality of si,ei using Math.nextDown and nextUp
             case INTEGER:
                 try {
-                    return IntPoint.newRangeQuery(field, Integer.parseInt(part1), Integer.parseInt(part2));
+
+                    int p1 = Integer.parseInt(part1);
+                    int p2 = Integer.parseInt(part2);
+                    p1 = si?p1:p1+1;
+                    p2 = ei?p2:p2-1;
+
+                    return IntPoint.newRangeQuery(field, p1, p2);
                 } catch (NumberFormatException e) {
                     throw new ParseException("Invalid query, the field '" + field + "' must contain integers");
                 }
             case LONG:
                 try {
-                    return LongPoint.newRangeQuery(field, this.parseTimestampOrDirectLong(part1), this.parseTimestampOrDirectLong(part2));
+
+                    long p1 = Long.parseLong(part1);
+                    long p2 = Long.parseLong(part2);
+                    p1 = si?p1:p1+1;
+                    p2 = ei?p2:p2-1;
+
+                    return LongPoint.newRangeQuery(field, p1,p2);
                 } catch (NumberFormatException e) {
                     throw new ParseException("Invalid query, the field '" + field + "' must contain long values");
                 }
             case DOUBLE:
                 try {
-                    return DoublePoint.newRangeQuery(field, Double.parseDouble(part1), Double.parseDouble(part2));
+
+                    double p1 = Double.parseDouble(part1);
+                    double p2 = Double.parseDouble(part2);
+                    p1 = si?p1:Math.nextUp(p1);
+                    p2 = ei?p2:Math.nextDown(p2);
+
+                    return DoublePoint.newRangeQuery(field, p1, p2);
                 } catch (NumberFormatException e) {
                     throw new ParseException("Invalid query, the field '" + field + "' must contain double values");
                 }
             case FLOAT:
                 try {
-                    return FloatPoint.newRangeQuery(field, Float.parseFloat(part1), Float.parseFloat(part2));
+                    float p1 = Float.parseFloat(part1);
+                    float p2 = Float.parseFloat(part2);
+                    p1 = si?p1:Math.nextUp(p1);
+                    p2 = ei?p2:Math.nextDown(p2);
+
+                    return FloatPoint.newRangeQuery(field,  p1, p2);
                 } catch (NumberFormatException e) {
                     throw new ParseException("Invalid query, the field '" + field + "' must contain float values");
                 }
@@ -132,41 +155,28 @@ public class AnalyticsQueryParser extends QueryParser {
                 //Todo check whether code replacement is correct. ToPrefixCoded
                 try {
                     int value = Integer.parseInt(term.text());
-//                    BytesRefBuilder bytes = new BytesRefBuilder();
-//                    NumericUtils.intToSortableBytes(value,bytes.bytes(),0);
-//                    NumericUtils.intToPrefixCoded(value, 0, bytes);
-                    return new TermQuery(new Term(term.field(), String.valueOf(value)));
+                    return IntPoint.newExactQuery(field,value);
                 } catch (NumberFormatException e) {
                     throw new RuntimeException("Invalid query, the field '" + field + "' must contain integers");
                 }
             case LONG:
                 try {
                     long value = this.parseTimestampOrDirectLong(term.text());
-                    BytesRefBuilder bytes = new BytesRefBuilder();
-                    NumericUtils.longToSortableBytes(value,bytes.bytes(),0);
-//                    NumericUtils.longToPrefixCoded(value, 0, bytes);
-                    return new TermQuery(new Term(term.field(), bytes.toBytesRef().utf8ToString()));
+                    return LongPoint.newExactQuery(field,value);
                 } catch (NumberFormatException e) {
                     throw new RuntimeException("Invalid query, the field '" + field + "' must contain long values");
                 }
             case DOUBLE:
                 try {
                     double value = Double.parseDouble(term.text());
-                    BytesRefBuilder bytes = new BytesRefBuilder();
-
-                    NumericUtils.longToSortableBytes(NumericUtils.doubleToSortableLong(value),bytes.bytes(),0);
-//                    NumericUtils.longToPrefixCoded(NumericUtils.doubleToSortableLong(value), 0, bytes);
-                    return new TermQuery(new Term(term.field(), bytes.toBytesRef().utf8ToString()));
+                    return DoublePoint.newExactQuery(field,value);
                 } catch (NumberFormatException e) {
                     throw new RuntimeException("Invalid query, the field '" + field + "' must contain double values");
                 }
             case FLOAT:
                 try {
                     float value = Float.parseFloat(term.text());
-                    BytesRefBuilder bytes = new BytesRefBuilder();
-                    NumericUtils.intToSortableBytes(NumericUtils.floatToSortableInt(value) ,bytes.bytes(),0);
-//                    NumericUtils.intToPrefixCoded(NumericUtils.floatToSortableInt(value), 0, bytes);
-                    return new TermQuery(new Term(term.field(), bytes.toBytesRef().utf8ToString()));
+                    return FloatPoint.newExactQuery(field,value);
                 } catch (NumberFormatException e) {
                     throw new RuntimeException("Invalid query, the field '" + field + "' must contain float values");
                 }

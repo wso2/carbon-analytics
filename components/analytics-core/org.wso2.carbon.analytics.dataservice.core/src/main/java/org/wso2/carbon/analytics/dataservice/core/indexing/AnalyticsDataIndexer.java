@@ -42,7 +42,6 @@ import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.NumericUtils;
 import org.wso2.carbon.analytics.dataservice.commons.*;
 import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -1453,8 +1452,7 @@ public class AnalyticsDataIndexer {
 //            numericFieldType = getLuceneNumericFieldType(FieldType.NumericType.INT);
             if (obj instanceof Number) {
                 doc.add(new IntPoint(name,((Number) obj).intValue()));// IntField(name, ((Number) obj).intValue(), numericFieldType));
-                doc.add(new NumericDocValuesField(name,((Number) obj).intValue()));
-
+                doc.add(new SortedNumericDocValuesField(name,((Number) obj).intValue()));
             } else {
                 doc.add(new StringField(name, obj.toString(), Store.NO));
             }
