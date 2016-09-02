@@ -225,8 +225,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             this.startMaster();
         }
 
-        // if the master is the only member in the cluster, cleanup the spark meta table
         if (acm.getMembers(CLUSTER_GROUP_NAME).size() == 0) {
+            log.info("Analytics Execution cluster is empty. Hence cleaning up Spark meta data...");
             cleanupSparkMetaTable();
         }
 
