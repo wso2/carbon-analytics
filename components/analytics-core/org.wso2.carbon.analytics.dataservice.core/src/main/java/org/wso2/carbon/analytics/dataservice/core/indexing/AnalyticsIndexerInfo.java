@@ -57,6 +57,13 @@ public class AnalyticsIndexerInfo {
 
     private int indexQueueCleanupThreshold;
 
+    private String taxonomyWriterCacheType;
+
+    private String taxonomyWriterLRUCacheType;
+
+    private int taxonomyWriterLRUCacheSize;
+
+
     public Analyzer getLuceneAnalyzer() {
         return luceneAnalyzer;
     }
@@ -175,5 +182,29 @@ public class AnalyticsIndexerInfo {
 
     public void setIndexQueueCleanupThreshold(int indexQueueCleanupThreshold) {
         this.indexQueueCleanupThreshold = indexQueueCleanupThreshold;
+    }
+
+    public String getTaxonomyWriterCacheType() {
+        return taxonomyWriterCacheType;
+    }
+
+    public void setTaxonomyWriterCacheType(String taxonomyWriterCacheType) {
+        this.taxonomyWriterCacheType = taxonomyWriterCacheType;
+    }
+
+    public String getTaxonomyWriterLRUCacheType() {
+        return taxonomyWriterLRUCacheType;
+    }
+
+    public void setTaxonomyWriterLRUCacheType(String taxonomyWriterLRUCacheType) {
+        this.taxonomyWriterLRUCacheType = taxonomyWriterLRUCacheType;
+    }
+
+    public int getTaxonomyWriterLRUCacheSize() {
+        return taxonomyWriterLRUCacheSize;
+    }
+
+    public void setTaxonomyWriterLRUCacheSize(int taxonomyWriterLRUCacheSize) {
+        this.taxonomyWriterLRUCacheSize = taxonomyWriterLRUCacheSize;
     }
 }

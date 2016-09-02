@@ -36,6 +36,8 @@ import org.apache.lucene.facet.taxonomy.TaxonomyReader;
 import org.apache.lucene.facet.taxonomy.TaxonomyWriter;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyReader;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter;
+import org.apache.lucene.facet.taxonomy.writercache.LruTaxonomyWriterCache;
+import org.apache.lucene.facet.taxonomy.writercache.TaxonomyWriterCache;
 import org.apache.lucene.index.*;
 import org.apache.lucene.queries.function.ValueSource;
 import org.apache.lucene.search.*;
@@ -118,7 +120,7 @@ public class AnalyticsDataIndexer {
 
     private final Map<String, IndexWriter> indexWriters = new HashMap<>();
 
-    private Map<String, DirectoryTaxonomyWriter> indexTaxonomyWriters = new HashMap<>();
+    private final Map<String, DirectoryTaxonomyWriter> indexTaxonomyWriters = new HashMap<>();
 
     private AggregateFunctionFactory aggregateFunctionFactory;
     
@@ -1605,9 +1607,10 @@ public class AnalyticsDataIndexer {
                 taxonomyWriter = this.indexTaxonomyWriters.get(shardedTableId);
                 if (taxonomyWriter == null) {
                     try {
+                        TaxonomyWriterCache taxonomyWriterCache = getTaxonomyWriterCache();
                         taxonomyWriter = new DirectoryTaxonomyWriter(this.createDirectory(shardId,
                                 TAXONOMY_INDEX_DATA_FS_BASE_PATH, tableId), 
-                                IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+                                IndexWriterConfig.OpenMode.CREATE_OR_APPEND, taxonomyWriterCache);
                         this.indexTaxonomyWriters.put(shardedTableId, taxonomyWriter);
                     } catch (IOException e) {
                         throw new AnalyticsIndexException("Error in creating index writer: " +
@@ -1617,6 +1620,42 @@ public class AnalyticsDataIndexer {
             }
         }
         return taxonomyWriter;
+    }
+
+    private TaxonomyWriterCache getTaxonomyWriterCache() {
+
+        TaxonomyWriterCache taxonomyWriterCache;
+        String taxonomyWriterCacheType = indexerInfo.getTaxonomyWriterCacheType();
+
+        if (taxonomyWriterCacheType != null
+                    && taxonomyWriterCacheType
+                .equals(org.wso2.carbon.analytics.dataservice.core.Constants.DEFAULT_TAXONOMY_WRITER_CACHE)) {
+            taxonomyWriterCache = DirectoryTaxonomyWriter.defaultTaxonomyWriterCache();
+        } else if (taxonomyWriterCacheType != null && taxonomyWriterCacheType
+                .equals(org.wso2.carbon.analytics.dataservice.core.Constants.LRU_TAXONOMY_WRITER_CACHE)) {
+
+            LruTaxonomyWriterCache.LRUType lruType;
+            String taxonomyWriterLRUCacheType = indexerInfo.getTaxonomyWriterLRUCacheType();
+            if (taxonomyWriterLRUCacheType != null &&
+                taxonomyWriterLRUCacheType.equals(org.wso2.carbon.analytics.dataservice.core.Constants.DEFAULT_LRU_CACHE_TYPE)) {
+                lruType = LruTaxonomyWriterCache.LRUType.LRU_STRING;
+            } else if (taxonomyWriterLRUCacheType != null &&
+                       taxonomyWriterLRUCacheType.equals(org.wso2.carbon.analytics.dataservice.core.Constants.HASHED_LRU_CACHE_TYPE)) {
+                lruType = LruTaxonomyWriterCache.LRUType.LRU_HASHED;
+            } else {
+                log.error("Unsupported TaxonomyWriterLRUCacheType: " + taxonomyWriterLRUCacheType + ", using STRING type");
+                lruType = LruTaxonomyWriterCache.LRUType.LRU_STRING;
+            }
+            int cacheSize = indexerInfo.getTaxonomyWriterLRUCacheSize();
+            if (cacheSize <= 0) {
+                cacheSize = org.wso2.carbon.analytics.dataservice.core.Constants.DEFAULT_LRU_CACHE_SIZE;
+            }
+            taxonomyWriterCache = new LruTaxonomyWriterCache(cacheSize, lruType);
+        } else {
+            log.error("Unsupported TaxonomyWriterCacheType: " + taxonomyWriterCacheType + ", using DEFAULT type");
+            taxonomyWriterCache = DirectoryTaxonomyWriter.defaultTaxonomyWriterCache();
+        }
+        return taxonomyWriterCache;
     }
 
     public void clearIndexData(int tenantId, String tableName) throws AnalyticsException {

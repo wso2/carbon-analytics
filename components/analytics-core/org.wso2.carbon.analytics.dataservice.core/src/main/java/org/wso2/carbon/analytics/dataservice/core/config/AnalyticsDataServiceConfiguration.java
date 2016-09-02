@@ -33,6 +33,8 @@ public class AnalyticsDataServiceConfiguration {
         
     private AnalyticsLuceneAnalyzerConfiguration luceneAnalyzerConfiguration;
 
+    private TaxonomyWriterCacheConfiguration taxonomyWriterCacheConfiguration;
+
     private AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration;
         
     private String primaryRecordStore;
@@ -70,7 +72,17 @@ public class AnalyticsDataServiceConfiguration {
 	public void setLuceneAnalyzerConfiguration(AnalyticsLuceneAnalyzerConfiguration luceneAnalyzerConfiguration) {
 		this.luceneAnalyzerConfiguration = luceneAnalyzerConfiguration;
 	}
-    
+
+    @XmlElement(name = "taxonomy-writer-cache")
+    public TaxonomyWriterCacheConfiguration getTaxonomyWriterCacheConfiguration() {
+        return taxonomyWriterCacheConfiguration;
+    }
+
+    public void setTaxonomyWriterCacheConfiguration(
+            TaxonomyWriterCacheConfiguration taxonomyWriterCacheConfiguration) {
+        this.taxonomyWriterCacheConfiguration = taxonomyWriterCacheConfiguration;
+    }
+
     @XmlElement (nillable = false, required = true)
     public String getPrimaryRecordStore() {
         return primaryRecordStore;

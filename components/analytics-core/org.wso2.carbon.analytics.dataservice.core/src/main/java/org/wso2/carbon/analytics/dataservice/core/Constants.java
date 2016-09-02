@@ -64,6 +64,11 @@ public class Constants {
     public static final int DEFAULT_INDEX_WORKER_COUNT = 1;
     public static final int DEFAULT_MAX_INDEXER_COMMUNICATOR_BUFFER_SIZE = 1024;
     public static final int DEFAULT_INDEXING_QUEUE_CLEANUP_THRESHOLD = 209715200;
+    public static final String DEFAULT_TAXONOMY_WRITER_CACHE = "DEFAULT";
+    public static final String LRU_TAXONOMY_WRITER_CACHE = "LRU";
+    public static final String DEFAULT_LRU_CACHE_TYPE = "STRING";
+    public static final String HASHED_LRU_CACHE_TYPE = "HASHED";
+    public static final int DEFAULT_LRU_CACHE_SIZE = 4096;
     public static final String DISABLE_INDEXING_ENV_PROP = "disableIndexing";
     public static final String ANALYTICS_INDEXING_GROUP = "__ANALYTICS_INDEXING_GROUP__";
 
@@ -78,5 +83,4 @@ public class Constants {
             + File.separator + "conf" + File.separator + "analytics" + File.separator + "my-node-id.dat";
     public static final String DEFAULT_LOCAL_INDEX_STAGING_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator + "repository"
             + File.separator + "data" + File.separator + "index_staging_queues" + File.separator;
-
 }
