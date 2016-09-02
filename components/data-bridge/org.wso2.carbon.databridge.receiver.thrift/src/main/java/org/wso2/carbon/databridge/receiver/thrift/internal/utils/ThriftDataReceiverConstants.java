@@ -34,4 +34,6 @@ public final class ThriftDataReceiverConstants {
     public static final String RECEIVER_HOST_NAME = "hostName";
     public static final String DEFAULT_HOSTNAME = "0.0.0.0";
     public static final String DATA_BRIDGE_RECEIVER_NAME = "Thrift";
+    public static final String DATA_BRIDGE_KEY_STORE_LOCATION = "keyStoreLocation";
+    public static final String DATA_BRIDGE_KEY_STORE_PASSWORD = "keyStorePassword";
 }

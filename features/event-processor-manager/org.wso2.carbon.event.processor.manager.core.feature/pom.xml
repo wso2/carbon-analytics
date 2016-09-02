@@ -20,7 +20,7 @@
     <parent>
         <artifactId>event-processor-manager-feature</artifactId>
         <groupId>org.wso2.carbon.analytics-common</groupId>
-        <version>5.1.2-SNAPSHOT</version>
+        <version>5.1.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
