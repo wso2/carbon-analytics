@@ -48,8 +48,6 @@
         <module>org.wso2.carbon.event.output.adapter.websocket.local</module>
         <module>org.wso2.carbon.event.output.adapter.websocket.local/org.wso2.carbon.event.output.adapter.websocket.endpoint</module>
         <module>org.wso2.carbon.event.output.adapter.ui</module>
-        <module>org.wso2.carbon.event.output.adapter.ui/org.wso2.carbon.event.output.adapter.ui.endpoint</module>
-        <module>org.wso2.carbon.event.output.adapter.ui/org.wso2.carbon.event.output.adapter.ui.test</module>
         <module>org.wso2.carbon.event.output.adapter.mqtt</module>
         <module>org.wso2.carbon.event.output.adapter.sms</module>
     </modules>

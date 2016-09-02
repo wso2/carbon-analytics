@@ -327,6 +327,11 @@
                 <version>${javax.websocket.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.jaggeryjs</groupId>
+                <artifactId>org.jaggeryjs.hostobjects.web</artifactId>
+                <version>${jaggery.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.tomcat</groupId>
                 <artifactId>tomcat-websocket-api</artifactId>
                 <version>${tomcat.websocket.version}</version>
@@ -1398,6 +1403,8 @@
         <jsonpath.version>0.9.1</jsonpath.version>
         <jsonsmart.version>1.2</jsonsmart.version>
         <javax.websocket.version>1.0</javax.websocket.version>
+        <jaggery.version>0.12.8</jaggery.version>
+
         <snakeyaml.version>1.11</snakeyaml.version>
         <antlr.version>4.5</antlr.version>
         <org.eclipse.osgi.version>3.7.0.v20110613</org.eclipse.osgi.version>
