@@ -56,6 +56,8 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
 
     private final boolean traceEnabled;
     private final boolean statisticsEnabled;
+    private final boolean processingEnabled;
+    private String enable_message;
     private List<String> dynamicMessagePropertyList = new ArrayList<String>();
     private Counter eventCounter;
     private Logger trace = Logger.getLogger(EventPublisherConstants.EVENT_TRACE_LOGGER);
@@ -76,6 +78,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     private boolean isContinue = false;
     private BlockingEventQueue eventQueue;
     private int inputStreamSize = 0;
+
 
 //    private volatile AtomicLong totalLatency = new AtomicLong();
 //    private volatile AtomicLong totalEvents = new AtomicLong();
@@ -137,9 +140,18 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
             throw new EventPublisherStreamValidationException("Stream " + streamId + " does not exist", streamId);
         }
 
+
         this.traceEnabled = eventPublisherConfiguration.isTracingEnabled();
         this.statisticsEnabled = eventPublisherConfiguration.isStatisticsEnabled() &&
                 EventPublisherServiceValueHolder.isGlobalStatisticsEnabled();
+        this.processingEnabled=eventPublisherConfiguration.isProcessingEnabled();
+
+
+        if(!processingEnabled){
+            this.enable_message=EventPublisherConstants.EVENT_PUBLISHER+" : " + eventPublisherConfiguration.getEventPublisherName()+ " is disabled";
+        }
+
+
         if (statisticsEnabled) {
             this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO);
         }
@@ -369,6 +381,12 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         }
         if (statisticsEnabled) {
             eventCounter.inc();
+        }
+
+        if (!processingEnabled){
+            log.info(enable_message);
+            return;
+
         }
 
         org.wso2.siddhi.core.event.Event siddhiEvent = EventPublisherUtil.convertToSiddhiEvent(event, inputStreamSize);

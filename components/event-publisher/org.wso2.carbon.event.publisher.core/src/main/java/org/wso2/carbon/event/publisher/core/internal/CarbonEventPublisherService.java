@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -287,7 +288,7 @@ public class CarbonEventPublisherService implements EventPublisherService {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         EventPublisherConfiguration eventPublisherConfiguration = getActiveEventPublisherConfiguration(eventPublisherName);
         eventPublisherConfiguration.setStatisticsEnabled(statisticsEnabled);
-        editTracingStatistics(eventPublisherConfiguration, eventPublisherName, tenantId);
+        editTracingStatisticsProcessing(eventPublisherConfiguration, eventPublisherName, tenantId);
     }
 
     @Override
@@ -296,9 +297,17 @@ public class CarbonEventPublisherService implements EventPublisherService {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         EventPublisherConfiguration eventPublisherConfiguration = getActiveEventPublisherConfiguration(eventPublisherName);
         eventPublisherConfiguration.setTraceEnabled(traceEnabled);
-        editTracingStatistics(eventPublisherConfiguration, eventPublisherName, tenantId);
+        editTracingStatisticsProcessing(eventPublisherConfiguration, eventPublisherName, tenantId);
     }
 
+    @Override
+    public void setProcessEnabled(String eventPublisherName, boolean processEnabled)
+            throws EventPublisherConfigurationException{
+        int tenantId=PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        EventPublisherConfiguration eventPublisherConfiguration = getActiveEventPublisherConfiguration(eventPublisherName);
+        eventPublisherConfiguration.setProcessEnabled(processEnabled);
+        editTracingStatisticsProcessing(eventPublisherConfiguration, eventPublisherName, tenantId);
+    }
     //Non-Interface public methods
 
     public void addEventPublisherConfigurationFile(EventPublisherConfigurationFile eventPublisherConfigurationFile, int tenantId) {
@@ -508,7 +517,7 @@ public class CarbonEventPublisherService implements EventPublisherService {
 
     //Private Methods are below
 
-    private void editTracingStatistics(
+    private void editTracingStatisticsProcessing(
             EventPublisherConfiguration eventPublisherConfiguration,
             String eventPublisherName, int tenantId)
             throws EventPublisherConfigurationException {

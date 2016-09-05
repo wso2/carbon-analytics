@@ -29,6 +29,7 @@ public class EventPublisherConfiguration {
     private boolean enableTracing;
     private boolean enableStatistics;
     private boolean editable;
+    private boolean processing;
 
     public String getEventPublisherName() {
         return eventPublisherName;
@@ -86,6 +87,12 @@ public class EventPublisherConfiguration {
     public void setStatisticsEnabled(boolean enableStatistics) {
         this.enableStatistics = enableStatistics;
     }
+
+    public boolean isProcessingEnabled() {
+        return processing;
+    }
+
+    public void setProcessEnabled(boolean processing) {this.processing = processing;}
 
     public Map<String, String> getToAdapterDynamicProperties() {
         return toAdapterDynamicProperties;

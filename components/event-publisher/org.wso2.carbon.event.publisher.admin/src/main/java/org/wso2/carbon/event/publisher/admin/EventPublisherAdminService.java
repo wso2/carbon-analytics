@@ -74,6 +74,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                     eventPublisherConfigurationInfoDtoArray[index].setEnableStats(eventPublisherConfiguration.isStatisticsEnabled());
                     eventPublisherConfigurationInfoDtoArray[index].setEnableTracing(eventPublisherConfiguration.isTracingEnabled());
                     eventPublisherConfigurationInfoDtoArray[index].setEditable(eventPublisherConfiguration.isEditable());
+                    eventPublisherConfigurationInfoDtoArray[index].setEnableProcessing(eventPublisherConfiguration.isProcessingEnabled());
                 }
                 Arrays.sort(eventPublisherConfigurationInfoDtoArray, new Comparator() {
 
@@ -121,6 +122,8 @@ public class EventPublisherAdminService extends AbstractAdmin {
                     eventPublisherConfigurationInfoDtoArray[index].setEnableStats(eventPublisherConfiguration.isStatisticsEnabled());
                     eventPublisherConfigurationInfoDtoArray[index].setEnableTracing(eventPublisherConfiguration.isTracingEnabled());
                     eventPublisherConfigurationInfoDtoArray[index].setEditable(eventPublisherConfiguration.isEditable());
+                    eventPublisherConfigurationInfoDtoArray[index].setEnableProcessing(eventPublisherConfiguration.isProcessingEnabled());
+
                 }
                 Arrays.sort(eventPublisherConfigurationInfoDtoArray, new Comparator() {
 
@@ -452,22 +455,22 @@ public class EventPublisherAdminService extends AbstractAdmin {
 
     // Deprecated method
     public boolean deployTextEventPublisherConfiguration(String eventPublisherName,
-                                                          String streamNameWithVersion,
-                                                          String eventAdapterType,
-                                                          String textData,
-                                                          BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                          String dataFrom, boolean mappingEnabled)
+                                                         String streamNameWithVersion,
+                                                         String eventAdapterType,
+                                                         String textData,
+                                                         BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                         String dataFrom, boolean mappingEnabled)
             throws AxisFault {
         return deployCacheableTextEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType,
                 textData, outputPropertyConfiguration, dataFrom, PropertyAttributeTypeConstants.DEFAULT_REGISTRY_RESOURCE_CACHE_TIMEOUT, mappingEnabled);
     }
 
     public boolean deployCacheableTextEventPublisherConfiguration(String eventPublisherName,
-                                                         String streamNameWithVersion,
-                                                         String eventAdapterType,
-                                                         String textData,
-                                                         BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                         String dataFrom, long cacheTimeoutDuration, boolean mappingEnabled)
+                                                                  String streamNameWithVersion,
+                                                                  String eventAdapterType,
+                                                                  String textData,
+                                                                  BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                                  String dataFrom, long cacheTimeoutDuration, boolean mappingEnabled)
             throws AxisFault {
 
         if (checkEventPublisherValidity(eventPublisherName)) {
@@ -515,22 +518,22 @@ public class EventPublisherAdminService extends AbstractAdmin {
 
     // Deprecated method
     public boolean deployXmlEventPublisherConfiguration(String eventPublisherName,
-                                                         String streamNameWithVersion,
-                                                         String eventAdapterType,
-                                                         String textData,
-                                                         BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                         String dataFrom, boolean mappingEnabled)
+                                                        String streamNameWithVersion,
+                                                        String eventAdapterType,
+                                                        String textData,
+                                                        BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                        String dataFrom, boolean mappingEnabled)
             throws AxisFault {
         return deployCacheableXmlEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType,
                 textData, outputPropertyConfiguration, dataFrom, PropertyAttributeTypeConstants.DEFAULT_REGISTRY_RESOURCE_CACHE_TIMEOUT, mappingEnabled);
     }
 
     public boolean deployCacheableXmlEventPublisherConfiguration(String eventPublisherName,
-                                                        String streamNameWithVersion,
-                                                        String eventAdapterType,
-                                                        String textData,
-                                                        BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                        String dataFrom, long cacheTimeoutDuration, boolean mappingEnabled)
+                                                                 String streamNameWithVersion,
+                                                                 String eventAdapterType,
+                                                                 String textData,
+                                                                 BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                                 String dataFrom, long cacheTimeoutDuration, boolean mappingEnabled)
             throws AxisFault {
 
         if (checkEventPublisherValidity(eventPublisherName)) {
@@ -624,22 +627,22 @@ public class EventPublisherAdminService extends AbstractAdmin {
 
     // Deprecated method
     public boolean deployJsonEventPublisherConfiguration(String eventPublisherName,
-                                                        String streamNameWithVersion,
-                                                        String eventAdapterType,
-                                                        String textData,
-                                                        BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                        String dataFrom, boolean mappingEnabled)
+                                                         String streamNameWithVersion,
+                                                         String eventAdapterType,
+                                                         String textData,
+                                                         BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                         String dataFrom, boolean mappingEnabled)
             throws AxisFault {
         return deployCacheableJsonEventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType,
                 textData, outputPropertyConfiguration, dataFrom, PropertyAttributeTypeConstants.DEFAULT_REGISTRY_RESOURCE_CACHE_TIMEOUT, mappingEnabled);
     }
 
     public boolean deployCacheableJsonEventPublisherConfiguration(String eventPublisherName,
-                                                         String streamNameWithVersion,
-                                                         String eventAdapterType,
-                                                         String jsonData,
-                                                         BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                         String dataFrom, long cacheTimeoutDuration, boolean mappingEnabled)
+                                                                  String streamNameWithVersion,
+                                                                  String eventAdapterType,
+                                                                  String jsonData,
+                                                                  BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                                  String dataFrom, long cacheTimeoutDuration, boolean mappingEnabled)
             throws AxisFault {
 
         if (checkEventPublisherValidity(eventPublisherName)) {
@@ -697,6 +700,18 @@ public class EventPublisherAdminService extends AbstractAdmin {
         EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
         try {
             eventPublisherService.setTraceEnabled(eventPublisherName, flag);
+        } catch (EventPublisherConfigurationException e) {
+            log.error(e.getMessage(), e);
+            throw new AxisFault(e.getMessage());
+        }
+        return true;
+    }
+
+    public boolean setProcessingEnabled(String eventPublisherName, boolean flag) throws AxisFault{
+        EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
+        try {
+            eventPublisherService.setProcessEnabled(eventPublisherName,flag);
+
         } catch (EventPublisherConfigurationException e) {
             log.error(e.getMessage(), e);
             throw new AxisFault(e.getMessage());
@@ -984,10 +999,31 @@ public class EventPublisherAdminService extends AbstractAdmin {
         return isStatisticsEnabled;
     }
 
+
+    public boolean isPublisherProcessingEnabled(String eventPublisherName){
+        EventPublisherService eventPublisherService=EventPublisherAdminServiceValueHolder.getEventPublisherService();
+        List<EventPublisherConfiguration> eventPublisherConfigurationList = null;
+        boolean isProcessEnabled = true;
+        try {
+            eventPublisherConfigurationList = eventPublisherService.getAllActiveEventPublisherConfigurations();
+            Iterator eventReceiverConfigurationIterator = eventPublisherConfigurationList.iterator();
+            while (eventReceiverConfigurationIterator.hasNext()) {
+                EventPublisherConfiguration eventPublisherConfiguration =
+                        (EventPublisherConfiguration) eventReceiverConfigurationIterator.next();
+                if (eventPublisherConfiguration.getEventPublisherName().equalsIgnoreCase(eventPublisherName)) {
+                    isProcessEnabled = eventPublisherConfiguration.isProcessingEnabled();
+                }
+            }
+        } catch (EventPublisherConfigurationException e) {
+            log.error(e.getMessage(), e);
+        }
+        return isProcessEnabled;
+    }
+
     public boolean isPublisherTraceEnabled(String eventPublisherName) {
         EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
         List<EventPublisherConfiguration> eventPublisherConfigurationList = null;
-        boolean isTraceEnabled = false;
+        boolean isTraceEnabled = true;
         try {
             eventPublisherConfigurationList = eventPublisherService.getAllActiveEventPublisherConfigurations();
             Iterator eventReceiverConfigurationIterator = eventPublisherConfigurationList.iterator();
