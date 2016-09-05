@@ -30,10 +30,7 @@
         <module>features/analytics-lite</module>
         <module>features/analytics-processors</module>
         <module>features/analytics-views</module>
-        <module>features/categories/analyzer</module>
-        <module>features/categories/dashboard</module>
-        <module>features/categories/indexer</module>
-        <module>features/categories/receiver</module>
+        <module>features/categories</module>
     </modules>
 
     <dependencyManagement>
@@ -1185,6 +1182,7 @@
                 <module>features/analytics-lite</module>
                 <module>features/analytics-processors</module>
                 <module>features/analytics-views</module>
+                <module>features/categories</module>
             </modules>
         </profile>
         <profile>
@@ -1210,6 +1208,7 @@
                 <module>features/analytics-lite</module>
                 <module>features/analytics-processors</module>
                 <module>features/analytics-views</module>
+                <module>features/categories</module>
             </modules>
         </profile>
         <profile>
