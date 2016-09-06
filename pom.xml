@@ -1320,8 +1320,6 @@
         <!-- Javax-->
         <javax.servelet.version>3.0.1</javax.servelet.version>
 
-        <!--<lucene.orbit.version>5.2.1.wso2v1</lucene.orbit.version>-->
-        <!--<lucene.imp.pkg.version>[5.2.1, 5.3.0)</lucene.imp.pkg.version>-->
         <lucene.orbit.version>6.2.0.wso2v1</lucene.orbit.version>
         <lucene.imp.pkg.version>[6.0.0, 6.2.0]</lucene.imp.pkg.version>
         <asm4.orbit.version>4.1.0.wso2v1</asm4.orbit.version>
