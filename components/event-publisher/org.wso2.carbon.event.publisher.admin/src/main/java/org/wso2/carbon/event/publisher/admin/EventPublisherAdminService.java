@@ -75,6 +75,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                     eventPublisherConfigurationInfoDtoArray[index].setEnableTracing(eventPublisherConfiguration.isTracingEnabled());
                     eventPublisherConfigurationInfoDtoArray[index].setEditable(eventPublisherConfiguration.isEditable());
                     eventPublisherConfigurationInfoDtoArray[index].setEnableProcessing(eventPublisherConfiguration.isProcessingEnabled());
+
                 }
                 Arrays.sort(eventPublisherConfigurationInfoDtoArray, new Comparator() {
 
@@ -393,7 +394,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
 
                 EventPublisherConfiguration eventPublisherConfiguration = new EventPublisherConfiguration();
-
+                eventPublisherConfiguration.setProcessEnabled(true);
                 eventPublisherConfiguration.setEventPublisherName(eventPublisherName);
                 String[] fromStreamProperties = streamNameWithVersion.split(":");
                 eventPublisherConfiguration.setFromStreamName(fromStreamProperties[0]);
@@ -478,7 +479,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
 
                 EventPublisherConfiguration eventPublisherConfiguration = new EventPublisherConfiguration();
-
+                eventPublisherConfiguration.setProcessEnabled(true);
                 eventPublisherConfiguration.setEventPublisherName(eventPublisherName);
                 String[] fromStreamProperties = streamNameWithVersion.split(":");
                 eventPublisherConfiguration.setFromStreamName(fromStreamProperties[0]);
@@ -541,6 +542,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
 
                 EventPublisherConfiguration eventPublisherConfiguration = new EventPublisherConfiguration();
+                eventPublisherConfiguration.setProcessEnabled(true);
 
                 eventPublisherConfiguration.setEventPublisherName(eventPublisherName);
                 String[] fromStreamProperties = streamNameWithVersion.split(":");
@@ -587,7 +589,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
 
                 EventPublisherConfiguration eventPublisherConfiguration = new EventPublisherConfiguration();
-
+                eventPublisherConfiguration.setProcessEnabled(true);
                 eventPublisherConfiguration.setEventPublisherName(eventPublisherName);
                 String[] fromStreamProperties = streamNameWithVersion.split(":");
                 eventPublisherConfiguration.setFromStreamName(fromStreamProperties[0]);
@@ -650,7 +652,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                 EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
 
                 EventPublisherConfiguration eventPublisherConfiguration = new EventPublisherConfiguration();
-
+                eventPublisherConfiguration.setProcessEnabled(true);
                 eventPublisherConfiguration.setEventPublisherName(eventPublisherName);
                 String[] fromStreamProperties = streamNameWithVersion.split(":");
                 eventPublisherConfiguration.setFromStreamName(fromStreamProperties[0]);
@@ -707,10 +709,10 @@ public class EventPublisherAdminService extends AbstractAdmin {
         return true;
     }
 
-    public boolean setProcessingEnabled(String eventPublisherName, boolean flag) throws AxisFault{
+    public boolean setProcessingEnabled(String eventPublisherName, boolean flag) throws AxisFault {
         EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
         try {
-            eventPublisherService.setProcessEnabled(eventPublisherName,flag);
+            eventPublisherService.setProcessEnabled(eventPublisherName, flag);
 
         } catch (EventPublisherConfigurationException e) {
             log.error(e.getMessage(), e);
@@ -858,7 +860,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
         mappingTextList.clear();
         while (text.contains("{{") && text.indexOf("}}") > 0) {
             String property = text.substring(text.indexOf("{{") + 2, text.indexOf("}}"));
-            if(property != null && !property.startsWith(PropertyAttributeTypeConstants.ARBITRARY_MAP_PREFIX)) {
+            if (property != null && !property.startsWith(PropertyAttributeTypeConstants.ARBITRARY_MAP_PREFIX)) {
                 // Do not consider arbitrary map properties for validation
                 mappingTextList.add(property);
             }
@@ -1000,8 +1002,8 @@ public class EventPublisherAdminService extends AbstractAdmin {
     }
 
 
-    public boolean isPublisherProcessingEnabled(String eventPublisherName){
-        EventPublisherService eventPublisherService=EventPublisherAdminServiceValueHolder.getEventPublisherService();
+    public boolean isPublisherProcessingEnabled(String eventPublisherName) {
+        EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
         List<EventPublisherConfiguration> eventPublisherConfigurationList = null;
         boolean isProcessEnabled = true;
         try {
@@ -1023,7 +1025,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
     public boolean isPublisherTraceEnabled(String eventPublisherName) {
         EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
         List<EventPublisherConfiguration> eventPublisherConfigurationList = null;
-        boolean isTraceEnabled = true;
+        boolean isTraceEnabled = false;
         try {
             eventPublisherConfigurationList = eventPublisherService.getAllActiveEventPublisherConfigurations();
             Iterator eventReceiverConfigurationIterator = eventPublisherConfigurationList.iterator();
@@ -1039,5 +1041,6 @@ public class EventPublisherAdminService extends AbstractAdmin {
         }
         return isTraceEnabled;
     }
+
 
 }

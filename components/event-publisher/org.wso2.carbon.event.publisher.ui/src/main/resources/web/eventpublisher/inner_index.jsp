@@ -176,7 +176,12 @@
                     <% }
                     if (eventPublisherDetails.getEnableProcessing()) { %>
                        <div class="inlineDiv">
-
+                           <div id="disableProcessing<%= eventPublisherDetails.getEventPublisherName()%>">
+                               <a href="#"
+                                     onclick="disablePublisherProcessing('<%= eventPublisherDetails.getEventPublisherName() %>')"
+                                     class="icon-link"
+                                     style="background-image:url(images/disable_processing.gif);">Disable Processing </a>
+                          </div>
                           <div id="enableProcessing<%= eventPublisherDetails.getEventPublisherName()%>"
                                style="display:none;">
                                 <a href="#"
@@ -184,16 +189,16 @@
                                       class="icon-link"
                                       style="background-image:url(images/enable_processing.gif);">Enable Processing </a>
                           </div>
-                          <div id="disableProcessing<%= eventPublisherDetails.getEventPublisherName()%>">
-                               <a href="#"
-                                     onclick="disablePublisherProcessing('<%= eventPublisherDetails.getEventPublisherName() %>')"
-                                     class="icon-link"
-                                     style="background-image:url(images/disable_processing.gif);">Disable Processing </a>
-                          </div>
+
                        </div>
                     <% } else { %>
                        <div class="inlineDiv">
-
+                            <div id="enableProcessing<%= eventPublisherDetails.getEventPublisherName()%>">
+                                  <a href="#"
+                                       onclick="enablePublisherProcessing('<%= eventPublisherDetails.getEventPublisherName() %>')"
+                                       class="icon-link"
+                                       style="background-image:url(images/enable_processing.gif);">Enable Processing </a>
+                           </div>
                           <div id="disableProcessing<%= eventPublisherDetails.getEventPublisherName()%>"
                                   style="display:none">
                                   <a href="#"
@@ -201,12 +206,7 @@
                                         class="icon-link"
                                         style="background-image:url(images/disable_processing.gif);">Disable Processing </a>
                            </div>
-                           <div id="enableProcessing<%= eventPublisherDetails.getEventPublisherName()%>">
-                                  <a href="#"
-                                       onclick="enablePublisherProcessing('<%= eventPublisherDetails.getEventPublisherName() %>')"
-                                       class="icon-link"
-                                       style="background-image:url(images/enable_processing.gif);">Enable Processing </a>
-                           </div>
+
                        </div>
                     <% } %>
                     <a style="background-image: url(../admin/images/delete.gif);"

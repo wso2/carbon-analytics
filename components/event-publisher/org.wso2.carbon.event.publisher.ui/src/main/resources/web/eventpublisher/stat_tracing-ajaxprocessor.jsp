@@ -23,6 +23,7 @@
         response.sendError(405);
         return;
     }
+
     String eventAdapterType = request.getParameter("eventPublisherName");
     String action = request.getParameter("action");
     if (eventAdapterType != null && action != null) {
@@ -40,6 +41,5 @@
         }else if("disableProcessing".equals(action)){
             stub.setProcessingEnabled(eventAdapterType,false);
         }
-
     }
 %>

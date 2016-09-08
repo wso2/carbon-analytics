@@ -302,8 +302,17 @@ public class CarbonEventPublisherService implements EventPublisherService {
 
     @Override
     public void setProcessEnabled(String eventPublisherName, boolean processEnabled)
-            throws EventPublisherConfigurationException{
-        int tenantId=PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            throws EventPublisherConfigurationException {
+
+        if (!processEnabled) {
+
+            log.info("EventPublisher disabled : " + eventPublisherName);
+        } else {
+
+            log.info("EventPublisher enabled : " + eventPublisherName);
+        }
+
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         EventPublisherConfiguration eventPublisherConfiguration = getActiveEventPublisherConfiguration(eventPublisherName);
         eventPublisherConfiguration.setProcessEnabled(processEnabled);
         editTracingStatisticsProcessing(eventPublisherConfiguration, eventPublisherName, tenantId);
@@ -422,7 +431,7 @@ public class CarbonEventPublisherService implements EventPublisherService {
                 EventPublisherConfigurationFilesystemInvoker.reload(eventPublisherConfigurationFile.getFilePath());
             } catch (Exception e) {
                 log.error("Exception occurred while trying to deploy the Event publisher configuration file : " + new File(eventPublisherConfigurationFile.getFileName()).getName(), e);
-            }   finally {
+            } finally {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }

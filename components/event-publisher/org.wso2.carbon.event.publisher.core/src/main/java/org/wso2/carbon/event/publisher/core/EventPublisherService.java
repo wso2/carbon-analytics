@@ -119,7 +119,7 @@ public interface EventPublisherService {
     public List<EventPublisherConfigurationFile> getAllInactiveEventPublisherConfigurations();
 
 
-    /**trac
+    /**
      * Method used to get the inactive event publisher configuration xml as a string
      *
      * @param filename
@@ -179,7 +179,12 @@ public interface EventPublisherService {
     public void setTraceEnabled(String eventPublisherName, boolean traceEnabled)
             throws EventPublisherConfigurationException;
 
-
+    /**
+     * Method used to enable/disable the processing for an event publisher
+     *
+     * @param eventPublisherName the event publisher name to which tracing state should be changed
+     * @param processingEnabled
+     */
     public void setProcessEnabled(String eventPublisherName, boolean processingEnabled)
             throws EventPublisherConfigurationException;
 
