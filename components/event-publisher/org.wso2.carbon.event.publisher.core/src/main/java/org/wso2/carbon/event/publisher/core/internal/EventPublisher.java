@@ -56,6 +56,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
 
     private final boolean traceEnabled;
     private final boolean statisticsEnabled;
+    private final boolean processingEnabled;
     private List<String> dynamicMessagePropertyList = new ArrayList<String>();
     private Counter eventCounter;
     private Logger trace = Logger.getLogger(EventPublisherConstants.EVENT_TRACE_LOGGER);
@@ -76,6 +77,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     private boolean isContinue = false;
     private BlockingEventQueue eventQueue;
     private int inputStreamSize = 0;
+
 
 //    private volatile AtomicLong totalLatency = new AtomicLong();
 //    private volatile AtomicLong totalEvents = new AtomicLong();
@@ -137,9 +139,12 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
             throw new EventPublisherStreamValidationException("Stream " + streamId + " does not exist", streamId);
         }
 
+
         this.traceEnabled = eventPublisherConfiguration.isTracingEnabled();
         this.statisticsEnabled = eventPublisherConfiguration.isStatisticsEnabled() &&
                 EventPublisherServiceValueHolder.isGlobalStatisticsEnabled();
+        this.processingEnabled = eventPublisherConfiguration.isProcessingEnabled();
+
         if (statisticsEnabled) {
             this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO);
         }
@@ -154,6 +159,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
                     eventPublisherConfiguration.getEventPublisherName() + ", after processing " +
                     System.getProperty("line.separator");
         }
+
 
         OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();
         try {
@@ -332,7 +338,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
             if (entryValue != null && entryValue.contains(mapValue)) {
                 if (position == null) {
                     // messageProperty is not included in propertyPositionMap, so it should be an arbitrary data map
-                    if(arbitraryDataMap == null || !arbitraryDataMap.containsKey(messageProperty)) {
+                    if (arbitraryDataMap == null || !arbitraryDataMap.containsKey(messageProperty)) {
                         // Not found in arbitrary data map as well
                         throw new EventPublisherStreamValidationException("Property " + messageProperty + " is neither in the input stream attributes nor in runtime arbitrary data map.");
                     } else {
@@ -369,6 +375,11 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         }
         if (statisticsEnabled) {
             eventCounter.inc();
+        }
+
+        if (!processingEnabled) {
+            return;
+
         }
 
         org.wso2.siddhi.core.event.Event siddhiEvent = EventPublisherUtil.convertToSiddhiEvent(event, inputStreamSize);

@@ -180,6 +180,15 @@ public interface EventPublisherService {
             throws EventPublisherConfigurationException;
 
     /**
+     * Method used to enable/disable the processing for an event publisher
+     *
+     * @param eventPublisherName the event publisher name to which tracing state should be changed
+     * @param processingEnabled
+     */
+    public void setProcessEnabled(String eventPublisherName, boolean processingEnabled)
+            throws EventPublisherConfigurationException;
+
+    /**
      * Returns the Event Publisher Name as in the given {@code eventPublisherConfigXml}.
      *
      * @param eventPublisherConfigXml Event Publisher Configuration, in XML format.

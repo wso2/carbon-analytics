@@ -49,17 +49,14 @@
     <script type="text/javascript">CARBON.showInfoDialog('Event Publisher successfully deleted.');</script>
     <%
         }
-
         EventPublisherConfigurationInfoDto[] eventPublisherDetailsArray = stub.getAllActiveEventPublisherConfigurations();
         if (eventPublisherDetailsArray != null) {
             totalEventPublishers = eventPublisherDetailsArray.length;
         }
-
         EventPublisherConfigurationFileDto[] notDeployedEventPublisherConfigurationFiles = stub.getAllInactiveEventPublisherConfigurations();
         if (notDeployedEventPublisherConfigurationFiles != null) {
             totalNotDeployedEventPublishers = notDeployedEventPublisherConfigurationFiles.length;
         }
-
     %>
 
     <div id="workArea">
@@ -73,7 +70,6 @@
         <br/><br/>
         <table class="styledLeft">
             <%
-
                 if (eventPublisherDetailsArray != null) {
             %>
             <thead>
@@ -177,9 +173,42 @@
                         </div>
                     </div>
 
+                    <% }
+                    if (eventPublisherDetails.getEnableProcessing()) { %>
+                       <div class="inlineDiv">
+                           <div id="disableProcessing<%= eventPublisherDetails.getEventPublisherName()%>">
+                               <a href="#"
+                                     onclick="disablePublisherProcessing('<%= eventPublisherDetails.getEventPublisherName() %>')"
+                                     class="icon-link"
+                                     style="background-image:url(images/disable_processing.gif);">Disable Processing </a>
+                          </div>
+                          <div id="enableProcessing<%= eventPublisherDetails.getEventPublisherName()%>"
+                               style="display:none;">
+                                <a href="#"
+                                      onclick="enablePublisherProcessing('<%= eventPublisherDetails.getEventPublisherName() %>')"
+                                      class="icon-link"
+                                      style="background-image:url(images/enable_processing.gif);">Enable Processing </a>
+                          </div>
+
+                       </div>
+                    <% } else { %>
+                       <div class="inlineDiv">
+                            <div id="enableProcessing<%= eventPublisherDetails.getEventPublisherName()%>">
+                                  <a href="#"
+                                       onclick="enablePublisherProcessing('<%= eventPublisherDetails.getEventPublisherName() %>')"
+                                       class="icon-link"
+                                       style="background-image:url(images/enable_processing.gif);">Enable Processing </a>
+                           </div>
+                          <div id="disableProcessing<%= eventPublisherDetails.getEventPublisherName()%>"
+                                  style="display:none">
+                                  <a href="#"
+                                        onclick="disablePublisherProcessing('<%= eventPublisherDetails.getEventPublisherName() %>')"
+                                        class="icon-link"
+                                        style="background-image:url(images/disable_processing.gif);">Disable Processing </a>
+                           </div>
+
+                       </div>
                     <% } %>
-
-
                     <a style="background-image: url(../admin/images/delete.gif);"
                        class="icon-link"
                        onclick="deleteEventPublisher('<%=eventPublisherDetails.getEventPublisherName()%>')"><font
@@ -204,7 +233,6 @@
             </tbody>
             <%
                 }
-
             } else {
             %>
 

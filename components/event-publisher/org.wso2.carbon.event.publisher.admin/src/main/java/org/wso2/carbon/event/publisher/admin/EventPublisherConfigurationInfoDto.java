@@ -27,6 +27,7 @@ public class EventPublisherConfigurationInfoDto {
     private boolean enableTracing;
     private boolean enableStats;
     private boolean editable;
+    private boolean enableProcessing;
 
     public String getEventPublisherName() {
         return eventPublisherName;
@@ -83,4 +84,14 @@ public class EventPublisherConfigurationInfoDto {
     public boolean isEditable() {
         return editable;
     }
+
+    public boolean isEnableProcessing() {
+        return enableProcessing;
+    }
+
+    public void setEnableProcessing(boolean enableProcessing) {
+        this.enableProcessing = enableProcessing;
+    }
+
+
 }

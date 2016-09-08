@@ -1,125 +1,8 @@
-<!--
-  ~ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~ http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://admin.publisher.event.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax2140="http://admin.publisher.event.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://admin.publisher.event.carbon.wso2.org">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ax2114="http://admin.publisher.event.carbon.wso2.org/xsd" xmlns:ns="http://admin.publisher.event.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://admin.publisher.event.carbon.wso2.org">
     <wsdl:documentation>EventPublisherAdminService</wsdl:documentation>
     <wsdl:types>
-        <xs:schema xmlns:ax2141="http://admin.publisher.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.publisher.event.carbon.wso2.org">
+        <xs:schema xmlns:ax2115="http://admin.publisher.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.publisher.event.carbon.wso2.org">
             <xs:import namespace="http://admin.publisher.event.carbon.wso2.org/xsd"/>
-            <xs:element name="deployTextEventPublisherConfiguration">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="textData" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2140:BasicOutputAdapterPropertyDto"/>
-                        <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deployTextEventPublisherConfigurationResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deployCacheableTextEventPublisherConfiguration">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="textData" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2140:BasicOutputAdapterPropertyDto"/>
-                        <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="cacheTimeoutDuration" type="xs:long"/>
-                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deployCacheableTextEventPublisherConfigurationResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deployXmlEventPublisherConfiguration">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="textData" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2140:BasicOutputAdapterPropertyDto"/>
-                        <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deployXmlEventPublisherConfigurationResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deployCacheableXmlEventPublisherConfiguration">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="textData" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2140:BasicOutputAdapterPropertyDto"/>
-                        <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="cacheTimeoutDuration" type="xs:long"/>
-                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deployCacheableXmlEventPublisherConfigurationResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deployMapEventPublisherConfiguration">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="mapData" nillable="true" type="ax2140:EventMappingPropertyDto"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2140:BasicOutputAdapterPropertyDto"/>
-                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deployMapEventPublisherConfigurationResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="deployJsonEventPublisherConfiguration">
                 <xs:complexType>
                     <xs:sequence>
@@ -127,7 +10,7 @@
                         <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="textData" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2140:BasicOutputAdapterPropertyDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2114:BasicOutputAdapterPropertyDto"/>
                         <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"/>
                     </xs:sequence>
@@ -147,7 +30,7 @@
                         <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="jsonData" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2140:BasicOutputAdapterPropertyDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2114:BasicOutputAdapterPropertyDto"/>
                         <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="cacheTimeoutDuration" type="xs:long"/>
                         <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"/>
@@ -155,6 +38,21 @@
                 </xs:complexType>
             </xs:element>
             <xs:element name="deployCacheableJsonEventPublisherConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setProcessingEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="flag" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setProcessingEnabledResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
@@ -171,7 +69,7 @@
             <xs:element name="getOutputAdapterConfigurationSchemaResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2140:OutputAdapterConfigurationDto"/>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2114:OutputAdapterConfigurationDto"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -192,7 +90,7 @@
                     <xs:sequence>
                         <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2140:BasicOutputAdapterPropertyDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2114:BasicOutputAdapterPropertyDto"/>
                         <xs:element minOccurs="0" name="messageFormat" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
@@ -225,6 +123,20 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="isPublisherProcessingEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isPublisherProcessingEnabledResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="isPublisherTraceEnabled">
                 <xs:complexType>
                     <xs:sequence>
@@ -245,16 +157,117 @@
                         <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="metaData" nillable="true" type="ax2140:EventMappingPropertyDto"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationData" nillable="true" type="ax2140:EventMappingPropertyDto"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="payloadData" nillable="true" type="ax2140:EventMappingPropertyDto"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2140:BasicOutputAdapterPropertyDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="metaData" nillable="true" type="ax2114:EventMappingPropertyDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationData" nillable="true" type="ax2114:EventMappingPropertyDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="payloadData" nillable="true" type="ax2114:EventMappingPropertyDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2114:BasicOutputAdapterPropertyDto"/>
                         <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"/>
                         <xs:element minOccurs="0" name="toStreamNameWithVersion" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="deployWSO2EventPublisherConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployTextEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="textData" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2114:BasicOutputAdapterPropertyDto"/>
+                        <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployTextEventPublisherConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployCacheableTextEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="textData" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2114:BasicOutputAdapterPropertyDto"/>
+                        <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="cacheTimeoutDuration" type="xs:long"/>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployCacheableTextEventPublisherConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployXmlEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="textData" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2114:BasicOutputAdapterPropertyDto"/>
+                        <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployXmlEventPublisherConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployCacheableXmlEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="textData" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2114:BasicOutputAdapterPropertyDto"/>
+                        <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="cacheTimeoutDuration" type="xs:long"/>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployCacheableXmlEventPublisherConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployMapEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="mapData" nillable="true" type="ax2114:EventMappingPropertyDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2114:BasicOutputAdapterPropertyDto"/>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployMapEventPublisherConfigurationResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
@@ -271,7 +284,7 @@
             <xs:element name="getAllStreamSpecificActiveEventPublisherConfigurationsResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2140:EventPublisherConfigurationInfoDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2114:EventPublisherConfigurationInfoDto"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -357,7 +370,7 @@
             <xs:element name="getActiveEventPublisherConfigurationResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2140:EventPublisherConfigurationDto"/>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2114:EventPublisherConfigurationDto"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -369,7 +382,7 @@
             <xs:element name="getAllActiveEventPublisherConfigurationsResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2140:EventPublisherConfigurationInfoDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2114:EventPublisherConfigurationInfoDto"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -381,7 +394,7 @@
             <xs:element name="getAllInactiveEventPublisherConfigurationsResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2140:EventPublisherConfigurationFileDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2114:EventPublisherConfigurationFileDto"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -452,18 +465,11 @@
                     <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
-            <xs:complexType name="EventMappingPropertyDto">
-                <xs:sequence>
-                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="valueOf" nillable="true" type="xs:string"/>
-                </xs:sequence>
-            </xs:complexType>
             <xs:complexType name="OutputAdapterConfigurationDto">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="outputEventAdapterDynamicProperties" nillable="true" type="ax2140:DetailOutputAdapterPropertyDto"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="outputEventAdapterStaticProperties" nillable="true" type="ax2140:DetailOutputAdapterPropertyDto"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="outputEventAdapterDynamicProperties" nillable="true" type="ax2114:DetailOutputAdapterPropertyDto"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="outputEventAdapterStaticProperties" nillable="true" type="ax2114:DetailOutputAdapterPropertyDto"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="supportedMessageFormats" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="usageTips" nillable="true" type="xs:string"/>
                 </xs:sequence>
@@ -480,9 +486,17 @@
                     <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="EventMappingPropertyDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="valueOf" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
             <xs:complexType name="EventPublisherConfigurationInfoDto">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="editable" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="enableProcessing" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="enableStats" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="enableTracing" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
@@ -496,14 +510,14 @@
                     <xs:element minOccurs="0" name="customMappingEnabled" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="fromStreamNameWithVersion" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="jsonOutputMappingDto" nillable="true" type="ax2140:JSONOutputMappingDto"/>
-                    <xs:element minOccurs="0" name="mapOutputMappingDto" nillable="true" type="ax2140:MapOutputMappingDto"/>
+                    <xs:element minOccurs="0" name="jsonOutputMappingDto" nillable="true" type="ax2114:JSONOutputMappingDto"/>
+                    <xs:element minOccurs="0" name="mapOutputMappingDto" nillable="true" type="ax2114:MapOutputMappingDto"/>
                     <xs:element minOccurs="0" name="messageFormat" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="streamDefinition" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="textOutputMappingDto" nillable="true" type="ax2140:TextOutputMappingDto"/>
-                    <xs:element minOccurs="0" name="toAdapterConfigurationDto" nillable="true" type="ax2140:OutputAdapterConfigurationDto"/>
-                    <xs:element minOccurs="0" name="wso2EventOutputMappingDto" nillable="true" type="ax2140:WSO2EventOutputMappingDto"/>
-                    <xs:element minOccurs="0" name="xmlOutputMappingDto" nillable="true" type="ax2140:XMLOutputMappingDto"/>
+                    <xs:element minOccurs="0" name="textOutputMappingDto" nillable="true" type="ax2114:TextOutputMappingDto"/>
+                    <xs:element minOccurs="0" name="toAdapterConfigurationDto" nillable="true" type="ax2114:OutputAdapterConfigurationDto"/>
+                    <xs:element minOccurs="0" name="wso2EventOutputMappingDto" nillable="true" type="ax2114:WSO2EventOutputMappingDto"/>
+                    <xs:element minOccurs="0" name="xmlOutputMappingDto" nillable="true" type="ax2114:XMLOutputMappingDto"/>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="JSONOutputMappingDto">
@@ -515,7 +529,7 @@
             </xs:complexType>
             <xs:complexType name="MapOutputMappingDto">
                 <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="eventMappingProperties" nillable="true" type="ax2140:EventMappingPropertyDto"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="eventMappingProperties" nillable="true" type="ax2114:EventMappingPropertyDto"/>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="TextOutputMappingDto">
@@ -527,11 +541,11 @@
             </xs:complexType>
             <xs:complexType name="WSO2EventOutputMappingDto">
                 <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationWSO2EventMappingProperties" nillable="true" type="ax2140:EventMappingPropertyDto"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="metaWSO2EventMappingProperties" nillable="true" type="ax2140:EventMappingPropertyDto"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationWSO2EventMappingProperties" nillable="true" type="ax2114:EventMappingPropertyDto"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="metaWSO2EventMappingProperties" nillable="true" type="ax2114:EventMappingPropertyDto"/>
                     <xs:element minOccurs="0" name="outputStreamName" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="outputStreamVersion" nillable="true" type="xs:string"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="payloadWSO2EventMappingProperties" nillable="true" type="ax2140:EventMappingPropertyDto"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="payloadWSO2EventMappingProperties" nillable="true" type="ax2114:EventMappingPropertyDto"/>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="XMLOutputMappingDto">
@@ -658,6 +672,12 @@
     <wsdl:message name="isPublisherTraceEnabledResponse">
         <wsdl:part name="parameters" element="ns:isPublisherTraceEnabledResponse"/>
     </wsdl:message>
+    <wsdl:message name="isPublisherProcessingEnabledRequest">
+        <wsdl:part name="parameters" element="ns:isPublisherProcessingEnabled"/>
+    </wsdl:message>
+    <wsdl:message name="isPublisherProcessingEnabledResponse">
+        <wsdl:part name="parameters" element="ns:isPublisherProcessingEnabledResponse"/>
+    </wsdl:message>
     <wsdl:message name="getOutputAdapterConfigurationSchemaRequest">
         <wsdl:part name="parameters" element="ns:getOutputAdapterConfigurationSchema"/>
     </wsdl:message>
@@ -697,6 +717,12 @@
     </wsdl:message>
     <wsdl:message name="setTracingEnabledResponse">
         <wsdl:part name="parameters" element="ns:setTracingEnabledResponse"/>
+    </wsdl:message>
+    <wsdl:message name="setProcessingEnabledRequest">
+        <wsdl:part name="parameters" element="ns:setProcessingEnabled"/>
+    </wsdl:message>
+    <wsdl:message name="setProcessingEnabledResponse">
+        <wsdl:part name="parameters" element="ns:setProcessingEnabledResponse"/>
     </wsdl:message>
     <wsdl:message name="undeployActiveEventPublisherConfigurationRequest">
         <wsdl:part name="parameters" element="ns:undeployActiveEventPublisherConfiguration"/>
@@ -783,6 +809,10 @@
             <wsdl:input message="ns:isPublisherTraceEnabledRequest" wsaw:Action="urn:isPublisherTraceEnabled"/>
             <wsdl:output message="ns:isPublisherTraceEnabledResponse" wsaw:Action="urn:isPublisherTraceEnabledResponse"/>
         </wsdl:operation>
+        <wsdl:operation name="isPublisherProcessingEnabled">
+            <wsdl:input message="ns:isPublisherProcessingEnabledRequest" wsaw:Action="urn:isPublisherProcessingEnabled"/>
+            <wsdl:output message="ns:isPublisherProcessingEnabledResponse" wsaw:Action="urn:isPublisherProcessingEnabledResponse"/>
+        </wsdl:operation>
         <wsdl:operation name="getOutputAdapterConfigurationSchema">
             <wsdl:input message="ns:getOutputAdapterConfigurationSchemaRequest" wsaw:Action="urn:getOutputAdapterConfigurationSchema"/>
             <wsdl:output message="ns:getOutputAdapterConfigurationSchemaResponse" wsaw:Action="urn:getOutputAdapterConfigurationSchemaResponse"/>
@@ -810,6 +840,10 @@
         <wsdl:operation name="setTracingEnabled">
             <wsdl:input message="ns:setTracingEnabledRequest" wsaw:Action="urn:setTracingEnabled"/>
             <wsdl:output message="ns:setTracingEnabledResponse" wsaw:Action="urn:setTracingEnabledResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="setProcessingEnabled">
+            <wsdl:input message="ns:setProcessingEnabledRequest" wsaw:Action="urn:setProcessingEnabled"/>
+            <wsdl:output message="ns:setProcessingEnabledResponse" wsaw:Action="urn:setProcessingEnabledResponse"/>
         </wsdl:operation>
         <wsdl:operation name="undeployActiveEventPublisherConfiguration">
             <wsdl:input message="ns:undeployActiveEventPublisherConfigurationRequest" wsaw:Action="urn:undeployActiveEventPublisherConfiguration"/>
@@ -984,6 +1018,15 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="isPublisherProcessingEnabled">
+            <soap:operation soapAction="urn:isPublisherProcessingEnabled" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="getOutputAdapterConfigurationSchema">
             <soap:operation soapAction="urn:getOutputAdapterConfigurationSchema" style="document"/>
             <wsdl:input>
@@ -1040,6 +1083,15 @@
         </wsdl:operation>
         <wsdl:operation name="setTracingEnabled">
             <soap:operation soapAction="urn:setTracingEnabled" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setProcessingEnabled">
+            <soap:operation soapAction="urn:setProcessingEnabled" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -1230,6 +1282,15 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="isPublisherProcessingEnabled">
+            <soap12:operation soapAction="urn:isPublisherProcessingEnabled" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="getOutputAdapterConfigurationSchema">
             <soap12:operation soapAction="urn:getOutputAdapterConfigurationSchema" style="document"/>
             <wsdl:input>
@@ -1286,6 +1347,15 @@
         </wsdl:operation>
         <wsdl:operation name="setTracingEnabled">
             <soap12:operation soapAction="urn:setTracingEnabled" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setProcessingEnabled">
+            <soap12:operation soapAction="urn:setProcessingEnabled" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1476,6 +1546,15 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="isPublisherProcessingEnabled">
+            <http:operation location="isPublisherProcessingEnabled"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="getOutputAdapterConfigurationSchema">
             <http:operation location="getOutputAdapterConfigurationSchema"/>
             <wsdl:input>
@@ -1539,6 +1618,15 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="setProcessingEnabled">
+            <http:operation location="setProcessingEnabled"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="undeployActiveEventPublisherConfiguration">
             <http:operation location="undeployActiveEventPublisherConfiguration"/>
             <wsdl:input>
@@ -1560,13 +1648,13 @@
     </wsdl:binding>
     <wsdl:service name="EventPublisherAdminService">
         <wsdl:port name="EventPublisherAdminServiceHttpsSoap11Endpoint" binding="ns:EventPublisherAdminServiceSoap11Binding">
-            <soap:address location="https://192.168.122.1:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsSoap11Endpoint/"/>
+            <soap:address location="https://10.100.4.209:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsSoap11Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="EventPublisherAdminServiceHttpsSoap12Endpoint" binding="ns:EventPublisherAdminServiceSoap12Binding">
-            <soap12:address location="https://192.168.122.1:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsSoap12Endpoint/"/>
+            <soap12:address location="https://10.100.4.209:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsSoap12Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="EventPublisherAdminServiceHttpsEndpoint" binding="ns:EventPublisherAdminServiceHttpBinding">
-            <http:address location="https://192.168.122.1:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsEndpoint/"/>
+            <http:address location="https://10.100.4.209:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsEndpoint/"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

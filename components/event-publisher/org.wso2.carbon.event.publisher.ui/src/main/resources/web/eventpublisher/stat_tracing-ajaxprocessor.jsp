@@ -26,7 +26,6 @@
 
     String eventAdapterType = request.getParameter("eventPublisherName");
     String action = request.getParameter("action");
-
     if (eventAdapterType != null && action != null) {
         EventPublisherAdminServiceStub stub = EventPublisherUIUtils.getEventPublisherAdminService(config, session, request);
         if ("enableStat".equals(action)) {
@@ -37,7 +36,10 @@
             stub.setTracingEnabled(eventAdapterType, true);
         } else if ("disableTracing".equals(action)) {
             stub.setTracingEnabled(eventAdapterType, false);
+        }else if ("enableProcessing".equals(action)){
+            stub.setProcessingEnabled(eventAdapterType,true);
+        }else if("disableProcessing".equals(action)){
+            stub.setProcessingEnabled(eventAdapterType,false);
         }
     }
-
 %>

@@ -136,6 +136,7 @@ var ENABLE = "enable";
 var DISABLE = "disable";
 var STAT = "statistics";
 var TRACE = "Tracing";
+var PROCESS="processing";
 
 function deleteEventPublisher(eventPublisherName) {
     CARBON.showConfirmationDialog(
@@ -163,6 +164,7 @@ function disablePublisherStat(eventPublisherName) {
 }
 
 function enablePublisherStat(eventPublisherName) {
+
     jQuery.ajax({
                     type:'POST',
                     url:'../eventpublisher/stat_tracing-ajaxprocessor.jsp',
@@ -175,8 +177,41 @@ function enablePublisherStat(eventPublisherName) {
                         CARBON.showErrorDialog('<fmt:message key="stat.enable.error"/>' +
                                                ' ' + eventPublisherName);
                     }
+          });
+}
+
+
+function enablePublisherProcessing(eventPublisherName){
+
+    jQuery.ajax({
+
+                 type:'POST',
+                 url:'../eventpublisher/stat_tracing-ajaxprocessor.jsp',
+                 data:'eventPublisherName=' + eventPublisherName + '&action=enableProcessing',
+                 async:false,
+                 success:function (msg) {
+
+                        handleCallback(eventPublisherName, ENABLE, PROCESS);
+                 }
                 });
 }
+
+
+function disablePublisherProcessing(eventPublisherName){
+
+    jQuery.ajax({
+
+                    type:'POST',
+                    url:'../eventpublisher/stat_tracing-ajaxprocessor.jsp',
+                    data:'eventPublisherName=' + eventPublisherName + '&action=disableProcessing',
+                    async:false,
+                    success:function (msg) {
+
+                        handleCallback(eventPublisherName, DISABLE, PROCESS);
+                    }
+                });
+}
+
 
 function handleCallback(eventPublisherName, action, type) {
     var element;
@@ -186,11 +221,16 @@ function handleCallback(eventPublisherName, action, type) {
             element.style.display = "";
             element = document.getElementById("enableStat" + eventPublisherName);
             element.style.display = "none";
-        } else {
+        } else if (type=="Tracing"){
             element = document.getElementById("disableTracing" + eventPublisherName);
             element.style.display = "";
             element = document.getElementById("enableTracing" + eventPublisherName);
             element.style.display = "none";
+        }else if(type=="processing"){
+            element=document.getElementById("disableProcessing"+ eventPublisherName);
+            element.style.display="";
+            element=document.getElementById("enableProcessing"+eventPublisherName);
+            element.style.display="none";
         }
     } else {
         if (type == "statistics") {
@@ -198,13 +238,18 @@ function handleCallback(eventPublisherName, action, type) {
             element.style.display = "none";
             element = document.getElementById("enableStat" + eventPublisherName);
             element.style.display = "";
-        } else {
+        } else if (type=="Tracing"){
             element = document.getElementById("disableTracing" + eventPublisherName);
             element.style.display = "none";
             element = document.getElementById("enableTracing" + eventPublisherName);
             element.style.display = "";
-        }
+        }else if(type=="processing"){
+            element=document.getElementById("disableProcessing"+ eventPublisherName);
+            element.style.display="none";
+            element=document.getElementById("enableProcessing"+eventPublisherName);
+            element.style.display="";
     }
+}
 }
 
 function enablePublisherTracing(eventPublisherName) {

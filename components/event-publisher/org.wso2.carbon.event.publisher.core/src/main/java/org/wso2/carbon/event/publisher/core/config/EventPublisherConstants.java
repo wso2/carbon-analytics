@@ -74,6 +74,7 @@ public final class EventPublisherConstants {
     public static final String REGISTRY_CONF_PREFIX = "conf:/";
     public static final String REGISTRY_GOVERNANCE_PREFIX = "gov:/";
     public static final String EF_ATTR_TRACE_ENABLED = "trace";
+    public static final String EF_ATTR_PROCESSING = "processing";
     public static final String EF_ATTR_STATISTICS_ENABLED = "statistics";
     public static final String ENABLE_CONST = "enable";
     public static final String TM_VALUE_DISABLE = "disable";

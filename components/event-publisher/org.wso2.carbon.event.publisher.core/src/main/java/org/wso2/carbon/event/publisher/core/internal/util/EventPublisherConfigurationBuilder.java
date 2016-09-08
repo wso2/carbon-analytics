@@ -73,6 +73,13 @@ public class EventPublisherConfigurationBuilder {
             eventPublisherConfigElement.addAttribute(EventPublisherConstants.EF_ATTR_TRACE_ENABLED, EventPublisherConstants.TM_VALUE_DISABLE, null);
         }
 
+
+        if (eventPublisherConfiguration.isProcessingEnabled()) {
+            eventPublisherConfigElement.addAttribute(EventPublisherConstants.EF_ATTR_PROCESSING, EventPublisherConstants.ENABLE_CONST, null);
+        } else {
+            eventPublisherConfigElement.addAttribute(EventPublisherConstants.EF_ATTR_PROCESSING, EventPublisherConstants.TM_VALUE_DISABLE, null);
+        }
+
         //From properties - Stream Name and version
         OMElement fromOMElement = factory.createOMElement(new QName(
                 EventPublisherConstants.EF_ELEMENT_FROM));
@@ -97,7 +104,7 @@ public class EventPublisherConfigurationBuilder {
             properties.putAll(eventPublisherConfiguration.getToAdapterDynamicProperties());
         }
         for (Map.Entry<String, String> propertyEntry : properties.entrySet()) {
-            if(propertyEntry.getValue() != null){
+            if (propertyEntry.getValue() != null) {
                 OMElement propertyElement = factory.createOMElement(new QName(
                         EventPublisherConstants.EF_ELE_PROPERTY));
                 propertyElement.declareDefaultNamespace(EventPublisherConstants.EF_CONF_NS);
@@ -129,6 +136,8 @@ public class EventPublisherConfigurationBuilder {
 
         boolean traceEnabled = false;
         boolean statisticsEnabled = false;
+        boolean processingEnabled = true;
+
         String traceEnabledAttribute = eventPublisherConfigOMElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_TRACE_ENABLED));
         if (traceEnabledAttribute != null && traceEnabledAttribute.equalsIgnoreCase(EventPublisherConstants.ENABLE_CONST)) {
             traceEnabled = true;
@@ -136,6 +145,11 @@ public class EventPublisherConfigurationBuilder {
         String statisticsEnabledAttribute = eventPublisherConfigOMElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_STATISTICS_ENABLED));
         if (statisticsEnabledAttribute != null && statisticsEnabledAttribute.equalsIgnoreCase(EventPublisherConstants.ENABLE_CONST)) {
             statisticsEnabled = true;
+        }
+
+        String processingEnabledAttribute = eventPublisherConfigOMElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_PROCESSING));
+        if (processingEnabledAttribute != null && processingEnabledAttribute.equalsIgnoreCase(EventPublisherConstants.TM_VALUE_DISABLE)) {
+            processingEnabled = false;
         }
 
         EventPublisherConfiguration eventPublisherConfiguration = new EventPublisherConfiguration();
@@ -200,9 +214,9 @@ public class EventPublisherConfigurationBuilder {
             toStreamVersion = toOMElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_VERSION));
         }
 
-        if(toStreamName == null || toStreamName.isEmpty() || toStreamVersion == null ||toStreamVersion.isEmpty()){
+        if (toStreamName == null || toStreamName.isEmpty() || toStreamVersion == null || toStreamVersion.isEmpty()) {
             outputEventAdapterConfiguration.setOutputStreamIdOfWso2eventMessageFormat(fromStreamName + EventPublisherConstants.STREAM_ID_SEPERATOR + fromStreamVersion);
-        }else{
+        } else {
             outputEventAdapterConfiguration.setOutputStreamIdOfWso2eventMessageFormat(toStreamName + EventPublisherConstants.STREAM_ID_SEPERATOR + toStreamVersion);
         }
 
@@ -255,6 +269,7 @@ public class EventPublisherConfigurationBuilder {
         eventPublisherConfiguration.setToAdapterConfiguration(outputEventAdapterConfiguration);
         eventPublisherConfiguration.setToAdapterDynamicProperties(dynamicProperties);
         eventPublisherConfiguration.setEditable(isEditable);
+        eventPublisherConfiguration.setProcessEnabled(processingEnabled);
         return eventPublisherConfiguration;
 
     }
