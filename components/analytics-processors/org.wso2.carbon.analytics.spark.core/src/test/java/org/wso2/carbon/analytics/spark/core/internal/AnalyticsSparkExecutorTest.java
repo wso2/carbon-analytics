@@ -37,6 +37,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import javax.naming.NamingException;
@@ -569,7 +570,7 @@ public class AnalyticsSparkExecutorTest {
         System.out.println(testString("end : test Time stamp retrievability"));
     }
 
-    @Test(expectedExceptions = SparkException.class)
+    @Test(expectedExceptions = {SparkException.class, AnalyticsException.class})
     public void testFaultyTimestampUDFException() throws AnalyticsException, InterruptedException {
         System.out.println(testString("start : Faulty Timestamp exception test"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
