@@ -707,22 +707,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         return partitionCount;
     }
 
-//    public int getSparkExecutorCountLocal() throws AnalyticsClusterException {
-//        if (acm.isClusteringEnabled()) {
-//            int workerCores = this.sparkConf.getInt("spark.worker.cores", -1);
-//            if (workerCores == -1) {
-//                throw new AnalyticsClusterException("Worker cores have not specified " +
-//                                                    "in the spark-defaults.conf");
-//            }
-//            int executorCoresPerApp = this.sparkConf.getInt("spark.executor.cores", workerCores);
-//            int maxCores = this.sparkConf.getInt("spark.cores.max", Integer.MAX_VALUE);
-//
-//            this.sqlCtx.sparkContext().get
-//        } else {
-//            return getWorkerCount();
-//        }
-//    }
-
     public AnalyticsQueryResult executeQuery(int tenantId, String query)
             throws AnalyticsExecutionException {
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
@@ -777,7 +761,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 return toResult(result);
             } catch (Throwable e) {
                 success = false;
-                throw e;
+                throw new AnalyticsExecutionException("Exception in executing query " + origQuery, e);
             } finally {
                 long end = System.currentTimeMillis();
                 if (ServiceHolder.isAnalyticsStatsEnabled()) {
