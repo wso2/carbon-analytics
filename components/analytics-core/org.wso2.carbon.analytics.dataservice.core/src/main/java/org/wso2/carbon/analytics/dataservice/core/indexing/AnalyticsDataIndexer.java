@@ -682,42 +682,6 @@ public class AnalyticsDataIndexer {
     }
   }
 
-    /*public List<AnalyticsDrillDownRange> getAnalyticsDrillDownRanges(int tenantId,
-                                                                      AnalyticsDrillDownRequest drillDownRequest,
-                                                                      IndexReader indexReader)
-            throws AnalyticsIndexException, org.apache.lucene.queryparser.classic.ParseException,
-                   IOException {
-        IndexSearcher searcher = new IndexSearcher(indexReader);
-        List<AnalyticsDrillDownRange> drillDownRanges = new ArrayList<>();
-        drillDownRanges.addAll(drillDownRequest.getRanges());
-        Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
-        Query indexQuery = new MatchAllDocsQuery();
-        FacetsCollector fc = new FacetsCollector();
-        if (drillDownRequest.getQuery() != null && !drillDownRequest.getQuery().isEmpty()) {
-            Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
-            indexQuery = new AnalyticsQueryParser(analyzer,
-                                                  indices).parse(drillDownRequest.getQuery());
-        }
-        FacetsCollector.search(searcher, indexQuery, Integer.MAX_VALUE, fc);
-        DoubleRange[] ranges = this.createRangeBuckets(drillDownRanges);
-        ValueSource valueSource = this.getCompiledScoreFunction(drillDownRequest.getScoreFunction(), indices);
-        Facets facets = null;
-        if (indices.keySet().contains(drillDownRequest.getRangeField())) {
-            if (indices.get(drillDownRequest.getRangeField()).isScoreParam()) {
-                facets = new DoubleRangeFacetCounts(drillDownRequest.getRangeField(), valueSource, fc, ranges);
-            }
-        }
-        if (facets == null) {
-            facets = new DoubleRangeFacetCounts(drillDownRequest.getRangeField(), fc, ranges);
-        }
-        FacetResult facetResult = facets.getTopChildren(Integer.MAX_VALUE, drillDownRequest.getRangeField());
-        for (int i = 0; i < drillDownRanges.size(); i++) {
-            AnalyticsDrillDownRange range = drillDownRanges.get(i);
-            range.setScore(facetResult.labelValues[i].value.doubleValue());
-        }
-        return drillDownRanges;
-    }*/
-
   public List<AnalyticsDrillDownRange> drillDownRangeCount(final int tenantId,
                                                            final AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
     if (drillDownRequest.getRangeField() == null) {
