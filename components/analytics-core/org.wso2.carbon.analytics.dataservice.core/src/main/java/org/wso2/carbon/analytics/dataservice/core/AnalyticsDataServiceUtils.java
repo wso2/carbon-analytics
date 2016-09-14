@@ -29,7 +29,6 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.ndatasource.core.DataSourceService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -57,7 +56,7 @@ public class AnalyticsDataServiceUtils {
     }
     
     private static Map<String, ColumnDefinitionExt> translate(Map<String, ColumnDefinition> colDefs) {
-        Map<String, ColumnDefinitionExt> result = new HashMap<>(colDefs.size());
+        Map<String, ColumnDefinitionExt> result = new LinkedHashMap<>(colDefs.size());
         for (Map.Entry<String, ColumnDefinition> colDef : colDefs.entrySet()) {
             result.put(colDef.getKey(), ColumnDefinitionExt.copy(colDef.getValue()));
         }

@@ -163,7 +163,13 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         String tableName = firstRecord.getTableName();
         String mergeSQL = this.getRecordMergeSQL(tenantId, tableName);
         if (mergeSQL != null) {
-            this.mergeRecordsSimilar(conn, records, tenantId, tableName, mergeSQL);
+            try {
+                this.mergeRecordsSimilar(conn, records, tenantId, tableName, mergeSQL);
+            } catch (SQLException e) {
+                /* merge has been failed, maybe because one of some constraint violations,
+                * lets try to sequentially insert/update */
+                this.insertAndUpdateRecordsSimilar(conn, records, tenantId, tableName);
+            }
         } else {
             this.insertAndUpdateRecordsSimilar(conn, records, tenantId, tableName);
         }
@@ -194,7 +200,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         stmt.setString(4, record.getId());
     }
     
-    private void mergeRecordsSimilar(Connection conn, 
+    private void mergeRecordsSimilar(Connection conn,
             List<Record> records, int tenantId, String tableName, String query) 
             throws SQLException, AnalyticsException, AnalyticsTableNotAvailableException {
         PreparedStatement stmt = null;
@@ -205,7 +211,9 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
                 stmt.addBatch();
             }
             stmt.executeBatch();
+            conn.commit();
         } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
             if (!this.tableExists(conn, tenantId, tableName)) {
                 throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {

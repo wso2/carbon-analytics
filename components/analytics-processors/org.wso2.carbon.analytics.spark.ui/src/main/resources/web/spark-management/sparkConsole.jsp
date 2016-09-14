@@ -96,6 +96,14 @@
                         );
 
                         $.register_command(
+                                'with',
+                                'Execute a Spark SQL with query\n' +
+                                'Ex: with q1 as (select * from students_table) select * from q1',
+                                'WITH [sql query]',
+                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
+                        );
+
+                        $.register_command(
                                 'insert',
                                 'Inserts data into tables. These tables needs to be created before inserting.\n' +
                                 'Ex: insert into table temp_table select * from students_table',

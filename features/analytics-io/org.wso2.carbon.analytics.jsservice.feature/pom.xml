@@ -20,7 +20,7 @@
     <parent>
         <artifactId>analytics-io-feature</artifactId>
         <groupId>org.wso2.carbon.analytics</groupId>
-        <version>1.2.4-SNAPSHOT</version>
+        <version>1.2.7-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -49,6 +49,32 @@
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>src/main/resources</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>resources</directory>
+                                    <includes>
+                                        <include>p2.inf</include>
+                                        <include>build.properties</include>
+                                        <include>analytics.jag</include>
+                                        <include>carbon-analytics.js</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>

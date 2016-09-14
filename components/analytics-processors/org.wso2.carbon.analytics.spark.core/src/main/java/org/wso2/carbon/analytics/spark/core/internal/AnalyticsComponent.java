@@ -30,6 +30,7 @@ import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 import org.wso2.carbon.analytics.spark.core.interfaces.SparkContextService;
 import org.wso2.carbon.analytics.spark.core.internal.jmx.AnalyticsScriptLastExecutionStartTime;
 import org.wso2.carbon.analytics.spark.core.internal.jmx.IncrementalLastProcessedTimestamp;
+import org.wso2.carbon.analytics.spark.core.udf.CarbonUDAF;
 import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.utils.ComputeClasspath;
@@ -60,6 +61,8 @@ import java.net.SocketException;
  * cardinality="1..1" policy="dynamic" bind="setTenantRegistryLoader" unbind="unsetTenantRegistryLoader"
  * @scr.reference name="carbon.udf" interface="org.wso2.carbon.analytics.spark.core.udf.CarbonUDF"
  * cardinality="0..n" policy="dynamic" bind="addCarbonUDF" unbind="removeCarbonUDFs"
+ * @scr.reference name="carbon.udaf" interface="org.wso2.carbon.analytics.spark.core.udf.CarbonUDAF"
+ * cardinality="0..n" policy="dynamic" bind="addCarbonUDAF" unbind="removeCarbonUDAF"
  */
 public class AnalyticsComponent {
 
@@ -183,6 +186,23 @@ public class AnalyticsComponent {
         }
     }
 
+    protected void addCarbonUDAF(CarbonUDAF carbonUDAF) {
+        try {
+            if (ServiceHolder.getAnalyticskExecutor() != null) {
+                ServiceHolder.getAnalyticskExecutor().registerUDAFFromOSGIComponent(carbonUDAF);
+            } else {
+                ServiceHolder.addCarbonUDAFs(carbonUDAF);
+            }
+            addCarbonUDFJarToSparkClasspath(carbonUDAF.getClass());
+        } catch (AnalyticsUDFException e) {
+            log.error("Error while registering UDFs from OSGI components: " + e.getMessage(), e);
+        }
+    }
+
+    protected void removeCarbonUDAF(CarbonUDAF carbonUDAF) {
+        ServiceHolder.removeCarbonUDAF(carbonUDAF);
+    }
+
     @SuppressWarnings("rawtypes")
     private void addCarbonUDFJarToSparkClasspath(Class carbonUDFClass) {
         String[] jarPath = carbonUDFClass.getProtectionDomain().getCodeSource().getLocation().getPath()
@@ -192,7 +212,7 @@ public class AnalyticsComponent {
     }
 
     protected void removeCarbonUDFs(CarbonUDF carbonUDF) {
-        ServiceHolder.removeCarbonUDFs();
+        ServiceHolder.removeCarbonUDFs(carbonUDF);
     }
 
     private void checkAnalyticsEnabled() {

@@ -31,6 +31,7 @@ import org.apache.spark.serializer.KryoSerializer;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.expressions.UserDefinedAggregateFunction;
 import org.apache.spark.sql.jdbc.carbon.AnalyticsJDBCRelationProvider;
 import org.apache.spark.util.Utils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
@@ -42,13 +43,20 @@ import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionCall;
-import org.wso2.carbon.analytics.spark.core.deploy.*;
+import org.wso2.carbon.analytics.spark.core.deploy.AnalyticsPersistenceEngine;
+import org.wso2.carbon.analytics.spark.core.deploy.AnalyticsRecoveryModeFactory;
+import org.wso2.carbon.analytics.spark.core.deploy.CheckElectedLeaderExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.ElectLeaderExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.InitClientExecutionCall;
+import org.wso2.carbon.analytics.spark.core.deploy.StartWorkerExecutionCall;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsRelationProvider;
 import org.wso2.carbon.analytics.spark.core.sources.CompressedEventAnalyticsRelationProvider;
 import org.wso2.carbon.analytics.spark.core.udf.AnalyticsUDFsRegister;
+import org.wso2.carbon.analytics.spark.core.udf.CarbonUDAF;
 import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
+import org.wso2.carbon.analytics.spark.core.udf.config.CustomUDAF;
 import org.wso2.carbon.analytics.spark.core.udf.config.UDFConfiguration;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
@@ -57,7 +65,6 @@ import org.wso2.carbon.analytics.spark.core.util.SparkTableNamesHolder;
 import org.wso2.carbon.analytics.spark.utils.ComputeClasspath;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.CarbonUtils;
-import scala.None$;
 import scala.Option;
 import scala.Tuple2;
 
@@ -68,7 +75,15 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -210,6 +225,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             this.startMaster();
         }
 
+        if (acm.getMembers(CLUSTER_GROUP_NAME).size() == 0) {
+            log.info("Analytics Execution cluster is empty. Hence cleaning up Spark meta data...");
+            cleanupSparkMetaTable();
+        }
+
         acm.joinGroup(CLUSTER_GROUP_NAME, this);
         log.info("Member joined the Carbon Analytics Execution cluster : " + localMember);
 
@@ -224,6 +244,14 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             log.info("Redundant master count reached. Starting Spark client app in " +
                      "the carbon cluster master...");
             this.initializeAnalyticsClient();
+        }
+    }
+
+    private void cleanupSparkMetaTable() throws AnalyticsClusterException {
+        try {
+            AnalyticsPersistenceEngine.cleanupSparkMetaTable();
+        } catch (AnalyticsException e) {
+            throw new AnalyticsClusterException("Unable to cleanup the Spark Meta table", e);
         }
     }
 
@@ -299,6 +327,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private void initializeSqlContext(JavaSparkContext jsc) throws AnalyticsUDFException {
         this.sqlCtx = new SQLContext(jsc);
         registerUDFs(this.sqlCtx);
+        registerUDAFs(this.sqlCtx);
     }
 
     public void registerUDFFromOSGIComponent(CarbonUDF carbonUDF) throws AnalyticsUDFException {
@@ -313,6 +342,40 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             }
         } else {
             ServiceHolder.addCarbonUDFs(carbonUDF);
+        }
+    }
+
+    public void registerUDAFFromOSGIComponent(CarbonUDAF carbonUDAF) throws AnalyticsUDFException {
+        if (this.sqlCtx != null) {
+            AnalyticsUDFsRegister analyticsUDFsRegister = AnalyticsUDFsRegister.getInstance();
+            String name = carbonUDAF.getAlias();
+            Class<? extends UserDefinedAggregateFunction> clazz = carbonUDAF.getClass();
+            analyticsUDFsRegister.registerUDAF(name, clazz, sqlCtx);
+        } else {
+            ServiceHolder.addCarbonUDAFs(carbonUDAF);
+        }
+    }
+
+    private void registerUDAFs(SQLContext sqlCtx) throws AnalyticsUDFException {
+        Map<String, Class<? extends UserDefinedAggregateFunction>> udafMap = new HashMap<>();
+        if (this.udfConfiguration.getCustomUDAFs() != null && !this.udfConfiguration.getCustomUDAFs().isEmpty()) {
+            for (CustomUDAF udaf : this.udfConfiguration.getCustomUDAFs()) {
+                try {
+                    if (!udaf.getAlias().isEmpty() && !udaf.getImplClass().isEmpty()) {
+                        Class<? extends UserDefinedAggregateFunction> clazz = Class.forName(udaf.getImplClass()).asSubclass(UserDefinedAggregateFunction.class);
+                        udafMap.put(udaf.getAlias(), clazz);
+                    }
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (!ServiceHolder.getCarbonUDAFs().isEmpty()) {
+            udafMap.putAll(ServiceHolder.getCarbonUDAFs());
+        }
+        AnalyticsUDFsRegister udafRegister = AnalyticsUDFsRegister.getInstance();
+        for (String udaf : udafMap.keySet()) {
+            udafRegister.registerUDAF(udaf, udafMap.get(udaf), sqlCtx);
         }
     }
 
@@ -358,7 +421,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             int port = this.sparkConf.getInt(AnalyticsConstants.SPARK_MASTER_PORT, 7077 + this.portOffset);
             int webUiPort = this.sparkConf.getInt(AnalyticsConstants.SPARK_MASTER_WEBUI_PORT, 8081 + this.portOffset);
 
-            Master.startSystemAndActor(host, port, webUiPort, this.sparkConf);
+            Master.startRpcEnvAndEndpoint(host, port, webUiPort, this.sparkConf);
 
             log.info("Started SPARK MASTER in spark://" + host + ":" + port + " with webUI port : " + webUiPort);
 
@@ -449,9 +512,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             String[] masters = this.getSparkMastersFromCluster();
             String workerDir = getStringFromSparkConf(AnalyticsConstants.SPARK_WORKER_DIR, "work");
 
-            Worker.startSystemAndActor(workerHost, workerPort, workerUiPort, workerCores,
-                                       Utils.memoryStringToMb(workerMemory), masters, workerDir,
-                                       (Option) None$.MODULE$, this.sparkConf);
+            Worker.startRpcEnvAndEndpoint(workerHost, workerPort, workerUiPort, workerCores,
+                                          Utils.memoryStringToMb(workerMemory), masters, workerDir,
+                                          Option.empty(), this.sparkConf);
 
             log.info("Started SPARK WORKER in " + workerHost + ":" + workerPort + " with webUI port "
                      + workerUiPort + " with Masters " + Arrays.toString(masters));
@@ -599,6 +662,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         } catch (NoSuchElementException e) {
             conf.set("spark.driver.extraClassPath", sparkClasspath);
         }
+
+        conf.setIfMissing(AnalyticsConstants.CARBON_INSERT_BATCH_SIZE, AnalyticsConstants.MAX_RECORDS);
     }
 
     private String getLog4jPropertiesJvmOpt(String analyticsSparkConfDir) {
@@ -641,22 +706,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         return partitionCount;
     }
-
-//    public int getSparkExecutorCountLocal() throws AnalyticsClusterException {
-//        if (acm.isClusteringEnabled()) {
-//            int workerCores = this.sparkConf.getInt("spark.worker.cores", -1);
-//            if (workerCores == -1) {
-//                throw new AnalyticsClusterException("Worker cores have not specified " +
-//                                                    "in the spark-defaults.conf");
-//            }
-//            int executorCoresPerApp = this.sparkConf.getInt("spark.executor.cores", workerCores);
-//            int maxCores = this.sparkConf.getInt("spark.cores.max", Integer.MAX_VALUE);
-//
-//            this.sqlCtx.sparkContext().get
-//        } else {
-//            return getWorkerCount();
-//        }
-//    }
 
     public AnalyticsQueryResult executeQuery(int tenantId, String query)
             throws AnalyticsExecutionException {
@@ -710,9 +759,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                                                             this.sparkConf.get(AnalyticsConstants.SPARK_SCHEDULER_POOL));
                 DataFrame result = this.sqlCtx.sql(query);
                 return toResult(result);
-            } catch (Throwable e){
+            } catch (Throwable e) {
                 success = false;
-                throw e;
+                throw new AnalyticsExecutionException("Exception in executing query " + origQuery, e);
             } finally {
                 long end = System.currentTimeMillis();
                 if (ServiceHolder.isAnalyticsStatsEnabled()) {
@@ -871,6 +920,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                                 AnalyticsJDBCRelationProvider.class.getName());
         this.addShorthandString(AnalyticsConstants.COMPRESSED_EVENT_ANALYTICS_SHORTHAND,
                                 CompressedEventAnalyticsRelationProvider.class.getName());
+        this.addShorthandString(AnalyticsConstants.SPARK_EVENTS_SHORTHAND_STRING,
+                                "org.wso2.carbon.analytics.spark.event.EventStreamProvider");
+        // NOTE: Had to put the name string here, otherwise it creates a circular dependency
     }
 
     private void addShorthandString(String shorthand, String className) {

@@ -2249,7 +2249,7 @@ public class AnalyticsDataIndexer {
         private void addAllCategoriesToSet(String[] parent, int localAggregateLevel, Set<List<String>> uniqueGroups)
                 throws IOException, AnalyticsException {
             TaxonomyReader taxonomyReader = new DirectoryTaxonomyReader(indexer.lookupTaxonomyIndexWriter(shardId, tableId));
-            IndexReader indexReader = DirectoryReader.open(indexer.lookupIndexWriter(shardId, tableId), true);
+            IndexReader indexReader = DirectoryReader.open(indexer.lookupIndexWriter(shardId, tableId), true, true);
             CategoryDrillDownRequest request = new CategoryDrillDownRequest();
             request.setFieldName(aggregateRequest.getGroupByField());
             request.setPath(parent);

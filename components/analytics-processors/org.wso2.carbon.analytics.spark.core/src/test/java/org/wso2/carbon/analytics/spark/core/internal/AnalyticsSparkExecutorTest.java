@@ -37,6 +37,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import javax.naming.NamingException;
@@ -55,6 +56,25 @@ public class AnalyticsSparkExecutorTest {
 
     private static final Log log = LogFactory.getLog(AnalyticsSparkExecutorTest.class);
     private AnalyticsDataService service;
+
+    @BeforeClass
+    public void setup() throws NamingException, AnalyticsException, IOException {
+        GenericUtils.clearGlobalCustomDataSourceRepo();
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
+        AnalyticsServiceHolder.setHazelcastInstance(null);
+        AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
+        System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
+        this.service = ServiceHolder.getAnalyticsDataService();
+        ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor("localhost", 0));
+        ServiceHolder.getAnalyticskExecutor().initializeSparkServer();
+    }
+
+    @AfterClass
+    public void done() throws NamingException, AnalyticsException, IOException {
+        ServiceHolder.getAnalyticskExecutor().stop();
+        this.service.destroy();
+        System.clearProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP);
+    }
 
     @Test
     public void testCreateTableQuery() throws AnalyticsException {
@@ -97,7 +117,7 @@ public class AnalyticsSparkExecutorTest {
         ex.executeQuery(1, "CREATE TEMPORARY TABLE EventsTable USING CompressedEventAnalytics " +
                            "OPTIONS(tableName \"CompressedEventsTable\", schema \"messageFlowId STRING, compotentType STRING, " +
                            "componentName STRING, compotentIndex INT, componentId STRING, startTime LONG, endTime LONG, " +
-                           "duration FLOAT, beforePayload STRING, afterPayload STRING, contextPropertyMap STRING, " +
+                           "duration LONG, beforePayload STRING, afterPayload STRING, contextPropertyMap STRING, " +
                            "transportPropertyMap STRING, children STRING, entryPoint STRING, entryPointHashcode INT, faultCount INT," +
                            " hashCode INT, host STRING, _tenantId INT, _timestamp LONG\", " +
                            "incrementalParams \"EventsTable, SECOND\")");
@@ -149,30 +169,6 @@ public class AnalyticsSparkExecutorTest {
         log.info(testString("end : create temp table using Compressed Event Analytics test"));
     }
 
-    private List<Record> generateRecordsForCompressedEventAnalytics(int tenantId, String tableName,
-                                                                    boolean generateRecordIds) throws Exception {
-        List<Record> result = new ArrayList<>();
-        Map<String, Object> values;
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        String[] sampleData;
-        try {
-            sampleData = IOUtils.toString(classLoader.getResourceAsStream("sample-data/CompressedEventData"))
-                    .split("\n");
-        } catch (IOException e) {
-            throw new AnalyticsException(e.getMessage());
-        }
-        long timeTmp = System.currentTimeMillis();
-        for (String aSampleData : sampleData) {
-            values = new HashMap<>();
-            String[] fields = aSampleData.split(",", 2);
-            values.put("meta_compressed", Boolean.parseBoolean(fields[0]));
-            values.put("flowData", fields[1]);
-            timeTmp =  timeTmp + 5000;
-            result.add(new Record(generateRecordIds ? GenericUtils.generateRecordID() : null, tenantId, tableName,
-                                  values, timeTmp));
-        }
-        return result;
-    }
 
     @Test
     public void testExecutionInsertQuery() throws AnalyticsException {
@@ -309,6 +305,28 @@ public class AnalyticsSparkExecutorTest {
         Assert.assertEquals(result.getRows().get(0).get(0), 4);
         System.out.println(result.getRows().get(0).get(0));
         System.out.println(testString("end : spark udf test"));
+    }
+
+    @Test
+    public void testSparkUdafTest() throws AnalyticsException, InterruptedException {
+        System.out.println(testString("start : spark udaf test"));
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        this.service.deleteTable(1, "Log5");
+        String query = "CREATE TEMPORARY TABLE Log5 USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Log5\"," +
+                "schema \"member DOUBLE\"" +
+                ")";
+        ex.executeQuery(1, query);
+        for (int i = 1; i < 6; i++) {
+            ex.executeQuery(1, "INSERT INTO TABLE Log5 SELECT " + Math.pow(2, i));
+        }
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT geometricMean(member) FROM Log5");
+        Assert.assertEquals(Math.round(Double.parseDouble(result.getRows().get(0).get(0).toString())), 8L);
+        AnalyticsQueryResult result2 = ex.executeQuery(1, "SELECT harmonicMean(member) FROM Log5");
+        Assert.assertEquals(Math.round(Double.parseDouble(result2.getRows().get(0).get(0).toString()) * 100.0) / 100.0, 5.16);
+        this.cleanupTable(1, "Log5");
+        System.out.println(testString("end : spark udaf test"));
     }
 
     @Test
@@ -552,7 +570,7 @@ public class AnalyticsSparkExecutorTest {
         System.out.println(testString("end : test Time stamp retrievability"));
     }
 
-    @Test(expectedExceptions = SparkException.class)
+    @Test(expectedExceptions = {SparkException.class, AnalyticsException.class})
     public void testFaultyTimestampUDFException() throws AnalyticsException, InterruptedException {
         System.out.println(testString("start : Faulty Timestamp exception test"));
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
@@ -573,29 +591,6 @@ public class AnalyticsSparkExecutorTest {
         this.service.deleteTable(1, "Log8");
         System.out.println(testString("end : Faulty Timestamp exception test"));
     }
-
-//    @Test
-//    public void testCreateTableQuerySchemaInLine() throws AnalyticsException {
-//        System.out.println(testString("start : create temp table test"));
-//        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
-//        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
-//        this.service.deleteTable(1, "Log");
-//        this.service.createTable(1, "Log");
-//        this.service.put(records);
-//        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log (server_name STRING, ip STRING, tenant INTEGER, sequence LONG, summary STRING) " +
-//                           "USING CarbonAnalytics " +
-//                           "OPTIONS" +
-//                           "(tableName \"Log\"" +
-//                           ")");
-//        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT ip FROM Log");
-//        Assert.assertEquals(result.getRows().size(), 10);
-//        System.out.println(result);
-//        result = ex.executeQuery(1, "SELECT * FROM Log");
-//        Assert.assertEquals(result.getRows().size(), 10);
-//        System.out.println(result);
-//        this.service.deleteTable(1, "Log");
-//        System.out.println(testString("end : create temp table test"));
-//    }
 
     @Test
     public void testCreateTableWithNoSchema() throws AnalyticsException {
@@ -743,11 +738,11 @@ public class AnalyticsSparkExecutorTest {
         service.put(records);
 
         List<ColumnDefinition> cols = new ArrayList<>();
-        cols.add(new ColumnDefinition("server_name", AnalyticsSchema.ColumnType.STRING));
-        cols.add(new ColumnDefinition("ip", AnalyticsSchema.ColumnType.STRING));
-        cols.add(new ColumnDefinition("tenant", AnalyticsSchema.ColumnType.INTEGER));
-        cols.add(new ColumnDefinition("sequence", AnalyticsSchema.ColumnType.LONG));
-        cols.add(new ColumnDefinition("summary", AnalyticsSchema.ColumnType.LONG));
+        cols.add(new ColumnDefinition("server_name", ColumnType.STRING));
+        cols.add(new ColumnDefinition("ip", ColumnType.STRING));
+        cols.add(new ColumnDefinition("tenant", ColumnType.INTEGER));
+        cols.add(new ColumnDefinition("sequence", ColumnType.LONG));
+        cols.add(new ColumnDefinition("summary", ColumnType.STRING));
         this.service.setTableSchema(1, "Log10", new AnalyticsSchema(cols, Collections.<String>emptyList()));
         this.service.setTableSchema(1, "Log11", new AnalyticsSchema(cols, Collections.<String>emptyList()));
 
@@ -921,24 +916,40 @@ public class AnalyticsSparkExecutorTest {
         this.service.deleteTable(2, "StatsSummary");
     }
 
-    @BeforeClass
-    public void setup() throws NamingException, AnalyticsException, IOException {
-        GenericUtils.clearGlobalCustomDataSourceRepo();
-        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
-        AnalyticsServiceHolder.setHazelcastInstance(null);
-        AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
-        System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
-        this.service = ServiceHolder.getAnalyticsDataService();
-        ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor("localhost", 0));
-        ServiceHolder.getAnalyticskExecutor().initializeSparkServer();
+
+
+
+
+
+
+    //*************** util methods ********************************
+
+
+    private List<Record> generateRecordsForCompressedEventAnalytics(int tenantId, String tableName,
+                                                                    boolean generateRecordIds) throws Exception {
+        List<Record> result = new ArrayList<>();
+        Map<String, Object> values;
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        String[] sampleData;
+        try {
+            sampleData = IOUtils.toString(classLoader.getResourceAsStream("sample-data/CompressedEventData"))
+                    .split("\n");
+        } catch (IOException e) {
+            throw new AnalyticsException(e.getMessage());
+        }
+        long timeTmp = System.currentTimeMillis();
+        for (String aSampleData : sampleData) {
+            values = new HashMap<>();
+            String[] fields = aSampleData.split(",", 2);
+            values.put("meta_compressed", Boolean.parseBoolean(fields[0]));
+            values.put("flowData", fields[1]);
+            timeTmp =  timeTmp + 5000;
+            result.add(new Record(generateRecordIds ? GenericUtils.generateRecordID() : null, tenantId, tableName,
+                                  values, timeTmp));
+        }
+        return result;
     }
 
-    @AfterClass
-    public void done() throws NamingException, AnalyticsException, IOException {
-        ServiceHolder.getAnalyticskExecutor().stop();
-        this.service.destroy();
-        System.clearProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP);
-    }
 
     private String testString(String str) {
         return "\n************** " + str.toUpperCase() + " **************\n";
@@ -954,6 +965,4 @@ public class AnalyticsSparkExecutorTest {
     private void cleanupIncrementalTable() throws AnalyticsException {
         this.cleanupTable(-5000, "__analytics_incremental_meta_table");
     }
-
-
 }

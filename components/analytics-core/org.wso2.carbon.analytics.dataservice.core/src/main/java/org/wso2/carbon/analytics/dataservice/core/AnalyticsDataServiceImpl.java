@@ -154,6 +154,11 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         indexerInfo.setIndexWorkerCount(this.extractIndexWorkerCount(config));
         indexerInfo.setIndexCommunicatorBufferSize(config.getMaxIndexerCommunicatorBufferSize());
         indexerInfo.setIndexQueueCleanupThreshold(config.getQueueCleanupThreshold());
+        if (config.getTaxonomyWriterCacheConfiguration() != null) {
+            indexerInfo.setTaxonomyWriterCacheType(config.getTaxonomyWriterCacheConfiguration().getCacheType());
+            indexerInfo.setTaxonomyWriterLRUCacheType(config.getTaxonomyWriterCacheConfiguration().getLRUType());
+            indexerInfo.setTaxonomyWriterLRUCacheSize(config.getTaxonomyWriterCacheConfiguration().getCacheSize());
+        }
         this.indexer = new AnalyticsDataIndexer(indexerInfo);
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();

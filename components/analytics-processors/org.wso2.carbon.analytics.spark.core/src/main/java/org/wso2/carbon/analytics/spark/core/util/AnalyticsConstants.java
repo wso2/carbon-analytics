@@ -89,14 +89,16 @@ public class AnalyticsConstants {
     public static final String DEFAULT_PROCESSED_DATA_STORE_NAME = "PROCESSED_DATA_STORE";
     public static final String SPARK_SHORTHAND_STRING = "CarbonAnalytics";
     public static final String SPARK_JDBC_SHORTHAND_STRING = "CarbonJDBC";
+    public static final String SPARK_EVENTS_SHORTHAND_STRING = "CarbonEvents";
     public static final String TENANT_ID_AND_TABLES_MAP = "tenantIdTablesMap";
-    public static final int MAX_RECORDS = 1000;
+    public static final String MAX_RECORDS = "1000";
 
 
     //Carbon Spark properties strings
     public static final String CARBON_SPARK_MASTER_COUNT = "carbon.spark.master.count";
     public static final String CARBON_SPARK_MASTER = "carbon.spark.master";
     public static final String CARBON_DAS_SYMBOLIC_LINK = "carbon.das.symbolic.link";
+    public static final String CARBON_INSERT_BATCH_SIZE = "carbon.insert.batch.size";
 
     public static final int SPARK_PERSISTENCE_TENANT_ID = -5000;
     public static final String SPARK_MASTER_MAP = "__SPARK_MASTER_MAP__";

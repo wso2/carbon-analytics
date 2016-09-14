@@ -18,11 +18,13 @@
 package org.wso2.carbon.analytics.spark.core.internal;
 
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.expressions.UserDefinedAggregateFunction;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsIncrementalMetaStore;
+import org.wso2.carbon.analytics.spark.core.udf.CarbonUDAF;
 import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.ntask.common.TaskException;
@@ -61,6 +63,8 @@ public class ServiceHolder {
     private static SparkAnalyticsExecutor analyticskExecutor;
 
     private static Map<String, CarbonUDF> carbonUDFs = new HashMap<>();
+
+    private static Map<String, Class<? extends UserDefinedAggregateFunction>> carbonUDAFs = new HashMap<>();
 
     private static boolean analyticsExecutionEnabled = true;
 
@@ -171,12 +175,24 @@ public class ServiceHolder {
         ServiceHolder.carbonUDFs.put(carbonUDF.getClass().getName(), carbonUDF);
     }
 
-    public static void removeCarbonUDFs() {
-        ServiceHolder.carbonUDFs = null;
+    public static void removeCarbonUDFs(CarbonUDF carbonUDF) {
+        ServiceHolder.carbonUDFs.remove(carbonUDF.getClass().getName());
     }
 
     public static Map<String, CarbonUDF> getCarbonUDFs() {
         return ServiceHolder.carbonUDFs;
+    }
+
+    public static void addCarbonUDAFs(CarbonUDAF carbonUDAF) {
+        ServiceHolder.carbonUDAFs.put(carbonUDAF.getAlias(), carbonUDAF.getClass());
+    }
+
+    public static void removeCarbonUDAF(CarbonUDAF udaf) {
+        ServiceHolder.carbonUDAFs.remove(udaf.getAlias());
+    }
+
+    public static Map<String, Class<? extends UserDefinedAggregateFunction>> getCarbonUDAFs() {
+        return ServiceHolder.carbonUDAFs;
     }
 
     public static AnalyticsIncrementalMetaStore getIncrementalMetaStore() {

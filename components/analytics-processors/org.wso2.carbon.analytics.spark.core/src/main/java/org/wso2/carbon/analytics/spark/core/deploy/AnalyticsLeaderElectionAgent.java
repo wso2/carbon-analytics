@@ -40,7 +40,7 @@ public class AnalyticsLeaderElectionAgent implements LeaderElectionAgent {
     }
 
     @Override
-    public LeaderElectable masterActor() {
+    public LeaderElectable masterInstance() {
         return master;
     }
 

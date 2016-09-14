@@ -27,11 +27,10 @@ import javax.xml.transform.stream.StreamResult
 import org.apache.commons.logging.{Log, LogFactory}
 import org.apache.spark.Partition
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.catalyst.expressions.Row
-import org.apache.spark.sql.jdbc.{JDBCPartition, JDBCPartitioningInfo}
+import org.apache.spark.sql.execution.datasources.jdbc.{JDBCPartition, JDBCPartitioningInfo}
 import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 import org.w3c.dom.Node
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException
 import org.wso2.carbon.analytics.spark.core.sources.AnalyticsDatasourceWrapper
@@ -240,7 +239,7 @@ case class CarbonJDBCRelation(
         tableName,
         requiredColumns,
         filters,
-        parts)
+        parts).asInstanceOf[RDD[Row]]
     }
     catch {
       case e: Exception =>

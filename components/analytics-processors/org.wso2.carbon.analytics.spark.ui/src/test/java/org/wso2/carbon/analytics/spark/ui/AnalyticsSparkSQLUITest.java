@@ -71,7 +71,7 @@ public class AnalyticsSparkSQLUITest {
         System.clearProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP);
     }
 
-    @Test(expectedExceptions = RuntimeException.class)
+    @Test(expectedExceptions = {RuntimeException.class, AnalyticsException.class})
     public void testUIJsonStringGeneration() throws Exception {
         System.out.printf("***** AnalyticsSparkSQLUITest ***** \n");
 
