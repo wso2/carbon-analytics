@@ -33,6 +33,7 @@ import org.apache.lucene.util.NumericUtils;
 import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Map;
@@ -93,8 +94,8 @@ public class AnalyticsQueryParser extends QueryParser {
                 try {
                     double p1 = Double.parseDouble(part1);
                     double p2 = Double.parseDouble(part2);
-                    p1 = si?p1:Math.nextUp(p1);
-                    p2 = ei?p2:Math.nextDown(p2);
+                    p1 = si?p1: GenericUtils.nextUp(p1);
+                    p2 = ei?p2:GenericUtils.nextDown(p2);
                     return DoublePoint.newRangeQuery(field, p1, p2);
                 } catch (NumberFormatException e) {
                     throw new ParseException("Invalid query, the field '" + field + "' must contain double values");
@@ -103,8 +104,8 @@ public class AnalyticsQueryParser extends QueryParser {
                 try {
                     float p1 = Float.parseFloat(part1);
                     float p2 = Float.parseFloat(part2);
-                    p1 = si?p1:Math.nextUp(p1);
-                    p2 = ei?p2:Math.nextDown(p2);
+                    p1 = si?p1:GenericUtils.nextUp(p1);
+                    p2 = ei?p2:GenericUtils.nextDown(p2);
                     return FloatPoint.newRangeQuery(field,  p1, p2);
                 } catch (NumberFormatException e) {
                     throw new ParseException("Invalid query, the field '" + field + "' must contain float values");
