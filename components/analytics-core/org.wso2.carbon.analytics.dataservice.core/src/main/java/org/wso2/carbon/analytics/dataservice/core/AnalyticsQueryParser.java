@@ -44,7 +44,7 @@ import java.util.Map;
 public class AnalyticsQueryParser extends QueryParser {
 
     private Map<String, ColumnDefinition> indices;
-    
+
     public AnalyticsQueryParser(Analyzer analyzer, Map<String, ColumnDefinition> indices) {
         super(null, analyzer);
         this.indices = indices;
@@ -63,45 +63,38 @@ public class AnalyticsQueryParser extends QueryParser {
                 type = AnalyticsSchema.ColumnType.STRING;
             } else if (AnalyticsDataIndexer.INDEX_INTERNAL_TIMESTAMP_FIELD.equals(field)) {
                 type = AnalyticsSchema.ColumnType.LONG;
-            } 
+            }
         }
         if (type != null) {
             switch (type) {
             case STRING:
                 return super.getRangeQuery(field, part1, part2, si, ei);
-            //Todo add the functionality of si,ei using Math.nextDown and nextUp
             case INTEGER:
                 try {
-
                     int p1 = Integer.parseInt(part1);
                     int p2 = Integer.parseInt(part2);
                     p1 = si?p1:p1+1;
                     p2 = ei?p2:p2-1;
-
                     return IntPoint.newRangeQuery(field, p1, p2);
                 } catch (NumberFormatException e) {
                     throw new ParseException("Invalid query, the field '" + field + "' must contain integers");
                 }
             case LONG:
                 try {
-
                     long p1 = Long.parseLong(part1);
                     long p2 = Long.parseLong(part2);
                     p1 = si?p1:p1+1;
                     p2 = ei?p2:p2-1;
-
                     return LongPoint.newRangeQuery(field, p1,p2);
                 } catch (NumberFormatException e) {
                     throw new ParseException("Invalid query, the field '" + field + "' must contain long values");
                 }
             case DOUBLE:
                 try {
-
                     double p1 = Double.parseDouble(part1);
                     double p2 = Double.parseDouble(part2);
                     p1 = si?p1:Math.nextUp(p1);
                     p2 = ei?p2:Math.nextDown(p2);
-
                     return DoublePoint.newRangeQuery(field, p1, p2);
                 } catch (NumberFormatException e) {
                     throw new ParseException("Invalid query, the field '" + field + "' must contain double values");
@@ -112,7 +105,6 @@ public class AnalyticsQueryParser extends QueryParser {
                     float p2 = Float.parseFloat(part2);
                     p1 = si?p1:Math.nextUp(p1);
                     p2 = ei?p2:Math.nextDown(p2);
-
                     return FloatPoint.newRangeQuery(field,  p1, p2);
                 } catch (NumberFormatException e) {
                     throw new ParseException("Invalid query, the field '" + field + "' must contain float values");
@@ -145,14 +137,13 @@ public class AnalyticsQueryParser extends QueryParser {
                 type = AnalyticsSchema.ColumnType.STRING;
             } else if (AnalyticsDataIndexer.INDEX_INTERNAL_TIMESTAMP_FIELD.equals(field)) {
                 type = AnalyticsSchema.ColumnType.LONG;
-            } 
+            }
         }
         if (type != null) {
             switch (type) {
             case STRING:
                 return super.newTermQuery(term);
             case INTEGER:
-                //Todo check whether code replacement is correct. ToPrefixCoded
                 try {
                     int value = Integer.parseInt(term.text());
                     return IntPoint.newExactQuery(field,value);
@@ -189,7 +180,7 @@ public class AnalyticsQueryParser extends QueryParser {
             return super.newTermQuery(term);
         }
     }
-    
+
     private long parseTimestampOrDirectLong(String textValue) throws NumberFormatException {
         try {
             return Long.parseLong(textValue);
@@ -203,12 +194,12 @@ public class AnalyticsQueryParser extends QueryParser {
                     try {
                         return new SimpleDateFormat("yyyy-MM-dd").parse(textValue).getTime();
                     } catch (java.text.ParseException e) {
-                        throw new RuntimeException("Error in parsing long/timestamp field '" + 
+                        throw new RuntimeException("Error in parsing long/timestamp field '" +
                                 textValue + "' : " + e.getMessage());
                     }
                 }
             }
         }
     }
-    
+
 }
