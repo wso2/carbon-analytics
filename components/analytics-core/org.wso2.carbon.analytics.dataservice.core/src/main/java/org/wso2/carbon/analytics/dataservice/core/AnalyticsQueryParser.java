@@ -64,7 +64,7 @@ public class AnalyticsQueryParser extends QueryParser {
                 type = AnalyticsSchema.ColumnType.STRING;
             } else if (AnalyticsDataIndexer.INDEX_INTERNAL_TIMESTAMP_FIELD.equals(field)) {
                 type = AnalyticsSchema.ColumnType.LONG;
-            }
+            } 
         }
         if (type != null) {
             switch (type) {
@@ -138,7 +138,7 @@ public class AnalyticsQueryParser extends QueryParser {
                 type = AnalyticsSchema.ColumnType.STRING;
             } else if (AnalyticsDataIndexer.INDEX_INTERNAL_TIMESTAMP_FIELD.equals(field)) {
                 type = AnalyticsSchema.ColumnType.LONG;
-            }
+            } 
         }
         if (type != null) {
             switch (type) {
@@ -181,7 +181,7 @@ public class AnalyticsQueryParser extends QueryParser {
             return super.newTermQuery(term);
         }
     }
-
+    
     private long parseTimestampOrDirectLong(String textValue) throws NumberFormatException {
         try {
             return Long.parseLong(textValue);
@@ -195,12 +195,12 @@ public class AnalyticsQueryParser extends QueryParser {
                     try {
                         return new SimpleDateFormat("yyyy-MM-dd").parse(textValue).getTime();
                     } catch (java.text.ParseException e) {
-                        throw new RuntimeException("Error in parsing long/timestamp field '" +
+                        throw new RuntimeException("Error in parsing long/timestamp field '" + 
                                 textValue + "' : " + e.getMessage());
                     }
                 }
             }
         }
     }
-
+    
 }
