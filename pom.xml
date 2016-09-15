@@ -1357,7 +1357,6 @@
         <json4s.orbit.version>3.2.10.wso2v1</json4s.orbit.version>
         <kryo.orbit.version>2.24.0.wso2v1</kryo.orbit.version>
         <kryo.version>2.21</kryo.version>
-        <antlr.version>3.2.0.wso2v1</antlr.version>
         <antlr4.version>4.5.1.wso2v1</antlr4.version>
         <snappy.version>1.1.1.6</snappy.version>
         <netty-all.version>4.0.23.wso2v1</netty-all.version>
