@@ -86,7 +86,7 @@ public class AnalyticsQueryParser extends QueryParser {
                     long p2 = Long.parseLong(part2);
                     p1 = si?p1:p1+1;
                     p2 = ei?p2:p2-1;
-                    return LongPoint.newRangeQuery(field, p1,p2);
+                    return LongPoint.newRangeQuery(field, p1, p2);
                 } catch (NumberFormatException e) {
                     throw new ParseException("Invalid query, the field '" + field + "' must contain long values");
                 }
