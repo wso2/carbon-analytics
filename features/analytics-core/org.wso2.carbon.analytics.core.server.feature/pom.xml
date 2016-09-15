@@ -74,10 +74,6 @@
             <artifactId>kryo</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.antlr.wso2</groupId>
-            <artifactId>antlr-runtime</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.orbit.com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
         </dependency>
@@ -132,7 +128,7 @@
                             <bundles>
                                 <bundleDef>org.wso2.orbit.org.apache.lucene:lucene</bundleDef>
                                 <bundleDef>org.wso2.orbit.org.ow2.asm:asm-all</bundleDef>
-                                <bundleDef>org.antlr.wso2:antlr-runtime</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.antlr:antlr4-runtime</bundleDef>
                                 <bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>
                                 <bundleDef>io.dropwizard.metrics:metrics-core</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef>
