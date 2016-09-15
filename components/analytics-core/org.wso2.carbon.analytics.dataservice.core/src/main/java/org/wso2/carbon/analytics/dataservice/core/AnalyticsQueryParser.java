@@ -45,12 +45,12 @@ import java.util.Map;
 public class AnalyticsQueryParser extends QueryParser {
 
     private Map<String, ColumnDefinition> indices;
-
+    
     public AnalyticsQueryParser(Analyzer analyzer, Map<String, ColumnDefinition> indices) {
         super(null, analyzer);
         this.indices = indices;
     }
-
+    
     @Override
     public Query getRangeQuery(String field, String part1, String part2, boolean si, boolean ei) throws ParseException {
         AnalyticsSchema.ColumnType type = null;
