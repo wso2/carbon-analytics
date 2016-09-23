@@ -1432,7 +1432,6 @@ public class AnalyticsDataIndexer {
     
     private void checkAndAddDocEntry(Document doc, AnalyticsSchema.ColumnType type, String name, Object obj)
             throws AnalyticsIndexException {
-        FieldType numericFieldType;
         if (obj == null) {
             doc.add(new StringField(name, NULL_INDEX_VALUE, Store.NO));
             return;
