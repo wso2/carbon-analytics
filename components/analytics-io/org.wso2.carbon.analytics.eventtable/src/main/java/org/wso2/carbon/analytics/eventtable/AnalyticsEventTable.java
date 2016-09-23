@@ -646,6 +646,13 @@ public class AnalyticsEventTable implements EventTable {
             }
             if (value instanceof Boolean) {
                 return "\"" + value + "\"";
+            }
+            if (value instanceof Integer) {
+                if ((int) value < 0) {
+                    return ("[" + value + " TO " + value + "]").toString();
+                } else {
+                    return value.toString();
+                }
             } else {
                 return value.toString();
             }
