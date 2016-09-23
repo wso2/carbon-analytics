@@ -45,12 +45,12 @@ import java.util.Map;
 public class AnalyticsQueryParser extends QueryParser {
 
     private Map<String, ColumnDefinition> indices;
-
+    
     public AnalyticsQueryParser(Analyzer analyzer, Map<String, ColumnDefinition> indices) {
         super(null, analyzer);
         this.indices = indices;
     }
-
+    
     @Override
     public Query getRangeQuery(String field, String part1, String part2, boolean si, boolean ei) throws ParseException {
         AnalyticsSchema.ColumnType type = null;
@@ -64,7 +64,7 @@ public class AnalyticsQueryParser extends QueryParser {
                 type = AnalyticsSchema.ColumnType.STRING;
             } else if (AnalyticsDataIndexer.INDEX_INTERNAL_TIMESTAMP_FIELD.equals(field)) {
                 type = AnalyticsSchema.ColumnType.LONG;
-            }
+            } 
         }
         if (type != null) {
             switch (type) {
@@ -86,7 +86,7 @@ public class AnalyticsQueryParser extends QueryParser {
                     long p2 = Long.parseLong(part2);
                     p1 = si?p1:p1+1;
                     p2 = ei?p2:p2-1;
-                    return LongPoint.newRangeQuery(field, p1,p2);
+                    return LongPoint.newRangeQuery(field, p1, p2);
                 } catch (NumberFormatException e) {
                     throw new ParseException("Invalid query, the field '" + field + "' must contain long values");
                 }
@@ -138,7 +138,7 @@ public class AnalyticsQueryParser extends QueryParser {
                 type = AnalyticsSchema.ColumnType.STRING;
             } else if (AnalyticsDataIndexer.INDEX_INTERNAL_TIMESTAMP_FIELD.equals(field)) {
                 type = AnalyticsSchema.ColumnType.LONG;
-            }
+            } 
         }
         if (type != null) {
             switch (type) {
@@ -181,7 +181,7 @@ public class AnalyticsQueryParser extends QueryParser {
             return super.newTermQuery(term);
         }
     }
-
+    
     private long parseTimestampOrDirectLong(String textValue) throws NumberFormatException {
         try {
             return Long.parseLong(textValue);
@@ -195,12 +195,12 @@ public class AnalyticsQueryParser extends QueryParser {
                     try {
                         return new SimpleDateFormat("yyyy-MM-dd").parse(textValue).getTime();
                     } catch (java.text.ParseException e) {
-                        throw new RuntimeException("Error in parsing long/timestamp field '" +
+                        throw new RuntimeException("Error in parsing long/timestamp field '" + 
                                 textValue + "' : " + e.getMessage());
                     }
                 }
             }
         }
     }
-
+    
 }
