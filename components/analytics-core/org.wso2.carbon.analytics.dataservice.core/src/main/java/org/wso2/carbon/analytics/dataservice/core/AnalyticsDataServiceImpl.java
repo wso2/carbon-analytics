@@ -1005,7 +1005,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
                 ids.add(this.generateRecordIdFromPrimaryKeyValues(values, primaryKeys));
             }
         }
-        return this.get(tenantId, tableName, numPartitionsHint, null, ids);
+        return this.get(tenantId, tableName, numPartitionsHint, columns, ids);
     }
 
     @Override
