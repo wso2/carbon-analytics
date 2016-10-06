@@ -681,9 +681,9 @@
             </dependency>
 
             <dependency>
-                <groupId>org.antlr.wso2</groupId>
-                <artifactId>antlr-runtime</artifactId>
-                <version>${antlr.version}</version>
+                <groupId>org.wso2.orbit.org.antlr</groupId>
+                <artifactId>antlr4-runtime</artifactId>
+                <version>${antlr4.version}</version>
             </dependency>
 
             <dependency>
@@ -1343,8 +1343,8 @@
         <!-- Javax-->
         <javax.servelet.version>3.0.1</javax.servelet.version>
 
-        <lucene.orbit.version>5.2.1.wso2v1</lucene.orbit.version>
-        <lucene.imp.pkg.version>[5.2.1, 5.3.0)</lucene.imp.pkg.version>
+        <lucene.orbit.version>6.2.0.wso2v1</lucene.orbit.version>
+        <lucene.imp.pkg.version>[6.2.0, 6.3.0)</lucene.imp.pkg.version>
         <asm4.orbit.version>4.1.0.wso2v1</asm4.orbit.version>
 
         <!--analytics processors -->
@@ -1357,7 +1357,7 @@
         <json4s.orbit.version>3.2.10.wso2v1</json4s.orbit.version>
         <kryo.orbit.version>2.24.0.wso2v1</kryo.orbit.version>
         <kryo.version>2.21</kryo.version>
-        <antlr.version>3.2.0.wso2v1</antlr.version>
+        <antlr4.version>4.5.1.wso2v1</antlr4.version>
         <snappy.version>1.1.1.6</snappy.version>
         <netty-all.version>4.0.23.wso2v1</netty-all.version>
         <scala.version>2.10.4</scala.version>
