@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>data-bridge</artifactId>
-        <version>5.1.4</version>
+        <version>5.1.5-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
