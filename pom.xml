@@ -3,10 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.wso2.carbon.analytics</groupId>
   <artifactId>carbon-analytics</artifactId>
-  <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>carbon-analytics</name>
+  <packaging>pom</packaging>
+  <version>2.0.0-SNAPSHOT</version>
+    <modules>
+        <module>components/analytics-dataservice-core</module>
+    </modules>
+    <name>carbon-analytics</name>
   <url>http://maven.apache.org</url>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
