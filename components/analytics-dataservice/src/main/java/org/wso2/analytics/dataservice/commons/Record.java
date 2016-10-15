@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.das.analytics.dataservice.commons;
+package org.wso2.analytics.dataservice.commons;
 
 import java.io.Serializable;
 import java.util.Iterator;

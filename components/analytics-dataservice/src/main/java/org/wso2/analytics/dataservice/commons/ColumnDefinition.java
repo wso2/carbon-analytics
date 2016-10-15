@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package org.wso2.das.analytics.dataservice.commons;
+package org.wso2.analytics.dataservice.commons;
 
 import java.io.Serializable;
-import org.wso2.das.analytics.dataservice.commons.AnalyticsSchema.ColumnType;
 
 /**
  * This class represents a defintion of a column in an analytics schema.
@@ -28,11 +27,11 @@ public class ColumnDefinition implements Serializable {
 
     private String name;
 
-    private ColumnType type;
+    private AnalyticsSchema.ColumnType type;
 
     public ColumnDefinition() { }
     
-    public ColumnDefinition(String name, ColumnType type) {
+    public ColumnDefinition(String name, AnalyticsSchema.ColumnType type) {
         this.name = name;
         this.type = type;
     }

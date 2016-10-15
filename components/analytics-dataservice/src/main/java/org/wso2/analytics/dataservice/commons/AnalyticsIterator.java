@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.das.analytics.dataservice.commons;
+package org.wso2.analytics.dataservice.commons;
 
 import java.io.Closeable;
 import java.util.Iterator;

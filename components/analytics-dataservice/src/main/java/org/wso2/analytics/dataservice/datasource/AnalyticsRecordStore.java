@@ -16,13 +16,13 @@
  *  under the License.
  *
  */
-package org.wso2.das.analytics.dataservice.datasource;
+package org.wso2.analytics.dataservice.datasource;
 
-import org.wso2.das.analytics.dataservice.commons.AnalyticsIterator;
-import org.wso2.das.analytics.dataservice.commons.Record;
-import org.wso2.das.analytics.dataservice.commons.RecordGroup;
-import org.wso2.das.analytics.dataservice.commons.exception.AnalyticsException;
-import org.wso2.das.analytics.dataservice.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.analytics.dataservice.commons.AnalyticsIterator;
+import org.wso2.analytics.dataservice.commons.RecordGroup;
+import org.wso2.analytics.dataservice.commons.exception.AnalyticsException;
+import org.wso2.analytics.dataservice.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.analytics.dataservice.commons.Record;
 
 import java.util.List;
 import java.util.Map;
@@ -120,7 +120,7 @@ public interface AnalyticsRecordStore {
      * Reads in the records from a given record group, the records will be streamed in.
      *
      * @param recordGroup The record group which represents the local data set
-     * @return An iterator of type {@link org.wso2.das.analytics.dataservice.commons.Record} in the local record group
+     * @return An iterator of type {@link Record} in the local record group
      * @throws AnalyticsException
      */
     AnalyticsIterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException;
@@ -133,8 +133,7 @@ public interface AnalyticsRecordStore {
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    void delete(String tableName, long timeFrom, long timeTo)
-            throws AnalyticsException, AnalyticsTableNotAvailableException;
+    void delete(String tableName, long timeFrom, long timeTo) throws AnalyticsException, AnalyticsTableNotAvailableException;
     
     /**
      * Delete data in a table with given ids.
@@ -143,8 +142,7 @@ public interface AnalyticsRecordStore {
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    void delete(String tableName, List<String> ids)
-            throws AnalyticsException, AnalyticsTableNotAvailableException;
+    void delete(String tableName, List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException;
 
     /**
      *  Destroys the AnalyticsRecordStore instance and closes
