@@ -21,11 +21,36 @@ package org.wso2.analytics.dataservice.core;
 import org.wso2.analytics.dataservice.AnalyticsDataService;
 import org.wso2.analytics.dataservice.commons.*;
 import org.wso2.analytics.dataservice.commons.exception.AnalyticsException;
+import org.wso2.analytics.dataservice.utils.AnalyticsUtils;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
 public class AnalyticsDataServiceImpl implements AnalyticsDataService {
+
+    private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
+        try {
+            File confFile = new File(AnalyticsUtils.getAnalyticsConfDirectory() +
+                    File.separator + AnalyticsDataSourceConstants.ANALYTICS_CONF_DIR +
+                    File.separator + AnalyticsDataServiceConstants.ANALYTICS_DS_CONFIG_FILE);
+            if (!confFile.exists()) {
+                throw new AnalyticsException("Cannot initalize analytics data service, " +
+                        "the analytics data service configuration file cannot be found at: " +
+                        confFile.getPath());
+            }
+            JAXBContext ctx = JAXBContext.newInstance(AnalyticsDataServiceConfiguration.class);
+            Unmarshaller unmarshaller = ctx.createUnmarshaller();
+            return (AnalyticsDataServiceConfiguration) unmarshaller.unmarshal(confFile);
+        } catch (JAXBException e) {
+            throw new AnalyticsException(
+                    "Error in processing analytics data service configuration: " + e.getMessage(), e);
+        }
+    }
+
     @Override
     public List<String> listRecordStoreNames() {
         return null;

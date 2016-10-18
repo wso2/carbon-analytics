@@ -24,8 +24,8 @@ import org.wso2.analytics.dataservice.commons.exception.AnalyticsException;
 
 import java.io.File;
 
-public class GenericUtils {
-    private static final Log log = LogFactory.getLog(GenericUtils.class);
+public class AnalyticsUtils {
+    private static final Log log = LogFactory.getLog(AnalyticsUtils.class);
 
     public static String getAnalyticsConfDirectory() throws AnalyticsException {
         File confDir = null;
