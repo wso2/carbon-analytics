@@ -9,6 +9,7 @@
 
     <modules>
         <module>components/analytics-dataservice</module>
+        <module>components/analytics-datasources</module>
     </modules>
 
     <dependencies>
