@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.dataservice.core;
+package org.wso2.analytics.dataservice.impl;
 
 import org.wso2.analytics.dataservice.AnalyticsDataService;
 import org.wso2.analytics.dataservice.commons.*;
