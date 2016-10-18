@@ -11,4 +11,11 @@
 	<artifactId>org.wso2.analytics.datasource.rdbms</artifactId>
 	<name>WSO2 Carbon - Analytics Data Source RDBMS</name>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.analytics</groupId>
+            <artifactId>org.wso2.analytics.dataservice</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>
