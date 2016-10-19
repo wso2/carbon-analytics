@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -19,6 +19,7 @@
 package org.wso2.analytics.dataservice.commons;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * This class represents an analytics data service response.
@@ -27,24 +28,45 @@ public class AnalyticsDataResponse implements Serializable {
 
     private static final long serialVersionUID = 7912542783175151940L;
 
-    private String recordStoreName;
-
-    private RecordGroup[] recordGroups;
+    private List<Entry> entries;
 
     public AnalyticsDataResponse() {
     }
 
-    public AnalyticsDataResponse(String recordStoreName, RecordGroup[] recordGroups) {
-        this.recordStoreName = recordStoreName;
-        this.recordGroups = recordGroups;
+    public AnalyticsDataResponse(List<Entry> entries) {
+        this.entries = entries;
     }
 
-    public String getRecordStoreName() {
-        return recordStoreName;
+    public List<Entry> getEntries() {
+        return entries;
     }
+    
+    /**
+     * This class represents a single record store name / record group entry.
+     */
+    public static class Entry implements Serializable {
+        
+        private static final long serialVersionUID = 3278533423223275273L;
 
-    public RecordGroup[] getRecordGroups() {
-        return recordGroups;
+        private String recordStoreName;
+        
+        private RecordGroup recordGroup;
+        
+        public Entry() { }
+        
+        public Entry(String recordStoreName, RecordGroup recordGroup) {
+            this.recordStoreName = recordStoreName;
+            this.recordGroup = recordGroup;
+        }
+        
+        public String getRecordStoreName() {
+            return recordStoreName;
+        }
+        
+        public RecordGroup getRecordGroup() {
+            return recordGroup;
+        }
+        
     }
-
+    
 }

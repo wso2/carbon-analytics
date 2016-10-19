@@ -16,26 +16,38 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.dataservice.commons.exception;
+package org.wso2.analytics.dataservice.config;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
 
 /**
- * This exception represents a situation when the requested analytics data source table is not available.
+ * This class represents an analytics data service configuration property.
  */
-public class AnalyticsTableNotAvailableException extends AnalyticsException {
+@XmlRootElement(name = "property")
+public class AnalyticsDataServiceConfigProperty {
 
-    private static final long serialVersionUID = -3197293684263626136L;
-    private String tableName;
+    private String name;
 
-    public AnalyticsTableNotAvailableException(String tableName) {
-        this(tableName, null);
+    private String value;
+
+    @XmlAttribute(name = "name")
+    public String getName() {
+        return name;
     }
 
-    public AnalyticsTableNotAvailableException(String tableName, Throwable cause) {
-        super("Table: " + tableName + " does not exist", cause);
-        this.tableName = tableName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getTableName() {
-        return tableName;
+    @XmlValue
+    public String getValue() {
+        return value;
     }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
 }
