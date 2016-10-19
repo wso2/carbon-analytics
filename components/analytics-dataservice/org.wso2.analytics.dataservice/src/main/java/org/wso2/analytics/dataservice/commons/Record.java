@@ -31,72 +31,66 @@ public class Record implements Serializable {
 
     private static final long serialVersionUID = -1415468443958067528L;
 
-    private int tenantId;
-    
     private String tableName;
-    
+
     private Map<String, Object> values;
-    
+
     private long timestamp;
-        
+
     private String id;
-    
+
     private int hashCode = -1;
-    
-    public Record() { }
-    
-    public Record(int tenantId, String tableName, Map<String, Object> values) {
-        this(null, tenantId, tableName, values, System.currentTimeMillis());
+
+    public Record() {
     }
-    
-    public Record(String id, int tenantId, String tableName, Map<String, Object> values) {
-        this(id, tenantId, tableName, values, System.currentTimeMillis());
+
+    public Record(String tableName, Map<String, Object> values) {
+        this(null, tableName, values, System.currentTimeMillis());
     }
-    
-    public Record(int tenantId, String tableName, Map<String, Object> values, long timestamp) {
-        this(null, tenantId, tableName, values, timestamp);
+
+    public Record(String id, String tableName, Map<String, Object> values) {
+        this(id, tableName, values, System.currentTimeMillis());
     }
-    
-    public Record(String id, int tenantId, String tableName, Map<String, Object> values, long timestamp) {
+
+    public Record(String tableName, Map<String, Object> values, long timestamp) {
+        this(null, tableName, values, timestamp);
+    }
+
+    public Record(String id, String tableName, Map<String, Object> values, long timestamp) {
         this.id = id;
-        this.tenantId = tenantId;
         this.tableName = tableName;
         this.values = values;
         this.timestamp = timestamp;
     }
-    
+
     public String getId() {
         return id;
     }
-    
+
     public void setId(String id) {
         this.id = id;
     }
-    
-    public int getTenantId() {
-        return tenantId;
-    }
-    
+
     public String getTableName() {
         return tableName;
     }
-    
+
     public void setTableName(String tableName) {
         this.tableName = tableName;
     }
-    
+
     public Map<String, Object> getValues() {
         return values;
     }
-    
+
     public Object getValue(String name) {
         return this.values.get(name);
     }
-    
+
     public long getTimestamp() {
         return timestamp;
     }
-    
+
     /**
      * Equality is checked not with the field order in mind, if all the columns' key/value pairs match,
      * the records are the same. The persistence media of a record doesn't have to maintain the order of the
@@ -109,9 +103,6 @@ public class Record implements Serializable {
             return false;
         }
         Record rhs = (Record) obj;
-        if (this.getTenantId() != rhs.getTenantId()) {
-            return false;
-        }
         if (!this.getTableName().equals(rhs.getTableName())) {
             return false;
         }
@@ -123,12 +114,11 @@ public class Record implements Serializable {
         }
         return this.getNotNullValues().equals(rhs.getNotNullValues());
     }
-    
+
     @Override
     public int hashCode() {
         if (this.hashCode == -1) {
-            this.hashCode = ((Integer) this.getTenantId()).hashCode();
-            this.hashCode += this.getTableName().hashCode() >> 2;
+            this.hashCode = this.getTableName().hashCode() >> 2;
             this.hashCode += this.getId().hashCode() >> 4;
             this.hashCode += String.valueOf(this.getTimestamp()).hashCode() >> 8;
             this.hashCode += this.getNotNullValues().hashCode() >> 16;
@@ -146,11 +136,11 @@ public class Record implements Serializable {
         }
         return result;
     }
-    
+
     @Override
     public String toString() {
-        return "TID: " + this.getTenantId() + " Table Name: " + this.getTableName() + 
+        return "Table Name: " + this.getTableName() +
                 " ID: " + this.getId() + " Timestamp: " + this.getTimestamp() + " Values: " + this.getValues();
     }
-    
+
 }
