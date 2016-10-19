@@ -20,9 +20,11 @@ package org.wso2.analytics.dataservice.utils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.analytics.dataservice.commons.Record;
 import org.wso2.analytics.dataservice.commons.exception.AnalyticsException;
 
 import java.io.File;
+import java.util.*;
 
 public class AnalyticsUtils {
     private static final Log log = LogFactory.getLog(AnalyticsUtils.class);
@@ -62,4 +64,37 @@ public class AnalyticsUtils {
         }
         return baseDir;
     }
+
+    public static Collection<List<Record>> generateRecordBatches(List<Record> records) {
+        return generateRecordBatches(records, false);
+    }
+
+    public static Collection<List<Record>> generateRecordBatches(List<Record> records, boolean normalizeTableName) {
+        /* if the records have identities (unique table category and name) as the following
+         * "ABABABCCAACBDABCABCDBAC", the job of this method is to make it like the following,
+         * {"AAAAAAAA", "BBBBBBB", "CCCCCC", "DD" } */
+        Map<String, List<Record>> recordBatches = new HashMap<>();
+        List<Record> recordBatch;
+        for (Record record : records) {
+            if (normalizeTableName) {
+                record.setTableName(normalizeTableName(record.getTableName()));
+            }
+            recordBatch = recordBatches.get(calculateRecordIdentity(record));
+            if (recordBatch == null) {
+                recordBatch = new ArrayList<>();
+                recordBatches.put(calculateRecordIdentity(record), recordBatch);
+            }
+            recordBatch.add(record);
+        }
+        return recordBatches.values();
+    }
+
+    public static String calculateRecordIdentity(Record record) {
+        return normalizeTableName(record.getTableName());
+    }
+
+    public static String normalizeTableName(String tableName) {
+        return tableName.toUpperCase();
+    }
+
 }
