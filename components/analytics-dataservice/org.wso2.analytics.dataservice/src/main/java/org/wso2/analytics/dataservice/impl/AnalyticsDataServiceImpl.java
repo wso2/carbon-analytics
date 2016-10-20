@@ -42,6 +42,8 @@ import java.util.stream.Collectors;
 public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     private static final int DELETE_BATCH_SIZE = 1000;
+    private static final String ANALYTICS_META_TABLE = "ANALYTICS_META_TABLE";
+    private static final String TABLE_INFO_DATA_COLUMN = "TABLE_INFO_DATA";
 
     private int recordsBatchSize;
     private String primaryARSName;
@@ -100,7 +102,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         return result;
     }
 
-    public AnalyticsRecordStore getAnalyticsRecordStore(String name) throws AnalyticsException {
+    private AnalyticsRecordStore getAnalyticsRecordStore(String name) throws AnalyticsException {
         AnalyticsRecordStore ars = this.analyticsRecordStores.get(name);
         if (ars == null) {
             throw new AnalyticsException("Analytics record store with the name '" + name + "' cannot be found.");
@@ -131,8 +133,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (tableInfo == null || !tableInfo.getRecordStoreName().equals(recordStoreName)) {
             tableInfo = new AnalyticsTableInfo(tableName, recordStoreName, new AnalyticsSchema());
         }
-        //todo: what's this?
-        this.writeTenantId(tenantId);
         this.writeTableInfo(tableName, tableInfo);
         this.invalidateAnalyticsTableInfo(tableName);
     }
@@ -148,30 +148,30 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     private void writeTableInfo(String tableName, AnalyticsTableInfo tableInfo) throws AnalyticsException {
         AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
-        Map<String, Object> values = new HashMap<String, Object>(1);
-        values.put(TABLE_INFO_DATA_COLUMN, GenericUtils.serializeObject(tableInfo));
-        Record record = new Record(tableName, TABLE_INFO_TENANT_ID, tableName, values);
-        List<Record> records = new ArrayList<Record>(1);
+        Map<String, Object> values = new HashMap<>(1);
+        values.put(TABLE_INFO_DATA_COLUMN, AnalyticsUtils.serializeObject(tableInfo));
+        Record record = new Record(tableName, ANALYTICS_META_TABLE, values);
+        List<Record> records = new ArrayList<>(1);
         records.add(record);
         try {
             ars.put(records);
         } catch (AnalyticsTableNotAvailableException e) {
-            ars.createTable(TABLE_INFO_TENANT_ID, tableName);
+            ars.createTable(ANALYTICS_META_TABLE);
             ars.put(records);
         }
     }
 
-    private AnalyticsRecordStore getPrimaryAnalyticsRecordStore() {
-        return this.analyticsRecordStores.get(this.primaryARSName);
+    public void invalidateAnalyticsTableInfo(String tableName) {
+        tableName = AnalyticsUtils.normalizeTableName(tableName);
+        this.tableInfoMap.remove(tableName);
     }
-
     private AnalyticsTableInfo readTableInfo(String tableName) throws AnalyticsException {
         AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
         List<String> ids = new ArrayList<>();
         ids.add(tableName);
         List<Record> records;
         try {
-            records = AnalyticsUtils.listRecords(ars, ars.get(tableName, 1, null, ids));
+            records = AnalyticsUtils.listRecords(ars, ars.get(ANALYTICS_META_TABLE, 1, null, ids));
         } catch (AnalyticsTableNotAvailableException e) {
             throw new AnalyticsTableNotAvailableException(tableName);
         }
@@ -180,10 +180,22 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         } else {
             byte[] data = (byte[]) records.get(0).getValue(TABLE_INFO_DATA_COLUMN);
             if (data == null) {
-                throw new AnalyticsException("Corrupted table info for the table:  " + tableName);
+                throw new AnalyticsException("Corrupted table info for table: " + tableName);
             }
-            return (AnalyticsTableInfo) GenericUtils.deserializeObject(data);
+            return (AnalyticsTableInfo) AnalyticsUtils.deserializeObject(data);
         }
+    }
+
+
+    @Override
+    public void createTableIfNotExists(int tenantId, String recordStoreName, String tableName) throws AnalyticsException {
+        if (!this.tableExists(tableName)) {
+            this.createTable(recordStoreName, tableName);
+        }
+    }
+
+    private AnalyticsRecordStore getPrimaryAnalyticsRecordStore() {
+        return this.analyticsRecordStores.get(this.primaryARSName);
     }
 
     @Override
@@ -203,8 +215,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         AnalyticsTableInfo tableInfo = this.lookupTableInfo(tableName);
         tableInfo.setSchema(schema);
         this.writeTableInfo(tableName, tableInfo);
-        //Todo what's this? It's a cluster message
-        this.checkAndInvalidateTableInfo(tenantId, tableName);
+        this.checkAndInvalidateTableInfo(tableName);
     }
 
     @Override
@@ -240,19 +251,35 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         this.getAnalyticsRecordStore(arsName).deleteTable(tableName);
     }
 
+    private void deleteTableInfo(String tableName) throws AnalyticsException {
+        List<String> ids = new ArrayList<>(1);
+        ids.add(tableName);
+        try {
+            this.getPrimaryAnalyticsRecordStore().delete(ANALYTICS_META_TABLE, ids);
+        } catch (AnalyticsTableNotAvailableException ignore) {
+            /* ignore */
+        }
+    }
+
+    private void checkAndInvalidateTableInfo(String tableName) throws AnalyticsException {
+        //todo: add clustered table removal here
+        /*AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        if (acm.isClusteringEnabled()) {
+            *//* send cluster message to invalidate *//*
+            acm.executeAll(ANALYTICS_DATASERVICE_GROUP, new AnalyticsTableInfoChangeMessage(tenantId, tableName));
+        } else {
+        }*/
+        this.invalidateAnalyticsTableInfo(tableName);
+    }
+
     @Override
     public List<String> listTables() throws AnalyticsException {
         try {
             List<Record> records = AnalyticsUtils.listRecords(this.getPrimaryAnalyticsRecordStore(),
-                    this.getPrimaryAnalyticsRecordStore().get(TABLE_INFO_TENANT_ID,
-                            targetTableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
-            List<String> result = new ArrayList<String>();
-            for (Record record : records) {
-                result.add(record.getId());
-            }
-            return result;
+                    this.getPrimaryAnalyticsRecordStore().get(ANALYTICS_META_TABLE, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+            return records.stream().map(Record::getId).collect(Collectors.toList());
         } catch (AnalyticsTableNotAvailableException e) {
-            return new ArrayList<String>(0);
+            return new ArrayList<>(0);
         }
     }
 
@@ -277,7 +304,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
      * e.g. update the record ids if its not already set by using the table
      * schema's primary keys.
      *
-     * @param recordBatches
+     * @param recordBatches batch of records
      */
     private void preprocessRecords(Collection<List<Record>> recordBatches) throws AnalyticsException {
         for (List<Record> recordBatch : recordBatches) {
@@ -311,9 +338,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private void populateRecordsWithPrimaryKeyAwareIds(List<Record> records, List<String> primaryKeys) {
         /* users have the ability to explicitly provide a record id,
          * in-spite of having primary keys defined to auto generate the id */
-        records.stream().filter(record -> record.getId() == null).forEach(record -> {
-            this.populateRecordWithPrimaryKeyAwareId(record, primaryKeys);
-        });
+        records.stream().filter(record -> record.getId() == null).forEach(record -> this.populateRecordWithPrimaryKeyAwareId(record, primaryKeys));
     }
 
     @Override
@@ -389,10 +414,10 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     private <T> List<List<T>> getChoppedLists(List<T> list, final int L) {
-        List<List<T>> parts = new ArrayList<List<T>>();
+        List<List<T>> parts = new ArrayList<>();
         final int N = list.size();
         for (int i = 0; i < N; i += L) {
-            parts.add(new ArrayList<T>(list.subList(i, Math.min(N, i + L))));
+            parts.add(new ArrayList<>(list.subList(i, Math.min(N, i + L))));
         }
         return parts;
     }
@@ -404,9 +429,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         AnalyticsSchema schema = this.lookupTableInfo(tableName).getSchema();
         List<String> primaryKeys = schema.getPrimaryKeys();
         if (primaryKeys != null && primaryKeys.size() > 0) {
-            for (Map<String, Object> values : valuesBatch) {
-                ids.add(this.generateRecordIdFromPrimaryKeyValues(values, primaryKeys));
-            }
+            ids.addAll(valuesBatch.stream().map(values -> this.generateRecordIdFromPrimaryKeyValues(values, primaryKeys)).collect(Collectors.toList()));
         }
         return this.get(tableName, numPartitionsHint, columns, ids);
     }

@@ -18,6 +18,9 @@
  */
 package org.wso2.analytics.dataservice.utils;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,7 +31,10 @@ import org.wso2.analytics.dataservice.commons.Record;
 import org.wso2.analytics.dataservice.commons.RecordGroup;
 import org.wso2.analytics.dataservice.commons.exception.AnalyticsException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.*;
@@ -134,4 +140,43 @@ public class AnalyticsUtils {
         }
     };
 
+    private static ThreadLocal<Kryo> kryoTL = new ThreadLocal<Kryo>() {
+        protected Kryo initialValue() {
+            return new Kryo();
+        }
+    };
+
+    /* do not touch, @see serializeObject(Object) */
+    public static void serializeObject(Object obj, OutputStream out) throws IOException {
+        byte[] data = serializeObject(obj);
+        out.write(data, 0, data.length);
+    }
+
+    /* do not touch, @see serializeObject(Object) */
+    public static Object deserializeObject(byte[] source) {
+        if (source == null) {
+            return null;
+        }
+        /* skip the object size integer */
+        try (Input input = new Input(Arrays.copyOfRange(source, Integer.SIZE / 8, source.length))) {
+            Kryo kryo = kryoTL.get();
+            return kryo.readClassAndObject(input);
+        }
+    }
+
+    /* do not touch if you do not know what you're doing, critical for serialize/deserialize
+     * implementation to be stable to retain backward compatibility */
+    public static byte[] serializeObject(Object obj) {
+        Kryo kryo = kryoTL.get();
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        try (Output out = new Output(byteOut)) {
+            kryo.writeClassAndObject(out, obj);
+            out.flush();
+            byte[] data = byteOut.toByteArray();
+            ByteBuffer result = ByteBuffer.allocate(data.length + Integer.SIZE / 8);
+            result.putInt(data.length);
+            result.put(data);
+            return result.array();
+        }
+    }
 }
