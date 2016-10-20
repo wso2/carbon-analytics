@@ -50,6 +50,16 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private Map<String, AnalyticsRecordStore> analyticsRecordStores;
     private Map<String, AnalyticsTableInfo> tableInfoMap = new HashMap<>();
 
+    public AnalyticsDataServiceImpl() throws AnalyticsException {
+        AnalyticsDataServiceConfiguration config = this.loadAnalyticsDataServiceConfig();
+        this.initARS(config);
+        //todo: add clustering info here
+//        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+//        if (acm.isClusteringEnabled()) {
+//            acm.joinGroup(ANALYTICS_DATASERVICE_GROUP, null);
+//        }
+    }
+
     private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
         try {
             File confFile = new File(AnalyticsUtils.getAnalyticsConfDirectory() + File.separator +
