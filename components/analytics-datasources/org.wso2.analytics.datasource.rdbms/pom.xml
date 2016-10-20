@@ -15,6 +15,7 @@
         <dependency>
             <groupId>org.wso2.analytics</groupId>
             <artifactId>org.wso2.analytics.dataservice</artifactId>
+			<version>${project.version}</version>
         </dependency>
     </dependencies>
 
