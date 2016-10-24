@@ -33,6 +33,7 @@
 
     <modules>
         <module>org.wso2.analytics.datasource.rdbms</module>
+        <module>org.wso2.analytics.datasource.hbase</module>
     </modules>
 
 </project>
