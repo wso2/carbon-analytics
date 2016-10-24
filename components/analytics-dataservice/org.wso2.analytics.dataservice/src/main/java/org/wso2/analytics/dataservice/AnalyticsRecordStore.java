@@ -58,21 +58,6 @@ public interface AnalyticsRecordStore {
     void deleteTable(String tableName) throws AnalyticsException;
 
     /**
-     * Returns the number of records in the table with the given category and name, -1 if the number of records cannot
-     * be determined reliably.
-     * @param tableName The name of the table to get the count from
-     * @param timeFrom The starting time to consider the count from, inclusive, relatively to epoch,
-     * Long.MIN_VALUE should signal, this restriction to be disregarded
-     * @param timeTo The ending time to consider the count to, non-inclusive, relatively to epoch,
-     * Long.MAX_VALUE should signal, this restriction to be disregarded     
-     * @return The record count
-     * @throws AnalyticsException
-     * @throws AnalyticsTableNotAvailableException
-     */
-    long getRecordCount(String tableName, long timeFrom, long timeTo)
-            throws AnalyticsException, AnalyticsTableNotAvailableException;
-    
-    /**
      * Adds a new record to the table. If the record id is mentioned, 
      * it will be used to do the insert, or else, the insert will be done with a randomly generated id.
      * If the record already exists,it updates the record store with the given records, matches by its record id, 
