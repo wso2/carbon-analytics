@@ -374,4 +374,14 @@ public class AnalyticsUtils {
         return result;
     }
 
+    public static void closeQuietly(Closeable closeable) {
+        try {
+            if (closeable != null) {
+                closeable.close();
+            }
+        } catch (IOException ignore) {
+            /* ignore */
+        }
+    }
+
 }
