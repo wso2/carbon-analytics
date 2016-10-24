@@ -15,6 +15,7 @@
         <dependency>
             <groupId>org.wso2.analytics</groupId>
             <artifactId>org.wso2.analytics.dataservice</artifactId>
+			<version>2.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
