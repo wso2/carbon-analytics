@@ -21,14 +21,13 @@ package org.wso2.analytics.datasource.rdbms;
 import com.google.common.collect.Lists;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.analytics.dataservice.AnalyticsRecordStore;
 import org.wso2.analytics.dataservice.commons.AnalyticsIterator;
 import org.wso2.analytics.dataservice.commons.Record;
 import org.wso2.analytics.dataservice.commons.RecordGroup;
 import org.wso2.analytics.dataservice.commons.exception.AnalyticsException;
 import org.wso2.analytics.dataservice.commons.exception.AnalyticsTableNotAvailableException;
-import org.wso2.analytics.dataservice.AnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-import org.wso2.carbon.ndatasource.common.DataSourceException;
+import org.wso2.analytics.dataservice.utils.AnalyticsUtils;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
@@ -36,96 +35,97 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 
+;
+
 /**
  * Abstract RDBMS database backed implementation of {@link AnalyticsRecordStore}.
  */
 public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     private static final Log log = LogFactory.getLog(RDBMSAnalyticsRecordStore.class);
-    
+
     private static final String RECORD_IDS_PLACEHOLDER = "{{RECORD_IDS}}";
 
     private static final String TABLE_NAME_PLACEHOLDER = "{{TABLE_NAME}}";
-        
+
     private DataSource dataSource;
-    
+
     private Map<String, String> properties;
-    
+
     private RDBMSQueryConfigurationEntry rdbmsQueryConfigurationEntry;
-    
+
     private int partitionCount = RDBMSAnalyticsDSConstants.DEFAULT_PARTITION_COUNT;
-    
+
     public RDBMSAnalyticsRecordStore() throws AnalyticsException {
         this.rdbmsQueryConfigurationEntry = null;
     }
-    
+
     @Override
     public void init(Map<String, String> properties)
             throws AnalyticsException {
         this.properties = properties;
         String dsName = properties.get(RDBMSAnalyticsDSConstants.DATASOURCE);
         if (dsName == null) {
-            throw new AnalyticsException("The property '" + 
+            throw new AnalyticsException("The property '" +
                     RDBMSAnalyticsDSConstants.DATASOURCE + "' is required");
         }
         String partitionCountProp = properties.get(RDBMSAnalyticsDSConstants.PARTITION_COUNT);
         if (partitionCountProp != null) {
             this.partitionCount = Integer.parseInt(partitionCountProp);
         }
-        try {
-            this.dataSource = (DataSource) GenericUtils.loadGlobalDataSource(dsName);
+        /*try {
+            this.dataSource = (DataSource) AnalyticsUtils.loadGlobalDataSource(dsName);
         } catch (DataSourceException e) {
             throw new AnalyticsException("Error in loading data source: " + e.getMessage(), e);
-        }
+        }*/
         if (this.rdbmsQueryConfigurationEntry == null) {
             String category = properties.get(RDBMSAnalyticsDSConstants.CATEGORY);
             this.rdbmsQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource, category);
         }
+
+        // TODO: Logic for retrieving datasources and DB connection creation
+
     }
-        
+
     public RDBMSQueryConfigurationEntry getQueryConfiguration() {
         return rdbmsQueryConfigurationEntry;
     }
-    
+
     public int getPartitionCount() {
         return partitionCount;
     }
-    
-    private String[] getRecordTableInitQueries(int tenantId, String tableName) {
+
+    private String[] getRecordTableInitQueries(String tableName) {
         String[] queries = this.getQueryConfiguration().getRecordTableInitQueries();
         String[] result = new String[queries.length];
         for (int i = 0; i < queries.length; i++) {
-            result[i] = this.translateQueryWithTableInfo(queries[i], tenantId, tableName);
+            result[i] = this.translateQueryWithTableInfo(queries[i], tableName);
         }
         return result;
     }
-    
-    private String[] getRecordTableDeleteQueries(int tenantId, String tableName) {
+
+    private String[] getRecordTableDeleteQueries(String tableName) {
         String[] queries = this.getQueryConfiguration().getRecordTableDeleteQueries();
         String[] result = new String[queries.length];
         for (int i = 0; i < queries.length; i++) {
-            result[i] = this.translateQueryWithTableInfo(queries[i], tenantId, tableName);
+            result[i] = this.translateQueryWithTableInfo(queries[i], tableName);
         }
         return result;
     }
-    
-    public Map<String, String> getProperties() {
-        return properties;
-    }
-    
+
     public DataSource getDataSource() {
         return dataSource;
     }
-    
+
     private Connection getConnection() throws SQLException {
         return this.getConnection(true);
     }
-    
+
     private Connection getConnection(boolean autoCommit) throws SQLException {
         Connection conn = this.getDataSource().getConnection();
         conn.setAutoCommit(autoCommit);
         return conn;
     }
-    
+
     @Override
     public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if (records.size() == 0) {
@@ -134,7 +134,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         Connection conn = null;
         try {
             conn = this.getConnection(false);
-            Collection<List<Record>> recordBatches = GenericUtils.generateRecordBatches(records);
+            Collection<List<Record>> recordBatches = AnalyticsUtils.generateRecordBatches(records);
             for (List<Record> batch : recordBatches) {
                 this.addRecordsSimilar(conn, batch);
             }
@@ -149,27 +149,26 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
     }
-    
-    private void addRecordsSimilar(Connection conn, 
-            List<Record> records) throws SQLException, 
+
+    private void addRecordsSimilar(Connection conn,
+                                   List<Record> records) throws SQLException,
             AnalyticsException, AnalyticsTableNotAvailableException {
         Record firstRecord = records.get(0);
-        int tenantId = firstRecord.getTenantId();
         String tableName = firstRecord.getTableName();
-        String mergeSQL = this.getRecordMergeSQL(tenantId, tableName);
+        String mergeSQL = this.getRecordMergeSQL(tableName);
         if (mergeSQL != null) {
             try {
-                this.mergeRecordsSimilar(conn, records, tenantId, tableName, mergeSQL);
+                this.mergeRecordsSimilar(conn, records, tableName, mergeSQL);
             } catch (SQLException e) {
-                /* merge has been failed, maybe because one of some constraint violations,
+                /* merge has failed, maybe because one of some constraint violations,
                 * lets try to sequentially insert/update */
-                this.insertAndUpdateRecordsSimilar(conn, records, tenantId, tableName);
+                this.insertAndUpdateRecordsSimilar(conn, records, tableName);
             }
         } else {
-            this.insertAndUpdateRecordsSimilar(conn, records, tenantId, tableName);
+            this.insertAndUpdateRecordsSimilar(conn, records, tableName);
         }
     }
-    
+
     private int abs(int val) {
         if (val == Integer.MIN_VALUE) {
             return Integer.MAX_VALUE;
@@ -177,16 +176,16 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             return Math.abs(val);
         }
     }
-    
+
     private int generatePartitionKey(String id) {
         return this.abs(id.hashCode()) % this.getPartitionCount();
     }
-    
-    private void populateStatementForAdd(PreparedStatement stmt, 
-            Record record) throws SQLException, AnalyticsException {
+
+    private void populateStatementForAdd(PreparedStatement stmt,
+                                         Record record) throws SQLException, AnalyticsException {
         stmt.setInt(1, this.generatePartitionKey(record.getId()));
         stmt.setLong(2, record.getTimestamp());
-        byte [] bytes = GenericUtils.encodeRecordValues(record.getValues());
+        byte[] bytes = AnalyticsUtils.encodeRecordValues(record.getValues());
         if (!this.rdbmsQueryConfigurationEntry.isBlobLengthRequired()) {
             stmt.setBinaryStream(3, new ByteArrayInputStream(bytes));
         } else {
@@ -194,9 +193,8 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
         stmt.setString(4, record.getId());
     }
-    
-    private void mergeRecordsSimilar(Connection conn,
-            List<Record> records, int tenantId, String tableName, String query) 
+
+    private void mergeRecordsSimilar(Connection conn, List<Record> records, String tableName, String query)
             throws SQLException, AnalyticsException, AnalyticsTableNotAvailableException {
         PreparedStatement stmt = null;
         try {
@@ -209,8 +207,8 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             conn.commit();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
-            if (!this.tableExists(conn, tenantId, tableName)) {
-                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+            if (!this.tableExists(conn, tableName)) {
+                throw new AnalyticsTableNotAvailableException(tableName);
             } else {
                 throw e;
             }
@@ -218,29 +216,26 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             RDBMSUtils.cleanupConnection(null, stmt, null);
         }
     }
-    
-    private void insertAndUpdateRecordsSimilar(Connection conn, 
-            List<Record> records, int tenantId, String tableName) throws SQLException, 
-            AnalyticsException, AnalyticsTableNotAvailableException {
+
+    private void insertAndUpdateRecordsSimilar(Connection conn, List<Record> records, String tableName)
+            throws SQLException, AnalyticsException, AnalyticsTableNotAvailableException {
         try {
-            this.insertBatchRecordsSimilar(conn, records, tenantId, tableName);
+            this.insertBatchRecordsSimilar(conn, records, tableName);
         } catch (SQLException e) {
             /* batch insert failed, maybe because one of the records were already there,
              * lets try to sequentially insert/update */
-            this.insertAndUpdateRecordsSimilarSequentially(conn, records, tenantId, tableName);
-        } catch (AnalyticsException e1) {
-            throw e1;
+            this.insertAndUpdateRecordsSimilarSequentially(conn, records, tableName);
         }
     }
 
 
-    private void insertAndUpdateRecordsSimilarSequentially(Connection conn,
-                                                           List<Record> records, int tenantId, String tableName) throws SQLException, AnalyticsException {
+    private void insertAndUpdateRecordsSimilarSequentially(Connection conn, List<Record> records,
+                                                           String tableName) throws SQLException, AnalyticsException {
         PreparedStatement insertStatement = null;
         PreparedStatement updateStatement = null;
         try {
-            insertStatement = conn.prepareStatement(this.getRecordInsertSQL(tenantId, tableName));
-            updateStatement = conn.prepareStatement(this.getRecordUpdateSQL(tenantId, tableName));
+            insertStatement = conn.prepareStatement(this.getRecordInsertSQL(tableName));
+            updateStatement = conn.prepareStatement(this.getRecordUpdateSQL(tableName));
             for (Record record : records) {
                 try {
                     this.populateStatementForAdd(insertStatement, record);
@@ -265,83 +260,65 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
 
-    private void insertBatchRecordsSimilar(Connection conn, 
-            List<Record> records, int tenantId, String tableName) throws SQLException, 
+    private void insertBatchRecordsSimilar(Connection conn,
+                                           List<Record> records, String tableName) throws SQLException,
             AnalyticsException, AnalyticsTableNotAvailableException {
-        String query = this.getRecordInsertSQL(tenantId, tableName);
-        PreparedStatement stmt = null;
-        try {
-            stmt = conn.prepareStatement(query);
-            for (Record record : records) {
-                this.populateStatementForAdd(stmt, record);
-                stmt.addBatch();
-            }
-            stmt.executeBatch();
-            conn.commit();
-        } catch (SQLException e) {
-            RDBMSUtils.rollbackConnection(conn);
-            if (!this.tableExists(conn, tenantId, tableName)) {
-                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
-            } else {
-                throw e;
-            }
-        } finally {
-            RDBMSUtils.cleanupConnection(null, stmt, null);
-        }
+        String query = this.getRecordInsertSQL(tableName);
+        this.mergeRecordsSimilar(conn, records, tableName, query);
     }
-    
-    private String getRecordMergeSQL(int tenantId, String tableName) {
-    	String query = this.getQueryConfiguration().getRecordMergeQuery();
-    	return translateQueryWithTableInfo(query, tenantId, tableName);
+
+    private String getRecordMergeSQL(String tableName) {
+        String query = this.getQueryConfiguration().getRecordMergeQuery();
+        return translateQueryWithTableInfo(query, tableName);
     }
-    
-    private String getRecordInsertSQL(int tenantId, String tableName) {
+
+    private String getRecordInsertSQL(String tableName) {
         String query = this.getQueryConfiguration().getRecordInsertQuery();
-        return translateQueryWithTableInfo(query, tenantId, tableName);
+        return translateQueryWithTableInfo(query, tableName);
     }
-    
-    private String getRecordUpdateSQL(int tenantId, String tableName) {
+
+    private String getRecordUpdateSQL(String tableName) {
         String query = this.getQueryConfiguration().getRecordUpdateQuery();
-        return translateQueryWithTableInfo(query, tenantId, tableName);
+        return translateQueryWithTableInfo(query, tableName);
     }
-    
-    private boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
+
+    private boolean tableExists(String tableName) throws AnalyticsException {
         Connection conn = null;
         try {
             conn = this.getConnection();
-            return this.tableExists(conn, tenantId, tableName);
+            return this.tableExists(conn, tableName);
         } catch (SQLException e) {
             throw new AnalyticsException("Error in tableExists: " + e.getMessage(), e);
-        } finally {            
+        } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
     }
-    
+
     @Override
-    public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, 
-            List<String> ids) throws AnalyticsException,
+    public RecordGroup[] get(String tableName, int numPartitionsHint, List<String> columns,
+                             List<String> ids) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
-        if (!this.tableExists(tenantId, tableName)) {
-            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        if (!this.tableExists(tableName)) {
+            throw new AnalyticsTableNotAvailableException(tableName);
         }
-        return new RDBMSIDsRecordGroup[] { new RDBMSIDsRecordGroup(tenantId, tableName, columns, ids) };
+        return new RDBMSIDsRecordGroup[]{new RDBMSIDsRecordGroup(tableName, columns, ids)};
     }
-    
-    private List<Integer[]> generatePartitionPlan(int numPartitionsHint) throws AnalyticsException, 
+
+    private List<Integer[]> generatePartitionPlan(int numPartitionsHint) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
-        List<Integer[]> result = GenericUtils.splitNumberRange(this.getPartitionCount(), numPartitionsHint);
+        List<Integer[]> result = AnalyticsUtils.splitNumberRange(this.getPartitionCount(), numPartitionsHint);
         for (Integer[] entry : result) {
             entry[1] = entry[0] + entry[1];
         }
         return result;
     }
-    
+
     @Override
-    public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
-            long timeFrom, long timeTo, int recordsFrom, int recordsCount)
+    public RecordGroup[] get(String tableName, int numPartitionsHint, List<String> columns,
+                             long timeFrom, long timeTo, int recordsFrom, int recordsCount)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        if (!this.tableExists(tenantId, tableName)) {
-            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        if (!this.tableExists(tableName)) {
+            throw new AnalyticsTableNotAvailableException(tableName);
         }
         if (numPartitionsHint > 1 && (recordsFrom > 0 || (recordsCount != -1 && recordsCount != Integer.MAX_VALUE))) {
             numPartitionsHint = 1;
@@ -351,7 +328,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         Integer[] param;
         for (int i = 0; i < result.length; i++) {
             param = params.get(i);
-            result[i] = new RDBMSRangeRecordGroup(tenantId, tableName, columns, timeFrom, timeTo, 
+            result[i] = new RDBMSRangeRecordGroup(tableName, columns, timeFrom, timeTo,
                     recordsFrom, recordsCount, param[0], param[1]);
         }
         return result;
@@ -361,33 +338,33 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     public AnalyticsIterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
         if (recordGroup instanceof RDBMSRangeRecordGroup) {
             RDBMSRangeRecordGroup recordRangeGroup = (RDBMSRangeRecordGroup) recordGroup;
-            return this.getRecords(recordRangeGroup.getTenantId(), recordRangeGroup.getTableName(), 
-                    recordRangeGroup.getColumns(), recordRangeGroup.getTimeFrom(), 
+            return this.getRecords(recordRangeGroup.getTableName(),
+                    recordRangeGroup.getColumns(), recordRangeGroup.getTimeFrom(),
                     recordRangeGroup.getTimeTo(), recordRangeGroup.getRecordsFrom(), recordRangeGroup.getRecordsCount(),
                     recordRangeGroup.getPartitionStart(), recordRangeGroup.getPartitionEnd());
         } else if (recordGroup instanceof RDBMSIDsRecordGroup) {
             RDBMSIDsRecordGroup recordIdGroup = (RDBMSIDsRecordGroup) recordGroup;
-            return this.getRecords(recordIdGroup.getTenantId(), recordIdGroup.getTableName(), 
+            return this.getRecords(recordIdGroup.getTableName(),
                     recordIdGroup.getColumns(), recordIdGroup.getIds());
         } else {
             throw new AnalyticsException("Invalid RDBMS RecordGroup implementation: " + recordGroup.getClass());
         }
     }
-    
-    public AnalyticsIterator<Record> getRecords(int tenantId, String tableName, List<String> columns,
+
+    public AnalyticsIterator<Record> getRecords(String tableName, List<String> columns,
                                                 long timeFrom, long timeTo, int recordsFrom,
-                                                int recordsCount, int partitionStart, 
-                                                int partitionEnd) throws AnalyticsException, 
-                                                AnalyticsTableNotAvailableException {
+                                                int recordsCount, int partitionStart,
+                                                int partitionEnd) throws AnalyticsException,
+            AnalyticsTableNotAvailableException {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             conn = this.getConnection(false);
             if (!this.rdbmsQueryConfigurationEntry.isForwardOnlyReadEnabled()) {
-                stmt = conn.prepareStatement(this.getRecordRetrievalQuery(tenantId, tableName));
+                stmt = conn.prepareStatement(this.getRecordRetrievalQuery(tableName));
             } else {
-                stmt = conn.prepareStatement(this.getRecordRetrievalQuery(tenantId, tableName),
+                stmt = conn.prepareStatement(this.getRecordRetrievalQuery(tableName),
                         ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
                 stmt.setFetchSize(this.rdbmsQueryConfigurationEntry.getFetchSize());
             }
@@ -402,51 +379,51 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             stmt.setInt(5, paginationIndices[0]);
             stmt.setInt(6, paginationIndices[1]);
             rs = stmt.executeQuery();
-            return new RDBMSResultSetIterator(tenantId, tableName, columns, conn, stmt, rs);
+            return new RDBMSResultSetIterator(tableName, columns, conn, stmt, rs);
         } catch (SQLException e) {
-            if (conn != null && !this.tableExists(conn, tenantId, tableName)) {
+            if (conn != null && !this.tableExists(conn, tableName)) {
                 RDBMSUtils.cleanupConnection(rs, stmt, conn);
-                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+                throw new AnalyticsTableNotAvailableException(tableName);
             } else {
                 RDBMSUtils.cleanupConnection(rs, stmt, conn);
                 throw new AnalyticsException("Error in retrieving records: " + e.getMessage(), e);
-            }            
+            }
         }
     }
-    
+
     private int[] calculateIndicesForPaginationMode(int recordsFrom, int recordsCount) {
         switch (this.rdbmsQueryConfigurationEntry.getPaginationMode()) {
-        case MODE1:
+            case MODE1:
             /* MySQL, H2, MSSQL 2012 like */
-            return new int[] { recordsFrom, recordsCount };
-        case MODE2:
+                return new int[]{recordsFrom, recordsCount};
+            case MODE2:
             /* Oracle, MSSQL ROWNUM like */
-            return new int[] {recordsFrom + recordsCount, recordsFrom};
-        case MODE3:
+                return new int[]{recordsFrom + recordsCount, recordsFrom};
+            case MODE3:
             /* inverse MODE2 */
-            return new int[] {recordsFrom, recordsFrom + recordsCount};
-        default:
-            throw new IllegalArgumentException("Invalid pagination mode: " + 
-                    this.rdbmsQueryConfigurationEntry.getPaginationMode());
+                return new int[]{recordsFrom, recordsFrom + recordsCount};
+            default:
+                throw new IllegalArgumentException("Invalid pagination mode: " +
+                        this.rdbmsQueryConfigurationEntry.getPaginationMode());
         }
     }
-    
-    public AnalyticsIterator<Record> getRecords(int tenantId, String tableName, List<String> columns,
+
+    public AnalyticsIterator<Record> getRecords(String tableName, List<String> columns,
                                                 List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if (ids.isEmpty()) {
             return new EmptyResultSetAnalyticsIterator();
         }
         if (ids.size() > this.rdbmsQueryConfigurationEntry.getRecordBatchSize()) {
             List<List<String>> idsSubLists = Lists.partition(ids, this.rdbmsQueryConfigurationEntry.getRecordBatchSize());
-            RDBMSIDsRecordGroup [] rdbmsIDsRecordGroups = new RDBMSIDsRecordGroup[idsSubLists.size()];
+            RDBMSIDsRecordGroup[] rdbmsIDsRecordGroups = new RDBMSIDsRecordGroup[idsSubLists.size()];
             int index = 0;
-            for(List<String> idSubList : idsSubLists) {
-                rdbmsIDsRecordGroups[index] =  new RDBMSIDsRecordGroup(tenantId, tableName, columns, idSubList);
+            for (List<String> idSubList : idsSubLists) {
+                rdbmsIDsRecordGroups[index] = new RDBMSIDsRecordGroup(tableName, columns, idSubList);
                 index++;
             }
             return new RDBMSRecordIDListIterator(this, rdbmsIDsRecordGroups);
         }
-        String recordGetSQL = this.generateGetRecordRetrievalWithIdQuery(tenantId, tableName, ids.size());
+        String recordGetSQL = this.generateGetRecordRetrievalWithIdQuery(tableName, ids.size());
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -457,11 +434,11 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
                 stmt.setString(i + 1, ids.get(i));
             }
             rs = stmt.executeQuery();
-            return new RDBMSResultSetIterator(tenantId, tableName, columns, conn, stmt, rs);
+            return new RDBMSResultSetIterator(tableName, columns, conn, stmt, rs);
         } catch (SQLException e) {
-            if (conn != null && !this.tableExists(conn, tenantId, tableName)) {
+            if (conn != null && !this.tableExists(conn, tableName)) {
                 RDBMSUtils.cleanupConnection(rs, stmt, conn);
-                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+                throw new AnalyticsTableNotAvailableException(tableName);
             } else {
                 RDBMSUtils.cleanupConnection(rs, stmt, conn);
                 throw new AnalyticsException("Error in retrieving records: " + e.getMessage(), e);
@@ -470,9 +447,8 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     @Override
-    public void delete(int tenantId, String tableName, long timeFrom, long timeTo)
-            throws AnalyticsException, AnalyticsTableNotAvailableException {
-        String sql = this.getRecordDeletionQuery(tenantId, tableName);
+    public void delete(String tableName, long timeFrom, long timeTo) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        String sql = this.getRecordDeletionQuery(tableName);
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
@@ -483,8 +459,8 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             stmt.executeUpdate();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
-            if (conn != null && !this.tableExists(conn, tenantId, tableName)) {
-                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+            if (conn != null && !this.tableExists(conn, tableName)) {
+                throw new AnalyticsTableNotAvailableException(tableName);
             } else {
                 throw new AnalyticsException("Error in deleting records: " + e.getMessage(), e);
             }
@@ -492,10 +468,9 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             RDBMSUtils.cleanupConnection(null, stmt, conn);
         }
     }
-        
+
     @Override
-    public void delete(int tenantId, String tableName, 
-            List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
+    public void delete(String tableName, List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if (ids.size() == 0) {
             return;
         }
@@ -504,7 +479,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         try {
             conn = this.getConnection();
             for (List<String> idSubList : idsSubLists) {
-                this.delete(conn, tenantId, tableName, idSubList);
+                this.delete(conn, tableName, idSubList);
             }
         } catch (SQLException e) {
             throw new AnalyticsException("Error in deleting records: " + e.getMessage(), e);
@@ -518,9 +493,9 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         /* do nothing */
     }
 
-    private void delete(Connection conn, int tenantId, String tableName, 
-            List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        String sql = this.generateRecordDeletionRecordsWithIdsQuery(tenantId, tableName, ids.size());
+    private void delete(Connection conn, String tableName,
+                        List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        String sql = this.generateRecordDeletionRecordsWithIdsQuery(tableName, ids.size());
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(sql);
@@ -529,8 +504,8 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             }
             stmt.executeUpdate();
         } catch (SQLException e) {
-            if (!this.tableExists(conn, tenantId, tableName)) {
-                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+            if (!this.tableExists(conn, tableName)) {
+                throw new AnalyticsTableNotAvailableException(tableName);
             } else {
                 throw new AnalyticsException("Error in deleting records: " + e.getMessage(), e);
             }
@@ -538,41 +513,41 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             RDBMSUtils.cleanupConnection(null, stmt, null);
         }
     }
-    
-    private String generateTargetTableName(int tenantId, String tableName) {
-        return GenericUtils.generateTableUUID(tenantId, tableName);
+
+    private String generateTargetTableName(String tableName) {
+        return AnalyticsUtils.generateTableUUID(tableName);
     }
-    
-    private String translateQueryWithTableInfo(String query, int tenantId, String tableName) {
+
+    private String translateQueryWithTableInfo(String query, String tableName) {
         if (query == null) {
             return null;
         }
-        return query.replace(TABLE_NAME_PLACEHOLDER, this.generateTargetTableName(tenantId, tableName));
+        return query.replace(TABLE_NAME_PLACEHOLDER, this.generateTargetTableName(tableName));
     }
-    
+
     private String translateQueryWithRecordIdsInfo(String query, int recordCount) {
         return query.replace(RECORD_IDS_PLACEHOLDER, this.getDynamicSQLParams(recordCount));
     }
-    
-    private String getRecordRetrievalQuery(int tenantId, String tableName) {
+
+    private String getRecordRetrievalQuery(String tableName) {
         String query = this.getQueryConfiguration().getRecordRetrievalQuery();
-        return this.translateQueryWithTableInfo(query, tenantId, tableName);
+        return this.translateQueryWithTableInfo(query, tableName);
     }
-    
-    private String generateGetRecordRetrievalWithIdQuery(int tenantId, String tableName, int recordCount) {
+
+    private String generateGetRecordRetrievalWithIdQuery(String tableName, int recordCount) {
         String query = this.getQueryConfiguration().getRecordRetrievalWithIdsQuery();
-        query = this.translateQueryWithTableInfo(query, tenantId, tableName);
+        query = this.translateQueryWithTableInfo(query, tableName);
         query = this.translateQueryWithRecordIdsInfo(query, recordCount);
         return query;
     }
-    
-    private String generateRecordDeletionRecordsWithIdsQuery(int tenantId, String tableName, int recordCount) {
+
+    private String generateRecordDeletionRecordsWithIdsQuery(String tableName, int recordCount) {
         String query = this.getQueryConfiguration().getRecordDeletionWithIdsQuery();
-        query = this.translateQueryWithTableInfo(query, tenantId, tableName);
+        query = this.translateQueryWithTableInfo(query, tableName);
         query = this.translateQueryWithRecordIdsInfo(query, recordCount);
         return query;
     }
-    
+
     private String getDynamicSQLParams(int count) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < count; i++) {
@@ -584,57 +559,57 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
         return builder.toString();
     }
-    
-    private String getRecordDeletionQuery(int tenantId, String tableName) {
+
+    private String getRecordDeletionQuery(String tableName) {
         String query = this.getQueryConfiguration().getRecordDeletionQuery();
-        return this.translateQueryWithTableInfo(query, tenantId, tableName);
+        return this.translateQueryWithTableInfo(query, tableName);
     }
-    
+
     @Override
-    public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
+    public void deleteTable(String tableName) throws AnalyticsException {
         Connection conn = null;
         try {
             conn = this.getConnection();
-            Map<String, Object[]> queries = new HashMap<String, Object[]>();
-            String[] tableInitQueries = this.getRecordTableDeleteQueries(tenantId, tableName);
+            Map<String, Object[]> queries = new HashMap<>();
+            String[] tableInitQueries = this.getRecordTableDeleteQueries(tableName);
             queries.putAll(RDBMSUtils.generateNoParamQueryMap(tableInitQueries));
             RDBMSUtils.executeAllUpdateQueries(conn, queries);
         } catch (SQLException | AnalyticsException e) {
-            if (conn == null || this.tableExists(conn, tenantId, tableName)) {
+            if (conn == null || this.tableExists(conn, tableName)) {
                 throw new AnalyticsException("Error in deleting table: " + e.getMessage(), e);
-            }            
+            }
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
     }
-        
+
     @Override
-    public void createTable(int tenantId, String tableName) throws AnalyticsException {
+    public void createTable(String tableName) throws AnalyticsException {
         Connection conn = null;
         try {
             conn = this.getConnection();
-            String[] tableInitQueries = this.getRecordTableInitQueries(tenantId, tableName);
+            String[] tableInitQueries = this.getRecordTableInitQueries(tableName);
             Map<String, Object[]> queries = RDBMSUtils.generateNoParamQueryMap(tableInitQueries);
             RDBMSUtils.executeAllUpdateQueries(conn, queries);
         } catch (SQLException | AnalyticsException e) {
-            if (conn == null || !this.tableExists(conn, tenantId, tableName)) {
+            if (conn == null || !this.tableExists(conn, tableName)) {
                 throw new AnalyticsException("Error in creating table: " + e.getMessage(), e);
             }
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
     }
-    
-    private String getRecordTableCheckQuery(int tenantId, String tableName) {
+
+    private String getRecordTableCheckQuery(String tableName) {
         String query = this.getQueryConfiguration().getRecordTableCheckQuery();
-        return this.translateQueryWithTableInfo(query, tenantId, tableName);
+        return this.translateQueryWithTableInfo(query, tableName);
     }
-    
-    private boolean tableExists(Connection conn, int tenantId, String tableName) {
+
+    private boolean tableExists(Connection conn, String tableName) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            String query = this.getRecordTableCheckQuery(tenantId, tableName);
+            String query = this.getRecordTableCheckQuery(tableName);
             stmt = conn.prepareStatement(query);
             rs = stmt.executeQuery();
             return true;
@@ -646,89 +621,28 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
 
-    private String getRecordCountQuery(int tenantId, String tableName) {
-        String query = this.getQueryConfiguration().getRecordCountQuery();
-        return this.translateQueryWithTableInfo(query, tenantId, tableName);
-    }
-    
-    private String printableTableName(int tenantId, String tableName) {
-        return "[" + tenantId + ":" + tableName + "]";
-    }
-
-    @Override
-    public boolean isPaginationSupported() {
-        return this.rdbmsQueryConfigurationEntry.isPaginationSupported();
-    }
-    
-    @Override
-    public boolean isRecordCountSupported() {
-        return this.rdbmsQueryConfigurationEntry.isRecordCountSupported();
-    }
-
-    @Override
-    public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo)
-            throws AnalyticsException, AnalyticsTableNotAvailableException {
-        if (this.rdbmsQueryConfigurationEntry.isRecordCountSupported()) {
-            String recordCountQuery = this.getRecordCountQuery(tenantId, tableName);
-            Connection conn = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
-            try {
-                conn = this.getConnection();
-                stmt = conn.prepareStatement(recordCountQuery);
-                stmt.setLong(1, timeFrom);
-                stmt.setLong(2, timeTo);
-                rs = stmt.executeQuery();
-                if (rs.next()) {
-                    return rs.getLong(1);
-                } else {
-                    throw new AnalyticsException("Record count not available for " +
-                            printableTableName(tenantId, tableName));
-                }
-            } catch (SQLException e) {
-                if (conn != null && !this.tableExists(conn, tenantId, tableName)) {
-                    throw new AnalyticsTableNotAvailableException(tenantId, tableName);
-                }
-                throw new AnalyticsException("Error in retrieving record count: " + e.getMessage(), e);
-            } finally {
-                RDBMSUtils.cleanupConnection(rs, stmt, conn);
-            }
-        } else {
-            return -1L;
-        }
-    }
-    
     /**
      * This class represents the RDBMS result set iterator, which will stream the result records out.
      */
     private static class RDBMSResultSetIterator implements AnalyticsIterator<Record> {
 
-        private int tenantId;
-        
         private String tableName;
-        
         private List<String> columns;
-        
         private Connection conn;
-        
         private Statement stmt;
-        
         private ResultSet rs;
-        
         private Record nextValue;
-        
         private boolean prefetched;
-        
-        public RDBMSResultSetIterator(int tenantId, String tableName, List<String> columns, 
-                Connection conn, Statement stmt, ResultSet rs) {
-            this.tenantId = tenantId;
+
+        public RDBMSResultSetIterator(String tableName, List<String> columns,
+                                      Connection conn, Statement stmt, ResultSet rs) {
             this.tableName = tableName;
             this.columns = columns;
             this.conn = conn;
             this.stmt = stmt;
             this.rs = rs;
         }
-        
+
         @Override
         public boolean hasNext() {
             if (!this.prefetched) {
@@ -755,11 +669,11 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
                     byte[] bytes = this.rs.getBytes(3);
                     Map<String, Object> values;
                     if (bytes != null) {
-                        values = GenericUtils.decodeRecordValues(bytes, colSet);
+                        values = AnalyticsUtils.decodeRecordValues(bytes, colSet);
                     } else {
                         values = new HashMap<>(0);
                     }
-                    return new Record(this.rs.getString(1), this.tenantId, this.tableName, values, this.rs.getLong(2));                
+                    return new Record(this.rs.getString(1), this.tableName, values, this.rs.getLong(2));
                 } else {
                     /* end of the result set, time to clean up.. */
                     RDBMSUtils.cleanupConnection(this.rs, this.stmt, this.conn);
@@ -817,7 +731,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         public void remove() {
             /* Nothing to do */
         }
-        
+
     }
 
     /**
@@ -854,7 +768,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
                     try {
                         this.index++;
                         RDBMSIDsRecordGroup recordIdGroup = (RDBMSIDsRecordGroup) (rgs[index]);
-                        this.itr = this.reader.getRecords(recordIdGroup.getTenantId(), recordIdGroup.getTableName(),
+                        this.itr = this.reader.getRecords(recordIdGroup.getTableName(),
                                 recordIdGroup.getColumns(), recordIdGroup.getIds());
                     } catch (AnalyticsException e) {
                         throw new IllegalStateException("Error in traversing record group: " + e.getMessage(), e);

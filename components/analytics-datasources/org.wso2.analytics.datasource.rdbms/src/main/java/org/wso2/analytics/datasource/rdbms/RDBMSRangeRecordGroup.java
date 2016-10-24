@@ -24,22 +24,33 @@ import org.wso2.analytics.dataservice.commons.exception.AnalyticsException;
 import java.util.List;
 
 /**
- * RDBMS {@link RecordGroup} implementation with given record ids.
+ * RDBMS range based implementation of {@link RecordGroup}.
  */
-public class RDBMSIDsRecordGroup implements RecordGroup {
+public class RDBMSRangeRecordGroup implements RecordGroup {
 
-    private static final long serialVersionUID = 4900051873387043121L;
+    private static final long serialVersionUID = -7561378201354396921L;
     private String tableName;
     private List<String> columns;
-    private List<String> ids;
+    private long timeFrom;
+    private long timeTo;
+    private int recordsFrom;
+    private int recordsCount;
+    private int partitionStart;
+    private int partitionEnd;
 
-    public RDBMSIDsRecordGroup() {
+    public RDBMSRangeRecordGroup() {
     }
 
-    public RDBMSIDsRecordGroup(String tableName, List<String> columns, List<String> ids) {
+    public RDBMSRangeRecordGroup(String tableName, List<String> columns, long timeFrom, long timeTo,
+                                 int recordsFrom, int recordsCount, int partitionStart, int partitionEnd) {
         this.tableName = tableName;
         this.columns = columns;
-        this.ids = ids;
+        this.timeFrom = timeFrom;
+        this.timeTo = timeTo;
+        this.recordsFrom = recordsFrom;
+        this.recordsCount = recordsCount;
+        this.partitionStart = partitionStart;
+        this.partitionEnd = partitionEnd;
     }
 
     public String getTableName() {
@@ -50,8 +61,28 @@ public class RDBMSIDsRecordGroup implements RecordGroup {
         return columns;
     }
 
-    public List<String> getIds() {
-        return ids;
+    public long getTimeFrom() {
+        return timeFrom;
+    }
+
+    public long getTimeTo() {
+        return timeTo;
+    }
+
+    public int getRecordsFrom() {
+        return recordsFrom;
+    }
+
+    public int getRecordsCount() {
+        return recordsCount;
+    }
+
+    public int getPartitionStart() {
+        return partitionStart;
+    }
+
+    public int getPartitionEnd() {
+        return partitionEnd;
     }
 
     @Override
