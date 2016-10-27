@@ -77,6 +77,10 @@ public class BinaryDataEndpoint extends DataEndpoint {
         } catch (Exception e) {
             if (e instanceof DataEndpointException) {
                 throw (DataEndpointException) e;
+            } else if (e instanceof UndefinedEventTypeException) {
+                throw new UndefinedEventTypeException("Undefined Event Type Exception ", e);
+            } else if (e instanceof SessionTimeoutException) {
+                throw new SessionTimeoutException("Binary Session Expired Exception ", e);
             } else {
                 throw new DataEndpointException("Error while trying to publish events to data receiver :"
                         + socket.getRemoteSocketAddress().toString(), e);
