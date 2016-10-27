@@ -21,6 +21,8 @@ package org.wso2.carbon.event.output.adapter.ui;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Event;
@@ -49,11 +51,11 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class UIEventAdapter implements OutputEventAdapter {
-
     private static final Log log = LogFactory.getLog(UIEventAdapter.class);
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
     private String streamId;
+    private UIOutputAuthorizationService authorizationService;
     private int queueSize;
     private LinkedBlockingDeque<Object> streamSpecificEvents;
     private static ThreadPoolExecutor executorService;
@@ -167,6 +169,8 @@ public class UIEventAdapter implements OutputEventAdapter {
         } else {
             queueSize = UIEventAdapterConstants.EVENTS_QUEUE_SIZE;
         }
+        //TODO: set and get the authorization service name
+        authorizationService = UIEventAdaptorServiceInternalValueHolder.getAuthorizationService(null);
     }
 
     @Override
@@ -254,7 +258,6 @@ public class UIEventAdapter implements OutputEventAdapter {
 
     @Override
     public void destroy() {
-
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         ConcurrentHashMap<String, String> tenantSpecificAdapterMap = UIEventAdaptorServiceInternalValueHolder
@@ -296,7 +299,6 @@ public class UIEventAdapter implements OutputEventAdapter {
          */
         @Override
         public void run() {
-
             UIOutputCallbackControllerServiceImpl uiOutputCallbackControllerServiceImpl = UIEventAdaptorServiceInternalValueHolder.getUIOutputCallbackRegisterServiceImpl();
             CopyOnWriteArrayList<SessionHolder> sessions = uiOutputCallbackControllerServiceImpl.getSessions(tenantId, streamId);
             if (sessions != null) {
@@ -304,9 +306,12 @@ public class UIEventAdapter implements OutputEventAdapter {
                 for (SessionHolder session : sessions) {
                     synchronized (session) {
                         try {
-                            session.sendText(message);
-//                          session.getBasicRemote().sendText(message);
-                        } catch (IOException e) {
+                            JSONArray eventJson = new JSONArray(message);
+                            if (authorizationService.authorizeSubscription(eventJson, session.getFilterProps(),
+                                    session.getUsername(), session.getTenantId())){
+                                session.sendText(message);
+                            }
+                        } catch (IOException | JSONException | UIAdaptorException e) {
                             EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to endpoint", e, log, tenantId);
                         }
                     }

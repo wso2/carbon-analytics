@@ -27,6 +27,7 @@ import org.wso2.carbon.event.output.adapter.ui.internal.ds.UIEventAdaptorService
 import org.wso2.carbon.event.output.adapter.ui.internal.util.UIEventAdapterConstants;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -103,10 +104,8 @@ public class UIOutputCallbackControllerServiceImpl implements UIOutputCallbackCo
      * @return the events list.
      */
     public LinkedBlockingDeque<Object> getEvents(int tenanId, String streamName, String version) {
-
         ConcurrentHashMap<String, LinkedBlockingDeque<Object>> tenantSpecificStreamMap =
                 UIEventAdaptorServiceInternalValueHolder.getTenantSpecificStreamEventMap().get(tenanId);
-
         if (tenantSpecificStreamMap != null) {
             String streamId = streamName + UIEventAdapterConstants.ADAPTER_UI_COLON + version;
             return tenantSpecificStreamMap.get(streamId);

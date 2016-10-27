@@ -19,10 +19,17 @@
 package org.wso2.carbon.event.output.adapter.ui;
 
 import java.io.IOException;
+import java.util.Map;
 
 public interface SessionHolder {
 
     public String getId();
+
+    public String getUsername();
+
+    public int getTenantId();
+
+    public Map<Integer, String> getFilterProps();
 
     public void sendText(String message) throws IOException;
 }

@@ -19,9 +19,15 @@
  */
 package org.wso2.carbon.event.output.adapter.ui.internal.ds;
 
+import org.wso2.carbon.event.output.adapter.ui.UIAdaptorException;
+import org.wso2.carbon.event.output.adapter.ui.UIOutputAuthorizationService;
+import org.wso2.carbon.event.output.adapter.ui.internal.DefaultUIOutputAuthorizationServiceImpl;
 import org.wso2.carbon.event.output.adapter.ui.internal.UIOutputCallbackControllerServiceImpl;
+import org.wso2.carbon.event.output.adapter.ui.internal.util.UIEventAdapterConstants;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -31,10 +37,12 @@ import java.util.concurrent.LinkedBlockingDeque;
 public final class UIEventAdaptorServiceInternalValueHolder {
 
     private static UIOutputCallbackControllerServiceImpl UIOutputCallbackRegisterServiceImpl;
-    private static ConcurrentHashMap<Integer,ConcurrentHashMap<String, String>> tenantSpecificOutputEventStreamAdapterMap = new
-            ConcurrentHashMap<Integer,ConcurrentHashMap<String, String>>();
+    private static ConcurrentHashMap<Integer, ConcurrentHashMap<String, String>> tenantSpecificOutputEventStreamAdapterMap = new
+            ConcurrentHashMap<Integer, ConcurrentHashMap<String, String>>();
     private static ConcurrentHashMap<Integer, ConcurrentHashMap<String, LinkedBlockingDeque<Object>>> tenantSpecificStreamEventMap
             = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, LinkedBlockingDeque<Object>>>();
+    private static Map<String, UIOutputAuthorizationService> authorizationServiceRegistry = new HashMap<>();
+    private static EventStreamService eventStreamService;
 
     public static void registerUIOutputCallbackRegisterServiceInternal(
             UIOutputCallbackControllerServiceImpl UIOutputCallbackRegisterServiceImpl) {
@@ -46,12 +54,43 @@ public final class UIEventAdaptorServiceInternalValueHolder {
         return UIEventAdaptorServiceInternalValueHolder.UIOutputCallbackRegisterServiceImpl;
     }
 
-    public static ConcurrentHashMap<Integer,ConcurrentHashMap<String, String>> getTenantSpecificOutputEventStreamAdapterMap() {
+    public static ConcurrentHashMap<Integer, ConcurrentHashMap<String, String>> getTenantSpecificOutputEventStreamAdapterMap() {
         return tenantSpecificOutputEventStreamAdapterMap;
     }
 
     public static ConcurrentHashMap<Integer, ConcurrentHashMap<String, LinkedBlockingDeque<Object>>>
     getTenantSpecificStreamEventMap() {
         return tenantSpecificStreamEventMap;
+    }
+
+    public static void registerAuthorizationService(UIOutputAuthorizationService authorizationService)
+            throws UIAdaptorException {
+        if (authorizationServiceRegistry.get(authorizationService.getAuthorizationServiceName()) == null) {
+            authorizationServiceRegistry.put(authorizationService.getAuthorizationServiceName(), authorizationService);
+        } else {
+            throw new UIAdaptorException("Already UI Authorization Service Exists in name - "
+                    + authorizationService.getAuthorizationServiceName()
+                    + ", therefore cannot proceed with a new registration with same name");
+        }
+    }
+
+    public static void unresgiterAuthorizationService(String serviceName){
+        authorizationServiceRegistry.remove(serviceName);
+    }
+
+    public static UIOutputAuthorizationService getAuthorizationService(String serviceName){
+        if (serviceName == null) {
+            serviceName = UIEventAdapterConstants.DEFAULT_AUTHORIZATION_SERVICE_NAME;
+        }
+        return authorizationServiceRegistry.get(serviceName);
+    }
+
+
+    public static EventStreamService getEventStreamService() {
+        return eventStreamService;
+    }
+
+    public static void setEventStreamService(EventStreamService eventStreamService) {
+        UIEventAdaptorServiceInternalValueHolder.eventStreamService = eventStreamService;
     }
 }

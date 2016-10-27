@@ -22,6 +22,7 @@ import org.jaggeryjs.hostobjects.web.WebSocketHostObject;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Holds the Session established between the Jaggery Websocket server and the Websocket client.
@@ -29,10 +30,18 @@ import java.io.IOException;
 public class JaggerySessionHolder implements SessionHolder {
 
     private final String sessionId;
+    private Map<Integer, String> filterProps;
+    private String username;
+    private int tenantId;
     private final WebSocketHostObject webSocketHostObject;
 
-    public JaggerySessionHolder(String sessionId, WebSocketHostObject webSocketHostObject) {
+    public JaggerySessionHolder(String sessionId, Map<Integer, String> filterProps,
+                                String username, int tenantId,
+                                WebSocketHostObject webSocketHostObject) {
         this.sessionId = sessionId;
+        this.filterProps = filterProps;
+        this.username = username;
+        this.tenantId = tenantId;
         this.webSocketHostObject = webSocketHostObject;
     }
 
@@ -40,6 +49,22 @@ public class JaggerySessionHolder implements SessionHolder {
     public String getId() {
         return sessionId;
     }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public int getTenantId() {
+        return tenantId;
+    }
+
+    @Override
+    public Map<Integer, String> getFilterProps() {
+        return filterProps;
+    }
+
 
     @Override
     public void sendText(String message) throws IOException {

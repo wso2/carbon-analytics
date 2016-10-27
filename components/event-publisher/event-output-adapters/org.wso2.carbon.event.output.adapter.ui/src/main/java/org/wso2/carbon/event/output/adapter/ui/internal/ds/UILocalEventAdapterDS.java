@@ -24,13 +24,23 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpService;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
+import org.wso2.carbon.event.output.adapter.ui.UIAdaptorException;
+import org.wso2.carbon.event.output.adapter.ui.UIOutputAuthorizationService;
+import org.wso2.carbon.event.output.adapter.ui.internal.DefaultUIOutputAuthorizationServiceImpl;
 import org.wso2.carbon.event.output.adapter.ui.internal.UIOutputCallbackControllerServiceImpl;
 import org.wso2.carbon.event.output.adapter.ui.UIEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.ui.UIOutputCallbackControllerService;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.user.core.service.RealmService;
 
 /**
  * @scr.component component.name="output.Ui.AdapterService.component" immediate="true"
+ * @scr.reference name="ui.event.adapter.externsion"
+ * interface="org.wso2.carbon.event.output.adapter.ui.UIOutputAuthorizationService" cardinality="0..n"
+ * policy="dynamic" bind="setUIOutputAuthorizationService" unbind="unsetUIOutputAuthorizationService"
+ * @scr.reference name="eventStreamManager.service"
+ * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
+ * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  */
 public class UILocalEventAdapterDS {
 
@@ -42,23 +52,42 @@ public class UILocalEventAdapterDS {
      * @param context
      */
     protected void activate(ComponentContext context) {
-
         try {
             OutputEventAdapterFactory uiEventAdapterFactory = new UIEventAdapterFactory();
             context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(), uiEventAdapterFactory, null);
-
             UIOutputCallbackControllerServiceImpl UIOutputCallbackRegisterServiceImpl = new UIOutputCallbackControllerServiceImpl();
             context.getBundleContext().registerService(UIOutputCallbackControllerService.class.getName(),
                     UIOutputCallbackRegisterServiceImpl, null);
-
             UIEventAdaptorServiceInternalValueHolder.registerUIOutputCallbackRegisterServiceInternal(
                     UIOutputCallbackRegisterServiceImpl);
-
+            context.getBundleContext().registerService(UIOutputAuthorizationService.class.getName(),
+                    new DefaultUIOutputAuthorizationServiceImpl(), null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed the output ui adapter service");
             }
         } catch (RuntimeException e) {
             log.error("Can not create the output ui adapter service ", e);
         }
+    }
+
+    protected void setUIOutputAuthorizationService(UIOutputAuthorizationService authorizationService) {
+        try {
+            UIEventAdaptorServiceInternalValueHolder.registerAuthorizationService(authorizationService);
+        } catch (UIAdaptorException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    protected void unsetUIOutputAuthorizationService(UIOutputAuthorizationService authorizationService) {
+        UIEventAdaptorServiceInternalValueHolder.
+                unresgiterAuthorizationService(authorizationService.getAuthorizationServiceName());
+    }
+
+    protected void setEventStreamService(EventStreamService eventStreamService) {
+        UIEventAdaptorServiceInternalValueHolder.setEventStreamService(eventStreamService);
+    }
+
+    protected void unsetEventStreamService(EventStreamService eventStreamService) {
+        UIEventAdaptorServiceInternalValueHolder.setEventStreamService(null);
     }
 }

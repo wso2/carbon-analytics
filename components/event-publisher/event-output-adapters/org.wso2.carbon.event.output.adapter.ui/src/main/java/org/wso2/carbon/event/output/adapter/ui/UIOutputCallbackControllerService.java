@@ -22,6 +22,8 @@ package org.wso2.carbon.event.output.adapter.ui;
 
 import com.google.gson.JsonObject;
 
+import java.util.Map;
+
 /**
  * This interface is exposed as an OSGI service, which will be invoked by the local websocket endpoint to inform new subscriptions; and do un-subscriptions..
  */
