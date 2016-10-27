@@ -27,17 +27,24 @@
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
-                <version>1.2</version>
+                <version>${commons.logging.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
-                <version>3.0</version>
+                <version>${commons.collections.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>19.0</version>
+                <version>${guava.version}</version>
+            </dependency>
+
+            <!-- Analytics dataservice dependencies -->
+            <dependency>
+                <groupId>com.esotericsoftware</groupId>
+                <artifactId>kryo</artifactId>
+                <version>${kryo.version}</version>
             </dependency>
 
             <!-- Spark related dependencies-->
@@ -52,11 +59,23 @@
                 <version>${spark.version}</version>
             </dependency>
 
+            <!-- DAL dependencies -->
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-client</artifactId>
+                <version>${hadoop-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-client</artifactId>
+                <version>${hbase.version}</version>
+            </dependency>
+
             <!-- child module dependencies-->
             <dependency>
                 <groupId>org.wso2.analytics</groupId>
                 <artifactId>org.wso2.analytics.dataservice</artifactId>
-                <version>${project.version}</version>
+                <version>${analytics.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -76,6 +95,16 @@
     </build>
 
     <properties>
+        <!-- WSO2 dependencies (alphabetical) -->
+        <analytics.version>2.0.0-SNAPSHOT</analytics.version>
+
+        <!-- Project dependencies (alphabetical) -->
+        <commons.collections.version>3.0</commons.collections.version>
+        <commons.logging.version>1.2</commons.logging.version>
+        <guava.version>19.0</guava.version>
+        <hadoop-version>2.7.2</hadoop-version>
+        <hbase.version>1.2.0</hbase.version>
+        <kryo.version>3.0.0</kryo.version>
         <spark.version>2.0.1</spark.version>
     </properties>
 </project>
