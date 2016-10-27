@@ -30,5 +30,12 @@
     <artifactId>org.wso2.analytics.processor</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics Processor Module</name>
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.analytics</groupId>
+            <artifactId>org.wso2.analytics.dataservice</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
 </project>
