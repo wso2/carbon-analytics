@@ -23,7 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.analytics.dataservice.AnalyticsDataService;
 import org.wso2.analytics.recordstore.AnalyticsRecordStore;
-import org.wso2.analytics.recordstore.commons.AnalyticsDataResponse;
+import org.wso2.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.analytics.recordstore.commons.Record;
 import org.wso2.analytics.recordstore.commons.RecordGroup;
 import org.wso2.analytics.recordstore.exception.AnalyticsException;
@@ -35,9 +35,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class AnalyticsUtils {
+public class AnalyticsDataServiceUtils {
 
-    private static final Log log = LogFactory.getLog(AnalyticsUtils.class);
+    private static final Log log = LogFactory.getLog(AnalyticsDataServiceUtils.class);
 
     public static String getAnalyticsConfDirectory() throws AnalyticsException {
         File confDir = null;

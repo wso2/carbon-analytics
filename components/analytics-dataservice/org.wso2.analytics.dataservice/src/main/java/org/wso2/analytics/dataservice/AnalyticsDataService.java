@@ -18,6 +18,8 @@
  */
 package org.wso2.analytics.dataservice;
 
+import org.wso2.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.analytics.dataservice.commons.AnalyticsSchema;
 import org.wso2.analytics.recordstore.commons.*;
 import org.wso2.analytics.recordstore.exception.AnalyticsException;
 
