@@ -77,6 +77,11 @@
                 <artifactId>org.wso2.analytics.dataservice</artifactId>
                 <version>${analytics.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.analytics</groupId>
+                <artifactId>org.wso2.analytics.recordstore</artifactId>
+                <version>${analytics.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

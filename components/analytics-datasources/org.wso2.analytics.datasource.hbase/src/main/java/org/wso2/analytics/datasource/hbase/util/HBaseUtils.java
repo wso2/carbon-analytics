@@ -21,8 +21,8 @@ import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.wso2.analytics.dataservice.commons.Record;
-import org.wso2.analytics.dataservice.commons.exception.AnalyticsException;
+import org.wso2.analytics.recordstore.commons.Record;
+import org.wso2.analytics.recordstore.exception.AnalyticsException;
 import org.wso2.analytics.dataservice.utils.AnalyticsUtils;
 import org.wso2.analytics.datasource.hbase.HBaseAnalyticsConfigurationEntry;
 

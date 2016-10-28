@@ -16,13 +16,13 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.dataservice;
+package org.wso2.analytics.recordstore;
 
-import org.wso2.analytics.dataservice.commons.AnalyticsIterator;
-import org.wso2.analytics.dataservice.commons.RecordGroup;
-import org.wso2.analytics.dataservice.commons.exception.AnalyticsException;
-import org.wso2.analytics.dataservice.commons.exception.AnalyticsTableNotAvailableException;
-import org.wso2.analytics.dataservice.commons.Record;
+import org.wso2.analytics.recordstore.commons.AnalyticsIterator;
+import org.wso2.analytics.recordstore.commons.RecordGroup;
+import org.wso2.analytics.recordstore.exception.AnalyticsException;
+import org.wso2.analytics.recordstore.exception.AnalyticsTableNotAvailableException;
+import org.wso2.analytics.recordstore.commons.Record;
 
 import java.util.List;
 import java.util.Map;

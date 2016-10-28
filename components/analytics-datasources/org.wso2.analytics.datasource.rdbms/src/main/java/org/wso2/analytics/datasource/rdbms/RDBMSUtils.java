@@ -21,7 +21,7 @@ package org.wso2.analytics.datasource.rdbms;
 import com.google.common.collect.Maps;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.analytics.dataservice.commons.exception.AnalyticsException;
+import org.wso2.analytics.recordstore.exception.AnalyticsException;
 import org.wso2.analytics.dataservice.utils.AnalyticsUtils;
 
 import javax.sql.DataSource;

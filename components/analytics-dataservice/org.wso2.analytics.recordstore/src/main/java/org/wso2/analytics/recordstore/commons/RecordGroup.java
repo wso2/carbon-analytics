@@ -16,21 +16,23 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.dataservice.commons.exception;
+package org.wso2.analytics.recordstore.commons;
+
+import org.wso2.analytics.recordstore.exception.AnalyticsException;
+
+import java.io.Serializable;
+
 
 /**
- * This class represents analytics related exceptions.
+ * This interface represents a record group, which represents the availability set of records local to a common environment. 
  */
-public class AnalyticsException extends Exception {
-
-    private static final long serialVersionUID = 6750673867599631611L;
+public interface RecordGroup extends Serializable {
     
-    public AnalyticsException(String msg) {
-        super(msg);
-    }
+    /**
+     * Returns all the locations this record group is situation at.
+     * @return The list of hosts
+     * @throws AnalyticsException
+     */
+    String[] getLocations() throws AnalyticsException;
     
-    public AnalyticsException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
-
 }

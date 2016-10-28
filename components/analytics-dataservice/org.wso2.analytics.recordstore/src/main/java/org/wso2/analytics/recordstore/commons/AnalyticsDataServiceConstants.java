@@ -16,9 +16,10 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.dataservice.commons;
+package org.wso2.analytics.recordstore.commons;
 
-public class AnalyticsConstants {
-    public static final String DEFAULT_CHARSET = "UTF8";
-    public static final int RECORDS_BATCH_SIZE = 1000;
+public class AnalyticsDataServiceConstants {
+
+    public static final String ANALYTICS_DS_CONFIG_FILE = "analytics-dataservice.xml";
+    public static final String ANALYTICS_DS_CONFIG_DIR = "dataservice";
 }

@@ -11,12 +11,13 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>org.wso2.analytics.dataservice</artifactId>
+    <artifactId>org.wso2.analytics.recordstore</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.esotericsoftware</groupId>
             <artifactId>kryo</artifactId>
+            <version>3.0.0</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
@@ -29,11 +30,6 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.wso2.analytics</groupId>
-            <artifactId>org.wso2.analytics.recordstore</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -33,6 +33,7 @@
 
     <modules>
         <module>org.wso2.analytics.dataservice</module>
+        <module>org.wso2.analytics.recordstore</module>
     </modules>
 
 </project>

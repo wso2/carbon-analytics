@@ -18,7 +18,7 @@
  */
 package org.wso2.analytics.dataservice.config;
 
-import org.wso2.analytics.dataservice.commons.AnalyticsConstants;
+import org.wso2.analytics.recordstore.commons.AnalyticsConstants;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

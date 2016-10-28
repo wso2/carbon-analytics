@@ -22,11 +22,11 @@ import com.google.common.collect.Lists;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.analytics.dataservice.AnalyticsRecordStore;
-import org.wso2.analytics.dataservice.commons.AnalyticsIterator;
-import org.wso2.analytics.dataservice.commons.Record;
-import org.wso2.analytics.dataservice.commons.RecordGroup;
-import org.wso2.analytics.dataservice.commons.exception.AnalyticsException;
-import org.wso2.analytics.dataservice.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.analytics.recordstore.commons.AnalyticsIterator;
+import org.wso2.analytics.recordstore.commons.Record;
+import org.wso2.analytics.recordstore.commons.RecordGroup;
+import org.wso2.analytics.recordstore.exception.AnalyticsException;
+import org.wso2.analytics.recordstore.exception.AnalyticsTableNotAvailableException;
 import org.wso2.analytics.dataservice.utils.AnalyticsUtils;
 
 import javax.sql.DataSource;

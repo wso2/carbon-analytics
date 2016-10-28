@@ -18,8 +18,8 @@
  */
 package org.wso2.analytics.datasource.rdbms;
 
-import org.wso2.analytics.dataservice.commons.RecordGroup;
-import org.wso2.analytics.dataservice.commons.exception.AnalyticsException;
+import org.wso2.analytics.recordstore.commons.RecordGroup;
+import org.wso2.analytics.recordstore.exception.AnalyticsException;
 
 import java.util.List;
 

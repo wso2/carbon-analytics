@@ -19,11 +19,11 @@
 package org.wso2.analytics.dataservice.impl;
 
 import org.wso2.analytics.dataservice.AnalyticsDataService;
-import org.wso2.analytics.dataservice.AnalyticsRecordStore;
-import org.wso2.analytics.dataservice.commons.*;
-import org.wso2.analytics.dataservice.commons.AnalyticsDataResponse.Entry;
-import org.wso2.analytics.dataservice.commons.exception.AnalyticsException;
-import org.wso2.analytics.dataservice.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.analytics.recordstore.AnalyticsRecordStore;
+import org.wso2.analytics.recordstore.commons.*;
+import org.wso2.analytics.recordstore.commons.AnalyticsDataResponse.Entry;
+import org.wso2.analytics.recordstore.exception.AnalyticsException;
+import org.wso2.analytics.recordstore.exception.AnalyticsTableNotAvailableException;
 import org.wso2.analytics.dataservice.config.AnalyticsDataServiceConfigProperty;
 import org.wso2.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
 import org.wso2.analytics.dataservice.config.AnalyticsRecordStoreConfiguration;

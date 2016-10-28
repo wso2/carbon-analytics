@@ -16,26 +16,21 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.dataservice.commons.exception;
+package org.wso2.analytics.recordstore.exception;
 
 /**
- * This exception represents a situation when the requested analytics data source table is not available.
+ * This class represents analytics timeout related exceptions.
  */
-public class AnalyticsTableNotAvailableException extends AnalyticsException {
+public class AnalyticsTimeoutException extends AnalyticsException {
 
-    private static final long serialVersionUID = -3197293684263626136L;
-    private String tableName;
+    private static final long serialVersionUID = -2986526796979584267L;
 
-    public AnalyticsTableNotAvailableException(String tableName) {
-        this(tableName, null);
+    public AnalyticsTimeoutException(String msg) {
+        super(msg);
+    }
+    
+    public AnalyticsTimeoutException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 
-    public AnalyticsTableNotAvailableException(String tableName, Throwable cause) {
-        super("Table: " + tableName + " does not exist", cause);
-        this.tableName = tableName;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
 }

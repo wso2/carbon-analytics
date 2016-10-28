@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.analytics</groupId>
-            <artifactId>org.wso2.analytics.dataservice</artifactId>
+            <artifactId>org.wso2.analytics.recordstore</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
