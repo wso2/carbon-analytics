@@ -21,14 +21,9 @@ package org.wso2.analytics.datasource.rdbms;
 import com.google.common.collect.Maps;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.analytics.recordstore.exception.AnalyticsException;
-import org.wso2.analytics.dataservice.utils.AnalyticsUtils;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
 
 import javax.sql.DataSource;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.File;
 import java.sql.*;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -86,7 +81,9 @@ public class RDBMSUtils {
     }
 
     public static RDBMSQueryConfiguration loadQueryConfiguration() throws AnalyticsException {
-        try {
+        // TODO: Finalize logic for RDBMS config files
+        return null;
+        /*try {
             File confFile = new File(AnalyticsUtils.getAnalyticsConfDirectory() +
                     File.separator + ANALYTICS_CONF_DIR + File.separator + RDBMS_QUERY_CONFIG_FILE);
             if (!confFile.exists()) {
@@ -101,7 +98,7 @@ public class RDBMSUtils {
         } catch (JAXBException e) {
             throw new AnalyticsException(
                     "Error in processing RDBMS query configuration: " + e.getMessage(), e);
-        }
+        }*/
     }
 
     private static void validateRDBMSQueryConfiguration(RDBMSQueryConfiguration conf) throws AnalyticsException {

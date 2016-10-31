@@ -18,7 +18,7 @@
  */
 package org.wso2.analytics.dataservice.commons;
 
-import org.wso2.analytics.recordstore.commons.RecordGroup;
+import org.wso2.analytics.data.commons.RecordGroup;
 
 import java.io.Serializable;
 import java.util.List;

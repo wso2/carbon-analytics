@@ -21,19 +21,16 @@ package org.wso2.analytics.dataservice.utils;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.analytics.data.commons.AnalyticsRecordStore;
+import org.wso2.analytics.data.commons.Record;
+import org.wso2.analytics.data.commons.RecordGroup;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.analytics.dataservice.AnalyticsDataService;
-import org.wso2.analytics.recordstore.AnalyticsRecordStore;
 import org.wso2.analytics.dataservice.commons.AnalyticsDataResponse;
-import org.wso2.analytics.recordstore.commons.Record;
-import org.wso2.analytics.recordstore.commons.RecordGroup;
-import org.wso2.analytics.recordstore.exception.AnalyticsException;
 
 import java.io.File;
-import java.nio.ByteBuffer;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class AnalyticsDataServiceUtils {
 
@@ -92,16 +89,4 @@ public class AnalyticsDataServiceUtils {
         return result;
     }
 
-    public static String generateRecordID() {
-        byte[] data = new byte[16];
-        secureRandom.get().nextBytes(data);
-        ByteBuffer buff = ByteBuffer.wrap(data);
-        return new UUID(buff.getLong(), buff.getLong()).toString();
-    }
-
-    private static ThreadLocal<SecureRandom> secureRandom = new ThreadLocal<SecureRandom>() {
-        protected SecureRandom initialValue() {
-            return new SecureRandom();
-        }
-    };
 }

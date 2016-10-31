@@ -21,13 +21,13 @@ package org.wso2.analytics.datasource.rdbms;
 import com.google.common.collect.Lists;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.analytics.dataservice.AnalyticsRecordStore;
-import org.wso2.analytics.recordstore.commons.AnalyticsIterator;
-import org.wso2.analytics.recordstore.commons.Record;
-import org.wso2.analytics.recordstore.commons.RecordGroup;
-import org.wso2.analytics.recordstore.exception.AnalyticsException;
-import org.wso2.analytics.recordstore.exception.AnalyticsTableNotAvailableException;
-import org.wso2.analytics.dataservice.utils.AnalyticsUtils;
+import org.wso2.analytics.data.commons.AnalyticsRecordStore;
+import org.wso2.analytics.data.commons.AnalyticsIterator;
+import org.wso2.analytics.data.commons.Record;
+import org.wso2.analytics.data.commons.RecordGroup;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
@@ -134,7 +134,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         Connection conn = null;
         try {
             conn = this.getConnection(false);
-            Collection<List<Record>> recordBatches = AnalyticsUtils.generateRecordBatches(records);
+            Collection<List<Record>> recordBatches = AnalyticsCommonUtils.generateRecordBatches(records);
             for (List<Record> batch : recordBatches) {
                 this.addRecordsSimilar(conn, batch);
             }
@@ -185,7 +185,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
                                          Record record) throws SQLException, AnalyticsException {
         stmt.setInt(1, this.generatePartitionKey(record.getId()));
         stmt.setLong(2, record.getTimestamp());
-        byte[] bytes = AnalyticsUtils.encodeRecordValues(record.getValues());
+        byte[] bytes = AnalyticsCommonUtils.encodeRecordValues(record.getValues());
         if (!this.rdbmsQueryConfigurationEntry.isBlobLengthRequired()) {
             stmt.setBinaryStream(3, new ByteArrayInputStream(bytes));
         } else {
@@ -306,7 +306,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
 
     private List<Integer[]> generatePartitionPlan(int numPartitionsHint) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
-        List<Integer[]> result = AnalyticsUtils.splitNumberRange(this.getPartitionCount(), numPartitionsHint);
+        List<Integer[]> result = AnalyticsCommonUtils.splitNumberRange(this.getPartitionCount(), numPartitionsHint);
         for (Integer[] entry : result) {
             entry[1] = entry[0] + entry[1];
         }
@@ -515,7 +515,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     private String generateTargetTableName(String tableName) {
-        return AnalyticsUtils.generateTableUUID(tableName);
+        return AnalyticsCommonUtils.generateTableUUID(tableName);
     }
 
     private String translateQueryWithTableInfo(String query, String tableName) {
@@ -669,7 +669,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
                     byte[] bytes = this.rs.getBytes(3);
                     Map<String, Object> values;
                     if (bytes != null) {
-                        values = AnalyticsUtils.decodeRecordValues(bytes, colSet);
+                        values = AnalyticsCommonUtils.decodeRecordValues(bytes, colSet);
                     } else {
                         values = new HashMap<>(0);
                     }
