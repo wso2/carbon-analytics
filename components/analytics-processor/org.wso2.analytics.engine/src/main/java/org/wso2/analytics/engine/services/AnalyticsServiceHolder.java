@@ -16,15 +16,19 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.processor.utils;
+package org.wso2.analytics.engine.services;
 
 import org.wso2.analytics.dataservice.AnalyticsDataService;
-import java.util.ServiceLoader;
-import org.wso2.analytics.processor.exceptions.*;
+import org.wso2.analytics.engine.commons.AnalyticsIncrementalMetaStore;
+import org.wso2.analytics.engine.exceptions.AnalyticsDataServiceLoadException;
+import org.wso2.analytics.recordstore.exception.AnalyticsException;
 
-public class Utils {
+import java.util.ServiceLoader;
+
+public class AnalyticsServiceHolder {
 
     private static AnalyticsDataService analyticsDataService;
+    private static AnalyticsIncrementalMetaStore incrementalMetaStore;
     private static ServiceLoader<AnalyticsDataService> analyticsDataServiceServiceLoader;
 
     static {
@@ -34,7 +38,7 @@ public class Utils {
     /**
      * Returns the Analytics Data Service loaded through Java SPI.
      * @return analyticsDataService object
-     * @throws AnalyticsDataServiceLoadException if the class cannot be loaded.
+     * @throws AnalyticsDataServiceLoadException if the class cannot be loaded
      */
     public static synchronized AnalyticsDataService getAnalyticsDataService() throws AnalyticsDataServiceLoadException {
         if (analyticsDataService == null) {
@@ -44,5 +48,20 @@ public class Utils {
             }
         }
         return analyticsDataService;
+    }
+
+    /**
+     * Get the Analytics Incremental Meta Store.
+     * @return Analytics Incremental Meta Store
+     */
+    public static AnalyticsIncrementalMetaStore getIncrementalMetaStore() {
+        if (incrementalMetaStore == null) {
+            try {
+                incrementalMetaStore = new AnalyticsIncrementalMetaStore();
+            } catch (Exception e) {
+                throw new RuntimeException("Error in creating analytics incremental metastore: " + e.getMessage(), e);
+            }
+        }
+        return incrementalMetaStore;
     }
 }

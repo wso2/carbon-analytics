@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.processor.exceptions;
+package org.wso2.analytics.engine.exceptions;
 
 public class AnalyticsDataServiceLoadException extends Exception {
 

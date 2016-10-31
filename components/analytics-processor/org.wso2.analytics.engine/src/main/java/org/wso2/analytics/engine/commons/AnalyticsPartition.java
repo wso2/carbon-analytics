@@ -16,10 +16,10 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.engine.core;
+package org.wso2.analytics.engine.commons;
 
 import org.apache.spark.Partition;
-import org.wso2.analytics.dataservice.commons.RecordGroup;
+import org.wso2.analytics.recordstore.commons.RecordGroup;
 
 import java.io.Serializable;
 
