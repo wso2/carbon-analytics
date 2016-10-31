@@ -21,7 +21,7 @@ package org.wso2.analytics.engine.commons;
 import org.wso2.analytics.dataservice.AnalyticsDataService;
 import org.wso2.analytics.dataservice.commons.AnalyticsSchema;
 import org.wso2.analytics.dataservice.commons.ColumnDefinition;
-import org.wso2.analytics.dataservice.utils.AnalyticsDataServiceUtils;
+import org.wso2.analytics.dataservice.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.engine.exceptions.AnalyticsDataServiceLoadException;
 import org.wso2.analytics.engine.services.AnalyticsServiceHolder;
 import org.wso2.analytics.recordstore.commons.Record;
@@ -71,7 +71,7 @@ public class AnalyticsIncrementalMetaStore {
     public long getLastProcessedTimestamp(String id, boolean primaryValue) throws AnalyticsException {
         Map<String, Object> values = new HashMap<>();
         values.put(COLUMN_TABLE_ID, id);
-        List<Record> result = AnalyticsDataServiceUtils.listRecords(
+        List<Record> result = AnalyticsCommonUtils.listRecords(
                 this.ads, this.ads.getWithKeyValues(INC_META_TABLE, 1, null, new ArrayList<>(Collections.singletonList(values))));
         if (result.size() > 0) {
             Record record = result.get(0);

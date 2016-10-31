@@ -22,6 +22,7 @@ import org.wso2.analytics.data.commons.AnalyticsIterator;
 import org.wso2.analytics.data.commons.AnalyticsRecordStoreConstants;
 import org.wso2.analytics.data.commons.Record;
 import org.wso2.analytics.data.commons.RecordGroup;
+import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.dataservice.AnalyticsDataService;
 import org.wso2.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.analytics.dataservice.commons.AnalyticsSchema;
@@ -33,7 +34,6 @@ import org.wso2.analytics.data.commons.exception.AnalyticsTableNotAvailableExcep
 import org.wso2.analytics.dataservice.config.AnalyticsDataServiceConfigProperty;
 import org.wso2.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
 import org.wso2.analytics.dataservice.config.AnalyticsRecordStoreConfiguration;
-import org.wso2.analytics.dataservice.utils.AnalyticsDataServiceUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -68,7 +68,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
         try {
-            File confFile = new File(AnalyticsDataServiceUtils.getAnalyticsConfDirectory() + File.separator +
+            File confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() + File.separator +
                     AnalyticsDataServiceConstants.ANALYTICS_DS_CONFIG_DIR + File.separator +
                     AnalyticsDataServiceConstants.ANALYTICS_DS_CONFIG_FILE);
             if (!confFile.exists()) {
@@ -137,7 +137,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public void createTable(String recordStoreName, String tableName) throws AnalyticsException {
-        tableName = AnalyticsDataServiceUtils.normalizeTableName(tableName);
+        tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
         recordStoreName = recordStoreName.trim();
         this.getAnalyticsRecordStore(recordStoreName).createTable(tableName);
         AnalyticsTableInfo tableInfo = null;
@@ -165,7 +165,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private void writeTableInfo(String tableName, AnalyticsTableInfo tableInfo) throws AnalyticsException {
         AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
         Map<String, Object> values = new HashMap<>(1);
-        values.put(TABLE_INFO_DATA_COLUMN, AnalyticsDataServiceUtils.serializeObject(tableInfo));
+        values.put(TABLE_INFO_DATA_COLUMN, AnalyticsCommonUtils.serializeObject(tableInfo));
         Record record = new Record(tableName, ANALYTICS_META_TABLE, values);
         List<Record> records = new ArrayList<>(1);
         records.add(record);
@@ -178,7 +178,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     public void invalidateAnalyticsTableInfo(String tableName) {
-        tableName = AnalyticsDataServiceUtils.normalizeTableName(tableName);
+        tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
         this.tableInfoMap.remove(tableName);
     }
     private AnalyticsTableInfo readTableInfo(String tableName) throws AnalyticsException {
@@ -187,7 +187,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         ids.add(tableName);
         List<Record> records;
         try {
-            records = AnalyticsDataServiceUtils.listRecords(ars, ars.get(ANALYTICS_META_TABLE, 1, null, ids));
+            records = AnalyticsCommonUtils.listRecords(ars, ars.get(ANALYTICS_META_TABLE, 1, null, ids));
         } catch (AnalyticsTableNotAvailableException e) {
             throw new AnalyticsTableNotAvailableException(tableName);
         }
@@ -198,7 +198,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             if (data == null) {
                 throw new AnalyticsException("Corrupted table info for table: " + tableName);
             }
-            return (AnalyticsTableInfo) AnalyticsDataServiceUtils.deserializeObject(data);
+            return (AnalyticsTableInfo) AnalyticsCommonUtils.deserializeObject(data);
         }
     }
 
@@ -221,13 +221,13 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public String getRecordStoreNameByTable(String tableName) throws AnalyticsException {
-        tableName = AnalyticsDataServiceUtils.normalizeTableName(tableName);
+        tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
         return this.lookupTableInfo(tableName).getRecordStoreName();
     }
 
     @Override
     public void setTableSchema(String tableName, AnalyticsSchema schema) throws AnalyticsException {
-        tableName = AnalyticsDataServiceUtils.normalizeTableName(tableName);
+        tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
         AnalyticsTableInfo tableInfo = this.lookupTableInfo(tableName);
         tableInfo.setSchema(schema);
         this.writeTableInfo(tableName, tableInfo);
@@ -236,14 +236,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public AnalyticsSchema getTableSchema(String tableName) throws AnalyticsException {
-        tableName = AnalyticsDataServiceUtils.normalizeTableName(tableName);
+        tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
         return this.lookupTableInfo(tableName).getSchema();
     }
 
     @Override
     public boolean tableExists(String tableName) throws AnalyticsException {
         try {
-            tableName = AnalyticsDataServiceUtils.normalizeTableName(tableName);
+            tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
             return this.getRecordStoreNameByTable(tableName) != null;
         } catch (AnalyticsTableNotAvailableException e) {
             return false;
@@ -252,7 +252,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public void deleteTable(String tableName) throws AnalyticsException {
-        tableName = AnalyticsDataServiceUtils.normalizeTableName(tableName);
+        tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
         String arsName;
         try {
             arsName = this.getRecordStoreNameByTable(tableName);
@@ -291,7 +291,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public List<String> listTables() throws AnalyticsException {
         try {
-            List<Record> records = AnalyticsDataServiceUtils.listRecords(this.getPrimaryAnalyticsRecordStore(),
+            List<Record> records = AnalyticsCommonUtils.listRecords(this.getPrimaryAnalyticsRecordStore(),
                     this.getPrimaryAnalyticsRecordStore().get(ANALYTICS_META_TABLE, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
             return records.stream().map(Record::getId).collect(Collectors.toList());
         } catch (AnalyticsTableNotAvailableException e) {
@@ -301,7 +301,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public void put(List<Record> records) throws AnalyticsException {
-        Collection<List<Record>> recordBatches = AnalyticsDataServiceUtils.generateRecordBatches(records, true);
+        Collection<List<Record>> recordBatches = AnalyticsCommonUtils.generateRecordBatches(records, true);
         this.preprocessRecords(recordBatches);
         for (List<Record> recordsBatch : recordBatches) {
             this.putSimilarRecordBatch(recordsBatch);
@@ -342,7 +342,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private void populateWithGenerateIds(List<Record> records) {
         for (Record record : records) {
             if (record.getId() == null) {
-                record.setId(AnalyticsDataServiceUtils.generateRecordID());
+                record.setId(AnalyticsCommonUtils.generateRecordID());
             }
         }
     }
@@ -359,7 +359,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public AnalyticsDataResponse get(String tableName, int numPartitionsHint, List<String> columns, long timeFrom, long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException {
-        tableName = AnalyticsDataServiceUtils.normalizeTableName(tableName);
+        tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
         String arsName = this.getRecordStoreNameByTable(tableName);
         if (arsName == null) {
             throw new AnalyticsTableNotAvailableException(tableName);
@@ -412,7 +412,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public AnalyticsDataResponse get(String tableName, int numPartitionsHint, List<String> columns, List<String> ids) throws AnalyticsException {
-        tableName = AnalyticsDataServiceUtils.normalizeTableName(tableName);
+        tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
         String arsName = this.getRecordStoreNameByTable(tableName);
         if (arsName == null) {
             throw new AnalyticsTableNotAvailableException(tableName);
@@ -440,7 +440,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public AnalyticsDataResponse getWithKeyValues(String tableName, int numPartitionsHint, List<String> columns, List<Map<String, Object>> valuesBatch) throws AnalyticsException {
-        tableName = AnalyticsDataServiceUtils.normalizeTableName(tableName);
+        tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
         List<String> ids = new ArrayList<>();
         AnalyticsSchema schema = this.lookupTableInfo(tableName).getSchema();
         List<String> primaryKeys = schema.getPrimaryKeys();
@@ -480,9 +480,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public void delete(String tableName, long timeFrom, long timeTo) throws AnalyticsException {
-        tableName = AnalyticsDataServiceUtils.normalizeTableName(tableName);
+        tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
         while (true) {
-            List<Record> recordBatch = AnalyticsDataServiceUtils.listRecords(this, this.get(tableName, 1, null, timeFrom, timeTo, 0, DELETE_BATCH_SIZE));
+            List<Record> recordBatch = AnalyticsCommonUtils.listRecords(this, this.get(tableName, 1, null, timeFrom, timeTo, 0, DELETE_BATCH_SIZE));
             if (recordBatch.size() == 0) {
                 break;
             }
@@ -498,7 +498,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public void delete(String tableName, List<String> ids) throws AnalyticsException {
-        tableName = AnalyticsDataServiceUtils.normalizeTableName(tableName);
+        tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
         String arsName = this.getRecordStoreNameByTable(tableName);
         if (arsName == null) {
             throw new AnalyticsTableNotAvailableException(tableName);

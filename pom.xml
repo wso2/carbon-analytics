@@ -82,6 +82,18 @@
                 <artifactId>org.wso2.analytics.recordstore</artifactId>
                 <version>${analytics.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.analytics</groupId>
+                <artifactId>org.wso2.analytics.data.commons</artifactId>
+                <version>${analytics.version}</version>
+            </dependency>
+
+            <!-- Testing related dependencies -->
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>${testng.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -111,5 +123,6 @@
         <hbase.version>1.2.0</hbase.version>
         <kryo.version>3.0.0</kryo.version>
         <spark.version>2.0.1</spark.version>
+        <testng.version>6.9.13.6</testng.version>
     </properties>
 </project>
