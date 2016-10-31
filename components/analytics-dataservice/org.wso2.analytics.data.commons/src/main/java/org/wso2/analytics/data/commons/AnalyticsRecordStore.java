@@ -20,6 +20,9 @@ package org.wso2.analytics.data.commons;
 
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.analytics.data.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.analytics.data.commons.sources.AnalyticsIterator;
+import org.wso2.analytics.data.commons.sources.Record;
+import org.wso2.analytics.data.commons.sources.RecordGroup;
 
 import java.util.List;
 import java.util.Map;

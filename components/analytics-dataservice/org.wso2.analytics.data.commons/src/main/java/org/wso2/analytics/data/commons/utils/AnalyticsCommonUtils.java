@@ -22,7 +22,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import org.wso2.analytics.data.commons.Record;
+import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
 
 import java.io.*;

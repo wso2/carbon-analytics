@@ -18,10 +18,10 @@
  */
 package org.wso2.analytics.dataservice.impl;
 
-import org.wso2.analytics.data.commons.AnalyticsIterator;
-import org.wso2.analytics.data.commons.AnalyticsRecordStoreConstants;
-import org.wso2.analytics.data.commons.Record;
-import org.wso2.analytics.data.commons.RecordGroup;
+import org.wso2.analytics.data.commons.sources.AnalyticsIterator;
+import org.wso2.analytics.data.commons.sources.AnalyticsRecordStoreConstants;
+import org.wso2.analytics.data.commons.sources.Record;
+import org.wso2.analytics.data.commons.sources.RecordGroup;
 import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.dataservice.AnalyticsDataService;
 import org.wso2.analytics.dataservice.commons.AnalyticsDataResponse;

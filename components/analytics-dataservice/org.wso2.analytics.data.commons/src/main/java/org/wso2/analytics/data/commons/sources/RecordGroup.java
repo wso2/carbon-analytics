@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.data.commons;
+package org.wso2.analytics.data.commons.sources;
 
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
 

@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.data.commons;
+package org.wso2.analytics.data.commons.sources;
 
 public class AnalyticsRecordStoreConstants {
     public static final String DEFAULT_CHARSET = "UTF8";
