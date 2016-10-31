@@ -34,6 +34,7 @@ import org.wso2.analytics.data.commons.exception.AnalyticsTableNotAvailableExcep
 import org.wso2.analytics.dataservice.config.AnalyticsDataServiceConfigProperty;
 import org.wso2.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
 import org.wso2.analytics.dataservice.config.AnalyticsRecordStoreConfiguration;
+import org.wso2.analytics.dataservice.utils.AnalyticsDataServiceUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -482,7 +483,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public void delete(String tableName, long timeFrom, long timeTo) throws AnalyticsException {
         tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
         while (true) {
-            List<Record> recordBatch = AnalyticsCommonUtils.listRecords(this, this.get(tableName, 1, null, timeFrom, timeTo, 0, DELETE_BATCH_SIZE));
+            List<Record> recordBatch = AnalyticsDataServiceUtils.listRecords(this, this.get(tableName, 1, null, timeFrom, timeTo, 0, DELETE_BATCH_SIZE));
             if (recordBatch.size() == 0) {
                 break;
             }

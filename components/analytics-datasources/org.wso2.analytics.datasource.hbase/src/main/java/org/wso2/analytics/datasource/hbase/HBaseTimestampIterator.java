@@ -24,14 +24,14 @@ import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.wso2.analytics.recordstore.commons.AnalyticsIterator;
-import org.wso2.analytics.recordstore.commons.Record;
-import org.wso2.analytics.recordstore.exception.AnalyticsException;
-import org.wso2.analytics.recordstore.exception.AnalyticsTableNotAvailableException;
-import org.wso2.analytics.dataservice.utils.AnalyticsUtils;
 import org.wso2.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.analytics.datasource.hbase.util.HBaseRuntimeException;
 import org.wso2.analytics.datasource.hbase.util.HBaseUtils;
+import org.wso2.analytics.data.commons.sources.AnalyticsIterator;
+import org.wso2.analytics.data.commons.sources.Record;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -262,13 +262,13 @@ class HBaseTimestampIterator implements AnalyticsIterator<Record> {
             throw new AnalyticsException("Error pruning obsolete entries from the secondary index of table [" + tableName + "] : "
                     + e.getMessage(), e);
         } finally {
-            AnalyticsUtils.closeQuietly(table);
+            AnalyticsCommonUtils.closeQuietly(table);
         }
     }
 
     private void cleanup() {
-        AnalyticsUtils.closeQuietly(this.indexTable);
-        AnalyticsUtils.closeQuietly(this.table);
+        AnalyticsCommonUtils.closeQuietly(this.indexTable);
+        AnalyticsCommonUtils.closeQuietly(this.table);
     }
 
     @Override

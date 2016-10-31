@@ -21,14 +21,14 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.filter.PageFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.wso2.analytics.recordstore.commons.AnalyticsIterator;
-import org.wso2.analytics.recordstore.commons.Record;
-import org.wso2.analytics.recordstore.exception.AnalyticsException;
-import org.wso2.analytics.recordstore.exception.AnalyticsTableNotAvailableException;
-import org.wso2.analytics.dataservice.utils.AnalyticsUtils;
 import org.wso2.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.analytics.datasource.hbase.util.HBaseRuntimeException;
 import org.wso2.analytics.datasource.hbase.util.HBaseUtils;
+import org.wso2.analytics.data.commons.sources.AnalyticsIterator;
+import org.wso2.analytics.data.commons.sources.Record;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -60,7 +60,7 @@ public class HBaseRegionSplitIterator implements AnalyticsIterator<Record> {
         } catch (IOException e) {
             throw new AnalyticsException("The table [" + tableName + "] could not be initialized for reading: " + e.getMessage(), e);
         } finally {
-            AnalyticsUtils.closeQuietly(admin);
+            AnalyticsCommonUtils.closeQuietly(admin);
         }
         if (columns != null && columns.size() > 0) {
             this.colSet = new HashSet<>(columns);
@@ -116,7 +116,7 @@ public class HBaseRegionSplitIterator implements AnalyticsIterator<Record> {
     }
 
     private void cleanup() {
-        AnalyticsUtils.closeQuietly(this.table);
+        AnalyticsCommonUtils.closeQuietly(this.table);
     }
 
     @Override

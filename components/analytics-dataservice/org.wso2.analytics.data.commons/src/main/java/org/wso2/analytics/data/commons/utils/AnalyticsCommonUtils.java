@@ -22,8 +22,13 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.analytics.data.commons.AnalyticsRecordStore;
 import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.sources.RecordGroup;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -45,6 +50,8 @@ public class AnalyticsCommonUtils {
     private static final byte DATA_TYPE_BINARY = 0x07;
     private static final byte DATA_TYPE_OBJECT = 0x10;
     private static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
+
+    private static final Log log = LogFactory.getLog(AnalyticsCommonUtils.class);
 
     private static ThreadLocal<Kryo> kryoTL = new ThreadLocal<Kryo>() {
         protected Kryo initialValue() {
@@ -322,5 +329,48 @@ public class AnalyticsCommonUtils {
         }
     }
 
+    public static List<Record> listRecords(AnalyticsRecordStore rs, RecordGroup[] rgs) throws AnalyticsException {
+        List<Record> result = new ArrayList<>();
+        for (RecordGroup rg : rgs) {
+            result.addAll(IteratorUtils.toList(rs.readRecords(rg)));
+        }
+        return result;
+    }
+
+    public static String getAnalyticsConfDirectory() throws AnalyticsException {
+        File confDir = null;
+        try {
+            confDir = new File(getConfDirectoryPath());
+        } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error in getting the config path: " + e.getMessage(), e);
+            }
+        }
+        if (confDir == null || !confDir.exists()) {
+            return getConfDirectoryPath();
+        } else {
+            return confDir.getAbsolutePath();
+        }
+    }
+
+    public static String getConfDirectoryPath() {
+        String carbonConfigDirPath = System.getProperty("carbon.config.dir.path");
+        if (carbonConfigDirPath == null) {
+            carbonConfigDirPath = System.getenv("CARBON_CONFIG_DIR_PATH");
+            if (carbonConfigDirPath == null) {
+                return getBaseDirectoryPath() + File.separator + "conf";
+            }
+        }
+        return carbonConfigDirPath;
+    }
+
+    public static String getBaseDirectoryPath() {
+        String baseDir = System.getProperty("analytics.home");
+        if (baseDir == null) {
+            baseDir = System.getenv("ANALYTICS_HOME");
+            System.setProperty("analytics.home", baseDir);
+        }
+        return baseDir;
+    }
 
 }

@@ -21,9 +21,9 @@ import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.wso2.analytics.recordstore.commons.Record;
-import org.wso2.analytics.recordstore.exception.AnalyticsException;
-import org.wso2.analytics.dataservice.utils.AnalyticsUtils;
+import org.wso2.analytics.data.commons.sources.Record;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.datasource.hbase.HBaseAnalyticsConfigurationEntry;
 
 import javax.xml.bind.JAXBContext;
@@ -79,7 +79,7 @@ public class HBaseUtils {
                             HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME);
             byte[] data = CellUtil.cloneValue(dataCell);
             if (data.length > 0) {
-                values = AnalyticsUtils.decodeRecordValues(data, colSet);
+                values = AnalyticsCommonUtils.decodeRecordValues(data, colSet);
             } else {
                 values = new HashMap<>();
             }
@@ -98,7 +98,7 @@ public class HBaseUtils {
 
     public static HBaseAnalyticsConfigurationEntry lookupConfiguration() throws AnalyticsException {
         try {
-            File confFile = new File(AnalyticsUtils.getAnalyticsConfDirectory() +
+            File confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() +
                     File.separator + ANALYTICS_CONF_DIR + File.separator +
                     HBaseAnalyticsDSConstants.HBASE_ANALYTICS_CONFIG_FILE);
             if (!confFile.exists()) {

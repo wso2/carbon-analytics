@@ -17,9 +17,8 @@
 */
 package org.wso2.analytics.datasource.hbase.rg;
 
-
-import org.wso2.analytics.recordstore.commons.RecordGroup;
-import org.wso2.analytics.recordstore.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.sources.RecordGroup;
 
 import java.util.List;
 

@@ -26,18 +26,18 @@ import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Pair;
-import org.wso2.analytics.dataservice.AnalyticsRecordStore;
-import org.wso2.analytics.recordstore.commons.AnalyticsIterator;
-import org.wso2.analytics.recordstore.commons.Record;
-import org.wso2.analytics.recordstore.commons.RecordGroup;
-import org.wso2.analytics.recordstore.exception.AnalyticsException;
-import org.wso2.analytics.recordstore.exception.AnalyticsTableNotAvailableException;
-import org.wso2.analytics.dataservice.utils.AnalyticsUtils;
 import org.wso2.analytics.datasource.hbase.rg.HBaseIDRecordGroup;
 import org.wso2.analytics.datasource.hbase.rg.HBaseRegionSplitRecordGroup;
 import org.wso2.analytics.datasource.hbase.rg.HBaseTimestampRecordGroup;
 import org.wso2.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.analytics.datasource.hbase.util.HBaseUtils;
+import org.wso2.analytics.data.commons.AnalyticsRecordStore;
+import org.wso2.analytics.data.commons.sources.AnalyticsIterator;
+import org.wso2.analytics.data.commons.sources.Record;
+import org.wso2.analytics.data.commons.sources.RecordGroup;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Apache HBase implementation of {@link org.wso2.analytics.dataservice.AnalyticsRecordStore}
+ * Apache HBase implementation of {@link AnalyticsRecordStore}
  */
 public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
@@ -127,7 +127,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         } catch (IOException e) {
             throw new AnalyticsException("Error creating table [" + tableName + "] : " + e.getMessage(), e);
         } finally {
-            AnalyticsUtils.closeQuietly(admin);
+            AnalyticsCommonUtils.closeQuietly(admin);
         }
     }
 
@@ -141,7 +141,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         } catch (IOException e) {
             throw new AnalyticsException("Error checking existence of table [" + tableName + "] : " + e.getMessage(), e);
         } finally {
-            AnalyticsUtils.closeQuietly(admin);
+            AnalyticsCommonUtils.closeQuietly(admin);
         }
         return isExist;
     }
@@ -172,7 +172,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         } catch (IOException e) {
             throw new AnalyticsException("Error deleting table [" + tableName + "] : " + e.getMessage(), e);
         } finally {
-            AnalyticsUtils.closeQuietly(admin);
+            AnalyticsCommonUtils.closeQuietly(admin);
         }
     }
 
@@ -200,8 +200,8 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                     table.put(allPuts.get(1));
                     log.debug("Processed " + records.size() + " PUT operations for [" + tableName + "]");
                 } finally {
-                    AnalyticsUtils.closeQuietly(table);
-                    AnalyticsUtils.closeQuietly(indexTable);
+                    AnalyticsCommonUtils.closeQuietly(table);
+                    AnalyticsCommonUtils.closeQuietly(indexTable);
                 }
             }
         } catch (TableNotFoundException | RetriesExhaustedException e) {
@@ -225,7 +225,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             if ((columns == null) || columns.isEmpty()) {
                 data = new byte[]{};
             } else {
-                data = AnalyticsUtils.encodeRecordValues(columns);
+                data = AnalyticsCommonUtils.encodeRecordValues(columns);
             }
             Put put = new Put(Bytes.toBytes(recordId));
             put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
@@ -405,8 +405,8 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         } catch (IOException e) {
             throw new AnalyticsException("Index for table [" + tableName + "] could not be read for deletion: " + e.getMessage(), e);
         } finally {
-            AnalyticsUtils.closeQuietly(resultScanner);
-            AnalyticsUtils.closeQuietly(indexTable);
+            AnalyticsCommonUtils.closeQuietly(resultScanner);
+            AnalyticsCommonUtils.closeQuietly(indexTable);
         }
     }
 
@@ -426,7 +426,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             throw new AnalyticsException("Error deleting records from [" + tableName + "] : "
                     + e.getMessage(), e);
         } finally {
-            AnalyticsUtils.closeQuietly(dataTable);
+            AnalyticsCommonUtils.closeQuietly(dataTable);
         }
     }
 
@@ -458,7 +458,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             throw new AnalyticsException("The secondary index for table [" + tableName +
                     "] could not be initialized for deletion of rows: " + e.getMessage(), e);
         } finally {
-            AnalyticsUtils.closeQuietly(dataTable);
+            AnalyticsCommonUtils.closeQuietly(dataTable);
         }
         return indexDeletes;
     }
@@ -473,7 +473,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             throw new AnalyticsException("Error deleting columns from [" + tableName + "] of type " + type + " : "
                     + e.getMessage(), e);
         } finally {
-            AnalyticsUtils.closeQuietly(table);
+            AnalyticsCommonUtils.closeQuietly(table);
         }
     }
 
@@ -489,7 +489,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             throw new AnalyticsException("Error deleting rows from [" + tableName + "] of type " + type + " : "
                     + e.getMessage(), e);
         } finally {
-            AnalyticsUtils.closeQuietly(table);
+            AnalyticsCommonUtils.closeQuietly(table);
         }
     }
 
@@ -527,7 +527,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             throw new AnalyticsException("Error deleting records from [" + tableName + "] : "
                     + e.getMessage(), e);
         } finally {
-            AnalyticsUtils.closeQuietly(dataTable);
+            AnalyticsCommonUtils.closeQuietly(dataTable);
         }
     }
 
