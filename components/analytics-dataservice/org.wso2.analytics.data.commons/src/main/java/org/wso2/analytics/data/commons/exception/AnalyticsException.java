@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.recordstore.exception;
+package org.wso2.analytics.data.commons.exception;
 
 /**
  * This class represents analytics related exceptions.

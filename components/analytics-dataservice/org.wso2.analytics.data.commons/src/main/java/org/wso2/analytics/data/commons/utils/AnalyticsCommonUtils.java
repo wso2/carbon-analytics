@@ -15,19 +15,20 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.analytics.recordstore.utils;
+package org.wso2.analytics.data.commons.utils;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import org.wso2.analytics.recordstore.commons.Record;
-import org.wso2.analytics.recordstore.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.Record;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.*;
 
 public class AnalyticsCommonUtils {
@@ -48,6 +49,19 @@ public class AnalyticsCommonUtils {
     private static ThreadLocal<Kryo> kryoTL = new ThreadLocal<Kryo>() {
         protected Kryo initialValue() {
             return new Kryo();
+        }
+    };
+
+    public static String generateRecordID() {
+        byte[] data = new byte[16];
+        secureRandom.get().nextBytes(data);
+        ByteBuffer buff = ByteBuffer.wrap(data);
+        return new UUID(buff.getLong(), buff.getLong()).toString();
+    }
+
+    private static ThreadLocal<SecureRandom> secureRandom = new ThreadLocal<SecureRandom>() {
+        protected SecureRandom initialValue() {
+            return new SecureRandom();
         }
     };
 

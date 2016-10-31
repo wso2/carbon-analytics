@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.recordstore.exception;
+package org.wso2.analytics.data.commons.exception;
 
 /**
  * This exception represents a situation when the requested analytics data source table is not available.

@@ -16,9 +16,9 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.recordstore.commons;
+package org.wso2.analytics.data.commons;
 
-import org.wso2.analytics.recordstore.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
 
 import java.io.Serializable;
 
