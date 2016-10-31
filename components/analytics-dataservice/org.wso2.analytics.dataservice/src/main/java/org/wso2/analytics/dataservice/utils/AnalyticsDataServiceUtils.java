@@ -21,8 +21,8 @@ package org.wso2.analytics.dataservice.utils;
 import org.apache.commons.collections.IteratorUtils;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.analytics.data.commons.sources.Record;
-import org.wso2.analytics.dataservice.AnalyticsDataService;
-import org.wso2.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.analytics.data.commons.AnalyticsDataService;
+import org.wso2.analytics.data.commons.service.AnalyticsDataResponse;
 
 import java.util.ArrayList;
 import java.util.List;

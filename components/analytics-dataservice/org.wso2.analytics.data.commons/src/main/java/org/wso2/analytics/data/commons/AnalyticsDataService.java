@@ -16,13 +16,13 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.dataservice;
+package org.wso2.analytics.data.commons;
 
 import org.wso2.analytics.data.commons.sources.AnalyticsIterator;
 import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.data.commons.sources.RecordGroup;
-import org.wso2.analytics.dataservice.commons.AnalyticsDataResponse;
-import org.wso2.analytics.dataservice.commons.AnalyticsSchema;
+import org.wso2.analytics.data.commons.service.AnalyticsDataResponse;
+import org.wso2.analytics.data.commons.service.AnalyticsSchema;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
 
 import java.util.List;
