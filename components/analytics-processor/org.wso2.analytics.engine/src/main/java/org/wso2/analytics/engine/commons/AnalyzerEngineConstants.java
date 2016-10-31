@@ -16,14 +16,13 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.dataservice.utils;
+package org.wso2.analytics.engine.commons;
 
-public class AnalyticsDataServiceConstants {
+public class AnalyzerEngineConstants {
 
-    public static final String ANALYTICS_DS_CONFIG_FILE = "analytics-dataservice.xml";
-    public static final String ANALYTICS_DS_CONFIG_DIR = "dataservice";
+    public static final int SPARK_DEFAULT_PARTITION_COUNT = 6;
 
-    private AnalyticsDataServiceConstants() {
+    private AnalyzerEngineConstants() {
         /**
          * Avoid initialization.
          */

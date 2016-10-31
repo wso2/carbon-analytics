@@ -24,14 +24,17 @@ import org.apache.spark.*;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
+import org.wso2.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.analytics.recordstore.commons.AnalyticsRecordStoreConstants;
 import org.wso2.analytics.recordstore.exception.AnalyticsException;
 import org.wso2.analytics.engine.services.AnalyticsServiceHolder;
 import scala.Serializable;
 import scala.collection.Iterator;
+import scala.collection.JavaConversions;
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -80,8 +83,44 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     }
 
     @Override
+    public Seq<String> getPreferredLocations(Partition split) {
+        if (split instanceof AnalyticsPartition) {
+            AnalyticsPartition ap = (AnalyticsPartition) split;
+            try {
+                return JavaConversions.asScalaBuffer(Arrays.asList(ap.getRecordGroup().getLocations())).toList();
+            } catch (AnalyticsException e) {
+                log.error("Error in getting preffered location: " + e.getMessage() +
+                        " falling back to default impl.", e);
+                return super.getPreferredLocations(split);
+            }
+        } else {
+            return super.getPreferredLocations(split);
+        }
+    }
+
+    @Override
     public Partition[] getPartitions() {
-        return new Partition[0];
+        AnalyticsDataResponse resp;
+        try {
+            resp = AnalyticsServiceHolder.getAnalyticsDataService().get(this.tableName,
+                    computePartitions(), this.columns, timeFrom, timeTo, 0, -1);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        List<AnalyticsDataResponse.Entry> entries = resp.getEntries();
+        Partition[] result = new Partition[entries.size()];
+        for (int i = 0; i < entries.size(); i++) {
+            result[i] = new AnalyticsPartition(entries.get(i).getRecordStoreName(), entries.get(i).getRecordGroup(), i);
+        }
+        return result;
+    }
+
+    private int computePartitions() throws AnalyticsException {
+        //fixme: fix when analytics executor is added
+        /*if (ServiceHolder.getAnalyticskExecutor() != null) {
+            return ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint();
+        }*/
+        return AnalyzerEngineConstants.SPARK_DEFAULT_PARTITION_COUNT;
     }
 
     /**
