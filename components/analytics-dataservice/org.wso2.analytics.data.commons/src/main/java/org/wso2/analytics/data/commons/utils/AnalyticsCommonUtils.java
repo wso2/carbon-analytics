@@ -25,7 +25,9 @@ import com.google.common.io.ByteStreams;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.analytics.data.commons.AnalyticsDataService;
 import org.wso2.analytics.data.commons.AnalyticsRecordStore;
+import org.wso2.analytics.data.commons.service.AnalyticsDataResponse;
 import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.analytics.data.commons.sources.RecordGroup;
@@ -333,6 +335,15 @@ public class AnalyticsCommonUtils {
         List<Record> result = new ArrayList<>();
         for (RecordGroup rg : rgs) {
             result.addAll(IteratorUtils.toList(rs.readRecords(rg)));
+        }
+        return result;
+    }
+
+    public static List<Record> listRecords(AnalyticsDataService ads,
+                                           AnalyticsDataResponse response) throws AnalyticsException {
+        List<Record> result = new ArrayList<>();
+        for (AnalyticsDataResponse.Entry entry : response.getEntries()) {
+            result.addAll(IteratorUtils.toList(ads.readRecords(entry.getRecordStoreName(), entry.getRecordGroup())));
         }
         return result;
     }
