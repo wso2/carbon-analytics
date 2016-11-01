@@ -23,17 +23,10 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.api.CarbonAnalyticsAPI;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.core.SecureAnalyticsDataService;
-
 /**
  * This class represents the analytics api declarative services component.
  *
  * @scr.component name="analytics.api.component" immediate="true"
- * @scr.reference name="analytics.component" interface="AnalyticsDataService"
- * cardinality="0..1" policy="dynamic"  bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
- * @scr.reference name="analytics.secure.component" interface="SecureAnalyticsDataService"
- * cardinality="0..1" policy="dynamic"  bind="setSecureAnalyticsDataService" unbind="unsetSecureAnalyticsDataService"
  */
 public class AnalyticsApiDSComponent {
     
@@ -49,22 +42,6 @@ public class AnalyticsApiDSComponent {
         } catch (Exception e) {
             log.error("Error while starting the Analytics API component: " + e.getMessage(), e);
         }
-    }
-
-    protected void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
-        ServiceHolder.setAnalyticsDataService(analyticsDataService);
-    }
-
-    protected void unsetAnalyticsDataService(AnalyticsDataService analyticsDataService) {
-        ServiceHolder.setAnalyticsDataService(null);
-    }
-
-    protected void setSecureAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
-        ServiceHolder.setSecureAnalyticsDataService(secureAnalyticsDataService);
-    }
-
-    protected void unsetSecureAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
-        ServiceHolder.setSecureAnalyticsDataService(null);
     }
     
 }

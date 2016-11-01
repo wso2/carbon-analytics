@@ -19,7 +19,6 @@ package org.wso2.carbon.analytics.io.commons;
 
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import java.io.IOException;
 

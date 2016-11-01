@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>analytics-io</artifactId>
@@ -15,11 +16,11 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.dataservice.core</artifactId>
+            <artifactId>org.wso2.carbon.analytics.dataservice.commons</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.dataservice.commons</artifactId>
+            <artifactId>org.wso2.carbon.analytics.dataservice.core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
@@ -52,7 +53,15 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Export-Package>org.wso2.carbon.analytics.api.*</Export-Package>
+                        <Export-Package>
+                            !org.wso2.carbon.analytics.api.internal.*,
+                            org.wso2.carbon.analytics.api.*,
+                        </Export-Package>
+                        <Import-Package>
+                            org.wso2.carbon.analytics.dataservice.commons.*;version="${carbon.analytics.version}",
+                            org.wso2.carbon.analytics.datasource.commons.*;version="${carbon.analytics.version}",
+                            org.wso2.carbon.analytics.io.commons.*;version="${carbon.analytics.version}"
+                        </Import-Package>
                         <Private-Package>org.wso2.carbon.analytics.api.internal.*</Private-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

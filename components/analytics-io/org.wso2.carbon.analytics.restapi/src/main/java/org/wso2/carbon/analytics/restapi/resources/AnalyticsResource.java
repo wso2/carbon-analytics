@@ -21,6 +21,7 @@ import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.analytics.api.AnalyticsDataAPIUtil;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -473,7 +474,7 @@ public class AnalyticsResource extends AbstractResource {
         }
         final AnalyticsDataResponse resp = analyticsDataService.get(username, tableName, 1, columnList, timeFrom,
                 timeTo, recordsFrom, count);
-        final Iterator<Record> iterator = AnalyticsDataServiceUtils.responseToIterator(analyticsDataService, resp);
+        final Iterator<Record> iterator = AnalyticsDataAPIUtil.responseToIterator(analyticsDataService, resp);
         return new StreamingOutput() {
             @Override
             public void write(OutputStream outputStream)
@@ -613,7 +614,7 @@ public class AnalyticsResource extends AbstractResource {
                 ? null : columnKeyValueBean.getColumns();
         final AnalyticsDataResponse resp = analyticsDataService.getWithKeyValues(username, tableName, 1, columns,
                 columnKeyValueBean.getValueBatches());
-        final Iterator<Record> iterator = AnalyticsDataServiceUtils.responseToIterator(analyticsDataService, resp);
+        final Iterator<Record> iterator = AnalyticsDataAPIUtil.responseToIterator(analyticsDataService, resp);
         return new StreamingOutput() {
             @Override
             public void write(OutputStream outputStream)
@@ -734,7 +735,7 @@ public class AnalyticsResource extends AbstractResource {
             List<String> columns = (queryBean.getColumns() == null || queryBean.getColumns().isEmpty()) ? null : queryBean.getColumns();
             AnalyticsDataResponse resp = analyticsDataService.get(username,
                                                                   queryBean.getTableName(), 1, columns, ids);
-            Map<String, RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataServiceUtils.listRecords(analyticsDataService,
+            Map<String, RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataAPIUtil.listRecords(analyticsDataService,
                                                                                             resp));
             List<RecordBean> sortedRecordBeans = Utils.getSortedRecordBeans(recordBeans, searchResults);
             if (logger.isDebugEnabled()) {
@@ -775,7 +776,7 @@ public class AnalyticsResource extends AbstractResource {
             List<String> columns = requestBean.getColumns() == null || requestBean.getColumns().isEmpty() ? null : requestBean.getColumns();
             AnalyticsDataResponse resp = analyticsDataService.get(username,
                                                                   requestBean.getTableName(), 1, columns, ids);
-            Map<String, RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataServiceUtils.listRecords(analyticsDataService,
+            Map<String, RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataAPIUtil.listRecords(analyticsDataService,
                                                                                             resp));
             List<RecordBean> sortedRecordBeans = Utils.getSortedRecordBeans(recordBeans, result);
             return Response.ok(sortedRecordBeans).build();

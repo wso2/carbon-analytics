@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.webservice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.analytics.api.AnalyticsDataAPIUtil;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -367,7 +368,7 @@ public class AnalyticsWebService extends AbstractAdmin {
                                                                   recordsCount);
             List<Record> records;
             if (!isPaginationSupported(getRecordStoreNameByTable(tableName))) {
-                Iterator<Record> itr = AnalyticsDataServiceUtils.responseToIterator(analyticsDataAPI, response);
+                Iterator<Record> itr = AnalyticsDataAPIUtil.responseToIterator(analyticsDataAPI, response);
                 records = new ArrayList<>();
                 for (int i = 0; i < originalFrom && itr.hasNext(); i++) {
                     itr.next();
@@ -376,7 +377,7 @@ public class AnalyticsWebService extends AbstractAdmin {
                     records.add(itr.next());
                 }
             } else {
-                records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, response);
+                records = AnalyticsDataAPIUtil.listRecords(analyticsDataAPI, response);
             }
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
@@ -408,7 +409,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             }
             List<Map<String, Object>> valuesBatch = Utils.getValuesBatch(valuesBatchBeans,
                                                         analyticsDataAPI.getTableSchema(getUsername(), tableName));
-            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI,
+            List<Record> records = AnalyticsDataAPIUtil.listRecords(analyticsDataAPI,
                                                         analyticsDataAPI.getWithKeyValues(getUsername(), tableName, numPartitionsHint,
                                                                                                            columnList, valuesBatch));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
@@ -444,7 +445,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             } else {
                 throw new AnalyticsException("Ids cannot be empty!");
             }
-            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(),
+            List<Record> records = AnalyticsDataAPIUtil.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(),
                                                      tableName, numPartitionsHint, columnList, idList));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];

@@ -94,9 +94,13 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
                 if (mode == null) {
                     AnalyticsDataConfiguration.Mode mode = analyticsDataConfiguration.getOperationMode();
                     if (mode == AnalyticsDataConfiguration.Mode.AUTO) {
-                        if (ServiceHolder.getAnalyticsDataService() != null) {
-                            this.mode = AnalyticsDataConfiguration.Mode.LOCAL;
-                        } else {
+                        try {
+                            if (ServiceHolder.getAnalyticsDataService() != null) {
+                                this.mode = AnalyticsDataConfiguration.Mode.LOCAL;
+                            } else {
+                                this.mode = AnalyticsDataConfiguration.Mode.REMOTE;
+                            }
+                        } catch (Throwable e){
                             this.mode = AnalyticsDataConfiguration.Mode.REMOTE;
                         }
                     } else {

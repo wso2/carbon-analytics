@@ -25,6 +25,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.analytics.api.AnalyticsDataAPIUtil;
 import org.wso2.carbon.analytics.dataservice.commons.AggregateRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -331,7 +332,7 @@ public class AnalyticsJSServiceConnector {
             List<Record> records;
             if (!analyticsDataAPI.isPaginationSupported(analyticsDataAPI.getRecordStoreNameByTable(tenantId, tableName))) {
                 Iterator<org.wso2.carbon.analytics.datasource.commons.Record> itr =
-                        AnalyticsDataServiceUtils.responseToIterator(analyticsDataAPI, response);
+                        AnalyticsDataAPIUtil.responseToIterator(analyticsDataAPI, response);
                 records = new ArrayList<>();
                 for (int i = 0; i < start && itr.hasNext(); i++) {
                     itr.next();
@@ -340,7 +341,7 @@ public class AnalyticsJSServiceConnector {
                     records.add(itr.next());
                 }
             } else {
-                records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, response);
+                records = AnalyticsDataAPIUtil.listRecords(analyticsDataAPI, response);
             }
             return handleResponse(ResponseStatus.SUCCESS, gson.toJson(Utils.getRecordBeans(records)));
 
@@ -377,7 +378,7 @@ public class AnalyticsJSServiceConnector {
                 if (valueBatchList != null && !valueBatchList.isEmpty()) {
                     response = analyticsDataAPI.getWithKeyValues(tenantId, tableName, 1, columnKeyValueBean.getColumns(),
                             columnKeyValueBean.getValueBatches());
-                    List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, response);
+                    List<Record> records = AnalyticsDataAPIUtil.listRecords(analyticsDataAPI, response);
                     return handleResponse(ResponseStatus.SUCCESS, gson.toJson(Utils.getRecordBeans(records)));
                 } else {
                     throw new JSServiceException("Values batch is null or empty");
@@ -440,7 +441,7 @@ public class AnalyticsJSServiceConnector {
                     logger.debug("Invoking getRecordsByIds for tableName: " + tableName);
                 }
                 AnalyticsDataResponse response = analyticsDataAPI.get(tenantId, tableName, 1, bean.getColumns(), bean.getIds());
-                List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, response);
+                List<Record> records = AnalyticsDataAPIUtil.listRecords(analyticsDataAPI, response);
                 return handleResponse(ResponseStatus.SUCCESS, gson.toJson(Utils.getRecordBeans(records)));
             } catch (Exception e) {
                 logger.error("failed to get records from table: " + tableName + " : " + e.getMessage(), e);
@@ -968,7 +969,7 @@ public class AnalyticsJSServiceConnector {
         List<String> ids = Utils.getIds(searchResults);
         List<String> requiredColumns = (columns == null || columns.isEmpty()) ? null : columns;
         AnalyticsDataResponse response = analyticsDataAPI.get(tenantId, tableName, 1, requiredColumns, ids);
-        List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, response);
+        List<Record> records = AnalyticsDataAPIUtil.listRecords(analyticsDataAPI, response);
         Map<String, RecordBean> recordBeanMap = Utils.getRecordBeanKeyedWithIds(records);
         return Utils.getSortedRecordBeans(recordBeanMap, searchResults);
     }

@@ -18,6 +18,10 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.esotericsoftware.kryo</groupId>
+            <artifactId>kryo</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -44,10 +48,16 @@
                                 <bundleDef>
                                     org.wso2.orbit.org.apache.httpcomponents:httpclient
                                 </bundleDef>
+                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice.commons
+                                </bundleDef>
+                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.commons
+                                </bundleDef>
+                                <bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo
+                                </bundleDef>
+                                <bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.analytics.core.server:${carbon.analytics.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>
