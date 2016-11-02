@@ -19,7 +19,7 @@
 package org.wso2.analytics.dataservice.impl;
 
 import org.wso2.analytics.data.commons.sources.AnalyticsIterator;
-import org.wso2.analytics.data.commons.sources.AnalyticsRecordStoreConstants;
+import org.wso2.analytics.data.commons.sources.AnalyticsCommonConstants;
 import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.data.commons.sources.RecordGroup;
 import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
@@ -150,7 +150,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             tableInfo = new AnalyticsTableInfo(tableName, recordStoreName, new AnalyticsSchema());
         }
         this.writeTableInfo(tableName, tableInfo);
-        this.invalidateAnalyticsTableInfo(tableName);
+        this.invalidateTable(tableName);
     }
 
     private AnalyticsTableInfo lookupTableInfo(String tableName) throws AnalyticsException {
@@ -177,10 +177,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         }
     }
 
-    public void invalidateAnalyticsTableInfo(String tableName) {
-        tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
-        this.tableInfoMap.remove(tableName);
-    }
     private AnalyticsTableInfo readTableInfo(String tableName) throws AnalyticsException {
         AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
         List<String> ids = new ArrayList<>();
@@ -285,7 +281,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             acm.executeAll(ANALYTICS_DATASERVICE_GROUP, new AnalyticsTableInfoChangeMessage(tenantId, tableName));
         } else {
         }*/
-        this.invalidateAnalyticsTableInfo(tableName);
+        this.invalidateTable(tableName);
     }
 
     @Override
@@ -465,7 +461,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         // to make sure, we don't have an empty string
         builder.append("");
         try {
-            byte[] data = builder.toString().getBytes(AnalyticsRecordStoreConstants.DEFAULT_CHARSET);
+            byte[] data = builder.toString().getBytes(AnalyticsCommonConstants.DEFAULT_CHARSET);
             return UUID.nameUUIDFromBytes(data).toString();
         } catch (UnsupportedEncodingException e) {
             // This wouldn't happen
@@ -512,6 +508,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         for (AnalyticsRecordStore ars : this.analyticsRecordStores.values()) {
             ars.destroy();
         }
+    }
+
+    @Override
+    public void invalidateTable(String tableName) {
+        tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
+        this.tableInfoMap.remove(tableName);
     }
 
     /**

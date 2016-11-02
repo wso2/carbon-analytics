@@ -19,7 +19,7 @@
 package org.wso2.analytics.engine.commons;
 
 import org.apache.spark.Partition;
-import org.wso2.analytics.recordstore.commons.RecordGroup;
+import org.wso2.analytics.data.commons.sources.RecordGroup;
 
 import java.io.Serializable;
 

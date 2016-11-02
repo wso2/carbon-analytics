@@ -19,6 +19,7 @@
     <modules>
         <module>components/analytics-dataservice</module>
         <module>components/analytics-datasources</module>
+        <module>components/analytics-processor</module>
     </modules>
 
     <dependencyManagement>

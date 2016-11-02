@@ -18,7 +18,7 @@
  */
 package org.wso2.analytics.dataservice.config;
 
-import org.wso2.analytics.data.commons.sources.AnalyticsRecordStoreConstants;
+import org.wso2.analytics.data.commons.sources.AnalyticsCommonConstants;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -33,7 +33,7 @@ public class AnalyticsDataServiceConfiguration {
 
     private String primaryRecordStore;
 
-    private int recordsBatchSize = AnalyticsRecordStoreConstants.RECORDS_BATCH_SIZE;
+    private int recordsBatchSize = AnalyticsCommonConstants.RECORDS_BATCH_SIZE;
 
     @XmlElement(name = "analytics-record-store", nillable = false)
     public AnalyticsRecordStoreConfiguration[] getAnalyticsRecordStoreConfigurations() {
@@ -49,7 +49,7 @@ public class AnalyticsDataServiceConfiguration {
         return primaryRecordStore;
     }
 
-    @XmlElement (name = "recordsBatchSize", defaultValue = "" + AnalyticsRecordStoreConstants.RECORDS_BATCH_SIZE)
+    @XmlElement (name = "recordsBatchSize", defaultValue = "" + AnalyticsCommonConstants.RECORDS_BATCH_SIZE)
     public int getRecordsBatchSize() {
         return recordsBatchSize;
     }

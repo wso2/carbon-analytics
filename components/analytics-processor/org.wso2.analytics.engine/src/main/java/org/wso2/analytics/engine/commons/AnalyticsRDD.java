@@ -24,21 +24,19 @@ import org.apache.spark.*;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
-import org.wso2.analytics.dataservice.commons.AnalyticsDataResponse;
-import org.wso2.analytics.recordstore.commons.AnalyticsRecordStoreConstants;
-import org.wso2.analytics.recordstore.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.service.AnalyticsDataResponse;
+import org.wso2.analytics.data.commons.sources.AnalyticsCommonConstants;
+import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.engine.services.AnalyticsServiceHolder;
 import scala.Serializable;
 import scala.collection.Iterator;
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.wso2.analytics.recordstore.commons.Record;
 
 import static scala.collection.JavaConversions.asScalaIterator;
 
@@ -151,13 +149,9 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         }
 
         private void updateIncProcessingTS() {
-            try {
-                long existingIncTS = AnalyticsServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(this.incID, false);
-                if (existingIncTS < this.incMaxTS) {
-                    AnalyticsServiceHolder.getIncrementalMetaStore().setLastProcessedTimestamp(this.incID, this.incMaxTS, false);
-                }
-            } catch (AnalyticsException e) {
-                throw new RuntimeException(e);
+            long existingIncTS = AnalyticsServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(this.incID, false);
+            if (existingIncTS < this.incMaxTS) {
+                AnalyticsServiceHolder.getIncrementalMetaStore().setLastProcessedTimestamp(this.incID, this.incMaxTS, false);
             }
         }
 
@@ -180,7 +174,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
             Object[] rowVals = new Object[columns.size()];
 
             for (int i = 0; i < columns.size(); i++) {
-                if (columns.get(i).equals(AnalyticsRecordStoreConstants.TIMESTAMP_FIELD)) {
+                if (columns.get(i).equals(AnalyticsCommonConstants.TIMESTAMP_FIELD)) {
                     rowVals[i] = record.getTimestamp();
                 } else {
                     rowVals[i] = recordVals.get(columns.get(i));

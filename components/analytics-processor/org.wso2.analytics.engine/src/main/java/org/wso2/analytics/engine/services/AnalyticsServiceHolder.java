@@ -18,10 +18,9 @@
  */
 package org.wso2.analytics.engine.services;
 
-import org.wso2.analytics.dataservice.AnalyticsDataService;
+import org.wso2.analytics.data.commons.AnalyticsDataService;
 import org.wso2.analytics.engine.commons.AnalyticsIncrementalMetaStore;
 import org.wso2.analytics.engine.exceptions.AnalyticsDataServiceLoadException;
-import org.wso2.analytics.recordstore.exception.AnalyticsException;
 
 import java.util.ServiceLoader;
 

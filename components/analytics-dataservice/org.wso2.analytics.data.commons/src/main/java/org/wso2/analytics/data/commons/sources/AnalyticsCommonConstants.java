@@ -18,7 +18,7 @@
  */
 package org.wso2.analytics.data.commons.sources;
 
-public class AnalyticsRecordStoreConstants {
+public class AnalyticsCommonConstants {
     public static final String DEFAULT_CHARSET = "UTF8";
     public static final int RECORDS_BATCH_SIZE = 1000;
     public static final String TIMESTAMP_FIELD = "_timestamp";

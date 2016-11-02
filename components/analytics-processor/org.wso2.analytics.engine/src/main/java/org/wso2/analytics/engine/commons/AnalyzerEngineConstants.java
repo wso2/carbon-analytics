@@ -20,11 +20,23 @@ package org.wso2.analytics.engine.commons;
 
 public class AnalyzerEngineConstants {
 
-    public static final int SPARK_DEFAULT_PARTITION_COUNT = 6;
-
     private AnalyzerEngineConstants() {
         /**
          * Avoid initialization.
          */
+    }
+
+    public static final int SPARK_DEFAULT_PARTITION_COUNT = 6;
+
+    public static final String CARBON_INSERT_BATCH_SIZE = "carbon.insert.batch.size";
+
+    public enum IncrementalWindowUnit {
+        SECOND,
+        MINUTE,
+        HOUR,
+        DAY,
+        MONTH,
+        YEAR
+
     }
 }
