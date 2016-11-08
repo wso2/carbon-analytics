@@ -67,7 +67,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.hbase</groupId>
-                <artifactId>hbase-client</artifactId>
+                <artifactId>hbase-shaded-client</artifactId>
                 <version>${hbase.version}</version>
             </dependency>
 
@@ -123,6 +123,6 @@
         <hbase.version>1.2.0</hbase.version>
         <kryo.version>3.0.0</kryo.version>
         <spark.version>2.0.1</spark.version>
-        <testng.version>6.9.13.6</testng.version>
+        <testng.version>6.8.21</testng.version>
     </properties>
 </project>

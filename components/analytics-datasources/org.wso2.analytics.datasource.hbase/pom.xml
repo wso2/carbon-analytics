@@ -19,7 +19,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-client</artifactId>
+            <artifactId>hbase-shaded-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
