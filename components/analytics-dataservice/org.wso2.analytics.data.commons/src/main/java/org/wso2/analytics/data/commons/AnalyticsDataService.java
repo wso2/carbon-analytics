@@ -61,12 +61,11 @@ public interface AnalyticsDataService {
     /**
      * Creates the table if it does not already exist in the system.
      *
-     * @param tenantId        The tenant which this table belongs to
      * @param recordStoreName The name of the target record store to store the table at
      * @param tableName       The name of the table to be created
      * @throws AnalyticsException
      */
-    void createTableIfNotExists(int tenantId, String recordStoreName, String tableName) throws AnalyticsException;
+    void createTableIfNotExists(String recordStoreName, String tableName) throws AnalyticsException;
 
 
     /**

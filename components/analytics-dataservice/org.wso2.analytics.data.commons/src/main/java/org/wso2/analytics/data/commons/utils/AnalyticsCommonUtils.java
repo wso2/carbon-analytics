@@ -384,4 +384,7 @@ public class AnalyticsCommonUtils {
         return baseDir;
     }
 
+    public static String convertStreamNameToTableName(String stream) {
+        return stream.replaceAll("\\.", "_");
+    }
 }

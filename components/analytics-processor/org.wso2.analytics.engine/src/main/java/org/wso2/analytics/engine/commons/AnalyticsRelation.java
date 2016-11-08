@@ -62,16 +62,22 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Insert
     private boolean incEnabled;
     private String incID;
     private int incBuffer;
+    private String schemaString;
+    private String primaryKeys;
+    private boolean mergeFlag;
     private AnalyzerEngineConstants.IncrementalWindowUnit windowUnit;
 
     public AnalyticsRelation(String recordStore, String tableName, SQLContext sqlContext, StructType schema,
-                             String incrementalParams) {
+                             String incrementalParams, String schemaString, String primaryKeys, boolean mergeFlag) {
         this.tableName = tableName;
         this.recordStore = recordStore;
         this.sqlContext = sqlContext;
         this.schema = schema;
-        setIncrementalParameters(incrementalParams);
+        this.schemaString = schemaString;
+        this.primaryKeys = primaryKeys;
+        this.mergeFlag = mergeFlag;
         this.recordBatchSize = Integer.parseInt(sqlContext.sparkContext().getConf().get(AnalyzerEngineConstants.CARBON_INSERT_BATCH_SIZE));
+        setIncrementalParameters(incrementalParams);
     }
 
     @Override

@@ -200,7 +200,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
 
     @Override
-    public void createTableIfNotExists(int tenantId, String recordStoreName, String tableName) throws AnalyticsException {
+    public void createTableIfNotExists(String recordStoreName, String tableName) throws AnalyticsException {
         if (!this.tableExists(tableName)) {
             this.createTable(recordStoreName, tableName);
         }

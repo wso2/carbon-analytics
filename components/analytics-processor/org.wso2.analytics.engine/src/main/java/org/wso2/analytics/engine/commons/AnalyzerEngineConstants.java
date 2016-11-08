@@ -28,6 +28,16 @@ public class AnalyzerEngineConstants {
 
     public static final int SPARK_DEFAULT_PARTITION_COUNT = 6;
 
+    public static final String TABLE_NAME = "tableName";
+    public static final String SCHEMA_STRING = "schema";
+    public static final String STREAM_NAME = "streamName";
+    public static final String PRIMARY_KEYS = "primaryKeys";
+    public static final String RECORD_STORE = "recordStore";
+    public static final String GLOBAL_TENANT_ACCESS = "globalTenantAccess";
+    public static final String INC_PARAMS = "incrementalParams";
+    public static final String DEFAULT_PROCESSED_DATA_STORE_NAME = "PROCESSED_DATA_STORE";
+    public static final String MERGE_SCHEMA = "mergeSchema";
+
     public static final String CARBON_INSERT_BATCH_SIZE = "carbon.insert.batch.size";
 
     public enum IncrementalWindowUnit {
@@ -39,4 +49,22 @@ public class AnalyzerEngineConstants {
         YEAR
 
     }
+
+    //Spark data types
+    public static final String STRING_TYPE = "string";
+    public static final String INT_TYPE = "int";
+    public static final String INTEGER_TYPE = "integer";
+    public static final String BOOLEAN_TYPE = "boolean";
+    public static final String DOUBLE_TYPE = "double";
+    public static final String FLOAT_TYPE = "float";
+    public static final String LONG_TYPE = "long";
+    public static final String BINARY_TYPE = "binary";
+    public static final String FACET_TYPE = "facet";
+
+    // Spark schema details
+    public static final String OPTION_IS_FACET = "-f";
+    public static final String OPTION_IS_INDEXED = "-i";
+    public static final String OPTION_SCORE_PARAM = "-sp";
 }
+
+
