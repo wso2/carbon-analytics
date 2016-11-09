@@ -66,13 +66,13 @@ public abstract class AnalyticsRecordStoreTest {
         return new Record(AnalyticsCommonUtils.generateRecordID(), tableName, values, System.currentTimeMillis());
     }
 
-    static List<Record> generateRecords(String tableName, int i, int c, long time,
-                                        int timeOffset) {
+    public static List<Record> generateRecords(String tableName, int i, int c, long time,
+                                               int timeOffset) {
         return generateRecords(tableName, i, c, time, timeOffset, true);
     }
 
-    static List<Record> generateRecords(String tableName, int i, int c, long time, int timeOffset,
-                                        boolean generateRecordIds) {
+    public static List<Record> generateRecords(String tableName, int i, int c, long time, int timeOffset,
+                                               boolean generateRecordIds) {
         List<Record> result = new ArrayList<>();
         Map<String, Object> values;
         long timeTmp;

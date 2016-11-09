@@ -35,6 +35,7 @@ import org.wso2.analytics.data.commons.sources.RecordGroup;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.*;
 
@@ -53,7 +54,10 @@ public class AnalyticsCommonUtils {
     private static final byte DATA_TYPE_OBJECT = 0x10;
     private static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
 
-    private static final Log log = LogFactory.getLog(AnalyticsCommonUtils.class);
+    private static final String CUSTOM_WSO2_CONF_DIR_NAME = "conf";
+    public static final String WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP = "wso2_custom_conf_dir";
+
+    private static final Log LOG = LogFactory.getLog(AnalyticsCommonUtils.class);
 
     private static ThreadLocal<Kryo> kryoTL = new ThreadLocal<Kryo>() {
         protected Kryo initialValue() {
@@ -353,15 +357,29 @@ public class AnalyticsCommonUtils {
         try {
             confDir = new File(getConfDirectoryPath());
         } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error in getting the config path: " + e.getMessage(), e);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Error in getting the config path: " + e.getMessage(), e);
             }
         }
         if (confDir == null || !confDir.exists()) {
-            return getConfDirectoryPath();
+            return getCustomAnalyticsConfDirectory();
         } else {
             return confDir.getAbsolutePath();
         }
+    }
+
+    private static String getCustomAnalyticsConfDirectory() throws AnalyticsException {
+        String path = System.getProperty(WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP);
+        if (path == null) {
+            path = Paths.get("").toAbsolutePath().toString() + File.separator + CUSTOM_WSO2_CONF_DIR_NAME;
+        }
+        File confDir = new File(path);
+        if (!confDir.exists()) {
+            throw new AnalyticsException("The custom WSO2 configuration directory does not exist at '" + path + "'. "
+                    + "This can be given by correctly pointing to a valid configuration directory by setting the "
+                    + "Java system property '" + WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + "'.");
+        }
+        return confDir.getAbsolutePath();
     }
 
     public static String getConfDirectoryPath() {

@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <!--    <parent>
-            <groupId>org.wso2</groupId>
-            <artifactId>wso2</artifactId>
-            <version>5</version>
-            <relativePath />
-        </parent>-->
+    <parent>
+        <groupId>org.wso2</groupId>
+        <artifactId>wso2</artifactId>
+        <version>1</version>
+        <relativePath/>
+    </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.analytics</groupId>
@@ -87,6 +87,11 @@
                 <artifactId>org.wso2.analytics.data.commons</artifactId>
                 <version>${analytics.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.analytics</groupId>
+                <artifactId>org.wso2.analytics.datasource.rdbms</artifactId>
+                <version>${analytics.version}</version>
+            </dependency>
 
             <!-- Testing related dependencies -->
             <dependency>
@@ -102,11 +107,22 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <preparationGoals>clean install</preparationGoals>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

@@ -18,19 +18,20 @@
  */
 package org.wso2.analytics.dataservice.impl;
 
-import org.wso2.analytics.data.commons.sources.AnalyticsIterator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.analytics.data.commons.AnalyticsDataService;
+import org.wso2.analytics.data.commons.AnalyticsRecordStore;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.analytics.data.commons.service.AnalyticsDataResponse;
+import org.wso2.analytics.data.commons.service.AnalyticsDataResponse.Entry;
+import org.wso2.analytics.data.commons.service.AnalyticsSchema;
 import org.wso2.analytics.data.commons.sources.AnalyticsCommonConstants;
+import org.wso2.analytics.data.commons.sources.AnalyticsIterator;
 import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.data.commons.sources.RecordGroup;
 import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
-import org.wso2.analytics.data.commons.AnalyticsDataService;
-import org.wso2.analytics.data.commons.service.AnalyticsDataResponse;
-import org.wso2.analytics.data.commons.service.AnalyticsSchema;
-import org.wso2.analytics.dataservice.utils.AnalyticsDataServiceConstants;
-import org.wso2.analytics.data.commons.AnalyticsRecordStore;
-import org.wso2.analytics.data.commons.service.AnalyticsDataResponse.Entry;
-import org.wso2.analytics.data.commons.exception.AnalyticsException;
-import org.wso2.analytics.data.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.analytics.dataservice.config.AnalyticsDataServiceConfigProperty;
 import org.wso2.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
 import org.wso2.analytics.dataservice.config.AnalyticsRecordStoreConfiguration;
@@ -45,6 +46,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.wso2.analytics.dataservice.utils.AnalyticsDataServiceConstants.ANALYTICS_CONFIG_FILE;
+import static org.wso2.analytics.dataservice.utils.AnalyticsDataServiceConstants.ANALYTICS_CONF_DIR;
+
 public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     private static final int DELETE_BATCH_SIZE = 1000;
@@ -56,9 +60,18 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private Map<String, AnalyticsRecordStore> analyticsRecordStores;
     private Map<String, AnalyticsTableInfo> tableInfoMap = new HashMap<>();
 
-    public AnalyticsDataServiceImpl() throws AnalyticsException {
-        AnalyticsDataServiceConfiguration config = this.loadAnalyticsDataServiceConfig();
-        this.initARS(config);
+    private static final Log LOGGER = LogFactory.getLog(AnalyticsDataServiceImpl.class);
+
+    public AnalyticsDataServiceImpl() {
+        AnalyticsDataServiceConfiguration config = null;
+        try {
+            config = this.loadAnalyticsDataServiceConfig();
+            this.initARS(config);
+        } catch (AnalyticsException e) {
+            // Logging throwable since there is no other way to make the user aware of any insiantiation failures
+            LOGGER.error("Failed to initialize Analytics Data Service: " + e.getMessage(), e);
+        }
+
         //todo: add clustering info here
 //        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
 //        if (acm.isClusteringEnabled()) {
@@ -68,9 +81,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
         try {
-            File confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() + File.separator +
-                    AnalyticsDataServiceConstants.ANALYTICS_DS_CONFIG_DIR + File.separator +
-                    AnalyticsDataServiceConstants.ANALYTICS_DS_CONFIG_FILE);
+            File confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() + File.separator
+                    + ANALYTICS_CONF_DIR + File.separator + ANALYTICS_CONFIG_FILE);
             if (!confFile.exists()) {
                 throw new AnalyticsException("Cannot initalize analytics data service, " +
                         "the analytics data service configuration file cannot be found at: " +
@@ -336,11 +348,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     private void populateWithGenerateIds(List<Record> records) {
-        for (Record record : records) {
-            if (record.getId() == null) {
-                record.setId(AnalyticsCommonUtils.generateRecordID());
-            }
-        }
+        records.stream().filter(record -> record.getId() == null).forEach(
+                record -> record.setId(AnalyticsCommonUtils.generateRecordID()));
     }
 
     private void populateRecordWithPrimaryKeyAwareId(Record record, List<String> primaryKeys) {
