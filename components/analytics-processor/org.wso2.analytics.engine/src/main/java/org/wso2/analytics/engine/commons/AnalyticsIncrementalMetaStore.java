@@ -18,19 +18,16 @@
  */
 package org.wso2.analytics.engine.commons;
 
-import org.wso2.analytics.dataservice.AnalyticsDataService;
-import org.wso2.analytics.dataservice.commons.AnalyticsSchema;
-import org.wso2.analytics.dataservice.commons.ColumnDefinition;
-import org.wso2.analytics.dataservice.utils.AnalyticsCommonUtils;
+import org.wso2.analytics.data.commons.AnalyticsDataService;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.service.AnalyticsSchema;
+import org.wso2.analytics.data.commons.service.ColumnDefinition;
+import org.wso2.analytics.data.commons.sources.Record;
+import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.engine.exceptions.AnalyticsDataServiceLoadException;
 import org.wso2.analytics.engine.services.AnalyticsServiceHolder;
-import org.wso2.analytics.recordstore.commons.Record;
-import org.wso2.analytics.recordstore.exception.AnalyticsException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+
+import java.util.*;
 
 /**
  * This class stores metadata required for incremental processing actions.
