@@ -34,12 +34,15 @@ import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConst
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkUtil;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Analytics Event Store deployer which basically combines the streams and tables connectivity.
@@ -47,7 +50,7 @@ import java.util.List;
 public class AnalyticsEventStoreDeployer extends AbstractDeployer {
 
     private final static Log log = LogFactory.getLog(AnalyticsEventStoreDeployer.class);
-    private static List<DeploymentFileData> pausedDeployments = new ArrayList<>();
+    private static Map<Integer, List<DeploymentFileData>> pausedDeployments = new HashMap<>();
     private boolean eventSinkEnabled;
 
     public AnalyticsEventStoreDeployer(){
@@ -92,7 +95,13 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
             }
             log.info("Deployed successfully analytics event store: " + deploymentFileData.getName());
         } else {
-            pausedDeployments.add(deploymentFileData);
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            List<DeploymentFileData> tenantSpecificPausedDeploymentList = pausedDeployments.get(tenantId);
+            if(tenantSpecificPausedDeploymentList == null){
+                tenantSpecificPausedDeploymentList = new ArrayList<>();
+                pausedDeployments.put(tenantId, tenantSpecificPausedDeploymentList);
+            }
+            tenantSpecificPausedDeploymentList.add(deploymentFileData);
         }
     }
 
@@ -167,7 +176,7 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
         log.info("Undeployed successfully analytics event store: " + fileName);
     }
 
-    public static List<DeploymentFileData> getPausedDeployments() {
+    public static Map<Integer, List<DeploymentFileData>> getPausedDeployments() {
         return pausedDeployments;
     }
 
