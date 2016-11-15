@@ -76,6 +76,11 @@ public class AnalyzerEngineConstants {
     public static final String SPARK_MASTER = "spark.master";
     public static final String SPARK_APP_NAME = "spark.app.name";
 
+    // Relation providers
+    public static final String SPARK_CARBONANALYTICS_PROVIDER = "CarbonAnalytics";
+    public static final String SPARK_JDBC_SHORTHAND_STRING = "CarbonJDBC";
+    public static final String SPARK_EVENTS_SHORTHAND_STRING = "CarbonEvents";
+
 
 }
 

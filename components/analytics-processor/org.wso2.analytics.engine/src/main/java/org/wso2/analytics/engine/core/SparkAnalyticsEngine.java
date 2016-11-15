@@ -29,12 +29,16 @@ import org.wso2.analytics.data.commons.AnalyticsEngine;
 import org.wso2.analytics.data.commons.AnalyticsEngineQueryResult;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
+import org.wso2.analytics.engine.commons.AnalyticsRelationProvider;
 import org.wso2.analytics.engine.commons.AnalyzerEngineConstants;
 import org.wso2.analytics.engine.commons.SparkAnalyticsEngineQueryResult;
+import org.wso2.analytics.engine.exceptions.AnalyticsExecutionException;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.wso2.analytics.data.commons.sources.AnalyticsCommonConstants.ANALYTICS_CONF_DIR;
 
@@ -45,9 +49,13 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
     private SparkConf sparkConf;
     private String sparkMaster;
     private String appName;
+    private Map<String, String> shorthandStringsMap;
+
 
     public SparkAnalyticsEngine() {
+        this.shorthandStringsMap = new HashMap<>();
         init();
+        registerAnalyticsProviders();
     }
 
     private void init() {
@@ -79,19 +87,32 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
 
     @Override
     public AnalyticsEngineQueryResult executeQuery(String query) {
-        String processedQuery;
-        if (query.endsWith(";")) {
-            processedQuery = query.substring(0, query.length() - 1).trim();
+        String processedQuery = replaceShorthandStrings(query);
+        if (processedQuery.endsWith(";")) {
+            processedQuery = processedQuery.substring(0, processedQuery.length() - 1).trim();
         }
-        processedQuery = query.trim();
         // todo: implement processing incremental queries
         // checkAndProcessIncrementalQuery();
 
         long start = System.currentTimeMillis();
         boolean success = true;
-
-        Dataset<Row> resultsSet = sparkSession.sql(processedQuery);
-        return convertToResult(resultsSet);
+        AnalyticsEngineQueryResult analyticsEngineQueryResult = null;
+        try {
+            Dataset<Row> resultsSet = sparkSession.sql(processedQuery);
+            analyticsEngineQueryResult = convertToResult(resultsSet);
+        } catch (Throwable throwable) {
+            success = false;
+            log.error("Exception in executing query " + query, throwable);
+        } finally {
+            // todo: add printing this based on -DenableAnalyticsStats
+            long end = System.currentTimeMillis();
+            if (success) {
+                log.info("Executed query: " + query + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
+            } else {
+                log.error("Unable to execute query: " + query + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
+            }
+        }
+        return analyticsEngineQueryResult;
     }
 
     private AnalyticsEngineQueryResult convertToResult(Dataset<Row> results) {
@@ -116,5 +137,16 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
             result.add(objects);
         }
         return result;
+    }
+
+    private String replaceShorthandStrings(String query) {
+        for (Map.Entry<String, String> entry : this.shorthandStringsMap.entrySet()) {
+            query = query.replaceFirst("\\b" + entry.getKey() + "\\b", entry.getValue());
+        }
+        return query.trim();
+    }
+
+    private void registerAnalyticsProviders() {
+        this.shorthandStringsMap.put(AnalyzerEngineConstants.SPARK_CARBONANALYTICS_PROVIDER, AnalyticsRelationProvider.class.getName());
     }
 }
