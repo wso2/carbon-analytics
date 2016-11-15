@@ -57,6 +57,12 @@ public class RDBMSQueryConfigurationEntry {
     
     private String recordRetrievalWithIdsQuery;
     
+    private int recordExtDataFieldCount;
+    
+    private String recordExtDataFieldType;
+    
+    private int recordExtDataFieldSize;
+    
     private String recordDeletionWithIdsQuery;
         
     private int recordBatchSize = RDBMSAnalyticsDSConstants.RECORD_BATCH_SIZE;
@@ -183,6 +189,30 @@ public class RDBMSQueryConfigurationEntry {
     
     public void setRecordRetrievalWithIdsQuery(String recordRetrievalWithIdsQuery) {
         this.recordRetrievalWithIdsQuery = recordRetrievalWithIdsQuery;
+    }
+
+    public int getRecordExtDataFieldCount() {
+        return recordExtDataFieldCount;
+    }
+
+    public void setRecordExtDataFieldCount(int recordExtDataFieldCount) {
+        this.recordExtDataFieldCount = recordExtDataFieldCount;
+    }
+
+    public String getRecordExtDataFieldType() {
+        return recordExtDataFieldType;
+    }
+
+    public void setRecordExtDataFieldType(String recordExtDataFieldType) {
+        this.recordExtDataFieldType = recordExtDataFieldType;
+    }
+
+    public int getRecordExtDataFieldSize() {
+        return recordExtDataFieldSize;
+    }
+
+    public void setRecordExtDataFieldSize(int recordExtDataFieldSize) {
+        this.recordExtDataFieldSize = recordExtDataFieldSize;
     }
 
     public String getRecordDeletionWithIdsQuery() {

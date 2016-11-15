@@ -18,7 +18,10 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.io.BaseEncoding;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
@@ -33,6 +36,7 @@ import org.wso2.carbon.ndatasource.common.DataSourceException;
 import javax.sql.DataSource;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -45,11 +49,17 @@ import java.util.*;
  * Abstract RDBMS database backed implementation of {@link AnalyticsRecordStore}.
  */
 public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
+    private static final String EXT_DATA_FIELD_NAME_PREFIX = "ED";
+
     private static final Log log = LogFactory.getLog(RDBMSAnalyticsRecordStore.class);
     
     private static final String RECORD_IDS_PLACEHOLDER = "{{RECORD_IDS}}";
 
     private static final String TABLE_NAME_PLACEHOLDER = "{{TABLE_NAME}}";
+    
+    private static final String EXT_DATA_FIELDS_PLACEHOLDER = "{{EXT_DATA_FIELDS}}";
+    
+    private static final String EXT_DATA_PARAMS_PLACEHOLDER = "{{EXT_DATA_PARAMS}}";
         
     private DataSource dataSource;
     
@@ -86,7 +96,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             this.rdbmsQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource, category);
         }
     }
-        
+    
     public RDBMSQueryConfigurationEntry getQueryConfiguration() {
         return rdbmsQueryConfigurationEntry;
     }
@@ -100,6 +110,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         String[] result = new String[queries.length];
         for (int i = 0; i < queries.length; i++) {
             result[i] = this.translateQueryWithTableInfo(queries[i], tenantId, tableName);
+            result[i] = this.translateQueryWithCreateTableInfo(result[i]);
         }
         return result;
     }
@@ -191,13 +202,56 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             Record record) throws SQLException, AnalyticsException {
         stmt.setInt(1, this.generatePartitionKey(record.getId()));
         stmt.setLong(2, record.getTimestamp());
-        byte [] bytes = GenericUtils.encodeRecordValues(record.getValues());
+        byte[] bytes = GenericUtils.encodeRecordValues(record.getValues());
+        List<Object> dataFields = this.splitData(bytes);
+        byte[] blobData = (byte[]) dataFields.get(dataFields.size() - 1);
         if (!this.rdbmsQueryConfigurationEntry.isBlobLengthRequired()) {
-            stmt.setBinaryStream(3, new ByteArrayInputStream(bytes));
+            stmt.setBinaryStream(3, new ByteArrayInputStream(blobData));
         } else {
-            stmt.setBinaryStream(3, new ByteArrayInputStream(bytes), bytes.length);
+            stmt.setBinaryStream(3, new ByteArrayInputStream(blobData), blobData.length);
         }
-        stmt.setString(4, record.getId());
+        int fieldCount = this.getQueryConfiguration().getRecordExtDataFieldCount();
+        for (int i = 0; i < fieldCount; i++) {
+            stmt.setString(4 + i, (String) dataFields.get(i));
+        }
+        stmt.setString(4 + fieldCount, record.getId());
+    }
+    
+    private List<Object> splitData(byte[] data) {
+        int fieldSize = this.getQueryConfiguration().getRecordExtDataFieldSize();
+        int fieldCount = this.getQueryConfiguration().getRecordExtDataFieldCount();
+        List<Object> result = new ArrayList<>(fieldCount + 1);
+        /* base64 space requirement processing */
+        int bytesInExtFields = (int) Math.floor((fieldSize * fieldCount - 4) / 4.0 * 3);
+        if (bytesInExtFields <= 0) {
+            bytesInExtFields = 0;
+        }
+        byte[] blobData;
+        byte[] extFieldData = null;
+        if (data.length > bytesInExtFields) {
+            if (bytesInExtFields > 0) {
+                blobData = new byte[data.length - bytesInExtFields];
+                extFieldData = new byte[bytesInExtFields];
+                System.arraycopy(data, bytesInExtFields, blobData, 0, blobData.length);
+                System.arraycopy(data, 0, extFieldData, 0, bytesInExtFields);
+            } else {
+                blobData = data;
+            }
+        } else {
+            blobData = new byte[0];
+            extFieldData = data;
+        }
+        if (extFieldData != null) {
+            String base64ExtFieldData = BaseEncoding.base64().encode(extFieldData);
+            for (String ds : Splitter.fixedLength(fieldSize).split(base64ExtFieldData)) {
+                result.add(ds);
+            }
+        }
+        for (int i = result.size(); i < fieldCount; i++) {
+            result.add(new String());
+        }
+        result.add(blobData);
+        return result;
     }
     
     private void mergeRecordsSimilar(Connection conn,
@@ -297,17 +351,20 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     
     private String getRecordMergeSQL(int tenantId, String tableName) {
     	String query = this.getQueryConfiguration().getRecordMergeQuery();
-    	return translateQueryWithTableInfo(query, tenantId, tableName);
+    	query = this.translateQueryWithTableInfo(query, tenantId, tableName);
+    	return this.translateInsertQueryWithFieldInfo(query);
     }
     
     private String getRecordInsertSQL(int tenantId, String tableName) {
         String query = this.getQueryConfiguration().getRecordInsertQuery();
-        return translateQueryWithTableInfo(query, tenantId, tableName);
+        query = this.translateQueryWithTableInfo(query, tenantId, tableName);
+        return this.translateInsertQueryWithFieldInfo(query);
     }
     
     private String getRecordUpdateSQL(int tenantId, String tableName) {
         String query = this.getQueryConfiguration().getRecordUpdateQuery();
-        return translateQueryWithTableInfo(query, tenantId, tableName);
+        query = translateQueryWithTableInfo(query, tenantId, tableName);
+        return this.translateUpdateQueryWithFieldInfo(query);
     }
     
     private boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
@@ -407,7 +464,8 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             stmt.setInt(5, paginationIndices[0]);
             stmt.setInt(6, paginationIndices[1]);
             rs = stmt.executeQuery();
-            return new RDBMSResultSetIterator(tenantId, tableName, columns, conn, stmt, rs);
+            return new RDBMSResultSetIterator(tenantId, tableName, columns, conn, stmt, rs, 
+                    this.getQueryConfiguration().getRecordExtDataFieldCount());
         } catch (SQLException e) {
             if (conn != null && !this.tableExists(conn, tenantId, tableName)) {
                 RDBMSUtils.cleanupConnection(rs, stmt, conn);
@@ -462,7 +520,8 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
                 stmt.setString(i + 1, ids.get(i));
             }
             rs = stmt.executeQuery();
-            return new RDBMSResultSetIterator(tenantId, tableName, columns, conn, stmt, rs);
+            return new RDBMSResultSetIterator(tenantId, tableName, columns, conn, stmt, rs,
+                    this.getQueryConfiguration().getRecordExtDataFieldCount());
         } catch (SQLException e) {
             if (conn != null && !this.tableExists(conn, tenantId, tableName)) {
                 RDBMSUtils.cleanupConnection(rs, stmt, conn);
@@ -555,20 +614,102 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         return query.replace(TABLE_NAME_PLACEHOLDER, this.generateTargetTableName(tenantId, tableName));
     }
     
+    private String translateQueryWithCreateTableInfo(String query) {
+        if (query == null) {
+            return null;
+        }
+        return query.replace(EXT_DATA_FIELDS_PLACEHOLDER, this.generateExtDataFieldsWithTypes());
+    }
+    
+    private String translateInsertQueryWithFieldInfo(String query) {
+        if (query == null) {
+            return null;
+        }
+        return query.replace(EXT_DATA_FIELDS_PLACEHOLDER, this.generateExtDataFieldsWOTypes()).replace(
+                EXT_DATA_PARAMS_PLACEHOLDER, this.generateExtDataFieldParams());
+    }
+    
+    private String translateRetrievalQueryWithFieldInfo(String query) {
+        if (query == null) {
+            return null;
+        }
+        return query.replace(EXT_DATA_FIELDS_PLACEHOLDER, this.generateExtDataFieldsWOTypes());
+    }
+    
+    private String translateUpdateQueryWithFieldInfo(String query) {
+        if (query == null) {
+            return null;
+        }
+        return query.replace(EXT_DATA_PARAMS_PLACEHOLDER, this.generateExtDataFieldsForUpdate());
+    }
+    
+    private String generateExtDataFieldsForUpdate() {
+        StringBuilder builder = new StringBuilder();
+        int count = this.getQueryConfiguration().getRecordExtDataFieldCount();
+        for (int i = 0; i < count; i++) {
+            builder.append(this.generateExtDataFieldName(i) + " = ?");
+            if (i < count - 1) {
+                builder.append(", ");
+            }
+        }
+        return builder.toString();
+    }
+    
+    private String generateExtDataFieldName(int index) {
+        return EXT_DATA_FIELD_NAME_PREFIX + index;
+    }
+    
+    private String generateExtDataFieldParams() {
+        StringBuilder builder = new StringBuilder();
+        int count = this.getQueryConfiguration().getRecordExtDataFieldCount();
+        for (int i = 0; i < count; i++) {
+            builder.append("?");
+            if (i < count - 1) {
+                builder.append(", ");
+            }
+        }
+        return builder.toString();
+    }
+    
+    private String generateExtDataFieldsWithTypes() {
+        StringBuilder builder = new StringBuilder();
+        int count = this.getQueryConfiguration().getRecordExtDataFieldCount();
+        for (int i = 0; i < count; i++) {
+            builder.append(this.generateExtDataFieldName(i) + " " + this.getQueryConfiguration().getRecordExtDataFieldType());
+            if (i < count - 1) {
+                builder.append(", ");
+            }
+        }
+        return builder.toString();
+    }
+    
+    private String generateExtDataFieldsWOTypes() {
+        StringBuilder builder = new StringBuilder();
+        int count = this.getQueryConfiguration().getRecordExtDataFieldCount();
+        for (int i = 0; i < count; i++) {
+            builder.append(this.generateExtDataFieldName(i));
+            if (i < count - 1) {
+                builder.append(", ");
+            }
+        }
+        return builder.toString();
+    }
+    
     private String translateQueryWithRecordIdsInfo(String query, int recordCount) {
         return query.replace(RECORD_IDS_PLACEHOLDER, this.getDynamicSQLParams(recordCount));
     }
     
     private String getRecordRetrievalQuery(int tenantId, String tableName) {
         String query = this.getQueryConfiguration().getRecordRetrievalQuery();
-        return this.translateQueryWithTableInfo(query, tenantId, tableName);
+        query = this.translateQueryWithTableInfo(query, tenantId, tableName);
+        return this.translateRetrievalQueryWithFieldInfo(query);
     }
     
     private String generateGetRecordRetrievalWithIdQuery(int tenantId, String tableName, int recordCount) {
         String query = this.getQueryConfiguration().getRecordRetrievalWithIdsQuery();
         query = this.translateQueryWithTableInfo(query, tenantId, tableName);
         query = this.translateQueryWithRecordIdsInfo(query, recordCount);
-        return query;
+        return this.translateRetrievalQueryWithFieldInfo(query);
     }
     
     private String generateRecordDeletionRecordsWithIdsQuery(int tenantId, String tableName, int recordCount) {
@@ -724,14 +865,17 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         
         private boolean prefetched;
         
+        private int extFieldCount;
+        
         public RDBMSResultSetIterator(int tenantId, String tableName, List<String> columns, 
-                Connection conn, Statement stmt, ResultSet rs) {
+                Connection conn, Statement stmt, ResultSet rs, int extFieldCount) {
             this.tenantId = tenantId;
             this.tableName = tableName;
             this.columns = columns;
             this.conn = conn;
             this.stmt = stmt;
             this.rs = rs;
+            this.extFieldCount = extFieldCount;
         }
         
         @Override
@@ -757,7 +901,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             }
             try {
                 if (this.rs.next()) {
-                    byte[] bytes = this.rs.getBytes(3);
+                    byte[] bytes = this.extractDataFromRS(this.rs);
                     Map<String, Object> values;
                     if (bytes != null) {
                         values = GenericUtils.decodeRecordValues(bytes, colSet);
@@ -777,6 +921,15 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
                 RDBMSUtils.cleanupConnection(this.rs, this.stmt, this.conn);
                 throw new RuntimeException(e.getMessage(), e);
             }
+        }
+        
+        private byte[] extractDataFromRS(ResultSet rs) throws SQLException, IOException {
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            for (int i = 0; i < this.extFieldCount; i++) {
+                byteOut.write(BaseEncoding.base64().decode(rs.getString(4 + i)));
+            }
+            byteOut.write(rs.getBytes(3));
+            return byteOut.toByteArray();
         }
 
         @Override

@@ -20,7 +20,7 @@
         <recordTableInitQueries>
             <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BINARY, partition_key INT, PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
-            <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{PARTITION_KEY}} (partition_key)</query>            
+            <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
         </recordTableInitQueries>
     </database>
 </rdbms-configuration>
