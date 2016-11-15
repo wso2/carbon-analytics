@@ -228,7 +228,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
         byte[] blobData;
         byte[] extFieldData = null;        
-        int blobDataSize = Math.min(0, data.length - bytesInExtFields);
+        int blobDataSize = Math.max(0, data.length - bytesInExtFields);
         int extFieldsDataSize = Math.min(data.length, bytesInExtFields);        
         if (extFieldsDataSize > 0) {
             extFieldData = new byte[extFieldsDataSize];
