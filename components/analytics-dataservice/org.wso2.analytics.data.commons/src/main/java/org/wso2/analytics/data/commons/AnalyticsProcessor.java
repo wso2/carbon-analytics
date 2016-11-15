@@ -16,19 +16,11 @@
  *  under the License.
  *
  */
+package org.wso2.analytics.data.commons;
 
-package org.wso2.analytics.engine;
+import java.util.List;
 
-/**
- * This interface represents all the Analytics Engines.
- */
-public interface AnalyticsEngine {
+public interface AnalyticsProcessor {
 
-    /** todo: make the result object
-     * This executes the given query and returns the result object.
-     * @param query spark sql query to be executed
-     */
-    public void executeQuery(String query);
-
-    public void executeScript();
+    public List<AnalyticsEngine> listAnalyticsEngines();
 }

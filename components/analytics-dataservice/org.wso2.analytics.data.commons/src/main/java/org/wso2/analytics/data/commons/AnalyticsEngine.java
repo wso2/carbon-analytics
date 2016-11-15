@@ -16,13 +16,19 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.data.commons.sources;
 
-public class AnalyticsCommonConstants {
+package org.wso2.analytics.data.commons;
 
-    public static final String DEFAULT_CHARSET = "UTF8";
-    public static final int RECORDS_BATCH_SIZE = 1000;
-    public static final String TIMESTAMP_FIELD = "_timestamp";
+/**
+ * This interface represents Analytics Engines.
+ */
+public interface AnalyticsEngine {
 
-    public static final String ANALYTICS_CONF_DIR = "analytics";
+    /**
+     * This executes the given query and returns the result object.
+     *
+     * @param query spark sql query to be executed
+     */
+    AnalyticsEngineQueryResult executeQuery(String query);
+
 }

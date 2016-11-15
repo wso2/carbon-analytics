@@ -46,8 +46,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.wso2.analytics.data.commons.sources.AnalyticsCommonConstants.ANALYTICS_CONF_DIR;
 import static org.wso2.analytics.dataservice.utils.AnalyticsDataServiceConstants.ANALYTICS_CONFIG_FILE;
-import static org.wso2.analytics.dataservice.utils.AnalyticsDataServiceConstants.ANALYTICS_CONF_DIR;
 
 public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
@@ -71,12 +71,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             // Logging throwable since there is no other way to make the user aware of any insiantiation failures
             LOGGER.error("Failed to initialize Analytics Data Service: " + e.getMessage(), e);
         }
-
-        //todo: add clustering info here
-//        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
-//        if (acm.isClusteringEnabled()) {
-//            acm.joinGroup(ANALYTICS_DATASERVICE_GROUP, null);
-//        }
     }
 
     private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {

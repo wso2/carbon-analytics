@@ -33,10 +33,15 @@ public class AnalyzerEngineConstants {
     public static final String STREAM_NAME = "streamName";
     public static final String PRIMARY_KEYS = "primaryKeys";
     public static final String RECORD_STORE = "recordStore";
-    public static final String GLOBAL_TENANT_ACCESS = "globalTenantAccess";
-    public static final String INC_PARAMS = "incrementalParams";
     public static final String DEFAULT_PROCESSED_DATA_STORE_NAME = "PROCESSED_DATA_STORE";
     public static final String MERGE_SCHEMA = "mergeSchema";
+
+    // Incremental table parameters
+    public static final String INC_PARAMS = "incrementalParams";
+    public static final String INC_TABLE = "incremental_table_";
+    public static final String INC_TABLE_COMMIT = "incremental_table_commit";
+    public static final String INC_TABLE_RESET = "incremental_table_reset";
+    public static final String INC_TABLE_SHOW = "incremental_table_show";
 
     public static final String CARBON_INSERT_BATCH_SIZE = "carbon.insert.batch.size";
 
@@ -65,6 +70,13 @@ public class AnalyzerEngineConstants {
     public static final String OPTION_IS_FACET = "-f";
     public static final String OPTION_IS_INDEXED = "-i";
     public static final String OPTION_SCORE_PARAM = "-sp";
+
+    // Spark conf location related options
+    public static final String SPARK_CONF_FOLDER = "spark";
+    public static final String SPARK_MASTER = "spark.master";
+    public static final String SPARK_APP_NAME = "spark.app.name";
+
+
 }
 
 

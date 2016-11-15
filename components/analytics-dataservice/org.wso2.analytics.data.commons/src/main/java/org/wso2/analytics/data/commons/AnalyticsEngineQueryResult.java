@@ -16,23 +16,32 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.engine.core;
+package org.wso2.analytics.data.commons;
 
-import org.wso2.analytics.engine.AnalyticsEngine;
+import java.io.Serializable;
+import java.util.List;
 
-public class AnalyticsEngineImpl implements AnalyticsEngine {
+public interface AnalyticsEngineQueryResult extends Serializable {
 
-    public AnalyticsEngineImpl() {
-    }
+    /**
+     * Get the columns list.
+     *
+     * @return string array of columns
+     */
+    String[] getColumns();
 
+    /**
+     * Get all the data for the result.
+     *
+     * @return list of rows containing all the values as objects
+     */
+    List<List<Object>> getRows();
 
-    @Override
-    public void executeQuery(String query) {
+    /**
+     * Returns the query result as a String.
+     *
+     * @return query result as a string
+     */
+    String toString();
 
-    }
-
-    @Override
-    public void executeScript() {
-
-    }
 }

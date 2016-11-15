@@ -16,13 +16,17 @@
  *  under the License.
  *
  */
-package org.wso2.analytics.data.commons.sources;
+package org.wso2.analytics.engine.exceptions;
 
-public class AnalyticsCommonConstants {
+public class AnalyzerConfigLoadingException extends Exception {
 
-    public static final String DEFAULT_CHARSET = "UTF8";
-    public static final int RECORDS_BATCH_SIZE = 1000;
-    public static final String TIMESTAMP_FIELD = "_timestamp";
+    private static final long serialVersionUID = 3710152528912180771L;
 
-    public static final String ANALYTICS_CONF_DIR = "analytics";
+    public AnalyzerConfigLoadingException(String msg) {
+        super(msg);
+    }
+
+    public AnalyzerConfigLoadingException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

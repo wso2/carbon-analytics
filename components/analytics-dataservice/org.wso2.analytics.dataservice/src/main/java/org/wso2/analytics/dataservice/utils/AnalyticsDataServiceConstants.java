@@ -21,7 +21,6 @@ package org.wso2.analytics.dataservice.utils;
 public class AnalyticsDataServiceConstants {
 
     public static final String ANALYTICS_CONFIG_FILE = "analytics-dataservice-config.xml";
-    public static final String ANALYTICS_CONF_DIR = "analytics";
 
     private AnalyticsDataServiceConstants() {
         /**
