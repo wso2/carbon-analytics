@@ -223,31 +223,36 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         List<Object> result = new ArrayList<>(fieldCount + 1);
         /* base64 space requirement processing */
         int bytesInExtFields = (int) Math.floor((fieldSize * fieldCount - 4) / 4.0 * 3);
-        if (bytesInExtFields <= 0) {
+        if (bytesInExtFields < 0) {
             bytesInExtFields = 0;
         }
         byte[] blobData;
-        byte[] extFieldData = null;
-        if (data.length > bytesInExtFields) {
-            if (bytesInExtFields > 0) {
-                blobData = new byte[data.length - bytesInExtFields];
-                extFieldData = new byte[bytesInExtFields];
-                System.arraycopy(data, bytesInExtFields, blobData, 0, blobData.length);
-                System.arraycopy(data, 0, extFieldData, 0, bytesInExtFields);
-            } else {
+        byte[] extFieldData = null;        
+        int blobDataSize = Math.min(0, data.length - bytesInExtFields);
+        int extFieldsDataSize = Math.min(data.length, bytesInExtFields);        
+        if (extFieldsDataSize > 0) {
+            extFieldData = new byte[extFieldsDataSize];
+            System.arraycopy(data, 0, extFieldData, 0, extFieldsDataSize);
+        }
+        if (blobDataSize > 0) {
+            blobData = new byte[blobDataSize];
+            if (data.length == blobData.length) {
                 blobData = data;
+            } else {
+                System.arraycopy(data, extFieldsDataSize, blobData, 0, blobData.length);
             }
         } else {
             blobData = new byte[0];
-            extFieldData = data;
         }
+        int addedExtFields = 0;
         if (extFieldData != null) {
             String base64ExtFieldData = BaseEncoding.base64().encode(extFieldData);
             for (String ds : Splitter.fixedLength(fieldSize).split(base64ExtFieldData)) {
                 result.add(ds);
+                addedExtFields++;
             }
         }
-        for (int i = result.size(); i < fieldCount; i++) {
+        for (int i = addedExtFields; i < fieldCount; i++) {
             result.add(new String());
         }
         result.add(blobData);
