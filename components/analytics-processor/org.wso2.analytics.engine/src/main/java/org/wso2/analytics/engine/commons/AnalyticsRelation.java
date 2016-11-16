@@ -102,7 +102,11 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Insert
         long fromTimestamp;
         long toTimestamp = Long.MAX_VALUE;
         if (this.incEnabled) {
-            fromTimestamp = AnalyticsServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(this.incID, true);
+            try {
+                fromTimestamp = AnalyticsServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(this.incID, true);
+            } catch (AnalyticsException e) {
+                throw new RuntimeException("Cannot access the incremental meta store! ", e);
+            }
             if (fromTimestamp > 0) {
                 if (this.windowUnit != null) {
                     fromTimestamp = AnalyzerEngineUtils.getIncrementalStartTime(fromTimestamp, windowUnit, incBuffer);

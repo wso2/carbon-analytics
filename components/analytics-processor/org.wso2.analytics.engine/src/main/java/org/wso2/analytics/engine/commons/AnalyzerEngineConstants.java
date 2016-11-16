@@ -73,6 +73,7 @@ public class AnalyzerEngineConstants {
 
     // Spark conf location related options
     public static final String SPARK_CONF_FOLDER = "spark";
+    public static final String SPARK_CONF_FILE = "spark-defaults.conf";
     public static final String SPARK_MASTER = "spark.master";
     public static final String SPARK_APP_NAME = "spark.app.name";
 
@@ -81,6 +82,7 @@ public class AnalyzerEngineConstants {
     public static final String SPARK_JDBC_SHORTHAND_STRING = "CarbonJDBC";
     public static final String SPARK_EVENTS_SHORTHAND_STRING = "CarbonEvents";
 
+    public static final String SPARK_ANALYTICS_ENGINE_NAME = "Apache Spark";
 
 }
 

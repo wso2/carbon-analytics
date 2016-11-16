@@ -32,13 +32,9 @@ import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.engine.commons.AnalyticsRelationProvider;
 import org.wso2.analytics.engine.commons.AnalyzerEngineConstants;
 import org.wso2.analytics.engine.commons.SparkAnalyticsEngineQueryResult;
-import org.wso2.analytics.engine.exceptions.AnalyticsExecutionException;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.wso2.analytics.data.commons.sources.AnalyticsCommonConstants.ANALYTICS_CONF_DIR;
 
@@ -50,15 +46,21 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
     private String sparkMaster;
     private String appName;
     private Map<String, String> shorthandStringsMap;
-
+    private String sparkConfPath;
 
     public SparkAnalyticsEngine() {
-        this.shorthandStringsMap = new HashMap<>();
+        this.sparkConfPath = null;
         init();
-        registerAnalyticsProviders();
+    }
+
+    public SparkAnalyticsEngine(String sparkConfFilePath) {
+        this.sparkConfPath = sparkConfFilePath;
+        init();
     }
 
     private void init() {
+        this.shorthandStringsMap = new HashMap<>();
+        registerAnalyticsProviders();
         try {
             initSparkConf();
         } catch (AnalyticsException e) {
@@ -68,17 +70,31 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
         this.sparkSession = SparkSession.builder().master(this.sparkMaster)
                 .appName(appName)
                 .config(sparkConf).getOrCreate();
+        this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-datasources/org.wso2.analytics.datasource.rdbms/target/org.wso2.analytics.datasource.rdbms-2.0.0-SNAPSHOT.jar");
+        this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-dataservice/org.wso2.analytics.dataservice/target/org.wso2.analytics.dataservice-2.0.0-SNAPSHOT.jar");
+        this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-dataservice/org.wso2.analytics.data.commons/target/org.wso2.analytics.data.commons-2.0.0-SNAPSHOT.jar");
     }
 
+    /**
+     * This method initializes the spark configurations.
+     *
+     * @throws AnalyticsException
+     */
     private void initSparkConf() throws AnalyticsException {
         this.sparkConf = new SparkConf(false);
-        String sparkConfFile = AnalyticsCommonUtils.getAnalyticsConfDirectory() + File.separator
-                + ANALYTICS_CONF_DIR + File.separator + AnalyzerEngineConstants.SPARK_CONF_FOLDER;
+        String sparkConfFile = null;
+        if (this.sparkConfPath != null) {
+            sparkConfFile = this.sparkConfPath;
+        } else {
+            sparkConfFile = AnalyticsCommonUtils.getAnalyticsConfDirectory() + File.separator + ANALYTICS_CONF_DIR +
+                    File.separator + AnalyzerEngineConstants.SPARK_CONF_FOLDER + File.separator + AnalyzerEngineConstants.SPARK_CONF_FILE;
+        }
         scala.collection.Map<String, String> properties = Utils.getPropertiesFromFile(sparkConfFile);
         this.sparkConf.setAll(properties);
         // setting spark master
-        this.sparkMaster = sparkConf.get(AnalyzerEngineConstants.SPARK_MASTER);
-        if (this.sparkMaster == null) {
+        try {
+            this.sparkMaster = sparkConf.get(AnalyzerEngineConstants.SPARK_MASTER);
+        } catch (NoSuchElementException e) {
             this.sparkMaster = "local";
         }
         // setting the app name
@@ -113,6 +129,11 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
             }
         }
         return analyticsEngineQueryResult;
+    }
+
+    @Override
+    public String getVersion() {
+        return AnalyzerEngineConstants.SPARK_ANALYTICS_ENGINE_NAME + " : " + this.sparkSession.version();
     }
 
     private AnalyticsEngineQueryResult convertToResult(Dataset<Row> results) {

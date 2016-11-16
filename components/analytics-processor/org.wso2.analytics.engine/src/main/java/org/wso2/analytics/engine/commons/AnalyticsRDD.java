@@ -34,6 +34,7 @@ import scala.collection.Iterator;
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -149,9 +150,13 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         }
 
         private void updateIncProcessingTS() {
-            long existingIncTS = AnalyticsServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(this.incID, false);
-            if (existingIncTS < this.incMaxTS) {
-                AnalyticsServiceHolder.getIncrementalMetaStore().setLastProcessedTimestamp(this.incID, this.incMaxTS, false);
+            try {
+                long existingIncTS = AnalyticsServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(this.incID, false);
+                if (existingIncTS < this.incMaxTS) {
+                    AnalyticsServiceHolder.getIncrementalMetaStore().setLastProcessedTimestamp(this.incID, this.incMaxTS, false);
+                }
+            } catch (AnalyticsException e) {
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
 

@@ -31,6 +31,11 @@ public interface AnalyticsEngine {
      */
     AnalyticsEngineQueryResult executeQuery(String query);
 
-
+    /**
+     * Returns the versioning details of the Analytics Engine.
+     *
+     * @return
+     */
+    String getVersion();
 
 }
