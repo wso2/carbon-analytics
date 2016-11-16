@@ -59,8 +59,6 @@ public class RDBMSQueryConfigurationEntry {
     
     private int recordExtDataFieldCount;
     
-    private String recordExtDataFieldType;
-    
     private int recordExtDataFieldSize;
     
     private String recordDeletionWithIdsQuery;
@@ -197,14 +195,6 @@ public class RDBMSQueryConfigurationEntry {
 
     public void setRecordExtDataFieldCount(int recordExtDataFieldCount) {
         this.recordExtDataFieldCount = recordExtDataFieldCount;
-    }
-
-    public String getRecordExtDataFieldType() {
-        return recordExtDataFieldType;
-    }
-
-    public void setRecordExtDataFieldType(String recordExtDataFieldType) {
-        this.recordExtDataFieldType = recordExtDataFieldType;
     }
 
     public int getRecordExtDataFieldSize() {

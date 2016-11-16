@@ -56,11 +56,11 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     private static final String RECORD_IDS_PLACEHOLDER = "{{RECORD_IDS}}";
 
     private static final String TABLE_NAME_PLACEHOLDER = "{{TABLE_NAME}}";
-    
-    private static final String EXT_DATA_FIELDS_PLACEHOLDER = "{{EXT_DATA_FIELDS}}";
-    
-    private static final String EXT_DATA_PARAMS_PLACEHOLDER = "{{EXT_DATA_PARAMS}}";
-        
+
+    private static final String EXT_FIELD_PLACEHOLDER = "{{EXT_FIELD}}";
+
+    private static final String EXT_FIELD_TYPE_PLACEHOLDER = "{{EXT_FIELD_TYPE}}";
+
     private DataSource dataSource;
     
     private Map<String, String> properties;
@@ -110,7 +110,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         String[] result = new String[queries.length];
         for (int i = 0; i < queries.length; i++) {
             result[i] = this.translateQueryWithTableInfo(queries[i], tenantId, tableName);
-            result[i] = this.translateQueryWithCreateTableInfo(result[i]);
+            result[i] = this.translateExtFieldInfo(result[i]);
         }
         return result;
     }
@@ -357,19 +357,19 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     private String getRecordMergeSQL(int tenantId, String tableName) {
     	String query = this.getQueryConfiguration().getRecordMergeQuery();
     	query = this.translateQueryWithTableInfo(query, tenantId, tableName);
-    	return this.translateInsertQueryWithFieldInfo(query);
+    	return this.translateExtFieldInfo(query);
     }
     
     private String getRecordInsertSQL(int tenantId, String tableName) {
         String query = this.getQueryConfiguration().getRecordInsertQuery();
         query = this.translateQueryWithTableInfo(query, tenantId, tableName);
-        return this.translateInsertQueryWithFieldInfo(query);
+        return this.translateExtFieldInfo(query);
     }
     
     private String getRecordUpdateSQL(int tenantId, String tableName) {
         String query = this.getQueryConfiguration().getRecordUpdateQuery();
         query = translateQueryWithTableInfo(query, tenantId, tableName);
-        return this.translateUpdateQueryWithFieldInfo(query);
+        return this.translateExtFieldInfo(query);
     }
     
     private boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
@@ -618,88 +618,42 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
         return query.replace(TABLE_NAME_PLACEHOLDER, this.generateTargetTableName(tenantId, tableName));
     }
-    
-    private String translateQueryWithCreateTableInfo(String query) {
+
+    private String translateExtFieldInfo(String query) {
         if (query == null) {
             return null;
         }
-        return query.replace(EXT_DATA_FIELDS_PLACEHOLDER, this.generateExtDataFieldsWithTypes());
-    }
-    
-    private String translateInsertQueryWithFieldInfo(String query) {
-        if (query == null) {
-            return null;
+        int index = query.indexOf("[");
+        if (index < 0) {
+            return query;
         }
-        return query.replace(EXT_DATA_FIELDS_PLACEHOLDER, this.generateExtDataFieldsWOTypes()).replace(
-                EXT_DATA_PARAMS_PLACEHOLDER, this.generateExtDataFieldParams());
-    }
-    
-    private String translateRetrievalQueryWithFieldInfo(String query) {
-        if (query == null) {
-            return null;
-        }
-        return query.replace(EXT_DATA_FIELDS_PLACEHOLDER, this.generateExtDataFieldsWOTypes());
-    }
-    
-    private String translateUpdateQueryWithFieldInfo(String query) {
-        if (query == null) {
-            return null;
-        }
-        return query.replace(EXT_DATA_PARAMS_PLACEHOLDER, this.generateExtDataFieldsForUpdate());
-    }
-    
-    private String generateExtDataFieldsForUpdate() {
-        StringBuilder builder = new StringBuilder();
         int count = this.getQueryConfiguration().getRecordExtDataFieldCount();
-        for (int i = 0; i < count; i++) {
-            builder.append(this.generateExtDataFieldName(i) + " = ?");
-            if (i < count - 1) {
-                builder.append(", ");
-            }
+        List<String> dynamicFields = new ArrayList<>();
+
+        while (index >= 0) {
+            String subQuery = query.substring(index);
+            dynamicFields.add(subQuery.substring(subQuery.indexOf("["), subQuery.indexOf("]") + 1));
+            index = query.indexOf("[", index + 1);
         }
-        return builder.toString();
+        StringBuilder builder;
+        for (String field : dynamicFields) {
+            builder = new StringBuilder();
+            String single = field.substring(1, field.length() - 1);
+            for (int i = 0; i < count; i++) {
+                builder.append(single.replace(EXT_FIELD_PLACEHOLDER, this.generateExtDataFieldName(i)));
+                if (i < count - 1) {
+                    builder.append(", ");
+                }
+            }
+            query = query.replace(field, builder.toString());
+        }
+        return query;
     }
-    
+
     private String generateExtDataFieldName(int index) {
         return EXT_DATA_FIELD_NAME_PREFIX + index;
     }
-    
-    private String generateExtDataFieldParams() {
-        StringBuilder builder = new StringBuilder();
-        int count = this.getQueryConfiguration().getRecordExtDataFieldCount();
-        for (int i = 0; i < count; i++) {
-            builder.append("?");
-            if (i < count - 1) {
-                builder.append(", ");
-            }
-        }
-        return builder.toString();
-    }
-    
-    private String generateExtDataFieldsWithTypes() {
-        StringBuilder builder = new StringBuilder();
-        int count = this.getQueryConfiguration().getRecordExtDataFieldCount();
-        for (int i = 0; i < count; i++) {
-            builder.append(this.generateExtDataFieldName(i) + " " + this.getQueryConfiguration().getRecordExtDataFieldType());
-            if (i < count - 1) {
-                builder.append(", ");
-            }
-        }
-        return builder.toString();
-    }
-    
-    private String generateExtDataFieldsWOTypes() {
-        StringBuilder builder = new StringBuilder();
-        int count = this.getQueryConfiguration().getRecordExtDataFieldCount();
-        for (int i = 0; i < count; i++) {
-            builder.append(this.generateExtDataFieldName(i));
-            if (i < count - 1) {
-                builder.append(", ");
-            }
-        }
-        return builder.toString();
-    }
-    
+
     private String translateQueryWithRecordIdsInfo(String query, int recordCount) {
         return query.replace(RECORD_IDS_PLACEHOLDER, this.getDynamicSQLParams(recordCount));
     }
@@ -707,14 +661,14 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     private String getRecordRetrievalQuery(int tenantId, String tableName) {
         String query = this.getQueryConfiguration().getRecordRetrievalQuery();
         query = this.translateQueryWithTableInfo(query, tenantId, tableName);
-        return this.translateRetrievalQueryWithFieldInfo(query);
+        return this.translateExtFieldInfo(query);
     }
     
     private String generateGetRecordRetrievalWithIdQuery(int tenantId, String tableName, int recordCount) {
         String query = this.getQueryConfiguration().getRecordRetrievalWithIdsQuery();
         query = this.translateQueryWithTableInfo(query, tenantId, tableName);
         query = this.translateQueryWithRecordIdsInfo(query, recordCount);
-        return this.translateRetrievalQueryWithFieldInfo(query);
+        return this.translateExtFieldInfo(query);
     }
     
     private String generateRecordDeletionRecordsWithIdsQuery(int tenantId, String tableName, int recordCount) {
