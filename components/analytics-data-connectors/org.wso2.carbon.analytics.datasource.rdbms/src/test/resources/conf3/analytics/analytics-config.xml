@@ -6,7 +6,7 @@
       <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
       <properties>
          <property name="datasource">WSO2_ANALYTICS_RS_DB</property>
-         <property name="category">write_read_optimized</property>
+         <property name="category">read_write_optimized</property>
       </properties>
    </analytics-record-store>
    <!-- The data indexing analyzer implementation -->
