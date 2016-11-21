@@ -64,7 +64,6 @@ public class JaggeryWebSocketHelper {
 
             }
         } catch (JSONException | EventStreamConfigurationException e) {
-            //TODO: handle exception
             log.error(e.getMessage(), e);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();

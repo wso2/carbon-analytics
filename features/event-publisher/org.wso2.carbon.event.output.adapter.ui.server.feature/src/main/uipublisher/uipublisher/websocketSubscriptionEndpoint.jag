@@ -16,32 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-var user = session.get('user');
-var streamId;
 
+var user = session.get('user');
+var streamName;
+var streamVersion;
 var JaggeryWebSocketHelper = Packages.org.wso2.carbon.event.output.adapter.ui.JaggeryWebSocketHelper;
 
 webSocket.onopen = function () {
-	if (user == null) {
-		this.close();
-	}
+    if (user == null) {
+        this.close();
+    }
 };
 
 webSocket.ontext = function (data) {
-	streamId = data;
-	JaggeryWebSocketHelper.subscribeWebSocket(data.split(":")[0], data.split(":")[1],session.getId(), this, user.tenantId);
+    var dataObj = parse(data);
+    streamName = dataObj.streamName;
+    streamVersion = dataObj.streamVersion;
+    JaggeryWebSocketHelper.subscribeWebSocket(streamName, streamVersion, stringify(dataObj.filterProps),
+            user.username, session.getId(), user.tenantId, this);
 };
 
 webSocket.onclose = function () {
-    if (user != null) {     //onclose may get invoked when an invalid user (user==null case) closes the connection. Hence this check is required.
-        JaggeryWebSocketHelper.unsubscribeWebsocket(streamId.split(":")[0], streamId.split(":")[1],session.getId(), user.tenantId);
+    if (user != null && streamName != null && streamVersion != null) {     //onclose may get invoked when an invalid user (user==null case) closes the connection. Hence this check is required.
+        JaggeryWebSocketHelper.unsubscribeWebsocket(streamName, streamVersion, session.getId(), user.tenantId);
     }
 };
 
 webSocket.onerror = function () {
     if (user != null) {
-        JaggeryWebSocketHelper.unsubscribeWebsocket(streamId.split(":")[0], streamId.split(":")[1],session.getId(), user.tenantId);
+        JaggeryWebSocketHelper.unsubscribeWebsocket(streamId.split(":")[0], streamId.split(":")[1], session.getId(), user.tenantId);
     }
 };
 
 %>
+

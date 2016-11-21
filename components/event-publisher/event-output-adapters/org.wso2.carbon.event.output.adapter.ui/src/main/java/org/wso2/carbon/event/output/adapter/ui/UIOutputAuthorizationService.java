@@ -23,7 +23,6 @@ import java.util.Map;
 
 public interface UIOutputAuthorizationService {
 
-    //TODO: add authorization service selection drop down
     String getAuthorizationServiceName();
 
     boolean authorizeSubscription(JSONArray eventJson, Map<Integer, String> filterProps,
