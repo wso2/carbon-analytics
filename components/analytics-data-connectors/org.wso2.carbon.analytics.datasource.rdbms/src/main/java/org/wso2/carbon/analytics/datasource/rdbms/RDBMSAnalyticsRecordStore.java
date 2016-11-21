@@ -21,7 +21,6 @@ package org.wso2.carbon.analytics.datasource.rdbms;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.io.BaseEncoding;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
@@ -34,15 +33,10 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.ndatasource.common.DataSourceException;
 
 import javax.sql.DataSource;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
 
 /**
@@ -58,8 +52,6 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     private static final String TABLE_NAME_PLACEHOLDER = "{{TABLE_NAME}}";
 
     private static final String EXT_FIELD_PLACEHOLDER = "{{EXT_FIELD}}";
-
-    private static final String EXT_FIELD_TYPE_PLACEHOLDER = "{{EXT_FIELD_TYPE}}";
 
     private DataSource dataSource;
     
@@ -204,11 +196,15 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         stmt.setLong(2, record.getTimestamp());
         byte[] bytes = GenericUtils.encodeRecordValues(record.getValues());
         List<Object> dataFields = this.splitData(bytes);
-        byte[] blobData = (byte[]) dataFields.get(dataFields.size() - 1);
-        if (!this.rdbmsQueryConfigurationEntry.isBlobLengthRequired()) {
-            stmt.setBinaryStream(3, new ByteArrayInputStream(blobData));
+        if (dataFields.get(dataFields.size() - 1) != null) {
+            byte[] blobData = (byte[]) dataFields.get(dataFields.size() - 1);
+            if (!this.rdbmsQueryConfigurationEntry.isBlobLengthRequired()) {
+                stmt.setBinaryStream(3, new ByteArrayInputStream(blobData));
+            } else {
+                stmt.setBinaryStream(3, new ByteArrayInputStream(blobData), blobData.length);
+            }
         } else {
-            stmt.setBinaryStream(3, new ByteArrayInputStream(blobData), blobData.length);
+            stmt.setNull(3, Types.BINARY);
         }
         int fieldCount = this.getQueryConfiguration().getRecordExtDataFieldCount();
         for (int i = 0; i < fieldCount; i++) {
@@ -235,14 +231,14 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             System.arraycopy(data, 0, extFieldData, 0, extFieldsDataSize);
         }
         if (blobDataSize > 0) {
-            blobData = new byte[blobDataSize];
-            if (data.length == blobData.length) {
+            if (data.length == blobDataSize) {
                 blobData = data;
             } else {
+                blobData = new byte[blobDataSize];
                 System.arraycopy(data, extFieldsDataSize, blobData, 0, blobData.length);
             }
         } else {
-            blobData = new byte[0];
+            blobData = null;
         }
         int addedExtFields = 0;
         if (extFieldData != null) {
@@ -253,7 +249,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             }
         }
         for (int i = addedExtFields; i < fieldCount; i++) {
-            result.add(new String());
+            result.add("");
         }
         result.add(blobData);
         return result;
@@ -884,10 +880,15 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         
         private byte[] extractDataFromRS(ResultSet rs) throws SQLException, IOException {
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < this.extFieldCount; i++) {
-                byteOut.write(BaseEncoding.base64().decode(rs.getString(4 + i)));
+                sb.append(rs.getString(4 + i));
             }
-            byteOut.write(rs.getBytes(3));
+            byteOut.write(BaseEncoding.base64().decode(sb.toString()));
+            byte[] blobVal = rs.getBytes(3);
+            if (blobVal != null) {
+                byteOut.write(blobVal);
+            }
             return byteOut.toByteArray();
         }
 
