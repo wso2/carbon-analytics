@@ -4,6 +4,7 @@
      <classes>
         <class name="org.wso2.carbon.analytics.datasource.cassandra.CassandraAnalyticsRecordStoreTest"/>
         <class name="org.wso2.carbon.analytics.datasource.cassandra.CassandraAnalyticsDataServiceTest"/>        
+        <class name="org.wso2.carbon.analytics.datasource.cassandra.CassandraUtilsTest"/>
      </classes>
    </test>
 </suite>
