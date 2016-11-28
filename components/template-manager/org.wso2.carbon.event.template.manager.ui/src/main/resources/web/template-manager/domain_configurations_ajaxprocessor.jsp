@@ -117,7 +117,7 @@
             <div class="container col-md-12 marg-top-20">
                 <div class="action-container">
                     <button id="" type="button"
-                            onclick="location.href = 'template_configurations_ajaxprocessor.jsp?isUpdate=false&ordinal=1&domainName=<%=Encode.forHtml(request.getParameter("domainName"))%>';"
+                            onclick="location.href = 'template_configurations_ajaxprocessor.jsp?isUpdate=false&ordinal=1&domainName=<%=Encode.forJavaScriptBlock(request.getParameter("domainName"))%>';"
                             class="btn btn-default btn-add col-md-2 col-xs-12 pull-left">Create New Scenario
                     </button>
                 </div>
