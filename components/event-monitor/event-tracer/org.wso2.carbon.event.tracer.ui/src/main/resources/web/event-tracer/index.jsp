@@ -21,6 +21,7 @@
 <%@ page import="org.wso2.carbon.event.tracer.ui.client.EventTracerAdminServiceClient" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <fmt:bundle basename="org.wso2.carbon.event.tracer.ui.i18n.Resources">
 <carbon:breadcrumb
@@ -52,7 +53,7 @@
             }
         } else {
             if (opeation.equals("search")) {
-                String key = request.getParameter("key");
+                String key = Encode.forJavaScriptBlock(request.getParameter("key"));
                 String ignoreCase = request.getParameter("ignoreCase");
 
                 if (key == null) {
