@@ -19,6 +19,8 @@
 
 package org.wso2.analytics.data.commons;
 
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
+
 /**
  * This interface represents Analytics Engines.
  */
@@ -29,12 +31,12 @@ public interface AnalyticsEngine {
      *
      * @param query spark sql query to be executed
      */
-    AnalyticsEngineQueryResult executeQuery(String query);
+    AnalyticsEngineQueryResult executeQuery(String query) throws AnalyticsException;
 
     /**
      * Returns the versioning details of the Analytics Engine.
      *
-     * @return
+     * @return the version of the Analytics Engine
      */
     String getVersion();
 

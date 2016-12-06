@@ -86,7 +86,7 @@ public class AnalyticsRelationProvider implements RelationProvider, SchemaRelati
     }
 
     private void init(Map<String, String> parameters) {
-        java.util.Map<String, String> jMap = new HashMap<>(JavaConversions.asJavaMap(parameters));
+        java.util.Map<String, String> jMap = new HashMap<>(JavaConversions.mapAsJavaMap(parameters));
         this.tableName = extractAndRemoveValuesFromMap(AnalyzerEngineConstants.TABLE_NAME, jMap, "");
         this.schemaString = extractAndRemoveValuesFromMap(AnalyzerEngineConstants.SCHEMA_STRING, jMap, "");
         this.streamName = extractAndRemoveValuesFromMap(AnalyzerEngineConstants.STREAM_NAME, jMap, "");
@@ -128,7 +128,7 @@ public class AnalyticsRelationProvider implements RelationProvider, SchemaRelati
 
     protected StructType createSparkSchemaStruct(AnalyticsDataService ads, String targetTableName,
                                                  String schemaString, String primaryKeys,
-                                                 boolean mergeFlag) throws AnalyticsException, AnalyticsExecutionException {
+                                                 boolean mergeFlag) throws AnalyticsException {
         AnalyticsSchema schema = createAnalyticsTableSchema(ads, targetTableName, schemaString, primaryKeys, mergeFlag, true);
         return new StructType(AnalyzerEngineUtils.extractFieldsFromColumns(schema.getColumns()));
     }

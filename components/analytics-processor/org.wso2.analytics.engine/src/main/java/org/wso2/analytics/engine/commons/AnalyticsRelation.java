@@ -154,7 +154,9 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Insert
     private void setIncrementalParameters(String incrementalParameterString) {
         if (!incrementalParameterString.isEmpty()) {
             this.incEnabled = true;
-            log.debug("Incremental processing enabled. Setting incremental parameters " + incrementalParameterString);
+            if (log.isDebugEnabled()) {
+                log.debug("Incremental processing enabled. Setting incremental parameters " + incrementalParameterString);
+            }
             String[] splits = incrementalParameterString.split("\\s*,\\s*");
             if (splits.length == 1) {
                 this.incID = splits[0];
@@ -171,7 +173,9 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Insert
                 throw new RuntimeException(msg);
             }
         } else {
-            log.debug("Incremental processing disabled");
+            if (log.isDebugEnabled()) {
+                log.debug("Incremental processing disabled");
+            }
             this.incEnabled = false;
         }
     }
@@ -179,9 +183,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Insert
     private void writeDataFrameToDAL(Dataset<Row> data) {
         for (int i = 0; i < data.rdd().partitions().length; i++) {
             //fixme: add the Carbon Scala utils from Java
-           /* data.sqlContext().sparkContext().runJob(data.rdd(),
-                    new AnalyticsDALWriter(this.tableName, data.schema(), this.recordBatchSize), CarbonScalaUtils.getNumberSeq(i, i + 1),
-                    false, ClassTag$.MODULE$.Unit());*/
+            data.sqlContext().sparkContext().runJob(data.rdd(), new AnalyticsDALWriter(this.tableName, data.schema(), this.recordBatchSize), ClassTag$.MODULE$.Unit());
         }
     }
 

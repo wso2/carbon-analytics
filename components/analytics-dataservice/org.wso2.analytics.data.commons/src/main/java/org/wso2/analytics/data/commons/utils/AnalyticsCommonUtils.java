@@ -33,6 +33,8 @@ import org.wso2.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.analytics.data.commons.sources.RecordGroup;
 
 import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -404,5 +406,18 @@ public class AnalyticsCommonUtils {
 
     public static String convertStreamNameToTableName(String stream) {
         return stream.replaceAll("\\.", "_");
+    }
+
+    public static File getFileFromSystemResources(String fileName) throws URISyntaxException {
+        File file = null;
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        if (classLoader != null) {
+            URL url = classLoader.getResource(fileName);
+            if (url == null) {
+                url = classLoader.getResource(File.separator + fileName);
+            }
+            file = new File(url.toURI());
+        }
+        return file;
     }
 }
