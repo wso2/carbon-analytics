@@ -18,6 +18,10 @@
 package org.wso2.carbon.databridge.agent.test.thrift;
 
 import junit.framework.Assert;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,6 +32,7 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationExce
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.test.DataPublisherTestUtil;
+import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
@@ -36,6 +41,8 @@ import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServerOfflineThriftTest {
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
@@ -101,6 +108,59 @@ public class ServerOfflineThriftTest {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
+        }
+    }
+
+    @Test
+    public void testAgentBehaviourWhileServerOffline() throws StreamDefinitionStoreException,
+            MalformedStreamDefinitionException, DataBridgeException, DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
+            DataEndpointConfigurationException, InterruptedException {
+        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
+        final TestAppender appender = new TestAppender();
+        final Logger logger = Logger.getRootLogger();
+        logger.addAppender(appender);
+        String hostName = DataPublisherTestUtil.LOCAL_HOST;
+
+        thriftTestServer = new ThriftTestServer();
+        thriftTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        thriftTestServer.start(7611);
+
+        DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7611", "knownUserName", "knownPass");
+
+        Event event = new Event();
+        event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
+        event.setMetaData(new Object[]{"127.0.0.1"});
+        event.setCorrelationData(null);
+        event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
+
+        dataPublisher.publish(event);
+        Thread.sleep(5000);
+        thriftTestServer.stop();
+        Thread.sleep(5000);
+        dataPublisher.publish(event);
+        Thread.sleep(5000);
+
+        try {
+            final List<LoggingEvent> log = appender.getLog();
+            for (LoggingEvent loggingEvent : log) {
+                if (loggingEvent.getLevel() == Level.ERROR) {
+                    Throwable exception = loggingEvent.getThrowableInformation().getThrowable();
+                    if (exception instanceof DataEndpointException && exception.getMessage().contains("knownUserName")) {
+                        String errorMessage = exception.getMessage();
+                        Assert.assertTrue("Format of log entry does not match", errorMessage.contains(DataEndpointConstants.SEPARATOR));
+                        Assert.assertFalse("Log output not sanitized", errorMessage.contains("knownPass"));
+                        break;
+                    }
+                }
+            }
+        } finally {
+            logger.removeAppender(appender);
+            try {
+                dataPublisher.shutdown();
+            } catch (Exception e) {
+                // do nothing
+            }
         }
     }
 
@@ -225,5 +285,26 @@ public class ServerOfflineThriftTest {
 //        thriftTestServer.stop();
 //    }
 
+    private class TestAppender extends AppenderSkeleton {
+        private final List<LoggingEvent> log = new ArrayList<>();
+
+        @Override
+        public boolean requiresLayout() {
+            return false;
+        }
+
+        @Override
+        protected void append(final LoggingEvent loggingEvent) {
+            log.add(loggingEvent);
+        }
+
+        @Override
+        public void close() {
+        }
+
+        public List<LoggingEvent> getLog() {
+            return new ArrayList<>(log);
+        }
+    }
 
 }

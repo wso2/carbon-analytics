@@ -67,10 +67,8 @@ public class DataEndpointConfiguration {
         this.password = password;
         this.transportPool = transportPool;
         this.securedTransportPool = securedTransportPool;
-        this.publisherKey = this.receiverURL + DataEndpointConstants.SEPARATOR + username +
-                DataEndpointConstants.SEPARATOR + password;
-        this.authKey = this.authURL + DataEndpointConstants.SEPARATOR + username +
-                DataEndpointConstants.SEPARATOR + password;
+        this.publisherKey = this.receiverURL + DataEndpointConstants.SEPARATOR + username;
+        this.authKey = this.authURL + DataEndpointConstants.SEPARATOR + username;
         this.batchSize = batchSize;
         this.corePoolSize = corePoolSize;
         this.maxPoolSize = maxPoolSize;
