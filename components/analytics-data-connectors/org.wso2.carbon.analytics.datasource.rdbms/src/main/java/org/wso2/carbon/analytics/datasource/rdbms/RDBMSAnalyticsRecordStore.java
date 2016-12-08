@@ -882,7 +882,10 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < this.extFieldCount; i++) {
-                sb.append(rs.getString(4 + i));
+                String strVal = rs.getString(4 + i);
+                if (strVal != null) {
+                    sb.append(strVal);
+                }
             }
             byteOut.write(BaseEncoding.base64().decode(sb.toString()));
             byte[] blobVal = rs.getBytes(3);
