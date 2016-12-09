@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>jaggeryapp-template-deployer</artifactId>
-        <version>5.1.5-SNAPSHOT</version>
+        <version>5.1.5</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
