@@ -353,7 +353,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
             for (int i = 0; i < colOrder.size(); i++) {
                 attribute = colOrder.get(i);
                 Object value = map.get(attribute.getName());
-                if (value != null) {
+                if (value != null || attribute.getType() == AttributeType.STRING) {
                     switch (attribute.getType()) {
                         case INT:
                             stmt.setInt(i + 1, (Integer) value);
