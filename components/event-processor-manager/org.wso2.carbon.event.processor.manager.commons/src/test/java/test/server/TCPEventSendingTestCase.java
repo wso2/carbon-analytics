@@ -139,7 +139,7 @@ public class TCPEventSendingTestCase {
     @Test
     public void testHighLoadEventSendingToServer() throws IOException, InterruptedException {
         String hostname = "0.0.0.0";
-        int port = 7653;
+        int port = 7658;
 
         StreamDefinition streamDefinition = new StreamDefinition().id("analyticsStats")
                 .attribute("meta_ipAdd", Attribute.Type.STRING)
