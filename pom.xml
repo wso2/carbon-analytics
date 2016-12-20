@@ -28,7 +28,7 @@
     <groupId>org.wso2.carbon.analytics-common</groupId>
     <artifactId>carbon-analytics-common</artifactId>
     <packaging>pom</packaging>
-    <version>5.1.5-SNAPSHOT</version>
+    <version>5.1.6-SNAPSHOT</version>
     <name>WSO2 Carbon - Carbon Analytics Common Aggregator Module</name>
     <url>http://wso2.org</url>
 
@@ -1356,7 +1356,7 @@
     </repositories>
 
     <properties>
-        <carbon.analytics.common.version>5.1.5-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.1.6-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.4.7</carbon.kernel.version>
