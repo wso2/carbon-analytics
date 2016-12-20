@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>analytics-jmx-agent-feature</artifactId>
-        <version>5.1.7</version>
+        <version>5.1.8-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
