@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -125,7 +126,8 @@ public final class EventDefinitionConverterUtils {
             JSONArray jsonArray = new JSONArray(jsonArrayOfEventDefns);
             List<StreamDefinition> streamDefinitions = new ArrayList<StreamDefinition>();
             for (int i = 0; i < jsonArray.length(); i++) {
-                streamDefinitions.add(convertFromJson(jsonArray.getString(i)));
+                JSONObject definition = (JSONObject) jsonArray.get(i);
+                streamDefinitions.add(convertFromJson(definition.toString()));
             }
             return streamDefinitions;
         } catch (JSONException e) {
