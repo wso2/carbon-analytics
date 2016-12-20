@@ -38,8 +38,7 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class TCPEventPublisher {
     public static final int PING_HEADER_VALUE = -99;
@@ -54,6 +53,8 @@ public class TCPEventPublisher {
     private TCPEventPublisherConfig publisherConfig;
     public String defaultCharset;
     private Timer connectionStatusCheckTimer;
+    private ExecutorService socketIoExecutorService;
+    private long socketIoTimeout = java.lang.Integer.MAX_VALUE;
 
     /**
      * Indicate synchronous or asynchronous mode. In asynchronous mode Disruptor pattern is used and in synchronous mode sendEvent call
@@ -81,6 +82,8 @@ public class TCPEventPublisher {
         this.streamRuntimeInfoMap = new ConcurrentHashMap<String, StreamRuntimeInfo>();
         this.isSynchronous = isSynchronous;
         this.connectionCallback = connectionCallback;
+        this.socketIoExecutorService = Executors.newCachedThreadPool();
+        this.socketIoTimeout = publisherConfig.getConnectionStatusCheckInterval() / 4;
 
         if (!isSynchronous) {
             try {
@@ -247,19 +250,35 @@ public class TCPEventPublisher {
     }
 
     private synchronized void publishEvent(byte[] data, boolean flush) throws IOException {
-        outputStream.write(data);
-        if (flush) {
-            outputStream.flush();
+        doPublishEvent(data, flush);
+    }
+
+    private void doPublishEvent(final byte[] data, final boolean flush) throws IOException {
+        Future<Boolean> callableFuture = socketIoExecutorService.submit(new Callable<Boolean>() {
+
+            @Override
+            public Boolean call() throws IOException {
+                outputStream.write(data);
+                if (flush) {
+                    outputStream.flush();
+                }
+                return true;
+            }
+        });
+
+        try {
+            callableFuture.get(socketIoTimeout, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new IOException("Could not write the data to " + hostUrl);
+        } catch (TimeoutException e) {
+            throw new IOException("Timed out writing the data to " + hostUrl + " in milliseconds " + socketIoTimeout);
         }
     }
 
     private synchronized void publishEventAsync(byte[] data, boolean flush) throws IOException {
         if (outputStream != null) {
             try {
-                outputStream.write(data);
-                if (flush) {
-                    outputStream.flush();
-                }
+                doPublishEvent(data, flush);
 
             } catch (IOException e) {
                 try {
@@ -267,10 +286,7 @@ public class TCPEventPublisher {
                     log.info("Reconnecting to " + hostUrl);
                     disconnect();
                     connect(hostUrl);
-                    outputStream.write(data);
-                    if (flush) {
-                        outputStream.flush();
-                    }
+                    doPublishEvent(data, flush);
                 } catch (IOException ex) {
                     log.error("Error on reconnection to " + hostUrl, ex);
                 }
@@ -281,10 +297,7 @@ public class TCPEventPublisher {
                 log.info("Reconnecting to " + hostUrl);
                 disconnect();
                 connect(hostUrl);
-                outputStream.write(data);
-                if (flush) {
-                    outputStream.flush();
-                }
+                doPublishEvent(data, flush);
             } catch (IOException ex) {
                 log.error("Error on reconnection to " + hostUrl, ex);
             }
@@ -299,7 +312,7 @@ public class TCPEventPublisher {
             public ByteArrayHolder newInstance() {
                 return new ByteArrayHolder();
             }
-        }, publisherConfig.getBufferSize(), Executors.newCachedThreadPool());
+        }, publisherConfig.getBufferSize(), Executors.newSingleThreadExecutor());
 
         this.ringBuffer = disruptor.getRingBuffer();
 
@@ -337,32 +350,63 @@ public class TCPEventPublisher {
             disruptor.shutdown();
         }
         disconnect();
+        try {
+            socketIoExecutorService.awaitTermination(socketIoTimeout, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            log.debug("Error while terminating the executor service", e);
+        }
     }
 
     private void disconnect() {
         if (connectionStatusCheckTimer != null) {
             connectionStatusCheckTimer.cancel();
         }
+
+        Future outputStreamClosing = socketIoExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (outputStream != null) {
+                        outputStream.close();
+                        outputStream = null;
+                    }
+                } catch (IOException e) {
+                    log.debug("Error while disconnecting to " + hostUrl + " : " + e.getMessage(), e);
+                }
+            }
+        });
+
         try {
-            if (outputStream != null) {
-                outputStream.close();
-                outputStream = null;
-            }
-        } catch (IOException e) {
-            log.debug("Error while disconnecting to " + hostUrl + " : " + e.getMessage(), e);
+            outputStreamClosing.get(socketIoTimeout, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            //Ignore
+            log.error("Could not close the output stream properly ", e);
         }
+
+        Future clientSocketClosing = socketIoExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (clientSocket != null) {
+                        clientSocket.close();
+                        clientSocket = null;
+                    }
+                } catch (IOException e) {
+                    log.debug("Error while closing socket to " + hostUrl + " : " + e.getMessage(), e);
+                }
+            }
+        });
+
         try {
-            if (clientSocket != null) {
-                clientSocket.close();
-                clientSocket = null;
-            }
-        } catch (IOException e) {
-            log.debug("Error while closing socket to " + hostUrl + " : " + e.getMessage(), e);
-        } finally {
-            if (connectionCallback != null) {
-                connectionCallback.onCepReceiverDisconnect();
-            }
+            clientSocketClosing.get(socketIoTimeout, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            //Ignore
+            log.error("Could not close the socket properly ", e);
         }
+        if (connectionCallback != null) {
+            connectionCallback.onCepReceiverDisconnect();
+        }
+
     }
 
     class ByteArrayHolder {
