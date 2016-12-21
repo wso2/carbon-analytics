@@ -828,7 +828,7 @@ public class AnalyticsSparkExecutorTest {
         cols.add(new ColumnDefinition("value", ColumnType.INTEGER));
         this.service.setTableSchema(1, table1, new AnalyticsSchema(cols, Collections.<String>emptyList()));
 
-        cols.add(new ColumnDefinition("count", ColumnType.INTEGER));
+        cols.add(new ColumnDefinition("cnt", ColumnType.INTEGER));
         this.service.setTableSchema(1, table2, new AnalyticsSchema(cols, Collections.<String>emptyList()));
         this.service.setTableSchema(1, table3, new AnalyticsSchema(cols, Collections.<String>emptyList()));
 
@@ -852,7 +852,7 @@ public class AnalyticsSparkExecutorTest {
         AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM " + table1);
         Assert.assertEquals(result.getRows().size(), recordsCount, "Wrong number of rows returned");
 
-        ex.executeQuery(1, "INSERT OVERWRITE TABLE " + table2 + " SELECT value, count(*) as count from " + table1 + " " +
+        ex.executeQuery(1, "INSERT OVERWRITE TABLE " + table2 + " SELECT value, count(*) as cnt from " + table1 + " " +
                            "group by value order by value");
 
         result = ex.executeQuery(1, "SELECT * FROM " + table2);
@@ -860,7 +860,7 @@ public class AnalyticsSparkExecutorTest {
 
         Assert.assertTrue(checkResultOrder(result.getRows()), "The results are out of order");
 
-        ex.executeQuery(1, "INSERT OVERWRITE TABLE " + table3 + " SELECT value, count(*) as count from " + table1 + " " +
+        ex.executeQuery(1, "INSERT OVERWRITE TABLE " + table3 + " SELECT value, count(*) as cnt from " + table1 + " " +
                            "group by value order by value");
 
         result = ex.executeQuery(1, "SELECT * FROM " + table3);
