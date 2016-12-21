@@ -37,7 +37,6 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import javax.naming.NamingException;
@@ -313,10 +312,10 @@ public class AnalyticsSparkExecutorTest {
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
         this.service.deleteTable(1, "Log5");
         String query = "CREATE TEMPORARY TABLE Log5 USING CarbonAnalytics " +
-                "OPTIONS" +
-                "(tableName \"Log5\"," +
-                "schema \"member DOUBLE\"" +
-                ")";
+                       "OPTIONS" +
+                       "(tableName \"Log5\"," +
+                       "schema \"member DOUBLE\"" +
+                       ")";
         ex.executeQuery(1, query);
         for (int i = 1; i < 6; i++) {
             ex.executeQuery(1, "INSERT INTO TABLE Log5 SELECT " + Math.pow(2, i));
@@ -798,6 +797,80 @@ public class AnalyticsSparkExecutorTest {
         System.out.println(testString("end : " + testName));
     }
 
+    @Test
+    public void testPreserveOrder() throws AnalyticsException, InterruptedException {
+        String testName = "preserve order test";
+        String table1 = "Log12";
+        String table2 = "Log13";
+        String table3 = "Log14";
+        int recordsCount = 10000;
+
+        System.out.println(testString("start : " + testName));
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+
+        List<Record> records = new ArrayList<>();
+        for (int i = 0; i < recordsCount; i++) {
+            Map<String, Object> values = new HashMap<>();
+            values.put("value", i);
+            Record record = new Record(1, table1, values);
+            records.add(record);
+        }
+
+        this.service.deleteTable(1, table1);
+        this.service.createTable(1, table1);
+        this.service.deleteTable(1, table2);
+        this.service.createTable(1, table2);
+        this.service.deleteTable(1, table3);
+        this.service.createTable(1, table3);
+        service.put(records);
+
+        List<ColumnDefinition> cols = new ArrayList<>();
+        cols.add(new ColumnDefinition("value", ColumnType.INTEGER));
+        this.service.setTableSchema(1, table1, new AnalyticsSchema(cols, Collections.<String>emptyList()));
+
+        cols.add(new ColumnDefinition("count", ColumnType.INTEGER));
+        this.service.setTableSchema(1, table2, new AnalyticsSchema(cols, Collections.<String>emptyList()));
+        this.service.setTableSchema(1, table3, new AnalyticsSchema(cols, Collections.<String>emptyList()));
+
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE " + table1 + " USING CarbonAnalytics " +
+                           "OPTIONS" +
+                           "(tableName \"" + table1 + "\"" +
+                           ")");
+
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE " + table2 + " USING CarbonAnalytics " +
+                           "OPTIONS" +
+                           "(tableName \"" + table2 + "\"," +
+                           "preserveOrder \"true\"" +
+                           ")");
+
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE " + table3 + " USING CarbonAnalytics " +
+                           "OPTIONS" +
+                           "(tableName \"" + table3 + "\"," +
+                           "preserveOrder \"false\"" +
+                           ")");
+
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT * FROM " + table1);
+        Assert.assertEquals(result.getRows().size(), recordsCount, "Wrong number of rows returned");
+
+        ex.executeQuery(1, "INSERT OVERWRITE TABLE " + table2 + " SELECT value, count(*) as count from " + table1 + " " +
+                           "group by value order by value");
+
+        result = ex.executeQuery(1, "SELECT * FROM " + table2);
+        Assert.assertEquals(result.getRows().size(), recordsCount, "Wrong number of rows returned");
+
+        Assert.assertTrue(checkResultOrder(result.getRows()), "The results are out of order");
+
+        ex.executeQuery(1, "INSERT OVERWRITE TABLE " + table3 + " SELECT value, count(*) as count from " + table1 + " " +
+                           "group by value order by value");
+
+        result = ex.executeQuery(1, "SELECT * FROM " + table3);
+        Assert.assertEquals(result.getRows().size(), recordsCount, "Wrong number of rows returned");
+
+        this.cleanupTable(1, table1);
+        this.cleanupTable(1, table2);
+        System.out.println(testString("end : " + testName));
+    }
+
     @Test(expectedExceptions = Exception.class)
     public void testGlobalTenantCreateNonMTFail() throws Exception {
         SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
@@ -917,11 +990,6 @@ public class AnalyticsSparkExecutorTest {
     }
 
 
-
-
-
-
-
     //*************** util methods ********************************
 
 
@@ -943,7 +1011,7 @@ public class AnalyticsSparkExecutorTest {
             String[] fields = aSampleData.split(",", 2);
             values.put("meta_compressed", Boolean.parseBoolean(fields[0]));
             values.put("flowData", fields[1]);
-            timeTmp =  timeTmp + 5000;
+            timeTmp = timeTmp + 5000;
             result.add(new Record(generateRecordIds ? GenericUtils.generateRecordID() : null, tenantId, tableName,
                                   values, timeTmp));
         }
@@ -964,5 +1032,17 @@ public class AnalyticsSparkExecutorTest {
 
     private void cleanupIncrementalTable() throws AnalyticsException {
         this.cleanupTable(-5000, "__analytics_incremental_meta_table");
+    }
+
+
+    private boolean checkResultOrder(List<List<Object>> rows) {
+        boolean result = true;
+        for (int i = 0; i < rows.size() - 1; i++) {
+            if (((int) rows.get(i).get(0)) > ((int) rows.get(i + 1).get(0))) {
+                result = false;
+                break;
+            }
+        }
+         return result;
     }
 }

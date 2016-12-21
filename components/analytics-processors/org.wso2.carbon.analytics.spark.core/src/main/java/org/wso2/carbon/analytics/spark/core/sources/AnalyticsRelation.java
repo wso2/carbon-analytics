@@ -42,7 +42,6 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants.IncrementalW
 import org.wso2.carbon.analytics.spark.core.util.CarbonScalaUtils;
 import org.wso2.carbon.analytics.spark.core.util.IncrementalUtils;
 import org.wso2.carbon.base.MultitenantConstants;
-
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
@@ -52,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.extractFieldsFromColumns;
 import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.isEmptyAnalyticsSchema;
 import static org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils.isEmptySchema;
 
@@ -64,8 +62,8 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
 
     private static final long serialVersionUID = -7773419083178608517L;
     private static final Log log = LogFactory.getLog(AnalyticsRelation.class);
-
     private SQLContext sqlContext;
+
     private StructType schema;
     private int tenantId;
     private int recordBatchSize;
@@ -79,13 +77,15 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     private String schemaString;
     private String primaryKeys;
     private boolean mergeFlag;
+    private boolean preserveOrder;
 
     public AnalyticsRelation() {
     }
 
     public AnalyticsRelation(int tenantId, String recordStore, String tableName,
                              SQLContext sqlContext, StructType schema, String incParams,
-                             boolean globalTenantAccess, String schemaString, String primaryKeys, boolean mergeFlag) {
+                             boolean globalTenantAccess, String schemaString, String primaryKeys, boolean mergeFlag,
+                             boolean preserveOrder) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.recordStore = recordStore;
@@ -96,14 +96,13 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         this.schemaString = schemaString;
         this.primaryKeys = primaryKeys;
         this.mergeFlag = mergeFlag;
-
         this.recordBatchSize = Integer.parseInt(sqlContext.sparkContext().getConf()
                                                         .get(AnalyticsConstants.CARBON_INSERT_BATCH_SIZE));
-
+        this.preserveOrder = preserveOrder;
     }
 
     private void setIncParams(String incParamStr) {
-        if(!incParamStr.isEmpty()) {
+        if (!incParamStr.isEmpty()) {
             this.incEnable = true;
             logDebug("Incremental processing enabled. Setting incremental parameters " + incParamStr);
             String[] splits = incParamStr.split("\\s*,\\s*");
@@ -212,7 +211,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             } catch (AnalyticsTableNotAvailableException e) {
                 tempSchema = null;
             }
-            if (overwrite && !isEmptyAnalyticsSchema(tempSchema)) {                
+            if (overwrite && !isEmptyAnalyticsSchema(tempSchema)) {
                 dataService.deleteTable(targetTenantId, this.tableName);
                 if (!dataService.listRecordStoreNames().contains(this.recordStore)) {
                     throw new RuntimeException("Unknown record store name " + this.recordStore);
@@ -229,18 +228,26 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     }
 
     private void writeDataFrameToDAL(DataFrame data) {
-        for (int i = 0; i < data.rdd().partitions().length; i++) {
-            data.sqlContext().sparkContext().runJob(data.rdd(),
-                                                    new AnalyticsWritingFunction(this.tenantId, this.tableName, data.schema(),
-                                                    this.globalTenantAccess, this.schemaString, this.primaryKeys, this.mergeFlag, 
-                                                    this.recordStore, this.recordBatchSize), CarbonScalaUtils.getNumberSeq(i, i + 1),
-                                                    false, ClassTag$.MODULE$.Unit());
+        if (this.preserveOrder) {
+            logDebug("Inserting data with order preserved! Each partition will be written using separate jobs.");
+            for (int i = 0; i < data.rdd().partitions().length; i++) {
+                data.sqlContext().sparkContext().runJob(data.rdd(),
+                                                        new AnalyticsWritingFunction(this.tenantId, this.tableName, data.schema(),
+                                                                                     this.globalTenantAccess, this.schemaString, this.primaryKeys, this.mergeFlag,
+                                                                                     this.recordStore, this.recordBatchSize), CarbonScalaUtils.getNumberSeq(i, i + 1),
+                                                        false, ClassTag$.MODULE$.Unit());
+            }
+        } else {
+            data.foreachPartition(new AnalyticsWritingFunction(this.tenantId, this.tableName, data.schema(),
+                                                               this.globalTenantAccess, this.schemaString, this.primaryKeys, this.mergeFlag,
+                                                               this.recordStore, this.recordBatchSize));
         }
     }
 
-    protected AnalyticsRDD getAnalyticsRDD(int tenantId, String tableName, List<String> columns, 
-            SparkContext sparkContext, Seq<Dependency<?>> deps, ClassTag<Row> evidence, long startTime, long endTime, 
-            boolean incEnable, String incID) {
+    protected AnalyticsRDD getAnalyticsRDD(int tenantId, String tableName, List<String> columns,
+                                           SparkContext sparkContext, Seq<Dependency<?>> deps, ClassTag<Row> evidence,
+                                           long startTime, long endTime,
+                                           boolean incEnable, String incID) {
         return new AnalyticsRDD(tenantId, tableName, columns, sparkContext, deps, evidence, startTime, endTime, incEnable, incID);
     }
 }

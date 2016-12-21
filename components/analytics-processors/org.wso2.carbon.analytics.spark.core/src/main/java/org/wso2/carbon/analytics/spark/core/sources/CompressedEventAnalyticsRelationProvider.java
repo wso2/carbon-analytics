@@ -43,9 +43,9 @@ public class CompressedEventAnalyticsRelationProvider extends AnalyticsRelationP
     @Override
     protected AnalyticsRelation getAnalyticsRelation(int tenantId, String recordStore, String tableName,
             SQLContext sqlContext, StructType schema, String incParams, boolean globalTenantAccess, String schemaString,
-            String primaryKeys, boolean mergeFlag) {
+            String primaryKeys, boolean mergeFlag, boolean preserveOrder) {
         return new CompressedEventAnalyticsRelation(tenantId, recordStore, tableName, sqlContext, schema, incParams, 
-            globalTenantAccess, schemaString, primaryKeys, mergeFlag);
+            globalTenantAccess, schemaString, primaryKeys, mergeFlag, preserveOrder);
     }
     
     @Override

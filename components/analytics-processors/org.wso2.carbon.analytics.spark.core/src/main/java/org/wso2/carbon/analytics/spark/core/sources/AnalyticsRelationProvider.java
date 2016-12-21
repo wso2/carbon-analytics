@@ -57,6 +57,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
     private boolean globalTenantAccess;
     private StructType schemaStruct;
     private String incParams;
+    private boolean preserveOrder;
 
     public AnalyticsRelationProvider() {
 
@@ -76,7 +77,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
         doTableActions();
         return getAnalyticsRelation(this.tenantId, this.recordStore, this.tableName, sqlContext,
                                     this.schemaStruct, this.incParams, this.globalTenantAccess,
-                                    this.schemaString, this.primaryKeys, this.mergeFlag);
+                                    this.schemaString, this.primaryKeys, this.mergeFlag, this.preserveOrder);
     }
 
     private void doTableActions() {
@@ -109,6 +110,8 @@ public class AnalyticsRelationProvider implements RelationProvider,
                                                                             jMap, String.valueOf(true)));
         this.globalTenantAccess = Boolean.parseBoolean(extractAndRemoveValuesFromMap(AnalyticsConstants.GLOBAL_TENANT_ACCESS,
                                                                                      jMap, String.valueOf(false)));
+        this.preserveOrder = Boolean.parseBoolean(extractAndRemoveValuesFromMap(AnalyticsConstants.PRESERVE_ORDER,
+                                                                                                 jMap, String.valueOf(false)));
         this.incParams = extractAndRemoveValuesFromMap(AnalyticsConstants.INC_PARAMS, jMap, "");
         checkParameters(jMap);
     }
@@ -234,15 +237,16 @@ public class AnalyticsRelationProvider implements RelationProvider,
 
         return getAnalyticsRelation(this.tenantId, this.tableName, this.recordStore, sqlContext,
                                     schema, this.incParams, this.globalTenantAccess,
-                                    this.schemaString, this.primaryKeys, this.mergeFlag);
+                                    this.schemaString, this.primaryKeys, this.mergeFlag, this.preserveOrder);
     }
 
 
     protected AnalyticsRelation getAnalyticsRelation(int tenantId, String recordStore, String tableName,
-                                                     SQLContext sqlContext, StructType schema, String incParams,
-                                                     boolean globalTenantAccess,
-                                                     String schemaString, String primaryKeys, boolean mergeFlag) {
+                                                   SQLContext sqlContext, StructType schema, String incParams,
+                                                   boolean globalTenantAccess,
+                                                   String schemaString, String primaryKeys, boolean mergeFlag,
+                                                   boolean preserveOrder) {
         return new AnalyticsRelation(tenantId, recordStore, tableName, sqlContext, schema, incParams,
-                                     globalTenantAccess, schemaString, primaryKeys, mergeFlag);
+                                     globalTenantAccess, schemaString, primaryKeys, mergeFlag, preserveOrder);
     }
 }

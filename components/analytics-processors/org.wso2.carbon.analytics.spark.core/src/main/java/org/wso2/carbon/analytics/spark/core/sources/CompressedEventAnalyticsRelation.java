@@ -54,9 +54,9 @@ public class CompressedEventAnalyticsRelation extends AnalyticsRelation implemen
      */
     public CompressedEventAnalyticsRelation(int tenantId, String recordStore, String tableName, SQLContext sqlContext,
             StructType schema, String incParams, boolean globalTenantAccess, String schemaString, String primaryKeys,
-            boolean mergeFlag) {
+            boolean mergeFlag, boolean preserveOrder) {
         super(tenantId, recordStore, tableName, sqlContext, schema, incParams, globalTenantAccess, schemaString, 
-            primaryKeys, mergeFlag);
+            primaryKeys, mergeFlag, preserveOrder);
     }
 
     
