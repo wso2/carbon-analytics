@@ -28,6 +28,8 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.analytics.data.commons.AnalyticsDataService;
 import org.wso2.analytics.data.commons.AnalyticsRecordStore;
 import org.wso2.analytics.data.commons.service.AnalyticsDataResponse;
+import org.wso2.analytics.data.commons.service.AnalyticsSchema;
+import org.wso2.analytics.data.commons.sources.AnalyticsCommonConstants;
 import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.analytics.data.commons.sources.RecordGroup;
@@ -404,5 +406,64 @@ public class AnalyticsCommonUtils {
 
     public static String convertStreamNameToTableName(String stream) {
         return stream.replaceAll("\\.", "_");
+    }
+
+    /**
+     * This method preprocesses the records before adding to the record store,
+     * e.g. update the record ids if its not already set by using the table
+     * schema's primary keys.
+     *
+     * @param recordBatches batch of records
+     */
+    public static void preProcessRecords(Collection<List<Record>> recordBatches, AnalyticsDataService analyticsDataService) throws AnalyticsException {
+        for (List<Record> recordBatch : recordBatches) {
+            preProcessRecordBatch(recordBatch, analyticsDataService);
+        }
+    }
+
+    private static void preProcessRecordBatch(List<Record> recordBatch, AnalyticsDataService service) throws AnalyticsException {
+        Record firstRecord = recordBatch.get(0);
+        AnalyticsSchema schema = service.getTableSchema(firstRecord.getTableName());
+        List<String> primaryKeys = schema.getPrimaryKeys();
+        if (primaryKeys != null && primaryKeys.size() > 0) {
+            populateRecordsWithPrimaryKeyAwareIds(recordBatch, primaryKeys);
+        } else {
+            populateWithGenerateIds(recordBatch);
+        }
+    }
+
+    private static void populateWithGenerateIds(List<Record> records) {
+        records.stream().filter(record -> record.getId() == null).forEach(
+                record -> record.setId(AnalyticsCommonUtils.generateRecordID()));
+    }
+
+    private static void populateRecordWithPrimaryKeyAwareId(Record record, List<String> primaryKeys) {
+        record.setId(generateRecordIdFromPrimaryKeyValues(record.getValues(), primaryKeys));
+    }
+
+    private static String generateRecordIdFromPrimaryKeyValues(Map<String, Object> values, List<String> primaryKeys) {
+        StringBuilder builder = new StringBuilder();
+        Object obj;
+        for (String key : primaryKeys) {
+            obj = values.get(key);
+            if (obj != null) {
+                builder.append(obj.toString());
+            }
+        }
+        // to make sure, we don't have an empty string
+        builder.append("");
+        try {
+            byte[] data = builder.toString().getBytes(AnalyticsCommonConstants.DEFAULT_CHARSET);
+            return UUID.nameUUIDFromBytes(data).toString();
+        } catch (UnsupportedEncodingException e) {
+            // This wouldn't happen
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void populateRecordsWithPrimaryKeyAwareIds(List<Record> records, List<String> primaryKeys) {
+        /* users have the ability to explicitly provide a record id,
+         * in-spite of having primary keys defined to auto generate the id */
+        records.stream().filter(record -> record.getId() == null).forEach(record -> populateRecordWithPrimaryKeyAwareId(record, primaryKeys));
     }
 }

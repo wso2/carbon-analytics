@@ -21,6 +21,7 @@
         <module>components/analytics-datasources</module>
         <module>components/analytics-processor</module>
         <module>components/indexer-service</module>
+        <module>components/analytics-api</module>
     </modules>
 
     <dependencyManagement>
@@ -81,6 +82,11 @@
             <dependency>
                 <groupId>org.wso2.analytics</groupId>
                 <artifactId>org.wso2.analytics.data.commons</artifactId>
+                <version>${analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.analytics</groupId>
+                <artifactId>org.wso2.analytics.indexer</artifactId>
                 <version>${analytics.version}</version>
             </dependency>
             <dependency>

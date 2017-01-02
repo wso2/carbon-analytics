@@ -27,12 +27,10 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>analytics-indexer</artifactId>
+    <artifactId>analytics-api</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Analytics Indexer Aggregator Module</name>
-
+    <name>WSO2 Carbon - Analytics Dataservice Aggregator Module</name>
     <modules>
-        <module>org.wso2.analytics.indexer</module>
+        <module>org.wso2.analytics.api.commons</module>
     </modules>
-
 </project>

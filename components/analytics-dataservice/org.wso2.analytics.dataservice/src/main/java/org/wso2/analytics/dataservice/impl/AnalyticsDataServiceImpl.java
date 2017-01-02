@@ -304,7 +304,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void put(List<Record> records) throws AnalyticsException {
         Collection<List<Record>> recordBatches = AnalyticsCommonUtils.generateRecordBatches(records, true);
-        this.preprocessRecords(recordBatches);
+        AnalyticsCommonUtils.preProcessRecords(recordBatches, this);
         for (List<Record> recordsBatch : recordBatches) {
             this.putSimilarRecordBatch(recordsBatch);
         }
@@ -315,45 +315,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         String tableName = firstRecord.getTableName();
         String arsName = this.getRecordStoreNameByTable(tableName);
         this.getAnalyticsRecordStore(arsName).put(recordsBatch);
-    }
-
-    /**
-     * This method preprocesses the records before adding to the record store,
-     * e.g. update the record ids if its not already set by using the table
-     * schema's primary keys.
-     *
-     * @param recordBatches batch of records
-     */
-    private void preprocessRecords(Collection<List<Record>> recordBatches) throws AnalyticsException {
-        for (List<Record> recordBatch : recordBatches) {
-            this.preprocessRecordBatch(recordBatch);
-        }
-    }
-
-    private void preprocessRecordBatch(List<Record> recordBatch) throws AnalyticsException {
-        Record firstRecord = recordBatch.get(0);
-        AnalyticsSchema schema = this.lookupTableInfo(firstRecord.getTableName()).getSchema();
-        List<String> primaryKeys = schema.getPrimaryKeys();
-        if (primaryKeys != null && primaryKeys.size() > 0) {
-            this.populateRecordsWithPrimaryKeyAwareIds(recordBatch, primaryKeys);
-        } else {
-            this.populateWithGenerateIds(recordBatch);
-        }
-    }
-
-    private void populateWithGenerateIds(List<Record> records) {
-        records.stream().filter(record -> record.getId() == null).forEach(
-                record -> record.setId(AnalyticsCommonUtils.generateRecordID()));
-    }
-
-    private void populateRecordWithPrimaryKeyAwareId(Record record, List<String> primaryKeys) {
-        record.setId(this.generateRecordIdFromPrimaryKeyValues(record.getValues(), primaryKeys));
-    }
-
-    private void populateRecordsWithPrimaryKeyAwareIds(List<Record> records, List<String> primaryKeys) {
-        /* users have the ability to explicitly provide a record id,
-         * in-spite of having primary keys defined to auto generate the id */
-        records.stream().filter(record -> record.getId() == null).forEach(record -> this.populateRecordWithPrimaryKeyAwareId(record, primaryKeys));
     }
 
     @Override
