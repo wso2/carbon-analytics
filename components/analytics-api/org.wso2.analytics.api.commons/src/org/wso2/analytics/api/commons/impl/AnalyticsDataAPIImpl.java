@@ -20,7 +20,9 @@ import org.wso2.analytics.indexerservice.exceptions.IndexSchemaNotFoundException
 import org.wso2.analytics.indexerservice.exceptions.IndexerException;
 import org.wso2.analytics.indexerservice.impl.CarbonIndexerClient;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -30,10 +32,13 @@ import java.util.ServiceLoader;
  */
 public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
 
+    private static final String TEMP_INDEX_DATA_STORE_ = "_TEMP_INDEX_DATA_STORE_";
+    private static final String TEMP_INDEX_DATA_ = "_TEMP_INDEX_DATA_";
     private static Log log = LogFactory.getLog(AnalyticsDataAPIImpl.class);
     private CarbonIndexerService indexerService;
     private AnalyticsDataService analyticsDataService;
-    private static final String TEMP_INDEX_SCHEMA_TABLE = "_TEMP_INDEX_SCHEMA_STORE_";
+    private static final String TEMP_INDEX_SCHEMA_STORE = "_TEMP_INDEX_SCHEMA_STORE_";
+    private static final String TEMP_INDEX_SCHEMA_FIELD = "_TEMP_INDEX_SCHEMA_";
 
     public AnalyticsDataAPIImpl() throws AnalyticsException {
         ServiceLoader<CarbonIndexerService> indexerServiceServiceLoader = ServiceLoader.load(CarbonIndexerService.class);
@@ -81,22 +86,37 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
     @Override
     public void setTableSchema(String tableName, CompositeSchema schema, boolean merge) throws AnalyticsException {
         analyticsDataService.setTableSchema(tableName, schema.getAnalyticsSchema());
+        IndexSchema indexSchema = schema.getIndexSchema();
         try {
-            //TODO:mechanism to pass the tenantDomain
-            IndexSchema indexSchema = schema.getIndexSchema();
             if (indexSchema != null && !indexSchema.getFields().isEmpty()) {
                 indexerService.updateIndexSchema(tableName, schema.getIndexSchema(), merge);
                 indexerService.createIndexForTable(tableName);
             }
         } catch (IndexerException e) {
-            if (!analyticsDataService.tableExists(TEMP_INDEX_SCHEMA_TABLE)) {
-                analyticsDataService.createTable(TEMP_INDEX_SCHEMA_TABLE);
-            }
-            Record record = new Record();
-
             log.error("Error while updating the index schema for table : " + tableName, e);
+            log.info("Inserting index Schema details to staging area, as the index schema update failed..");
+            AddIndexSchemaToStagingArea(tableName, indexSchema);
             throw new AnalyticsException("Error while updating the index schema for table : " + tableName, e);
         }
+    }
+
+    /**
+     * Keep the indexSchema in a backup area if the solr server is not available or the indexer service is not available
+     * @param tableName table name of the index schema
+     * @param indexSchema The index Schema
+     * @throws AnalyticsException If the DAL.put() didn't work
+     */
+    private void AddIndexSchemaToStagingArea(String tableName, IndexSchema indexSchema)
+            throws AnalyticsException {
+        if (!analyticsDataService.tableExists(TEMP_INDEX_SCHEMA_STORE)) {
+            analyticsDataService.createTable(TEMP_INDEX_SCHEMA_STORE);
+        }
+        Map<String, Object> values = new HashMap<>(1);
+        values.put(TEMP_INDEX_SCHEMA_FIELD, AnalyticsCommonUtils.serializeObject(indexSchema));
+        Record record = new Record(tableName, TEMP_INDEX_SCHEMA_STORE, values);
+        List<Record> records = new ArrayList<>(1);
+        records.add(record);
+        analyticsDataService.put(records);
     }
 
     @Override
@@ -143,18 +163,40 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
         analyticsDataService.put(records);
         Collection<List<Record>> recordBatches = AnalyticsCommonUtils.generateRecordBatches(records, true);
         AnalyticsCommonUtils.preProcessRecords(recordBatches, analyticsDataService);
+        List<CarbonIndexDocument> indexDocuments = null;
+        String table = null;
         try {
             for (List<Record> recordBatch : recordBatches) {
-                String table = recordBatch.get(0).getTableName();
                 if (isIndexedTable(table)) {
+                    table = recordBatch.get(0).getTableName();
                     IndexSchema indexSchema = indexerService.getIndexSchema(table);
-                    List<CarbonIndexDocument> indexDocuments = DataAPIUtils.getIndexDocuments(recordBatch, indexSchema);
+                    indexDocuments = DataAPIUtils.getIndexDocuments(recordBatch, indexSchema);
                     indexerService.put(table, indexDocuments);
                 }
             }
-        } catch (IndexerException | IndexSchemaNotFoundException e) {
+        } catch (IndexSchemaNotFoundException e) {
             log.error("Error while inserting records: " + e.getMessage(), e);
             throw new AnalyticsException("Error while inserting records: " + e.getMessage(), e);
+        } catch (IndexerException e) {
+            log.error("Error while inserting records: " + e.getMessage(), e);
+            log.info("Inserting Index data of records to staging area as indexing failed..");
+            AddIndexDocumentsToStagingArea(indexDocuments, table);
+            throw new AnalyticsException("Error while inserting records: " + e.getMessage(), e);
+        }
+    }
+
+    private void AddIndexDocumentsToStagingArea(List<CarbonIndexDocument> indexDocuments,
+                                                String table) throws AnalyticsException {
+        if (!analyticsDataService.tableExists(TEMP_INDEX_DATA_STORE_)) {
+            analyticsDataService.createTable(TEMP_INDEX_DATA_STORE_);
+        }
+        if (indexDocuments != null && !indexDocuments.isEmpty()) {
+            List<Record> stagingIndexRecords = new ArrayList<>(1);
+            Map<String, Object> values = new HashMap<>(1);
+            values.put(TEMP_INDEX_DATA_, AnalyticsCommonUtils.serializeObject(indexDocuments));
+            Record record = new Record(table, values);
+            stagingIndexRecords.add(record);
+            analyticsDataService.put(stagingIndexRecords);
         }
     }
 
@@ -165,7 +207,6 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
         } catch (IndexSchemaNotFoundException e) {
             return false;
         }
-
     }
 
     @Override
@@ -320,5 +361,32 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
     @Override
     public CarbonIndexerClient getIndexerClient(String username) throws AnalyticsException {
         return null;
+    }
+
+    /**
+     * Worker class which tries to reindex data from the staging area.
+     * (If inserting data to solr failed those data goes to the staging area)
+     */
+    private class RetryIndexWorker implements Runnable {
+
+        private boolean stop;
+
+        public RetryIndexWorker() {
+            stop = false;
+        }
+
+        @Override
+        public void run() {
+            while (!stop) {
+                try {
+                    if (analyticsDataService.tableExists(TEMP_INDEX_DATA_STORE_)) {
+
+                    }
+                } catch (Throwable e) {
+
+                }
+            }
+
+        }
     }
 }

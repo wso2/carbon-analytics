@@ -17,5 +17,4 @@ public class CarbonIndexDocument extends SolrInputDocument {
     public CarbonIndexDocument(Map<String, CarbonIndexDocumentField> fields) {
         super(IndexerUtils.getSolrFields(fields));
     }
-
 }
