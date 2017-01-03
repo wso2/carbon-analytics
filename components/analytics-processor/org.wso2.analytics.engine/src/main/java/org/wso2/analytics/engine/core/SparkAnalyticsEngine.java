@@ -72,14 +72,24 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
         this.sparkSession = SparkSession.builder().master(this.sparkMaster)
                 .appName(appName)
                 .config(sparkConf).getOrCreate();
+
+        //adding the relevant jars todo: handle this properly
         this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-datasources/org.wso2.analytics.datasource.rdbms/target/org.wso2.analytics.datasource.rdbms-2.0.0-SNAPSHOT.jar");
         this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-dataservice/org.wso2.analytics.dataservice/target/org.wso2.analytics.dataservice-2.0.0-SNAPSHOT.jar");
         this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-dataservice/org.wso2.analytics.data.commons/target/org.wso2.analytics.data.commons-2.0.0-SNAPSHOT.jar");
         this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/target/org.wso2.analytics.engine-2.0.0-SNAPSHOT.jar");
         this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/mysql-connector-java-5.1.40-bin.jar");
+
+        // adding the conf files todo: handle these properly
+        this.sparkSession.sparkContext().addFile("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/conf/analytics/rdbms-config.xml");
+        this.sparkSession.sparkContext().addFile("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/conf/datasources/analytics-datasources.xml");
+        this.sparkSession.sparkContext().addFile("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/conf/analytics/analytics-dataservice-config.xml");
+
 //        this.sparkSession.sparkContext().addFile("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/conf", true);
 //        this.sparkSession.conf().set("spark.executor.extraJavaOptions", "-D" + AnalyticsCommonUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + "=" + SparkFiles.getRootDirectory());
-        this.sparkSession.conf().set("spark.executor.extraJavaOptions", "-D" + AnalyticsCommonUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + "=/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/conf");
+//        this.sparkSession.conf().set("spark.executor.extraJavaOptions", "-D" + AnalyticsCommonUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + "=/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/conf");
+        this.sparkSession.conf().set("spark.executor.extraJavaOptions", "-agentlib:jdwp=transport=dt_socket,server=n,address=sachiths-X1:5005,suspend=n");
+        this.sparkSession.conf().set("spark.executor.extraClassPath", "./");
     }
 
     /**

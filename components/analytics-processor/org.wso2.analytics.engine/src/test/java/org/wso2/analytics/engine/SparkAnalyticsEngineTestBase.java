@@ -62,8 +62,9 @@ public class SparkAnalyticsEngineTestBase {
     public void creatingTablesTest() throws AnalyticsException {
         log.info("================== Creating temporary table Test =====================");
         this.analyticsEngine.executeQuery("CREATE TEMPORARY VIEW person using CarbonAnalytics options (tableName \"PERSON\", schema \"name STRING\");");
+//        this.analyticsEngine.executeQuery("INSERT INTO person select 'sachith';");
         AnalyticsEngineQueryResult analyticsEngineQueryResult = this.analyticsEngine.executeQuery("SELECT * FROM person");
-        Assert.assertEquals(analyticsEngineQueryResult.getRows().size(), 0);
+        Assert.assertEquals(analyticsEngineQueryResult.getRows().size(), 2);
     }
 /*
     @Test(dependsOnMethods = "simpleQueryExecutionTest", expectedExceptions = AnalyticsExecutionException.class)
