@@ -29,10 +29,15 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.*;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils.getFileFromSystemResources;
 
 /**
  * Utility methods for RDBMS based operations for analytics data source.
@@ -87,12 +92,15 @@ public class RDBMSUtils {
 
     public static RDBMSQueryConfiguration loadQueryConfiguration() throws AnalyticsException {
         // TODO: Finalize logic for RDBMS config files
+        File confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() +
+                File.separator + ANALYTICS_CONF_DIR + File.separator + RDBMS_QUERY_CONFIG_FILE);
         try {
-            File confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() +
-                    File.separator + ANALYTICS_CONF_DIR + File.separator + RDBMS_QUERY_CONFIG_FILE);
             if (!confFile.exists()) {
-                throw new AnalyticsException("Cannot initalize RDBMS analytics data source, "
-                        + "the query configuration file cannot be found at: " + confFile.getPath());
+                confFile = getFileFromSystemResources(RDBMS_QUERY_CONFIG_FILE);
+                if (confFile == null) {
+                    throw new AnalyticsException("Cannot initalize analytics data service, " +
+                            "the analytics data service configuration file cannot be found at: " + confFile.getPath());
+                }
             }
             JAXBContext ctx = JAXBContext.newInstance(RDBMSQueryConfiguration.class);
             Unmarshaller unmarshaller = ctx.createUnmarshaller();
@@ -102,6 +110,9 @@ public class RDBMSUtils {
         } catch (JAXBException e) {
             throw new AnalyticsException(
                     "Error in processing RDBMS query configuration: " + e.getMessage(), e);
+        } catch (URISyntaxException e) {
+            throw new AnalyticsException("Cannot initalize RDBMS analytics data source, "
+                    + "the query configuration file cannot be found at: " + confFile.getPath() + " or in Classpath");
         }
     }
 

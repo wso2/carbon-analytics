@@ -21,6 +21,7 @@ package org.wso2.analytics.engine.core;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.SparkConf;
+import org.apache.spark.SparkFiles;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -32,6 +33,7 @@ import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.engine.commons.AnalyticsRelationProvider;
 import org.wso2.analytics.engine.commons.AnalyzerEngineConstants;
 import org.wso2.analytics.engine.commons.SparkAnalyticsEngineQueryResult;
+import org.wso2.analytics.engine.exceptions.AnalyticsExecutionException;
 
 import java.io.File;
 import java.util.*;
@@ -73,6 +75,11 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
         this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-datasources/org.wso2.analytics.datasource.rdbms/target/org.wso2.analytics.datasource.rdbms-2.0.0-SNAPSHOT.jar");
         this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-dataservice/org.wso2.analytics.dataservice/target/org.wso2.analytics.dataservice-2.0.0-SNAPSHOT.jar");
         this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-dataservice/org.wso2.analytics.data.commons/target/org.wso2.analytics.data.commons-2.0.0-SNAPSHOT.jar");
+        this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/target/org.wso2.analytics.engine-2.0.0-SNAPSHOT.jar");
+        this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/mysql-connector-java-5.1.40-bin.jar");
+//        this.sparkSession.sparkContext().addFile("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/conf", true);
+//        this.sparkSession.conf().set("spark.executor.extraJavaOptions", "-D" + AnalyticsCommonUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + "=" + SparkFiles.getRootDirectory());
+        this.sparkSession.conf().set("spark.executor.extraJavaOptions", "-D" + AnalyticsCommonUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + "=/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/conf");
     }
 
     /**
@@ -102,7 +109,7 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
     }
 
     @Override
-    public AnalyticsEngineQueryResult executeQuery(String query) {
+    public AnalyticsEngineQueryResult executeQuery(String query) throws AnalyticsExecutionException {
         String processedQuery = replaceShorthandStrings(query);
         if (processedQuery.endsWith(";")) {
             processedQuery = processedQuery.substring(0, processedQuery.length() - 1).trim();
@@ -118,7 +125,7 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
             analyticsEngineQueryResult = convertToResult(resultsSet);
         } catch (Throwable throwable) {
             success = false;
-            log.error("Exception in executing query " + query, throwable);
+            throw new AnalyticsExecutionException("Exception in executing query " + query, throwable);
         } finally {
             // todo: add printing this based on -DenableAnalyticsStats
             long end = System.currentTimeMillis();

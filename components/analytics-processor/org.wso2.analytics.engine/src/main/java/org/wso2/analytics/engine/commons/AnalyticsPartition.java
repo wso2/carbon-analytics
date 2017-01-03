@@ -24,7 +24,7 @@ import org.wso2.analytics.data.commons.sources.RecordGroup;
 import java.io.Serializable;
 
 /**
- * Spark analytics partition implementa tion, based on {@link RecordGroup}.
+ * Spark analytics partition implementation, based on {@link RecordGroup}.
  */
 public class AnalyticsPartition implements Partition, Serializable {
 
@@ -46,11 +46,6 @@ public class AnalyticsPartition implements Partition, Serializable {
 
     public RecordGroup getRecordGroup() {
         return recordGroup;
-    }
-
-    @Override
-    public boolean org$apache$spark$Partition$$super$equals(Object o) {
-        return equals(o);
     }
 
     @Override

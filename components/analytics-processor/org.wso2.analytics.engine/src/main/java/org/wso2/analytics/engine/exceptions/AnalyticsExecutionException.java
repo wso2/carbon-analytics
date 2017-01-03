@@ -18,10 +18,12 @@
  */
 package org.wso2.analytics.engine.exceptions;
 
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
+
 /**
  * This class represents exceptions occuring in Spark query execution.
  */
-public class AnalyticsExecutionException extends Exception {
+public class AnalyticsExecutionException extends AnalyticsException {
 
     private static final long serialVersionUID = 3710152528912180791L;
 

@@ -25,8 +25,10 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.wso2.analytics.data.commons.AnalyticsEngine;
 import org.wso2.analytics.data.commons.AnalyticsEngineQueryResult;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.engine.core.SparkAnalyticsEngine;
+import org.wso2.analytics.engine.exceptions.AnalyticsExecutionException;
 
 public class SparkAnalyticsEngineTestBase {
     private static final Log log = LogFactory.getLog(SparkAnalyticsEngineTestBase.class);
@@ -40,7 +42,7 @@ public class SparkAnalyticsEngineTestBase {
         this.analyticsEngine = new SparkAnalyticsEngine(sparkConfFilePath);
     }
 
-    @Test
+    /*@Test
     public void getVersionTest() {
         log.info("================== Testing Spark Connectivity through getVersion method =====================");
         String sparkVersion = this.analyticsEngine.getVersion();
@@ -48,11 +50,25 @@ public class SparkAnalyticsEngineTestBase {
         log.info("Spark getVersion result: " + sparkVersion);
     }
 
-    @Test (dependsOnMethods = "getVersionTest")
-    public void simpleQueryExecutionTest() {
+    @Test(dependsOnMethods = "getVersionTest")
+    public void simpleQueryExecutionTest() throws AnalyticsException {
         log.info("================== Testing Simple SPARK SQL query execution =====================");
         AnalyticsEngineQueryResult analyticsEngineQueryResult = this.analyticsEngine.executeQuery("SELECT 1+2;");
         String result = analyticsEngineQueryResult.getRows().get(0).toString();
         Assert.assertEquals(result, "[3]");
     }
+*/
+    @Test
+    public void creatingTablesTest() throws AnalyticsException {
+        log.info("================== Creating temporary table Test =====================");
+        this.analyticsEngine.executeQuery("CREATE TEMPORARY VIEW person using CarbonAnalytics options (tableName \"PERSON\", schema \"name STRING\");");
+        AnalyticsEngineQueryResult analyticsEngineQueryResult = this.analyticsEngine.executeQuery("SELECT * FROM person");
+        Assert.assertEquals(analyticsEngineQueryResult.getRows().size(), 0);
+    }
+/*
+    @Test(dependsOnMethods = "simpleQueryExecutionTest", expectedExceptions = AnalyticsExecutionException.class)
+    public void accessingUnrecognizedTableTest() throws AnalyticsException {
+        log.info("================== Accessing an unavailable view Test =====================");
+        this.analyticsEngine.executeQuery("SELECT * FROM unrecog");
+    }*/
 }

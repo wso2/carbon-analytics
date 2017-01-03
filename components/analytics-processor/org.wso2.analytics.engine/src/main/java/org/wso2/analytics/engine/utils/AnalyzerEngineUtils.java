@@ -261,7 +261,9 @@ public class AnalyzerEngineUtils {
         try {
             existingSchema = ads.getTableSchema(targetTableName);
         } catch (AnalyticsTableNotAvailableException ignore) {
-            log.debug("Table not found when merging schema => " + ":" + targetTableName);
+            if (log.isDebugEnabled()) {
+                log.debug("Table not found when merging schema => " + ":" + targetTableName);
+            }
         }
        /* if (!isEmptyAnalyticsSchema(existingSchema)) {
             //fixme: support indexing related schema merging here

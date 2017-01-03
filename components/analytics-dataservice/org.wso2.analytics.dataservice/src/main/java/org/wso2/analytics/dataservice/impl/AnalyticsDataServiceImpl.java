@@ -43,10 +43,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.wso2.analytics.data.commons.sources.AnalyticsCommonConstants.ANALYTICS_CONF_DIR;
+import static org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils.getFileFromSystemResources;
 import static org.wso2.analytics.dataservice.utils.AnalyticsDataServiceConstants.ANALYTICS_CONFIG_FILE;
 
 public class AnalyticsDataServiceImpl implements AnalyticsDataService {
@@ -63,7 +66,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private static final Log LOGGER = LogFactory.getLog(AnalyticsDataServiceImpl.class);
 
     public AnalyticsDataServiceImpl() {
-        AnalyticsDataServiceConfiguration config = null;
+        AnalyticsDataServiceConfiguration config;
         try {
             config = this.loadAnalyticsDataServiceConfig();
             this.initARS(config);
@@ -74,13 +77,15 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
+        File confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() + File.separator
+                + ANALYTICS_CONF_DIR + File.separator + ANALYTICS_CONFIG_FILE);
         try {
-            File confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() + File.separator
-                    + ANALYTICS_CONF_DIR + File.separator + ANALYTICS_CONFIG_FILE);
             if (!confFile.exists()) {
-                throw new AnalyticsException("Cannot initalize analytics data service, " +
-                        "the analytics data service configuration file cannot be found at: " +
-                        confFile.getPath());
+                confFile = getFileFromSystemResources(ANALYTICS_CONFIG_FILE);
+                if (confFile == null) {
+                    throw new AnalyticsException("Cannot initalize analytics data service, " +
+                            "the analytics data service configuration file cannot be found at: " + confFile.getPath());
+                }
             }
             JAXBContext ctx = JAXBContext.newInstance(AnalyticsDataServiceConfiguration.class);
             Unmarshaller unmarshaller = ctx.createUnmarshaller();
@@ -88,6 +93,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         } catch (JAXBException e) {
             throw new AnalyticsException(
                     "Error in processing analytics data service configuration: " + e.getMessage(), e);
+        } catch (URISyntaxException e) {
+            throw new AnalyticsException("Cannot initalize analytics data service, " +
+                    "the analytics data service configuration file cannot be found at: " + confFile.getPath() + " or from classpath", e);
         }
     }
 
