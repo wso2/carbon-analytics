@@ -4,6 +4,7 @@ import org.wso2.analytics.indexerservice.exceptions.IndexSchemaNotFoundException
 import org.wso2.analytics.indexerservice.exceptions.IndexerException;
 import org.wso2.analytics.indexerservice.impl.CarbonIndexerClient;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -77,6 +78,12 @@ public interface CarbonIndexerService {
      * @param docs Documents which represents the records
      * @throws IndexerException Exceptions is thrown if something goes wrong.
      */
-    public void put(String table, List<CarbonIndexDocument> docs) throws IndexerException;
+    public void indexDocuments(String table, List<CarbonIndexDocument> docs) throws IndexerException;
+
+    /**
+     * Closes the internally maintained Solr clients
+     * @throws IOException
+     */
+    public void destroy() throws IndexerException;
 
 }

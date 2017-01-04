@@ -361,7 +361,7 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
     }
 
     @Override
-    public void put(String table, List<CarbonIndexDocument> docs) throws IndexerException {
+    public void indexDocuments(String table, List<CarbonIndexDocument> docs) throws IndexerException {
         try {
             CarbonIndexerClient client = getIndexerClient(table);
             client.add(IndexerUtils.getSolrInputDocuments(docs));
@@ -371,6 +371,19 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
             log.error("Error while inserting the documents to index for table: " + table, e);
             throw new IndexerException("Error while inserting the documents to index for table: " + table, e);
         }
+    }
+
+    @Override
+    public void destroy() throws IndexerException {
+        try {
+            for (SolrClient solrClient : indexerClients.values()) {
+                solrClient.close();
+            }
+        } catch (IOException e) {
+            log.error("Error while destroying the indexer service, " + e.getMessage(), e);
+            throw new IndexerException("Error while destroying the indexer service, " + e.getMessage(), e);
+        }
+        indexerClients = null;
     }
 
     private String getTableNameWithDomainName(String tableName) {

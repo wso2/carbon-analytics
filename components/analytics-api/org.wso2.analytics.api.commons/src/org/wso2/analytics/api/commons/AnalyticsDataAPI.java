@@ -412,4 +412,6 @@ public interface AnalyticsDataAPI {
      * @throws AnalyticsException
      */
     CarbonIndexerClient getIndexerClient(String username) throws AnalyticsException;
+
+
 }

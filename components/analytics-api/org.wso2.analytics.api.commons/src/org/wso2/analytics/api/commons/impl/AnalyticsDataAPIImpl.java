@@ -26,19 +26,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation class of AnalyticsDataAPI - Implements the DAL level APIs with indexing.
  */
 public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
 
-    private static final String TEMP_INDEX_DATA_STORE_ = "_TEMP_INDEX_DATA_STORE_";
-    private static final String TEMP_INDEX_DATA_ = "_TEMP_INDEX_DATA_";
     private static Log log = LogFactory.getLog(AnalyticsDataAPIImpl.class);
+
+    private static final String TEMP_INDEX_DATA_STORE = "_TEMP_INDEX_DATA_STORE_";
+    private static final String FIELD_INDEX_DATA = "_FIELD_INDEX_DATA_";
+    private static final String FIELD_INDEX_DATA_TABLE_NAME = "_FIELD_INDEX_DATA_TABLE_NAME_";
+    private static final String TEMP_INDEX_SCHEMA_STORE = "_TEMP_INDEX_SCHEMA_STORE_";
+    private static final String FIELD_INDEX_SCHEMA = "_FIELD_INDEX_SCHEMA_";
+    private static final String FIELD_INDEX_SCHEMA_MERGE = "_FIELD_INDEX_SCHEMA_MERGE_";
+
+    private static final int NO_STAGING_INDEX_WORKERS = 2;
+    private static final int STAGING_INDEX_WORKER_EXECUTOR_TIMEOUT = 60000;
+    private static final int RETRY_INDEX_DOC_BATCH_SIZE = 100;
+
     private CarbonIndexerService indexerService;
     private AnalyticsDataService analyticsDataService;
-    private static final String TEMP_INDEX_SCHEMA_STORE = "_TEMP_INDEX_SCHEMA_STORE_";
-    private static final String TEMP_INDEX_SCHEMA_FIELD = "_TEMP_INDEX_SCHEMA_";
+    private ExecutorService stagingIndexWorkerExecutor;
+    private StagingIndexWorker stagingIndexWorker;
+    private StagingIndexSchemaWorker stagingIndexSchemaWorker;
 
     public AnalyticsDataAPIImpl() throws AnalyticsException {
         ServiceLoader<CarbonIndexerService> indexerServiceServiceLoader = ServiceLoader.load(CarbonIndexerService.class);
@@ -55,6 +69,15 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
         if (indexerService == null) {
             throw new AnalyticsException("Cannot load CarbonIndexerService..");
         }
+        scheduleStagingIndexWorkers();
+    }
+
+    private void scheduleStagingIndexWorkers() {
+        stagingIndexWorkerExecutor = Executors.newFixedThreadPool(NO_STAGING_INDEX_WORKERS);
+        stagingIndexWorker = new StagingIndexWorker();
+        stagingIndexSchemaWorker = new StagingIndexSchemaWorker();
+        stagingIndexWorkerExecutor.execute(stagingIndexWorker);
+        stagingIndexWorkerExecutor.execute(stagingIndexSchemaWorker);
     }
 
     @Override
@@ -95,7 +118,7 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
         } catch (IndexerException e) {
             log.error("Error while updating the index schema for table : " + tableName, e);
             log.info("Inserting index Schema details to staging area, as the index schema update failed..");
-            AddIndexSchemaToStagingArea(tableName, indexSchema);
+            AddIndexSchemaToStagingArea(tableName, indexSchema, merge);
             throw new AnalyticsException("Error while updating the index schema for table : " + tableName, e);
         }
     }
@@ -106,13 +129,14 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
      * @param indexSchema The index Schema
      * @throws AnalyticsException If the DAL.put() didn't work
      */
-    private void AddIndexSchemaToStagingArea(String tableName, IndexSchema indexSchema)
+    private void AddIndexSchemaToStagingArea(String tableName, IndexSchema indexSchema, boolean merge)
             throws AnalyticsException {
         if (!analyticsDataService.tableExists(TEMP_INDEX_SCHEMA_STORE)) {
             analyticsDataService.createTable(TEMP_INDEX_SCHEMA_STORE);
         }
-        Map<String, Object> values = new HashMap<>(1);
-        values.put(TEMP_INDEX_SCHEMA_FIELD, AnalyticsCommonUtils.serializeObject(indexSchema));
+        Map<String, Object> values = new HashMap<>(2);
+        values.put(FIELD_INDEX_SCHEMA, AnalyticsCommonUtils.serializeObject(indexSchema));
+        values.put(FIELD_INDEX_SCHEMA_MERGE, merge);
         Record record = new Record(tableName, TEMP_INDEX_SCHEMA_STORE, values);
         List<Record> records = new ArrayList<>(1);
         records.add(record);
@@ -171,7 +195,7 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
                     table = recordBatch.get(0).getTableName();
                     IndexSchema indexSchema = indexerService.getIndexSchema(table);
                     indexDocuments = DataAPIUtils.getIndexDocuments(recordBatch, indexSchema);
-                    indexerService.put(table, indexDocuments);
+                    indexerService.indexDocuments(table, indexDocuments);
                 }
             }
         } catch (IndexSchemaNotFoundException e) {
@@ -187,14 +211,15 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
 
     private void AddIndexDocumentsToStagingArea(List<CarbonIndexDocument> indexDocuments,
                                                 String table) throws AnalyticsException {
-        if (!analyticsDataService.tableExists(TEMP_INDEX_DATA_STORE_)) {
-            analyticsDataService.createTable(TEMP_INDEX_DATA_STORE_);
+        if (!analyticsDataService.tableExists(TEMP_INDEX_DATA_STORE)) {
+            analyticsDataService.createTable(TEMP_INDEX_DATA_STORE);
         }
         if (indexDocuments != null && !indexDocuments.isEmpty()) {
             List<Record> stagingIndexRecords = new ArrayList<>(1);
-            Map<String, Object> values = new HashMap<>(1);
-            values.put(TEMP_INDEX_DATA_, AnalyticsCommonUtils.serializeObject(indexDocuments));
-            Record record = new Record(table, values);
+            Map<String, Object> values = new HashMap<>(2);
+            values.put(FIELD_INDEX_DATA, AnalyticsCommonUtils.serializeObject(indexDocuments));
+            values.put(FIELD_INDEX_DATA_TABLE_NAME, table);
+            Record record = new Record(TEMP_INDEX_DATA_STORE, values);
             stagingIndexRecords.add(record);
             analyticsDataService.put(stagingIndexRecords);
         }
@@ -345,12 +370,41 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
 
     @Override
     public void destroy() throws AnalyticsException {
+        stopRetryIndexerWorkers();
+        if (analyticsDataService != null) {
+            analyticsDataService.destroy();
+        }
+        try {
+            if (indexerService != null) {
+                indexerService.destroy();
+            }
+        } catch (IndexerException e) {
+            log.error("Error while destroying the Analytics Data API, " + e.getMessage(), e);
+            throw new AnalyticsException("Error while destroying the Analytics Data API, " + e.getMessage(), e);
+        }
+    }
 
+    private void stopRetryIndexerWorkers() {
+        if (stagingIndexWorkerExecutor != null && !stagingIndexWorkerExecutor.isShutdown()) {
+            stagingIndexWorker.stop();
+            stagingIndexSchemaWorker.stop();
+            stagingIndexWorkerExecutor.shutdownNow();
+            try {
+                stagingIndexWorkerExecutor.awaitTermination(STAGING_INDEX_WORKER_EXECUTOR_TIMEOUT,
+                        TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                log.warn("Failed to stop staging Index workers, Interrupted.");
+            } finally {
+                stagingIndexWorkerExecutor = null;
+                stagingIndexSchemaWorker = null;
+                stagingIndexWorker = null;
+            }
+        }
     }
 
     @Override
     public void invalidateTable(String tableName) {
-
+        analyticsDataService.invalidateTable(tableName);
     }
 
     @Override
@@ -365,13 +419,14 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
 
     /**
      * Worker class which tries to reindex data from the staging area.
-     * (If inserting data to solr failed those data goes to the staging area)
+     * (If inserting data to Solr failed those data goes to the staging area)
      */
-    private class RetryIndexWorker implements Runnable {
+    private class StagingIndexWorker implements Runnable {
 
+        private static final int RETRY_INTERVAL = 1000;
         private boolean stop;
 
-        public RetryIndexWorker() {
+        public StagingIndexWorker() {
             stop = false;
         }
 
@@ -379,14 +434,84 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
         public void run() {
             while (!stop) {
                 try {
-                    if (analyticsDataService.tableExists(TEMP_INDEX_DATA_STORE_)) {
+                    if (analyticsDataService.tableExists(TEMP_INDEX_DATA_STORE)) {
+                        List<Record> records = getRecordsListFromTable(TEMP_INDEX_DATA_STORE, 0, RETRY_INDEX_DOC_BATCH_SIZE);
+                        List<String> ids = new ArrayList<>();
+                        for (Record record : records) {
+                            try {
+                                String table = (String) record.getValue(FIELD_INDEX_DATA_TABLE_NAME);
+                                byte[] indexData = (byte[]) record.getValue(FIELD_INDEX_DATA);
+                                List<CarbonIndexDocument> documents =
+                                        (List<CarbonIndexDocument>) AnalyticsCommonUtils.deserializeObject(indexData);
+                                indexerService.indexDocuments(table, documents);
+                                ids.add(record.getId());
 
+                            } catch (IndexerException e) {
+                                log.error("Staging data Indexing failed, " + e.getMessage(), e);
+                            }
+                        }
+                        analyticsDataService.delete(TEMP_INDEX_DATA_STORE, ids);
+                        Thread.sleep(RETRY_INTERVAL);
                     }
                 } catch (Throwable e) {
-
+                    log.error("Staging data Indexing failed, " + e.getMessage(), e);
                 }
             }
-
         }
+
+        public void stop() {
+            stop = true;
+        }
+    }
+
+    private class StagingIndexSchemaWorker implements Runnable {
+
+        private static final int RETRY_INTERVAL = 1000;
+        private boolean stop;
+
+        public StagingIndexSchemaWorker() {
+            stop = false;
+        }
+
+        @Override
+        public void run() {
+            while (!stop) {
+                try {
+                    if (analyticsDataService.tableExists(FIELD_INDEX_SCHEMA)) {
+                        List<Record> records = getRecordsListFromTable(TEMP_INDEX_DATA_STORE, 0, RETRY_INDEX_DOC_BATCH_SIZE);
+                        List<String> ids = new ArrayList<>();
+                        for (Record record : records) {
+                            try {
+                                //id is the schema table name
+                                String table = record.getId();
+                                byte[] indexSchemaData = (byte[]) record.getValue(FIELD_INDEX_SCHEMA);
+                                boolean merge = (Boolean) record.getValue(FIELD_INDEX_SCHEMA_MERGE);
+                                IndexSchema indexSchema =
+                                        (IndexSchema) AnalyticsCommonUtils.deserializeObject(indexSchemaData);
+                                indexerService.updateIndexSchema(table, indexSchema, merge);
+                                ids.add(record.getId());
+
+                            } catch (IndexerException e) {
+                                log.error("Inserting staged index schema failed, " + e.getMessage(), e);
+                            }
+                        }
+                        analyticsDataService.delete(TEMP_INDEX_SCHEMA_STORE, ids);
+                        Thread.sleep(RETRY_INTERVAL);
+                    }
+                } catch (Throwable e) {
+                    log.error("Inserting staged index schema failed, " + e.getMessage(), e);
+                }
+            }
+        }
+
+        public void stop() {
+            stop = true;
+        }
+    }
+
+    private List<Record> getRecordsListFromTable(String table, int start, int count) throws AnalyticsException {
+        AnalyticsDataResponse response = analyticsDataService.get(table, 0, null,
+                                                                  Long.MIN_VALUE, Long.MAX_VALUE, start, count);
+        return AnalyticsCommonUtils.listRecords(analyticsDataService, response);
     }
 }
