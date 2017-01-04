@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasources-configuration>
+
+    <providers>
+        <provider>es.eci.carbon.datasource.reader.mongo.MongoDataSourceReader</provider>
+    </providers>
+
+    <datasources>
+
+        <datasource>
+            <name>WSO2_ANALYTICS_DS_MONGO</name>
+            <description>The datasource used for analytics record store</description>
+            <definition type="MONGO">
+                <configuration>
+                    <host>localhost</host>
+                    <port>27017</port>
+                </configuration>
+            </definition>
+        </datasource>
+
+    </datasources>
+
+</datasources-configuration>
