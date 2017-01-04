@@ -23,7 +23,7 @@
 
     <ManagementPermissions>
         <ManagementPermission>
-            <DisplayName>Event Streams</DisplayName>
+            <DisplayName>Event Publisher</DisplayName>
             <ResourceId>/permission/admin/manage/event-publish</ResourceId>
         </ManagementPermission>
     </ManagementPermissions>

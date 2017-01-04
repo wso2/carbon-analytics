@@ -151,6 +151,7 @@ public class JMSEventAdapterFactory extends InputEventAdapterFactory {
         jmsSecuredProperties.setHint(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_SECURED_PROPERTIES_HINT));
         jmsSecuredProperties.setRequired(false);
         jmsSecuredProperties.setEncrypted(true);
+        jmsSecuredProperties.setSecured(true);
         propertyList.add(jmsSecuredProperties);
 
         return propertyList;

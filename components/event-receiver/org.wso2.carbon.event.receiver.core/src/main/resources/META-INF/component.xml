@@ -23,8 +23,8 @@
 
     <ManagementPermissions>
         <ManagementPermission>
-            <DisplayName>Event Streams</DisplayName>
-            <ResourceId>/permission/admin/manage/event-streams</ResourceId>
+            <DisplayName>Event Receiver</DisplayName>
+            <ResourceId>/permission/admin/manage/event-receive</ResourceId>
         </ManagementPermission>
     </ManagementPermissions>
 </component>
