@@ -11,6 +11,9 @@ import org.wso2.analytics.indexerservice.IndexSchemaField;
 import org.wso2.analytics.indexerservice.exceptions.IndexerException;
 
 import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,6 +26,9 @@ public class IndexerUtils {
 
     private static Log log = LogFactory.getLog(IndexerUtils.class);
 
+    private static final String CUSTOM_WSO2_CONF_DIR_NAME = "conf";
+    public static final String WSO2_ANALYTICS_INDEX_CONF_DIRECTORY_SYS_PROP = "wso2_custom_index_conf_dir";
+
     public static String getIndexerConfDirectory() throws IndexerException {
         File confDir = null;
         try {
@@ -33,7 +39,7 @@ public class IndexerUtils {
             }
         }
         if (confDir == null || !confDir.exists()) {
-            return getConfDirectoryPath();
+            return getCustomIndexerConfDirectory();
         } else {
             return confDir.getAbsolutePath();
         }
@@ -50,6 +56,20 @@ public class IndexerUtils {
         return carbonConfigDirPath;
     }
 
+    private static String getCustomIndexerConfDirectory() throws IndexerException {
+        String path = System.getProperty(WSO2_ANALYTICS_INDEX_CONF_DIRECTORY_SYS_PROP);
+        if (path == null) {
+            path = Paths.get("").toAbsolutePath().toString() + File.separator + CUSTOM_WSO2_CONF_DIR_NAME;
+        }
+        File confDir = new File(path);
+        if (!confDir.exists()) {
+            throw new IndexerException("The custom WSO2 index configuration directory does not exist at '" + path + "'. "
+                    + "This can be given by correctly pointing to a valid configuration directory by setting the "
+                    + "Java system property '" + WSO2_ANALYTICS_INDEX_CONF_DIRECTORY_SYS_PROP + "'.");
+        }
+        return confDir.getAbsolutePath();
+    }
+
     public static String getBaseDirectoryPath() {
         String baseDir = System.getProperty("analytics.home");
         if (baseDir == null) {
@@ -57,6 +77,19 @@ public class IndexerUtils {
             System.setProperty("analytics.home", baseDir);
         }
         return baseDir;
+    }
+
+    public static File getFileFromSystemResources(String fileName) throws URISyntaxException {
+        File file = null;
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        if (classLoader != null) {
+            URL url = classLoader.getResource(fileName);
+            if (url == null) {
+                url = classLoader.getResource(File.separator + fileName);
+            }
+            file = new File(url.toURI());
+        }
+        return file;
     }
 
     public static IndexSchema getMergedIndexSchema(IndexSchema oldSchema, IndexSchema newSchema) {

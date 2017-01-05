@@ -229,7 +229,6 @@ public interface AnalyticsDataAPI {
      */
     void createTableIfNotExists(String username, String recordStoreName, String tableName) throws AnalyticsException;
 
-
     /**
      * Returns the record store name given the table information.
      *

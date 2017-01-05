@@ -12,6 +12,10 @@ import java.util.List;
  * This class contains the static Utility methods required by the Data API
  */
 public class DataAPIUtils {
+
+    private static final String FIELD_TIMESTAMP = "_timestamp";
+    private static final String FIELD_ID = "id";
+
     public static List<CarbonIndexDocument> getIndexDocuments(List<Record> records, IndexSchema schema) {
         List<CarbonIndexDocument> indexDocuments = new ArrayList<>();
         if (schema != null && !schema.getFields().isEmpty()) {
@@ -32,6 +36,12 @@ public class DataAPIUtils {
                 indexDocument.addField(field, value);
             }
         }
+        indexDocument.addField(FIELD_ID, record.getId());
+        indexDocument.addField(FIELD_TIMESTAMP, record.getTimestamp());
         return indexDocument;
+    }
+
+    public static String createTimeRangeQuery(long fromTime, long toTime) {
+        return FIELD_TIMESTAMP.concat(":[" + fromTime + "TO " + toTime + "]");
     }
 }

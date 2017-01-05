@@ -264,11 +264,27 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
     @Override
     public void delete(String tableName, long timeFrom, long timeTo) throws AnalyticsException {
         analyticsDataService.delete(tableName, timeFrom, timeTo);
+        try {
+            if (isIndexedTable(tableName)) {
+                indexerService.deleteDocuments(tableName, DataAPIUtils.createTimeRangeQuery(timeFrom, timeTo));
+            }
+        } catch (IndexerException e) {
+            log.error("Error while deleting records, " + e.getMessage(), e);
+            throw new AnalyticsException("Error while deleting records, " + e.getMessage(), e);
+        }
     }
 
     @Override
     public void delete(String tableName, List<String> ids) throws AnalyticsException {
         analyticsDataService.delete(tableName, ids);
+        try {
+            if (isIndexedTable(tableName)) {
+                indexerService.deleteDocuments(tableName, ids);
+            }
+        } catch (IndexerException e) {
+            log.error("Error while deleting indexed records, " + e.getMessage(), e);
+            throw new AnalyticsException("Error while deleting indexed records, " + e.getMessage(), e);
+        }
     }
 
     @Override

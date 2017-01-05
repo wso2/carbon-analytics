@@ -81,6 +81,22 @@ public interface CarbonIndexerService {
     public void indexDocuments(String table, List<CarbonIndexDocument> docs) throws IndexerException;
 
     /**
+     * Delete index documents by given document/record ids
+     * @param table the name of the table to which the records belong
+     * @param ids list of ids of records to be deleted
+     * @throws IndexerException
+     */
+    public void deleteDocuments(String table, List<String> ids) throws IndexerException;
+
+    /**
+     * Delete index documents which match the given solr query
+     * @param table the name of the table to which the records belong
+     * @param query the solr query to filter out the records to be deleted
+     * @throws IndexerException
+     */
+    public void deleteDocuments(String table, String query) throws IndexerException;
+
+    /**
      * Closes the internally maintained Solr clients
      * @throws IOException
      */
