@@ -28,7 +28,7 @@ public class KafkaConsumer implements Runnable {
 
     private KafkaStream stream;
     private InputEventAdapterListener brokerListener;
-    private String evento;
+    private String event;
     private int tenantId;
     private Log log = LogFactory.getLog(KafkaConsumer.class);
 
@@ -46,13 +46,13 @@ public class KafkaConsumer implements Runnable {
             ConsumerIterator<byte[], byte[]> it = stream.iterator();
             while (it.hasNext()) {
                 try {
-                    evento = new String(it.next().message());
+                    event = new String(it.next().message());
                     if (log.isDebugEnabled()) {
-                        log.debug("Event received in Kafka Event Adaptor - " + evento);
+                        log.debug("Event received in Kafka Event Adaptor - " + event);
                     }
-                    brokerListener.onEvent(evento);
+                    brokerListener.onEvent(event);
                 } catch (Throwable t) {
-                    log.error("Error while transforming the event : "+evento, t);
+                    log.error("Error while transforming the event : "+ event, t);
                 }
             }
         } catch (Throwable t) {
