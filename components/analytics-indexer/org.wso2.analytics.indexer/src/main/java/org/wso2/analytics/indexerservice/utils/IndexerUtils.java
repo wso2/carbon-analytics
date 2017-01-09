@@ -26,8 +26,9 @@ public class IndexerUtils {
 
     private static Log log = LogFactory.getLog(IndexerUtils.class);
 
-    private static final String CUSTOM_WSO2_CONF_DIR_NAME = "conf";
+    public static final String CUSTOM_WSO2_CONF_DIR_NAME = "conf";
     public static final String WSO2_ANALYTICS_INDEX_CONF_DIRECTORY_SYS_PROP = "wso2_custom_index_conf_dir";
+    private static final String tenantDomain = "DEFAULT";
 
     public static String getIndexerConfDirectory() throws IndexerException {
         File confDir = null;
@@ -113,5 +114,13 @@ public class IndexerUtils {
         List<SolrInputDocument> solrDocs = new ArrayList<>(docs.size());
         solrDocs.addAll(docs);
         return solrDocs;
+    }
+
+    public static String getTableNameWithDomainName(String tableName) {
+        if (tableName != null) {
+            return tenantDomain.toUpperCase() + "_" + tableName.toUpperCase();
+        } else {
+            return null;
+        }
     }
 }

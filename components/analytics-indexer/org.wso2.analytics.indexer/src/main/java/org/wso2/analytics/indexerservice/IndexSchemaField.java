@@ -29,7 +29,9 @@ public class IndexSchemaField implements Serializable {
         this.isIndexed = isIndexed;
         this.type = type;
         this.otherProperties = new HashMap<>();
-        this.otherProperties.putAll(otherProperties);
+        if (otherProperties != null) {
+            this.otherProperties.putAll(otherProperties);
+        }
     }
 
 
@@ -82,7 +84,9 @@ public class IndexSchemaField implements Serializable {
     }
 
     public void setOtherProperties(Map<String, Object> otherProperties) {
-        this.otherProperties.putAll(otherProperties);
+        if (otherProperties != null) {
+            this.otherProperties.putAll(otherProperties);
+        }
     }
 
     @Override

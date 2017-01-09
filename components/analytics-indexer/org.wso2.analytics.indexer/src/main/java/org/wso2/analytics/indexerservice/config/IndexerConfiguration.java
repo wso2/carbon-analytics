@@ -44,7 +44,7 @@ public class IndexerConfiguration {
         this.noOfReplicas = noOfReplicas;
     }
 
-    @XmlElement(name = "base-config-set", defaultValue = BASE_CONFIG_SET)
+    @XmlElement(name = "default-config-set", defaultValue = BASE_CONFIG_SET)
     public String getBaseConfigSet() {
         return baseConfigSet;
     }

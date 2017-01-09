@@ -57,7 +57,11 @@ public class IndexSchema implements Serializable {
     }
 
     public IndexSchemaField getField(String fieldName) {
-        return new IndexSchemaField(fields.get(fieldName));
+        if (fields.get(fieldName) != null) {
+            return new IndexSchemaField(fields.get(fieldName));
+        } else {
+            return null;
+        }
     }
 
     @Override

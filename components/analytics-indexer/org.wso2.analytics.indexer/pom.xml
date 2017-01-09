@@ -11,8 +11,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.analytics.indexer</artifactId>
-    <packaging>pom</packaging>
-    <name>WSO2 Carbon - Indexer Service</name>
+    <name>WSO2 Carbon - Analytics Indexer Service</name>
     <dependencies>
         <dependency>
             <groupId>org.apache.solr</groupId>
