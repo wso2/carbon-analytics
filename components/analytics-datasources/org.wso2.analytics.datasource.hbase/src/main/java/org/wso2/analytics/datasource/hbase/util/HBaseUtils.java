@@ -21,6 +21,7 @@ import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.wso2.analytics.data.commons.service.AnalyticsDataHolder;
 import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
@@ -29,6 +30,7 @@ import org.wso2.analytics.datasource.hbase.HBaseAnalyticsConfigurationEntry;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -98,7 +100,7 @@ public class HBaseUtils {
 
     public static HBaseAnalyticsConfigurationEntry lookupConfiguration() throws AnalyticsException {
         try {
-            File confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() +
+            File confFile = new File(AnalyticsDataHolder.getInstance().getAnalyticsConfigsDir() +
                     File.separator + ANALYTICS_CONF_DIR + File.separator +
                     HBaseAnalyticsDSConstants.HBASE_ANALYTICS_CONFIG_FILE);
             if (!confFile.exists()) {

@@ -37,6 +37,7 @@ import org.wso2.analytics.data.commons.service.AnalyticsSchema;
 import org.wso2.analytics.engine.exceptions.AnalyticsDataServiceLoadException;
 import org.wso2.analytics.engine.services.AnalyticsServiceHolder;
 import org.wso2.analytics.engine.utils.AnalyzerEngineUtils;
+
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
@@ -44,6 +45,7 @@ import scala.reflect.ClassTag$;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.wso2.analytics.engine.utils.AnalyzerEngineUtils.isEmptyAnalyticsSchema;

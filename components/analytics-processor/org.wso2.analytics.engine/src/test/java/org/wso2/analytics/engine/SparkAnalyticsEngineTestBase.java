@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2016 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+x *  Copyright (c) 2016 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -28,7 +28,6 @@ import org.wso2.analytics.data.commons.AnalyticsEngineQueryResult;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.engine.core.SparkAnalyticsEngine;
-import org.wso2.analytics.engine.exceptions.AnalyticsExecutionException;
 
 public class SparkAnalyticsEngineTestBase {
     private static final Log log = LogFactory.getLog(SparkAnalyticsEngineTestBase.class);
@@ -59,12 +58,13 @@ public class SparkAnalyticsEngineTestBase {
     }
 */
     @Test
-    public void creatingTablesTest() throws AnalyticsException {
+    public void simpleQueryExecutionTest() throws AnalyticsException {
         log.info("================== Creating temporary table Test =====================");
         this.analyticsEngine.executeQuery("CREATE TEMPORARY VIEW person using CarbonAnalytics options (tableName \"PERSON\", schema \"name STRING\");");
-//        this.analyticsEngine.executeQuery("INSERT INTO person select 'sachith';");
+        AnalyticsEngineQueryResult analyticsEngineQueryResultBeforeTest = this.analyticsEngine.executeQuery("SELECT * FROM person");
+        this.analyticsEngine.executeQuery("INSERT INTO person select 'a';");
         AnalyticsEngineQueryResult analyticsEngineQueryResult = this.analyticsEngine.executeQuery("SELECT * FROM person");
-        Assert.assertEquals(analyticsEngineQueryResult.getRows().size(), 2);
+        Assert.assertEquals(analyticsEngineQueryResult.getRows().size() - analyticsEngineQueryResultBeforeTest.getRows().size(), 1);
     }
 /*
     @Test(dependsOnMethods = "simpleQueryExecutionTest", expectedExceptions = AnalyticsExecutionException.class)

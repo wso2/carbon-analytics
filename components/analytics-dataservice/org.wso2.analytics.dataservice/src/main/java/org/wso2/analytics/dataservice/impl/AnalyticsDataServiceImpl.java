@@ -24,6 +24,7 @@ import org.wso2.analytics.data.commons.AnalyticsDataService;
 import org.wso2.analytics.data.commons.AnalyticsRecordStore;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.analytics.data.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.analytics.data.commons.service.AnalyticsDataHolder;
 import org.wso2.analytics.data.commons.service.AnalyticsDataResponse;
 import org.wso2.analytics.data.commons.service.AnalyticsDataResponse.Entry;
 import org.wso2.analytics.data.commons.service.AnalyticsSchema;
@@ -39,12 +40,12 @@ import org.wso2.analytics.dataservice.config.AnalyticsRecordStoreConfiguration;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,6 +63,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private String primaryARSName;
     private Map<String, AnalyticsRecordStore> analyticsRecordStores;
     private Map<String, AnalyticsTableInfo> tableInfoMap = new HashMap<>();
+    private AnalyticsDataHolder analyticsDataHolder = AnalyticsDataHolder.getInstance();
 
     private static final Log LOGGER = LogFactory.getLog(AnalyticsDataServiceImpl.class);
 
@@ -77,7 +79,10 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
-        File confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() + File.separator
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Analytics Config Directory: " + analyticsDataHolder.getAnalyticsConfigsDir());
+        }
+        File confFile = new File(analyticsDataHolder.getAnalyticsConfigsDir() + File.separator
                 + ANALYTICS_CONF_DIR + File.separator + ANALYTICS_CONFIG_FILE);
         try {
             if (!confFile.exists()) {
@@ -199,6 +204,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         try {
             records = AnalyticsCommonUtils.listRecords(ars, ars.get(ANALYTICS_META_TABLE, 1, null, ids));
         } catch (AnalyticsTableNotAvailableException e) {
+            LOGGER.error(e);
             throw new AnalyticsTableNotAvailableException(tableName);
         }
         if (records.size() == 0) {
@@ -526,13 +532,13 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         tableName = AnalyticsCommonUtils.normalizeTableName(tableName);
         this.tableInfoMap.remove(tableName);
     }
-
+    
     /**
      * This class represents meta information about an analytics table.
      */
     public static class AnalyticsTableInfo implements Serializable {
 
-        private static final long serialVersionUID = -9100036429450395707L;
+        private static final long serialVersionUID = -8354600106518618547L;
         private String tableName;
         private String recordStoreName;
         private AnalyticsSchema schema;

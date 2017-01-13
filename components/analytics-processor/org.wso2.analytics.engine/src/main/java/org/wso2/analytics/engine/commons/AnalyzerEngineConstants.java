@@ -83,6 +83,7 @@ public class AnalyzerEngineConstants {
     public static final String SPARK_EVENTS_SHORTHAND_STRING = "CarbonEvents";
 
     public static final String SPARK_ANALYTICS_ENGINE_NAME = "Apache Spark";
+    public static final String SPARK_ANALYTICS_CONFIGS = "spark.sp.configs";
 
 }
 
