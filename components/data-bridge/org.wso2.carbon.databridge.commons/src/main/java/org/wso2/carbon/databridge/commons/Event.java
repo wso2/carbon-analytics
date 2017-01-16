@@ -1,21 +1,17 @@
-/**
+/*
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package org.wso2.carbon.databridge.commons;
@@ -23,6 +19,11 @@ package org.wso2.carbon.databridge.commons;
 import java.util.Arrays;
 import java.util.Map;
 
+/**
+ * WSO2 Event Implementation
+ *
+ * @Since 5.0.0
+ */
 public class Event {
     private String streamId;
 
@@ -122,29 +123,47 @@ public class Event {
     @Override
     public String toString() {
         return "\nEvent{\n" +
-               "  " + EBCommonsConstants.STREAM_ID + "='" + streamId + "\',\n" +
-               "  " + EBCommonsConstants.TIME_STAMP + "=" + timeStamp + ",\n" +
-               "  " + EBCommonsConstants.META_DATA + "=" + (metaData == null ? null : Arrays.asList(metaData)) + ",\n" +
-               "  " + EBCommonsConstants.CORRELATION_DATA + "=" + (correlationData == null ? null : Arrays.asList(correlationData)) + ",\n" +
-               "  " + EBCommonsConstants.PAYLOAD_DATA + "=" + (payloadData == null ? null : Arrays.asList(payloadData)) + ",\n" +
-               "  " + EBCommonsConstants.ARBITRARY_DATA_MAP + "=" + arbitraryDataMap + ",\n" +
-               "}\n";
+                "  " + EventBuilderCommonsConstants.STREAM_ID + "='" + streamId + "\',\n" +
+                "  " + EventBuilderCommonsConstants.TIME_STAMP + "=" + timeStamp + ",\n" +
+                "  " + EventBuilderCommonsConstants.META_DATA + "=" +
+                (metaData == null ? null : Arrays.asList(metaData)) + ",\n" +
+                "  " + EventBuilderCommonsConstants.CORRELATION_DATA + "=" +
+                (correlationData == null ? null : Arrays.asList(correlationData)) + ",\n" +
+                "  " + EventBuilderCommonsConstants.PAYLOAD_DATA + "=" +
+                (payloadData == null ? null : Arrays.asList(payloadData)) + ",\n" +
+                "  " + EventBuilderCommonsConstants.ARBITRARY_DATA_MAP + "=" + arbitraryDataMap + ",\n" +
+                "}\n";
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Event)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Event)) {
+            return false;
+        }
 
         Event event = (Event) o;
 
-        if (timeStamp != event.timeStamp) return false;
-        if (arbitraryDataMap != null ? !arbitraryDataMap.equals(event.arbitraryDataMap) : event.arbitraryDataMap != null)
+        if (timeStamp != event.timeStamp) {
             return false;
-        if (!Arrays.deepEquals(correlationData, event.correlationData)) return false;
-        if (!Arrays.deepEquals(metaData, event.metaData)) return false;
-        if (!Arrays.deepEquals(payloadData, event.payloadData)) return false;
-        if (streamId != null ? !streamId.equals(event.streamId) : event.streamId != null) return false;
+        }
+        if (arbitraryDataMap != null ? !arbitraryDataMap.equals(event.arbitraryDataMap) : event.arbitraryDataMap != null) {
+            return false;
+        }
+        if (!Arrays.deepEquals(correlationData, event.correlationData)) {
+            return false;
+        }
+        if (!Arrays.deepEquals(metaData, event.metaData)) {
+            return false;
+        }
+        if (!Arrays.deepEquals(payloadData, event.payloadData)) {
+            return false;
+        }
+        if (streamId != null ? !streamId.equals(event.streamId) : event.streamId != null) {
+            return false;
+        }
 
         return true;
     }

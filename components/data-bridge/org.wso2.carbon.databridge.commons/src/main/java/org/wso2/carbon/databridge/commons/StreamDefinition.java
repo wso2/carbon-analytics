@@ -1,21 +1,17 @@
-/**
+/*
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package org.wso2.carbon.databridge.commons;
@@ -27,6 +23,9 @@ import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * WSO2 Event Stream Definition
+ */
 public class StreamDefinition {
     private String streamId;
     private String name;
@@ -38,8 +37,6 @@ public class StreamDefinition {
     private List<Attribute> metaData;
     private List<Attribute> correlationData;
     private List<Attribute> payloadData;
-
-    private IndexDefinition indexDefinition;
 
     @Deprecated
     /**
@@ -53,16 +50,16 @@ public class StreamDefinition {
     public StreamDefinition(String name, String version)
             throws MalformedStreamDefinitionException {
         if (name.contains(DataBridgeCommonsUtils.STREAM_NAME_VERSION_SPLITTER)) {
-            throw new MalformedStreamDefinitionException(EBCommonsConstants.NAME + " " + name + " cannot contain '-' ");
+            throw new MalformedStreamDefinitionException(EventBuilderCommonsConstants.NAME + " " + name + " cannot contain '-' ");
         }
         this.name = name;
         if (version.contains(DataBridgeCommonsUtils.STREAM_NAME_VERSION_SPLITTER)) {
-            throw new MalformedStreamDefinitionException(EBCommonsConstants.VERSION + " " + version + " cannot contain '-' ");
+            throw new MalformedStreamDefinitionException(EventBuilderCommonsConstants.VERSION + " " + version + " cannot contain '-' ");
         }
         String versionPattern = "^\\d+\\.\\d+\\.\\d+$";
         if (!version.matches(versionPattern)) {
             throw new MalformedStreamDefinitionException(
-                    EBCommonsConstants.VERSION + " " + version + " does not adhere to the format x.x.x ");
+                    EventBuilderCommonsConstants.VERSION + " " + version + " does not adhere to the format x.x.x ");
         }
         this.version = version;
         generateSteamId();
@@ -229,24 +226,6 @@ public class StreamDefinition {
             payloadData = new ArrayList<Attribute>();
         }
         payloadData.add(new Attribute(name, type));
-    }
-
-    public IndexDefinition getIndexDefinition() {
-        return indexDefinition;
-    }
-
-    public void setIndexDefinition(IndexDefinition indexDefinition) {
-        this.indexDefinition = indexDefinition;
-    }
-
-    public void createIndexDefinition(String indexDefinition) {
-        this.indexDefinition = new IndexDefinition();
-        this.indexDefinition.setIndexData(indexDefinition, this);
-    }
-
-    public void createIndexDefinitionFromStore(String indexDefinition) {
-        this.indexDefinition = new IndexDefinition();
-        this.indexDefinition.setIndexDataFromStore(indexDefinition);
     }
 
     @Override
