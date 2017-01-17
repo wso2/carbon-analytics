@@ -14,9 +14,11 @@
  *  limitations under the License.
  */
 
-
 package org.wso2.carbon.databridge.commons.exception;
 
+/**
+ * UndefinedEventTypeException
+ */
 public class UndefinedEventTypeException extends Exception {
     private String errorMessage;
 

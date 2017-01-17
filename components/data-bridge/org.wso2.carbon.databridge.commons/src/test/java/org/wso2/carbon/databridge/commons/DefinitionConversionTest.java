@@ -16,7 +16,7 @@
 package org.wso2.carbon.databridge.commons;
 
 import com.google.gson.Gson;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
@@ -35,33 +35,19 @@ public class DefinitionConversionTest {
     }
 
     @Test
-    public void testDefinitionConversion()
-            throws MalformedStreamDefinitionException {
-        String definition = "{" +
-                            "  'name':'org.wso2.esb.MediatorStatistics'," +
-                            "  'version':'2.3.0'," +
-                            "  'nickName': 'Stock Quote Information'," +
-                            "  'description': 'Some Desc'," +
-                            "  'tags':['foo', 'bar']," +
-                            "  'metaData':[" +
-                            "          {'name':'ipAdd','type':'STRING'}" +
-                            "  ]," +
-                            "  'payloadData':[" +
-                            "          {'name':'symbol','type':'string'}," +
-                            "          {'name':'price','type':'double'}," +
-                            "          {'name':'volume','type':'int'}," +
-                            "          {'name':'maxTemp','type':'double'}," +
-                            "          {'name':'minTemp','type':'double'}" +
-                            "  ]" +
-                            "}";
-
+    public void testDefinitionConversion() throws MalformedStreamDefinitionException {
+        String definition = "{" + "  'name':'org.wso2.esb.MediatorStatistics'," + "  'version':'2.3.0',"
+                + "  'nickName': 'Stock Quote Information'," + "  'description': 'Some Desc',"
+                + "  'tags':['foo', 'bar']," + "  'metaData':[" + "          {'name':'ipAdd','type':'STRING'}" + "  ],"
+                + "  'payloadData':[" + "          {'name':'symbol','type':'string'},"
+                + "          {'name':'price','type':'double'}," + "          {'name':'volume','type':'int'},"
+                + "          {'name':'maxTemp','type':'double'}," + "          {'name':'minTemp','type':'double'}"
+                + "  ]" + "}";
 
         StreamDefinition streamDefinition1 = EventDefinitionConverterUtils.convertFromJson(definition);
         Assert.assertTrue(null != streamDefinition1.getStreamId());
-//        System.out.println(gson.toJson(streamDefinition1));
 
-        StreamDefinition streamDefinition2 =
-                new StreamDefinition("org.wso2.esb.MediatorStatistics", "2.3.0");
+        StreamDefinition streamDefinition2 = new StreamDefinition("org.wso2.esb.MediatorStatistics", "2.3.0");
         List<Attribute> meta = new ArrayList<Attribute>(1);
         meta.add(new Attribute("ipAdd", AttributeType.STRING));
         streamDefinition2.setMetaData(meta);
@@ -77,33 +63,20 @@ public class DefinitionConversionTest {
     }
 
     @Test
-    public void testDefinitionConversionWithoutVersion()
-            throws MalformedStreamDefinitionException {
-        String definition = "{" +
-                            "  'name':'org.wso2.esb.MediatorStatistics'," +
-//                            "  'version':'2.3.0'," +
-                            "  'nickName': 'Stock Quote Information'," +
-                            "  'description': 'Some Desc'," +
-                            "  'tags':['foo', 'bar']," +
-                            "  'metaData':[" +
-                            "          {'name':'ipAdd','type':'STRING'}" +
-                            "  ]," +
-                            "  'payloadData':[" +
-                            "          {'name':'symbol','type':'string'}," +
-                            "          {'name':'price','type':'double'}," +
-                            "          {'name':'volume','type':'int'}," +
-                            "          {'name':'max','type':'double'}," +
-                            "          {'name':'min','type':'double'}" +
-                            "  ]" +
-                            "}";
-
+    public void testDefinitionConversionWithoutVersion() throws MalformedStreamDefinitionException {
+        String definition = "{" + "  'name':'org.wso2.esb.MediatorStatistics'," +
+        // " 'version':'2.3.0'," +
+                "  'nickName': 'Stock Quote Information'," + "  'description': 'Some Desc',"
+                + "  'tags':['foo', 'bar']," + "  'metaData':[" + "          {'name':'ipAdd','type':'STRING'}" + "  ],"
+                + "  'payloadData':[" + "          {'name':'symbol','type':'string'},"
+                + "          {'name':'price','type':'double'}," + "          {'name':'volume','type':'int'},"
+                + "          {'name':'max','type':'double'}," + "          {'name':'min','type':'double'}" + "  ]"
+                + "}";
 
         StreamDefinition streamDefinition1 = EventDefinitionConverterUtils.convertFromJson(definition);
         Assert.assertTrue(null != streamDefinition1.getStreamId());
-//        System.out.println(gson.toJson(streamDefinition1));
 
-        StreamDefinition streamDefinition2 =
-                new StreamDefinition("org.wso2.esb.MediatorStatistics", "1.0.0");
+        StreamDefinition streamDefinition2 = new StreamDefinition("org.wso2.esb.MediatorStatistics", "1.0.0");
         List<Attribute> meta = new ArrayList<Attribute>(1);
         meta.add(new Attribute("ipAdd", AttributeType.STRING));
         streamDefinition2.setMetaData(meta);
@@ -117,6 +90,5 @@ public class DefinitionConversionTest {
 
         Assert.assertEquals(streamDefinition1, streamDefinition2);
     }
-
 
 }

@@ -46,94 +46,93 @@ public class EventConverterUtils {
 
     private static Gson gson = new Gson();
     /*
-   Sample JSON string expected:
-   [
-     {
-      "streamId" : "foo::1.0.0",
-      "payloadData" : ["val1", "val2"] ,
-      "metaData" : ["val1", "val2", "val3"] ,
-      "correlationData" : ["val1", "val2"],
-      "timeStamp" : 1312345432
-     }
-    ,
-     {
-      "streamId" : "bar::2.1.0",
-      "payloadData" : ["val1", "val2"] ,
-      "metaData" : ["val1", "val2", "val3"] ,
-      "correlationData" : ["val1", "val2"]
-     }
+     * Sample JSON string expected:
+     * [
+     * {
+     * "streamId" : "foo::1.0.0",
+     * "payloadData" : ["val1", "val2"] ,
+     * "metaData" : ["val1", "val2", "val3"] ,
+     * "correlationData" : ["val1", "val2"],
+     * "timeStamp" : 1312345432
+     * }
+     * ,
+     * {
+     * "streamId" : "bar::2.1.0",
+     * "payloadData" : ["val1", "val2"] ,
+     * "metaData" : ["val1", "val2", "val3"] ,
+     * "correlationData" : ["val1", "val2"]
+     * }
+     * 
+     * ]
+     */
 
-   ]
-    */
-
-//    public static List<Event> convertFromJson(String json) {
-//
-//
-//        List<Event> eventList = new ArrayList<Event>();
-//        try {
-//            JSONArray eventObjects = new JSONArray(json);
-//            for (int i = 0; i < eventObjects.length(); i++) {
-////                Event event = gson.fromJson(json, Event.class);
-//                Event event = new Event();
-//                JSONObject eventObject = eventObjects.getJSONObject(i);
-//                JSONArray metaJsonArray = eventObject.getJSONArray("meta");
-//                JSONArray correlationJsonArray = eventObject.getJSONArray("correlation");
-//                JSONArray eventJsonArray = eventObject.getJSONArray("event");
-//
-//                List<Object> metaEvents = new ArrayList<Object>();
-//                List<Object> correlationEvents = new ArrayList<Object>();
-//                List<Object> payloadEvents = new ArrayList<Object>();
-//                for (int j = 0; j < metaJsonArray.length(); j++) {
-//                    String value = metaJsonArray.getString(j);
-//                    metaEvents.add(value);
-//                }
-//                for (int j = 0; j < correlationJsonArray.length(); j++) {
-//                    String value = correlationJsonArray.getString(j);
-//                    correlationEvents.add(value);
-//                }
-//                for (int j = 0; j < eventJsonArray.length(); j++) {
-//                    String value = eventJsonArray.getString(j);
-//                    payloadEvents.add(value);
-//                }
-//
-//                long timestamp = 0;
-//                try {
-//                    timestamp = eventObject.getLong("timestamp");
-//                } catch (JSONException e) {
-//                    // ignore
-//                }
-//
-//                String streamId = null;
-//                try {
-//                    streamId = eventObject.getString("streamId");
-//                } catch (JSONException e) {
-//
-//                }
-//                if (streamId == null || streamId.equals("")) {
-//                    throw new MalformedEventException("Stream Id cannot be empty or null");
-//                }
-//
-//                event.setCorrelationData(correlationEvents.toArray(new Object[correlationEvents.size()]));
-//                event.setMetaData(metaEvents.toArray(new Object[metaEvents.size()]));
-//                event.setPayloadData(payloadEvents.toArray(new Object[payloadEvents.size()]));
-//                event.setTimeStamp(timestamp);
-//                event.setStreamId(streamId);
-//
-//                eventList.add(event);
-//            }
-//        } catch (JSONException e) {
-//            String errorMsg = "Error converting JSON to event, for JSON : " + json;
-//            MalformedEventException malformedEventException = new MalformedEventException(errorMsg, e);
-//            if (log.isDebugEnabled()) {
-//                log.error(errorMsg, malformedEventException);
-//            } else {
-//                log.error(errorMsg);
-//            }
-//            throw malformedEventException;
-//        }
-//        return eventList;
-//    }
-
+    // public static List<Event> convertFromJson(String json) {
+    //
+    //
+    // List<Event> eventList = new ArrayList<Event>();
+    // try {
+    // JSONArray eventObjects = new JSONArray(json);
+    // for (int i = 0; i < eventObjects.length(); i++) {
+    //// Event event = gson.fromJson(json, Event.class);
+    // Event event = new Event();
+    // JSONObject eventObject = eventObjects.getJSONObject(i);
+    // JSONArray metaJsonArray = eventObject.getJSONArray("meta");
+    // JSONArray correlationJsonArray = eventObject.getJSONArray("correlation");
+    // JSONArray eventJsonArray = eventObject.getJSONArray("event");
+    //
+    // List<Object> metaEvents = new ArrayList<Object>();
+    // List<Object> correlationEvents = new ArrayList<Object>();
+    // List<Object> payloadEvents = new ArrayList<Object>();
+    // for (int j = 0; j < metaJsonArray.length(); j++) {
+    // String value = metaJsonArray.getString(j);
+    // metaEvents.add(value);
+    // }
+    // for (int j = 0; j < correlationJsonArray.length(); j++) {
+    // String value = correlationJsonArray.getString(j);
+    // correlationEvents.add(value);
+    // }
+    // for (int j = 0; j < eventJsonArray.length(); j++) {
+    // String value = eventJsonArray.getString(j);
+    // payloadEvents.add(value);
+    // }
+    //
+    // long timestamp = 0;
+    // try {
+    // timestamp = eventObject.getLong("timestamp");
+    // } catch (JSONException e) {
+    // // ignore
+    // }
+    //
+    // String streamId = null;
+    // try {
+    // streamId = eventObject.getString("streamId");
+    // } catch (JSONException e) {
+    //
+    // }
+    // if (streamId == null || streamId.equals("")) {
+    // throw new MalformedEventException("Stream Id cannot be empty or null");
+    // }
+    //
+    // event.setCorrelationData(correlationEvents.toArray(new Object[correlationEvents.size()]));
+    // event.setMetaData(metaEvents.toArray(new Object[metaEvents.size()]));
+    // event.setPayloadData(payloadEvents.toArray(new Object[payloadEvents.size()]));
+    // event.setTimeStamp(timestamp);
+    // event.setStreamId(streamId);
+    //
+    // eventList.add(event);
+    // }
+    // } catch (JSONException e) {
+    // String errorMsg = "Error converting JSON to event, for JSON : " + json;
+    // MalformedEventException malformedEventException = new MalformedEventException(errorMsg, e);
+    // if (log.isDebugEnabled()) {
+    // log.error(errorMsg, malformedEventException);
+    // } else {
+    // log.error(errorMsg);
+    // }
+    // throw malformedEventException;
+    // }
+    // return eventList;
+    // }
 
     public static List<Event> convertFromJson(String json) {
         List<Event> eventList = new ArrayList<Event>();
@@ -166,38 +165,38 @@ public class EventConverterUtils {
         return eventList;
     }
 
-//    public static List<Event> convertFromJson(String json, String streamName, String version) {
-//        if ((streamName == null || streamName.equals("")) || ((version == null) || (version.equals("")))) {
-//            String errorMsg = "Stream name or version cannot be null or empty";
-//            MalformedEventException malformedEventException = new MalformedEventException();
-//            if (log.isDebugEnabled()) {
-//                log.error(errorMsg, malformedEventException);
-//            } else {
-//                log.error(errorMsg);
-//            }
-//            throw malformedEventException;
-//        }
-//        List<Event> eventList = new ArrayList<Event>();
-//        try {
-//            JSONArray eventObjects = new JSONArray(json);
-//            for (int i = 0; i < eventObjects.length(); i++) {
-//                Event event = gson.fromJson(eventObjects.get(i).toString(), Event.class);
-//                event.setStreamId(DatabridgeUtils.constructStreamKey(streamName, version));
-//                eventList.add(event);
-//            }
-//        } catch (JSONException e) {
-//            String errorMsg = "Error converting JSON to event, for JSON : " + json;
-//            MalformedEventException malformedEventException = new MalformedEventException(errorMsg, e);
-//            if (log.isDebugEnabled()) {
-//                log.error(errorMsg, malformedEventException);
-//            } else {
-//                log.error(errorMsg);
-//            }
-//            throw malformedEventException;
-//        }
-//        return eventList;
-//
-//    }
+    // public static List<Event> convertFromJson(String json, String streamName, String version) {
+    // if ((streamName == null || streamName.equals("")) || ((version == null) || (version.equals("")))) {
+    // String errorMsg = "Stream name or version cannot be null or empty";
+    // MalformedEventException malformedEventException = new MalformedEventException();
+    // if (log.isDebugEnabled()) {
+    // log.error(errorMsg, malformedEventException);
+    // } else {
+    // log.error(errorMsg);
+    // }
+    // throw malformedEventException;
+    // }
+    // List<Event> eventList = new ArrayList<Event>();
+    // try {
+    // JSONArray eventObjects = new JSONArray(json);
+    // for (int i = 0; i < eventObjects.length(); i++) {
+    // Event event = gson.fromJson(eventObjects.get(i).toString(), Event.class);
+    // event.setStreamId(DatabridgeUtils.constructStreamKey(streamName, version));
+    // eventList.add(event);
+    // }
+    // } catch (JSONException e) {
+    // String errorMsg = "Error converting JSON to event, for JSON : " + json;
+    // MalformedEventException malformedEventException = new MalformedEventException(errorMsg, e);
+    // if (log.isDebugEnabled()) {
+    // log.error(errorMsg, malformedEventException);
+    // } else {
+    // log.error(errorMsg);
+    // }
+    // throw malformedEventException;
+    // }
+    // return eventList;
+    //
+    // }
 
     public static List<Event> convertFromJson(String json, String streamId) {
         if ((streamId == null || streamId.equals(""))) {
@@ -232,8 +231,7 @@ public class EventConverterUtils {
 
     }
 
-    public static List<Event> convertFromJson(String json, String streamId,
-                                              StreamDefinition streamDefinition) {
+    public static List<Event> convertFromJson(String json, String streamId, StreamDefinition streamDefinition) {
         if ((streamId == null || streamId.equals(""))) {
             String errorMsg = "Stream name cannot be null or empty";
             MalformedEventException malformedEventException = new MalformedEventException();
@@ -271,7 +269,8 @@ public class EventConverterUtils {
                         List list = new ArrayList();
                         int pos = 0;
                         while (it.hasNext()) {
-                            Object value = getValue(jsonParser.parse(it.next().toString()).getAsString(), attributeList.get(pos).getType());
+                            Object value = getValue(jsonParser.parse(it.next().toString()).getAsString(),
+                                    attributeList.get(pos).getType());
                             list.add(value);
                             pos++;
                         }
@@ -296,24 +295,24 @@ public class EventConverterUtils {
 
     public static Object getValue(String val, AttributeType attributeType) {
         switch (attributeType) {
-            case BOOL: {
-                return Boolean.parseBoolean(val);
-            }
-            case INT: {
-                return Integer.parseInt(val);
-            }
-            case DOUBLE: {
-                return Double.parseDouble(val);
-            }
-            case FLOAT: {
-                return Float.parseFloat(val);
-            }
-            case LONG: {
-                return Long.parseLong(val);
-            }
-            case STRING: {
-                return val;
-            }
+        case BOOL: {
+            return Boolean.parseBoolean(val);
+        }
+        case INT: {
+            return Integer.parseInt(val);
+        }
+        case DOUBLE: {
+            return Double.parseDouble(val);
+        }
+        case FLOAT: {
+            return Float.parseFloat(val);
+        }
+        case LONG: {
+            return Long.parseLong(val);
+        }
+        case STRING: {
+            return val;
+        }
         }
         return "";
     }
