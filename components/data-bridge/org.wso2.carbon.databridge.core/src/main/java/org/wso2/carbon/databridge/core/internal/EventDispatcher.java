@@ -153,7 +153,7 @@ public class EventDispatcher {
             updateDomainNameStreamTypeHolderCache(newStreamDefinition, tenantId);
             streamDefinitionStore.saveStreamDefinition(newStreamDefinition, tenantId);
         }
-        newStreamDefinition.createIndexDefinition(indexDefinition);
+        //newStreamDefinition.createIndexDefinition(indexDefinition); // TODO: 1/18/17  
 
         for (AgentCallback agentCallback : subscribers) {
             agentCallback.definedStream(newStreamDefinition, tenantId);
