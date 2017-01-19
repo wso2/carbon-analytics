@@ -33,7 +33,7 @@ import java.util.List;
  * Util class that converts Events and its definitions in to various forms
  */
 public final class EventDefinitionConverterUtils {
-    // public final static String nullString = "_null";
+    public final static String nullString = "_null";
     private static Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private EventDefinitionConverterUtils() {
