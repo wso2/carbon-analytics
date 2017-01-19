@@ -152,7 +152,7 @@
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.core</artifactId>
-                <version>${wso2.carbon.version}</version>
+                <version>${carbon.kernel.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
@@ -160,7 +160,7 @@
                 <version>${gson.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.json</groupId>
+                <groupId>org.json.wso2</groupId>
                 <artifactId>json</artifactId>
                 <version>${json.version}</version>
             </dependency>
@@ -309,12 +309,12 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.api.version}</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>1.7.13</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>slf4j.wso2</groupId>
@@ -410,23 +410,23 @@
         <carbon.analytics-common.pkg.export.version>6.0.0</carbon.analytics-common.pkg.export.version>
 
         <carbon.kernel.version>5.1.0</carbon.kernel.version>
-        <wso2.carbon.version>4.4.7</wso2.carbon.version>
-        <carbon.feature.plugin.version>2.0.1</carbon.feature.plugin.version>
+        <wso2.carbon.version>4.4.12</wso2.carbon.version>
+        <carbon.feature.plugin.version>2.1.0</carbon.feature.plugin.version>
         <org.snakeyaml.version>1.16.0.wso2v1</org.snakeyaml.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
-        <gson.version>2.5</gson.version>
-        <json.version>20160212</json.version>
+        <gson.version>2.7</gson.version>
+        <json.version>3.0.0.wso2v1</json.version>
         <libthrift.version>0.9.2.wso2v1</libthrift.version>
-        <guava.version>19.0</guava.version>
+        <guava.version>20.0</guava.version>
         <carbon.commons.version>4.5.5</carbon.commons.version>
         <httpclient.version>4.3.2.wso2v1</httpclient.version>
         <disruptor.version>3.3.2.wso2v2</disruptor.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
 
-        <slf4j.api.version>1.7.12</slf4j.api.version>
+        <slf4j.version>1.7.5</slf4j.version>
         <wso2.slf4j.version>1.5.10.wso2v1</wso2.slf4j.version>
 
         <!-- OSGi API dependency versions -->

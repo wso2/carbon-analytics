@@ -12,7 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 
 package org.wso2.carbon.databridge.receiver.thrift.internal;
 
@@ -43,6 +44,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Hashtable;
 
+*/
 /**
  * @scr.component name="thriftdatareceiver.component" immediate="true"
  * @scr.reference name="server.configuration"
@@ -57,17 +59,20 @@ import java.util.Hashtable;
  * @scr.reference name="http.service"
  * interface="org.osgi.service.http.HttpService"
  * cardinality="1..1" policy="dynamic"  bind="setHttpService" unbind="unsetHttpService"
- */
+ *//*
+
 public class ThriftDataReceiverDS {
     private static final Log log = LogFactory.getLog(ThriftDataReceiverDS.class);
 
     private static final String DISABLE_RECEIVER = "disable.receiver";
 
-    /**
+    */
+/**
      * initialize the agent server here.
      *
      * @param context
-     */
+     *//*
+
     protected void activate(ComponentContext context) {
         String disableReceiver = System.getProperty(DISABLE_RECEIVER);
         if (disableReceiver != null && Boolean.parseBoolean(disableReceiver)) {
@@ -122,3 +127,4 @@ public class ThriftDataReceiverDS {
     }
 
 }
+*/

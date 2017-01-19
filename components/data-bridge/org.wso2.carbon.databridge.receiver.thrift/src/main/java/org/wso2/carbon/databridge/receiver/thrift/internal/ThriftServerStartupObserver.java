@@ -14,7 +14,8 @@
 * KIND, either express or implied.  See the License for the
 * specific language governing permissions and limitations
 * under the License.
-*/
+*//*
+
 package org.wso2.carbon.databridge.receiver.thrift.internal;
 
 import org.apache.commons.logging.Log;
@@ -55,7 +56,8 @@ public class ThriftServerStartupObserver implements ServerStartupObserver {
                         hostName = new URL(serverUrl).getHost();
                     } catch (MalformedURLException e) {
                         hostName = HostAddressFinder.findAddress("localhost");
-                        if (!serverUrl.matches("local:/.*/services/")) {
+                        if (!serverUrl.matches("local:/.*//*
+services/")) {
                             log.info("The server url :" + serverUrl + " is using local, hence hostname is assigned as '" + hostName + "'");
                         }
                     }
@@ -95,3 +97,4 @@ public class ThriftServerStartupObserver implements ServerStartupObserver {
 
     }
 }
+*/

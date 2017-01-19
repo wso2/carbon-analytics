@@ -57,7 +57,7 @@ public final class ThriftEventConverter implements EventConverter {
                         break;
                     case STRING:
                         String stringValue = thriftEventBundle.getStringAttributeList().get(indexCounter.getStringCount());
-                        if (stringValue.equals(EventDefinitionConverterUtils.nullString)) {
+                        if (stringValue.equals(EventDefinitionConverterUtils.NULL_STRING)) {
                             objects[i] = null;
                         } else {
                             objects[i] = stringValue;
