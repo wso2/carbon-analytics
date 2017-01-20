@@ -20,7 +20,7 @@
     <parent>
         <artifactId>analytics-io-feature</artifactId>
         <groupId>org.wso2.carbon.analytics</groupId>
-        <version>1.3.3-SNAPSHOT</version>
+        <version>1.3.5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -107,7 +107,7 @@
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
                                 <importFeatureDef>
-                                    org.wso2.carbon.analytics.api.server:${carbon.analytics.version}
+                                    org.wso2.carbon.analytics.api.client:${carbon.analytics.version}
                                 </importFeatureDef>
                                 <importFeatureDef>
                                     org.wso2.carbon.event.stream.server:${carbon.analytics.common.version}
