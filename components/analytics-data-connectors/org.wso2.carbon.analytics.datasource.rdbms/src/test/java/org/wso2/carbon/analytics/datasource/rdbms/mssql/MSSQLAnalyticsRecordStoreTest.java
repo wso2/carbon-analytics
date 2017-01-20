@@ -34,21 +34,22 @@ import java.util.Map;
  * Oracle implementation of analytics record store tests.
  */
 public class MSSQLAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
-        
+
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException {
         GenericUtils.clearGlobalCustomDataSourceRepo();
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf5");
+        System.setProperty("carbon.config.dir.path", "src/test/resources/conf5");
         AnalyticsRecordStore ars = new RDBMSAnalyticsRecordStore();
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "WSO2_ANALYTICS_RS_DB");
         ars.init(props);
         this.init("MSSQLDBAnalyticsDataSource", ars);
     }
-    
+
     @AfterClass
     public void destroy() throws AnalyticsException {
         this.cleanup();
     }
-    
+
 }

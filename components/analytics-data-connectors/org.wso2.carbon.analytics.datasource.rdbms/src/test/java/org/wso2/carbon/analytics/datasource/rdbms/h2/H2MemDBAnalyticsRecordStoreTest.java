@@ -35,21 +35,22 @@ import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore;
  * H2 implementation of analytics data source tests.
  */
 public class H2MemDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
-        
+
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException {
         GenericUtils.clearGlobalCustomDataSourceRepo();
-        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf2");        
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf2");
+        System.setProperty("carbon.config.dir.path", "src/test/resources/conf2");
         AnalyticsRecordStore ars = new RDBMSAnalyticsRecordStore();
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "WSO2_ANALYTICS_RS_DB");
         ars.init(props);
         this.init("H2InMemoryDBAnalyticsDataSource", ars);
     }
-    
+
     @AfterClass
     public void destroy() throws AnalyticsException {
         this.cleanup();
     }
-    
+
 }

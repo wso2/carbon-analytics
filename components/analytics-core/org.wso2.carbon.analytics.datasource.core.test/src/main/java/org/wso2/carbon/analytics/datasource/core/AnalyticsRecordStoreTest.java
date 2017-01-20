@@ -45,6 +45,7 @@ public class AnalyticsRecordStoreTest {
         this.implementationName = implementationName;
         this.analyticsRS = analyticsRS;
         randomNumberGenerator = new Random();
+        System.setProperty("carbon.home", "./target");
     }
 
     protected void cleanup() throws AnalyticsException {
@@ -646,7 +647,7 @@ public class AnalyticsRecordStoreTest {
         System.out.println(
                 "\n************** START RECORD PERF TEST [" + this.getImplementationName() + "] **************");
         this.cleanupT1();
-        
+
         /* warm-up */
         this.analyticsRS.createTable(7, "T1");
         List<Record> records;
