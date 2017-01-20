@@ -21,7 +21,6 @@ package org.wso2.carbon.analytics.dataservice.core.indexing;
 import org.apache.commons.io.FileUtils;
 import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.utils.FileUtil;
 
 import java.io.File;
@@ -45,7 +44,7 @@ public class LocalShardAllocationConfig implements Serializable {
     public LocalShardAllocationConfig() throws AnalyticsException {
         String config = null;
         try {
-            config = FileUtil.readFileToString(GenericUtils.resolveLocation(Constants.LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION));
+            config = FileUtil.readFileToString(Constants.LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION);
         } catch (FileNotFoundException e) {
             this.init = false;
             return;
@@ -82,8 +81,7 @@ public class LocalShardAllocationConfig implements Serializable {
 
     public void save() throws AnalyticsException {
         try {
-            FileUtils.writeStringToFile(new File(GenericUtils.resolveLocation(
-                    Constants.LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION)), this.toString());
+            FileUtils.writeStringToFile(new File(Constants.LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION), this.toString());
         } catch (IOException e) {
             throw new AnalyticsException("Error in saving local shard allocation configuration: " + e.getMessage(), e);
         }

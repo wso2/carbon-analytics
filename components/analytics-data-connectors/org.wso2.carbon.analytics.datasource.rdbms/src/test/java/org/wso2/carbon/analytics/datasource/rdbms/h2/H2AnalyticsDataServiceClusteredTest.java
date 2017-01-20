@@ -42,12 +42,13 @@ public class H2AnalyticsDataServiceClusteredTest extends AnalyticsDataServiceTes
     public void setup() throws NamingException, AnalyticsException, IOException {
         GenericUtils.clearGlobalCustomDataSourceRepo();
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf8");
+        System.setProperty("carbon.config.dir.path", "src/test/resources/conf8");
         Hazelcast.shutdownAll();
         AnalyticsServiceHolder.setHazelcastInstance(Hazelcast.newHazelcastInstance());
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         this.init(new AnalyticsDataServiceImpl());
     }
-    
+
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
@@ -55,5 +56,5 @@ public class H2AnalyticsDataServiceClusteredTest extends AnalyticsDataServiceTes
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsDataService(null);
     }
-    
+
 }

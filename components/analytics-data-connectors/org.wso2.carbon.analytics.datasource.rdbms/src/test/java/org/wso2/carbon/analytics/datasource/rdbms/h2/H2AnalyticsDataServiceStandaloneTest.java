@@ -33,22 +33,23 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
  * Standalone test implementation of {@link AnalyticsDataServiceTest}.
  */
 public class H2AnalyticsDataServiceStandaloneTest extends AnalyticsDataServiceTest {
-    
+
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
         GenericUtils.clearGlobalCustomDataSourceRepo();
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
+        System.setProperty("carbon.config.dir.path", "src/test/resources/conf1");
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(null);
         System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
         this.init(AnalyticsServiceHolder.getAnalyticsDataService());
     }
-    
+
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
         System.clearProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP);
         AnalyticsServiceHolder.setAnalyticsDataService(null);
     }
-    
+
 }

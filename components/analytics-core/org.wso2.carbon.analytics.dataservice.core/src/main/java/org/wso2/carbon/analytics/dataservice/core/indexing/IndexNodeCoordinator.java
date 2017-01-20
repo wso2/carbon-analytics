@@ -172,8 +172,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
 
     private void syncLocalWithGlobal() throws AnalyticsException {
-        /* update the local shard allocation config with the details from the 
-         * global config, and considering the INIT entries of the local config, 
+        /* update the local shard allocation config with the details from the
+         * global config, and considering the INIT entries of the local config,
          * where other types will be marked as NORMAL after this */
         List<Integer> initShards = new ArrayList<>();
         for (int shardIndex : this.localShardAllocationConfig.getShardIndices()) {
@@ -228,7 +228,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         }
         this.syncLocalWithGlobal();
     }
-    
+
     public void init() throws AnalyticsException {
         this.indexingNode = checkIfIndexingNode();
         this.populateMyNodeId();
@@ -402,7 +402,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
                 this.remoteCommunicator.put(member, records);
             }
         } catch (Exception e) {
-            String msg = "Error in sending remote record batch put to member: " + member + 
+            String msg = "Error in sending remote record batch put to member: " + member +
                     " with node id: " + nodeId + ": " + e.getMessage() + " -> adding to staging area for later pickup..";
             if (!this.suppressWarnMessagesInactiveMembers.contains(nodeId)) {
                 log.warn(msg);
@@ -434,7 +434,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
                 this.remoteCommunicator.delete(member, tenantId, tableName, ids);
             }
         } catch (Exception e) {
-            String msg = "Error in sending remote record batch delete to member: " + member + 
+            String msg = "Error in sending remote record batch delete to member: " + member +
                     "with node id: " + nodeId + ": " + e.getMessage() + " -> adding to staging area for later pickup..";
             if (!this.suppressWarnMessagesInactiveMembers.contains(nodeId)) {
                 log.warn(msg);
@@ -574,8 +574,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         if (this.myNodeId == null) {
             boolean create = false;
             try {
-                this.myNodeId = FileUtil.readFileToString(GenericUtils.resolveLocation(
-                        Constants.MY_NODEID_LOCATION)).trim();
+                this.myNodeId = FileUtil.readFileToString(Constants.MY_NODEID_LOCATION).trim();
                 if (this.myNodeId.isEmpty()) {
                     create = true;
                 }
@@ -590,8 +589,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
             if (create) {
                 this.myNodeId = UUID.randomUUID().toString();
                 try {
-                    FileUtils.writeStringToFile(new File(GenericUtils.resolveLocation(
-                            Constants.MY_NODEID_LOCATION)), this.myNodeId);
+                    FileUtils.writeStringToFile(new File(Constants.MY_NODEID_LOCATION), this.myNodeId);
                 } catch (IOException e) {
                     throw new AnalyticsException("Error in writing my node id: " + e.getMessage(), e);
                 }

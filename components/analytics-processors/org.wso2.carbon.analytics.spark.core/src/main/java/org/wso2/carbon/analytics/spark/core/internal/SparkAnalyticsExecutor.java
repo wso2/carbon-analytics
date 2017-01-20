@@ -68,9 +68,6 @@ import org.wso2.carbon.utils.CarbonUtils;
 import scala.Option;
 import scala.Tuple2;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -86,6 +83,9 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 /**
  * This class represents the analytics query execution context.
@@ -563,13 +563,22 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             }
         }
         logDebug("CARBON HOME used for Spark Conf : " + carbonHome);
-
+        String c5Enabled = System.getProperty("carbon.das.c5.enabled");
         if (carbonHome != null) {
-            carbonConfDir = carbonHome + File.separator + "repository" + File.separator + "conf";
+            if ( c5Enabled != null && Boolean.valueOf(c5Enabled).equals(Boolean.TRUE)) {
+                if (System.getProperty("carbon.das.symlink.config.dir.path") != null) {
+                    carbonConfDir = System.getProperty("carbon.das.symlink.config.dir.path");
+                } else {
+                    carbonConfDir = System.getProperty("carbon.config.dir.path");
+                }
+            } else {
+                carbonConfDir = carbonHome + File.separator + "repository" + File.separator + "conf";
+            }
         } else {
             logDebug("CARBON HOME is NULL. Spark conf in non-carbon environment. Using the custom conf path");
             carbonConfDir = GenericUtils.getAnalyticsConfDirectory();
         }
+
         analyticsSparkConfDir = carbonConfDir + File.separator + "analytics" + File.separator + "spark";
 
         conf.setIfMissing(AnalyticsConstants.SPARK_APP_NAME, DEFAULT_SPARK_APP_NAME);
@@ -610,8 +619,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE_FACTORY,
                           AnalyticsRecoveryModeFactory.class.getName());
 
-        String agentConfPath = carbonHome + File.separator + "repository" + File.separator +
-                               "conf" + File.separator + "data-bridge" + File.separator + "data-agent-config.xml";
+        String agentConfPath = carbonConfDir + File.separator + "data-bridge" + File.separator + "data-agent-config.xml";
 
         String jvmOpts = " -Dwso2_custom_conf_dir=" + carbonConfDir
                          + " -Dcarbon.home=" + carbonHome
