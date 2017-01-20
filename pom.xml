@@ -34,8 +34,8 @@
         <!--<module>components/analytics-dashboard</module>-->
         <module>components/data-bridge</module>
         <!--<module>components/analytics-data-agents</module>-->
-        <!--<module>components/event-stream</module>-->
-        <!--<module>components/application-deployer</module>-->
+        <module>components/event-stream</module>
+        <module>components/application-deployer</module>
         <!--<module>components/event-monitor</module>-->
         <!--<module>components/event-processor-manager</module>-->
         <!--<module>components/event-receiver</module>-->
@@ -82,6 +82,11 @@
                     <groupId>org.wso2.carbon.maven</groupId>
                     <artifactId>carbon-feature-plugin</artifactId>
                     <version>${carbon.feature.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-scr-plugin</artifactId>
+                    <version>${maven.src.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -150,6 +155,11 @@
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.application.deployer</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.core</artifactId>
                 <version>${carbon.kernel.version}</version>
@@ -198,6 +208,7 @@
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.core.common</artifactId>
                 <version>${wso2.carbon.version}</version>
+                <!--todo-->
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
@@ -225,9 +236,20 @@
                 <version>${wso2.carbon.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.application.deployer</artifactId>
+                <version>${wso2.carbon.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-pool.wso2</groupId>
                 <artifactId>commons-pool</artifactId>
                 <version>${commons.pool.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wso2.siddhi</groupId>
+                <artifactId>siddhi-core</artifactId>
+                <version>${siddhi.core.version}</version>
             </dependency>
 
             <!-- OSGi test -->
@@ -426,6 +448,8 @@
         <disruptor.version>3.3.2.wso2v2</disruptor.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
 
+        <siddhi.core.version>3.1.2</siddhi.core.version>
+
         <slf4j.version>1.7.5</slf4j.version>
         <wso2.slf4j.version>1.5.10.wso2v1</wso2.slf4j.version>
 
@@ -458,6 +482,7 @@
         <apache.felix.gogo.command.version>0.10.0.v201209301215</apache.felix.gogo.command.version>
         <apache.felix.gogo.runtime.version>0.10.0.v201209301036</apache.felix.gogo.runtime.version>
         <apache.felix.gogo.shell.version>0.10.0.v201212101605</apache.felix.gogo.shell.version>
+        <maven.src.version>1.21.0</maven.src.version>
         <equinox.app.version>1.3.200.v20130910-1609</equinox.app.version>
         <equinox.common.version>3.6.200.v20130402-1505</equinox.common.version>
         <equinox.concurrent.version>1.1.0.v20130327-1442</equinox.concurrent.version>

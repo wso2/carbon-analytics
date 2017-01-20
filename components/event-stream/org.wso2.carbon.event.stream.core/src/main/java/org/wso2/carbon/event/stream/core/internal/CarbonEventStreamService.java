@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+//import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -255,11 +255,13 @@ public class CarbonEventStreamService implements EventStreamService {
     private AxisConfiguration getAxisConfiguration() {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         AxisConfiguration axisConfig;
-        if (tenantId == MultitenantConstants.SUPER_TENANT_ID) {
+        // TODO: 1/20/17  
+        /*if (tenantId == MultitenantConstants.SUPER_TENANT_ID) {
             axisConfig = EventStreamServiceValueHolder.getConfigurationContextService().getServerConfigContext().getAxisConfiguration();
         } else {
             axisConfig = TenantAxisUtils.getTenantAxisConfiguration(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(), EventStreamServiceValueHolder.getConfigurationContextService().getServerConfigContext());
-        }
+        }*/
+        axisConfig = EventStreamServiceValueHolder.getConfigurationContextService().getServerConfigContext().getAxisConfiguration();
         return axisConfig;
     }
 
