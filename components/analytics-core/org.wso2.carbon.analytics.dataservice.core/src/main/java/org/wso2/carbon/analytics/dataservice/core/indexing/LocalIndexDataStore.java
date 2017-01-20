@@ -41,17 +41,17 @@ import java.util.Map;
 public class LocalIndexDataStore {
 
     private static Log log = LogFactory.getLog(LocalIndexDataStore.class);
-    
+
     private AnalyticsDataIndexer indexer;
-    
+
     private Map<Integer, LocalIndexDataQueue> indexDataQueues;
-    
+
     public LocalIndexDataStore(AnalyticsDataIndexer indexer) throws AnalyticsException {
         this.indexer = indexer;
         this.indexDataQueues = new HashMap<Integer, LocalIndexDataQueue>();
         this.refreshLocalIndexShards();
     }
-    
+
     public void refreshLocalIndexShards() throws AnalyticsException {
         this.flushQueues();
         for (int shardIndex : this.indexer.getLocalShards()) {
@@ -59,7 +59,7 @@ public class LocalIndexDataStore {
                     indexer.getAnalyticsIndexerInfo().getIndexQueueCleanupThreshold()));
         }
     }
-    
+
     public void put(List<Record> records) throws AnalyticsException {
         Map<Integer, List<Record>> recordsMap = this.indexer.extractShardedRecords(records);
         LocalIndexDataQueue dataList;
@@ -71,7 +71,7 @@ public class LocalIndexDataStore {
             dataList.enqueue(new IndexOperation(false).setRecords(entry.getValue()));
         }
     }
-    
+
     public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
         Map<Integer, List<String>> recordsMap = this.indexer.extractShardedIds(ids);
         LocalIndexDataQueue dataList;
@@ -84,39 +84,39 @@ public class LocalIndexDataStore {
                     setDeleteTenantId(tenantId).setDeleteTableName(tableName));
         }
     }
-    
+
     private void flushQueues() {
         for (LocalIndexDataQueue queue : this.indexDataQueues.values()) {
             queue.flush();
         }
     }
-    
+
     public void close() {
         this.flushQueues();
     }
-    
+
     public LocalIndexDataQueue getIndexDataQueue(int shardIndex) {
         return this.indexDataQueues.get(shardIndex);
     }
-    
+
     public static class IndexOperation implements Serializable {
-        
+
         private static final long serialVersionUID = 7764589621281488353L;
 
         private boolean delete;
-        
+
         private List<String> ids;
-        
+
         private int deleteTenantId;
-        
+
         private String deleteTableName;
-        
+
         private List<Record> records;
-        
+
         private long byteSize = 100;
-        
+
         public IndexOperation() { }
-        
+
         public IndexOperation(boolean delete) {
             this.delete = delete;
         }
@@ -138,7 +138,7 @@ public class LocalIndexDataStore {
             this.records = records;
             return this;
         }
-        
+
         public boolean isDelete() {
             return delete;
         }
@@ -160,55 +160,55 @@ public class LocalIndexDataStore {
             this.deleteTableName = deleteTableName;
             return this;
         }
-        
+
         public byte[] getBytes() {
             return GenericUtils.serializeObject(this);
         }
-        
+
         public static IndexOperation fromBytes(byte[] data) {
             IndexOperation result = (IndexOperation) GenericUtils.deserializeObject(data);
             result.setByteSize(data.length);
             return result;
         }
-        
+
         public long getByteSize() {
             return byteSize;
         }
-        
+
         public void setByteSize(long byteSize) {
             this.byteSize = byteSize;
         }
-        
+
     }
-    
+
     /**
-     * Local persistent queue implementation. This should be used in a single thread at a time, 
+     * Local persistent queue implementation. This should be used in a single thread at a time,
      * due to reliability guarantees it gives with dequeue.
      */
     public static class LocalIndexDataQueue {
-        
+
         private static final String PRIMARY_QUEUE_SUFFIX = "P";
-        
+
         private static final String SECONDARY_QUEUE_SUFFIX = "S";
 
         private int queueCleanupThreshold;
-        
+
         private IBigQueue primaryQueue;
-        
+
         private IBigQueue secondaryQueue;
-        
+
         private long secondaryQueueInitialCount;
-        
+
         private long secondaryProcessedCount;
-                
+
         private long removedDataSize = 0;
-        
+
         public LocalIndexDataQueue(int shardIndex, int queueCleanupThreshold) throws AnalyticsException {
             this.primaryQueue = this.createQueue(shardIndex + PRIMARY_QUEUE_SUFFIX);
             this.secondaryQueue = this.createQueue(shardIndex + SECONDARY_QUEUE_SUFFIX);
             this.queueCleanupThreshold = queueCleanupThreshold;
         }
-        
+
         private IBigQueue createQueue(String queueId) throws AnalyticsException {
             String path = Constants.DEFAULT_LOCAL_INDEX_STAGING_LOCATION;
             path = GenericUtils.resolveLocation(path);
@@ -218,7 +218,7 @@ public class LocalIndexDataStore {
                 throw new AnalyticsException("Error in creating queue: " + e.getMessage(), e);
             }
         }
-        
+
         public void enqueue(IndexOperation indexOp) throws AnalyticsException {
             try {
                 this.primaryQueue.enqueue(indexOp.getBytes());
@@ -228,7 +228,7 @@ public class LocalIndexDataStore {
                 throw new AnalyticsException("Error in index data enqueue: " + e.getMessage(), e);
             }
         }
-        
+
         public void startDequeue() {
             this.secondaryProcessedCount = 0;
             this.secondaryQueueInitialCount = this.secondaryQueue.size();
@@ -238,7 +238,7 @@ public class LocalIndexDataStore {
                 }
             }
         }
-        
+
         private void queueDrain(IBigQueue queue, long count) throws IOException {
             long queueSize = queue.size();
             count = queueSize < count ? queueSize : count;
@@ -246,7 +246,7 @@ public class LocalIndexDataStore {
                 queue.dequeue();
             }
         }
-        
+
         public void endDequeue() throws AnalyticsException {
             try {
                 this.queueDrain(this.secondaryQueue, this.secondaryProcessedCount);
@@ -255,7 +255,7 @@ public class LocalIndexDataStore {
                 throw new AnalyticsException("Error in end dequeue: " + e.getMessage(), e);
             }
         }
-        
+
         public IndexOperation peekNext() throws AnalyticsException {
             try {
                 byte[] data;
@@ -288,20 +288,20 @@ public class LocalIndexDataStore {
                 throw new AnalyticsException("Error in index data peekNext: " + e.getMessage(), e);
             }
         }
-        
+
         public boolean isEmpty() {
             return this.size() <= 0;
         }
-        
+
         public long size() {
             return this.primaryQueue.size() + this.secondaryQueue.size() - this.secondaryProcessedCount;
         }
-        
+
         public void flush() {
             this.primaryQueue.flush();
             this.secondaryQueue.flush();
         }
-        
+
     }
-    
+
 }
