@@ -23,11 +23,14 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
+/**
+ * Host address finder
+ */
 public class HostAddressFinder {
     public static String findAddress(String hostname) throws SocketException {
-        if (hostname.trim().equals("localhost") || hostname.trim().equals("127.0.0.1") || hostname.trim().equals("::1")) {
-            Enumeration<NetworkInterface> ifaces =
-                    NetworkInterface.getNetworkInterfaces();
+        if (hostname.trim().equals("localhost") || hostname.trim().equals("127.0.0.1")
+                || hostname.trim().equals("::1")) {
+            Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
             while (ifaces.hasMoreElements()) {
                 NetworkInterface iface = ifaces.nextElement();
                 Enumeration<InetAddress> addresses = iface.getInetAddresses();
