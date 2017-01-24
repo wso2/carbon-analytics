@@ -21,7 +21,6 @@ package org.wso2.analytics.engine.core;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.SparkConf;
-import org.apache.spark.SparkFiles;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -29,6 +28,7 @@ import org.apache.spark.util.Utils;
 import org.wso2.analytics.data.commons.AnalyticsEngine;
 import org.wso2.analytics.data.commons.AnalyticsEngineQueryResult;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.service.AnalyticsDataHolder;
 import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.engine.commons.AnalyticsRelationProvider;
 import org.wso2.analytics.engine.commons.AnalyzerEngineConstants;
@@ -72,24 +72,24 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
         this.sparkSession = SparkSession.builder().master(this.sparkMaster)
                 .appName(appName)
                 .config(sparkConf).getOrCreate();
-
+        
         //adding the relevant jars todo: handle this properly
-        this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-datasources/org.wso2.analytics.datasource.rdbms/target/org.wso2.analytics.datasource.rdbms-2.0.0-SNAPSHOT.jar");
-        this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-dataservice/org.wso2.analytics.dataservice/target/org.wso2.analytics.dataservice-2.0.0-SNAPSHOT.jar");
-        this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-dataservice/org.wso2.analytics.data.commons/target/org.wso2.analytics.data.commons-2.0.0-SNAPSHOT.jar");
-        this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/target/org.wso2.analytics.engine-2.0.0-SNAPSHOT.jar");
-        this.sparkSession.sparkContext().addJar("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/mysql-connector-java-5.1.40-bin.jar");
+        this.sparkSession.sparkContext().addJar("/tmp/jars/org.wso2.analytics.datasource.rdbms-2.0.0-SNAPSHOT.jar");
+        this.sparkSession.sparkContext().addJar("/tmp/jars/org.wso2.analytics.dataservice-2.0.0-SNAPSHOT.jar");
+        this.sparkSession.sparkContext().addJar("/tmp/jars/org.wso2.analytics.data.commons-2.0.0-SNAPSHOT.jar");
+        this.sparkSession.sparkContext().addJar("/tmp/jars/org.wso2.analytics.engine-2.0.0-SNAPSHOT.jar");
+        this.sparkSession.sparkContext().addJar("/tmp/jars/mysql-connector-java-5.1.24-bin.jar");
+        this.sparkSession.sparkContext().addJar("/tmp/jars/h2-1.4.187.jar");
+        this.sparkSession.sparkContext().addJar("/tmp/jars/kryo-shaded-3.0.3.jar");
 
         // adding the conf files todo: handle these properly
-        this.sparkSession.sparkContext().addFile("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/conf/analytics/rdbms-config.xml");
-        this.sparkSession.sparkContext().addFile("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/conf/datasources/analytics-datasources.xml");
-        this.sparkSession.sparkContext().addFile("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/conf/analytics/analytics-dataservice-config.xml");
-
-//        this.sparkSession.sparkContext().addFile("/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/conf", true);
-//        this.sparkSession.conf().set("spark.executor.extraJavaOptions", "-D" + AnalyticsCommonUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + "=" + SparkFiles.getRootDirectory());
-//        this.sparkSession.conf().set("spark.executor.extraJavaOptions", "-D" + AnalyticsCommonUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + "=/home/sachith/git/wso2/carbon-analytics/components/analytics-processor/org.wso2.analytics.engine/src/test/resources/conf");
-        this.sparkSession.conf().set("spark.executor.extraJavaOptions", "-agentlib:jdwp=transport=dt_socket,server=n,address=sachiths-X1:5005,suspend=n");
-        this.sparkSession.conf().set("spark.executor.extraClassPath", "./");
+        this.sparkSession.sparkContext().addFile("/tmp/configs/analytics/rdbms-config.xml");
+        this.sparkSession.sparkContext().addFile("/tmp/configs/datasources/analytics-datasources.xml");
+        this.sparkSession.sparkContext().addFile("/tmp/configs/analytics/analytics-dataservice-config.xml");
+        
+        // set the analytics config directory
+        this.sparkSession.conf().set(AnalyzerEngineConstants.SPARK_ANALYTICS_CONFIGS, "/tmp/configs");
+        
     }
 
     /**
@@ -103,7 +103,7 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
         if (this.sparkConfPath != null) {
             sparkConfFile = this.sparkConfPath;
         } else {
-            sparkConfFile = AnalyticsCommonUtils.getAnalyticsConfDirectory() + File.separator + ANALYTICS_CONF_DIR +
+            sparkConfFile = AnalyticsDataHolder.getInstance().getAnalyticsConfigsDir() + File.separator + ANALYTICS_CONF_DIR +
                     File.separator + AnalyzerEngineConstants.SPARK_CONF_FOLDER + File.separator + AnalyzerEngineConstants.SPARK_CONF_FILE;
         }
         scala.collection.Map<String, String> properties = Utils.getPropertiesFromFile(sparkConfFile);

@@ -25,10 +25,13 @@ import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.service.AnalyticsDataHolder;
 import org.wso2.analytics.data.commons.service.AnalyticsDataResponse;
 import org.wso2.analytics.data.commons.sources.AnalyticsCommonConstants;
 import org.wso2.analytics.data.commons.sources.Record;
+import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.engine.services.AnalyticsServiceHolder;
+
 import scala.Serializable;
 import scala.collection.Iterator;
 import scala.collection.JavaConversions;
@@ -66,6 +69,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
 
     @Override
     public Iterator<Row> compute(Partition split, TaskContext taskContext) {
+        AnalyticsDataHolder.getInstance().setAnalyticsConfigsDir(TaskContext.get().getLocalProperty(AnalyzerEngineConstants.SPARK_ANALYTICS_CONFIGS));
         AnalyticsPartition partition = (AnalyticsPartition) split;
         try {
             java.util.Iterator<Record> recordsItr = AnalyticsServiceHolder.getAnalyticsDataService().readRecords(

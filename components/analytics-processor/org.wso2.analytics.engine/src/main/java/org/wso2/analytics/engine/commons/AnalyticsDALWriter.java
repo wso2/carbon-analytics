@@ -20,14 +20,17 @@ package org.wso2.analytics.engine.commons;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.spark.TaskContext;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructType;
 import org.wso2.analytics.data.commons.AnalyticsDataService;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.service.AnalyticsDataHolder;
 import org.wso2.analytics.data.commons.sources.AnalyticsCommonConstants;
 import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.engine.exceptions.AnalyticsDataServiceLoadException;
 import org.wso2.analytics.engine.services.AnalyticsServiceHolder;
+
 import scala.collection.Iterator;
 import scala.runtime.AbstractFunction1;
 import scala.runtime.BoxedUnit;
@@ -72,6 +75,7 @@ public class AnalyticsDALWriter extends AbstractFunction1<Iterator<Row>, BoxedUn
      */
     @Override
     public BoxedUnit apply(Iterator<Row> iterator) {
+        AnalyticsDataHolder.getInstance().setAnalyticsConfigsDir(TaskContext.get().getLocalProperty(AnalyzerEngineConstants.SPARK_ANALYTICS_CONFIGS));
         List<Row> rows = new ArrayList<>(recordBatchSize);
         /* We have to invalidate the table information, since here, if some other node
         changes the table information, we cannot know about it (no cluster communication) */

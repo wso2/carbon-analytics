@@ -27,12 +27,14 @@ import org.apache.spark.sql.sources.SchemaRelationProvider;
 import org.apache.spark.sql.types.StructType;
 import org.wso2.analytics.data.commons.AnalyticsDataService;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.service.AnalyticsDataHolder;
 import org.wso2.analytics.data.commons.service.AnalyticsSchema;
 import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.engine.exceptions.AnalyticsDataServiceLoadException;
 import org.wso2.analytics.engine.exceptions.AnalyticsExecutionException;
 import org.wso2.analytics.engine.services.AnalyticsServiceHolder;
 import org.wso2.analytics.engine.utils.AnalyzerEngineUtils;
+
 import scala.collection.JavaConversions;
 import scala.collection.immutable.Map;
 
@@ -58,7 +60,6 @@ public class AnalyticsRelationProvider implements RelationProvider, SchemaRelati
     private String incParams;
 
     public AnalyticsRelationProvider() {
-
     }
 
     /**
@@ -71,6 +72,7 @@ public class AnalyticsRelationProvider implements RelationProvider, SchemaRelati
      */
     @Override
     public AnalyticsRelation createRelation(SQLContext sqlContext, Map<String, String> parameters) {
+        setAnalyticsConfigsDir(sqlContext);
         init(parameters);
         return getAnalyticsRelation(this.recordStore, this.tableName, sqlContext,
                 this.schemaStruct, this.incParams, this.schemaString, this.primaryKeys, this.mergeFlag);
@@ -170,13 +172,13 @@ public class AnalyticsRelationProvider implements RelationProvider, SchemaRelati
      */
     @Override
     public BaseRelation createRelation(SQLContext sqlContext, Map<String, String> parameters, StructType schema) {
+        setAnalyticsConfigsDir(sqlContext);
         /*
         * Here the schema is provided as struct type & NOT in the parameters
         * This extracts the schema information, set schema in the ds and create a new analytics relation
         * NOTE: this schema contains comments, which are included in the metadata fields
         */
         init(parameters);
-        prepareTable();
         try {
             AnalyticsSchema schemaFromDS;
             schemaFromDS = AnalyticsServiceHolder.getAnalyticsDataService().getTableSchema(this.tableName);
@@ -193,6 +195,13 @@ public class AnalyticsRelationProvider implements RelationProvider, SchemaRelati
 
         return getAnalyticsRelation(this.tableName, this.recordStore, sqlContext, schema, this.incParams,
                 this.schemaString, this.primaryKeys, this.mergeFlag);
+    }
+
+    private void setAnalyticsConfigsDir(SQLContext sqlContext) {
+        AnalyticsDataHolder.getInstance().setAnalyticsConfigsDir(
+                sqlContext.getConf(AnalyzerEngineConstants.SPARK_ANALYTICS_CONFIGS));
+        sqlContext.sparkContext().setLocalProperty(AnalyzerEngineConstants.SPARK_ANALYTICS_CONFIGS,
+                AnalyticsDataHolder.getInstance().getAnalyticsConfigsDir());
     }
 
 

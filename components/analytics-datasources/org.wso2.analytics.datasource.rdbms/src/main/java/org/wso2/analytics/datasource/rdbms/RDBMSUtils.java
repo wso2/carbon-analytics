@@ -19,15 +19,18 @@
 package org.wso2.analytics.datasource.rdbms;
 
 import com.google.common.collect.Maps;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.service.AnalyticsDataHolder;
 import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -92,7 +95,7 @@ public class RDBMSUtils {
 
     public static RDBMSQueryConfiguration loadQueryConfiguration() throws AnalyticsException {
         // TODO: Finalize logic for RDBMS config files
-        File confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() +
+        File confFile = new File(AnalyticsDataHolder.getInstance().getAnalyticsConfigsDir() +
                 File.separator + ANALYTICS_CONF_DIR + File.separator + RDBMS_QUERY_CONFIG_FILE);
         try {
             if (!confFile.exists()) {
