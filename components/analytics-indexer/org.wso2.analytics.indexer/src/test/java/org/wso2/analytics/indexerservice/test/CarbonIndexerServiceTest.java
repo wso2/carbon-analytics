@@ -140,7 +140,6 @@ public class CarbonIndexerServiceTest {
         doc1.addField("id", "1");
         doc1.addField("_timestamp", System.currentTimeMillis());
         doc1.addField("IntField", 100);
-        doc1.addField("IntField", 100);
         doc1.addField("LongField", 100);
         doc1.addField("FloatField", 100);
         doc1.addField("DoubleField", 100);
