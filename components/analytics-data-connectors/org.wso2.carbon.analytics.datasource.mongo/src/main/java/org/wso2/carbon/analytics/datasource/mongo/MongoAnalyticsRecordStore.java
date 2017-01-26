@@ -1,3 +1,21 @@
+/*
+ *  Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
 package org.wso2.carbon.analytics.datasource.mongo;
 
 import static com.mongodb.client.model.Filters.and;
@@ -5,7 +23,6 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.gte;
 import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Filters.lt;
-import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
 
@@ -33,6 +50,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.result.UpdateResult;
 
 /**
  * This class represents the Mongo implementation of
@@ -82,9 +100,6 @@ public class MongoAnalyticsRecordStore implements AnalyticsRecordStore {
                     .createCollection(collectionName);
             db.getCollection(collectionName)
                     .withWriteConcern(WriteConcern.MAJORITY.withWTimeout(writeConcernTimeout, TimeUnit.MILLISECONDS))
-                    .createIndex(Indexes.ascending("arsId"));
-            db.getCollection(collectionName)
-                    .withWriteConcern(WriteConcern.MAJORITY.withWTimeout(writeConcernTimeout, TimeUnit.MILLISECONDS))
                     .createIndex(Indexes.ascending("timestamp"));
         }
     }
@@ -99,7 +114,7 @@ public class MongoAnalyticsRecordStore implements AnalyticsRecordStore {
     @Override
     public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
         MongoCollection<Document> collection = db.getCollection(this.generateTargetCollectionName(tenantId, tableName));
-        collection.deleteMany(in("arsId", ids));
+        collection.deleteMany(in("_id", ids));
     }
 
     @Override
@@ -160,7 +175,7 @@ public class MongoAnalyticsRecordStore implements AnalyticsRecordStore {
         FindIterable<Document> iterableResult;
         int count = recordGroup.getCount();
         if (recordGroup.getTimeFrom() == Long.MIN_VALUE && recordGroup.getTimeTo() == Long.MAX_VALUE) {
-            iterableResult = db.getCollection(collection).find().projection(fields(include("arsId", "timestamp", "data"), excludeId()));
+            iterableResult = db.getCollection(collection).find().projection(fields(include("_id", "timestamp", "data")));
             if (count != -1) {
                 iterableResult = iterableResult.limit(count);
             }
@@ -181,7 +196,7 @@ public class MongoAnalyticsRecordStore implements AnalyticsRecordStore {
 
     private AnalyticsIterator<Record> lookupRecordsByIds(int tenantId, String tableName, List<String> ids, List<String> columns) {
         String collection = this.generateTargetCollectionName(tenantId, tableName);
-        MongoCursor<Document> cursor = db.getCollection(collection).find(in("arsId", ids)).iterator();
+        MongoCursor<Document> cursor = db.getCollection(collection).find(in("_id", ids)).iterator();
         return new MongoRecordDataIterator(cursor, columns, tableName, tenantId);
     }
 
@@ -218,9 +233,9 @@ public class MongoAnalyticsRecordStore implements AnalyticsRecordStore {
         try {
             Map<String, Document> documentsToInsert = new HashMap<String, Document>();
             for (Record record : batch) {
-                if (db.getCollection(collection).count(eq("arsId", record.getId())) >= 1) {
-                    db.getCollection(collection).replaceOne((eq("arsId", record.getId())), AnalyticsRecord.toDocument(record));
-                } else {
+                UpdateResult result = db.getCollection(collection).replaceOne((eq("_id", record.getId())),
+                        AnalyticsRecord.toDocument(record));
+                if (result.getModifiedCount() <= 0) {
                     documentsToInsert.put(record.getId(), AnalyticsRecord.toDocument(record));
                 }
             }
