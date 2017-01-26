@@ -43,6 +43,7 @@ import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.ndatasource.common.DataSourceException;
 
+import com.mongodb.MongoBulkWriteException;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.FindIterable;
@@ -231,16 +232,27 @@ public class MongoAnalyticsRecordStore implements AnalyticsRecordStore {
         String tableName = firstRecord.getTableName();
         String collection = this.generateTargetCollectionName(tenantId, tableName);
         try {
-            Map<String, Document> documentsToInsert = new HashMap<String, Document>();
+            List<Document> documentsToInsert = new ArrayList<Document>();
             for (Record record : batch) {
-                UpdateResult result = db.getCollection(collection).replaceOne((eq("_id", record.getId())),
-                        AnalyticsRecord.toDocument(record));
-                if (result.getModifiedCount() <= 0) {
-                    documentsToInsert.put(record.getId(), AnalyticsRecord.toDocument(record));
-                }
+                documentsToInsert.add(AnalyticsRecord.toDocument(record));
             }
-            if (!documentsToInsert.values().isEmpty()) {
-                db.getCollection(collection).insertMany(new ArrayList<Document>(documentsToInsert.values()));
+            try {
+                db.getCollection(collection).insertMany(documentsToInsert);
+            } catch (MongoBulkWriteException e) {
+                // Map to avoid duplicates in the same batch
+                Map<String, Document> notInsertedMap = new HashMap<String, Document>();
+                for (Document document : documentsToInsert) {
+                    UpdateResult result = db.getCollection(collection).replaceOne((eq("_id", document.getString("_id"))), document);
+                    // get matched instead of modified, because there may be
+                    // documents matched but not modified because they were
+                    // already inserted in the previous insertMany
+                    if (result.getMatchedCount() <= 0) {
+                        notInsertedMap.put(document.getString("_id"), document);
+                    }
+                }
+                if (!notInsertedMap.isEmpty()) {
+                    db.getCollection(collection).insertMany(new ArrayList<Document>(notInsertedMap.values()));
+                }
             }
         } catch (Exception e) {
             if (!this.tableExists(tenantId, tableName)) {
