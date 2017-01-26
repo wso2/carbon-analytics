@@ -30,8 +30,6 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsDataServiceTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
- * @author jmalvarezf
- * 
  *         Mongo implementation of {@link AnalyticsDataServiceTest}.
  */
 public class MongoAnalyticsDataServiceTest extends AnalyticsDataServiceTest {

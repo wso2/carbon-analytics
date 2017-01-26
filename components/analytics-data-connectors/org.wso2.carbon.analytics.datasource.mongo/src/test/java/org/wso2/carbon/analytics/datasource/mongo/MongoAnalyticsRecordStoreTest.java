@@ -33,28 +33,26 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.mongo.MongoAnalyticsRecordStore;
 
 /**
- * @author jmalvarezf
- * 
- *         Mongo analytics record store tests.
+ * Mongo analytics record store tests.
  *
  */
 public class MongoAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
 
-	@BeforeClass
-	public void setup() throws NamingException, AnalyticsException, IOException {
-		GenericUtils.clearGlobalCustomDataSourceRepo();
-		System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
-		AnalyticsRecordStore ars = new MongoAnalyticsRecordStore();
-		Map<String, String> props = new HashMap<String, String>();
-		props.put("datasource", "WSO2_ANALYTICS_DS_MONGO");
-		props.put("database", "ARS_TEST");
-		ars.init(props);
-		this.init("MongoAnalyticsDataSource", ars);
-	}
+    @BeforeClass
+    public void setup() throws NamingException, AnalyticsException, IOException {
+        GenericUtils.clearGlobalCustomDataSourceRepo();
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
+        AnalyticsRecordStore ars = new MongoAnalyticsRecordStore();
+        Map<String, String> props = new HashMap<String, String>();
+        props.put("datasource", "WSO2_ANALYTICS_DS_MONGO");
+        props.put("database", "ARS_TEST");
+        ars.init(props);
+        this.init("MongoAnalyticsDataSource", ars);
+    }
 
-	@AfterClass
-	public void destroy() throws AnalyticsException {
-		this.cleanup();
-	}
+    @AfterClass
+    public void destroy() throws AnalyticsException {
+        this.cleanup();
+    }
 
 }
