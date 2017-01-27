@@ -170,6 +170,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.datasource.mongo.server.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.core.server.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
@@ -246,6 +252,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.datasource.mongo</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.eventtable</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
@@ -319,6 +331,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.data</groupId>
                 <artifactId>org.wso2.carbon.datasource.reader.cassandra</artifactId>
+                <version>${carbon.data.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.data</groupId>
+                <artifactId>org.wso2.carbon.datasource.reader.mongo</artifactId>
                 <version>${carbon.data.version}</version>
             </dependency>
             <dependency>
@@ -966,6 +983,7 @@
                 <version>${carbon.data.version}</version>
                 <scope>test</scope>
             </dependency>
+
             <dependency>
                 <groupId>org.wso2.carbon.data</groupId>
                 <artifactId>org.wso2.carbon.datasource.reader.hadoop.server.feature</artifactId>
@@ -973,6 +991,17 @@
                 <type>zip</type>
             </dependency>
             <!-- END hbase + hadoop client dependencies -->
+
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongo-java-driver</artifactId>
+                <version>${mongo.osgi.driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.mongodb</groupId>
+                <artifactId>mongo-java-driver</artifactId>
+                <version>${orbit.mongo.osgi.driver.version}</version>
+            </dependency>
 
             <!-- START Analytics Dashboard  -->
             <dependency>
@@ -1280,7 +1309,7 @@
         <!-- WSO2 repository versions -->
         <carbon.commons.version>4.5.4</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.5, 5)</carbon.commons.imp.pkg.version>
-        <carbon.data.version>4.3.6</carbon.data.version>
+        <carbon.data.version>4.4.1-SNAPSHOT</carbon.data.version>
         <carbon.event-processing.version>2.1.4</carbon.event-processing.version>
         <carbon.analytics.common.version>5.1.3</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[5.0, 6.0)</carbon.analytics.common.imp.pkg.version>
@@ -1340,6 +1369,10 @@
         <hadoop.client.260.orbit.version>2.7.2.wso2v1</hadoop.client.260.orbit.version>
         <hbase.client.import.version>[1.0.0, 2.0)</hbase.client.import.version>
         <hadoop.client.import.version>[2.7.0, 2.8.0)</hadoop.client.import.version>
+
+        <!--osgi drivers for mongo-->
+        <mongo.osgi.driver.version>3.4.1</mongo.osgi.driver.version>
+        <orbit.mongo.osgi.driver.version>3.4.1.wso2v1</orbit.mongo.osgi.driver.version>
 
         <!-- Equinox -->
         <version.equinox.osgi.services>3.3.100.v20120522-1822</version.equinox.osgi.services>
