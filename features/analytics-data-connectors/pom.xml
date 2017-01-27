@@ -36,5 +36,6 @@
         <module>org.wso2.carbon.analytics.datasource.hbase.server.feature</module>
         <module>org.wso2.carbon.analytics.datasource.feature</module>
         <module>org.wso2.carbon.analytics.datasource.cassandra.server.feature</module>
+        <module>org.wso2.carbon.analytics.datasource.mongo.server.feature</module>
     </modules>
 </project>
