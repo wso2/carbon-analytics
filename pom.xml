@@ -329,6 +329,11 @@
                 <version>${com.datastax.cassandra.driver.orbit.verison}</version>
             </dependency>
             <dependency>
+                <groupId>org.mongodb</groupId>
+            	<artifactId>mongo-java-driver</artifactId>
+            	<version>${mongo.driver.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.data</groupId>
                 <artifactId>org.wso2.carbon.datasource.reader.cassandra</artifactId>
                 <version>${carbon.data.version}</version>
@@ -1418,6 +1423,7 @@
         <servelet.api.version>7.0.52.wso2v1</servelet.api.version>
         <servelet.jsp.version>2.2.1</servelet.jsp.version>
         <com.datastax.cassandra.driver.orbit.verison>2.1.10.2.wso2v2</com.datastax.cassandra.driver.orbit.verison>
+        <mongo.driver.version>3.4.1</mongo.driver.version>
         <com.codahale.metrics.version>3.1.0</com.codahale.metrics.version>
         <!--spark additional dependencies --> <!--todo: clean these up-->
         <exp.pkg.version.spark>1.4.3.wso2v2</exp.pkg.version.spark>
