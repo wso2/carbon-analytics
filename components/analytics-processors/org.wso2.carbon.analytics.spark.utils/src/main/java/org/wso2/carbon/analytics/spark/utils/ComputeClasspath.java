@@ -94,9 +94,25 @@ public class ComputeClasspath {
         result.addAll(getAdditionalJars());
 
         // Read from the file
-        File jarsFile = new File(carbonHome + File.separator + "repository" + File.separator + "conf"
-                                 + File.separator + "analytics" + File.separator + "spark"
-                                 + File.separator + "carbon-spark-classpath.conf");
+        File jarsFile;
+        String configDir = System.getProperty("carbon.config.dir.path");
+        String sparkSymLinkConfigDir = System.getProperty("carbon.das.symlink.config.dir.path");
+        String c5Enabled = System.getProperty("carbon.das.c5.enabled");
+        if (c5Enabled != null && Boolean.valueOf(c5Enabled).equals(Boolean.TRUE)) {
+            if (sparkSymLinkConfigDir != null) {
+                jarsFile = new File(sparkSymLinkConfigDir + File.separator + "analytics" + File.separator + "spark" +
+                                    File.separator +
+                                    "carbon-spark-classpath.conf");
+            } else {
+                jarsFile =
+                        new File(configDir + File.separator + "analytics" + File.separator + "spark" + File.separator +
+                                 "carbon-spark-classpath.conf");
+            }
+        } else {
+            jarsFile = new File(carbonHome + File.separator + "repository" + File.separator + "conf" + File.separator +
+                                "analytics" + File.separator + "spark" + File.separator +
+                                "carbon-spark-classpath.conf");
+        }
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(jarsFile), StandardCharsets.UTF_8));
@@ -129,8 +145,21 @@ public class ComputeClasspath {
 
 
     private static String addJarsFromLib(String scp, String carbonHome, String separator) {
-        File libDir = new File(carbonHome + File.separator + "repository" + File.separator
-                               + "components" + File.separator + "lib");
+        File libDir;
+        String externalLibDir = System.getProperty("carbon.external.lib.dir.path");
+        String sparkSymLinkExternalLibDir = System.getProperty("carbon.das.symlink.external.lib.dir.path");
+        String c5Enabled = System.getProperty("carbon.das.c5.enabled");
+        if (c5Enabled != null && Boolean.valueOf(c5Enabled).equals(Boolean.TRUE)) {
+            if (sparkSymLinkExternalLibDir != null) {
+                libDir = new File(sparkSymLinkExternalLibDir);
+            } else {
+                libDir = new File(externalLibDir);
+            }
+        } else {
+            libDir = new File(
+                    carbonHome + File.separator + "repository" + File.separator + "components" + File.separator +
+                    "lib");
+        }
         File[] libJars = listJars(libDir);
         return appendFilesToString(scp, libJars, separator);
     }
@@ -146,24 +175,63 @@ public class ComputeClasspath {
     }
 
     private static String addJarsFromDropins(String scp, String carbonHome, String separator) {
-        File libDir = new File(carbonHome + File.separator + "repository" + File.separator
-                               + "components" + File.separator + "dropins");
+        File libDir;
+        String dropinsDir = System.getProperty("carbon.dropins.dir.path");
+        String sparkSymLinkDropinsDir = System.getProperty("carbon.das.symlink.dropins.dir.path");
+        String c5Enabled = System.getProperty("carbon.das.c5.enabled");
+        if (c5Enabled != null && Boolean.valueOf(c5Enabled).equals(Boolean.TRUE)) {
+            if (sparkSymLinkDropinsDir != null) {
+                libDir = new File(sparkSymLinkDropinsDir);
+            } else {
+                libDir = new File(dropinsDir);
+            }
+        } else {
+            libDir = new File(
+                    carbonHome + File.separator + "repository" + File.separator + "components" + File.separator +
+                    "dropins");
+        }
         File[] libJars = listJars(libDir);
         return appendFilesToString(scp, libJars, separator);
     }
 
     private static String addJarsFromEndorsedLib(String scp, String carbonHome, String separator) {
-        File libDir = new File(carbonHome + File.separator + "lib" + File.separator + "endorsed");
+        File libDir;
+        String internalLibDir = System.getProperty("carbon.internal.lib.dir.path");
+        String sparkSymLinkInternalLibDir = System.getProperty("carbon.das.symlink.internal.lib.dir.path");
+        String c5Enabled = System.getProperty("carbon.das.c5.enabled");
+        if (c5Enabled != null && Boolean.valueOf(c5Enabled).equals(Boolean.TRUE)) {
+            if (sparkSymLinkInternalLibDir != null) {
+                libDir = new File(sparkSymLinkInternalLibDir + File.separator + "endorsed");
+            } else {
+                libDir = new File(internalLibDir + File.separator + "endorsed");
+            }
+        } else {
+            libDir = new File(carbonHome + File.separator + "lib" + File.separator + "endorsed");
+        }
         File[] libJars = listJars(libDir);
         return appendFilesToString(scp, libJars, separator);
     }
 
     private static String addJarsFromConfig(String scp, String carbonHome, String separator)
             throws IOException {
-        File cpFile = new File(carbonHome + File.separator + "repository" + File.separator + "conf"
-                               + File.separator + "analytics" + File.separator + "spark"
-                               + File.separator + "external-spark-classpath.conf");
-
+        File cpFile;
+        String configDir = System.getProperty("carbon.config.dir.path");
+        String sparkSymLinkConfigDir = System.getProperty("carbon.das.symlink.config.dir.path");
+        String c5Enabled = System.getProperty("carbon.das.c5.enabled");
+        if (c5Enabled != null && Boolean.valueOf(c5Enabled).equals(Boolean.TRUE)) {
+            if (sparkSymLinkConfigDir != null) {
+                cpFile = new File(sparkSymLinkConfigDir + File.separator + "analytics" + File.separator + "spark" +
+                                  File.separator +
+                                  "external-spark-classpath.conf");
+            } else {
+                cpFile = new File(configDir + File.separator + "analytics" + File.separator + "spark" + File.separator +
+                                  "external-spark-classpath.conf");
+            }
+        } else {
+            cpFile = new File(carbonHome + File.separator + "repository" + File.separator + "conf" + File.separator +
+                              "analytics" + File.separator + "spark" + File.separator +
+                              "external-spark-classpath.conf");
+        }
         BufferedReader reader = null;
         StringBuilder buf = new StringBuilder();
         buf.append(scp);
@@ -228,8 +296,20 @@ public class ComputeClasspath {
     private static String createInitialSparkClasspath(String sparkClasspath, String carbonHome,
                                                       Set<String> requiredJars, String separator,
                                                       String[] excludeJars) {
-        File pluginsDir = new File(carbonHome + File.separator + "repository" + File.separator + "components" +
-                                   File.separator + "plugins");
+        File pluginsDir;
+        String componentsRepo = System.getProperty("components.repo");
+        String sparkSymLinkComponentsRepo = System.getProperty("das.symlink.components.repo");
+        String c5Enabled = System.getProperty("carbon.das.c5.enabled");
+        if (c5Enabled != null && Boolean.valueOf(c5Enabled).equals(Boolean.TRUE)) {
+            if (sparkSymLinkComponentsRepo != null) {
+                pluginsDir = new File(sparkSymLinkComponentsRepo);
+            } else {
+                pluginsDir = new File(componentsRepo);
+            }
+        } else {
+            pluginsDir = new File(carbonHome + File.separator + "repository" + File.separator + "components" +
+                                  File.separator + "plugins");
+        }
         File[] pluginJars = listJars(pluginsDir);
         StringBuilder buf = new StringBuilder();
 
