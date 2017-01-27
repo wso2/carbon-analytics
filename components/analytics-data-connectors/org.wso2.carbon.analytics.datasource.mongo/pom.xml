@@ -40,10 +40,9 @@
             <artifactId>org.wso2.carbon.analytics.dataservice.core</artifactId>
             <scope>test</scope>
         </dependency>
-	<dependency>
+		<dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
-            <version>3.4.1</version>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
@@ -53,7 +52,6 @@
         <dependency>
             <groupId>org.wso2.carbon.data</groupId>
             <artifactId>org.wso2.carbon.datasource.reader.mongo</artifactId>
-            <version>4.4.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
