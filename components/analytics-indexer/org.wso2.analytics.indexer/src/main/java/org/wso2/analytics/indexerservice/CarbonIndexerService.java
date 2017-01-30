@@ -13,11 +13,10 @@ import java.util.List;
 public interface CarbonIndexerService {
     /**
      * Returns the indexingClient for the specific tenant's table. Can be used to add, delete, update query/perform searches the tables' index
-     * @param table The tableName
      * @return {@link org.wso2.analytics.indexerservice.impl.CarbonIndexerClient} A wrapper for {@link org.apache.solr.client.solrj.SolrClient}
      * @throws IndexerException Exception thrown if something goes wrong while creating or retrieving the client.
      */
-    public CarbonIndexerClient getIndexerClient(String table) throws IndexerException;
+    public CarbonIndexerClient getIndexerClient() throws IndexerException;
 
     /**
      * Create the Index/core/collection for the given table

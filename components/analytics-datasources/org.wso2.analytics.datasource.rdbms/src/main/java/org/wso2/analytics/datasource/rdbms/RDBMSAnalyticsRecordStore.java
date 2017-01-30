@@ -19,25 +19,32 @@
 package org.wso2.analytics.datasource.rdbms;
 
 import com.google.common.collect.Lists;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.h2.jdbcx.JdbcDataSource;
 import org.wso2.analytics.data.commons.AnalyticsRecordStore;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.analytics.data.commons.exception.AnalyticsTableNotAvailableException;
-import org.wso2.analytics.data.commons.service.AnalyticsDataHolder;
 import org.wso2.analytics.data.commons.sources.AnalyticsIterator;
 import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.data.commons.sources.RecordGroup;
 import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 
 import javax.sql.DataSource;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 ;
 
@@ -88,14 +95,10 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         try {
             Class.forName("org.h2.Driver");
             JdbcDataSource h2DataSource = new JdbcDataSource();
-            h2DataSource.setDescription(dsName);
-            h2DataSource.setURL("jdbc:h2:"+AnalyticsDataHolder.getInstance().getAnalyticsConfigsDir()+"/"+dsName+";DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;AUTO_SERVER=true");
+            h2DataSource.setURL("jdbc:h2:./target/ANALYTICS_EVENT_STORE;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;AUTO_SERVER=true");
             h2DataSource.setUser("wso2carbon");
             h2DataSource.setPassword("wso2carbon");
             this.dataSource = h2DataSource;
-            if (log.isDebugEnabled()) {
-                log.debug("Datastore: " + dsName + " - url - " + h2DataSource.getURL());
-            }
         } catch (Exception e) {
             throw new AnalyticsException("Error in loading data source: " + e.getMessage(), e);
         }

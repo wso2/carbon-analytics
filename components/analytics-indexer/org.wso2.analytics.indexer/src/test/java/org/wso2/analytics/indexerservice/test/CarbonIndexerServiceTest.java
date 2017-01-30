@@ -1,7 +1,5 @@
 package org.wso2.analytics.indexerservice.test;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -30,7 +28,6 @@ import java.util.ServiceLoader;
  */
 public class CarbonIndexerServiceTest {
 
-    private static Log log = LogFactory.getLog(CarbonIndexerServiceTest.class);
     private CarbonIndexerService indexerService;
 
 
@@ -83,7 +80,7 @@ public class CarbonIndexerServiceTest {
         IndexSchemaField intField = new IndexSchemaField("IntField", true, true, "int", null);
         IndexSchemaField longField = new IndexSchemaField("LongField", true, true, "long", null);
         IndexSchemaField floatField = new IndexSchemaField("FloatField", true, true, "float", null);
-        IndexSchemaField doubleField = new IndexSchemaField("DoubleField", true, true, "double", null);
+        IndexSchemaField doubleField = new IndexSchemaField("DoubleField", false, true, "double", null);
         IndexSchemaField boolField = new IndexSchemaField("BoolField", true, true, "boolean", null);
         IndexSchemaField timestamp = new IndexSchemaField("_timestamp", true, true, "long", null);
         fieldMap.put(intField.getFieldName(), intField);
@@ -111,7 +108,7 @@ public class CarbonIndexerServiceTest {
         IndexSchemaField intField = new IndexSchemaField("IntField1", true, true, "int", null);
         IndexSchemaField longField = new IndexSchemaField("LongField1", true, true, "long", null);
         IndexSchemaField floatField = new IndexSchemaField("FloatField1", true, true, "float", null);
-        IndexSchemaField doubleField = new IndexSchemaField("DoubleField1", true, true, "double", null);
+        IndexSchemaField doubleField = new IndexSchemaField("DoubleField1", false, true, "double", null);
         IndexSchemaField boolField = new IndexSchemaField("BoolField1", true, true, "boolean", null);
         fieldMap.put(intField.getFieldName(), intField);
         fieldMap.put(longField.getFieldName(), longField);
@@ -132,6 +129,7 @@ public class CarbonIndexerServiceTest {
         Assert.assertEquals(newIndexSchema.getField("DoubleField"), oldIndexSchema.getField("DoubleField"));
         Assert.assertEquals(newIndexSchema.getField("FloatField"), oldIndexSchema.getField("FloatField"));
         Assert.assertEquals(newIndexSchema.getField("BoolField"), oldIndexSchema.getField("BoolField"));
+        Assert.assertEquals(newIndexSchema.getField("_timestamp"), oldIndexSchema.getField("_timestamp"));
     }
 
     @Test(dependsOnMethods = "testUpdateIndexSchemaWithMerge")
@@ -140,23 +138,23 @@ public class CarbonIndexerServiceTest {
         doc1.addField("id", "1");
         doc1.addField("_timestamp", System.currentTimeMillis());
         doc1.addField("IntField", 100);
-        doc1.addField("LongField", 100);
-        doc1.addField("FloatField", 100);
-        doc1.addField("DoubleField", 100);
+        doc1.addField("LongField", 100l);
+        doc1.addField("FloatField", 100f);
+        doc1.addField("DoubleField", 100d);
         doc1.addField("BoolField", true);
         CarbonIndexDocument doc2 = new CarbonIndexDocument();
         doc2.addField("id", "2");
         doc2.addField("IntField1", 1000);
-        doc2.addField("LongField1", 1000);
-        doc2.addField("FloatField1", 1000);
-        doc2.addField("DoubleField1", 1000);
-        doc2.addField("BoolField1", 1000);
+        doc2.addField("LongField1", 1000l);
+        doc2.addField("FloatField1", 1000f);
+        doc2.addField("DoubleField1", 1000d);
+        doc2.addField("BoolField1", true);
         List<CarbonIndexDocument> docs = new ArrayList<>();
         docs.add(doc1);
         docs.add(doc2);
         indexerService.indexDocuments("T1", docs);
 
-        CarbonIndexerClient client = indexerService.getIndexerClient("T1");
+        CarbonIndexerClient client = indexerService.getIndexerClient();
         SolrQuery query = new SolrQuery();
         query.setQuery("id:1");
 
@@ -164,6 +162,7 @@ public class CarbonIndexerServiceTest {
         SolrDocumentList list = response.getResults();
         Assert.assertEquals(list.size(), 1);
         Assert.assertEquals(doc1.getFieldValue("id"), list.get(0).getFieldValue("id"));
+        Assert.assertEquals(doc1.getFieldValue("DoubleField"), list.get(0).getFieldValue("DoubleField"));
 
         query = new SolrQuery();
         query.setQuery("id:2");
@@ -178,7 +177,7 @@ public class CarbonIndexerServiceTest {
             throws IndexerException, IOException, SolrServerException {
         String strQuery = "_timestamp:[0 TO " + System.currentTimeMillis() + "]";
         indexerService.deleteDocuments("T1", strQuery);
-        CarbonIndexerClient client = indexerService.getIndexerClient("T1");
+        CarbonIndexerClient client = indexerService.getIndexerClient();
         SolrQuery query = new SolrQuery();
         query.setQuery(strQuery);
         QueryResponse response = client.query("T1", query);
@@ -192,7 +191,7 @@ public class CarbonIndexerServiceTest {
         List<String> ids = new ArrayList<>();
         ids.add("2");
         indexerService.deleteDocuments("T1",ids);
-        CarbonIndexerClient client = indexerService.getIndexerClient("T1");
+        CarbonIndexerClient client = indexerService.getIndexerClient();
         SolrQuery query = new SolrQuery();
         query.setQuery("id:2");
         QueryResponse response = client.query("T1", query);
@@ -213,6 +212,5 @@ public class CarbonIndexerServiceTest {
     @Test(dependsOnMethods = "testDeleteNonExistingIndex")
     public void testDestroy() throws IndexerException {
         indexerService.destroy();
-
     }
 }

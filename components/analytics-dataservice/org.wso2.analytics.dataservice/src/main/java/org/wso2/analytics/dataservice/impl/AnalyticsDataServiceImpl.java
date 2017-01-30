@@ -82,8 +82,15 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Analytics Config Directory: " + analyticsDataHolder.getAnalyticsConfigsDir());
         }
-        File confFile = new File(analyticsDataHolder.getAnalyticsConfigsDir() + File.separator
-                + ANALYTICS_CONF_DIR + File.separator + ANALYTICS_CONFIG_FILE);
+        File confFile;
+        String analyticsConfDir = analyticsDataHolder.getAnalyticsConfigsDir();
+        if (analyticsConfDir != null) {
+            confFile = new File(analyticsDataHolder.getAnalyticsConfigsDir() + File.separator
+                                + ANALYTICS_CONF_DIR + File.separator + ANALYTICS_CONFIG_FILE);
+        } else {
+            confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() + File.separator
+                                + ANALYTICS_CONF_DIR + File.separator + ANALYTICS_CONFIG_FILE);
+        }
         try {
             if (!confFile.exists()) {
                 confFile = getFileFromSystemResources(ANALYTICS_CONFIG_FILE);

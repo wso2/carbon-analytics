@@ -45,7 +45,7 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
     private static final String FIELD_INDEX_SCHEMA_MERGE = "_FIELD_INDEX_SCHEMA_MERGE_";
 
     private static final int NO_STAGING_INDEX_WORKERS = 2;
-    private static final int STAGING_INDEX_WORKER_EXECUTOR_TIMEOUT = 60000;
+    private static final int STAGING_INDEX_WORKER_EXECUTOR_TIMEOUT_MILLI_SEC = 60000;
     private static final int RETRY_INDEX_DOC_BATCH_SIZE = 100;
 
     private CarbonIndexerService indexerService;
@@ -191,8 +191,8 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
         String table = null;
         try {
             for (List<Record> recordBatch : recordBatches) {
+                table = recordBatch.get(0).getTableName();
                 if (isIndexedTable(table)) {
-                    table = recordBatch.get(0).getTableName();
                     IndexSchema indexSchema = indexerService.getIndexSchema(table);
                     indexDocuments = DataAPIUtils.getIndexDocuments(recordBatch, indexSchema);
                     indexerService.indexDocuments(table, indexDocuments);
@@ -312,7 +312,7 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
     }
 
     @Override
-    public void setTableSchema(String username, String tableName, AnalyticsSchema schema)
+    public void setTableSchema(String username, String tableName, CompositeSchema schema, boolean merge)
             throws AnalyticsException {
 
     }
@@ -406,7 +406,7 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
             stagingIndexSchemaWorker.stop();
             stagingIndexWorkerExecutor.shutdownNow();
             try {
-                stagingIndexWorkerExecutor.awaitTermination(STAGING_INDEX_WORKER_EXECUTOR_TIMEOUT,
+                stagingIndexWorkerExecutor.awaitTermination(STAGING_INDEX_WORKER_EXECUTOR_TIMEOUT_MILLI_SEC,
                         TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 log.warn("Failed to stop staging Index workers, Interrupted.");
@@ -461,7 +461,6 @@ public class AnalyticsDataAPIImpl implements AnalyticsDataAPI {
                                         (List<CarbonIndexDocument>) AnalyticsCommonUtils.deserializeObject(indexData);
                                 indexerService.indexDocuments(table, documents);
                                 ids.add(record.getId());
-
                             } catch (IndexerException e) {
                                 log.error("Staging data Indexing failed, " + e.getMessage(), e);
                             }

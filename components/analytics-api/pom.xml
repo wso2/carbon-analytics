@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>analytics-api</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Analytics Data API Module</name>
+    <name>WSO2 Carbon - Analytics API Aggregator Module</name>
     <modules>
         <module>org.wso2.analytics.api.commons</module>
     </modules>

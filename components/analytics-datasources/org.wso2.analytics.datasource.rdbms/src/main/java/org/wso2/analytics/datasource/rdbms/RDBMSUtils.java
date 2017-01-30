@@ -19,7 +19,6 @@
 package org.wso2.analytics.datasource.rdbms;
 
 import com.google.common.collect.Maps;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
@@ -30,13 +29,19 @@ import javax.sql.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
 import java.io.File;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -95,8 +100,15 @@ public class RDBMSUtils {
 
     public static RDBMSQueryConfiguration loadQueryConfiguration() throws AnalyticsException {
         // TODO: Finalize logic for RDBMS config files
-        File confFile = new File(AnalyticsDataHolder.getInstance().getAnalyticsConfigsDir() +
-                File.separator + ANALYTICS_CONF_DIR + File.separator + RDBMS_QUERY_CONFIG_FILE);
+        String analyticsConfigDir = AnalyticsDataHolder.getInstance().getAnalyticsConfigsDir();
+        File confFile;
+        if (analyticsConfigDir != null) {
+            confFile = new File(AnalyticsDataHolder.getInstance().getAnalyticsConfigsDir() +
+                                File.separator + ANALYTICS_CONF_DIR + File.separator + RDBMS_QUERY_CONFIG_FILE);
+        } else {
+            confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() +
+                                File.separator + ANALYTICS_CONF_DIR + File.separator + RDBMS_QUERY_CONFIG_FILE);
+        }
         try {
             if (!confFile.exists()) {
                 confFile = getFileFromSystemResources(RDBMS_QUERY_CONFIG_FILE);

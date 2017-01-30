@@ -48,7 +48,7 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
     private static final String FIELD_VERSION = "_version_";
     private static final String ATTR_COLLECTIONS = "collections";
     private static Log log = LogFactory.getLog(CarbonIndexerServiceImpl.class);
-    private volatile Map<String, CarbonIndexerClient> indexerClients = new ConcurrentHashMap<>();
+    private volatile CarbonIndexerClient indexerClient = null;
     private static final String INDEXER_CONFIG_DIR = "analytics";
     private static final String INDEXER_CONFIG_FILE = "indexer-config.xml";
     private IndexerConfiguration indexConfig;
@@ -86,16 +86,13 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
     }
 
     @Override
-    public CarbonIndexerClient getIndexerClient(String tableName) throws IndexerException {
-        String tableNameWithTenant = IndexerUtils.getTableNameWithDomainName(tableName);
-        CarbonIndexerClient indexerClient = indexerClients.get(tableNameWithTenant);
+    public CarbonIndexerClient getIndexerClient() throws IndexerException {
         if (indexerClient == null) {
             synchronized (indexClientsLock) {
                 if (indexerClient == null) {
                     if (indexConfig != null) {
                         SolrClient client = new CloudSolrClient.Builder().withZkHost(indexConfig.getSolrServerUrl()).build();
                         indexerClient = new CarbonIndexerClient(client);
-                        indexerClients.put(tableNameWithTenant, indexerClient);
                     }
                 }
             }
@@ -140,7 +137,7 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
         ConfigSetAdminRequest.Create configSetAdminRequest = new ConfigSetAdminRequest.Create();
         configSetAdminRequest.setBaseConfigSetName(indexConfig.getBaseConfigSet());
         configSetAdminRequest.setConfigSetName(tableNameWithTenant);
-        return configSetAdminRequest.process(getIndexerClient(table));
+        return configSetAdminRequest.process(getIndexerClient());
     }
 
     private boolean createSolrCollection(String table,  String tableNameWithTenant) throws SolrServerException, IOException,
@@ -149,7 +146,7 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
                 CollectionAdminRequest.createCollection(tableNameWithTenant, tableNameWithTenant,
                 indexConfig.getNoOfShards(), indexConfig.getNoOfReplicas());
         createRequest.setMaxShardsPerNode(indexConfig.getNoOfShards());
-        CollectionAdminResponse collectionAdminResponse = createRequest.process(getIndexerClient(table));
+        CollectionAdminResponse collectionAdminResponse = createRequest.process(getIndexerClient());
         Object errors = collectionAdminResponse.getErrorMessages();
         if (!collectionAdminResponse.isSuccess()) {
             throw new IndexerException("Error in deploying initial index configurations for table: " + table + ", " +
@@ -163,7 +160,7 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
             throws IndexerException {
         IndexSchema oldSchema;
         List<SchemaRequest.Update> updateFields = new ArrayList<>();
-        SolrClient client = getIndexerClient(table);
+        SolrClient client = getIndexerClient();
         String tableNameWithTenantDomain = IndexerUtils.getTableNameWithDomainName(table);
         SchemaResponse.UpdateResponse updateResponse;
         try {
@@ -263,7 +260,7 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
     @Override
     public IndexSchema getIndexSchema(String table)
             throws IndexerException, IndexSchemaNotFoundException {
-        SolrClient client = getIndexerClient(table);
+        SolrClient client = getIndexerClient();
         String tableNameWithTenantDomain = IndexerUtils.getTableNameWithDomainName(table);
         IndexSchema indexSchema = indexSchemaCache.get(tableNameWithTenantDomain);
         if (indexSchema == null) {
@@ -328,11 +325,11 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
                 String tableNameWithTenant = IndexerUtils.getTableNameWithDomainName(table);
                 CollectionAdminRequest.Delete deleteRequest = CollectionAdminRequest.deleteCollection(tableNameWithTenant);
                 CollectionAdminResponse deleteRequestResponse =
-                        deleteRequest.process(getIndexerClient(table), tableNameWithTenant);
+                        deleteRequest.process(getIndexerClient(), tableNameWithTenant);
                 if (deleteRequestResponse.isSuccess() && indexConfigsExists(table)) {
                     ConfigSetAdminRequest.Delete configSetAdminRequest = new ConfigSetAdminRequest.Delete();
                     configSetAdminRequest.setConfigSetName(tableNameWithTenant);
-                    ConfigSetAdminResponse configSetResponse = configSetAdminRequest.process(getIndexerClient(table));
+                    ConfigSetAdminResponse configSetResponse = configSetAdminRequest.process(getIndexerClient());
                     indexSchemaCache.remove(tableNameWithTenant);
                     Object errors = configSetResponse.getErrorMessages();
                     if (configSetResponse.getStatus() == 0 && errors == null) {
@@ -355,7 +352,7 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
         CollectionAdminRequest.List listRequest = CollectionAdminRequest.listCollections();
         String tableWithTenant = IndexerUtils.getTableNameWithDomainName(table);
         try {
-            CollectionAdminResponse listResponse = listRequest.process(getIndexerClient(table));
+            CollectionAdminResponse listResponse = listRequest.process(getIndexerClient());
             Object errors = listResponse.getErrorMessages();
             if (listResponse.getStatus() == 0 && errors == null) {
                 List collections = (List) listResponse.getResponse().get(ATTR_COLLECTIONS);
@@ -373,7 +370,7 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
     @Override
     public boolean indexConfigsExists(String table) throws IndexerException {
         ConfigSetAdminResponse.List listRequestReponse;
-        CarbonIndexerClient carbonIndexerClient = getIndexerClient(table);
+        CarbonIndexerClient carbonIndexerClient = getIndexerClient();
         String tableNameWithTenantDomain = IndexerUtils.getTableNameWithDomainName(table);
         ConfigSetAdminRequest.List listRequest = new ConfigSetAdminRequest.List();
         try {
@@ -394,7 +391,7 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
     @Override
     public void indexDocuments(String table, List<CarbonIndexDocument> docs) throws IndexerException {
         try {
-            CarbonIndexerClient client = getIndexerClient(table);
+            CarbonIndexerClient client = getIndexerClient();
             client.add(table, IndexerUtils.getSolrInputDocuments(docs));
             //TODO:should find a better way to commit, there are different overloaded methods of commit
             client.commit(table);
@@ -407,7 +404,7 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
     @Override
     public void deleteDocuments(String table, List<String> ids) throws IndexerException {
         if (ids != null && !ids.isEmpty()) {
-            CarbonIndexerClient client = getIndexerClient(table);
+            CarbonIndexerClient client = getIndexerClient();
             try {
                 //TODO:use updateResponse
                 client.deleteById(table, ids);
@@ -422,7 +419,7 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
     @Override
     public void deleteDocuments(String table, String query) throws IndexerException {
         if (query != null && !query.isEmpty()) {
-            CarbonIndexerClient client = getIndexerClient(table);
+            CarbonIndexerClient client = getIndexerClient();
             try {
                 //TODO:use updateResponse
                 client.deleteByQuery(table, query);
@@ -437,13 +434,13 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
     @Override
     public void destroy() throws IndexerException {
         try {
-            for (SolrClient solrClient : indexerClients.values()) {
-                solrClient.close();
+            if (indexerClient != null) {
+                indexerClient.close();
             }
         } catch (IOException e) {
             log.error("Error while destroying the indexer service, " + e.getMessage(), e);
             throw new IndexerException("Error while destroying the indexer service, " + e.getMessage(), e);
         }
-        indexerClients = null;
+        indexerClient = null;
     }
 }

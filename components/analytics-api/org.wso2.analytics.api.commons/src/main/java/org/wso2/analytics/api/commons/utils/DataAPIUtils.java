@@ -1,5 +1,9 @@
 package org.wso2.analytics.api.commons.utils;
 
+import org.apache.commons.collections.IteratorUtils;
+import org.wso2.analytics.api.commons.AnalyticsDataAPI;
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.service.AnalyticsDataResponse;
 import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.indexerservice.CarbonIndexDocument;
 import org.wso2.analytics.indexerservice.IndexSchema;
@@ -12,9 +16,6 @@ import java.util.List;
  * This class contains the static Utility methods required by the Data API
  */
 public class DataAPIUtils {
-
-    private static final String FIELD_TIMESTAMP = "_timestamp";
-    private static final String FIELD_ID = "id";
 
     public static List<CarbonIndexDocument> getIndexDocuments(List<Record> records, IndexSchema schema) {
         List<CarbonIndexDocument> indexDocuments = new ArrayList<>();
@@ -36,12 +37,22 @@ public class DataAPIUtils {
                 indexDocument.addField(field, value);
             }
         }
-        indexDocument.addField(FIELD_ID, record.getId());
-        indexDocument.addField(FIELD_TIMESTAMP, record.getTimestamp());
+        indexDocument.addField(IndexSchema.FIELD_ID, record.getId());
+        indexDocument.addField(IndexSchema.FIELD_TIMESTAMP, record.getTimestamp());
         return indexDocument;
     }
 
     public static String createTimeRangeQuery(long fromTime, long toTime) {
-        return FIELD_TIMESTAMP.concat(":[" + fromTime + "TO " + toTime + "]");
+        return IndexSchema.FIELD_TIMESTAMP.concat(":[" + fromTime + "TO " + toTime + "]");
+    }
+
+    public static List<Record> listRecords(AnalyticsDataAPI ads,
+                                           AnalyticsDataResponse response) throws
+                                                                           AnalyticsException {
+        List<Record> result = new ArrayList<>();
+        for (AnalyticsDataResponse.Entry entry : response.getEntries()) {
+            result.addAll(IteratorUtils.toList(ads.readRecords(entry.getRecordStoreName(), entry.getRecordGroup())));
+        }
+        return result;
     }
 }

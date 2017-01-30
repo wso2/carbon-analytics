@@ -246,9 +246,10 @@ public interface AnalyticsDataAPI {
      * @param username The username used to authorize to set tableSchema
      * @param tableName The table name
      * @param schema    The schema to be applied to the table
+     *                  @param merge Mark whether to merge or not with the existing schema.
      * @throws AnalyticsException
      */
-    void setTableSchema(String username, String tableName, AnalyticsSchema schema) throws AnalyticsException;
+    void setTableSchema(String username, String tableName, CompositeSchema schema, boolean merge) throws AnalyticsException;
 
     /**
      * Retrieves the table schema for the given table.
@@ -411,6 +412,4 @@ public interface AnalyticsDataAPI {
      * @throws AnalyticsException
      */
     CarbonIndexerClient getIndexerClient(String username) throws AnalyticsException;
-
-
 }
