@@ -32,6 +32,7 @@
 
     <modules>
         <!--<module>components/analytics-dashboard</module>-->
+        <module>components/tcp-transport</module>
         <module>components/data-bridge</module>
         <!--<module>components/analytics-data-agents</module>-->
         <!--<module>components/event-stream</module>-->
