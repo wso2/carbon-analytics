@@ -40,7 +40,7 @@
             <artifactId>org.wso2.carbon.analytics.dataservice.core</artifactId>
             <scope>test</scope>
         </dependency>
-	<dependency>
+		<dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
         </dependency>
