@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="Mongo Analytics Data Source Test Suite" parallel="false" preserve-order="true" thread-count="1">
+   <test name="Mongo Tests">
+     <classes>
+        <class name="org.wso2.carbon.analytics.datasource.mongo.MongoAnalyticsRecordStoreTest"/>
+        <class name="org.wso2.carbon.analytics.datasource.mongo.MongoAnalyticsDataServiceTest"/>        
+     </classes>
+   </test>
+</suite>

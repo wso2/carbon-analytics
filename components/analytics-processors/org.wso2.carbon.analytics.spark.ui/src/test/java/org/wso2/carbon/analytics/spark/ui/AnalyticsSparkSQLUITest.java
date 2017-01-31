@@ -51,11 +51,12 @@ import java.util.List;
 public class AnalyticsSparkSQLUITest {
 
     private AnalyticsDataService service;
-    
+
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
         GenericUtils.clearGlobalCustomDataSourceRepo();
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
+        System.setProperty("carbon.config.dir.path", "src/test/resources/conf1");
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
@@ -66,7 +67,7 @@ public class AnalyticsSparkSQLUITest {
 
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
-        ServiceHolder.getAnalyticskExecutor().stop();        
+        ServiceHolder.getAnalyticskExecutor().stop();
         this.service.destroy();
         System.clearProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP);
     }

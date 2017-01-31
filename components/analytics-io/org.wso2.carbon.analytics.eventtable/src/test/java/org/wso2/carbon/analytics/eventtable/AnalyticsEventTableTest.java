@@ -49,31 +49,32 @@ public class AnalyticsEventTableTest {
     private static final int DEFAULT_WAIT_TIME = 3000;
 
 	private AnalyticsDataService service;
-    
+
     private int inEventCount = 0;
-    
+
     private int removeEventCount = 0;
-    
+
     private boolean eventArrived = false;
-    
+
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException {
         GenericUtils.clearGlobalCustomDataSourceRepo();
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
+        System.setProperty("carbon.config.dir.path", "src/test/resources/conf1");
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(null);
         System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
         this.service = AnalyticsServiceHolder.getAnalyticsDataService();
         ServiceHolder.setAnalyticsDataService(service);
     }
-    
+
     @AfterClass
     public void destroy() throws AnalyticsException {
         this.service.destroy();
         System.clearProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP);
         AnalyticsServiceHolder.setAnalyticsDataService(null);
     }
-    
+
     @Test
     public void testInsert() throws InterruptedException, AnalyticsTableNotAvailableException, AnalyticsException {
         this.service.deleteTable(-1, "stocks");
@@ -100,7 +101,7 @@ public class AnalyticsEventTableTest {
         Assert.assertEquals(recordsIn.size(), 2);
         this.service.deleteTable(-1, "stocks");
     }
-    
+
     @Test
     public void testInsertWithIndices() throws InterruptedException, AnalyticsTableNotAvailableException, AnalyticsException {
         this.service.deleteTable(-1, "stocks");
@@ -128,7 +129,7 @@ public class AnalyticsEventTableTest {
         Assert.assertEquals(this.service.search(-1, "stocks", "symbol: 'WSO2'", 0, 10, null).size(), 1);
         this.service.deleteTable(-1, "stocks");
     }
-    
+
     @Test
     public void testInsertWithIndicesAndScoreParams() throws InterruptedException, AnalyticsException {
         this.service.deleteTable(-1, "stocks");
@@ -156,7 +157,7 @@ public class AnalyticsEventTableTest {
         Assert.assertEquals(this.service.search(-1, "stocks", "price: [60 TO 80]", 0, 10, null).size(), 1);
         this.service.deleteTable(-1, "stocks");
     }
-    
+
     @Test
     public void testJoin1() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
@@ -215,7 +216,7 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         checkStockStream.send(new Object[] { "WSO2" });
         Thread.sleep(DEFAULT_WAIT_TIME);
 
@@ -228,7 +229,7 @@ public class AnalyticsEventTableTest {
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
-    
+
     @Test
     public void testJoin1WithCache() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
@@ -287,7 +288,7 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         checkStockStream.send(new Object[] { "WSO2" });
         Thread.sleep(DEFAULT_WAIT_TIME);
 
@@ -300,7 +301,7 @@ public class AnalyticsEventTableTest {
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
-    
+
     @Test
     public void testJoin2() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
@@ -360,10 +361,10 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         checkStockStream.send(new Object[] { "WSO2" });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         Assert.assertEquals(this.inEventCount, 1);
         Assert.assertEquals(this.removeEventCount, 0);
         Assert.assertEquals(this.eventArrived, true);
@@ -373,7 +374,7 @@ public class AnalyticsEventTableTest {
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
-    
+
     @Test
     public void testJoin2WithCache() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
@@ -433,10 +434,10 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         checkStockStream.send(new Object[] { "WSO2" });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         Assert.assertEquals(this.inEventCount, 1);
         Assert.assertEquals(this.removeEventCount, 0);
         Assert.assertEquals(this.eventArrived, true);
@@ -446,7 +447,7 @@ public class AnalyticsEventTableTest {
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
-    
+
     @Test
     public void testJoin3() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
@@ -506,10 +507,10 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         checkStockStream.send(new Object[] { "WSO2" });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         Assert.assertEquals(this.inEventCount, 1);
         Assert.assertEquals(this.removeEventCount, 0);
         Assert.assertEquals(this.eventArrived, true);
@@ -519,7 +520,7 @@ public class AnalyticsEventTableTest {
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
-    
+
     @Test
     public void testJoin3WithCache() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
@@ -579,10 +580,10 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         checkStockStream.send(new Object[] { "WSO2" });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         Assert.assertEquals(this.inEventCount, 1);
         Assert.assertEquals(this.removeEventCount, 0);
         Assert.assertEquals(this.eventArrived, true);
@@ -592,7 +593,7 @@ public class AnalyticsEventTableTest {
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
-    
+
     @Test
     public void testJoin4() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
@@ -652,10 +653,10 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         checkStockStream.send(new Object[] { "WSO2" });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         Assert.assertEquals(this.inEventCount, 1);
         Assert.assertEquals(this.removeEventCount, 0);
         Assert.assertEquals(this.eventArrived, true);
@@ -665,7 +666,7 @@ public class AnalyticsEventTableTest {
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
-    
+
     @Test
     public void testJoin4WithCaching() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
@@ -725,10 +726,10 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "WSO2", 55.6f, 100l });
         stockStream.send(new Object[] { "IBM", 75.6f, 10l });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         checkStockStream.send(new Object[] { "WSO2" });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         Assert.assertEquals(this.inEventCount, 1);
         Assert.assertEquals(this.removeEventCount, 0);
         Assert.assertEquals(this.eventArrived, true);
@@ -738,7 +739,7 @@ public class AnalyticsEventTableTest {
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
-    
+
     @Test
     public void testUpdate1() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
@@ -771,10 +772,10 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         updateStockStream.send(new Object[] { "IBM", 99.6f, 100l });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 3);
@@ -787,7 +788,7 @@ public class AnalyticsEventTableTest {
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
-    
+
     @Test
     public void testUpdate1WithCaching() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
@@ -820,10 +821,10 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         updateStockStream.send(new Object[] { "IBM", 99.6f, 100l });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 3);
@@ -836,7 +837,7 @@ public class AnalyticsEventTableTest {
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
-    
+
     @Test
     public void testUpdate2() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
@@ -911,7 +912,7 @@ public class AnalyticsEventTableTest {
         checkStockStream.send(new Object[] { "IBM", 200l, 154.6f });
         checkStockStream.send(new Object[] { "WSO2", 100l, 44.6f });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         Assert.assertEquals(inEventCount, 2);
         Assert.assertEquals(removeEventCount, 0);
         Assert.assertEquals(eventArrived, true);
@@ -922,7 +923,7 @@ public class AnalyticsEventTableTest {
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
-    
+
     @Test
     public void testUpdate2WithCaching() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
@@ -997,7 +998,7 @@ public class AnalyticsEventTableTest {
         checkStockStream.send(new Object[] { "IBM", 200l, 154.6f });
         checkStockStream.send(new Object[] { "WSO2", 100l, 44.6f });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         Assert.assertEquals(inEventCount, 2);
         Assert.assertEquals(removeEventCount, 0);
         Assert.assertEquals(eventArrived, true);
@@ -1008,13 +1009,13 @@ public class AnalyticsEventTableTest {
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
-    
+
     private void cleanupCommonProps() {
         this.inEventCount = 0;
         this.removeEventCount = 0;
         this.eventArrived = false;
     }
-    
+
     @Test
     public void testDelete1() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
@@ -1050,18 +1051,18 @@ public class AnalyticsEventTableTest {
         Thread.sleep(DEFAULT_WAIT_TIME);
         deleteStockStream.send(new Object[] { "IBM", 57.6f, 100l });
         Thread.sleep(DEFAULT_WAIT_TIME);
-        
+
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 2);
 
         executionPlanRuntime.shutdown();
         siddhiManager.shutdown();
-        
+
         this.service.deleteTable(-1, "stocks");
         this.cleanupCommonProps();
     }
-    
+
     public static void main(String[] args) throws Exception {
         AnalyticsEventTableTest x = new AnalyticsEventTableTest();
         x.setup();
@@ -1069,5 +1070,5 @@ public class AnalyticsEventTableTest {
         x.destroy();
         System.exit(0);
     }
-    
+
 }
