@@ -14,8 +14,12 @@ public class IndexSchema implements Serializable {
     private String defaultSearchField;
     private Map<String, IndexSchemaField> fields;
 
-    public static final String FIELD_TIMESTAMP = "_timestamp";
-    public static final String FIELD_ID = "id";
+    public static final String TYPE_STRING = "string";
+    public static final String TYPE_LONG = "long";
+    public static final String TYPE_INT = "int";
+    public static final String TYPE_DOUBLE = "double";
+    public static final String TYPE_FLOAT = "float";
+    public static final String TYPE_BOOLEAN = "boolean";
 
     /**
      * This constructor will only be called by the deserializer

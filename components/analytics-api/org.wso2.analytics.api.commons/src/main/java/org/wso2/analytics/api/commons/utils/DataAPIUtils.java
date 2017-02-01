@@ -7,6 +7,7 @@ import org.wso2.analytics.data.commons.service.AnalyticsDataResponse;
 import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.indexerservice.CarbonIndexDocument;
 import org.wso2.analytics.indexerservice.IndexSchema;
+import org.wso2.analytics.indexerservice.IndexSchemaField;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,13 +38,13 @@ public class DataAPIUtils {
                 indexDocument.addField(field, value);
             }
         }
-        indexDocument.addField(IndexSchema.FIELD_ID, record.getId());
-        indexDocument.addField(IndexSchema.FIELD_TIMESTAMP, record.getTimestamp());
+        indexDocument.addField(IndexSchemaField.FIELD_ID, record.getId());
+        indexDocument.addField(IndexSchemaField.FIELD_TIMESTAMP, record.getTimestamp());
         return indexDocument;
     }
 
     public static String createTimeRangeQuery(long fromTime, long toTime) {
-        return IndexSchema.FIELD_TIMESTAMP.concat(":[" + fromTime + "TO " + toTime + "]");
+        return IndexSchemaField.FIELD_TIMESTAMP.concat(":[" + fromTime + "TO " + toTime + "]");
     }
 
     public static List<Record> listRecords(AnalyticsDataAPI ads,

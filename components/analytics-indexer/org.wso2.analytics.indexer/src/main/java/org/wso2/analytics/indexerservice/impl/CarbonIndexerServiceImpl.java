@@ -40,12 +40,7 @@ import java.util.stream.Collectors;
  */
 public class CarbonIndexerServiceImpl implements CarbonIndexerService {
 
-    private static final String ATTR_NAME = "name";
-    private static final String ATTR_INDEXED = "indexed";
-    private static final String ATTR_STORED = "stored";
-    private static final String ATTR_TYPE = "type";
     private static final String ATTR_ERRORS = "errors";
-    private static final String FIELD_VERSION = "_version_";
     private static final String ATTR_COLLECTIONS = "collections";
     private static Log log = LogFactory.getLog(CarbonIndexerServiceImpl.class);
     private volatile CarbonIndexerClient indexerClient = null;
@@ -238,10 +233,10 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
 
     private Map<String, Object> getSolrIndexProperties(Map.Entry<String, IndexSchemaField> field) {
         Map<String, Object> properties = new HashMap<>();
-        properties.put(ATTR_INDEXED, field.getValue().isIndexed());
-        properties.put(ATTR_STORED, field.getValue().isStored());
-        properties.put(ATTR_NAME, field.getValue().getFieldName());
-        properties.put(ATTR_TYPE, field.getValue().getType());
+        properties.put(IndexSchemaField.ATTR_INDEXED, field.getValue().isIndexed());
+        properties.put(IndexSchemaField.ATTR_STORED, field.getValue().isStored());
+        properties.put(IndexSchemaField.ATTR_FIELD_NAME, field.getValue().getFieldName());
+        properties.put(IndexSchemaField.ATTR_TYPE, field.getValue().getType());
         properties.putAll(field.getValue().getOtherProperties());
         return properties;
     }
@@ -250,7 +245,7 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
         List<SchemaRequest.Update> fields = new ArrayList<>();
         //TODO:add a config to define the default required field which should not be deleted. (e.g. id, there are other solr specific fields like _version_)
         oldSchema.getFields().entrySet().stream().filter(field -> !(field.getKey().equals(oldSchema.getUniqueKey()) ||
-                field.getKey().equals(FIELD_VERSION))).forEach(field -> {
+                field.getKey().equals(IndexSchemaField.FIELD_VERSION))).forEach(field -> {
             SchemaRequest.DeleteField deleteFieldRequest = new SchemaRequest.DeleteField(field.getKey());
             fields.add(deleteFieldRequest);
         });
@@ -296,23 +291,23 @@ public class CarbonIndexerServiceImpl implements CarbonIndexerService {
         Map<String, IndexSchemaField> indexFields = new LinkedHashMap<>();
         boolean isIndexed = false;
         boolean isStored = false;
-        String type = "string"; //the default type in case if the type is not provided
+        String type = IndexSchema.TYPE_STRING; //the default type in case if the type is not provided
         String fieldName;
         for (Map<String, Object> fieldProperties : fields) {
-            if (fieldProperties != null && fieldProperties.containsKey(ATTR_NAME)) {
-                fieldName = fieldProperties.remove(ATTR_NAME).toString();
-                if (fieldProperties.containsKey(ATTR_INDEXED)) {
-                    isIndexed = (Boolean) fieldProperties.remove(ATTR_INDEXED);
+            if (fieldProperties != null && fieldProperties.containsKey(IndexSchemaField.ATTR_FIELD_NAME)) {
+                fieldName = fieldProperties.remove(IndexSchemaField.ATTR_FIELD_NAME).toString();
+                if (fieldProperties.containsKey(IndexSchemaField.ATTR_INDEXED)) {
+                    isIndexed = (Boolean) fieldProperties.remove(IndexSchemaField.ATTR_INDEXED);
                 }
-                if (fieldProperties.containsKey(ATTR_STORED)) {
-                    isStored = (Boolean) fieldProperties.remove(ATTR_STORED);
+                if (fieldProperties.containsKey(IndexSchemaField.ATTR_STORED)) {
+                    isStored = (Boolean) fieldProperties.remove(IndexSchemaField.ATTR_STORED);
                 }
-                if (fieldProperties.containsKey(ATTR_TYPE)) {
-                    type = (String) fieldProperties.remove(ATTR_TYPE);
+                if (fieldProperties.containsKey(IndexSchemaField.ATTR_TYPE)) {
+                    type = (String) fieldProperties.remove(IndexSchemaField.ATTR_TYPE);
                 }
                 indexFields.put(fieldName, new IndexSchemaField(fieldName, isStored, isIndexed, type, fieldProperties));
             } else {
-                throw new IndexerException("Fields must have an attribute called " + ATTR_NAME);
+                throw new IndexerException("Fields must have an attribute called " + IndexSchemaField.ATTR_FIELD_NAME);
             }
         }
         return indexFields;
