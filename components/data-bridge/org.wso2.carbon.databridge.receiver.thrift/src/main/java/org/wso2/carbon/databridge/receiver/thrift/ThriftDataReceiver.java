@@ -26,7 +26,6 @@ import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TSSLTransportFactory;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
-import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.thrift.service.general.ThriftEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEventTransmissionService;
@@ -42,6 +41,7 @@ import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissio
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
 
 import javax.net.ssl.SSLServerSocket;
+import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -114,25 +114,17 @@ public class ThriftDataReceiver {
         try {
             String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
             if (keyStore == null) {
-                ServerConfiguration serverConfig = ServerConfiguration.getInstance();
-                keyStore = serverConfig.getFirstProperty("Security.KeyStore.Location");
-                if (keyStore == null) {
-                    keyStore = System.getProperty("Security.KeyStore.Location");
-                    if (keyStore == null) {
-                        throw new DataBridgeException("Cannot start thrift agent server, not valid Security.KeyStore.Location is null");
-                    }
-                }
+                // TODO: 1/26/17 keystore hack. change later
+                File filePath = new File("resources" + File.separator + "security");
+                String keyStorePath = filePath.getAbsolutePath();
+                System.setProperty("Security.KeyStore.Location", keyStorePath + File.separator + "wso2carbon.jks");
+                keyStore = System.getProperty("Security.KeyStore.Location");
             }
             String keyStorePassword = dataBridgeReceiverService.getInitialConfig().getKeyStorePassword();
             if (keyStorePassword == null) {
-                ServerConfiguration serverConfig = ServerConfiguration.getInstance();
-                keyStorePassword = serverConfig.getFirstProperty("Security.KeyStore.Password");
-                if (keyStorePassword == null) {
-                    keyStorePassword = System.getProperty("Security.KeyStore.Password");
-                    if (keyStorePassword == null) {
-                        throw new DataBridgeException("Cannot start thrift agent server, not valid Security.KeyStore.Password is null ");
-                    }
-                }
+                // TODO: 1/26/17 keystore hack. change later
+                System.setProperty("Security.KeyStore.Password", "wso2carbon");
+                keyStorePassword = System.getProperty("Security.KeyStore.Password");
             }
             startSecureEventTransmission(hostName, port, sslProtocols, ciphers, keyStore, keyStorePassword, dataBridgeReceiverService);
         } catch (TransportException e) {

@@ -40,6 +40,7 @@ import java.net.SocketException;
 
 
 public class OneEndPointDPThriftTest {
+    // TODO: 1/31/17 no tenant concept
     Logger log = Logger.getLogger(OneEndPointDPThriftTest.class);
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
@@ -83,7 +84,7 @@ public class OneEndPointDPThriftTest {
             StreamDefinitionStoreException, MalformedStreamDefinitionException {
         thriftTestServer = new ThriftTestServer();
         thriftTestServer.start(port);
-        thriftTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        thriftTestServer.addStreamDefinition(STREAM_DEFN);
 
     }
 

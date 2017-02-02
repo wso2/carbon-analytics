@@ -14,14 +14,13 @@
 * KIND, either express or implied.  See the License for the
 * specific language governing permissions and limitations
 * under the License.
-*//*
-TODO
+*/
+
 package org.wso2.carbon.databridge.receiver.thrift.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.thrift.protocol.TCompactProtocol;
-import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.databridge.commons.thrift.service.general.ThriftEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.utils.HostAddressFinder;
@@ -32,35 +31,38 @@ import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissio
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServlet;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServlet;
-import org.wso2.carbon.utils.CarbonUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Hashtable;
 
-public class ThriftServerStartupObserver implements ServerStartupObserver {
+public class ThriftServerStartupImpl implements ThriftServerStartup{
 
-    private static final Log log = LogFactory.getLog(ThriftServerStartupObserver.class);
-    @Override
+    private static final Log log = LogFactory.getLog(ThriftServerStartupImpl.class);
+
     public void completingServerStartup() {
         try {
-            ThriftDataReceiverConfiguration thriftDataReceiverConfiguration = new
-                    ThriftDataReceiverConfiguration(ServiceHolder.getDataBridgeReceiverService().getInitialConfig());
+            ThriftDataReceiverConfiguration thriftDataReceiverConfiguration = new ThriftDataReceiverConfiguration(
+                    ServiceHolder.getDataBridgeReceiverService().getInitialConfig());
 
             if (ServiceHolder.getDataReceiver() == null) {
-                ServiceHolder.setDataReceiver(new ThriftDataReceiverFactory().createAgentServer(thriftDataReceiverConfiguration, ServiceHolder.getDataBridgeReceiverService()));
-                String serverUrl = CarbonUtils.getServerURL(ServiceHolder.getServerConfiguration(), ServiceHolder.getConfigurationContext().getServerConfigContext());
+                ServiceHolder.setDataReceiver(new ThriftDataReceiverFactory().createAgentServer(
+                        thriftDataReceiverConfiguration, ServiceHolder.getDataBridgeReceiverService()));
+                // TODO: 1/27/17 Hack to get host name. Change!
+                /*String serverUrl = CarbonUtils.getServerURL(ServiceHolder.getServerConfiguration(),
+                        ServiceHolder.getConfigurationContext().getServerConfigContext());*/
                 String hostName = thriftDataReceiverConfiguration.getReceiverHostName();
                 if (null == hostName) {
-                    try {
+                    hostName = HostAddressFinder.findAddress("localhost");
+                    /*try {
                         hostName = new URL(serverUrl).getHost();
                     } catch (MalformedURLException e) {
                         hostName = HostAddressFinder.findAddress("localhost");
-                        if (!serverUrl.matches("local:/.*//*
-services/")) {
-                            log.info("The server url :" + serverUrl + " is using local, hence hostname is assigned as '" + hostName + "'");
+                        if (!serverUrl.matches("local:/.services/")) {
+                            log.info("The server url :" + serverUrl + " is using local, hence hostname is assigned as '"
+                                    + hostName + "'");
                         }
-                    }
+                    }*/
                 }
                 ServiceHolder.getDataReceiver().start(hostName);
                 ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl> processor = new ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl>(
@@ -69,18 +71,14 @@ services/")) {
                 TCompactProtocol.Factory outProtFactory = new TCompactProtocol.Factory();
 
                 ServiceHolder.getHttpServiceInstance().registerServlet("/thriftReceiver",
-                        new ThriftEventTransmissionServlet(processor, inProtFactory,
-                                outProtFactory),
-                        new Hashtable(),
+                        new ThriftEventTransmissionServlet(processor, inProtFactory, outProtFactory), new Hashtable(),
                         ServiceHolder.getHttpServiceInstance().createDefaultHttpContext());
 
                 ThriftSecureEventTransmissionService.Processor<ThriftSecureEventTransmissionServiceImpl> authProcessor = new ThriftSecureEventTransmissionService.Processor<ThriftSecureEventTransmissionServiceImpl>(
                         new ThriftSecureEventTransmissionServiceImpl(ServiceHolder.getDataBridgeReceiverService()));
                 ServiceHolder.getHttpServiceInstance().registerServlet("/securedThriftReceiver",
-                        new ThriftSecureEventTransmissionServlet(authProcessor, inProtFactory,
-                                outProtFactory),
-                        new Hashtable(),
-                        ServiceHolder.getHttpServiceInstance().createDefaultHttpContext());
+                        new ThriftSecureEventTransmissionServlet(authProcessor, inProtFactory, outProtFactory),
+                        new Hashtable(), ServiceHolder.getHttpServiceInstance().createDefaultHttpContext());
 
             }
         } catch (DataBridgeException e) {
@@ -91,10 +89,4 @@ services/")) {
             log.error("Error in starting Agent Server ", e);
         }
     }
-
-    @Override
-    public void completedServerStartup() {
-
-    }
 }
-*/

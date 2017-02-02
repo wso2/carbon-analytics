@@ -11,19 +11,19 @@
  * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
  * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations under the License.
- */
+ *//*
+
 package org.wso2.carbon.event.stream.core.internal.ds;
 
 import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.internal.CarbonEventStreamService;
 import org.wso2.carbon.event.stream.core.internal.EventStreamRuntime;
-import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EventStreamServiceValueHolder {
-
+    // TODO: 1/31/17 removing temporarily
     private static CarbonEventStreamService carbonEventStreamService;
     private static ConfigurationContextService configurationContextService;
     private static List<EventStreamListener> eventStreamListenerList =  new CopyOnWriteArrayList<EventStreamListener>();
@@ -70,3 +70,4 @@ public class EventStreamServiceValueHolder {
         EventStreamServiceValueHolder.eventStreamRuntime = eventStreamRuntime;
     }
 }
+*/

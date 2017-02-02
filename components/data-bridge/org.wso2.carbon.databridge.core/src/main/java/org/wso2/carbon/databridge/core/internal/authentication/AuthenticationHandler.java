@@ -18,7 +18,6 @@
 package org.wso2.carbon.databridge.core.internal.authentication;
 
 import org.wso2.carbon.databridge.core.Utils.AgentSession;
-import org.wso2.carbon.user.api.UserStoreException;
 
 /**
  * The handler interface that's used to authenticate Agents
@@ -26,9 +25,9 @@ import org.wso2.carbon.user.api.UserStoreException;
 public interface AuthenticationHandler {
     boolean authenticate(String userName, String password);
 
-    String getTenantDomain(String userName);
+    /*String getTenantDomain(String userName);
 
-    int getTenantId(String tenantDomain)throws UserStoreException;
+    int getTenantId(String tenantDomain)throws UserStoreException;*/
 
     void initContext(AgentSession agentSession);
 

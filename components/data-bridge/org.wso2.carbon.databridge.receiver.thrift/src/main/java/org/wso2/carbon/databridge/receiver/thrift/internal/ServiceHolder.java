@@ -18,15 +18,13 @@
 package org.wso2.carbon.databridge.receiver.thrift.internal;
 
 import org.osgi.service.http.HttpService;
-import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.receiver.thrift.ThriftDataReceiver;
-import org.wso2.carbon.utils.ConfigurationContextService;
+import org.wso2.carbon.kernel.CarbonRuntime;
 
 public class ServiceHolder {
     private static DataBridgeReceiverService dataBridgeReceiverService;
-    private static ServerConfigurationService serverConfiguration;
-    private static ConfigurationContextService configurationContext;
+    private static CarbonRuntime carbonRuntime;
     private static ThriftDataReceiver dataReceiver;
     private static HttpService httpServiceInstance;
 
@@ -38,20 +36,12 @@ public class ServiceHolder {
         ServiceHolder.dataBridgeReceiverService = dataBridgeReceiverService;
     }
 
-    public static ServerConfigurationService getServerConfiguration() {
-        return serverConfiguration;
+    public static CarbonRuntime getCarbonRuntime() {
+        return carbonRuntime;
     }
 
-    public static void setServerConfiguration(ServerConfigurationService serverConfiguration) {
-        ServiceHolder.serverConfiguration = serverConfiguration;
-    }
-
-    public static ConfigurationContextService getConfigurationContext() {
-        return configurationContext;
-    }
-
-    public static void setConfigurationContext(ConfigurationContextService configurationContext) {
-        ServiceHolder.configurationContext = configurationContext;
+    public static void setCarbonRuntime(CarbonRuntime carbonRuntime) {
+        ServiceHolder.carbonRuntime = carbonRuntime;
     }
 
     public static HttpService getHttpServiceInstance() {

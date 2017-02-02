@@ -14,15 +14,13 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
- */
+ *//*
+
 package org.wso2.carbon.event.stream.core.internal;
 
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.base.MultitenantConstants;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-//import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -37,7 +35,6 @@ import org.wso2.carbon.event.stream.core.WSO2EventListConsumer;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.event.stream.core.exception.StreamDefinitionAlreadyDefinedException;
 import org.wso2.carbon.event.stream.core.internal.ds.EventStreamServiceValueHolder;
-import org.wso2.carbon.event.stream.core.internal.util.CarbonEventStreamUtil;
 import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
 import org.wso2.carbon.event.stream.core.internal.util.SampleEventGenerator;
 import org.wso2.carbon.event.stream.core.internal.util.helper.EventStreamConfigurationFileSystemInvoker;
@@ -50,14 +47,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CarbonEventStreamService implements EventStreamService {
-
+    // TODO: 1/31/17 removing temporarily
+    // TODO: 1/30/17 no tenant concept. Temporarily loading streams from <carbon-home>/deployment/eventstreams directory
     private static final Log log = LogFactory.getLog(CarbonEventStreamService.class);
     private final List<StreamDefinition> pendingStreams = new ArrayList<StreamDefinition>();
-    private Map<Integer, ConcurrentHashMap<String, EventStreamConfiguration>> tenantSpecificEventStreamConfigs = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, EventStreamConfiguration>>();
+//    private Map<Integer, ConcurrentHashMap<String, EventStreamConfiguration>> tenantSpecificEventStreamConfigs = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, EventStreamConfiguration>>();
+    private ConcurrentHashMap<String, EventStreamConfiguration> eventStreamConfigs;
 
     public void removeEventStreamConfigurationFromMap(String fileName) throws EventStreamConfigurationException{
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+//        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+//        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
         String streamId = null;
         if (eventStreamConfigs != null) {
             for (EventStreamConfiguration eventStreamConfiguration : eventStreamConfigs.values()) {
@@ -70,17 +69,18 @@ public class CarbonEventStreamService implements EventStreamService {
         if (streamId != null) {
             eventStreamConfigs.remove(streamId);
             for (EventStreamListener eventStreamListener : EventStreamServiceValueHolder.getEventStreamListenerList()) {
-                eventStreamListener.removedEventStream(tenantId,
-                        DataBridgeCommonsUtils.getStreamNameFromStreamId(streamId),
+                eventStreamListener.removedEventStream(DataBridgeCommonsUtils.getStreamNameFromStreamId(streamId),
                         DataBridgeCommonsUtils.getStreamVersionFromStreamId(streamId));
             }
             EventStreamServiceValueHolder.getEventStreamRuntime().deleteStreamJunction(streamId);
         }
     }
 
-    /**
+    */
+/**
      * Pending streams will be added
-     */
+     *//*
+
     public void addPendingStreams() {
         synchronized (pendingStreams) {
             for (StreamDefinition stream : pendingStreams) {
@@ -94,29 +94,33 @@ public class CarbonEventStreamService implements EventStreamService {
         }
     }
 
-    /**
+    */
+/**
      * @param name
      * @param version
      * @return
-     */
+     *//*
+
     @Override
     public StreamDefinition getStreamDefinition(String name, String version) throws EventStreamConfigurationException {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+//        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+//        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
         if (eventStreamConfigs != null && eventStreamConfigs.containsKey(name + ":" + version)) {
             return eventStreamConfigs.get(name + ":" + version).getStreamDefinition();
         }
         return null;
     }
 
-    /**
+    */
+/**
      * @param streamId
      * @return StreamDefinition and returns null if ont exist
-     */
+     *//*
+
     @Override
     public StreamDefinition getStreamDefinition(String streamId) throws EventStreamConfigurationException {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+//        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+//        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
         if (eventStreamConfigs != null && eventStreamConfigs.containsKey(streamId)) {
             return eventStreamConfigs.get(streamId).getStreamDefinition();
         }
@@ -124,8 +128,8 @@ public class CarbonEventStreamService implements EventStreamService {
     }
 
     public EventStreamConfiguration getEventStreamConfiguration(String streamId) {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+//        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+//        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
         if (eventStreamConfigs != null && eventStreamConfigs.containsKey(streamId)) {
             return eventStreamConfigs.get(streamId);
         }
@@ -134,8 +138,8 @@ public class CarbonEventStreamService implements EventStreamService {
 
     @Override
     public List<StreamDefinition> getAllStreamDefinitions() throws EventStreamConfigurationException {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+//        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+//        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
         List<StreamDefinition> list = new ArrayList<StreamDefinition>();
         if (eventStreamConfigs == null) {
             return list;
@@ -148,8 +152,8 @@ public class CarbonEventStreamService implements EventStreamService {
 
     @Override
     public List<EventStreamConfiguration> getAllEventStreamConfigurations() throws EventStreamConfigurationException {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+//        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+//        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
         if (eventStreamConfigs == null) {
             return new ArrayList<EventStreamConfiguration>();
         }
@@ -158,16 +162,15 @@ public class CarbonEventStreamService implements EventStreamService {
 
     public void addEventStreamConfig(EventStreamConfiguration eventStreamConfiguration)
             throws EventStreamConfigurationException {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        ConcurrentHashMap<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+//        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+//        ConcurrentHashMap<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
         if (eventStreamConfigs == null) {
             eventStreamConfigs = new ConcurrentHashMap<String, EventStreamConfiguration>();
-            tenantSpecificEventStreamConfigs.put(tenantId, eventStreamConfigs);
+//            tenantSpecificEventStreamConfigs.put(tenantId, eventStreamConfigs);
         }
         eventStreamConfigs.put(eventStreamConfiguration.getStreamDefinition().getStreamId(), eventStreamConfiguration);
         for (EventStreamListener eventStreamListener : EventStreamServiceValueHolder.getEventStreamListenerList()) {
-            eventStreamListener.addedEventStream(tenantId,
-                    eventStreamConfiguration.getStreamDefinition().getName(),
+            eventStreamListener.addedEventStream(eventStreamConfiguration.getStreamDefinition().getName(),
                     eventStreamConfiguration.getStreamDefinition().getVersion());
         }
     }
@@ -211,7 +214,6 @@ public class CarbonEventStreamService implements EventStreamService {
     @Override
     public void addEventStreamDefinition(StreamDefinition streamDefinition) throws
             EventStreamConfigurationException {
-
         //If ConfigurationContextService is available stream will be saved,
         //Else stream will be added pendingStreams list to save once ConfigurationContextService is available
         if (EventStreamServiceValueHolder.getConfigurationContextService() != null) {
@@ -252,18 +254,19 @@ public class CarbonEventStreamService implements EventStreamService {
     }
 
 
-    private AxisConfiguration getAxisConfiguration() {
+    */
+/*private AxisConfiguration getAxisConfiguration() {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         AxisConfiguration axisConfig;
-        // TODO: 1/20/17  
-        /*if (tenantId == MultitenantConstants.SUPER_TENANT_ID) {
+        if (tenantId == MultitenantConstants.SUPER_TENANT_ID) {
             axisConfig = EventStreamServiceValueHolder.getConfigurationContextService().getServerConfigContext().getAxisConfiguration();
         } else {
             axisConfig = TenantAxisUtils.getTenantAxisConfiguration(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(), EventStreamServiceValueHolder.getConfigurationContextService().getServerConfigContext());
-        }*/
+        }
         axisConfig = EventStreamServiceValueHolder.getConfigurationContextService().getServerConfigContext().getAxisConfiguration();
         return axisConfig;
-    }
+    }*//*
+
 
     public void removeEventStreamDefinition(String streamId) throws EventStreamConfigurationException {
         String name = null, version = null;
@@ -360,8 +363,8 @@ public class CarbonEventStreamService implements EventStreamService {
 
 
     public boolean isEventStreamFileExists(String eventStreamFileName) {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+//        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+//        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
         if (eventStreamConfigs != null) {
             for (EventStreamConfiguration eventStreamConfiguration : eventStreamConfigs.values()) {
                 if (eventStreamConfiguration.getFileName().equals(eventStreamFileName)) {
@@ -419,3 +422,4 @@ public class CarbonEventStreamService implements EventStreamService {
         return true;
     }
 }
+*/

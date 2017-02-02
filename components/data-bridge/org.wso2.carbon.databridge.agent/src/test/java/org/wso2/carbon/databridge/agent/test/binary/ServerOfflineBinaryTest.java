@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.net.SocketException;
 
 public class ServerOfflineBinaryTest {
+    // TODO: 1/31/17 no tenant concept
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private String agentConfigFileName = "data-agent-config.xml";
@@ -128,7 +129,7 @@ public class ServerOfflineBinaryTest {
         }
 
         binaryTestServer = new BinaryTestServer();
-        binaryTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        binaryTestServer.addStreamDefinition(STREAM_DEFN);
         binaryTestServer.start(9619, 9719);
 
         try {
@@ -161,7 +162,7 @@ public class ServerOfflineBinaryTest {
         event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
 
         binaryTestServer = new BinaryTestServer();
-        binaryTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        binaryTestServer.addStreamDefinition(STREAM_DEFN);
         binaryTestServer.stopAndStartDuration(9651, 9751, 5000, 1000);
 
         int queueSize = AgentHolder.getInstance().getDataEndpointAgent("Binary").

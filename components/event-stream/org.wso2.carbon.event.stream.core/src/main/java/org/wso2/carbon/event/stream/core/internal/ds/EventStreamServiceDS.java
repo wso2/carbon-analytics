@@ -11,7 +11,8 @@
  * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
  * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations under the License.
- */
+ *//*
+
 package org.wso2.carbon.event.stream.core.internal.ds;
 
 import org.apache.commons.logging.Log;
@@ -23,6 +24,7 @@ import org.wso2.carbon.event.stream.core.internal.CarbonEventStreamService;
 import org.wso2.carbon.event.stream.core.internal.EventStreamRuntime;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
+*/
 /**
  * @scr.component name="eventStreamService.component" immediate="true"
  * @scr.reference name="config.context.service"
@@ -31,8 +33,10 @@ import org.wso2.carbon.utils.ConfigurationContextService;
  * @scr.reference name="eventStreamListener.service"
  * interface="org.wso2.carbon.event.stream.core.EventStreamListener" cardinality="0..n" policy="dynamic"
  * bind="setEventStreamListener" unbind="unsetEventStreamListener"
- */
+ *//*
+
 public class EventStreamServiceDS {
+    // TODO: 1/31/17 removing temporarily
     private static final Log log = LogFactory.getLog(EventStreamServiceDS.class);
 
     protected void activate(ComponentContext context) {
@@ -69,3 +73,4 @@ public class EventStreamServiceDS {
         EventStreamServiceValueHolder.unregisterEventStreamListener(eventStreamListener);
     }
 }
+*/

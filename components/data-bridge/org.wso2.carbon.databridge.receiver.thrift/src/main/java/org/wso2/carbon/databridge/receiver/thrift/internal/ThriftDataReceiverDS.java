@@ -12,102 +12,85 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *//*
-TODO
+ */
+
 
 package org.wso2.carbon.databridge.receiver.thrift.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.thrift.protocol.TCompactProtocol;
-import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.http.HttpService;
-import org.wso2.carbon.base.api.ServerConfigurationService;
-import org.wso2.carbon.core.ServerStartupObserver;
-import org.wso2.carbon.databridge.commons.thrift.service.general.ThriftEventTransmissionService;
-import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEventTransmissionService;
-import org.wso2.carbon.databridge.commons.thrift.utils.CommonThriftConstants;
-import org.wso2.carbon.databridge.commons.thrift.utils.HostAddressFinder;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
-import org.wso2.carbon.databridge.core.exception.DataBridgeException;
-import org.wso2.carbon.databridge.receiver.thrift.ThriftDataReceiver;
-import org.wso2.carbon.databridge.receiver.thrift.ThriftDataReceiverFactory;
-import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfiguration;
-import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServiceImpl;
-import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServlet;
-import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
-import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServlet;
-import org.wso2.carbon.utils.CarbonUtils;
-import org.wso2.carbon.utils.ConfigurationContextService;
+import org.wso2.carbon.kernel.CarbonRuntime;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Hashtable;
 
-*/
-/**
- * @scr.component name="thriftdatareceiver.component" immediate="true"
- * @scr.reference name="server.configuration"
- * interface="org.wso2.carbon.base.api.ServerConfigurationService"
- * cardinality="1..1" policy="dynamic"  bind="setServerConfiguration" unbind="unsetServerConfiguration"
- * @scr.reference name="configuration.context"
- * interface="org.wso2.carbon.utils.ConfigurationContextService"
- * cardinality="1..1" policy="dynamic"  bind="setConfigurationContext" unbind="unsetConfigurationContext"
- * @scr.reference name="databridge.core"
- * interface="org.wso2.carbon.databridge.core.DataBridgeReceiverService"
- * cardinality="1..1" policy="dynamic" bind="setDataBridgeReceiverService" unbind="unsetDatabridgeReceiverService"
- * @scr.reference name="http.service"
- * interface="org.osgi.service.http.HttpService"
- * cardinality="1..1" policy="dynamic"  bind="setHttpService" unbind="unsetHttpService"
- *//*
+@Component(
+        name = "org.wso2.carbon.databridge.receiver.thrift.internal.ThriftDataReceiverDS",
+        immediate = true
+)
 
 public class ThriftDataReceiverDS {
     private static final Log log = LogFactory.getLog(ThriftDataReceiverDS.class);
+    private ServiceRegistration serviceRegistration;
 
     private static final String DISABLE_RECEIVER = "disable.receiver";
 
-    */
-/**
-     * initialize the agent server here.
+    /**
+     * This is the activation method of ThriftDataReceiverDS. This will be called when its references are
+     * satisfied.
      *
-     * @param context
-     *//*
-
-    protected void activate(ComponentContext context) {
+     * @param bundleContext the bundle context instance of this bundle.
+     * @throws Exception this will be thrown if an issue occurs while executing the activate method
+     */
+    @Activate
+    protected void start(BundleContext bundleContext) throws Exception {
         String disableReceiver = System.getProperty(DISABLE_RECEIVER);
         if (disableReceiver != null && Boolean.parseBoolean(disableReceiver)) {
             log.info("Receiver disabled.");
             return;
         }
-        context.getBundleContext().registerService(ServerStartupObserver.class.getName(),
-                new ThriftServerStartupObserver(), null);
+        // Register ThriftServerStartupImpl instance as an OSGi service.
+        serviceRegistration = bundleContext.registerService(ThriftServerStartup.class.getName(),
+                new ThriftServerStartupImpl(), null);
     }
 
-
-    protected void deactivate(ComponentContext context) {
+    /**
+     * This is the deactivation method of ThriftDataReceiverDS. This will be called when this component
+     * is being stopped or references are satisfied during runtime.
+     *
+     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
+     */
+    @Deactivate
+    protected void stop() throws Exception {
         log.info("Thrift server shutting down...");
+        // Unregister OSGi service
+        serviceRegistration.unregister();
+
         ServiceHolder.getDataReceiver().stop();
         if (log.isDebugEnabled()) {
             log.debug("Successfully stopped agent server");
         }
     }
 
-    protected void setServerConfiguration(ServerConfigurationService serverConfiguration) {
-        ServiceHolder.setServerConfiguration(serverConfiguration);
-    }
-
-    protected void unsetServerConfiguration(ServerConfigurationService serverConfiguration) {
-       ServiceHolder.setServerConfiguration(null);
-    }
-
-    protected void setConfigurationContext(ConfigurationContextService configurationContext) {
-        ServiceHolder.setConfigurationContext(configurationContext);
-    }
-
-    protected void unsetConfigurationContext(ConfigurationContextService configurationContext) {
-       ServiceHolder.setConfigurationContext(null);
-    }
-
+    /**
+     *
+     * @param dataBridgeReceiverService The DataBridgeReceiverService instance registered as an OSGi service
+     */
+    @Reference(
+            name = "dataBridge.receiver.service",
+            service = DataBridgeReceiverService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetDatabridgeReceiverService"
+    )
     protected void setDataBridgeReceiverService(
             DataBridgeReceiverService dataBridgeReceiverService) {
         ServiceHolder.setDataBridgeReceiverService(dataBridgeReceiverService);
@@ -118,6 +101,17 @@ public class ThriftDataReceiverDS {
         ServiceHolder.setDataBridgeReceiverService(dataBridgeReceiverService);
     }
 
+    /**
+     *
+     * @param httpService The HttpService instance registered as an OSGi service
+     */
+    @Reference(
+            name = "http.service",
+            service = HttpService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetHttpService"
+    )
     protected void setHttpService(HttpService httpService) {
         ServiceHolder.setHttpServiceInstance(httpService);
     }
@@ -126,5 +120,24 @@ public class ThriftDataReceiverDS {
         ServiceHolder.setHttpServiceInstance(httpService);
     }
 
+    /**
+     * This bind method will be called when CarbonRuntime OSGi service is registered.
+     *
+     * @param carbonRuntime The CarbonRuntime instance registered by Carbon Kernel as an OSGi service
+     */
+    @Reference(
+            name = "carbon.runtime.service",
+            service = CarbonRuntime.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetCarbonRuntime"
+    )
+    protected void setCarbonRuntime(CarbonRuntime carbonRuntime) {
+        ServiceHolder.setCarbonRuntime(carbonRuntime);
+    }
+
+    protected void unsetCarbonRuntime(CarbonRuntime carbonRuntime) {
+        ServiceHolder.setCarbonRuntime(null);
+    }
 }
-*/
+

@@ -41,7 +41,6 @@ import org.wso2.carbon.databridge.core.internal.EventDispatcher;
 import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
 import org.wso2.carbon.databridge.core.internal.authentication.Authenticator;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
-import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.securevault.SecretResolver;
 import org.wso2.securevault.SecretResolverFactory;
 
@@ -60,6 +59,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * server implementations.
  */
 public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiverService {
+
+    // TODO: 1/30/17 no tenant concept
 
     private static final Log log = LogFactory.getLog(DataBridge.class);
     private StreamDefinitionStore streamDefinitionStore;
@@ -130,9 +131,9 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             authenticatorHandler.initContext(agentSession);
             String streamId = eventDispatcher.defineStream(streamDefinition, agentSession);
             if (streamId != null) {
-                int tenantId = agentSession.getCredentials().getTenantId();
+//                int tenantId = agentSession.getCredentials().getTenantId();
                 for (StreamAddRemoveListener streamAddRemoveListener : streamAddRemoveListenerList) {
-                    streamAddRemoveListener.streamAdded(tenantId, streamId);
+                    streamAddRemoveListener.streamAdded(streamId);
                 }
             }
             return streamId;
@@ -163,9 +164,9 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             authenticatorHandler.initContext(agentSession);
             String streamId = eventDispatcher.defineStream(streamDefinition, agentSession, indexDefinition);
             if (streamId != null) {
-                int tenantId = agentSession.getCredentials().getTenantId();
+//                int tenantId = agentSession.getCredentials().getTenantId();
                 for (StreamAddRemoveListener streamAddRemoveListener : streamAddRemoveListenerList) {
-                    streamAddRemoveListener.streamAdded(tenantId, streamId);
+                    streamAddRemoveListener.streamAdded(streamId);
                 }
             }
             return streamId;
@@ -218,7 +219,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             status = eventDispatcher.deleteStream(DataBridgeCommonsUtils.getStreamNameFromStreamId(streamId), DataBridgeCommonsUtils.getStreamVersionFromStreamId(streamId), agentSession);
             if (status) {
                 for (StreamAddRemoveListener streamAddRemoveListener : streamAddRemoveListenerList) {
-                    streamAddRemoveListener.streamRemoved(agentSession.getCredentials().getTenantId(), streamId);
+                    streamAddRemoveListener.streamRemoved(streamId);
                 }
             }
         } finally {
@@ -271,7 +272,10 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
                                 " end time stamp : " + endTime + " Throughput is (events / sec) : " +
                                 (currentBatchSize * 1000) / (endTime - startTime) + " Total Event Count : " +
                                 totalEventCounter + " \n";
-                        File file = new File(CarbonUtils.getCarbonHome() + File.separator + "receiver-perf.txt");
+                        // TODO: 1/30/17 creating receiver-perf.txt in CARBON_HOME/tmp directory
+                        //File file = new File(CarbonUtils.getCarbonHome() + File.separator + "receiver-perf.txt");
+                        File tmpFolder = new File("tmp");
+                        File file = new File(tmpFolder.getAbsolutePath() + File.separator + "receiver-perf.txt");
                         if (!file.exists()) {
                             log.info("Creating the performance measurement file at : " + file.getAbsolutePath());
                         }
@@ -364,7 +368,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
 
         try {
             authenticatorHandler.initContext(agentSession);
-            return getStreamDefinition(streamName, streamVersion, agentSession.getCredentials().getTenantId());
+            return getStreamDefinition(streamName, streamVersion);
         } finally {
             authenticatorHandler.destroyContext(agentSession);
 
@@ -383,7 +387,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         }
         try {
             authenticatorHandler.initContext(agentSession);
-            return getAllStreamDefinitions(agentSession.getCredentials().getTenantId());
+            return getAllStreamDefinitions();
         } finally {
             authenticatorHandler.destroyContext(agentSession);
         }
@@ -402,7 +406,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         }
         try {
             authenticatorHandler.initContext(agentSession);
-            saveStreamDefinition(streamDefinition, agentSession.getCredentials().getTenantId());
+            saveStreamDefinition(streamDefinition);
             eventDispatcher.updateStreamDefinitionHolder(agentSession);
         } finally {
             authenticatorHandler.destroyContext(agentSession);
@@ -412,36 +416,36 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     // Stream store operations
     @Override
     public StreamDefinition getStreamDefinition(String streamName,
-                                                String streamVersion, int tenantId)
+                                                String streamVersion)
             throws StreamDefinitionNotFoundException, StreamDefinitionStoreException {
-        return streamDefinitionStore.getStreamDefinition(streamName, streamVersion, tenantId);
+        return streamDefinitionStore.getStreamDefinition(streamName, streamVersion);
 
     }
 
     @Override
-    public StreamDefinition getStreamDefinition(String streamId, int tenantId)
+    public StreamDefinition getStreamDefinition(String streamId)
             throws StreamDefinitionNotFoundException, StreamDefinitionStoreException {
-        return streamDefinitionStore.getStreamDefinition(streamId, tenantId);
+        return streamDefinitionStore.getStreamDefinition(streamId);
 
     }
 
     @Override
-    public List<StreamDefinition> getAllStreamDefinitions(int tenantId) {
-        return new ArrayList<>(streamDefinitionStore.getAllStreamDefinitions(tenantId));
+    public List<StreamDefinition> getAllStreamDefinitions() {
+        return new ArrayList<>(streamDefinitionStore.getAllStreamDefinitions());
     }
 
 
     @Override
-    public void saveStreamDefinition(StreamDefinition streamDefinition, int tenantId)
+    public void saveStreamDefinition(StreamDefinition streamDefinition)
             throws DifferentStreamDefinitionAlreadyDefinedException,
             StreamDefinitionStoreException {
-        streamDefinitionStore.saveStreamDefinition(streamDefinition, tenantId);
+        streamDefinitionStore.saveStreamDefinition(streamDefinition);
     }
 
     @Override
     public boolean deleteStreamDefinition(String streamName,
-                                          String streamVersion, int tenantId) {
-        return streamDefinitionStore.deleteStreamDefinition(streamName, streamVersion, tenantId);
+                                          String streamVersion) {
+        return streamDefinitionStore.deleteStreamDefinition(streamName, streamVersion);
     }
 
     public List<AgentCallback> getSubscribers() {

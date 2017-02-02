@@ -23,12 +23,13 @@ import org.wso2.carbon.databridge.commons.thrift.utils.CommonThriftConstants;
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
 import org.wso2.carbon.databridge.core.conf.DataReceiver;
 import org.wso2.carbon.databridge.receiver.thrift.internal.utils.ThriftDataReceiverConstants;
-import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.kernel.internal.config.YAMLBasedConfigProvider;
 
 /**
  * configuration details related to DataReceiver
  */
 public class ThriftDataReceiverConfiguration {
+    // TODO: 1/31/17 getting port offset from carbon.yml file (CarbonConfiguration class in C5)
     private int secureDataReceiverPort;
     private int dataReceiverPort;
     private String sslProtocols;
@@ -90,8 +91,10 @@ public class ThriftDataReceiverConfiguration {
     }
 
     public int getPortOffset() {
-        return CarbonUtils.
-                getPortFromServerConfig(ThriftDataReceiverConstants.CARBON_CONFIG_PORT_OFFSET_NODE) + 1;
+        YAMLBasedConfigProvider yamlBasedConfigProvider = new YAMLBasedConfigProvider();
+
+//        return CarbonUtils.getPortFromServerConfig(BinaryDataReceiverConstants.CARBON_CONFIG_PORT_OFFSET_NODE)+1;
+        return yamlBasedConfigProvider.getCarbonConfiguration().getPortsConfig().getOffset()+1;
     }
 
     public String getSslProtocols() {

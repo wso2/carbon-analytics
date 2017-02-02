@@ -34,8 +34,8 @@
         <!--<module>components/analytics-dashboard</module>-->
         <module>components/data-bridge</module>
         <!--<module>components/analytics-data-agents</module>-->
-        <module>components/event-stream</module>
-        <module>components/application-deployer</module>
+        <!--<module>components/event-stream</module>-->
+        <!--<module>components/application-deployer</module>-->
         <!--<module>components/event-monitor</module>-->
         <!--<module>components/event-processor-manager</module>-->
         <!--<module>components/event-receiver</module>-->
@@ -155,11 +155,6 @@
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.application.deployer</artifactId>
-                <version>${carbon.analytics-common.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.core</artifactId>
                 <version>${carbon.kernel.version}</version>
@@ -205,40 +200,19 @@
                 <version>${disruptor.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.core.common</artifactId>
-                <version>${wso2.carbon.version}</version>
-                <!--todo-->
+                <groupId>org.apache.directory.studio</groupId>
+                <artifactId>org.apache.commons.io</artifactId>
+                <version>${apache.commons.io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.securevault</groupId>
+                <artifactId>org.wso2.securevault</artifactId>
+                <version>${securevalut.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.authenticator.proxy</artifactId>
-                <version>${wso2.carbon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.authenticator.stub</artifactId>
-                <version>${wso2.carbon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.commons</groupId>
-                <artifactId>org.wso2.carbon.identity.authentication</artifactId>
-                <version>${carbon.commons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.user.core</artifactId>
-                <version>${wso2.carbon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.utils</artifactId>
-                <version>${wso2.carbon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.application.deployer</artifactId>
-                <version>${wso2.carbon.version}</version>
+                <artifactId>org.wso2.carbon.base</artifactId>
+                <version>${carbon.kernel.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-pool.wso2</groupId>
@@ -308,6 +282,11 @@
                 <artifactId>org.jacoco.agent</artifactId>
                 <classifier>runtime</classifier>
                 <version>${jacoco.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>${javax.servlet.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.inject</groupId>
@@ -432,7 +411,6 @@
         <carbon.analytics-common.pkg.export.version>6.0.0</carbon.analytics-common.pkg.export.version>
 
         <carbon.kernel.version>5.1.0</carbon.kernel.version>
-        <wso2.carbon.version>4.4.12</wso2.carbon.version>
         <carbon.feature.plugin.version>2.1.0</carbon.feature.plugin.version>
         <org.snakeyaml.version>1.16.0.wso2v1</org.snakeyaml.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
@@ -443,10 +421,11 @@
         <json.version>3.0.0.wso2v1</json.version>
         <libthrift.version>0.9.2.wso2v1</libthrift.version>
         <guava.version>20.0</guava.version>
-        <carbon.commons.version>4.5.5</carbon.commons.version>
         <httpclient.version>4.3.2.wso2v1</httpclient.version>
         <disruptor.version>3.3.2.wso2v2</disruptor.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
+        <apache.commons.io.version>2.4</apache.commons.io.version>
+        <securevalut.version>1.0.0-wso2v2</securevalut.version>
 
         <siddhi.core.version>3.1.2</siddhi.core.version>
 
@@ -502,6 +481,7 @@
         <org.wso2.eclipse.osgi.version>3.4.0.v20140312-2051</org.wso2.eclipse.osgi.version>
         <ow2.jta.spec.version>1.0.12</ow2.jta.spec.version>
         <javax.inject.version>1</javax.inject.version>
+        <javax.servlet.version>3.1.0</javax.servlet.version>
         <jacoco.version>0.7.5.201505241946</jacoco.version>
         <junit.version>4.10</junit.version>
 

@@ -14,7 +14,8 @@
 * KIND, either express or implied.  See the License for the
 * specific language governing permissions and limitations
 * under the License.
-*/
+*//*
+
 package org.wso2.carbon.databridge.core.internal.authentication;
 
 import org.apache.commons.logging.Log;
@@ -28,10 +29,12 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+*/
 /**
  * CarbonAuthenticationHandler implementation that authenticate Agents
  * via Carbon AuthenticationService
- */
+ *//*
+
 public class CarbonAuthenticationHandler implements AuthenticationHandler {
     private AuthenticationService authenticationService;
     private static final Log log = LogFactory.getLog(CarbonAuthenticationHandler.class);
@@ -49,7 +52,9 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
             privilegedCarbonContext.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
         }
         boolean authenticated = authenticationService.authenticate(userName, password);
-        if (authenticated) {
+        // TODO: 1/24/17 no tenant concept any longer
+        */
+/*if (authenticated) {
 
             String tenantDomain = MultitenantUtils.getTenantDomain(userName);
             String tenantLessUserName = MultitenantUtils.getTenantAwareUsername(userName);
@@ -63,8 +68,7 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
             }
             // Load tenant : This is needed because we have removed ActivationHandler,
             // which did the tenant loading part earlier with login. So we load tenant after successful login
-            // TODO: 1/19/17  
-            /*try {
+            try {
                 if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                     TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
                             DataBridgeServiceValueHolder.
@@ -74,8 +78,9 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
                 }
             } catch (Exception e) {
                 log.error("Error trying load tenant after successful login", e);
-            }*/
-        }
+            }
+        }*//*
+
         return authenticated;
     }
 
@@ -84,9 +89,16 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
         return MultitenantUtils.getTenantDomain(userName);
     }
 
-    @Override
+    */
+/*@Override
     public int getTenantId(String tenantDomain) throws UserStoreException {
         return DataBridgeServiceValueHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
+    }*//*
+
+
+    @Override
+    public int getTenantId(String tenantDomain) throws UserStoreException {
+        return MultitenantConstants.SUPER_TENANT_ID;
     }
 
     @Override
@@ -108,3 +120,4 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
     }
 
 }
+*/

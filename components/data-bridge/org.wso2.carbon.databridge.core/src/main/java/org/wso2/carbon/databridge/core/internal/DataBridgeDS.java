@@ -16,12 +16,10 @@
 
 package org.wso2.carbon.databridge.core.internal;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.DifferentStreamDefinitionAlreadyDefinedException;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
@@ -30,23 +28,14 @@ import org.wso2.carbon.databridge.core.DataBridge;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.DataBridgeServiceValueHolder;
 import org.wso2.carbon.databridge.core.DataBridgeSubscriberService;
-import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
+import org.wso2.carbon.databridge.core.Utils.AgentSession;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
-import org.wso2.carbon.databridge.core.exception.DataBridgeConfigurationException;
+import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
-import org.wso2.carbon.databridge.core.internal.authentication.CarbonAuthenticationHandler;
-import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
+import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeCoreBuilder;
-import org.wso2.carbon.identity.authentication.AuthenticationService;
-import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.user.core.service.RealmService;
-import org.wso2.carbon.utils.ConfigurationContextService;
-import org.wso2.carbon.utils.ServerConstants;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+
 import java.io.File;
 import java.util.List;
 
@@ -66,41 +55,79 @@ import java.util.List;
  */
 public class DataBridgeDS {
     private static final Log log = LogFactory.getLog(DataBridgeDS.class);
-    private AuthenticationService authenticationService;
     private ServiceRegistration receiverServiceRegistration;
     private ServiceRegistration subscriberServiceRegistration;
     private DataBridge databridge;
-    private ServiceRegistration databridgeRegistration;
-
     /**
      * initialize the agent server here.
      *
      * @param context
      */
     protected void activate(ComponentContext context) {
+        File filePath = new File("resources");
         try {
             if (databridge == null) {
-                AbstractStreamDefinitionStore streamDefinitionStore = DataBridgeServiceValueHolder.getStreamDefinitionStore();
-                databridge = new DataBridge(new CarbonAuthenticationHandler(authenticationService),
-                        streamDefinitionStore, DataBridgeCoreBuilder.getDatabridgeConfigPath());
+                InMemoryStreamDefinitionStore streamDefinitionStore = DataBridgeServiceValueHolder.getStreamDefinitionStore();
+                // TODO: 1/31/17 temporary implementation
+                databridge = new DataBridge(new AuthenticationHandler() {
+                    @Override
+                    public boolean authenticate(String userName,
+                                                String password) {
+                        return true;// allays authenticate to true
+                    }
+
+                    @Override
+                    public void initContext(AgentSession agentSession) {
+                        //To change body of implemented methods use File | Settings | File Templates.
+                    }
+
+                    @Override
+                    public void destroyContext(AgentSession agentSession) {
+
+                    }
+                },streamDefinitionStore, DataBridgeCoreBuilder.getDatabridgeConfigPath());
+
+                databridge = new DataBridge(new AuthenticationHandler() {
+                    @Override
+                    public boolean authenticate(String userName,
+                                                String password) {
+                        return true;// always authenticate to true
+                    }
+
+                    @Override
+                    public void initContext(AgentSession agentSession) {
+                        //To change body of implemented methods use File | Settings | File Templates.
+                    }
+
+                    @Override
+                    public void destroyContext(AgentSession agentSession) {
+
+                    }
+                }, streamDefinitionStore, filePath.getAbsolutePath()+File.separator+"data-bridge-config.xml");
+
                 try {
-                    List<String[]> streamDefinitionStrings = DataBridgeCoreBuilder.loadStreamDefinitionXML();
-                    for (String[] streamDefinitionString : streamDefinitionStrings) {
+                    List<String> streamDefinitionStrings = DataBridgeCoreBuilder.loadStreamDefinitionXML();
+                    for (String streamDefinitionString : streamDefinitionStrings) {
                         try {
-                            StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(streamDefinitionString[1]);
-                            int tenantId = DataBridgeServiceValueHolder.getRealmService().getTenantManager().getTenantId(streamDefinitionString[0]);
-                            if (tenantId == MultitenantConstants.INVALID_TENANT_ID) {
+                            StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(streamDefinitionString);
+                            // TODO: 1/24/17  removed tenant dependency (no realm implementation in c5)
+                            //int tenantId = DataBridgeServiceValueHolder.getRealmService().getTenantManager().getTenantId(streamDefinitionString[0]);
+                            /*if (tenantId == MultitenantConstants.INVALID_TENANT_ID) {
                                 log.warn("Tenant " + streamDefinitionString[0] + " does not exist, Error in defining event stream " + streamDefinitionString[1]);
                                 continue;
-                            }
+                            }*/
 
-                            try {
+                            streamDefinitionStore.saveStreamDefinition(streamDefinition);
+
+
+                            /*try {
                                 PrivilegedCarbonContext.startTenantFlow();
                                 PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
                                 privilegedCarbonContext.setTenantId(tenantId);
+                                privilegedCarbonContext.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
                                 privilegedCarbonContext.setTenantDomain(streamDefinitionString[0]);
 
-                                streamDefinitionStore.saveStreamDefinition(streamDefinition, tenantId);
+                                streamDefinitionStore.saveStreamDefinition(streamDefinition, MultitenantConstants.SUPER_TENANT_ID);
 
                             } catch (DifferentStreamDefinitionAlreadyDefinedException e) {
                                 log.warn("Error redefining event stream of " + streamDefinitionString[0] + ": " + streamDefinitionString[1], e);
@@ -110,11 +137,9 @@ public class DataBridgeDS {
                                 log.error("Error in defining event stream in store " + streamDefinitionString[0] + ": " + streamDefinitionString[1], e);
                             } finally {
                                 PrivilegedCarbonContext.endTenantFlow();
-                            }
+                            }*/
                         } catch (MalformedStreamDefinitionException e) {
-                            log.error("Malformed Stream Definition for " + streamDefinitionString[0] + ": " + streamDefinitionString[1], e);
-                        } catch (UserStoreException e) {
-                            log.error("Error in identifying tenant event stream " + streamDefinitionString[0] + ": " + streamDefinitionString[1], e);
+                            log.error("Malformed Stream Definition for " + streamDefinitionString, e);
                         }
                     }
                 } catch (Throwable t) {
@@ -145,38 +170,38 @@ public class DataBridgeDS {
         }
     }
 
-    protected void setAuthenticationService(AuthenticationService authenticationService) {
+    /*protected void setAuthenticationService(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
 
     protected void unsetAuthenticationService(AuthenticationService authenticationService) {
         this.authenticationService = null;
-    }
+    }*/
 
-    protected void setRealmService(RealmService realmService) {
+    /*protected void setRealmService(RealmService realmService) {
         DataBridgeServiceValueHolder.setRealmService(realmService);
     }
 
     protected void unsetRealmService(RealmService realmService) {
         DataBridgeServiceValueHolder.setRealmService(null);
-    }
+    }*/
 
     protected void setEventStreamStoreService(
-            AbstractStreamDefinitionStore abstractStreamDefinitionStore) {
+            InMemoryStreamDefinitionStore abstractStreamDefinitionStore) {
         DataBridgeServiceValueHolder.setStreamDefinitionStore(abstractStreamDefinitionStore);
     }
 
     protected void unsetEventStreamStoreService(
-            AbstractStreamDefinitionStore abstractStreamDefinitionStore) {
+            InMemoryStreamDefinitionStore abstractStreamDefinitionStore) {
         DataBridgeServiceValueHolder.setStreamDefinitionStore(null);
     }
 
-    protected void setConfigurationContextService(ConfigurationContextService contextService) {
+    /*protected void setConfigurationContextService(ConfigurationContextService contextService) {
         DataBridgeServiceValueHolder.setConfigurationContextService(contextService);
     }
 
     protected void unsetConfigurationContextService(ConfigurationContextService contextService) {
         DataBridgeServiceValueHolder.setConfigurationContextService(null);
-    }
+    }*/
 
 }

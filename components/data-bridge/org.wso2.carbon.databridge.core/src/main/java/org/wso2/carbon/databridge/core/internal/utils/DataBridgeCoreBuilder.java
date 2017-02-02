@@ -23,8 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
 import org.wso2.carbon.databridge.core.exception.DataBridgeConfigurationException;
-import org.wso2.carbon.utils.ServerConstants;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.kernel.utils.Utils;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -39,17 +38,18 @@ import java.util.List;
  * Helper class to build Agent Server Initial Configurations
  */
 public final class DataBridgeCoreBuilder {
-
     private static final Log log = LogFactory.getLog(DataBridgeCoreBuilder.class);
 
     private DataBridgeCoreBuilder() {
     }
 
-    public static List<String[]> loadStreamDefinitionXML() throws DataBridgeConfigurationException {
-        List<String[]> streamDefinitionList = new ArrayList<String[]>();
-        String carbonHome = System.getProperty(ServerConstants.CARBON_CONFIG_DIR_PATH);
-        String path = carbonHome + File.separator + DataBridgeConstants.DATA_BRIDGE_DIR +
-                File.separator + DataBridgeConstants.STREAM_DEFINITIONS_XML;
+    // TODO: 2/2/17 stream definiitions are temporarily loaded from a file in <product-sp>/deployment
+    public static List<String> loadStreamDefinitionXML() throws DataBridgeConfigurationException {
+        List<String> streamDefinitionList = new ArrayList<String>();
+//        String carbonHome = System.getProperty(ServerConstants.CARBON_CONFIG_DIR_PATH);
+//        String path = carbonHome + File.separator + DataBridgeConstants.DATA_BRIDGE_DIR +
+//                File.separator + DataBridgeConstants.STREAM_DEFINITIONS_XML;
+        String path = Utils.getCarbonHome().toString()+File.separator+"deployment"+DataBridgeConstants.STREAM_DEFINITIONS_XML;
         File file = new File(path);
         if (file.exists() && !file.isDirectory()) {
             OMElement config = loadXML(path, DataBridgeConstants.STREAM_DEFINITIONS_XML);
@@ -60,12 +60,13 @@ public final class DataBridgeCoreBuilder {
                 for (Iterator streamDefinitionIterator = config.getChildElements();
                      streamDefinitionIterator.hasNext(); ) {
                     OMElement streamDefinition = (OMElement) streamDefinitionIterator.next();
-                    String domainName = streamDefinition.getAttributeValue(new QName(DataBridgeConstants.DOMAIN_NAME_ATTRIBUTE));
+//                    String domainName = streamDefinition.getAttributeValue(new QName(DataBridgeConstants.DOMAIN_NAME_ATTRIBUTE));
 
-                    if (domainName == null || domainName.equals("")) {
+                    /*if (domainName == null || domainName.equals("")) {
                         domainName = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-                    }
-                    streamDefinitionList.add(new String[]{domainName, streamDefinition.getText()});
+                    }*/
+//                    streamDefinitionList.add(new String[]{domainName, streamDefinition.getText()});
+                    streamDefinitionList.add(streamDefinition.getText());
                 }
             }
         }
@@ -74,8 +75,11 @@ public final class DataBridgeCoreBuilder {
     }
 
     public static String getDatabridgeConfigPath() {
-        String carbonHome = System.getProperty(ServerConstants.CARBON_CONFIG_DIR_PATH);
-        return carbonHome + File.separator + DataBridgeConstants.DATA_BRIDGE_DIR + File.separator + DataBridgeConstants.DATA_BRIDGE_CONFIG_XML;
+//        String carbonHome = System.getProperty(ServerConstants.CARBON_CONFIG_DIR_PATH);
+//        return carbonHome + File.separator + DataBridgeConstants.DATA_BRIDGE_DIR + File.separator + DataBridgeConstants.DATA_BRIDGE_CONFIG_XML;
+        String databridgeConfigXMLPath = "resources"+File.separator+DataBridgeConstants.DATA_BRIDGE_CONFIG_XML;
+        File file = new File(databridgeConfigXMLPath);
+        return file.getAbsolutePath();
     }
 
     public static OMElement loadXML(String path, String fileName) throws DataBridgeConfigurationException {
