@@ -34,6 +34,11 @@
         <!--<module>components/analytics-dashboard</module>-->
         <module>components/tcp-transport</module>
         <module>components/data-bridge</module>
+        <module>components/analytics-api</module>
+        <module>components/analytics-dataservice</module>
+        <module>components/analytics-datasources</module>
+        <module>components/analytics-indexer</module>
+        <module>components/analytics-processor</module>
         <!--<module>components/analytics-data-agents</module>-->
         <!--<module>components/event-stream</module>-->
         <!--<module>components/application-deployer</module>-->
@@ -298,6 +303,88 @@
                 <version>${org.eclipse.equinox.cm.version}</version>
             </dependency>
 
+            <!--###moved from carbon-analytics repo#### -->
+
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${commons.logging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${commons.collections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
+            <!-- Analytics dataservice dependencies -->
+            <dependency>
+                <groupId>com.esotericsoftware</groupId>
+                <artifactId>kryo-shaded</artifactId>
+                <version>${kryo.version}</version>
+            </dependency>
+
+            <!-- Spark related dependencies-->
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-core_2.11</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-sql_2.11</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+
+            <!-- DAL dependencies -->
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-client</artifactId>
+                <version>${hadoop-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-shaded-client</artifactId>
+                <version>${hbase.version}</version>
+            </dependency>
+
+            <!-- indexer dependancies -->
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-solrj</artifactId>
+                <version>${solr.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-core</artifactId>
+                <version>${solr.version}</version>
+            </dependency>
+
+            <!-- child module dependencies-->
+            <dependency>
+                <groupId>org.wso2.analytics</groupId>
+                <artifactId>org.wso2.analytics.dataservice</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.analytics</groupId>
+                <artifactId>org.wso2.analytics.data.commons</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.analytics</groupId>
+                <artifactId>org.wso2.analytics.indexer</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.analytics</groupId>
+                <artifactId>org.wso2.analytics.datasource.rdbms</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -312,6 +399,14 @@
         <apache.activemq.version>5.7.0</apache.activemq.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
+        <commons.collections.version>3.0</commons.collections.version>
+        <commons.logging.version>1.2</commons.logging.version>
+        <guava.version>19.0</guava.version>
+        <hadoop-version>2.7.2</hadoop-version>
+        <hbase.version>1.2.0</hbase.version>
+        <kryo.version>3.0.3</kryo.version>
+        <spark.version>2.0.2</spark.version>
+        <solr.version>6.2.1</solr.version>
 
         <slf4j.api.version>1.7.12</slf4j.api.version>
 
@@ -364,7 +459,6 @@
         <ow2.jta.spec.version>1.0.12</ow2.jta.spec.version>
         <javax.inject.version>1</javax.inject.version>
         <jacoco.version>0.7.5.201505241946</jacoco.version>
-
     </properties>
 
 </project>
