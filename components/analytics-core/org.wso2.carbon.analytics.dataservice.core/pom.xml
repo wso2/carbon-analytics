@@ -39,8 +39,8 @@
             <artifactId>org.wso2.carbon.ntask.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.antlr.wso2</groupId>
-            <artifactId>antlr-runtime</artifactId>
+            <groupId>org.wso2.orbit.org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.ow2.asm</groupId>

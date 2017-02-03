@@ -44,6 +44,7 @@ import org.wso2.carbon.ndatasource.core.*;
 import org.wso2.carbon.ndatasource.core.utils.DataSourceUtils;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import sun.misc.FloatConsts;
 
 import javax.xml.bind.JAXBContext;
 
@@ -744,6 +745,70 @@ public class GenericUtils {
             throw new RuntimeException("Invalid input path generated, the input cannot contain backtracking path elements");
         }
         return path;
+    }
+
+    /**
+     * Returns the closest upper higher for a give Double Number
+     * @param value
+     * @return
+     */
+    public static double nextUp(double value) {
+        if( Double.isNaN(value) || value == Double.POSITIVE_INFINITY)
+            return value;
+        else {
+            value += 0.0d;
+            return Double.longBitsToDouble(Double.doubleToRawLongBits(value) +
+                    ((value >= 0.0d)?+1L:-1L));
+        }
+    }
+
+    /**
+     * Returns the closest lower value for a given Double value
+     * @param value
+     * @return
+     */
+    public static double nextDown(double value) {
+        if (Double.isNaN(value) || value == Double.NEGATIVE_INFINITY)
+            return value;
+        else {
+            if (value == 0.0)
+                return -Double.MIN_VALUE;
+            else
+                return Double.longBitsToDouble(Double.doubleToRawLongBits(value) +
+                        ((value > 0.0d)?-1L:+1L));
+        }
+    }
+
+    /**
+     * Returns the closest higher value for a given Float value
+     * @param value
+     * @return
+     */
+    public static float nextUp(float value) {
+        if( Float.isNaN(value) || value == FloatConsts.POSITIVE_INFINITY)
+            return value;
+        else {
+            value += 0.0f;
+            return Float.intBitsToFloat(Float.floatToRawIntBits(value) +
+                    ((value >= 0.0f)?+1:-1));
+        }
+    }
+
+    /**
+     * Returns the closest lower value for a given Float value
+     * @param value
+     * @return
+     */
+    public static float nextDown(float value) {
+        if (Float.isNaN(value) || value == Float.NEGATIVE_INFINITY)
+            return value;
+        else {
+            if (value == 0.0f)
+                return -Float.MIN_VALUE;
+            else
+                return Float.intBitsToFloat(Float.floatToRawIntBits(value) +
+                        ((value > 0.0f)?-1:+1));
+        }
     }
     
 }
