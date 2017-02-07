@@ -20,35 +20,55 @@ package org.wso2.carbon.databridge.core.conf;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
+import java.util.Map;
 
 public class DataReceiver {
-    private String name;
-    private List<Configuration> configurations;
+    // TODO: 2/3/17 not used any more
+//    private String name;
+//    private List<Configuration> configurations;
+    private Map<String, Object> thrift;
+    private Map<String, Object> binary;
 
-    @XmlAttribute(name = "name")
-    public String getName() {
-        return name;
+//    @XmlAttribute(name = "name")
+//    public String getName() {
+//        return name;
+//    }
+
+//    public void setName(String name) {
+//        this.name = name;
+//    }
+
+//    @XmlElement(name = "config")
+//    public List<Configuration> getConfigurations() {
+//        return configurations;
+//    }
+
+//    public void setConfigurations(List<Configuration> configurations) {
+//        this.configurations = configurations;
+//    }
+
+//    public Object getConfiguration(String configName, Object defaultValue){
+//        for (Configuration configuration: configurations){
+//            if (configuration.getName().equalsIgnoreCase(configName)){
+//                return configuration.getValue();
+//            }
+//        }
+//        return defaultValue;
+//    }
+
+    public void setThrift(Map<String,Object> thrift) {
+        this.thrift = thrift;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Map<String,Object> getThrift() {
+        return thrift;
     }
 
-    @XmlElement(name = "config")
-    public List<Configuration> getConfigurations() {
-        return configurations;
+    public void setBinary(Map<String,Object> binary) {
+        this.binary = binary;
     }
 
-    public void setConfigurations(List<Configuration> configurations) {
-        this.configurations = configurations;
-    }
-
-    public Object getConfiguration(String configName, Object defaultValue){
-        for (Configuration configuration: configurations){
-            if (configuration.getName().equalsIgnoreCase(configName)){
-                return configuration.getValue();
-            }
-        }
-        return defaultValue;
+    public Map<String,Object> getBinary() {
+        return binary;
     }
 }

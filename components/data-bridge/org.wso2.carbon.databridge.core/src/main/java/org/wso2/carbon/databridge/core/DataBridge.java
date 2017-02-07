@@ -43,6 +43,7 @@ import org.wso2.carbon.databridge.core.internal.authentication.Authenticator;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.securevault.SecretResolver;
 import org.wso2.securevault.SecretResolverFactory;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -486,7 +487,9 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
 
         if (configFile.exists()) {
             try(FileInputStream fileInputStream = new FileInputStream(configFile)) {
-                JAXBContext jaxbContext = JAXBContext.newInstance(DataBridgeConfiguration.class);
+                Yaml yaml = new Yaml();
+                dataBridgeConfiguration=yaml.loadAs(fileInputStream,DataBridgeConfiguration.class);
+                /*JAXBContext jaxbContext = JAXBContext.newInstance(DataBridgeConfiguration.class);
                 Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
                 dataBridgeConfiguration = (DataBridgeConfiguration) jaxbUnmarshaller.unmarshal(configFile);
                 StAXOMBuilder builder = new StAXOMBuilder(fileInputStream);
@@ -498,7 +501,8 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
                     if (resolvedPassword != null) {
                         dataBridgeConfiguration.setKeyStorePassword(resolvedPassword);
                     }
-                }
+                }*/
+                // TODO: 2/5/17 is secret resolver needed anymore?
                 return dataBridgeConfiguration;
             }
         } else {

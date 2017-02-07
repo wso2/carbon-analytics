@@ -18,6 +18,7 @@ package org.wso2.carbon.databridge.core;
 
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
+import org.wso2.carbon.kernel.CarbonRuntime;
 
 public class DataBridgeServiceValueHolder {
 
@@ -25,7 +26,8 @@ public class DataBridgeServiceValueHolder {
     //private static RealmService realmService;
 //    private static AbstractStreamDefinitionStore streamDefinitionStore;
     // TODO: 1/31/17 temporarily converted above to InMemoryStreamDefinitionStore
-    private static InMemoryStreamDefinitionStore streamDefinitionStore;
+//    private static InMemoryStreamDefinitionStore streamDefinitionStore;
+    private static CarbonRuntime carbonRuntime;
 //    private static ConfigurationContextService configurationContextService;
 
     /*public static void setRealmService(RealmService realmService) {
@@ -36,13 +38,13 @@ public class DataBridgeServiceValueHolder {
         return realmService;
     }*/
 
-    public static void setStreamDefinitionStore(InMemoryStreamDefinitionStore streamDefinitionStore) {
+    /*public static void setStreamDefinitionStore(InMemoryStreamDefinitionStore streamDefinitionStore) {
         DataBridgeServiceValueHolder.streamDefinitionStore = streamDefinitionStore;
     }
 
     public static InMemoryStreamDefinitionStore getStreamDefinitionStore() {
         return streamDefinitionStore;
-    }
+    }*/
 
     /*public static void setConfigurationContextService(ConfigurationContextService configurationContextService) {
         DataBridgeServiceValueHolder.configurationContextService = configurationContextService;
@@ -51,4 +53,12 @@ public class DataBridgeServiceValueHolder {
     public static ConfigurationContextService getConfigurationContextService() {
         return configurationContextService;
     }*/
+
+    public static CarbonRuntime getCarbonRuntime() {
+        return carbonRuntime;
+    }
+
+    public static void setCarbonRuntime(CarbonRuntime carbonRuntime) {
+        DataBridgeServiceValueHolder.carbonRuntime = carbonRuntime;
+    }
 }

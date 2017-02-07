@@ -70,15 +70,16 @@ public class ThriftServerStartupImpl implements ThriftServerStartup{
                 TCompactProtocol.Factory inProtFactory = new TCompactProtocol.Factory();
                 TCompactProtocol.Factory outProtFactory = new TCompactProtocol.Factory();
 
-                ServiceHolder.getHttpServiceInstance().registerServlet("/thriftReceiver",
+                // TODO: 2/5/17 thrift over http is needed any more?
+                /*ServiceHolder.getHttpServiceInstance().registerServlet("/thriftReceiver",
                         new ThriftEventTransmissionServlet(processor, inProtFactory, outProtFactory), new Hashtable(),
-                        ServiceHolder.getHttpServiceInstance().createDefaultHttpContext());
+                        ServiceHolder.getHttpServiceInstance().createDefaultHttpContext());*/
 
                 ThriftSecureEventTransmissionService.Processor<ThriftSecureEventTransmissionServiceImpl> authProcessor = new ThriftSecureEventTransmissionService.Processor<ThriftSecureEventTransmissionServiceImpl>(
                         new ThriftSecureEventTransmissionServiceImpl(ServiceHolder.getDataBridgeReceiverService()));
-                ServiceHolder.getHttpServiceInstance().registerServlet("/securedThriftReceiver",
+                /*ServiceHolder.getHttpServiceInstance().registerServlet("/securedThriftReceiver",
                         new ThriftSecureEventTransmissionServlet(authProcessor, inProtFactory, outProtFactory),
-                        new Hashtable(), ServiceHolder.getHttpServiceInstance().createDefaultHttpContext());
+                        new Hashtable(), ServiceHolder.getHttpServiceInstance().createDefaultHttpContext());*/
 
             }
         } catch (DataBridgeException e) {

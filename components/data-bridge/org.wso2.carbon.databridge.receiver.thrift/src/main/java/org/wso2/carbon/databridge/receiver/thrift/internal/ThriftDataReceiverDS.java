@@ -31,7 +31,11 @@ import org.osgi.service.http.HttpService;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 
-
+/**
+ * Service component
+ *
+ * @since 1.0.0
+ */
 @Component(
         name = "org.wso2.carbon.databridge.receiver.thrift.internal.ThriftDataReceiverDS",
         immediate = true
@@ -52,6 +56,7 @@ public class ThriftDataReceiverDS {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
+        System.out.println("Called ThriftDataReceiverDS");
         String disableReceiver = System.getProperty(DISABLE_RECEIVER);
         if (disableReceiver != null && Boolean.parseBoolean(disableReceiver)) {
             log.info("Receiver disabled.");
@@ -104,7 +109,7 @@ public class ThriftDataReceiverDS {
     /**
      *
      * @param httpService The HttpService instance registered as an OSGi service
-     */
+     *//* todo thrift over http temporarily removed
     @Reference(
             name = "http.service",
             service = HttpService.class,
@@ -118,7 +123,7 @@ public class ThriftDataReceiverDS {
 
     protected void unsetHttpService(HttpService httpService) {
         ServiceHolder.setHttpServiceInstance(httpService);
-    }
+    }*/
 
     /**
      * This bind method will be called when CarbonRuntime OSGi service is registered.

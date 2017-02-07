@@ -24,18 +24,21 @@ import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
+import java.util.Map;
 
 /**
  * configuration details related to DataReceiver
  */
-@XmlRootElement(name = "dataBridgeConfiguration")
+// TODO: 2/3/17 changed to support yaml
+//@XmlRootElement(name = "dataBridgeConfiguration")
 public class DataBridgeConfiguration {
 
-    private List<DataReceiver> dataReceivers;
-    private int workerThreads;
-    private int maxEventBufferCapacity;
-    private int eventBufferSize;
-    private int clientTimeoutMin;
+//    private List<DataReceiver> dataReceivers;
+    private Map<String,Map<String,Object>> dataReceivers;
+    private Integer workerThreads;
+    private Integer maxEventBufferCapacity;
+    private Integer eventBufferSize;
+    private Integer clientTimeoutMin;
     private String keyStoreLocation;
     private String keyStorePassword;
 
@@ -48,21 +51,21 @@ public class DataBridgeConfiguration {
         keyStorePassword = null;
     }
 
-    @XmlElement(name = "dataReceiver")
-    public List<DataReceiver> getDataReceivers() {
+//    @XmlElement(name = "dataReceiver")
+    public Map<String,Map<String,Object>> getDataReceivers() {
         return dataReceivers;
     }
 
-    public void setDataReceivers(List<DataReceiver> dataReceivers) {
+    public void setDataReceivers(Map<String,Map<String,Object>> dataReceivers) {
         this.dataReceivers = dataReceivers;
     }
 
-    @XmlElement(name = "workerThreads")
+//    @XmlElement(name = "workerThreads")
     public int getWorkerThreads() {
         return workerThreads;
     }
 
-    @XmlElement(name = "keyStoreLocation")
+//    @XmlElement(name = "keyStoreLocation")
     public String getKeyStoreLocation() {
         return keyStoreLocation;
     }
@@ -71,7 +74,7 @@ public class DataBridgeConfiguration {
         this.keyStoreLocation = DataBridgeCommonsUtils.replaceSystemProperty(keyStoreLocation);
     }
 
-    @XmlElement(name = "keyStorePassword")
+//    @XmlElement(name = "keyStorePassword")
     public String getKeyStorePassword() {
         return keyStorePassword;
     }
@@ -84,7 +87,7 @@ public class DataBridgeConfiguration {
         this.workerThreads = workerThreads;
     }
 
-    @XmlElement(name = "maxEventBufferCapacity")
+//    @XmlElement(name = "maxEventBufferCapacity")
     public int getMaxEventBufferCapacity() {
         return maxEventBufferCapacity;
     }
@@ -94,7 +97,7 @@ public class DataBridgeConfiguration {
         this.maxEventBufferCapacity = maxEventBufferCapacity * (1000000);
     }
 
-    @XmlElement(name = "clientTimeoutMin")
+//    @XmlElement(name = "clientTimeoutMin")
     public int getClientTimeoutMin() {
         return clientTimeoutMin;
     }
@@ -103,20 +106,42 @@ public class DataBridgeConfiguration {
         this.clientTimeoutMin = clientTimeoutMin;
     }
 
-    public DataReceiver getDataReceiver(String name){
-        for (DataReceiver dataReceiver: dataReceivers){
-            if (dataReceiver.getName().equalsIgnoreCase(name)){
-                return dataReceiver;
+//    public DataReceiver getDataReceiver(String name){
+//        for (DataReceiver dataReceiver: dataReceivers){
+//            if (dataReceiver.getName().equalsIgnoreCase(name)){
+//                return dataReceiver;
+//            }
+//        }
+//        return null;
+//    }
+
+    /*public Map<String,Object> getThriftDataReceiver() {
+        for (DataReceiver dataReceiver: dataReceivers) {
+            if (dataReceiver.getThrift() != null) {
+                return dataReceiver.getThrift();
             }
         }
         return null;
+    }
+
+    public Map<String,Object> getBinaryDataReceiver() {
+        for (DataReceiver dataReceiver: dataReceivers) {
+            if (dataReceiver.getBinary() != null) {
+                return dataReceiver.getBinary();
+            }
+        }
+        return null;
+    }*/
+
+    public Map<String,Object> getDataReceiver(String name) {
+        return dataReceivers.get(name.toLowerCase());
     }
 
     public int getEventBufferSize() {
         return eventBufferSize;
     }
 
-    @XmlElement(name = "eventBufferSize")
+//    @XmlElement(name = "eventBufferSize")
     public void setEventBufferSize(int eventBufferSize) {
         this.eventBufferSize = eventBufferSize;
     }

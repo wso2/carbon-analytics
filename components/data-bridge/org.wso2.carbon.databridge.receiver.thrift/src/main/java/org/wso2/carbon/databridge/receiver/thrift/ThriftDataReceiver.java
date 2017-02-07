@@ -32,7 +32,6 @@ import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEven
 import org.wso2.carbon.databridge.commons.thrift.utils.CommonThriftConstants;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
-import org.wso2.carbon.databridge.core.conf.DataReceiver;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfiguration;
@@ -112,19 +111,28 @@ public class ThriftDataReceiver {
                                               DataBridgeReceiverService dataBridgeReceiverService)
             throws DataBridgeException {
         try {
-            String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
+//            String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
+            String keyStore = null;
             if (keyStore == null) {
                 // TODO: 1/26/17 keystore hack. change later
-                File filePath = new File("resources" + File.separator + "security");
-                String keyStorePath = filePath.getAbsolutePath();
-                System.setProperty("Security.KeyStore.Location", keyStorePath + File.separator + "wso2carbon.jks");
-                keyStore = System.getProperty("Security.KeyStore.Location");
+                File filePath = new File("src" + File.separator + "test" + File.separator + "resources");
+                if (!filePath.exists()) {
+                    filePath = new File("resources" + File.separator + "security");
+                }
+                keyStore = filePath.getAbsolutePath() + File.separator + "wso2carbon.jks";
+//                File filePath = new File("resources" + File.separator + "security");
+//                String keyStorePath = filePath.getAbsolutePath();
+//                System.setProperty("Security.KeyStore.Location", keyStorePath + File.separator + "wso2carbon.jks");
+                /*File filePath = new File("wso2carbon.jks");
+                System.setProperty("Security.KeyStore.Location", filePath.getAbsolutePath());
+                keyStore = System.getProperty("Security.KeyStore.Location");*/
             }
             String keyStorePassword = dataBridgeReceiverService.getInitialConfig().getKeyStorePassword();
             if (keyStorePassword == null) {
                 // TODO: 1/26/17 keystore hack. change later
-                System.setProperty("Security.KeyStore.Password", "wso2carbon");
-                keyStorePassword = System.getProperty("Security.KeyStore.Password");
+                /*System.setProperty("Security.KeyStore.Password", "wso2carbon");
+                keyStorePassword = System.getProperty("Security.KeyStore.Password");*/
+                keyStorePassword = "wso2carbon";
             }
             startSecureEventTransmission(hostName, port, sslProtocols, ciphers, keyStore, keyStorePassword, dataBridgeReceiverService);
         } catch (TransportException e) {

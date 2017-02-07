@@ -26,7 +26,7 @@ public class ServiceHolder {
     private static DataBridgeReceiverService dataBridgeReceiverService;
     private static CarbonRuntime carbonRuntime;
     private static ThriftDataReceiver dataReceiver;
-    private static HttpService httpServiceInstance;
+//    private static HttpService httpServiceInstance;
 
     public static DataBridgeReceiverService getDataBridgeReceiverService() {
         return dataBridgeReceiverService;
@@ -44,13 +44,14 @@ public class ServiceHolder {
         ServiceHolder.carbonRuntime = carbonRuntime;
     }
 
-    public static HttpService getHttpServiceInstance() {
+    // TODO: 2/5/17 thrift over http temporarily removed
+    /*public static HttpService getHttpServiceInstance() {
         return httpServiceInstance;
     }
 
     public static void setHttpServiceInstance(HttpService httpServiceInstance) {
         ServiceHolder.httpServiceInstance = httpServiceInstance;
-    }
+    }*/
 
     public static ThriftDataReceiver getDataReceiver() {
         return dataReceiver;
