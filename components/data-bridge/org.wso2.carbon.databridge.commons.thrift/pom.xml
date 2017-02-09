@@ -73,6 +73,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Private-Package>
+                            org.apache.thrift.*;version="${libthrift.wso2.imp.pkg.version.range}"
+                        </Private-Package>
                         <Export-Package>
                             org.wso2.carbon.databridge.commons.thrift.*
                         </Export-Package>

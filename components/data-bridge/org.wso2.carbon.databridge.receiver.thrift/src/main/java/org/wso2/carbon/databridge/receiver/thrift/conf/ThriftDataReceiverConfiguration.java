@@ -22,7 +22,6 @@ package org.wso2.carbon.databridge.receiver.thrift.conf;
 import org.wso2.carbon.databridge.commons.thrift.utils.CommonThriftConstants;
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
 import org.wso2.carbon.databridge.receiver.thrift.internal.utils.ThriftDataReceiverConstants;
-import org.wso2.carbon.kernel.internal.config.YAMLBasedConfigProvider;
 
 import java.util.Map;
 
@@ -42,7 +41,7 @@ public class ThriftDataReceiverConfiguration {
         dataReceiverPort = defaultPort;
     }
 
-    public ThriftDataReceiverConfiguration(DataBridgeConfiguration dataBridgeConfiguration) {
+    public ThriftDataReceiverConfiguration(DataBridgeConfiguration dataBridgeConfiguration, int portOffset) {
         /*DataReceiver dataReceiver = dataBridgeConfiguration.getDataReceiver(ThriftDataReceiverConstants.
                 DATA_BRIDGE_RECEIVER_NAME);
         int portOffset = getPortOffset();
@@ -60,7 +59,7 @@ public class ThriftDataReceiverConfiguration {
 
 
         Map<String,Object> dataReceiver = dataBridgeConfiguration.getDataReceiver(ThriftDataReceiverConstants.DATA_BRIDGE_RECEIVER_NAME);
-        int portOffset = getPortOffset();
+//        ++portOffset;
         secureDataReceiverPort = Integer.parseInt(dataReceiver.getOrDefault(
                 ThriftDataReceiverConstants.SECURE_PORT_ELEMENT,
                 CommonThriftConstants.DEFAULT_RECEIVER_PORT
@@ -109,12 +108,12 @@ public class ThriftDataReceiverConfiguration {
         this.receiverHostName = receiverHostName;
     }
 
-    public int getPortOffset() {
+    /*public int getPortOffset() {
         YAMLBasedConfigProvider yamlBasedConfigProvider = new YAMLBasedConfigProvider();
 
 //        return CarbonUtils.getPortFromServerConfig(BinaryDataReceiverConstants.CARBON_CONFIG_PORT_OFFSET_NODE)+1;
         return yamlBasedConfigProvider.getCarbonConfiguration().getPortsConfig().getOffset()+1;
-    }
+    }*/
 
     public String getSslProtocols() {
         return sslProtocols;

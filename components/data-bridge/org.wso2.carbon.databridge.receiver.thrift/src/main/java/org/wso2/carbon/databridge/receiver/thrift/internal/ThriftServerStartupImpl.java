@@ -43,7 +43,8 @@ public class ThriftServerStartupImpl implements ThriftServerStartup{
     public void completingServerStartup() {
         try {
             ThriftDataReceiverConfiguration thriftDataReceiverConfiguration = new ThriftDataReceiverConfiguration(
-                    ServiceHolder.getDataBridgeReceiverService().getInitialConfig());
+                    ServiceHolder.getDataBridgeReceiverService().getInitialConfig(),
+                    ServiceHolder.getCarbonRuntime().getConfiguration().getPortsConfig().getOffset());
 
             if (ServiceHolder.getDataReceiver() == null) {
                 ServiceHolder.setDataReceiver(new ThriftDataReceiverFactory().createAgentServer(

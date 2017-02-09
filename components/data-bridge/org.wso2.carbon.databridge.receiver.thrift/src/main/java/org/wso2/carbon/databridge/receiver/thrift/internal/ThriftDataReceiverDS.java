@@ -62,9 +62,10 @@ public class ThriftDataReceiverDS {
             log.info("Receiver disabled.");
             return;
         }
-        // Register ThriftServerStartupImpl instance as an OSGi service.
-        serviceRegistration = bundleContext.registerService(ThriftServerStartup.class.getName(),
-                new ThriftServerStartupImpl(), null);
+        // Register ThriftServerStartupImpl instance as an OSGi service. // TODO: 2/8/17 later, the kernel must start thrift server using the registered service
+//        serviceRegistration = bundleContext.registerService(ThriftServerStartup.class.getName(),
+//                new ThriftServerStartupImpl(), null);
+        new ThriftServerStartupImpl().completingServerStartup();
     }
 
     /**
