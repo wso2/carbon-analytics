@@ -32,362 +32,350 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ThriftSessionExpiredException extends TException
-        implements org.apache.thrift.TBase<ThriftSessionExpiredException, ThriftSessionExpiredException._Fields>,
-        java.io.Serializable, Cloneable, Comparable<ThriftSessionExpiredException> {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct(
-            "ThriftSessionExpiredException");
+public class ThriftSessionExpiredException extends TException implements org.apache.thrift.TBase<ThriftSessionExpiredException, ThriftSessionExpiredException._Fields>, java.io.Serializable, Cloneable, Comparable<ThriftSessionExpiredException> {
+  private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("ThriftSessionExpiredException");
 
-    private static final org.apache.thrift.protocol.TField MESSAGE_FIELD_DESC = new org.apache.thrift.protocol.TField(
-            "message", org.apache.thrift.protocol.TType.STRING, (short) 1);
+  private static final org.apache.thrift.protocol.TField MESSAGE_FIELD_DESC = new org.apache.thrift.protocol.TField("message", org.apache.thrift.protocol.TType.STRING, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+  private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+  static {
+    schemes.put(StandardScheme.class, new ThriftSessionExpiredExceptionStandardSchemeFactory());
+    schemes.put(TupleScheme.class, new ThriftSessionExpiredExceptionTupleSchemeFactory());
+  }
+
+  public String message; // required
+
+  /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+  public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+    MESSAGE((short)1, "message");
+
+    private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
     static {
-        schemes.put(StandardScheme.class, new ThriftSessionExpiredExceptionStandardSchemeFactory());
-        schemes.put(TupleScheme.class, new ThriftSessionExpiredExceptionTupleSchemeFactory());
-    }
-
-    public String message; // required
-
-    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
-    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-        MESSAGE((short) 1, "message");
-
-        private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
-
-        static {
-            for (_Fields field : EnumSet.allOf(_Fields.class)) {
-                byName.put(field.getFieldName(), field);
-            }
-        }
-
-        /**
-         * Find the _Fields constant that matches fieldId, or null if its not found.
-         */
-        public static _Fields findByThriftId(int fieldId) {
-            switch (fieldId) {
-            case 1: // MESSAGE
-                return MESSAGE;
-            default:
-                return null;
-            }
-        }
-
-        /**
-         * Find the _Fields constant that matches fieldId, throwing an exception
-         * if it is not found.
-         */
-        public static _Fields findByThriftIdOrThrow(int fieldId) {
-            _Fields fields = findByThriftId(fieldId);
-            if (fields == null)
-                throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
-            return fields;
-        }
-
-        /**
-         * Find the _Fields constant that matches name, or null if its not found.
-         */
-        public static _Fields findByName(String name) {
-            return byName.get(name);
-        }
-
-        private final short _thriftId;
-        private final String _fieldName;
-
-        _Fields(short thriftId, String fieldName) {
-            _thriftId = thriftId;
-            _fieldName = fieldName;
-        }
-
-        public short getThriftFieldId() {
-            return _thriftId;
-        }
-
-        public String getFieldName() {
-            return _fieldName;
-        }
-    }
-
-    // isset id assignments
-    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
-    static {
-        Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(
-                _Fields.class);
-        tmpMap.put(_Fields.MESSAGE,
-                new org.apache.thrift.meta_data.FieldMetaData("message",
-                        org.apache.thrift.TFieldRequirementType.REQUIRED,
-                        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
-        metaDataMap = Collections.unmodifiableMap(tmpMap);
-        org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(ThriftSessionExpiredException.class,
-                metaDataMap);
-    }
-
-    public ThriftSessionExpiredException() {
-    }
-
-    public ThriftSessionExpiredException(String message) {
-        this();
-        this.message = message;
+      for (_Fields field : EnumSet.allOf(_Fields.class)) {
+        byName.put(field.getFieldName(), field);
+      }
     }
 
     /**
-     * Performs a deep copy on <i>other</i>.
+     * Find the _Fields constant that matches fieldId, or null if its not found.
      */
-    public ThriftSessionExpiredException(ThriftSessionExpiredException other) {
-        if (other.isSetMessage()) {
-            this.message = other.message;
-        }
+    public static _Fields findByThriftId(int fieldId) {
+      switch(fieldId) {
+        case 1: // MESSAGE
+          return MESSAGE;
+        default:
+          return null;
+      }
     }
 
-    public ThriftSessionExpiredException deepCopy() {
-        return new ThriftSessionExpiredException(this);
+    /**
+     * Find the _Fields constant that matches fieldId, throwing an exception
+     * if it is not found.
+     */
+    public static _Fields findByThriftIdOrThrow(int fieldId) {
+      _Fields fields = findByThriftId(fieldId);
+      if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+      return fields;
     }
 
-    @Override
-    public void clear() {
-        this.message = null;
+    /**
+     * Find the _Fields constant that matches name, or null if its not found.
+     */
+    public static _Fields findByName(String name) {
+      return byName.get(name);
     }
 
-    public String getMessage() {
-        return this.message;
+    private final short _thriftId;
+    private final String _fieldName;
+
+    _Fields(short thriftId, String fieldName) {
+      _thriftId = thriftId;
+      _fieldName = fieldName;
     }
 
-    public ThriftSessionExpiredException setMessage(String message) {
-        this.message = message;
-        return this;
+    public short getThriftFieldId() {
+      return _thriftId;
     }
 
-    public void unsetMessage() {
-        this.message = null;
+    public String getFieldName() {
+      return _fieldName;
+    }
+  }
+
+  // isset id assignments
+  public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+  static {
+    Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.MESSAGE, new org.apache.thrift.meta_data.FieldMetaData("message", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
+    org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(ThriftSessionExpiredException.class, metaDataMap);
+  }
+
+  public ThriftSessionExpiredException() {
+  }
+
+  public ThriftSessionExpiredException(
+    String message)
+  {
+    this();
+    this.message = message;
+  }
+
+  /**
+   * Performs a deep copy on <i>other</i>.
+   */
+  public ThriftSessionExpiredException(ThriftSessionExpiredException other) {
+    if (other.isSetMessage()) {
+      this.message = other.message;
+    }
+  }
+
+  public ThriftSessionExpiredException deepCopy() {
+    return new ThriftSessionExpiredException(this);
+  }
+
+  @Override
+  public void clear() {
+    this.message = null;
+  }
+
+  public String getMessage() {
+    return this.message;
+  }
+
+  public ThriftSessionExpiredException setMessage(String message) {
+    this.message = message;
+    return this;
+  }
+
+  public void unsetMessage() {
+    this.message = null;
+  }
+
+  /** Returns true if field message is set (has been assigned a value) and false otherwise */
+  public boolean isSetMessage() {
+    return this.message != null;
+  }
+
+  public void setMessageIsSet(boolean value) {
+    if (!value) {
+      this.message = null;
+    }
+  }
+
+  public void setFieldValue(_Fields field, Object value) {
+    switch (field) {
+    case MESSAGE:
+      if (value == null) {
+        unsetMessage();
+      } else {
+        setMessage((String)value);
+      }
+      break;
+
+    }
+  }
+
+  public Object getFieldValue(_Fields field) {
+    switch (field) {
+    case MESSAGE:
+      return getMessage();
+
+    }
+    throw new IllegalStateException();
+  }
+
+  /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+  public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
     }
 
-    /** Returns true if field message is set (has been assigned a value) and false otherwise */
-    public boolean isSetMessage() {
-        return this.message != null;
+    switch (field) {
+    case MESSAGE:
+      return isSetMessage();
     }
+    throw new IllegalStateException();
+  }
 
-    public void setMessageIsSet(boolean value) {
-        if (!value) {
-            this.message = null;
-        }
-    }
+  @Override
+  public boolean equals(Object that) {
+    if (that == null)
+      return false;
+    if (that instanceof ThriftSessionExpiredException)
+      return this.equals((ThriftSessionExpiredException)that);
+    return false;
+  }
 
-    public void setFieldValue(_Fields field, Object value) {
-        switch (field) {
-        case MESSAGE:
-            if (value == null) {
-                unsetMessage();
-            } else {
-                setMessage((String) value);
-            }
-            break;
+  public boolean equals(ThriftSessionExpiredException that) {
+    if (that == null)
+      return false;
 
-        }
-    }
-
-    public Object getFieldValue(_Fields field) {
-        switch (field) {
-        case MESSAGE:
-            return getMessage();
-
-        }
-        throw new IllegalStateException();
-    }
-
-    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
-    public boolean isSet(_Fields field) {
-        if (field == null) {
-            throw new IllegalArgumentException();
-        }
-
-        switch (field) {
-        case MESSAGE:
-            return isSetMessage();
-        }
-        throw new IllegalStateException();
-    }
-
-    @Override
-    public boolean equals(Object that) {
-        if (that == null)
-            return false;
-        if (that instanceof ThriftSessionExpiredException)
-            return this.equals((ThriftSessionExpiredException) that);
+    boolean this_present_message = true && this.isSetMessage();
+    boolean that_present_message = true && that.isSetMessage();
+    if (this_present_message || that_present_message) {
+      if (!(this_present_message && that_present_message))
+        return false;
+      if (!this.message.equals(that.message))
         return false;
     }
 
-    public boolean equals(ThriftSessionExpiredException that) {
-        if (that == null)
-            return false;
+    return true;
+  }
 
-        boolean this_present_message = true && this.isSetMessage();
-        boolean that_present_message = true && that.isSetMessage();
-        if (this_present_message || that_present_message) {
-            if (!(this_present_message && that_present_message))
-                return false;
-            if (!this.message.equals(that.message))
-                return false;
+  @Override
+  public int hashCode() {
+    return 0;
+  }
+
+  @Override
+  public int compareTo(ThriftSessionExpiredException other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+
+    lastComparison = Boolean.valueOf(isSetMessage()).compareTo(other.isSetMessage());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetMessage()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.message, other.message);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
+  public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+  }
+
+  public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder("ThriftSessionExpiredException(");
+    boolean first = true;
+
+    sb.append("message:");
+    if (this.message == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.message);
+    }
+    first = false;
+    sb.append(")");
+    return sb.toString();
+  }
+
+  public void validate() throws TException {
+    // check for required fields
+    if (message == null) {
+      throw new TProtocolException("Required field 'message' was not present! Struct: " + toString());
+    }
+    // check for sub-struct validity
+  }
+
+  private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+    try {
+      write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+    } catch (TException te) {
+      throw new java.io.IOException(te);
+    }
+  }
+
+  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+    try {
+      read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+    } catch (TException te) {
+      throw new java.io.IOException(te);
+    }
+  }
+
+  private static class ThriftSessionExpiredExceptionStandardSchemeFactory implements SchemeFactory {
+    public ThriftSessionExpiredExceptionStandardScheme getScheme() {
+      return new ThriftSessionExpiredExceptionStandardScheme();
+    }
+  }
+
+  private static class ThriftSessionExpiredExceptionStandardScheme extends StandardScheme<ThriftSessionExpiredException> {
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot, ThriftSessionExpiredException struct) throws TException {
+      org.apache.thrift.protocol.TField schemeField;
+      iprot.readStructBegin();
+      while (true)
+      {
+        schemeField = iprot.readFieldBegin();
+        if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          break;
         }
+        switch (schemeField.id) {
+          case 1: // MESSAGE
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.message = iprot.readString();
+              struct.setMessageIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          default:
+            org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+        }
+        iprot.readFieldEnd();
+      }
+      iprot.readStructEnd();
 
-        return true;
+      // check for required fields of primitive type, which can't be checked in the validate method
+      struct.validate();
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot, ThriftSessionExpiredException struct) throws TException {
+      struct.validate();
+
+      oprot.writeStructBegin(STRUCT_DESC);
+      if (struct.message != null) {
+        oprot.writeFieldBegin(MESSAGE_FIELD_DESC);
+        oprot.writeString(struct.message);
+        oprot.writeFieldEnd();
+      }
+      oprot.writeFieldStop();
+      oprot.writeStructEnd();
+    }
+
+  }
+
+  private static class ThriftSessionExpiredExceptionTupleSchemeFactory implements SchemeFactory {
+    public ThriftSessionExpiredExceptionTupleScheme getScheme() {
+      return new ThriftSessionExpiredExceptionTupleScheme();
+    }
+  }
+
+  private static class ThriftSessionExpiredExceptionTupleScheme extends TupleScheme<ThriftSessionExpiredException> {
+
+    @Override
+    public void write(org.apache.thrift.protocol.TProtocol prot, ThriftSessionExpiredException struct) throws TException {
+      TTupleProtocol oprot = (TTupleProtocol) prot;
+      oprot.writeString(struct.message);
     }
 
     @Override
-    public int hashCode() {
-        return 0;
+    public void read(org.apache.thrift.protocol.TProtocol prot, ThriftSessionExpiredException struct) throws TException {
+      TTupleProtocol iprot = (TTupleProtocol) prot;
+      struct.message = iprot.readString();
+      struct.setMessageIsSet(true);
     }
-
-    @Override
-    public int compareTo(ThriftSessionExpiredException other) {
-        if (!getClass().equals(other.getClass())) {
-            return getClass().getName().compareTo(other.getClass().getName());
-        }
-
-        int lastComparison = 0;
-
-        lastComparison = Boolean.valueOf(isSetMessage()).compareTo(other.isSetMessage());
-        if (lastComparison != 0) {
-            return lastComparison;
-        }
-        if (isSetMessage()) {
-            lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.message, other.message);
-            if (lastComparison != 0) {
-                return lastComparison;
-            }
-        }
-        return 0;
-    }
-
-    public _Fields fieldForId(int fieldId) {
-        return _Fields.findByThriftId(fieldId);
-    }
-
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
-        schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
-    }
-
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
-        schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder("ThriftSessionExpiredException(");
-        boolean first = true;
-
-        sb.append("message:");
-        if (this.message == null) {
-            sb.append("null");
-        } else {
-            sb.append(this.message);
-        }
-        first = false;
-        sb.append(")");
-        return sb.toString();
-    }
-
-    public void validate() throws TException {
-        // check for required fields
-        if (message == null) {
-            throw new TProtocolException("Required field 'message' was not present! Struct: " + toString());
-        }
-        // check for sub-struct validity
-    }
-
-    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-        try {
-            write(new org.apache.thrift.protocol.TCompactProtocol(
-                    new org.apache.thrift.transport.TIOStreamTransport(out)));
-        } catch (TException te) {
-            throw new java.io.IOException(te);
-        }
-    }
-
-    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-        try {
-            read(new org.apache.thrift.protocol.TCompactProtocol(
-                    new org.apache.thrift.transport.TIOStreamTransport(in)));
-        } catch (TException te) {
-            throw new java.io.IOException(te);
-        }
-    }
-
-    private static class ThriftSessionExpiredExceptionStandardSchemeFactory implements SchemeFactory {
-        public ThriftSessionExpiredExceptionStandardScheme getScheme() {
-            return new ThriftSessionExpiredExceptionStandardScheme();
-        }
-    }
-
-    private static class ThriftSessionExpiredExceptionStandardScheme
-            extends StandardScheme<ThriftSessionExpiredException> {
-
-        public void read(org.apache.thrift.protocol.TProtocol iprot, ThriftSessionExpiredException struct)
-                throws TException {
-            org.apache.thrift.protocol.TField schemeField;
-            iprot.readStructBegin();
-            while (true) {
-                schemeField = iprot.readFieldBegin();
-                if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
-                    break;
-                }
-                switch (schemeField.id) {
-                case 1: // MESSAGE
-                    if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
-                        struct.message = iprot.readString();
-                        struct.setMessageIsSet(true);
-                    } else {
-                        org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-                    }
-                    break;
-                default:
-                    org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-                }
-                iprot.readFieldEnd();
-            }
-            iprot.readStructEnd();
-
-            // check for required fields of primitive type, which can't be checked in the validate method
-            struct.validate();
-        }
-
-        public void write(org.apache.thrift.protocol.TProtocol oprot, ThriftSessionExpiredException struct)
-                throws TException {
-            struct.validate();
-
-            oprot.writeStructBegin(STRUCT_DESC);
-            if (struct.message != null) {
-                oprot.writeFieldBegin(MESSAGE_FIELD_DESC);
-                oprot.writeString(struct.message);
-                oprot.writeFieldEnd();
-            }
-            oprot.writeFieldStop();
-            oprot.writeStructEnd();
-        }
-
-    }
-
-    private static class ThriftSessionExpiredExceptionTupleSchemeFactory implements SchemeFactory {
-        public ThriftSessionExpiredExceptionTupleScheme getScheme() {
-            return new ThriftSessionExpiredExceptionTupleScheme();
-        }
-    }
-
-    private static class ThriftSessionExpiredExceptionTupleScheme extends TupleScheme<ThriftSessionExpiredException> {
-
-        @Override
-        public void write(org.apache.thrift.protocol.TProtocol prot, ThriftSessionExpiredException struct)
-                throws TException {
-            TTupleProtocol oprot = (TTupleProtocol) prot;
-            oprot.writeString(struct.message);
-        }
-
-        @Override
-        public void read(org.apache.thrift.protocol.TProtocol prot, ThriftSessionExpiredException struct)
-                throws TException {
-            TTupleProtocol iprot = (TTupleProtocol) prot;
-            struct.message = iprot.readString();
-            struct.setMessageIsSet(true);
-        }
-    }
+  }
 
 }
+

@@ -99,7 +99,6 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
-                            org.apache.thrift.*;version="${libthrift.wso2.imp.pkg.version.range}",
                             org.wso2.carbon.databridge.receiver.thrift.internal,
                             org.wso2.carbon.databridge.receiver.thrift.internal.*
                         </Private-Package>
@@ -109,7 +108,7 @@
                             org.wso2.carbon.databridge.receiver.thrift.*
                         </Export-Package>
                         <Import-Package>
-                            <!--org.apache.thrift;version="${libthrift.wso2.imp.pkg.version.range}",-->
+                            org.apache.thrift;version="${libthrift.wso2.imp.pkg.version.range}",
                             org.osgi.framework,*;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
