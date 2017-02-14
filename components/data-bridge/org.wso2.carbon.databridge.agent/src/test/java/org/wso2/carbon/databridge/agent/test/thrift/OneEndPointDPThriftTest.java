@@ -75,9 +75,7 @@ public class OneEndPointDPThriftTest {
 
     @AfterClass
     public static void shop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
-        DataPublisher dataPublisher = new DataPublisher("tcp://localhost:8612",
-                "admin", "admin");
-        dataPublisher.shutdownWithAgent();
+        AgentHolder.shutdown();
     }
 
     private synchronized void startServer(int port) throws DataBridgeException,
@@ -110,7 +108,7 @@ public class OneEndPointDPThriftTest {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
         }
-        dataPublisher.shutdown();
+        dataPublisher.shutdownWithAgent();
         Assert.assertEquals(numberOfEventsSent, thriftTestServer.getNumberOfEventsReceived());
         thriftTestServer.resetReceivedEvents();
         thriftTestServer.stop();

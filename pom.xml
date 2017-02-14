@@ -423,7 +423,6 @@
         <guava.version>20.0</guava.version>
         <httpclient.version>4.3.2.wso2v1</httpclient.version>
         <disruptor.version>3.3.2.wso2v2</disruptor.version>
-        <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
         <apache.commons.io.version>2.4</apache.commons.io.version>
         <securevalut.version>1.0.0-wso2v2</securevalut.version>
 
