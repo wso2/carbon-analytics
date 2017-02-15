@@ -18,14 +18,17 @@
 package org.wso2.carbon.databridge.receiver.binary.conf;
 
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
-import org.wso2.carbon.databridge.core.conf.DataReceiver;
 import org.wso2.carbon.databridge.receiver.binary.BinaryDataReceiverConstants;
-import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
+import org.wso2.carbon.kernel.internal.config.YAMLBasedConfigProvider;
+
+import java.util.Map;
 
 /**
  * The receiver configuration for Binary Transport Receiver
  */
 public class BinaryDataReceiverConfiguration {
+    // TODO: 1/31/17 getting port offset from carbon.yml file (CarbonConfiguration class in C5)
     private int sslPort;
     private int tcpPort;
     private int sizeOfSSLThreadPool;
@@ -41,7 +44,7 @@ public class BinaryDataReceiverConfiguration {
     }
 
     public BinaryDataReceiverConfiguration(DataBridgeConfiguration dataBridgeConfiguration) {
-        DataReceiver dataReceiver = dataBridgeConfiguration.
+        /*DataReceiver dataReceiver = dataBridgeConfiguration.
                 getDataReceiver(BinaryDataReceiverConstants.DATA_BRIDGE_RECEIVER_CONFIG_NAME);
         this.sslPort = Integer.parseInt(dataReceiver.getConfiguration(BinaryDataReceiverConstants.SSL_RECEIVER_PORT_CONFIG_NAME,
                 BinaryDataReceiverConstants.DEFAULT_SSL_RECEIVER_PORT).toString())+getPortOffset();
@@ -57,6 +60,26 @@ public class BinaryDataReceiverConfiguration {
         Object sslProtocolObj = dataReceiver.getConfiguration(BinaryDataReceiverConstants.SSL_RECEIVER_PROTOCOLS_CONFIG_NAME, null);
         sslProtocols =  sslProtocolObj != null ? sslProtocolObj.toString() : null;
         Object ciphersObj = dataReceiver.getConfiguration(BinaryDataReceiverConstants.SSL_RECEIVER_CIPHERS_CONFIG_NAME, null);
+        ciphers =  sslProtocolObj != null ? ciphersObj.toString() : null;*/
+
+        Map<String,Object> dataReceiver = dataBridgeConfiguration.getDataReceiver(BinaryDataReceiverConstants.DATA_BRIDGE_RECEIVER_CONFIG_NAME);
+
+        this.sslPort = Integer.parseInt(dataReceiver.getOrDefault(
+                BinaryDataReceiverConstants.SSL_RECEIVER_PORT_CONFIG_NAME,
+                BinaryDataReceiverConstants.DEFAULT_SSL_RECEIVER_PORT).toString())+getPortOffset();
+        this.tcpPort = Integer.parseInt(dataReceiver.getOrDefault(
+                BinaryDataReceiverConstants.TCP_RECEIVER_PORT_CONFIG_NAME,
+                BinaryDataReceiverConstants.DEFAULT_TCP_RECEIVER_PORT).toString())+getPortOffset();
+        this.sizeOfSSLThreadPool = Integer.parseInt(dataReceiver.getOrDefault(
+                BinaryDataReceiverConstants.SSL_RECEIVER_THREAD_POOL_SIZE,
+                BinaryDataReceiverConstants.DEFAULT_SSL_RECEIVER_THREAD_POOL_SIZE).toString());
+        this.sizeOfTCPThreadPool = Integer.parseInt(dataReceiver.getOrDefault(
+                BinaryDataReceiverConstants.TCP_RECEIVER_THREAD_POOL_SIZE,
+                BinaryDataReceiverConstants.DEFAULT_TCP_RECEIVER_THREAD_POOL_SIZE).toString());
+
+        Object sslProtocolObj = dataReceiver.getOrDefault(BinaryDataReceiverConstants.SSL_RECEIVER_PROTOCOLS_CONFIG_NAME, null);
+        sslProtocols =  sslProtocolObj != null ? sslProtocolObj.toString() : null;
+        Object ciphersObj = dataReceiver.getOrDefault(BinaryDataReceiverConstants.SSL_RECEIVER_CIPHERS_CONFIG_NAME, null);
         ciphers =  sslProtocolObj != null ? ciphersObj.toString() : null;
     }
 
@@ -77,7 +100,10 @@ public class BinaryDataReceiverConfiguration {
     }
 
     private static int getPortOffset() {
-        return CarbonUtils.getPortFromServerConfig(BinaryDataReceiverConstants.CARBON_CONFIG_PORT_OFFSET_NODE)+1;
+        YAMLBasedConfigProvider yamlBasedConfigProvider = new YAMLBasedConfigProvider();
+
+//        return CarbonUtils.getPortFromServerConfig(BinaryDataReceiverConstants.CARBON_CONFIG_PORT_OFFSET_NODE)+1;
+        return yamlBasedConfigProvider.getCarbonConfiguration().getPortsConfig().getOffset()+1;
     }
 
     public String getSslProtocols() {

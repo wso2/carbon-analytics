@@ -20,7 +20,6 @@ package org.wso2.carbon.databridge.core;
 
 
 import org.wso2.carbon.databridge.commons.Event;
-import org.wso2.carbon.databridge.core.Utils.AgentSession;
 
 import java.util.List;
 

@@ -24,7 +24,7 @@ import org.wso2.carbon.databridge.agent.conf.DataAgentsConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
-import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.kernel.utils.Utils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -93,8 +93,18 @@ public class AgentHolder {
      */
     private DataAgentsConfiguration loadConfiguration()
             throws DataEndpointAgentConfigurationException {
-        if (configPath == null) configPath = CarbonUtils.getCarbonConfigDirPath()
-                + DataEndpointConstants.DATA_AGENT_CONF_FILE_PATH;
+        if (configPath == null) {
+            File filePath = new File("src" + File.separator + "test" + File.separator + "resources");
+            if (!filePath.exists()) {
+                filePath = new File("components" + File.separator + "data-bridge" + File.separator + "org.wso2.carbon.databridge.agent" + File.separator + "src" + File.separator + "test" + File.separator + "resources");
+            }
+            if (!filePath.exists()) {
+                // TODO: 1/24/17 points to data-agent-config.xml in data-bridge/resources folder.change later
+                filePath = new File(Utils.getCarbonHome() + File.separator + "resources");
+            }
+            configPath = filePath.getAbsolutePath()+File.separator
+                    + DataEndpointConstants.DATA_AGENT_CONF_FILE_NAME;
+        }
         try {
             File file = new File(configPath);
             JAXBContext jaxbContext = JAXBContext.newInstance(DataAgentsConfiguration.class);
@@ -161,9 +171,11 @@ public class AgentHolder {
     }
 
     public synchronized static void shutdown() throws DataEndpointException {
-        for (DataEndpointAgent dataEndpointAgent : instance.dataEndpointAgents.values()) {
-            dataEndpointAgent.shutDown();
+        if(instance!=null) {
+            for (DataEndpointAgent dataEndpointAgent : instance.dataEndpointAgents.values()) {
+                dataEndpointAgent.shutDown();
+            }
+            instance = null;
         }
-        instance = null;
     }
 }

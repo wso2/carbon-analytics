@@ -17,36 +17,46 @@ package org.wso2.carbon.databridge.core;
 */
 
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
-import org.wso2.carbon.user.core.service.RealmService;
-import org.wso2.carbon.utils.ConfigurationContextService;
+import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
+import org.wso2.carbon.kernel.CarbonRuntime;
 
 public class DataBridgeServiceValueHolder {
+    // TODO: 2/14/17 DataBridgeDS only references carbon runtime (may have to change later)
 
-    private static RealmService realmService;
-    private static AbstractStreamDefinitionStore streamDefinitionStore;
-    private static ConfigurationContextService configurationContextService;
+    private static CarbonRuntime carbonRuntime;
+//    private static RealmService realmService;
+//    private static AbstractStreamDefinitionStore streamDefinitionStore;
+//    private static ConfigurationContextService configurationContextService;
 
-    public static void setRealmService(RealmService realmService) {
+    /*public static void setRealmService(RealmService realmService) {
         DataBridgeServiceValueHolder.realmService = realmService;
-    }
+    }*/
 
-    public static RealmService getRealmService() {
+    /*public static RealmService getRealmService() {
         return realmService;
-    }
+    }*/
 
-    public static void setStreamDefinitionStore(AbstractStreamDefinitionStore streamDefinitionStore) {
+    /*public static void setStreamDefinitionStore(InMemoryStreamDefinitionStore streamDefinitionStore) {
         DataBridgeServiceValueHolder.streamDefinitionStore = streamDefinitionStore;
     }
 
-    public static AbstractStreamDefinitionStore getStreamDefinitionStore() {
+    public static InMemoryStreamDefinitionStore getStreamDefinitionStore() {
         return streamDefinitionStore;
-    }
+    }*/
 
-    public static void setConfigurationContextService(ConfigurationContextService configurationContextService) {
+    /*public static void setConfigurationContextService(ConfigurationContextService configurationContextService) {
         DataBridgeServiceValueHolder.configurationContextService = configurationContextService;
     }
 
     public static ConfigurationContextService getConfigurationContextService() {
         return configurationContextService;
+    }*/
+
+    public static CarbonRuntime getCarbonRuntime() {
+        return carbonRuntime;
+    }
+
+    public static void setCarbonRuntime(CarbonRuntime carbonRuntime) {
+        DataBridgeServiceValueHolder.carbonRuntime = carbonRuntime;
     }
 }

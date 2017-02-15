@@ -17,6 +17,9 @@
 */
 package org.wso2.carbon.databridge.commons.thrift.utils;
 
+/**
+ * CommonThriftConstants class
+ */
 public class CommonThriftConstants {
 
     public static final int SECURE_EVENT_RECEIVER_PORT_OFFSET = 100;

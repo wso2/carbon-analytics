@@ -38,6 +38,7 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import java.net.SocketException;
 
 public class ServerOfflineSyncThriftTest {
+    // TODO: 1/31/17 no tenant concept
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private String agentConfigFileName = "sync-data-agent-config.xml";
@@ -122,7 +123,7 @@ public class ServerOfflineSyncThriftTest {
         event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
 
         thriftTestServer = new ThriftTestServer();
-        thriftTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        thriftTestServer.addStreamDefinition(STREAM_DEFN);
         thriftTestServer.stopAndStartDuration(7642, 4000, 1000);
 
         DataPublisherTestUtil.setKeyStoreParams();
@@ -167,7 +168,7 @@ public class ServerOfflineSyncThriftTest {
         event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
 
         thriftTestServer = new ThriftTestServer();
-        thriftTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        thriftTestServer.addStreamDefinition(STREAM_DEFN);
         thriftTestServer.stopAndStartDuration(7652, 7000, 1000);
 
         DataPublisherTestUtil.setKeyStoreParams();

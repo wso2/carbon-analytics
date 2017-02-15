@@ -16,12 +16,14 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>data-bridge</artifactId>
-        <version>5.1.10-SNAPSHOT</version>
+        <version>6.0.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -35,11 +37,11 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.eclipse.osgi</groupId>
+            <groupId>org.wso2.eclipse.osgi</groupId>
             <artifactId>org.eclipse.osgi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.osgi</groupId>
+            <groupId>org.wso2.eclipse.osgi</groupId>
             <artifactId>org.eclipse.osgi.services</artifactId>
         </dependency>
         <dependency>
@@ -90,6 +92,10 @@
             <artifactId>org.wso2.carbon.databridge.core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.base</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -110,7 +116,7 @@
                             org.wso2.carbon.databridge.agent.*
                         </Export-Package>
                         <Import-Package>
-			    org.apache.thrift;version="${libthrift.wso2.imp.pkg.version.range}",
+                            org.apache.thrift;version="${libthrift.wso2.imp.pkg.version.range}",
                             org.osgi.framework,
                             com.lmax.disruptor.*;version="${disruptor.version.range}",
                             ;resolution:=optional

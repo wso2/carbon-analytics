@@ -14,7 +14,8 @@
 * KIND, either express or implied.  See the License for the
 * specific language governing permissions and limitations
 * under the License.
-*/
+*//*
+
 package org.wso2.carbon.databridge.core.internal.authentication;
 
 import org.apache.commons.logging.Log;
@@ -28,10 +29,13 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+*/
 /**
  * CarbonAuthenticationHandler implementation that authenticate Agents
  * via Carbon AuthenticationService
- */
+ *//*
+
+// TODO: 2/14/17 temporarily removing this class since AuthenticationHandler is implemented inline in DataBridgeDS
 public class CarbonAuthenticationHandler implements AuthenticationHandler {
     private AuthenticationService authenticationService;
     private static final Log log = LogFactory.getLog(CarbonAuthenticationHandler.class);
@@ -107,3 +111,4 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
     }
 
 }
+*/

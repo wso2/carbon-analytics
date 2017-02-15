@@ -19,102 +19,101 @@ package org.wso2.carbon.databridge.streamdefn.filesystem;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.databridge.streamdefn.filesystem.internal.ServiceHolder;
-import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+
 
 import java.util.Collection;
 
 public class FileSystemStreamDefinitionStore extends AbstractStreamDefinitionStore {
+    // TODO: 1/30/17 no tenant concept
     private static final Log log = LogFactory.getLog(FileSystemStreamDefinitionStore.class);
 
     @Override
-    public StreamDefinition getStreamDefinitionFromStore(String name, String version, int tenantId)
+    public StreamDefinition getStreamDefinitionFromStore(String name, String version)
             throws StreamDefinitionStoreException {
-        boolean tenantFlowStarted = false;
+//        boolean tenantFlowStarted = false;
         try {
-            tenantFlowStarted = startTenantFlow(tenantId);
+//            tenantFlowStarted = startTenantFlow(tenantId);
             return ServiceHolder.getEventStreamService().getStreamDefinition(name, version);
         } catch (EventStreamConfigurationException ex) {
             String msg = "Error while loading the stream definition name: " + name + ", version: " + version;
             log.error(msg, ex);
             throw new StreamDefinitionStoreException(msg, ex);
-        } finally {
+        } /*finally {
             if (tenantFlowStarted) PrivilegedCarbonContext.endTenantFlow();
-        }
+        }*/
     }
 
     @Override
-    public StreamDefinition getStreamDefinitionFromStore(String streamId, int tenantId)
+    public StreamDefinition getStreamDefinitionFromStore(String streamId)
             throws StreamDefinitionStoreException {
-        boolean tenantFlowStarted = false;
+//        boolean tenantFlowStarted = false;
         try {
-            tenantFlowStarted = startTenantFlow(tenantId);
+//            tenantFlowStarted = startTenantFlow(tenantId);
             return ServiceHolder.getEventStreamService().getStreamDefinition(streamId);
         } catch (EventStreamConfigurationException ex) {
             String msg = "Error while loading the stream definition Id: " + streamId;
             log.error(msg + streamId, ex);
             throw new StreamDefinitionStoreException(msg, ex);
-        } finally {
+        } /*finally {
             if (tenantFlowStarted) PrivilegedCarbonContext.endTenantFlow();
-        }
+        }*/
     }
 
     @Override
-    public Collection<StreamDefinition> getAllStreamDefinitionsFromStore(int tenantId)
+    public Collection<StreamDefinition> getAllStreamDefinitionsFromStore()
             throws StreamDefinitionStoreException {
-        boolean tenantFlowStarted = false;
+//        boolean tenantFlowStarted = false;
         try {
-            tenantFlowStarted = startTenantFlow(tenantId);
+//            tenantFlowStarted = startTenantFlow(tenantId);
             return ServiceHolder.getEventStreamService().getAllStreamDefinitions();
         } catch (EventStreamConfigurationException ex) {
-            String msg = "Error while loading all stream definitions for tenant: " + tenantId;
+//            String msg = "Error while loading all stream definitions for tenant: " + tenantId;
+            String msg = "Error while loading all stream definitions";
             log.error(msg, ex);
             throw new StreamDefinitionStoreException(msg, ex);
-        } finally {
+        } /*finally {
             if (tenantFlowStarted) PrivilegedCarbonContext.endTenantFlow();
-        }
+        }*/
     }
 
     @Override
-    public void saveStreamDefinitionToStore(StreamDefinition streamDefinition, int tenantId)
+    public void saveStreamDefinitionToStore(StreamDefinition streamDefinition)
             throws StreamDefinitionStoreException {
-        boolean tenantFlowStarted = false;
+//        boolean tenantFlowStarted = false;
         try {
-            tenantFlowStarted = startTenantFlow(tenantId);
+//            tenantFlowStarted = startTenantFlow(tenantId);
             ServiceHolder.getEventStreamService().addEventStreamDefinition(streamDefinition);
         } catch (EventStreamConfigurationException ex) {
             String msg = "Error while saving the stream definition: " + streamDefinition;
             log.error(msg, ex);
             throw new StreamDefinitionStoreException(msg, ex);
-        } finally {
+        } /*finally {
             if (tenantFlowStarted) PrivilegedCarbonContext.endTenantFlow();
-        }
+        }*/
     }
 
     @Override
-    public boolean removeStreamDefinition(String name, String version, int tenantId) {
-        boolean tenantFlowStarted = false;
+    public boolean removeStreamDefinition(String name, String version) {
+//        boolean tenantFlowStarted = false;
         try {
-            tenantFlowStarted = startTenantFlow(tenantId);
+//            tenantFlowStarted = startTenantFlow(tenantId);
             ServiceHolder.getEventStreamService().removeEventStreamDefinition(name, version);
             return true;
         } catch (EventStreamConfigurationException ex) {
             String msg = "Error while removing the stream definition name :" + name + ", version : " + version;
             log.error(msg, ex);
             return false;
-        } finally {
+        } /*finally {
             if (tenantFlowStarted) PrivilegedCarbonContext.endTenantFlow();
-        }
+        }*/
     }
 
-    private boolean startTenantFlow(int tenantId) {
+    /*private boolean startTenantFlow(int tenantId) {
         int currentTenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         if (currentTenantId == MultitenantConstants.INVALID_TENANT_ID ||
                 (currentTenantId == MultitenantConstants.SUPER_TENANT_ID && currentTenantId != tenantId)) {
@@ -123,5 +122,5 @@ public class FileSystemStreamDefinitionStore extends AbstractStreamDefinitionSto
             return true;
         }
         return false;
-    }
+    }*/
 }

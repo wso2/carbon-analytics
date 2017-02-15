@@ -33,10 +33,10 @@ public class DataBridgeCommonsUtils {
 
     static {
         String arch = System.getProperty(JVM_BIT_ARCH_SYSTEM_PROPERTY);
-        if (arch.equals("32")){
-            //32-bit architecture
+        if (arch.equals("32")) {
+            // 32-bit architecture
             referenceSize = 4;
-        }else {
+        } else {
             referenceSize = 8;
         }
     }
@@ -59,19 +59,19 @@ public class DataBridgeCommonsUtils {
         return streamId.split(STREAM_NAME_VERSION_SPLITTER)[1];
     }
 
-    public static int getSize(Event event){
+    public static int getSize(Event event) {
         int size = event.getStreamId().getBytes().length;
         size += 8; // for timestamp.
         if (event.getPayloadData() != null) {
             size += getSize(event.getPayloadData());
         }
-        if (event.getMetaData() != null){
+        if (event.getMetaData() != null) {
             size += getSize(event.getMetaData());
         }
-        if (event.getCorrelationData() != null){
+        if (event.getCorrelationData() != null) {
             size += getSize(event.getCorrelationData());
         }
-        if (event.getArbitraryDataMap() != null){
+        if (event.getArbitraryDataMap() != null) {
             size += getSize(event.getArbitraryDataMap());
         }
         return size;
@@ -88,9 +88,9 @@ public class DataBridgeCommonsUtils {
         return totalSize;
     }
 
-    private static int getSize(Object[] objects){
+    private static int getSize(Object[] objects) {
         int size = 0;
-        for (Object object : objects){
+        for (Object object : objects) {
             if (object != null) {
                 if (object instanceof Integer) {
                     size += 4;
@@ -111,7 +111,7 @@ public class DataBridgeCommonsUtils {
         return size;
     }
 
-    public static int getSize(String value){
+    public static int getSize(String value) {
         int size = 0;
         if (value != null) {
             try {
@@ -123,7 +123,7 @@ public class DataBridgeCommonsUtils {
         return size;
     }
 
-    public static int getReferenceSize(){
+    public static int getReferenceSize() {
         return referenceSize;
     }
 
@@ -131,18 +131,14 @@ public class DataBridgeCommonsUtils {
         int indexOfStartingChars = -1;
         int indexOfClosingBrace;
 
-        while (indexOfStartingChars < text.indexOf("${")
-                && (indexOfStartingChars = text.indexOf("${")) != -1
+        while (indexOfStartingChars < text.indexOf("${") && (indexOfStartingChars = text.indexOf("${")) != -1
                 && (indexOfClosingBrace = text.indexOf('}')) != -1) {
-            String sysProp = text.substring(indexOfStartingChars + 2,
-                    indexOfClosingBrace);
+            String sysProp = text.substring(indexOfStartingChars + 2, indexOfClosingBrace);
             String propValue = System.getProperty(sysProp);
             if (propValue != null) {
-                text = text.substring(0, indexOfStartingChars) + propValue
-                        + text.substring(indexOfClosingBrace + 1);
+                text = text.substring(0, indexOfStartingChars) + propValue + text.substring(indexOfClosingBrace + 1);
             }
-            if (sysProp.equals("carbon.home") && propValue != null
-                    && propValue.equals(".")) {
+            if (sysProp.equals("carbon.home") && propValue != null && propValue.equals(".")) {
 
                 text = new File(".").getAbsolutePath() + File.separator + text;
             }

@@ -17,7 +17,6 @@
 */
 package org.wso2.carbon.databridge.receiver.binary;
 
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil;
@@ -25,7 +24,7 @@ import org.wso2.carbon.databridge.commons.exception.MalformedEventException;
 import org.wso2.carbon.databridge.core.EventConverter;
 import org.wso2.carbon.databridge.core.StreamTypeHolder;
 import org.wso2.carbon.databridge.core.exception.EventConversionException;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.kernel.context.PrivilegedCarbonContext;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -86,11 +85,12 @@ public class BinaryEventConverter implements EventConverter {
 
         AttributeType[][] attributeTypeOrder = streamTypeHolder.getDataType(event.getStreamId());
         if (attributeTypeOrder == null) {
-            PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-            if (privilegedCarbonContext.getTenantDomain() == null) {
+            // TODO: 1/27/17 no multitenancy
+            PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getCurrentContext();
+            /*if (privilegedCarbonContext.getTenantDomain() == null) {
                 privilegedCarbonContext.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
                 privilegedCarbonContext.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
-            }
+            }*/
             streamTypeHolder.reloadStreamTypeHolder();
             attributeTypeOrder = streamTypeHolder.getDataType(event.getStreamId());
             if (attributeTypeOrder == null) {

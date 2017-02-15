@@ -18,6 +18,9 @@
 package org.wso2.carbon.databridge.commons.exception;
 
 
+/**
+ * TransportException
+ */
 public class TransportException extends Exception {
 
     private String errorMessage;

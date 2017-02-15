@@ -19,7 +19,6 @@
 package org.wso2.carbon.databridge.receiver.thrift.converter;
 
 
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle;
@@ -28,7 +27,7 @@ import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import org.wso2.carbon.databridge.core.EventConverter;
 import org.wso2.carbon.databridge.core.StreamTypeHolder;
 import org.wso2.carbon.databridge.core.exception.EventConversionException;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.kernel.context.PrivilegedCarbonContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +56,7 @@ public final class ThriftEventConverter implements EventConverter {
                         break;
                     case STRING:
                         String stringValue = thriftEventBundle.getStringAttributeList().get(indexCounter.getStringCount());
-                        if (stringValue.equals(EventDefinitionConverterUtils.nullString)) {
+                        if (stringValue.equals(EventDefinitionConverterUtils.NULL_STRING)) {
                             objects[i] = null;
                         } else {
                             objects[i] = stringValue;
@@ -154,12 +153,13 @@ public final class ThriftEventConverter implements EventConverter {
                 indexCounter.incrementLongCount();
                 event.setTimeStamp(timeStamp);
                 AttributeType[][] attributeTypeOrder = streamTypeHolder.getDataType(streamId);
-                if (attributeTypeOrder == null) {
-                    PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-                    if (privilegedCarbonContext.getTenantDomain() == null) {
+                if (attributeTypeOrder == null)     {
+                    // TODO: 1/27/17 no multitenancy
+                    PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getCurrentContext();
+                    /*if (privilegedCarbonContext.getTenantDomain() == null) {
                         privilegedCarbonContext.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
                         privilegedCarbonContext.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
-                    }
+                    }*/
                     streamTypeHolder.reloadStreamTypeHolder();
                     attributeTypeOrder = streamTypeHolder.getDataType(streamId);
                     if (attributeTypeOrder == null) {

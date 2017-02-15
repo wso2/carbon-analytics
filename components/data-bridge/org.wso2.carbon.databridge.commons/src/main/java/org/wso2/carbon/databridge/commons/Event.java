@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * WSO2 Event Implementation
  *
- * @Since 5.0.0
+ *
  */
 public class Event {
     private String streamId;
@@ -149,7 +149,9 @@ public class Event {
         if (timeStamp != event.timeStamp) {
             return false;
         }
-        if (arbitraryDataMap != null ? !arbitraryDataMap.equals(event.arbitraryDataMap) : event.arbitraryDataMap != null) {
+        if (arbitraryDataMap != null ?
+                !arbitraryDataMap.equals(event.arbitraryDataMap) :
+                event.arbitraryDataMap != null) {
             return false;
         }
         if (!Arrays.deepEquals(correlationData, event.correlationData)) {
