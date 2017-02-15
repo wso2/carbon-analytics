@@ -45,18 +45,17 @@ public final class DataBridgeCoreBuilder {
     private DataBridgeCoreBuilder() {
     }
 
-    // TODO: 2/2/17 stream definiitions are temporarily loaded from a file in <product-sp>/deployment
+    // TODO: 2/2/17 stream definitions are temporarily loaded from a file in <product-sp>/deployment
     public static List<String> loadStreamDefinitionXML() throws DataBridgeConfigurationException {
         List<String> streamDefinitionList = new ArrayList<String>();
 //        String carbonHome = System.getProperty(ServerConstants.CARBON_CONFIG_DIR_PATH);
 //        String path = carbonHome + File.separator + DataBridgeConstants.DATA_BRIDGE_DIR +
 //                File.separator + DataBridgeConstants.STREAM_DEFINITIONS_XML;
-//        String path = Utils.getCarbonHome().toString()+File.separator+"deployment"+File.separator+DataBridgeConstants.STREAM_DEFINITIONS_XML;
-        String path = Utils.getCarbonHome().toString()+File.separator+"deployment"+File.separator+"stream-definitions.yaml";
+        String path = Utils.getCarbonHome().toString()+ File.separator+ "deployment"+ File.separator+ "stream-definitions.yaml";
         Yaml yaml = new Yaml();
-        File f = new File(path);
+        File file = new File(path);
         try {
-            FileInputStream fileInputStream = new FileInputStream(f);
+            FileInputStream fileInputStream = new FileInputStream(file);
             Map<String,List<String>> streams = (Map<String, List<String>>) yaml.load(fileInputStream);
             streamDefinitionList.addAll(streams.get(DataBridgeConstants.STREAM_DEFINITIONS_ELEMENT));
         } catch (FileNotFoundException e) {
@@ -64,38 +63,41 @@ public final class DataBridgeCoreBuilder {
         }
 
 
-//        File file = new File(path);
-//        if (file.exists() && !file.isDirectory()) {
-//            OMElement config = loadXML(path, DataBridgeConstants.STREAM_DEFINITIONS_XML);
-//            if (config != null) {
-//                if (!(new QName(DataBridgeConstants.DATA_BRIDGE_NAMESPACE, DataBridgeConstants.STREAM_DEFINITIONS_ELEMENT)).equals(config.getQName())) {
-//                    throw new DataBridgeConfigurationException("Wrong configuration added in " + DataBridgeConstants.STREAM_DEFINITIONS_XML);
-//                }
-//                for (Iterator streamDefinitionIterator = config.getChildElements();
-//                     streamDefinitionIterator.hasNext(); ) {
-//                    OMElement streamDefinition = (OMElement) streamDefinitionIterator.next();
-//                    String domainName = streamDefinition.getAttributeValue(new QName(DataBridgeConstants.DOMAIN_NAME_ATTRIBUTE));
+        /*File file = new File(path);
+        if (file.exists() && !file.isDirectory()) {
+            OMElement config = loadXML(path, DataBridgeConstants.STREAM_DEFINITIONS_XML);
+            if (config != null) {
+                if (!(new QName(DataBridgeConstants.DATA_BRIDGE_NAMESPACE, DataBridgeConstants.STREAM_DEFINITIONS_ELEMENT)).equals(config.getQName())) {
+                    throw new DataBridgeConfigurationException("Wrong configuration added in " + DataBridgeConstants.STREAM_DEFINITIONS_XML);
+                }
+                for (Iterator streamDefinitionIterator = config.getChildElements();
+                     streamDefinitionIterator.hasNext(); ) {
+                    OMElement streamDefinition = (OMElement) streamDefinitionIterator.next();
+                    String domainName = streamDefinition.getAttributeValue(new QName(DataBridgeConstants.DOMAIN_NAME_ATTRIBUTE));
 
-                    /*if (domainName == null || domainName.equals("")) {
+                    if (domainName == null || domainName.equals("")) {
                         domainName = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-                    }*/
-//                    streamDefinitionList.add(new String[]{domainName, streamDefinition.getText()});
-//                    streamDefinitionList.add(streamDefinition.getText());
-//                }
-//            }
-//        }
+                    }
+                    streamDefinitionList.add(new String[]{domainName, streamDefinition.getText()});
+                }
+            }
+        }*/
 
         return streamDefinitionList;
     }
 
     public static String getDatabridgeConfigPath() {
+        // TODO: 2/14/17 data-bridge-config.yaml loaded from <product-sp>/resources
 //        String carbonHome = System.getProperty(ServerConstants.CARBON_CONFIG_DIR_PATH);
 //        return carbonHome + File.separator + DataBridgeConstants.DATA_BRIDGE_DIR + File.separator + DataBridgeConstants.DATA_BRIDGE_CONFIG_XML;
-//        String databridgeConfigXMLPath = "resources"+File.separator+DataBridgeConstants.DATA_BRIDGE_CONFIG_XML;
-//        File file = new File(databridgeConfigXMLPath);
-        String databridgeConfigYamlPath = "resources"+File.separator+"data-bridge-config.yaml";
-        File file = new File(databridgeConfigYamlPath);
-        return file.getAbsolutePath();
+        File filePath = new File("src" + File.separator + "test" + File.separator + "resources");
+        if (!filePath.exists()) {
+            filePath = new File("components" + File.separator + "data-bridge" + File.separator + "org.wso2.carbon.databridge.agent" + File.separator + "src" + File.separator + "test" + File.separator + "resources");
+        }
+        if (!(filePath.exists())) {
+            filePath = new File(Utils.getCarbonHome() + File.separator + "resources");
+        }
+        return filePath.getAbsolutePath() + File.separator + "data-bridge-config.yaml";
     }
 
     public static OMElement loadXML(String path, String fileName) throws DataBridgeConfigurationException {

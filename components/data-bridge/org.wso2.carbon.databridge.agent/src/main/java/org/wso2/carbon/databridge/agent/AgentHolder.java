@@ -24,7 +24,6 @@ import org.wso2.carbon.databridge.agent.conf.DataAgentsConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
-import org.wso2.carbon.base.utils.BaseUtils;
 import org.wso2.carbon.kernel.utils.Utils;
 
 import javax.xml.bind.JAXBContext;
@@ -94,7 +93,6 @@ public class AgentHolder {
      */
     private DataAgentsConfiguration loadConfiguration()
             throws DataEndpointAgentConfigurationException {
-        //if (configPath == null) configPath = CarbonUtils.getCarbonConfigDirPath()
         if (configPath == null) {
             File filePath = new File("src" + File.separator + "test" + File.separator + "resources");
             if (!filePath.exists()) {

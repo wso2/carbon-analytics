@@ -23,6 +23,7 @@ import org.wso2.carbon.databridge.core.Utils.AgentSession;
  * The handler interface that's used to authenticate Agents
  */
 public interface AuthenticationHandler {
+    // TODO: 2/14/17 no tenant concept
     boolean authenticate(String userName, String password);
 
     /*String getTenantDomain(String userName);

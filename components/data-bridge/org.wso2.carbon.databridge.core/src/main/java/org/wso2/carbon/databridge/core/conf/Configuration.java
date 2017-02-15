@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 
 public class Configuration {
-    // TODO: 2/3/17 no longer used since yaml file loaded instead of xml
+    // TODO: 2/3/17 no longer used since data-bridge-config.yaml file loaded instead of data-bridge-config.xml
     private String name;
     private String value;
 

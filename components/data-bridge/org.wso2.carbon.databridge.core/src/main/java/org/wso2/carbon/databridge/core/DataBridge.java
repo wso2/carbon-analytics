@@ -41,6 +41,7 @@ import org.wso2.carbon.databridge.core.internal.EventDispatcher;
 import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
 import org.wso2.carbon.databridge.core.internal.authentication.Authenticator;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
+import org.wso2.carbon.kernel.utils.Utils;
 import org.wso2.securevault.SecretResolver;
 import org.wso2.securevault.SecretResolverFactory;
 import org.yaml.snakeyaml.Yaml;
@@ -275,7 +276,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
                                 totalEventCounter + " \n";
                         // TODO: 1/30/17 creating receiver-perf.txt in CARBON_HOME/tmp directory
                         //File file = new File(CarbonUtils.getCarbonHome() + File.separator + "receiver-perf.txt");
-                        File tmpFolder = new File("tmp");
+                        File tmpFolder = new File(Utils.getCarbonHome() + File.separator + "tmp");
                         File file = new File(tmpFolder.getAbsolutePath() + File.separator + "receiver-perf.txt");
                         if (!file.exists()) {
                             log.info("Creating the performance measurement file at : " + file.getAbsolutePath());
@@ -473,7 +474,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     }
 
     /**
-     * This creates the DataBridgeConfiguration from the data-bridge-config.xml file
+     * This creates the DataBridgeConfiguration from the data-bridge-config.yaml file
      *
      * @param configPath
      * @return DataBridgeConfiguration
@@ -489,6 +490,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             try(FileInputStream fileInputStream = new FileInputStream(configFile)) {
                 Yaml yaml = new Yaml();
                 dataBridgeConfiguration=yaml.loadAs(fileInputStream,DataBridgeConfiguration.class);
+                // TODO: 2/14/17 changed to support yaml file reading (data-bridge-config.yaml)
                 /*JAXBContext jaxbContext = JAXBContext.newInstance(DataBridgeConfiguration.class);
                 Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
                 dataBridgeConfiguration = (DataBridgeConfiguration) jaxbUnmarshaller.unmarshal(configFile);

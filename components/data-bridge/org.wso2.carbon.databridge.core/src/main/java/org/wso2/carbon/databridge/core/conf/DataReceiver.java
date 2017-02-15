@@ -20,55 +20,36 @@ package org.wso2.carbon.databridge.core.conf;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
-import java.util.Map;
 
 public class DataReceiver {
-    // TODO: 2/3/17 not used any more
-//    private String name;
-//    private List<Configuration> configurations;
-    private Map<String, Object> thrift;
-    private Map<String, Object> binary;
+    // TODO: 2/3/17 no longer used since data-bridge-config.yaml file loaded instead of data-bridge-config.xml
+    private String name;
+    private List<Configuration> configurations;
 
-//    @XmlAttribute(name = "name")
-//    public String getName() {
-//        return name;
-//    }
-
-//    public void setName(String name) {
-//        this.name = name;
-//    }
-
-//    @XmlElement(name = "config")
-//    public List<Configuration> getConfigurations() {
-//        return configurations;
-//    }
-
-//    public void setConfigurations(List<Configuration> configurations) {
-//        this.configurations = configurations;
-//    }
-
-//    public Object getConfiguration(String configName, Object defaultValue){
-//        for (Configuration configuration: configurations){
-//            if (configuration.getName().equalsIgnoreCase(configName)){
-//                return configuration.getValue();
-//            }
-//        }
-//        return defaultValue;
-//    }
-
-    public void setThrift(Map<String,Object> thrift) {
-        this.thrift = thrift;
+    @XmlAttribute(name = "name")
+    public String getName() {
+        return name;
     }
 
-    public Map<String,Object> getThrift() {
-        return thrift;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setBinary(Map<String,Object> binary) {
-        this.binary = binary;
+    @XmlElement(name = "config")
+    public List<Configuration> getConfigurations() {
+        return configurations;
     }
 
-    public Map<String,Object> getBinary() {
-        return binary;
+    public void setConfigurations(List<Configuration> configurations) {
+        this.configurations = configurations;
+    }
+
+    public Object getConfiguration(String configName, Object defaultValue){
+        for (Configuration configuration: configurations){
+            if (configuration.getName().equalsIgnoreCase(configName)){
+                return configuration.getValue();
+            }
+        }
+        return defaultValue;
     }
 }

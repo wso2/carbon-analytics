@@ -49,7 +49,7 @@ public class ThriftServerStartupImpl implements ThriftServerStartup{
             if (ServiceHolder.getDataReceiver() == null) {
                 ServiceHolder.setDataReceiver(new ThriftDataReceiverFactory().createAgentServer(
                         thriftDataReceiverConfiguration, ServiceHolder.getDataBridgeReceiverService()));
-                // TODO: 1/27/17 Hack to get host name. Change!
+                // TODO: 1/27/17 Hack to get host name. Change later
                 /*String serverUrl = CarbonUtils.getServerURL(ServiceHolder.getServerConfiguration(),
                         ServiceHolder.getConfigurationContext().getServerConfigContext());*/
                 String hostName = thriftDataReceiverConfiguration.getReceiverHostName();
@@ -71,7 +71,7 @@ public class ThriftServerStartupImpl implements ThriftServerStartup{
                 TCompactProtocol.Factory inProtFactory = new TCompactProtocol.Factory();
                 TCompactProtocol.Factory outProtFactory = new TCompactProtocol.Factory();
 
-                // TODO: 2/5/17 thrift over http is needed any more?
+                // TODO: 2/5/17 thrift over http temporarily removed
                 /*ServiceHolder.getHttpServiceInstance().registerServlet("/thriftReceiver",
                         new ThriftEventTransmissionServlet(processor, inProtFactory, outProtFactory), new Hashtable(),
                         ServiceHolder.getHttpServiceInstance().createDefaultHttpContext());*/

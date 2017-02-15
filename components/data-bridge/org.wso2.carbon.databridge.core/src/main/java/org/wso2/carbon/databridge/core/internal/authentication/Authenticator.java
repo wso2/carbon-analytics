@@ -73,7 +73,7 @@ public final class Authenticator {
 
         if (isSuccessful) {
             String sessionId = UUID.randomUUID().toString();
-            // TODO: 1/30/17 removing tenant concept
+            // TODO: 1/30/17 no tenant concept
             int tenantId = 0;
             /*try {
                 String tenantDomain = authenticationHandler.getTenantDomain(userName);

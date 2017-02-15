@@ -66,12 +66,10 @@ public class DataBridgeDS {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        System.out.println("Called DataBridgeDS\n");
         try {
             if (databridge == null) {
-//                InMemoryStreamDefinitionStore streamDefinitionStore = DataBridgeServiceValueHolder.getStreamDefinitionStore();
                 InMemoryStreamDefinitionStore streamDefinitionStore = new InMemoryStreamDefinitionStore();
-                // TODO: 1/31/17 temporary implementation
+                // TODO: 1/31/17 temporary inline implementation of AuthenticationHandler
                 databridge = new DataBridge(new AuthenticationHandler() {
                     @Override
                     public boolean authenticate(String userName,
@@ -95,24 +93,20 @@ public class DataBridgeDS {
                     for (String streamDefinitionString : streamDefinitionStrings) {
                         try {
                             StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(streamDefinitionString);
-                            // TODO: 1/24/17  removed tenant dependency (no realm implementation in c5)
-                            //int tenantId = DataBridgeServiceValueHolder.getRealmService().getTenantManager().getTenantId(streamDefinitionString[0]);
-                            /*if (tenantId == MultitenantConstants.INVALID_TENANT_ID) {
+                            // TODO: 1/24/17  no tenant concept
+                            /*int tenantId = DataBridgeServiceValueHolder.getRealmService().getTenantManager().getTenantId(streamDefinitionString[0]);
+                            if (tenantId == MultitenantConstants.INVALID_TENANT_ID) {
                                 log.warn("Tenant " + streamDefinitionString[0] + " does not exist, Error in defining event stream " + streamDefinitionString[1]);
                                 continue;
-                            }*/
+                            }
 
-                            streamDefinitionStore.saveStreamDefinition(streamDefinition);
-
-
-                            /*try {
+                            try {
                                 PrivilegedCarbonContext.startTenantFlow();
                                 PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
                                 privilegedCarbonContext.setTenantId(tenantId);
-                                privilegedCarbonContext.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
                                 privilegedCarbonContext.setTenantDomain(streamDefinitionString[0]);
 
-                                streamDefinitionStore.saveStreamDefinition(streamDefinition, MultitenantConstants.SUPER_TENANT_ID);
+                                streamDefinitionStore.saveStreamDefinition(streamDefinition, tenantId);
 
                             } catch (DifferentStreamDefinitionAlreadyDefinedException e) {
                                 log.warn("Error redefining event stream of " + streamDefinitionString[0] + ": " + streamDefinitionString[1], e);
@@ -123,6 +117,9 @@ public class DataBridgeDS {
                             } finally {
                                 PrivilegedCarbonContext.endTenantFlow();
                             }*/
+
+                            streamDefinitionStore.saveStreamDefinition(streamDefinition);
+
                         } catch (MalformedStreamDefinitionException e) {
                             log.error("Malformed Stream Definition for " + streamDefinitionString, e);
                         }
@@ -143,7 +140,6 @@ public class DataBridgeDS {
         }  catch (RuntimeException e) {
             log.error("Error in starting Agent Server ", e);
         }
-
     }
 
 

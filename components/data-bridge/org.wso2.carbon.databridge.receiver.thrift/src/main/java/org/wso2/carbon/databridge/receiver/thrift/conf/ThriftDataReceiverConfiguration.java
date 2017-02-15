@@ -29,7 +29,7 @@ import java.util.Map;
  * configuration details related to DataReceiver
  */
 public class ThriftDataReceiverConfiguration {
-    // TODO: 1/31/17 getting port offset from carbon.yml file (CarbonConfiguration class in C5)
+    // TODO: 1/31/17 getting port offset from carbon context
     private int secureDataReceiverPort;
     private int dataReceiverPort;
     private String sslProtocols;
@@ -59,7 +59,6 @@ public class ThriftDataReceiverConfiguration {
 
 
         Map<String,Object> dataReceiver = dataBridgeConfiguration.getDataReceiver(ThriftDataReceiverConstants.DATA_BRIDGE_RECEIVER_NAME);
-//        ++portOffset;
         secureDataReceiverPort = Integer.parseInt(dataReceiver.getOrDefault(
                 ThriftDataReceiverConstants.SECURE_PORT_ELEMENT,
                 CommonThriftConstants.DEFAULT_RECEIVER_PORT
@@ -109,10 +108,8 @@ public class ThriftDataReceiverConfiguration {
     }
 
     /*public int getPortOffset() {
-        YAMLBasedConfigProvider yamlBasedConfigProvider = new YAMLBasedConfigProvider();
-
-//        return CarbonUtils.getPortFromServerConfig(BinaryDataReceiverConstants.CARBON_CONFIG_PORT_OFFSET_NODE)+1;
-        return yamlBasedConfigProvider.getCarbonConfiguration().getPortsConfig().getOffset()+1;
+        return CarbonUtils.
+                getPortFromServerConfig(ThriftDataReceiverConstants.CARBON_CONFIG_PORT_OFFSET_NODE) + 1;
     }*/
 
     public String getSslProtocols() {

@@ -94,14 +94,11 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Private-Package>
-                            org.json.*, com.google.gson.*
-                        </Private-Package>
                         <Export-Package>
                             org.wso2.carbon.databridge.commons.*
                         </Export-Package>
                         <Import-Package>
-                            *;resolution:=optional
+                            org.json.*, com.google.gson.*,*;resolution:=optional
                         </Import-Package>
                     </instructions>
                 </configuration>

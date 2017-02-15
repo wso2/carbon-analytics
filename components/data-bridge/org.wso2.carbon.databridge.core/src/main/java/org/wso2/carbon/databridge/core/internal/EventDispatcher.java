@@ -160,7 +160,7 @@ public class EventDispatcher {
             updateDomainNameStreamTypeHolderCache(newStreamDefinition);
             streamDefinitionStore.saveStreamDefinition(newStreamDefinition);
         }
-        //newStreamDefinition.createIndexDefinition(indexDefinition); // TODO: 1/18/17
+//        newStreamDefinition.createIndexDefinition(indexDefinition); // TODO: 1/18/17 no such method
 
         for (AgentCallback agentCallback : subscribers) {
             agentCallback.definedStream(newStreamDefinition);

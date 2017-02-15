@@ -81,8 +81,7 @@ public class AgentSession {
 
     public void setCredentials(String userName, String password, String domainName) {
         // TODO: 1/24/17 no tenant concept
-        //int tenantId = DataBridgeServiceValueHolder.getRealmService().getTenantManager().getTenantId(domainName);
-//        int tenantId = MultitenantConstants.SUPER_TENANT_ID;
+//        int tenantId = DataBridgeServiceValueHolder.getRealmService().getTenantManager().getTenantId(domainName);
 //        this.credentials = new Credentials(userName, password, domainName, tenantId);
         this.credentials = new Credentials(userName,password);
     }

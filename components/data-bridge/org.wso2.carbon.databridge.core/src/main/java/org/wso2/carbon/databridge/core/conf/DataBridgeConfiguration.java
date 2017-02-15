@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * configuration details related to DataReceiver
  */
-// TODO: 2/3/17 changed to support yaml
+// TODO: 2/3/17 changed to support yaml file reading (data-bridge-config.yaml)
 //@XmlRootElement(name = "dataBridgeConfiguration")
 public class DataBridgeConfiguration {
 
@@ -114,24 +114,6 @@ public class DataBridgeConfiguration {
 //        }
 //        return null;
 //    }
-
-    /*public Map<String,Object> getThriftDataReceiver() {
-        for (DataReceiver dataReceiver: dataReceivers) {
-            if (dataReceiver.getThrift() != null) {
-                return dataReceiver.getThrift();
-            }
-        }
-        return null;
-    }
-
-    public Map<String,Object> getBinaryDataReceiver() {
-        for (DataReceiver dataReceiver: dataReceivers) {
-            if (dataReceiver.getBinary() != null) {
-                return dataReceiver.getBinary();
-            }
-        }
-        return null;
-    }*/
 
     public Map<String,Object> getDataReceiver(String name) {
         return dataReceivers.get(name.toLowerCase());

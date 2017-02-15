@@ -21,13 +21,11 @@ import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionS
 import org.wso2.carbon.kernel.CarbonRuntime;
 
 public class DataBridgeServiceValueHolder {
+    // TODO: 2/14/17 DataBridgeDS only references carbon runtime (may have to change later)
 
-    // TODO: 1/24/17 no realmservice, ConfigurationContextService in c5. get methods not used either
-    //private static RealmService realmService;
-//    private static AbstractStreamDefinitionStore streamDefinitionStore;
-    // TODO: 1/31/17 temporarily converted above to InMemoryStreamDefinitionStore
-//    private static InMemoryStreamDefinitionStore streamDefinitionStore;
     private static CarbonRuntime carbonRuntime;
+//    private static RealmService realmService;
+//    private static AbstractStreamDefinitionStore streamDefinitionStore;
 //    private static ConfigurationContextService configurationContextService;
 
     /*public static void setRealmService(RealmService realmService) {

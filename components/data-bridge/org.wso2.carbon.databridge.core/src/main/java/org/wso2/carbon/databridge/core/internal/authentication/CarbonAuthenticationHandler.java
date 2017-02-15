@@ -21,7 +21,7 @@ package org.wso2.carbon.databridge.core.internal.authentication;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-//import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.databridge.core.DataBridgeServiceValueHolder;
 import org.wso2.carbon.databridge.core.Utils.AgentSession;
 import org.wso2.carbon.identity.authentication.AuthenticationService;
@@ -35,6 +35,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
  * via Carbon AuthenticationService
  *//*
 
+// TODO: 2/14/17 temporarily removing this class since AuthenticationHandler is implemented inline in DataBridgeDS
 public class CarbonAuthenticationHandler implements AuthenticationHandler {
     private AuthenticationService authenticationService;
     private static final Log log = LogFactory.getLog(CarbonAuthenticationHandler.class);
@@ -52,9 +53,7 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
             privilegedCarbonContext.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
         }
         boolean authenticated = authenticationService.authenticate(userName, password);
-        // TODO: 1/24/17 no tenant concept any longer
-        */
-/*if (authenticated) {
+        if (authenticated) {
 
             String tenantDomain = MultitenantUtils.getTenantDomain(userName);
             String tenantLessUserName = MultitenantUtils.getTenantAwareUsername(userName);
@@ -79,8 +78,7 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
             } catch (Exception e) {
                 log.error("Error trying load tenant after successful login", e);
             }
-        }*//*
-
+        }
         return authenticated;
     }
 
@@ -89,16 +87,9 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
         return MultitenantUtils.getTenantDomain(userName);
     }
 
-    */
-/*@Override
-    public int getTenantId(String tenantDomain) throws UserStoreException {
-        return DataBridgeServiceValueHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-    }*//*
-
-
     @Override
     public int getTenantId(String tenantDomain) throws UserStoreException {
-        return MultitenantConstants.SUPER_TENANT_ID;
+        return DataBridgeServiceValueHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
     }
 
     @Override
