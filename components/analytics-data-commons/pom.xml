@@ -27,12 +27,12 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>analytics-dataservice</artifactId>
+    <artifactId>analytics-data-commons</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Analytics Dataservice Aggregator Module</name>
+    <name>WSO2 Carbon - Analytics Data Commons Aggregator Module</name>
 
     <modules>
-        <module>org.wso2.analytics.dataservice</module>
+        <module>org.wso2.analytics.data.commons</module>
     </modules>
 
 </project>

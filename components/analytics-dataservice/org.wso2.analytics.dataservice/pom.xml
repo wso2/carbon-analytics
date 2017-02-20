@@ -31,11 +31,11 @@
             <artifactId>commons-logging</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.analytics</groupId>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.analytics.data.commons</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.analytics</groupId>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.analytics.datasource.rdbms</artifactId>
             <scope>test</scope>
         </dependency>
