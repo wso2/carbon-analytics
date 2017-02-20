@@ -29,7 +29,6 @@ import org.wso2.analytics.data.commons.AnalyticsEngine;
 import org.wso2.analytics.data.commons.AnalyticsEngineQueryResult;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.analytics.data.commons.service.AnalyticsDataHolder;
-import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.engine.commons.AnalyticsRelationProvider;
 import org.wso2.analytics.engine.commons.AnalyzerEngineConstants;
 import org.wso2.analytics.engine.commons.SparkAnalyticsEngineQueryResult;

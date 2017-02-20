@@ -13,9 +13,8 @@
     <name>WSO2 Carbon - Analytics Data Source HBase</name>
     <dependencies>
         <dependency>
-            <groupId>org.wso2.analytics</groupId>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.analytics.data.commons</artifactId>
-            <version>2.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.hbase</groupId>

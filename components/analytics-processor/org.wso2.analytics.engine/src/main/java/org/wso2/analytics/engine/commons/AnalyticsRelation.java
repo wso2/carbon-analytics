@@ -45,7 +45,6 @@ import scala.reflect.ClassTag$;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import static org.wso2.analytics.engine.utils.AnalyzerEngineUtils.isEmptyAnalyticsSchema;

@@ -29,7 +29,6 @@ import org.wso2.analytics.data.commons.service.AnalyticsDataHolder;
 import org.wso2.analytics.data.commons.service.AnalyticsDataResponse;
 import org.wso2.analytics.data.commons.sources.AnalyticsCommonConstants;
 import org.wso2.analytics.data.commons.sources.Record;
-import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.engine.services.AnalyticsServiceHolder;
 
 import scala.Serializable;

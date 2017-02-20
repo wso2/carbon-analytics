@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -34,11 +35,12 @@
         <!--<module>components/analytics-dashboard</module>-->
         <module>components/tcp-transport</module>
         <module>components/data-bridge</module>
-        <module>components/analytics-api</module>
-        <module>components/analytics-dataservice</module>
+        <module>components/analytics-data-commons</module>
         <module>components/analytics-datasources</module>
-        <module>components/analytics-indexer</module>
+        <module>components/analytics-dataservice</module>
         <module>components/analytics-processor</module>
+        <module>components/analytics-indexer</module>
+        <module>components/analytics-api</module>
         <!--<module>components/analytics-data-agents</module>-->
         <!--<module>components/event-stream</module>-->
         <!--<module>components/application-deployer</module>-->
@@ -98,6 +100,23 @@
         </pluginManagement>
 
         <plugins>
+
+            <!-- Disabling the Maven checkstyle and FindBugs plugins till the code could be fully migrated -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -421,11 +440,6 @@
                 <artifactId>commons-collections</artifactId>
                 <version>${commons.collections.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
 
             <!-- Analytics dataservice dependencies -->
             <dependency>
@@ -458,7 +472,7 @@
                 <version>${hbase.version}</version>
             </dependency>
 
-            <!-- indexer dependancies -->
+            <!-- indexer dependencies -->
             <dependency>
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-solrj</artifactId>
@@ -472,22 +486,22 @@
 
             <!-- child module dependencies-->
             <dependency>
-                <groupId>org.wso2.analytics</groupId>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.analytics.dataservice</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.analytics</groupId>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.analytics.data.commons</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.analytics</groupId>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.analytics.indexer</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.analytics</groupId>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.analytics.datasource.rdbms</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
