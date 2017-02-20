@@ -18,12 +18,12 @@
  */
 package org.wso2.analytics.data.commons;
 
+import org.wso2.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.analytics.data.commons.sources.AnalyticsIterator;
 import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.data.commons.sources.RecordGroup;
 import org.wso2.analytics.data.commons.service.AnalyticsDataResponse;
 import org.wso2.analytics.data.commons.service.AnalyticsSchema;
-import org.wso2.analytics.data.commons.exception.AnalyticsException;
 
 import java.util.List;
 import java.util.Map;
@@ -53,7 +53,7 @@ public interface AnalyticsDataService {
     /**
      * @param tableName The name of the table to be created
      * @throws AnalyticsException
-     * @see org.wso2.analytics.data.commons.AnalyticsDataService#createTable(String, String). The primary record store is used
+     * @see AnalyticsDataService#createTable(String, String). The primary record store is used
      * to create the table.
      */
     void createTable(String tableName) throws AnalyticsException;

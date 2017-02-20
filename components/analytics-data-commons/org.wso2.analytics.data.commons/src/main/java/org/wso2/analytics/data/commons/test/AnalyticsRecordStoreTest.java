@@ -23,10 +23,10 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.analytics.data.commons.AnalyticsRecordStore;
 import org.wso2.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.analytics.data.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.analytics.data.commons.sources.Record;
 import org.wso2.analytics.data.commons.sources.RecordGroup;
-import org.wso2.analytics.data.commons.utils.AnalyticsCommonUtils;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
