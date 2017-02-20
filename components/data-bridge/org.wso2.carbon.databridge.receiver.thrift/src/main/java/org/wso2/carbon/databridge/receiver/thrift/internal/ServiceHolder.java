@@ -18,17 +18,17 @@
 package org.wso2.carbon.databridge.receiver.thrift.internal;
 
 import org.osgi.service.http.HttpService;
-import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.receiver.thrift.ThriftDataReceiver;
-import org.wso2.carbon.utils.ConfigurationContextService;
+import org.wso2.carbon.kernel.CarbonRuntime;
 
 public class ServiceHolder {
     private static DataBridgeReceiverService dataBridgeReceiverService;
-    private static ServerConfigurationService serverConfiguration;
-    private static ConfigurationContextService configurationContext;
+//    private static ServerConfigurationService serverConfiguration;
+//    private static ConfigurationContextService configurationContext;
     private static ThriftDataReceiver dataReceiver;
-    private static HttpService httpServiceInstance;
+//    private static HttpService httpServiceInstance;
+    private static CarbonRuntime carbonRuntime;
 
     public static DataBridgeReceiverService getDataBridgeReceiverService() {
         return dataBridgeReceiverService;
@@ -38,7 +38,7 @@ public class ServiceHolder {
         ServiceHolder.dataBridgeReceiverService = dataBridgeReceiverService;
     }
 
-    public static ServerConfigurationService getServerConfiguration() {
+    /*public static ServerConfigurationService getServerConfiguration() {
         return serverConfiguration;
     }
 
@@ -52,15 +52,24 @@ public class ServiceHolder {
 
     public static void setConfigurationContext(ConfigurationContextService configurationContext) {
         ServiceHolder.configurationContext = configurationContext;
+    }*/
+
+    public static CarbonRuntime getCarbonRuntime() {
+        return carbonRuntime;
     }
 
-    public static HttpService getHttpServiceInstance() {
+    public static void setCarbonRuntime(CarbonRuntime carbonRuntime) {
+        ServiceHolder.carbonRuntime = carbonRuntime;
+    }
+
+    // TODO: 2/5/17 thrift over http temporarily removed
+    /*public static HttpService getHttpServiceInstance() {
         return httpServiceInstance;
     }
 
     public static void setHttpServiceInstance(HttpService httpServiceInstance) {
         ServiceHolder.httpServiceInstance = httpServiceInstance;
-    }
+    }*/
 
     public static ThriftDataReceiver getDataReceiver() {
         return dataReceiver;

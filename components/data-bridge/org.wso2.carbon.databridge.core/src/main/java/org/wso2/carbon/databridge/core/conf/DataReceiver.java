@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
 
 public class DataReceiver {
+    // TODO: 2/3/17 no longer used since data-bridge-config.yaml file loaded instead of data-bridge-config.xml
     private String name;
     private List<Configuration> configurations;
 

@@ -21,13 +21,14 @@ package org.wso2.carbon.databridge.streamdefn.filesystem.internal;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
 
 public class EventStreamListenerImpl implements EventStreamListener {
+    // TODO: 1/30/17 no tenant concept
     @Override
-    public void removedEventStream(int tenantId, String streamName, String streamVersion) {
-        ServiceHolder.getStreamDefinitionStore().invalidateStreamDefinition(streamName, streamVersion, tenantId);
+    public void removedEventStream(String streamName, String streamVersion) {
+        ServiceHolder.getStreamDefinitionStore().invalidateStreamDefinition(streamName, streamVersion);
     }
 
     @Override
-    public void addedEventStream(int tenantId, String streamName, String streamVersion) {
+    public void addedEventStream(String streamName, String streamVersion) {
 
     }
 }

@@ -18,9 +18,11 @@ package org.wso2.carbon.databridge.commons.utils;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
+/**
+ * DataBridgeThreadFactory
+ */
 public class DataBridgeThreadFactory implements ThreadFactory {
-    static final AtomicInteger poolNumber = new AtomicInteger(1);
+    private static final AtomicInteger poolNumber = new AtomicInteger(1);
     final ThreadGroup group;
     final AtomicInteger threadNumber = new AtomicInteger(1);
     final String namePrefix;

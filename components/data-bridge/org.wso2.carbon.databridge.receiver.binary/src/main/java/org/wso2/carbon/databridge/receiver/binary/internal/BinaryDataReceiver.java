@@ -20,15 +20,14 @@ package org.wso2.carbon.databridge.receiver.binary.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConstants;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
-import org.wso2.carbon.databridge.core.conf.DataReceiver;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.receiver.binary.BinaryDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.binary.BinaryEventConverter;
 import org.wso2.carbon.databridge.receiver.binary.conf.BinaryDataReceiverConfiguration;
+import org.wso2.carbon.kernel.utils.Utils;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocket;
@@ -73,7 +72,7 @@ public class BinaryDataReceiver {
     }
 
     private void startSecureTransmission() throws IOException, DataBridgeException {
-        String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
+        /*String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
         if (keyStore == null) {
             ServerConfiguration serverConfig = ServerConfiguration.getInstance();
             keyStore = serverConfig.getFirstProperty("Security.KeyStore.Location");
@@ -94,6 +93,21 @@ public class BinaryDataReceiver {
                     throw new DataBridgeException("Cannot start binary agent server, not valid Security.KeyStore.Password is null ");
                 }
             }
+        }*/
+
+        String keyStore = null;
+        if (keyStore == null) {
+            // TODO: 1/26/17 keystore hack. change later
+            File filePath = new File("src" + File.separator + "test" + File.separator + "resources");
+            if (!filePath.exists()) {
+                filePath = new File(Utils.getCarbonHome() + File.separator + "resources" + File.separator + "security");
+            }
+            keyStore = filePath.getAbsolutePath() + File.separator + "wso2carbon.jks";
+        }
+        String keyStorePassword = dataBridgeReceiverService.getInitialConfig().getKeyStorePassword();
+        if (keyStorePassword == null) {
+            // TODO: 1/26/17 keystore hack. change later
+            keyStorePassword = "wso2carbon";
         }
         System.setProperty("javax.net.ssl.keyStore", keyStore);
         System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);

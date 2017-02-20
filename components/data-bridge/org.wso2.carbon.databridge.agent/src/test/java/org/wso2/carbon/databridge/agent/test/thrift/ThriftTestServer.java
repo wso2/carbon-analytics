@@ -33,13 +33,13 @@ import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
 import org.wso2.carbon.databridge.receiver.thrift.ThriftDataReceiver;
-import org.wso2.carbon.user.api.UserStoreException;
 
 import java.net.SocketException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThriftTestServer {
+    // TODO: 1/30/17 no tenant concept
     Logger log = Logger.getLogger(ThriftTestServer.class);
     ThriftDataReceiver thriftDataReceiver;
     InMemoryStreamDefinitionStore streamDefinitionStore;
@@ -54,15 +54,15 @@ public class ThriftTestServer {
     }
 
 
-    public void addStreamDefinition(StreamDefinition streamDefinition, int tenantId)
+    public void addStreamDefinition(StreamDefinition streamDefinition)
             throws StreamDefinitionStoreException {
-        streamDefinitionStore.saveStreamDefinitionToStore(streamDefinition, tenantId);
+        streamDefinitionStore.saveStreamDefinitionToStore(streamDefinition);
     }
 
-    public void addStreamDefinition(String streamDefinitionStr, int tenantId)
+    public void addStreamDefinition(String streamDefinitionStr)
             throws StreamDefinitionStoreException, MalformedStreamDefinitionException {
         StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(streamDefinitionStr);
-        getStreamDefinitionStore().saveStreamDefinitionToStore(streamDefinition, tenantId);
+        getStreamDefinitionStore().saveStreamDefinitionToStore(streamDefinition);
     }
 
     private InMemoryStreamDefinitionStore getStreamDefinitionStore(){
@@ -85,16 +85,6 @@ public class ThriftTestServer {
             }
 
             @Override
-            public String getTenantDomain(String userName) {
-                return "admin";
-            }
-
-            @Override
-            public int getTenantId(String tenantDomain) throws UserStoreException {
-                return -1234;
-            }
-
-            @Override
             public void initContext(AgentSession agentSession) {
                 //To change body of implemented methods use File | Settings | File Templates.
             }
@@ -110,13 +100,12 @@ public class ThriftTestServer {
         databridge.subscribe(new AgentCallback() {
             int totalSize = 0;
 
-            public void definedStream(StreamDefinition streamDefinition,
-                                      int tenantId) {
+            public void definedStream(StreamDefinition streamDefinition) {
                 log.info("StreamDefinition " + streamDefinition);
             }
 
             @Override
-            public void removeStream(StreamDefinition streamDefinition, int tenantId) {
+            public void removeStream(StreamDefinition streamDefinition) {
                 log.info("StreamDefinition remove " + streamDefinition);
             }
 

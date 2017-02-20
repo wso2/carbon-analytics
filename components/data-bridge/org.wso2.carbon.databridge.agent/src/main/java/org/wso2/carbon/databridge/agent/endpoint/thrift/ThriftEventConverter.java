@@ -101,7 +101,7 @@ public final class ThriftEventConverter {
                     if (!thriftEventBundle.isSetStringAttributeList()) {
                         thriftEventBundle.setStringAttributeList(new ArrayList<String>());
                     }
-                    thriftEventBundle.addToStringAttributeList(EventDefinitionConverterUtils.nullString);
+                    thriftEventBundle.addToStringAttributeList(EventDefinitionConverterUtils.NULL_STRING);
                 } else {
                     log.error("Undefined attribute type : " + object);
                 }

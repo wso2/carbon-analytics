@@ -26,21 +26,22 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import java.util.Collection;
 
 public interface StreamDefinitionStore {
+    // TODO: 1/30/17 no tenant concept
 
     public StreamDefinition getStreamDefinition(String streamName,
-                                                String streamVersion, int tenantId)
+                                                String streamVersion/*, int tenantId*/)
             throws StreamDefinitionNotFoundException, StreamDefinitionStoreException;
 
-    public StreamDefinition getStreamDefinition(String streamId, int tenantId)
+    public StreamDefinition getStreamDefinition(String streamId/*, int tenantId*/)
             throws StreamDefinitionNotFoundException, StreamDefinitionStoreException;
 
 
-    public Collection<StreamDefinition> getAllStreamDefinitions(int tenantId);
+    public Collection<StreamDefinition> getAllStreamDefinitions(/*int tenantId*/);
 
-    public void saveStreamDefinition(StreamDefinition streamDefinition, int tenantId)
+    public void saveStreamDefinition(StreamDefinition streamDefinition/*, int tenantId*/)
             throws DifferentStreamDefinitionAlreadyDefinedException, StreamDefinitionStoreException;
 
-    public boolean deleteStreamDefinition(String streamName, String streamVersion, int tenantId);
+    public boolean deleteStreamDefinition(String streamName, String streamVersion/*, int tenantId*/);
 
     public void subscribe(StreamAddRemoveListener streamAddRemoveListener);
 

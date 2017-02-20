@@ -23,8 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
 import org.wso2.carbon.databridge.core.exception.DataBridgeConfigurationException;
-import org.wso2.carbon.utils.ServerConstants;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.kernel.utils.Utils;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -34,23 +34,36 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Helper class to build Agent Server Initial Configurations
  */
 public final class DataBridgeCoreBuilder {
-
     private static final Log log = LogFactory.getLog(DataBridgeCoreBuilder.class);
 
     private DataBridgeCoreBuilder() {
     }
 
-    public static List<String[]> loadStreamDefinitionXML() throws DataBridgeConfigurationException {
-        List<String[]> streamDefinitionList = new ArrayList<String[]>();
-        String carbonHome = System.getProperty(ServerConstants.CARBON_CONFIG_DIR_PATH);
-        String path = carbonHome + File.separator + DataBridgeConstants.DATA_BRIDGE_DIR +
-                File.separator + DataBridgeConstants.STREAM_DEFINITIONS_XML;
+    // TODO: 2/2/17 stream definitions are temporarily loaded from a file in <product-sp>/deployment
+    public static List<String> loadStreamDefinitionXML() throws DataBridgeConfigurationException {
+        List<String> streamDefinitionList = new ArrayList<String>();
+//        String carbonHome = System.getProperty(ServerConstants.CARBON_CONFIG_DIR_PATH);
+//        String path = carbonHome + File.separator + DataBridgeConstants.DATA_BRIDGE_DIR +
+//                File.separator + DataBridgeConstants.STREAM_DEFINITIONS_XML;
+        String path = Utils.getCarbonHome().toString()+ File.separator+ "deployment"+ File.separator+ "stream-definitions.yaml";
+        Yaml yaml = new Yaml();
         File file = new File(path);
+        try {
+            FileInputStream fileInputStream = new FileInputStream(file);
+            Map<String,List<String>> streams = (Map<String, List<String>>) yaml.load(fileInputStream);
+            streamDefinitionList.addAll(streams.get(DataBridgeConstants.STREAM_DEFINITIONS_ELEMENT));
+        } catch (FileNotFoundException e) {
+            log.error("File "+path+" could not be found", e);
+        }
+
+
+        /*File file = new File(path);
         if (file.exists() && !file.isDirectory()) {
             OMElement config = loadXML(path, DataBridgeConstants.STREAM_DEFINITIONS_XML);
             if (config != null) {
@@ -68,22 +81,30 @@ public final class DataBridgeCoreBuilder {
                     streamDefinitionList.add(new String[]{domainName, streamDefinition.getText()});
                 }
             }
-        }
+        }*/
 
         return streamDefinitionList;
     }
 
     public static String getDatabridgeConfigPath() {
-        String carbonHome = System.getProperty(ServerConstants.CARBON_CONFIG_DIR_PATH);
-        return carbonHome + File.separator + DataBridgeConstants.DATA_BRIDGE_DIR + File.separator + DataBridgeConstants.DATA_BRIDGE_CONFIG_XML;
+        // TODO: 2/14/17 data-bridge-config.yaml loaded from <product-sp>/resources
+//        String carbonHome = System.getProperty(ServerConstants.CARBON_CONFIG_DIR_PATH);
+//        return carbonHome + File.separator + DataBridgeConstants.DATA_BRIDGE_DIR + File.separator + DataBridgeConstants.DATA_BRIDGE_CONFIG_XML;
+        File filePath = new File("src" + File.separator + "test" + File.separator + "resources");
+        if (!filePath.exists()) {
+            filePath = new File("components" + File.separator + "data-bridge" + File.separator + "org.wso2.carbon.databridge.agent" + File.separator + "src" + File.separator + "test" + File.separator + "resources");
+        }
+        if (!(filePath.exists())) {
+            filePath = new File(Utils.getCarbonHome() + File.separator + "resources");
+        }
+        return filePath.getAbsolutePath() + File.separator + "data-bridge-config.yaml";
     }
 
     public static OMElement loadXML(String path, String fileName) throws DataBridgeConfigurationException {
         BufferedInputStream inputStream = null;
         try {
             inputStream = new BufferedInputStream(new FileInputStream(new File(path)));
-            XMLStreamReader parser = XMLInputFactory.newInstance().
-                    createXMLStreamReader(inputStream);
+            XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(inputStream);
             StAXOMBuilder builder = new StAXOMBuilder(parser);
             OMElement omElement = builder.getDocumentElement();
             omElement.build();
