@@ -516,7 +516,7 @@
         <gson.version>2.7</gson.version>
         <json.version>3.0.0.wso2v1</json.version>
         <libthrift.version>0.9.2.wso2v1</libthrift.version>
-        <guava.version>20.0</guava.version>
+        <!--<guava.version>20.0</guava.version>-->
         <httpclient.version>4.3.2.wso2v1</httpclient.version>
         <disruptor.version>3.3.2.wso2v2</disruptor.version>
         <apache.commons.io.version>2.4</apache.commons.io.version>
