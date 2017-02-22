@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<suite name="Analytics Indexer Service Test Suite" parallel="methods" thread-count="1">
-    <test name="Analytics Indexer Service Tests">
-        <classes>
-            <!--<class name="org.wso2.analytics.indexerservice.test.CarbonIndexerServiceTest"/>-->
-        </classes>
-    </test>
-</suite>

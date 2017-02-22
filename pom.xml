@@ -487,22 +487,22 @@
             <!-- child module dependencies-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.analytics.dataservice</artifactId>
+                <artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.analytics.data.commons</artifactId>
+                <artifactId>org.wso2.carbon.analytics.data.commons</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.analytics.indexer</artifactId>
+                <artifactId>org.wso2.carbon.analytics.indexer</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.analytics.datasource.rdbms</artifactId>
+                <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
         </dependencies>

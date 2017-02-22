@@ -32,7 +32,7 @@
     <name>WSO2 Carbon - Analytics Indexer Aggregator Module</name>
 
     <modules>
-        <module>org.wso2.analytics.indexer</module>
+        <module>org.wso2.carbon.analytics.indexer</module>
     </modules>
 
 </project>

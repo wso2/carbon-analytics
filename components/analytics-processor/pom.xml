@@ -32,8 +32,8 @@
     <name>WSO2 Carbon - Analytics Processor Aggregator Module</name>
 
     <modules>
-        <module>org.wso2.analytics.engine</module>
-        <module>org.wso2.analytics.processor</module>
+        <module>org.wso2.carbon.analytics.engine</module>
+        <module>org.wso2.carbon.analytics.processor</module>
     </modules>
 
 </project>
