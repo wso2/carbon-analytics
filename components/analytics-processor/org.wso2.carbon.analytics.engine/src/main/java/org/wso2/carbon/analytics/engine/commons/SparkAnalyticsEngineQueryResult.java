@@ -42,7 +42,7 @@ public class SparkAnalyticsEngineQueryResult implements AnalyticsEngineQueryResu
     }
 
     @Override
-    public String[] getColumns(){
+    public String[] getColumns() {
         return columns;
     }
 
@@ -68,7 +68,7 @@ public class SparkAnalyticsEngineQueryResult implements AnalyticsEngineQueryResu
         return builder.toString();
     }
 
-    public static SparkAnalyticsEngineQueryResult emptySparkAnalyticsQueryResult(){
+    public static SparkAnalyticsEngineQueryResult emptySparkAnalyticsQueryResult() {
         return new SparkAnalyticsEngineQueryResult(new String[0], Collections.emptyList());
     }
 }

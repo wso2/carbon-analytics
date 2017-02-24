@@ -18,6 +18,9 @@
  */
 package org.wso2.carbon.analytics.engine.exceptions;
 
+/**
+ * Analyzer configuration loading exception.
+ */
 public class AnalyzerConfigLoadingException extends Exception {
 
     private static final long serialVersionUID = 3710152528912180771L;

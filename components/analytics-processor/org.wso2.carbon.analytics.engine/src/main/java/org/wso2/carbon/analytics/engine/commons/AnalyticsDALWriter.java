@@ -42,6 +42,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * This class is used by Spark to write to the DAL Layer.
+ */
 public class AnalyticsDALWriter extends AbstractFunction1<Iterator<Row>, BoxedUnit> implements Serializable {
 
     private static final long serialVersionUID = -1919222653470217466L;
@@ -75,7 +78,8 @@ public class AnalyticsDALWriter extends AbstractFunction1<Iterator<Row>, BoxedUn
      */
     @Override
     public BoxedUnit apply(Iterator<Row> iterator) {
-        AnalyticsDataHolder.getInstance().setAnalyticsConfigsDir(TaskContext.get().getLocalProperty(AnalyzerEngineConstants.SPARK_ANALYTICS_CONFIGS));
+        AnalyticsDataHolder.getInstance().setAnalyticsConfigsDir(TaskContext.get()
+                .getLocalProperty(AnalyzerEngineConstants.SPARK_ANALYTICS_CONFIGS));
         List<Row> rows = new ArrayList<>(recordBatchSize);
         /* We have to invalidate the table information, since here, if some other node
         changes the table information, we cannot know about it (no cluster communication) */

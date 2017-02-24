@@ -50,6 +50,9 @@ import java.util.List;
 import static org.wso2.carbon.analytics.engine.utils.AnalyzerEngineUtils.isEmptyAnalyticsSchema;
 import static org.wso2.carbon.analytics.engine.utils.AnalyzerEngineUtils.isEmptySchema;
 
+/**
+ * Analytics Relation class mapping DAS relations.
+ */
 public class AnalyticsRelation extends BaseRelation implements TableScan, InsertableRelation, Serializable {
 
     private static final long serialVersionUID = -7773419083178608517L;
@@ -77,7 +80,8 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Insert
         this.schemaString = schemaString;
         this.primaryKeys = primaryKeys;
         this.mergeFlag = mergeFlag;
-        this.recordBatchSize = Integer.parseInt(sqlContext.sparkContext().getConf().get(AnalyzerEngineConstants.CARBON_INSERT_BATCH_SIZE));
+        this.recordBatchSize = Integer.parseInt(sqlContext.sparkContext().getConf()
+                .get(AnalyzerEngineConstants.CARBON_INSERT_BATCH_SIZE));
         setIncrementalParameters(incrementalParams);
     }
 
@@ -104,7 +108,8 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Insert
         long toTimestamp = Long.MAX_VALUE;
         if (this.incEnabled) {
             try {
-                fromTimestamp = AnalyticsServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(this.incID, true);
+                fromTimestamp = AnalyticsServiceHolder.getIncrementalMetaStore()
+                        .getLastProcessedTimestamp(this.incID, true);
             } catch (AnalyticsException e) {
                 throw new RuntimeException("Cannot access the incremental meta store! ", e);
             }
@@ -156,7 +161,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Insert
         if (!incrementalParameterString.isEmpty()) {
             this.incEnabled = true;
             if (log.isDebugEnabled()) {
-                log.debug("Incremental processing enabled. Setting incremental parameters " + incrementalParameterString);
+                log.debug("Incremental processing enabled. Setting incremental params " + incrementalParameterString);
             }
             String[] splits = incrementalParameterString.split("\\s*,\\s*");
             if (splits.length == 1) {
@@ -184,13 +189,14 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Insert
     private void writeDataFrameToDAL(Dataset<Row> data) {
         for (int i = 0; i < data.rdd().partitions().length; i++) {
             //fixme: add the Carbon Scala utils from Java
-            data.sqlContext().sparkContext().runJob(data.rdd(), new AnalyticsDALWriter(this.tableName, data.schema(), this.recordBatchSize), ClassTag$.MODULE$.Unit());
+            data.sqlContext().sparkContext().runJob(data.rdd(), new AnalyticsDALWriter(this.tableName, data.schema(),
+                    this.recordBatchSize), ClassTag$.MODULE$.Unit());
         }
     }
 
-    protected AnalyticsRDD getAnalyticsRDD(String tableName, List<String> columns,
-                                           SparkContext sparkContext, Seq<Dependency<?>> deps, ClassTag<Row> evidence, long startTime, long endTime,
-                                           boolean incEnable, String incID) {
+    protected AnalyticsRDD getAnalyticsRDD(String tableName, List<String> columns, SparkContext sparkContext,
+                                           Seq<Dependency<?>> deps, ClassTag<Row> evidence, long startTime,
+                                           long endTime, boolean incEnable, String incID) {
         return new AnalyticsRDD(tableName, columns, startTime, endTime, incEnable, incID, sparkContext, deps, evidence);
     }
 }

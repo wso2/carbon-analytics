@@ -44,7 +44,7 @@ import static org.wso2.carbon.analytics.engine.utils.AnalyzerEngineUtils.createA
 
 /**
  * This class allows spark to communicate with the the Analytics Dataservice when used in Spark SQL
- * with the 'USING' keyword
+ * with the 'USING' keyword.
  */
 public class AnalyticsRelationProvider implements RelationProvider, SchemaRelationProvider {
 
@@ -131,7 +131,8 @@ public class AnalyticsRelationProvider implements RelationProvider, SchemaRelati
     protected StructType createSparkSchemaStruct(AnalyticsDataService ads, String targetTableName,
                                                  String schemaString, String primaryKeys,
                                                  boolean mergeFlag) throws AnalyticsException {
-        AnalyticsSchema schema = createAnalyticsTableSchema(ads, targetTableName, schemaString, primaryKeys, mergeFlag, true);
+        AnalyticsSchema schema = createAnalyticsTableSchema(ads, targetTableName, schemaString, primaryKeys,
+                mergeFlag, true);
         return new StructType(AnalyzerEngineUtils.extractFieldsFromColumns(schema.getColumns()));
     }
 
@@ -143,7 +144,8 @@ public class AnalyticsRelationProvider implements RelationProvider, SchemaRelati
             if (schema != null) {
                 ads.setTableSchema(this.tableName, schema);
             }
-            this.schemaStruct = this.createSparkSchemaStruct(ads, this.tableName, this.schemaString, this.primaryKeys, this.mergeFlag);
+            this.schemaStruct = this.createSparkSchemaStruct(ads, this.tableName, this.schemaString,
+                    this.primaryKeys, this.mergeFlag);
         } catch (AnalyticsException e) {
             throw new AnalyticsExecutionException("Error in setting provided schema: " + e.getMessage(), e);
         }
@@ -208,7 +210,8 @@ public class AnalyticsRelationProvider implements RelationProvider, SchemaRelati
     protected AnalyticsRelation getAnalyticsRelation(String recordStore, String tableName,
                                                      SQLContext sqlContext, StructType schema, String incParams,
                                                      String schemaString, String primaryKeys, boolean mergeFlag) {
-        return new AnalyticsRelation(recordStore, tableName, sqlContext, schema, incParams, schemaString, primaryKeys, mergeFlag);
+        return new AnalyticsRelation(recordStore, tableName, sqlContext, schema, incParams, schemaString,
+                primaryKeys, mergeFlag);
     }
 }
 

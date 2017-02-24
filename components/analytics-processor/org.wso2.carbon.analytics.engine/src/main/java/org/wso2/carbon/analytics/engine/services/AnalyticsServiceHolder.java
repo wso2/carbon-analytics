@@ -24,6 +24,9 @@ import org.wso2.carbon.analytics.engine.exceptions.AnalyticsDataServiceLoadExcep
 
 import java.util.ServiceLoader;
 
+/**
+ * Provides Analytics services to the Analyzer.
+ */
 public class AnalyticsServiceHolder {
 
     private static AnalyticsDataService analyticsDataService;

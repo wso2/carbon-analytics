@@ -20,7 +20,11 @@ package org.wso2.carbon.analytics.engine.commons;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.spark.*;
+import org.apache.spark.Dependency;
+import org.apache.spark.InterruptibleIterator;
+import org.apache.spark.Partition;
+import org.apache.spark.SparkContext;
+import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
@@ -30,7 +34,6 @@ import org.wso2.carbon.analytics.data.commons.service.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.data.commons.sources.AnalyticsCommonConstants;
 import org.wso2.carbon.analytics.data.commons.sources.Record;
 import org.wso2.carbon.analytics.engine.services.AnalyticsServiceHolder;
-
 import scala.Serializable;
 import scala.collection.Iterator;
 import scala.collection.JavaConversions;
@@ -43,6 +46,9 @@ import java.util.Map;
 
 import static scala.collection.JavaConversions.asScalaIterator;
 
+/**
+ * RDD extension for DAS.
+ */
 public class AnalyticsRDD extends RDD<Row> implements Serializable {
 
     private static final Log log = LogFactory.getLog(AnalyticsRDD.class);
@@ -55,9 +61,9 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     private long timeFrom;
     private boolean incrementalEnabled;
 
-    public AnalyticsRDD(String tableName, List<String> columns, long timeFrom, long timeTo, boolean incrementalEnabled, String incrementalId,
-                        SparkContext _sc, Seq<Dependency<?>> deps, ClassTag<Row> evidence$1) {
-        super(_sc, deps, evidence$1);
+    public AnalyticsRDD(String tableName, List<String> columns, long timeFrom, long timeTo, boolean incrementalEnabled,
+                        String incrementalId, SparkContext sc, Seq<Dependency<?>> deps, ClassTag<Row> evidence) {
+        super(sc, deps, evidence);
         this.tableName = tableName;
         this.timeFrom = timeFrom;
         this.timeTo = timeTo;
@@ -68,7 +74,8 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
 
     @Override
     public Iterator<Row> compute(Partition split, TaskContext taskContext) {
-        AnalyticsDataHolder.getInstance().setAnalyticsConfigsDir(TaskContext.get().getLocalProperty(AnalyzerEngineConstants.SPARK_ANALYTICS_CONFIGS));
+        AnalyticsDataHolder.getInstance().setAnalyticsConfigsDir(TaskContext.get()
+                .getLocalProperty(AnalyzerEngineConstants.SPARK_ANALYTICS_CONFIGS));
         AnalyticsPartition partition = (AnalyticsPartition) split;
         try {
             java.util.Iterator<Record> recordsItr = AnalyticsServiceHolder.getAnalyticsDataService().readRecords(
@@ -80,7 +87,8 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         }
     }
 
-    protected java.util.Iterator<Row> getRowRecordIteratorAdaptor(java.util.Iterator<Record> recordItr, boolean incEnable, String incID) {
+    protected java.util.Iterator<Row> getRowRecordIteratorAdaptor(java.util.Iterator<Record> recordItr,
+                                                                  boolean incEnable, String incID) {
         return new RowRecordIteratorAdaptor(recordItr, incEnable, incID);
     }
 
@@ -154,9 +162,11 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
 
         private void updateIncProcessingTS() {
             try {
-                long existingIncTS = AnalyticsServiceHolder.getIncrementalMetaStore().getLastProcessedTimestamp(this.incID, false);
+                long existingIncTS = AnalyticsServiceHolder.getIncrementalMetaStore()
+                        .getLastProcessedTimestamp(this.incID, false);
                 if (existingIncTS < this.incMaxTS) {
-                    AnalyticsServiceHolder.getIncrementalMetaStore().setLastProcessedTimestamp(this.incID, this.incMaxTS, false);
+                    AnalyticsServiceHolder.getIncrementalMetaStore()
+                            .setLastProcessedTimestamp(this.incID, this.incMaxTS, false);
                 }
             } catch (AnalyticsException e) {
                 throw new RuntimeException(e.getMessage(), e);

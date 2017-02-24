@@ -27,7 +27,12 @@ import org.wso2.carbon.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.engine.exceptions.AnalyticsDataServiceLoadException;
 import org.wso2.carbon.analytics.engine.services.AnalyticsServiceHolder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * This class stores metadata required for incremental processing actions.
@@ -48,7 +53,8 @@ public class AnalyticsIncrementalMetaStore {
         columns.add(new ColumnDefinition(COLUMN_TABLE_ID, AnalyticsSchema.ColumnType.STRING));
         columns.add(new ColumnDefinition(COLUMN_PRIMARY_VALUE, AnalyticsSchema.ColumnType.LONG));
         columns.add(new ColumnDefinition(COLUMN_TEMP_VALUE, AnalyticsSchema.ColumnType.LONG));
-        AnalyticsSchema schema = new AnalyticsSchema(columns, new ArrayList<>(Collections.singletonList(COLUMN_TABLE_ID)));
+        AnalyticsSchema schema = new AnalyticsSchema(columns,
+                new ArrayList<>(Collections.singletonList(COLUMN_TABLE_ID)));
         this.ads.setTableSchema(INC_META_TABLE, schema);
     }
 
@@ -68,8 +74,8 @@ public class AnalyticsIncrementalMetaStore {
     public long getLastProcessedTimestamp(String id, boolean primaryValue) throws AnalyticsException {
         Map<String, Object> values = new HashMap<>();
         values.put(COLUMN_TABLE_ID, id);
-        List<Record> result = AnalyticsCommonUtils.listRecords(
-                this.ads, this.ads.getWithKeyValues(INC_META_TABLE, 1, null, new ArrayList<>(Collections.singletonList(values))));
+        List<Record> result = AnalyticsCommonUtils.listRecords(this.ads, this.ads.getWithKeyValues(INC_META_TABLE,
+                1, null, new ArrayList<>(Collections.singletonList(values))));
         if (result.size() > 0) {
             Record record = result.get(0);
             Object obj;

@@ -20,7 +20,11 @@ package org.wso2.carbon.analytics.engine.utils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.spark.sql.types.*;
+import org.apache.spark.sql.types.DataType;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import org.wso2.carbon.analytics.data.commons.AnalyticsDataService;
 import org.wso2.carbon.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.data.commons.exception.AnalyticsTableNotAvailableException;
@@ -32,8 +36,18 @@ import org.wso2.carbon.analytics.engine.exceptions.AnalyticsDataServiceLoadExcep
 import org.wso2.carbon.analytics.engine.exceptions.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.engine.services.AnalyticsServiceHolder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+/**
+ * Analyzer Engine Util class.
+ */
 public class AnalyzerEngineUtils {
 
     private static final Log log = LogFactory.getLog(AnalyzerEngineUtils.class);
@@ -43,10 +57,13 @@ public class AnalyzerEngineUtils {
     }
 
     public static boolean isEmptyAnalyticsSchema(AnalyticsSchema analyticsSchema) {
-        return analyticsSchema == null || analyticsSchema.getColumns() == null || analyticsSchema.getColumns().size() == 0;
+        return analyticsSchema == null || analyticsSchema.getColumns() == null ||
+                analyticsSchema.getColumns().size() == 0;
     }
 
-    public static long getIncrementalStartTime(long lastAccessTime, AnalyzerEngineConstants.IncrementalWindowUnit windowUnit, int incBuffer) {
+    public static long getIncrementalStartTime(long lastAccessTime,
+                                               AnalyzerEngineConstants.IncrementalWindowUnit windowUnit,
+                                               int incBuffer) {
         int year, month, day, hour, minute, second;
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(lastAccessTime);
@@ -126,8 +143,9 @@ public class AnalyzerEngineUtils {
         ads.createTableIfNotExists(recordStore, targetTableName);
     }
 
-    public static AnalyticsSchema createAnalyticsTableSchema(AnalyticsDataService ads, String targetTableName, String schemaString,
-                                                             String primaryKeys, boolean mergeFlag, boolean sparkSchema)
+    public static AnalyticsSchema createAnalyticsTableSchema(AnalyticsDataService ads, String targetTableName,
+                                                             String schemaString, String primaryKeys,
+                                                             boolean mergeFlag, boolean sparkSchema)
             throws AnalyticsException, AnalyticsExecutionException {
         List<String> primaryKeysList;
         if (!primaryKeys.isEmpty()) {
@@ -174,18 +192,20 @@ public class AnalyzerEngineUtils {
                         break;
                     //fixme : add indexing related schema functionality for the following case statements
                     case 3:
-                        if (columnDefinition[2].equalsIgnoreCase(AnalyzerEngineConstants.OPTION_IS_INDEXED)) { // if indexed
+                        if (columnDefinition[2].equalsIgnoreCase(AnalyzerEngineConstants.OPTION_IS_INDEXED)) {
                             //This is to be backward compatible with DAS 3.0.1 and DAS 3.0.0, DAS-402
-                            if (columnDefinition[1].toLowerCase().equalsIgnoreCase(AnalyzerEngineConstants.FACET_TYPE)) {
+                            if (columnDefinition[1].toLowerCase().
+                                    equalsIgnoreCase(AnalyzerEngineConstants.FACET_TYPE)) {
                                 //todo: add facet type support here
                             } else {
                             }
-                        } else if (columnDefinition[2].equalsIgnoreCase(AnalyzerEngineConstants.OPTION_SCORE_PARAM)) { // if score param
+                        } else if (columnDefinition[2].equalsIgnoreCase(AnalyzerEngineConstants.OPTION_SCORE_PARAM)) {
                             if (isNumericType(type)) { // if score param && numeric type
                             } else {
-                                throw new AnalyticsExecutionException("Score-param assigned to a non-numeric ColumnType");
+                                throw new AnalyticsExecutionException("Score-param assigned to a " +
+                                        "non-numeric ColumnType");
                             }
-                        } else if (columnDefinition[2].equalsIgnoreCase(AnalyzerEngineConstants.OPTION_IS_FACET)) { // if facet,
+                        } else if (columnDefinition[2].equalsIgnoreCase(AnalyzerEngineConstants.OPTION_IS_FACET)) {
                         } else {
                             throw new AnalyticsExecutionException("Invalid option for ColumnType");
                         }
@@ -194,9 +214,9 @@ public class AnalyzerEngineUtils {
                         //support multiple indexing options ex: -i -sp
                         Set<String> indexOptions = new HashSet<>(2);
                         indexOptions.addAll(Arrays.asList(columnDefinition[2], columnDefinition[3]));
-                        if (indexOptions.contains(AnalyzerEngineConstants.OPTION_IS_FACET) && // if score param and facet
+                        if (indexOptions.contains(AnalyzerEngineConstants.OPTION_IS_FACET) &&
                                 indexOptions.contains(AnalyzerEngineConstants.OPTION_SCORE_PARAM)) {
-                        } else if (indexOptions.contains(AnalyzerEngineConstants.OPTION_IS_FACET) &&  //if facet and index
+                        } else if (indexOptions.contains(AnalyzerEngineConstants.OPTION_IS_FACET) &&
                                 indexOptions.contains(AnalyzerEngineConstants.OPTION_IS_INDEXED)) {
                         } else {
                             throw new AnalyticsExecutionException("Invalid option for ColumnType");
@@ -255,8 +275,8 @@ public class AnalyzerEngineUtils {
                 || colType.name().equalsIgnoreCase(AnalyzerEngineConstants.FACET_TYPE));
     }
 
-    private static AnalyticsSchema createMergedSchema(AnalyticsDataService ads, String targetTableName, AnalyticsSchema schema)
-            throws AnalyticsException {
+    private static AnalyticsSchema createMergedSchema(AnalyticsDataService ads, String targetTableName,
+                                                      AnalyticsSchema schema) throws AnalyticsException {
         AnalyticsSchema existingSchema = null;
         try {
             existingSchema = ads.getTableSchema(targetTableName);
@@ -274,8 +294,8 @@ public class AnalyzerEngineUtils {
         //}
     }
 
-    public static AnalyticsSchema mergeSchemas(AnalyticsSchema existingSchema,
-                                                     List<String> primaryKeys, List<ColumnDefinition> columns, List<String> indices) {
+    public static AnalyticsSchema mergeSchemas(AnalyticsSchema existingSchema, List<String> primaryKeys,
+                                               List<ColumnDefinition> columns, List<String> indices) {
         Set<String> newPrimaryKeys;
         if (existingSchema.getPrimaryKeys() == null) {
             newPrimaryKeys = new HashSet<>();
@@ -311,7 +331,8 @@ public class AnalyzerEngineUtils {
         for (String index : indices) {
             processIndex(newColumns, index);
         }
-        return new AnalyticsSchema(new ArrayList<ColumnDefinition>(newColumns.values()), new ArrayList<>(newPrimaryKeys));*/
+        return new AnalyticsSchema(new ArrayList<ColumnDefinition>(newColumns.values()),
+                                        new ArrayList<>(newPrimaryKeys));*/
         return null;
     }
 

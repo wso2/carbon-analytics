@@ -35,10 +35,17 @@ import org.wso2.carbon.analytics.engine.commons.SparkAnalyticsEngineQueryResult;
 import org.wso2.carbon.analytics.engine.exceptions.AnalyticsExecutionException;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static org.wso2.carbon.analytics.data.commons.sources.AnalyticsCommonConstants.ANALYTICS_CONF_DIR;
 
+/**
+ * Spark implementation of the Analytics Engine.
+ */
 public class SparkAnalyticsEngine implements AnalyticsEngine {
     private static final Log log = LogFactory.getLog(SparkAnalyticsEngine.class);
 
@@ -73,7 +80,8 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
                 .config(sparkConf).getOrCreate();
         
         //adding the relevant jars todo: handle this properly
-        this.sparkSession.sparkContext().addJar("/tmp/jars/org.wso2.carbon.analytics.datasource.rdbms-2.0.0-SNAPSHOT.jar");
+        this.sparkSession.sparkContext().
+                addJar("/tmp/jars/org.wso2.carbon.analytics.datasource.rdbms-2.0.0-SNAPSHOT.jar");
         this.sparkSession.sparkContext().addJar("/tmp/jars/org.wso2.carbon.analytics.dataservice-2.0.0-SNAPSHOT.jar");
         this.sparkSession.sparkContext().addJar("/tmp/jars/org.wso2.carbon.analytics.data.commons-2.0.0-SNAPSHOT.jar");
         this.sparkSession.sparkContext().addJar("/tmp/jars/org.wso2.carbon.analytics.engine-2.0.0-SNAPSHOT.jar");
@@ -102,8 +110,9 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
         if (this.sparkConfPath != null) {
             sparkConfFile = this.sparkConfPath;
         } else {
-            sparkConfFile = AnalyticsDataHolder.getInstance().getAnalyticsConfigsDir() + File.separator + ANALYTICS_CONF_DIR +
-                    File.separator + AnalyzerEngineConstants.SPARK_CONF_FOLDER + File.separator + AnalyzerEngineConstants.SPARK_CONF_FILE;
+            sparkConfFile = AnalyticsDataHolder.getInstance().getAnalyticsConfigsDir() + File.separator +
+                    ANALYTICS_CONF_DIR + File.separator + AnalyzerEngineConstants.SPARK_CONF_FOLDER +
+                    File.separator + AnalyzerEngineConstants.SPARK_CONF_FILE;
         }
         scala.collection.Map<String, String> properties = Utils.getPropertiesFromFile(sparkConfFile);
         this.sparkConf.setAll(properties);
@@ -141,7 +150,8 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
             if (success) {
                 log.info("Executed query: " + query + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
             } else {
-                log.error("Unable to execute query: " + query + " \nTime Elapsed: " + (end - start) / 1000.0 + " seconds.");
+                log.error("Unable to execute query: " + query + " \nTime Elapsed: " + (end - start) / 1000.0 +
+                        " seconds.");
             }
         }
         return analyticsEngineQueryResult;
@@ -184,6 +194,7 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
     }
 
     private void registerAnalyticsProviders() {
-        this.shorthandStringsMap.put(AnalyzerEngineConstants.SPARK_CARBONANALYTICS_PROVIDER, AnalyticsRelationProvider.class.getName());
+        this.shorthandStringsMap.put(AnalyzerEngineConstants.SPARK_CARBONANALYTICS_PROVIDER,
+                AnalyticsRelationProvider.class.getName());
     }
 }

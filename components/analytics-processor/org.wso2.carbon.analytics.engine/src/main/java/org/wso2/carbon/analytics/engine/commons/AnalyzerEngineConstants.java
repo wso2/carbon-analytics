@@ -18,6 +18,9 @@
  */
 package org.wso2.carbon.analytics.engine.commons;
 
+/**
+ * Constants used for the analyzer engine.
+ */
 public class AnalyzerEngineConstants {
 
     private AnalyzerEngineConstants() {
@@ -45,6 +48,9 @@ public class AnalyzerEngineConstants {
 
     public static final String CARBON_INSERT_BATCH_SIZE = "carbon.insert.batch.size";
 
+    /**
+     * Incremental window units.
+     */
     public enum IncrementalWindowUnit {
         SECOND,
         MINUTE,
