@@ -46,6 +46,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import static org.wso2.carbon.analytics.engine.utils.AnalyzerEngineUtils.isEmptyAnalyticsSchema;
 import static org.wso2.carbon.analytics.engine.utils.AnalyzerEngineUtils.isEmptySchema;
@@ -168,11 +169,13 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Insert
                 this.incID = splits[0];
             } else if (splits.length == 2) {
                 this.incID = splits[0];
-                this.windowUnit = AnalyzerEngineConstants.IncrementalWindowUnit.valueOf(splits[1].toUpperCase());
+                this.windowUnit = AnalyzerEngineConstants.IncrementalWindowUnit
+                        .valueOf(splits[1].toUpperCase(Locale.ENGLISH));
                 this.incBuffer = 1;
             } else if (splits.length == 3) {
                 this.incID = splits[0];
-                this.windowUnit = AnalyzerEngineConstants.IncrementalWindowUnit.valueOf(splits[1].toUpperCase());
+                this.windowUnit = AnalyzerEngineConstants.IncrementalWindowUnit
+                        .valueOf(splits[1].toUpperCase(Locale.ENGLISH));
                 this.incBuffer = Integer.parseInt(splits[2]);
             } else {
                 String msg = "Error while setting incremental processing parameters : " + incrementalParameterString;

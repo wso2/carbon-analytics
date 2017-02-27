@@ -34,7 +34,6 @@ import org.wso2.carbon.analytics.data.commons.service.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.data.commons.sources.AnalyticsCommonConstants;
 import org.wso2.carbon.analytics.data.commons.sources.Record;
 import org.wso2.carbon.analytics.engine.services.AnalyticsServiceHolder;
-import scala.Serializable;
 import scala.collection.Iterator;
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
@@ -49,7 +48,7 @@ import static scala.collection.JavaConversions.asScalaIterator;
 /**
  * RDD extension for DAS.
  */
-public class AnalyticsRDD extends RDD<Row> implements Serializable {
+public class AnalyticsRDD extends RDD<Row> {
 
     private static final Log log = LogFactory.getLog(AnalyticsRDD.class);
     private static final long serialVersionUID = 5948588299500227997L;
@@ -136,9 +135,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     /**
      * Row iterator implementation to act as an adaptor for a record iterator.
      */
-    private class RowRecordIteratorAdaptor implements java.util.Iterator<Row>, java.io.Serializable {
-
-        private static final long serialVersionUID = -8866801517386445810L;
+    private class RowRecordIteratorAdaptor implements java.util.Iterator<Row> {
 
         private java.util.Iterator<Record> recordItr;
         private boolean incEnable;

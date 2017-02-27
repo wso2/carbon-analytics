@@ -27,7 +27,6 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.wso2.carbon.analytics.data.commons.AnalyticsDataService;
 import org.wso2.carbon.analytics.data.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.data.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.data.commons.service.AnalyticsSchema;
 import org.wso2.carbon.analytics.data.commons.service.ColumnDefinition;
 import org.wso2.carbon.analytics.data.commons.sources.AnalyticsCommonConstants;
@@ -42,6 +41,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -194,7 +194,7 @@ public class AnalyzerEngineUtils {
                     case 3:
                         if (columnDefinition[2].equalsIgnoreCase(AnalyzerEngineConstants.OPTION_IS_INDEXED)) {
                             //This is to be backward compatible with DAS 3.0.1 and DAS 3.0.0, DAS-402
-                            if (columnDefinition[1].toLowerCase().
+                            if (columnDefinition[1].toLowerCase(Locale.ENGLISH).
                                     equalsIgnoreCase(AnalyzerEngineConstants.FACET_TYPE)) {
                                 //todo: add facet type support here
                             } else {
@@ -245,7 +245,7 @@ public class AnalyzerEngineUtils {
     }
 
     private static AnalyticsSchema.ColumnType stringToColumnType(String strType) {
-        switch (strType.toLowerCase()) {
+        switch (strType.toLowerCase(Locale.ENGLISH)) {
             case AnalyzerEngineConstants.INTEGER_TYPE:
                 return AnalyticsSchema.ColumnType.INTEGER;
             case AnalyzerEngineConstants.INT_TYPE:
@@ -277,7 +277,7 @@ public class AnalyzerEngineUtils {
 
     private static AnalyticsSchema createMergedSchema(AnalyticsDataService ads, String targetTableName,
                                                       AnalyticsSchema schema) throws AnalyticsException {
-        AnalyticsSchema existingSchema = null;
+        /*AnalyticsSchema existingSchema = null;
         try {
             existingSchema = ads.getTableSchema(targetTableName);
         } catch (AnalyticsTableNotAvailableException ignore) {
@@ -285,7 +285,7 @@ public class AnalyzerEngineUtils {
                 log.debug("Table not found when merging schema => " + ":" + targetTableName);
             }
         }
-       /* if (!isEmptyAnalyticsSchema(existingSchema)) {
+        if (!isEmptyAnalyticsSchema(existingSchema)) {
             //fixme: support indexing related schema merging here
             return mergeSchemas(existingSchema, schema.getPrimaryKeys(),
                     new ArrayList<>(schema.getColumns().values()), Collections.emptyList());
@@ -348,7 +348,7 @@ public class AnalyzerEngineUtils {
     }
 
     public static DataType stringToDataType(String strType) {
-        switch (strType.toLowerCase()) {
+        switch (strType.toLowerCase(Locale.ENGLISH)) {
             case AnalyzerEngineConstants.INTEGER_TYPE:
                 return DataTypes.IntegerType;
             case AnalyzerEngineConstants.INT_TYPE:

@@ -56,7 +56,7 @@ public class AnalyticsServiceHolder {
      * Get the Analytics Incremental Meta Store.
      * @return Analytics Incremental Meta Store
      */
-    public static AnalyticsIncrementalMetaStore getIncrementalMetaStore() {
+    public static synchronized AnalyticsIncrementalMetaStore getIncrementalMetaStore() {
         if (incrementalMetaStore == null) {
             try {
                 incrementalMetaStore = new AnalyticsIncrementalMetaStore();

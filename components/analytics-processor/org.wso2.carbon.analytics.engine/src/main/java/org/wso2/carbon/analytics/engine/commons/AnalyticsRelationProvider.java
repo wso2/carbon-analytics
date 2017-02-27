@@ -39,6 +39,7 @@ import scala.collection.JavaConversions;
 import scala.collection.immutable.Map;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 import static org.wso2.carbon.analytics.engine.utils.AnalyzerEngineUtils.createAnalyticsTableSchema;
 
@@ -157,7 +158,7 @@ public class AnalyticsRelationProvider implements RelationProvider, SchemaRelati
         if (value == null) {
             return defaultValue;
         } else {
-            map.remove(key.toLowerCase());
+            map.remove(key.toLowerCase(Locale.ENGLISH));
             return value;
         }
     }

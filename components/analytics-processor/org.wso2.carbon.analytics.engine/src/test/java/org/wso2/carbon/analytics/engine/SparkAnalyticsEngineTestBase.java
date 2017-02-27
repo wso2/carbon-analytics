@@ -32,13 +32,13 @@ import org.wso2.carbon.analytics.engine.core.SparkAnalyticsEngine;
 public class SparkAnalyticsEngineTestBase {
     private static final Log log = LogFactory.getLog(SparkAnalyticsEngineTestBase.class);
 
-    protected static String sparkConfFilePath = "src/test/resources/conf/spark-defaults.conf";
+    protected static final String SPARK_CONF_FILE_PATH = "src/test/resources/conf/spark-defaults.conf";
     protected AnalyticsEngine analyticsEngine;
 
     @BeforeClass
     public void setup() {
         System.setProperty(AnalyticsCommonUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf");
-        this.analyticsEngine = new SparkAnalyticsEngine(sparkConfFilePath);
+        this.analyticsEngine = new SparkAnalyticsEngine(SPARK_CONF_FILE_PATH);
     }
 
     /*@Test
