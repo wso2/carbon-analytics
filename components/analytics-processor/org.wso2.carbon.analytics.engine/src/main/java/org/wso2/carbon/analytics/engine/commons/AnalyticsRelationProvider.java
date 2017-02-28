@@ -154,7 +154,7 @@ public class AnalyticsRelationProvider implements RelationProvider, SchemaRelati
 
     private String extractAndRemoveValuesFromMap(String key, java.util.Map<String, String> map,
                                                  final String defaultValue) {
-        String value = map.get(key.toLowerCase());
+        String value = map.get(key.toLowerCase(Locale.ENGLISH));
         if (value == null) {
             return defaultValue;
         } else {

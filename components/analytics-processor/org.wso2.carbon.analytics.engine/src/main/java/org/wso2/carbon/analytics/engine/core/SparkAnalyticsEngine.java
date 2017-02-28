@@ -56,6 +56,20 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
     private Map<String, String> shorthandStringsMap;
     private String sparkConfPath;
 
+    // todo: get the paths properly
+    private final String[] jarsToBeAdded = {
+            "/tmp/jars/org.wso2.carbon.analytics.datasource.rdbms-2.0.0-SNAPSHOT.jar",
+            "/tmp/jars/org.wso2.carbon.analytics.dataservice-2.0.0-SNAPSHOT.jar",
+            "/tmp/jars/org.wso2.carbon.analytics.data.commons-2.0.0-SNAPSHOT.jar",
+            "/tmp/jars/org.wso2.carbon.analytics.engine-2.0.0-SNAPSHOT.jar",
+            "/tmp/jars/mysql-connector-java-5.1.24-bin.jar",
+            "/tmp/jars/h2-1.4.187.jar",
+            "/tmp/jars/kryo-shaded-3.0.3.jar"};
+    private final String[] filesToBeAdded = {
+            "/tmp/configs/analytics/rdbms-config.xml",
+            "/tmp/configs/datasources/analytics-datasources.xml",
+            "/tmp/configs/analytics/analytics-dataservice-config.xml"};
+
     public SparkAnalyticsEngine() {
         this.sparkConfPath = null;
         init();
@@ -80,20 +94,15 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
                 .config(sparkConf).getOrCreate();
         
         //adding the relevant jars todo: handle this properly
-        this.sparkSession.sparkContext().
-                addJar("/tmp/jars/org.wso2.carbon.analytics.datasource.rdbms-2.0.0-SNAPSHOT.jar");
-        this.sparkSession.sparkContext().addJar("/tmp/jars/org.wso2.carbon.analytics.dataservice-2.0.0-SNAPSHOT.jar");
-        this.sparkSession.sparkContext().addJar("/tmp/jars/org.wso2.carbon.analytics.data.commons-2.0.0-SNAPSHOT.jar");
-        this.sparkSession.sparkContext().addJar("/tmp/jars/org.wso2.carbon.analytics.engine-2.0.0-SNAPSHOT.jar");
-        this.sparkSession.sparkContext().addJar("/tmp/jars/mysql-connector-java-5.1.24-bin.jar");
-        this.sparkSession.sparkContext().addJar("/tmp/jars/h2-1.4.187.jar");
-        this.sparkSession.sparkContext().addJar("/tmp/jars/kryo-shaded-3.0.3.jar");
+        for (int i = 0; i < jarsToBeAdded.length; i++) {
+            this.sparkSession.sparkContext().addJar(jarsToBeAdded[i]);
+        }
 
         // adding the conf files todo: handle these properly
-        this.sparkSession.sparkContext().addFile("/tmp/configs/analytics/rdbms-config.xml");
-        this.sparkSession.sparkContext().addFile("/tmp/configs/datasources/analytics-datasources.xml");
-        this.sparkSession.sparkContext().addFile("/tmp/configs/analytics/analytics-dataservice-config.xml");
-        
+        for (int j = 0; j < filesToBeAdded.length; j++) {
+            this.sparkSession.sparkContext().addFile(filesToBeAdded[j]);
+        }
+
         // set the analytics config directory
         this.sparkSession.conf().set(AnalyzerEngineConstants.SPARK_ANALYTICS_CONFIGS, "/tmp/configs");
         

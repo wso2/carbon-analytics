@@ -33,6 +33,7 @@ import org.wso2.carbon.analytics.data.commons.service.AnalyticsDataHolder;
 import org.wso2.carbon.analytics.data.commons.service.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.data.commons.sources.AnalyticsCommonConstants;
 import org.wso2.carbon.analytics.data.commons.sources.Record;
+import org.wso2.carbon.analytics.engine.exceptions.AnalyticsDataServiceLoadException;
 import org.wso2.carbon.analytics.engine.services.AnalyticsServiceHolder;
 import scala.collection.Iterator;
 import scala.collection.JavaConversions;
@@ -113,7 +114,9 @@ public class AnalyticsRDD extends RDD<Row> {
         try {
             resp = AnalyticsServiceHolder.getAnalyticsDataService().get(this.tableName,
                     computePartitions(), this.columns, timeFrom, timeTo, 0, -1);
-        } catch (Exception e) {
+        } catch (AnalyticsDataServiceLoadException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         List<AnalyticsDataResponse.Entry> entries = resp.getEntries();
