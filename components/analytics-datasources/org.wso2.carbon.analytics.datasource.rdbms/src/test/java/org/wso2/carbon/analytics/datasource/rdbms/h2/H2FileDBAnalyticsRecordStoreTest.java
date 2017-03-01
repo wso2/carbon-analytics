@@ -26,9 +26,9 @@ import org.wso2.carbon.analytics.data.commons.test.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.data.commons.utils.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore;
 
+import javax.naming.NamingException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.naming.NamingException;
 
 
 /**
@@ -38,8 +38,7 @@ public class H2FileDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
                 
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException {
-        //AnalyticsCommonUtils.clearGlobalCustomDataSourceRepo();
-        System.setProperty(AnalyticsCommonUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf_h2a");
+        System.setProperty(AnalyticsCommonUtils.WSO2_CARBON_CONF_DIR_SYS_PROP, "src/test/resources/conf_h2a");
         AnalyticsRecordStore ars = new RDBMSAnalyticsRecordStore();
         Map<String, String> props = new HashMap<>();
         props.put("datasource", "WSO2_ANALYTICS_EVENT_STORE_DB");

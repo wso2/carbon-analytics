@@ -21,7 +21,6 @@ package org.wso2.carbon.analytics.datasource.rdbms;
 import com.google.common.collect.Lists;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.h2.jdbcx.JdbcDataSource;
 import org.wso2.carbon.analytics.data.commons.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.data.commons.exception.AnalyticsTableNotAvailableException;
@@ -41,6 +40,7 @@ import java.util.*;
  * Abstract RDBMS database backed implementation of {@link AnalyticsRecordStore}.
  */
 public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
+    
     private static final Log log = LogFactory.getLog(RDBMSAnalyticsRecordStore.class);
 
     private static final String RECORD_IDS_PLACEHOLDER = "{{RECORD_IDS}}";
@@ -72,16 +72,16 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         if (partitionCountProp != null) {
             this.partitionCount = Integer.parseInt(partitionCountProp);
         }
-        /*try {
-            this.dataSource = (DataSource) AnalyticsUtils.loadGlobalDataSource(dsName);
-        } catch (DataSourceException e) {
+        try {
+            this.dataSource = (DataSource) AnalyticsCommonUtils.loadDatasource(dsName);
+        } catch (Exception e) {
             throw new AnalyticsException("Error in loading data source: " + e.getMessage(), e);
-        }*/
+        }
 
         // TODO: Logic for retrieving datasources and DB connection creation
 
         // =================================== TEMPORARY ================================
-        try {
+/*        try {
             Class.forName("org.h2.Driver");
             JdbcDataSource h2DataSource = new JdbcDataSource();
             h2DataSource.setURL("jdbc:h2:./target/ANALYTICS_EVENT_STORE;DB_CLOSE_ON_EXIT=FALSE;" +
@@ -91,7 +91,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             this.dataSource = h2DataSource;
         } catch (Exception e) {
             throw new AnalyticsException("Error in loading data source: " + e.getMessage(), e);
-        }
+        }*/
         // ==============================================================================
 
         if (this.rdbmsQueryConfigurationEntry == null) {
