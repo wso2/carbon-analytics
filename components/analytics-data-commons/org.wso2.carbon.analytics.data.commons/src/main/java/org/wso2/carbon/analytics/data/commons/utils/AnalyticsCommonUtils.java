@@ -28,9 +28,10 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.data.commons.AnalyticsDataService;
 import org.wso2.carbon.analytics.data.commons.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.data.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.data.commons.service.AnalyticsCommonServiceHolder;
+import org.wso2.carbon.analytics.data.commons.service.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.data.commons.service.AnalyticsSchema;
 import org.wso2.carbon.analytics.data.commons.sources.AnalyticsCommonConstants;
-import org.wso2.carbon.analytics.data.commons.service.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.data.commons.sources.Record;
 import org.wso2.carbon.analytics.data.commons.sources.RecordGroup;
 
@@ -59,7 +60,9 @@ public class AnalyticsCommonUtils {
     private static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
 
     private static final String CUSTOM_WSO2_CONF_DIR_NAME = "conf";
+    private static final String ANALYTICS_CONF_DIR_NAME = "analytics";
     public static final String WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP = "wso2_custom_conf_dir";
+    public static final String WSO2_CARBON_CONF_DIR_SYS_PROP = "carbon.config.dir.path";
 
     private static final Log LOG = LogFactory.getLog(AnalyticsCommonUtils.class);
 
@@ -372,6 +375,15 @@ public class AnalyticsCommonUtils {
         }
     }
 
+    public static String getAbsoluteDataSourceConfigDir() throws AnalyticsException {
+        /*Path carbonConfigPath = Paths.get("", getConfDirectoryPath());
+        Path dataSourcePath = DataSourceUtils.getDataSourceConfigPath();
+        String dataSourceDir = carbonConfigPath.relativize(dataSourcePath).toString();
+        return Paths.get(getConfDirectoryPath(), dataSourceDir).toAbsolutePath().toString();*/
+        //TODO: Recheck path logic after Kernel bug is fixed (https://github.com/wso2/carbon-kernel/issues/1309)
+        return getConfDirectoryPath() + File.separator + "datasources";
+    }
+
     private static String getCustomAnalyticsConfDirectory() throws AnalyticsException {
         String path = System.getProperty(WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP);
         if (path == null) {
@@ -386,24 +398,32 @@ public class AnalyticsCommonUtils {
         return confDir.getAbsolutePath();
     }
 
-    public static String getConfDirectoryPath() {
-        String carbonConfigDirPath = System.getProperty("carbon.config.dir.path");
+    public static String getConfDirectoryPath() throws AnalyticsException {
+        //TODO: Recheck path logic after Kernel bug is fixed (https://github.com/wso2/carbon-kernel/issues/1309)
+        /*Path carbonDir = Utils.getCarbonConfigHome();
+        if (carbonDir != null) {
+            return carbonDir.toString();
+        } else {*/
+        String carbonConfigDirPath = System.getProperty(WSO2_CARBON_CONF_DIR_SYS_PROP);
         if (carbonConfigDirPath == null) {
             carbonConfigDirPath = System.getenv("CARBON_CONFIG_DIR_PATH");
             if (carbonConfigDirPath == null) {
-                return getBaseDirectoryPath() + File.separator + "conf";
+                throw new AnalyticsException("The WSO2 configuration directory does not exist. " +
+                        "This can be given by setting the Java system property '" + WSO2_CARBON_CONF_DIR_SYS_PROP
+                        + "', to a valid carbon configuration directory..");
             }
         }
         return carbonConfigDirPath;
+        /*}*/
     }
 
-    public static String getBaseDirectoryPath() {
-        String baseDir = System.getProperty("analytics.home");
-        if (baseDir == null) {
-            baseDir = System.getenv("ANALYTICS_HOME");
-            System.setProperty("analytics.home", baseDir);
+    public static Object loadDatasource(String dsName) {
+        try {
+            return AnalyticsCommonServiceHolder.getDataSourceService().getDataSource(dsName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Object();
         }
-        return baseDir;
     }
 
     public static String convertStreamNameToTableName(String stream) {
@@ -456,7 +476,7 @@ public class AnalyticsCommonUtils {
         record.setId(generateRecordIdFromPrimaryKeyValues(record.getValues(), primaryKeys));
     }
 
-    private static String generateRecordIdFromPrimaryKeyValues(Map<String, Object> values, List<String> primaryKeys) {
+    public static String generateRecordIdFromPrimaryKeyValues(Map<String, Object> values, List<String> primaryKeys) {
         StringBuilder builder = new StringBuilder();
         Object obj;
         for (String key : primaryKeys) {
