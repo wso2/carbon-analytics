@@ -427,6 +427,11 @@
                 <artifactId>org.eclipse.equinox.cm</artifactId>
                 <version>${org.eclipse.equinox.cm.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.datasources</groupId>
+                <artifactId>org.wso2.carbon.datasource.core</artifactId>
+                <version>${carbon.datasources.version}</version>
+            </dependency>
 
             <!--###moved from carbon-analytics repo#### -->
 
@@ -514,6 +519,8 @@
 
         <carbon.kernel.version>5.1.0</carbon.kernel.version>
         <carbon.feature.plugin.version>2.1.0</carbon.feature.plugin.version>
+        <carbon.datasources.version>1.1.0</carbon.datasources.version>
+
         <org.snakeyaml.version>1.16.0.wso2v1</org.snakeyaml.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
