@@ -28,7 +28,6 @@ import org.wso2.carbon.analytics.data.commons.service.AnalyticsDataHolder;
 import org.wso2.carbon.analytics.data.commons.service.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.data.commons.service.AnalyticsDataResponse.Entry;
 import org.wso2.carbon.analytics.data.commons.service.AnalyticsSchema;
-import org.wso2.carbon.analytics.data.commons.sources.AnalyticsCommonConstants;
 import org.wso2.carbon.analytics.data.commons.sources.AnalyticsIterator;
 import org.wso2.carbon.analytics.data.commons.sources.Record;
 import org.wso2.carbon.analytics.data.commons.sources.RecordGroup;
@@ -40,11 +39,9 @@ import org.wso2.carbon.analytics.dataservice.config.AnalyticsRecordStoreConfigur
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -426,32 +423,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         AnalyticsSchema schema = this.lookupTableInfo(tableName).getSchema();
         List<String> primaryKeys = schema.getPrimaryKeys();
         if (primaryKeys != null && primaryKeys.size() > 0) {
-            ids.addAll(valuesBatch.stream().map(values -> this.generateRecordIdFromPrimaryKeyValues(values, primaryKeys)).collect(Collectors.toList()));
+            ids.addAll(valuesBatch.stream().map(values -> AnalyticsCommonUtils.generateRecordIdFromPrimaryKeyValues(values, primaryKeys)).collect(Collectors.toList()));
         }
         return this.get(tableName, numPartitionsHint, columns, ids);
-    }
-
-    /* The users should ensure that the order of the primary key list is independent of the order.
-     * check DAS-289.
-     */
-    private String generateRecordIdFromPrimaryKeyValues(Map<String, Object> values, List<String> primaryKeys) {
-        StringBuilder builder = new StringBuilder();
-        Object obj;
-        for (String key : primaryKeys) {
-            obj = values.get(key);
-            if (obj != null) {
-                builder.append(obj.toString());
-            }
-        }
-        // to make sure, we don't have an empty string
-        builder.append("");
-        try {
-            byte[] data = builder.toString().getBytes(AnalyticsCommonConstants.DEFAULT_CHARSET);
-            return UUID.nameUUIDFromBytes(data).toString();
-        } catch (UnsupportedEncodingException e) {
-            // This wouldn't happen
-            throw new RuntimeException(e);
-        }
     }
 
     @Override

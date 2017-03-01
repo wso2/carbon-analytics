@@ -254,11 +254,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         Map<String, List<Record>> recordBatches = new HashMap<>();
         List<Record> recordBatch;
         for (Record record : records) {
-            recordBatch = recordBatches.get(record.getTableName());
-            if (recordBatch == null) {
-                recordBatch = new ArrayList<>();
-                recordBatches.put(record.getTableName(), recordBatch);
-            }
+            recordBatch = recordBatches.computeIfAbsent(record.getTableName(), k -> new ArrayList<>());
             recordBatch.add(record);
         }
         return recordBatches;
