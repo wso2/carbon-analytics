@@ -24,6 +24,7 @@ import org.apache.spark.Dependency;
 import org.apache.spark.InterruptibleIterator;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
+import org.apache.spark.SparkFiles;
 import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Row;
@@ -74,8 +75,7 @@ public class AnalyticsRDD extends RDD<Row> {
 
     @Override
     public Iterator<Row> compute(Partition split, TaskContext taskContext) {
-        AnalyticsDataHolder.getInstance().setAnalyticsConfigsDir(TaskContext.get()
-                .getLocalProperty(AnalyzerEngineConstants.SPARK_ANALYTICS_CONFIGS));
+        AnalyticsDataHolder.getInstance().setAnalyticsConfigsDir(SparkFiles.getRootDirectory());
         AnalyticsPartition partition = (AnalyticsPartition) split;
         try {
             java.util.Iterator<Record> recordsItr = AnalyticsServiceHolder.getAnalyticsDataService().readRecords(

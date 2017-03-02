@@ -20,7 +20,7 @@ package org.wso2.carbon.analytics.engine.commons;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.spark.TaskContext;
+import org.apache.spark.SparkFiles;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructType;
 import org.wso2.carbon.analytics.data.commons.AnalyticsDataService;
@@ -78,8 +78,7 @@ public class AnalyticsDALWriter extends AbstractFunction1<Iterator<Row>, BoxedUn
      */
     @Override
     public BoxedUnit apply(Iterator<Row> iterator) {
-        AnalyticsDataHolder.getInstance().setAnalyticsConfigsDir(TaskContext.get()
-                .getLocalProperty(AnalyzerEngineConstants.SPARK_ANALYTICS_CONFIGS));
+        AnalyticsDataHolder.getInstance().setAnalyticsConfigsDir(SparkFiles.getRootDirectory());
         List<Row> rows = new ArrayList<>(recordBatchSize);
         /* We have to invalidate the table information, since here, if some other node
         changes the table information, we cannot know about it (no cluster communication) */
