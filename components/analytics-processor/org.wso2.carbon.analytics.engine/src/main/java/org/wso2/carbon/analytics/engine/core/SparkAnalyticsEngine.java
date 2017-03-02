@@ -58,17 +58,19 @@ public class SparkAnalyticsEngine implements AnalyticsEngine {
 
     // todo: get the paths properly
     private final String[] jarsToBeAdded = {
-            "/tmp/jars/org.wso2.carbon.analytics.datasource.rdbms-2.0.0-SNAPSHOT.jar",
-            "/tmp/jars/org.wso2.carbon.analytics.dataservice-2.0.0-SNAPSHOT.jar",
-            "/tmp/jars/org.wso2.carbon.analytics.data.commons-2.0.0-SNAPSHOT.jar",
-            "/tmp/jars/org.wso2.carbon.analytics.engine-2.0.0-SNAPSHOT.jar",
-            "/tmp/jars/mysql-connector-java-5.1.24-bin.jar",
+            "/tmp/jars/org.wso2.carbon.analytics.datasource.rdbms-6.0.0-SNAPSHOT.jar",
+            "/tmp/jars/org.wso2.carbon.analytics.dataservice-6.0.0-SNAPSHOT.jar",
+            "/tmp/jars/org.wso2.carbon.analytics.data.commons-6.0.0-SNAPSHOT.jar",
+            "/tmp/jars/org.wso2.carbon.analytics.engine-6.0.0-SNAPSHOT.jar",
+            "/tmp/jars/org.wso2.carbon.datasource.core-1.1.0.jar",
+            "/tmp/jars/HikariCP-2.5.1.jar",
             "/tmp/jars/h2-1.4.187.jar",
-            "/tmp/jars/kryo-shaded-3.0.3.jar"};
+            "/tmp/jars/kryo-shaded-3.0.3.jar"
+    };
     private final String[] filesToBeAdded = {
-            "/tmp/configs/analytics/rdbms-config.xml",
-            "/tmp/configs/datasources/analytics-datasources.xml",
-            "/tmp/configs/analytics/analytics-dataservice-config.xml"};
+            "/tmp/configs/rdbms-config.xml",
+            "/tmp/configs/analytics-datasources.xml",
+            "/tmp/configs/analytics-dataservice-config.xml"};
 
     public SparkAnalyticsEngine() {
         this.sparkConfPath = null;

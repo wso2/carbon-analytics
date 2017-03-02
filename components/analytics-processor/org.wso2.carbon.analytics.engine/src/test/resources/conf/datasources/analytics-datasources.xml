@@ -11,7 +11,7 @@
             <description>The datasource used for analytics record store</description>
             <definition type="RDBMS">
                 <configuration>
-                    <url>jdbc:h2:./target/ANALYTICS_EVENT_STORE;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000</url>
+                    <url>jdbc:h2:/tmp/db/ANALYTICS_EVENT_STORE;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;AUTO_SERVER=TRUE</url>
                     <username>wso2carbon</username>
                     <password>wso2carbon</password>
                     <driverClassName>org.h2.Driver</driverClassName>
@@ -25,13 +25,13 @@
                 </configuration>
             </definition>
         </datasource>
-        
+
         <datasource>
             <name>WSO2_ANALYTICS_PROCESSED_DATA_STORE_DB</name>
             <description>The datasource used for analytics record store</description>
             <definition type="RDBMS">
                 <configuration>
-                    <url>jdbc:h2:./target/ANALYTICS_PROCESSED_DATA_STORE;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000</url>
+                    <url>jdbc:h2:/tmp/db/ANALYTICS_PROCESSED_DATA_STORE;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;AUTO_SERVER=TRUE</url>
                     <username>root</username>
                     <password>dan</password>
                     <driverClassName>org.h2.Driver</driverClassName>

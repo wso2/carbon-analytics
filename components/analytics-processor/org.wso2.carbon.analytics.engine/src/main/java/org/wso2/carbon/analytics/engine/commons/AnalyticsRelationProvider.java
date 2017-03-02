@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.engine.commons;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.spark.SparkFiles;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.sources.BaseRelation;
 import org.apache.spark.sql.sources.RelationProvider;
@@ -201,10 +202,7 @@ public class AnalyticsRelationProvider implements RelationProvider, SchemaRelati
     }
 
     private void setAnalyticsConfigsDir(SQLContext sqlContext) {
-        AnalyticsDataHolder.getInstance().setAnalyticsConfigsDir(
-                sqlContext.getConf(AnalyzerEngineConstants.SPARK_ANALYTICS_CONFIGS));
-        sqlContext.sparkContext().setLocalProperty(AnalyzerEngineConstants.SPARK_ANALYTICS_CONFIGS,
-                AnalyticsDataHolder.getInstance().getAnalyticsConfigsDir());
+        AnalyticsDataHolder.getInstance().setAnalyticsConfigsDir(SparkFiles.getRootDirectory());
     }
 
 

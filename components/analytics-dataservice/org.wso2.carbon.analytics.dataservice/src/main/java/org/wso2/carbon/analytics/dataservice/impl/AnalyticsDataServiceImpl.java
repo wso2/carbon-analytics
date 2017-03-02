@@ -42,12 +42,10 @@ import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.wso2.carbon.analytics.data.commons.sources.AnalyticsCommonConstants.ANALYTICS_CONF_DIR;
-import static org.wso2.carbon.analytics.data.commons.utils.AnalyticsCommonUtils.getFileFromSystemResources;
 import static org.wso2.carbon.analytics.dataservice.utils.AnalyticsDataServiceConstants.ANALYTICS_CONFIG_FILE;
 
 public class AnalyticsDataServiceImpl implements AnalyticsDataService {
@@ -60,7 +58,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private String primaryARSName;
     private Map<String, AnalyticsRecordStore> analyticsRecordStores;
     private Map<String, AnalyticsTableInfo> tableInfoMap = new HashMap<>();
-    private AnalyticsDataHolder analyticsDataHolder = AnalyticsDataHolder.getInstance();
 
     private static final Log LOGGER = LogFactory.getLog(AnalyticsDataServiceImpl.class);
 
@@ -76,25 +73,11 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Analytics Config Directory: " + analyticsDataHolder.getAnalyticsConfigsDir());
-        }
-        File confFile;
-        String analyticsConfDir = analyticsDataHolder.getAnalyticsConfigsDir();
-        if (analyticsConfDir != null) {
-            confFile = new File(analyticsDataHolder.getAnalyticsConfigsDir() + File.separator
-                                + ANALYTICS_CONF_DIR + File.separator + ANALYTICS_CONFIG_FILE);
-        } else {
-            confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() + File.separator
-                                + ANALYTICS_CONF_DIR + File.separator + ANALYTICS_CONFIG_FILE);
-        }
+        File confFile = AnalyticsCommonUtils.loadConfigFile(ANALYTICS_CONF_DIR, ANALYTICS_CONFIG_FILE);
         try {
-            if (!confFile.exists()) {
-                confFile = getFileFromSystemResources(ANALYTICS_CONFIG_FILE);
-                if (confFile == null) {
-                    throw new AnalyticsException("Cannot initalize analytics data service, " +
-                            "the analytics data service configuration file cannot be found at: " + confFile.getPath());
-                }
+            if (confFile == null || !confFile.exists()) {
+                throw new AnalyticsException("Cannot find analytics data service configuration file: " +
+                        ANALYTICS_CONFIG_FILE);
             }
             JAXBContext ctx = JAXBContext.newInstance(AnalyticsDataServiceConfiguration.class);
             Unmarshaller unmarshaller = ctx.createUnmarshaller();
@@ -102,9 +85,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         } catch (JAXBException e) {
             throw new AnalyticsException(
                     "Error in processing analytics data service configuration: " + e.getMessage(), e);
-        } catch (URISyntaxException e) {
-            throw new AnalyticsException("Cannot initalize analytics data service, " +
-                    "the analytics data service configuration file cannot be found at: " + confFile.getPath() + " or from classpath", e);
         }
     }
 

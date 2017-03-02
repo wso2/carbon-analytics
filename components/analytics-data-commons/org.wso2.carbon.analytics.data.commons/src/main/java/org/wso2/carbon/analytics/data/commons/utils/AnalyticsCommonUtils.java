@@ -29,6 +29,7 @@ import org.wso2.carbon.analytics.data.commons.AnalyticsDataService;
 import org.wso2.carbon.analytics.data.commons.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.data.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.data.commons.service.AnalyticsCommonServiceHolder;
+import org.wso2.carbon.analytics.data.commons.service.AnalyticsDataHolder;
 import org.wso2.carbon.analytics.data.commons.service.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.data.commons.service.AnalyticsSchema;
 import org.wso2.carbon.analytics.data.commons.sources.AnalyticsCommonConstants;
@@ -89,6 +90,28 @@ public class AnalyticsCommonUtils {
     public static void serializeObject(Object obj, OutputStream out) throws IOException {
         byte[] data = serializeObject(obj);
         out.write(data, 0, data.length);
+    }
+
+    /**
+     * Load a given config file from the configuration directory
+     * @param subDirName sub directory name where the config file may reside
+     * @param fileName name of the config file
+     * @return File instance which represents the config file or null if the file not found
+     */
+    public static File loadConfigFile(String subDirName, String fileName) {
+        String analyticsConfigDir = AnalyticsDataHolder.getInstance().getAnalyticsConfigsDir();
+        File confFile;
+        if (analyticsConfigDir != null) {
+            // we're in Spark environment, hence no sub-folder hierarchy
+            confFile = new File(analyticsConfigDir + File.separator + fileName);
+        } else {
+            confFile = new File(AnalyticsCommonUtils.getAnalyticsConfDirectory() + File.separator + subDirName + File
+                    .separator + fileName);
+        }
+        if (!confFile.exists()) {
+            confFile = getFileFromSystemResources(fileName);
+        }
+        return confFile;
     }
 
     /* do not touch, @see serializeObject(Object) */
@@ -359,15 +382,9 @@ public class AnalyticsCommonUtils {
         return result;
     }
 
-    public static String getAnalyticsConfDirectory() throws AnalyticsException {
-        File confDir = null;
-        try {
-            confDir = new File(getConfDirectoryPath());
-        } catch (Exception e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Error in getting the config path: " + e.getMessage(), e);
-            }
-        }
+    private static String getAnalyticsConfDirectory() {
+        String confDirPath = getConfDirectoryPath();
+        File confDir = confDirPath == null ? null : new File(confDirPath);
         if (confDir == null || !confDir.exists()) {
             return getCustomAnalyticsConfDirectory();
         } else {
@@ -381,24 +398,30 @@ public class AnalyticsCommonUtils {
         String dataSourceDir = carbonConfigPath.relativize(dataSourcePath).toString();
         return Paths.get(getConfDirectoryPath(), dataSourceDir).toAbsolutePath().toString();*/
         //TODO: Recheck path logic after Kernel bug is fixed (https://github.com/wso2/carbon-kernel/issues/1309)
-        return getConfDirectoryPath() + File.separator + "datasources";
+        String analyticsConfigDir = AnalyticsDataHolder.getInstance().getAnalyticsConfigsDir();
+        if (analyticsConfigDir != null) {
+            // in a Spark environment, datasource file will be inside this directory
+            return analyticsConfigDir;
+        }
+        return getAnalyticsConfDirectory() + File.separator + "datasources";
     }
 
-    private static String getCustomAnalyticsConfDirectory() throws AnalyticsException {
+    private static String getCustomAnalyticsConfDirectory() {
         String path = System.getProperty(WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP);
         if (path == null) {
             path = Paths.get("").toAbsolutePath().toString() + File.separator + CUSTOM_WSO2_CONF_DIR_NAME;
         }
         File confDir = new File(path);
         if (!confDir.exists()) {
-            throw new AnalyticsException("The custom WSO2 configuration directory does not exist at '" + path + "'. "
+            LOG.warn("The custom WSO2 configuration directory does not exist at '" + path + "'. "
                     + "This can be given by correctly pointing to a valid configuration directory by setting the "
                     + "Java system property '" + WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + "'.");
+            return null;
         }
         return confDir.getAbsolutePath();
     }
 
-    public static String getConfDirectoryPath() throws AnalyticsException {
+    private static String getConfDirectoryPath() {
         //TODO: Recheck path logic after Kernel bug is fixed (https://github.com/wso2/carbon-kernel/issues/1309)
         /*Path carbonDir = Utils.getCarbonConfigHome();
         if (carbonDir != null) {
@@ -408,7 +431,7 @@ public class AnalyticsCommonUtils {
         if (carbonConfigDirPath == null) {
             carbonConfigDirPath = System.getenv("CARBON_CONFIG_DIR_PATH");
             if (carbonConfigDirPath == null) {
-                throw new AnalyticsException("The WSO2 configuration directory does not exist. " +
+                LOG.warn("The WSO2 configuration directory does not exist. " +
                         "This can be given by setting the Java system property '" + WSO2_CARBON_CONF_DIR_SYS_PROP
                         + "', to a valid carbon configuration directory..");
             }
@@ -430,7 +453,7 @@ public class AnalyticsCommonUtils {
         return stream.replaceAll("\\.", "_");
     }
 
-    public static File getFileFromSystemResources(String fileName) throws URISyntaxException {
+    private static File getFileFromSystemResources(String fileName) {
         File file = null;
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         if (classLoader != null) {
@@ -438,7 +461,12 @@ public class AnalyticsCommonUtils {
             if (url == null) {
                 url = classLoader.getResource(File.separator + fileName);
             }
-            file = new File(url.toURI());
+            try {
+                file = new File(url.toURI());
+            } catch (URISyntaxException e) {
+                // file cannot be loaded
+                return null;
+            }
         }
         return file;
     }
