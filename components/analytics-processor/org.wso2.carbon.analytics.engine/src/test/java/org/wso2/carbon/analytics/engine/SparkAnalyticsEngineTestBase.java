@@ -41,7 +41,7 @@ public class SparkAnalyticsEngineTestBase {
         this.analyticsEngine = new SparkAnalyticsEngine(SPARK_CONF_FILE_PATH);
     }
 
-    /*@Test
+    @Test
     public void getVersionTest() {
         log.info("================== Testing Spark Connectivity through getVersion method =====================");
         String sparkVersion = this.analyticsEngine.getVersion();
@@ -56,9 +56,9 @@ public class SparkAnalyticsEngineTestBase {
         String result = analyticsEngineQueryResult.getRows().get(0).toString();
         Assert.assertEquals(result, "[3]");
     }
-*/
-    @Test
-    public void simpleQueryExecutionTest() throws AnalyticsException {
+
+    @Test(dependsOnMethods = "simpleQueryExecutionTest")
+    public void writingToDALTest() throws AnalyticsException {
         log.info("================== Creating temporary table Test =====================");
         this.analyticsEngine.executeQuery("CREATE TEMPORARY VIEW person using CarbonAnalytics options " +
                 "(tableName \"PERSON\", schema \"name STRING\");");

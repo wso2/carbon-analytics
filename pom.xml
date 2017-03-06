@@ -532,7 +532,7 @@
         <hadoop-version>2.7.2</hadoop-version>
         <hbase.version>1.2.0</hbase.version>
         <kryo.version>3.0.3</kryo.version>
-        <spark.version>2.0.2</spark.version>
+        <spark.version>2.0.1</spark.version>
         <solr.version>6.2.1</solr.version>
         <gson.version>2.7</gson.version>
         <json.version>3.0.0.wso2v1</json.version>
