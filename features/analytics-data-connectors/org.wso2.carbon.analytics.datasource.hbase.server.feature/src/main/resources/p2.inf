@@ -1,2 +1,0 @@
-instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.datasource.hbase.server_${feature.version}/conf/analytics/hbase-analytics-config.xml,target:${installFolder}/../../conf/analytics/hbase-analytics-config.xml,overwrite:true);\

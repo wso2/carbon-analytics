@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<hbase-configuration>
-    <!-- Batch size for GET queries from the HBase instance -->
-    <query-batch-size>7000</query-batch-size>
-</hbase-configuration>
-
-
