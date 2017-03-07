@@ -1,0 +1,52 @@
+{
+    "info": {
+        "id": "line-chart",
+        "name": "Line Chart"
+    },
+    "config": [
+        {
+            "fieldLabel": "X axis",
+            "fieldName": "x",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "X type",
+            "fieldName": "xType",
+            "fieldType": "dropdown",
+            "valueSet": ["default", "string", "number", "time"]
+        },
+        {
+            "fieldLabel": "Y axis",
+            "fieldName": "y",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "Y type",
+            "fieldName": "yType",
+            "fieldType": "dropdown",
+            "valueSet": ["default", "string", "number", "time"]
+        },
+        {
+            "fieldLabel": "Color domain",
+            "fieldName": "color",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "Max Length",
+            "fieldName": "maxLength",
+            "fieldType": "string",
+            "defaultValue" : "30"
+        }
+    ],
+    "imports": {
+        "shared-libs":{
+            "js" :["analytics-wso2-2.0.0/d3.min.js", "analytics-wso2-2.0.0/vega.js",  "analytics-wso2-2.0.0/VizGrammar.min.js",
+                "analytics-wso2-2.0.0/wso2gadgets.js", "analytics-wso2-2.0.0/chart-utils.js"],
+            "css":["analytics-wso2-2.0.0/common.css"]
+        }
+    }
+}
+

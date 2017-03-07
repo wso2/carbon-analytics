@@ -1,0 +1,24 @@
+{
+    "info": {
+        "id": "batch",
+        "name": "Batch Data Source",
+        "image": ""
+    },
+    "config": [{
+        "fieldLabel": "Event Table",
+        "fieldName": "tableName",
+        "fieldType": "dropDown"
+    }, {
+        "fieldLabel": "Lucene Query (optional)",
+        "fieldName": "query",
+        "fieldType": "string",
+        "isRequired": false,
+        "placeholderText": "Run a sample Lucene query to filter data"
+    }, {
+        "fieldLabel": "Number of records to display",
+        "fieldName": "limit",
+        "fieldType": "string",
+        "isRequired": false,
+        "placeholderText": "100"
+    }]
+}

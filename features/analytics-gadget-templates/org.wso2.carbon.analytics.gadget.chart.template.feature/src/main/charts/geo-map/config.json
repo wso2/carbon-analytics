@@ -1,0 +1,73 @@
+{
+    "info": {
+        "id": "geo-map",
+        "name": "Geo map"
+    },
+    "config": [
+        {
+            "fieldLabel": "id",
+            "fieldName": "id",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"],
+
+        },
+        {
+            "fieldLabel": "type",
+            "fieldName": "type",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"],
+        },
+        {
+            "fieldLabel": "state",
+            "fieldName": "state",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"],
+            "defaultValue":"NORMAL"
+        },
+        {
+            "fieldLabel": "information",
+            "fieldName": "information",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"],
+        },
+        {
+            "fieldLabel": "speed",
+            "fieldName": "speed",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"],
+        },
+        {
+            "fieldLabel": "heading",
+            "fieldName": "heading",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"],
+        },
+        {
+            "fieldLabel": "longitude",
+            "fieldName": "longitude",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"],
+        },
+        {
+            "fieldLabel": "latitude",
+            "fieldName": "latitude",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"],
+        },
+        {
+            "fieldLabel": "level",
+            "fieldName": "level",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"]
+
+        }
+    ],
+    "imports": {
+        "js" :["leaflet.js","leaflet.markercluster.js","leaflet.featuregroup.subgroup.js", "marker.rotate.js",
+            "marker.js", "config.js", "bootstrap.min.js", "leaflet-search-control.js", "underscore-min.js", "notify.min.js",
+            "uikit.min.js", "map-config.js"],
+        "css" : ["leaflet.css", "style.css", "leaflet.markercluster.css", "bootstrap.min.css", "uikit.min.css",
+                "uikit.addons.min.css"]
+    }
+}
+

@@ -1,0 +1,9 @@
+{
+    "info": {
+        "id": "realtime",
+        "name": "Realtime Data Source",
+        "image": ""
+    },
+    "config" : [],
+    "provider-libs" : ["ws-client.js"]
+}

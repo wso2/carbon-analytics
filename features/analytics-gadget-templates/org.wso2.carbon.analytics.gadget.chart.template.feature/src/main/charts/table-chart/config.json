@@ -1,0 +1,41 @@
+{
+    "info": {
+        "id": "table-chart",
+        "name": "Table Chart"
+    },
+    "config": [
+        {
+            "fieldLabel": "Key",
+            "fieldName": "key",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "Color domain",
+            "fieldName": "color",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "Enable grid",
+            "fieldName": "grid",
+            "fieldType": "checkbox"
+        },
+        {
+            "fieldLabel": "Max Length",
+            "fieldName": "maxLength",
+            "fieldType": "string",
+            "defaultValue" : "30"
+        }
+    ],
+    "imports": {
+        "shared-libs":{
+            "js" :["analytics-wso2-2.0.0/d3.min.js", "analytics-wso2-2.0.0/vega.js",  "analytics-wso2-2.0.0/VizGrammar.min.js",
+                "analytics-wso2-2.0.0/wso2gadgets.js", "analytics-wso2-2.0.0/chart-utils.js"],
+            "css":["bootstrap_3.3.5/css/bootstrap.min.css","analytics-wso2-2.0.0/common.css"]
+        },
+        "js" : ["jquery.dataTables.min.js"],
+        "css" : ["dataTables.bootstrap.min.css"]
+    }
+}
+

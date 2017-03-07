@@ -1,0 +1,78 @@
+<!--
+  ~ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<serviceGroup>
+    <service name="TemplateManagerAdminService" scope="transportsession">
+        <transports>
+            <transport>https</transport>
+        </transports>
+        <parameter name="ServiceClass">org.wso2.carbon.event.template.manager.admin.TemplateManagerAdminService
+        </parameter>
+    </service>
+    <messageReceivers>
+        <messageReceiver mep="http://www.w3.org/ns/wsdl/robust-in-only"
+                         class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                         class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                         class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+    </messageReceivers>
+    <operation name="getDomainInfo">
+        <parameter name="AuthorizationAction" locked="true">
+            /permission/admin/manage/template-manager
+        </parameter>
+    </operation>
+    <operation name="getAllDomainInfos">
+        <parameter name="AuthorizationAction" locked="true">
+            /permission/admin/manage/template-manager
+        </parameter>
+    </operation>
+    <operation name="getConfiguration">
+        <parameter name="AuthorizationAction" locked="true">
+            /permission/admin/manage/template-manager
+        </parameter>
+    </operation>
+    <operation name="getConfigurationInfos">
+        <parameter name="AuthorizationAction" locked="true">
+            /permission/admin/manage/template-manager
+        </parameter>
+    </operation>
+    <operation name="deleteConfiguration">
+        <parameter name="AuthorizationAction" locked="true">
+            /permission/admin/manage/template-manager
+        </parameter>
+    </operation>
+    <operation name="saveConfiguration">
+        <parameter name="AuthorizationAction" locked="true">
+            /permission/admin/manage/template-manager
+        </parameter>
+    </operation>
+    <operation name="editConfiguration">
+        <parameter name="AuthorizationAction" locked="true">
+            /permission/admin/manage/template-manager
+        </parameter>
+    </operation>
+    <operation name="saveStreamMapping">
+        <parameter name="AuthorizationAction" locked="true">
+            /permission/admin/manage/template-manager
+        </parameter>
+    </operation>
+
+    <parameter name="adminService" locked="true">true</parameter>
+    <parameter name="hiddenService" locked="true">true</parameter>
+    <parameter name="AuthorizationAction" locked="true">/permission/admin/manage/template-manager</parameter>
+
+</serviceGroup>

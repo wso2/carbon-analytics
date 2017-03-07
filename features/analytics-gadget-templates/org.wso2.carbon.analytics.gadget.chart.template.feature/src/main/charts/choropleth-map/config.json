@@ -1,0 +1,40 @@
+{
+    "info": {
+        "id": "choropleth-map",
+        "name": "Choropleth Map"
+    },
+    "config": [
+        {
+            "fieldLabel": "X axis",
+            "fieldName": "x",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "Y axis",
+            "fieldName": "y",
+            "fieldType": "dropdown",
+            "valueSet": ["$COLUMN_NAMES"]
+        },
+        {
+            "fieldLabel": "Map type",
+            "fieldName": "mapType",
+            "fieldType": "dropdown",
+            "valueSet": ["world","usa","europe"]
+        },
+        {
+            "fieldLabel": "Max Length",
+            "fieldName": "maxLength",
+            "fieldType": "string",
+            "defaultValue" : "30"
+        }
+    ],
+    "imports": {
+        "shared-libs":{
+            "js" :["analytics-wso2-2.0.0/d3.min.js", "analytics-wso2-2.0.0/vega.js",  "analytics-wso2-2.0.0/VizGrammar.min.js",
+                   "analytics-wso2-2.0.0/wso2gadgets.js", "analytics-wso2-2.0.0/chart-utils.js"],
+            "css":["analytics-wso2-2.0.0/common.css"]
+        }
+    }
+}
+
