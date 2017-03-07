@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>analytics-dataservice</artifactId>
-        <groupId>org.wso2.carbon.analytics-common</groupId>
-        <version>6.0.0-SNAPSHOT</version>
+        <groupId>org.wso2.carbon.analytics</groupId>
+        <version>2.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -31,11 +31,11 @@
             <artifactId>commons-logging</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.data.commons</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
             <scope>test</scope>
         </dependency>

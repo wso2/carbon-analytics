@@ -18,7 +18,7 @@
 
     <parent>
         <artifactId>analytics-gadget-template-feature</artifactId>
-        <groupId>org.wso2.carbon.analytics-common</groupId>
+        <groupId>org.wso2.carbon.analytics</groupId>
         <version>5.1.10-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -30,23 +30,23 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.gadget.batch.provider.template.feature</artifactId>
             <type>zip</type>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.gadget.realtime.provider.template.feature</artifactId>
             <type>zip</type>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.gadget.rest.provider.template.feature</artifactId>
             <version>5.1.10-SNAPSHOT</version>
             <type>zip</type>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.gadget.chart.template.feature</artifactId>
             <type>zip</type>
         </dependency>
@@ -77,16 +77,16 @@
                             </adviceFile>
                             <includedFeatures>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.analytics.gadget.batch.provider.template.feature:${carbon.analytics.common.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.gadget.batch.provider.template.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.analytics.gadget.chart.template.feature:${carbon.analytics.common.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.gadget.chart.template.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.analytics.gadget.rest.provider.template.feature:${carbon.analytics.common.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.gadget.rest.provider.template.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.analytics.gadget.realtime.provider.template.feature:${carbon.analytics.common.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.gadget.realtime.provider.template.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                             </includedFeatures>
                         </configuration>

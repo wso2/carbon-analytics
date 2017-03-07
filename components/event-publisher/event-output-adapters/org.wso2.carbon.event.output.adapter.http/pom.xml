@@ -20,7 +20,7 @@
 
     <parent>
         <artifactId>event-output-adapters</artifactId>
-        <groupId>org.wso2.carbon.analytics-common</groupId>
+        <groupId>org.wso2.carbon.analytics</groupId>
         <version>5.1.10-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -36,7 +36,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.event.output.adapter.core</artifactId>
         </dependency>
         <dependency>

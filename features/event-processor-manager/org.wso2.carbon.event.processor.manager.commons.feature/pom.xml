@@ -19,7 +19,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>event-processor-manager-feature</artifactId>
-        <groupId>org.wso2.carbon.analytics-common</groupId>
+        <groupId>org.wso2.carbon.analytics</groupId>
         <version>5.1.10-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -35,7 +35,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.event.processor.manager.commons</artifactId>
         </dependency>
         <dependency>
@@ -61,7 +61,7 @@
                             <id>org.wso2.carbon.event.processor.manager.commons</id>
                             <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon.analytics-common:org.wso2.carbon.event.processor.manager.commons</bundleDef>
+                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.event.processor.manager.commons</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.lmax:disruptor:${disruptor.orbit.version}</bundleDef>
                             </bundles>
                         </configuration>

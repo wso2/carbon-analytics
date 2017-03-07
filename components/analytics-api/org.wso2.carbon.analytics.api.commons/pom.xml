@@ -21,8 +21,8 @@
 
     <parent>
         <artifactId>analytics-api</artifactId>
-        <groupId>org.wso2.carbon.analytics-common</groupId>
-        <version>6.0.0-SNAPSHOT</version>
+        <groupId>org.wso2.carbon.analytics</groupId>
+        <version>2.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -31,19 +31,19 @@
     <name>WSO2 Carbon - Analytics API</name>
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.data.commons</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.indexer</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
             <scope>test</scope>
         </dependency>

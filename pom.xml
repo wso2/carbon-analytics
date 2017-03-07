@@ -25,11 +25,11 @@
         <version>5</version>
     </parent>
 
-    <groupId>org.wso2.carbon.analytics-common</groupId>
-    <artifactId>org.wso2.carbon.analytics-common.parent</artifactId>
+    <groupId>org.wso2.carbon.analytics</groupId>
+    <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>6.0.0-SNAPSHOT</version>
-    <name>WSO2 Carbon Analytics Common - Parent</name>
+    <version>2.0.0-SNAPSHOT</version>
+    <name>WSO2 Carbon Analytics - Parent</name>
 
     <modules>
         <!--<module>components/analytics-dashboard</module>-->
@@ -150,32 +150,32 @@
                 <version>${equinox.ds.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.databridge.commons</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.databridge.core</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.databridge.commons.binary</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.databridge.commons.thrift</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.databridge.receiver.binary</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.databridge.receiver.thrift</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
@@ -491,22 +491,22 @@
 
             <!-- child module dependencies-->
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.data.commons</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.indexer</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
@@ -514,7 +514,7 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics-common.version>6.0.0-SNAPSHOT</carbon.analytics-common.version>
+        <carbon.analytics-common.version>2.0.0-SNAPSHOT</carbon.analytics-common.version>
         <carbon.analytics-common.pkg.export.version>6.0.0</carbon.analytics-common.pkg.export.version>
 
         <carbon.kernel.version>5.1.0</carbon.kernel.version>
