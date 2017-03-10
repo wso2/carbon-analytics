@@ -1,4 +1,4 @@
-# carbon-analytics-common
+# Carbon Analytics
 ---
 
 |  Branch | Build Status |
@@ -13,7 +13,7 @@ Latest Released Version v5.0.11.
 
 This project contains compontents which implements common functionalities used in WSO2 analytics platform.
 
-#### carbon-analytics-common repo contains following components.
+#### Carbon Analytics repo contains following components:
 
 * event-streams      
 * event-recevier
