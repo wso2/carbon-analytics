@@ -32,7 +32,6 @@
     <name>WSO2 Carbon Analytics - Parent</name>
 
     <modules>
-        <!--<module>components/analytics-dashboard</module>-->
         <module>components/tcp-transport</module>
         <module>components/data-bridge</module>
         <module>components/analytics-data-commons</module>
@@ -67,13 +66,12 @@
         <!--<module>features/gadget-template-deployer</module>-->
         <!--<module>features/dashboard-template-deployer</module>-->
         <!--<module>features/jaggeryapp-template-deployer</module>-->
-        <!--<module>tests</module>-->
     </modules>
 
     <scm>
-        <url>https://github.com/wso2/carbon-analytics-common.git</url>
-        <developerConnection>scm:git:https://github.com/wso2/carbon-analytics-common.git</developerConnection>
-        <connection>scm:git:https://github.com/wso2/carbon-analytics-common.git</connection>
+        <url>https://github.com/wso2/carbon-analytics.git</url>
+        <developerConnection>scm:git:https://github.com/wso2/carbon-analytics.git</developerConnection>
+        <connection>scm:git:https://github.com/wso2/carbon-analytics.git</connection>
         <tag>HEAD</tag>
     </scm>
 
