@@ -1,3 +1,0 @@
-instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/server/webapps);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.event.output.adapter.websocket.local.server_${feature.version}/outputwebsocket.war,target:${installFolder}/../../deployment/server/webapps/outputwebsocket.war,overwrite:true);
