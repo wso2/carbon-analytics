@@ -32,41 +32,12 @@
     <name>WSO2 Carbon Analytics - Parent</name>
 
     <modules>
-        <module>components/tcp-transport</module>
         <module>components/data-bridge</module>
-        <module>components/analytics-data-commons</module>
-        <module>components/analytics-datasources</module>
-        <module>components/analytics-dataservice</module>
-        <module>components/analytics-processor</module>
-        <module>components/analytics-indexer</module>
-        <module>components/analytics-api</module>
-        <!--<module>components/analytics-data-agents</module>-->
-        <!--<module>components/event-stream</module>-->
-        <!--<module>components/application-deployer</module>-->
-        <!--<module>components/event-monitor</module>-->
-        <!--<module>components/event-processor-manager</module>-->
-        <!--<module>components/event-receiver</module>-->
-        <!--<module>components/event-publisher</module>-->
-        <!--<module>components/template-manager</module>-->
-        <!--<module>components/gadget-template-deployer</module>-->
-        <!--<module>components/jaggeryapp-template-deployer</module>-->
-        <!--<module>components/dashboard-template-deployer</module>-->
-        <!--<module>features/event-stream</module>-->
-        <!--<module>features/data-bridge</module>-->
-        <!--<module>features/analytics-dashboard</module>-->
-        <!--<module>features/analytics-data-agents</module>-->
-        <!--<module>features/application-deployer</module>-->
-        <!--<module>features/event-monitor</module>-->
-        <!--<module>features/event-receiver</module>-->
-        <!--<module>features/event-publisher</module>-->
-        <!--<module>features/event-processor-manager</module>-->
-        <!--<module>features/template-manager</module>-->
-        <!--<module>features/spark-common</module>-->
-        <!--<module>features/analytics-gadget-templates</module>-->
-        <!--<module>features/gadget-template-deployer</module>-->
-        <!--<module>features/dashboard-template-deployer</module>-->
-        <!--<module>features/jaggeryapp-template-deployer</module>-->
-    </modules>
+        <!--<module>components/tcp-transport</module>-->
+        <!--<module>components/analytics-data-commons</module>-->
+        <!--<module>components/analytics-datasources</module>-->
+        <!--<module>components/analytics-api</module>-->
+     </modules>
 
     <scm>
         <url>https://github.com/wso2/carbon-analytics.git</url>

@@ -1,2 +1,0 @@
-instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.event.input.adapter.server_${feature.version}/conf/input-event-adapters.xml,target:${installFolder}/../../conf/input-event-adapters.xml,overwrite:true);
