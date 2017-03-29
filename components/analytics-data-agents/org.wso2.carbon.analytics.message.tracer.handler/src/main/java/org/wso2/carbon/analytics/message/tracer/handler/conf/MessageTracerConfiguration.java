@@ -37,6 +37,8 @@ public class MessageTracerConfiguration {
 
     private Set<String> messageTracingEnabledAdminServices;
 
+    private String messageTracingEnabled;
+
     public MessageTracerConfiguration() throws MessageTracerHandlerException {
         try {
             JAXBContext ctx = JAXBContext.newInstance(MessageTracerConfiguration.class);
@@ -46,16 +48,16 @@ public class MessageTracerConfiguration {
                     e.getMessage(), e);
         }
     }
-    
-    @XmlElementWrapper(name = "MessageTracingEnabledAdminServices", nillable = false)
-	@XmlElement(name = "Service", nillable = false)
-	public Set<String> getMessageTracingEnabledAdminServices() {
-		return messageTracingEnabledAdminServices;
-	}
 
-	public void setMessageTracingEnabledAdminServices(Set<String> messageTracingEnabledAdminServices) {
-		this.messageTracingEnabledAdminServices = messageTracingEnabledAdminServices;
-	}
+    @XmlElementWrapper(name = "MessageTracingEnabledAdminServices", nillable = false)
+    @XmlElement(name = "Service", nillable = false)
+    public Set<String> getMessageTracingEnabledAdminServices() {
+        return messageTracingEnabledAdminServices;
+    }
+
+    public void setMessageTracingEnabledAdminServices(Set<String> messageTracingEnabledAdminServices) {
+        this.messageTracingEnabledAdminServices = messageTracingEnabledAdminServices;
+    }
 
     @XmlRootElement(name = "Service")
     public static class MessageTracingService {
@@ -72,9 +74,18 @@ public class MessageTracerConfiguration {
         }
     }
 
+    @XmlElement(name = "MessageTracingEnabled")
+    public void setmessageTracingEnabled(String messageTracingEnabled) {
+        this.messageTracingEnabled = messageTracingEnabled;
+    }
+
+    public String getMessageTracingEnabled() {
+        return messageTracingEnabled;
+    }
+
     @XmlTransient
-	public Marshaller getMsgTracingMarshaller() {
-		return msgTracingMarshaller;
-	}
+    public Marshaller getMsgTracingMarshaller() {
+        return msgTracingMarshaller;
+    }
 
 }

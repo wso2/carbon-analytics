@@ -16,21 +16,19 @@
 package org.wso2.carbon.analytics.message.tracer.handler.internal;
 
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.analytics.message.tracer.handler.conf.EventingConfigData;
 import org.wso2.carbon.analytics.message.tracer.handler.conf.MessageTracerConfiguration;
 import org.wso2.carbon.analytics.message.tracer.handler.conf.MessageTracerConfigurationManager;
 import org.wso2.carbon.analytics.message.tracer.handler.conf.RegistryPersistenceManager;
-import org.wso2.carbon.analytics.message.tracer.handler.stream.StreamDefCreator;
 import org.wso2.carbon.analytics.message.tracer.handler.util.MessageTracerConstants;
 import org.wso2.carbon.analytics.message.tracer.handler.util.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
-import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.event.stream.core.EventStreamService;
-import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.ConfigurationContextService;
@@ -76,20 +74,13 @@ public class MessageTracerServiceComponent {
 
             new RegistryPersistenceManager().load(CarbonContext.getThreadLocalCarbonContext().getTenantId());
 
-            try {
-                StreamDefinition streamDef = StreamDefCreator.getStreamDef();
-                if (streamDef != null) {
-                    EventStreamService eventStreamService = ServiceHolder.getEventStreamService();
-                    if (eventStreamService != null) {
-                        eventStreamService.addEventStreamDefinition(streamDef);
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Added stream definition to event publisher service.");
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                LOG.error("Unable to create stream: " + e.getMessage(), e);
+            String messageTracingEnabled = msgTracerConfiguration.getMessageTracingEnabled();
+            if (StringUtils.isNotEmpty(messageTracingEnabled)) {
+                EventingConfigData eventingConfigData = new RegistryPersistenceManager().getEventingConfigData();
+                eventingConfigData.setMessageTracingEnable(Boolean.parseBoolean(messageTracingEnabled));
+                new RegistryPersistenceManager().update(eventingConfigData);
             }
+
         } catch (Exception e) {
             LOG.error("Failed to activate BAM message tracer handler bundle", e);
         }
