@@ -17,8 +17,8 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.das</groupId>
@@ -28,16 +28,16 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>org.wso2.carbon.das.jobmanager.core.feature</artifactId>
+    <artifactId>org.wso2.carbon.siddhi.editor.core.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Data Analytics Server - Job Manager Feature</name>
+    <name>WSO2 Data Analytics Server - Siddhi Editor Feature</name>
     <url>http://wso2.org</url>
-    <description>This feature contains the bundles related to Job Manager</description>
+    <description>This feature contains the bundles related to Siddhi Edior</description>
 
     <dependencies>
         <dependency>
             <groupId>org.wso2.das</groupId>
-            <artifactId>org.wso2.carbon.das.jobmanager.core</artifactId>
+            <artifactId>org.wso2.carbon.siddhi.editor.core</artifactId>
         </dependency>
     </dependencies>
 
@@ -68,7 +68,7 @@
                             </adviceFileContents>
                             <bundles>
                                 <bundle>
-                                    <symbolicName>org.wso2.carbon.das.jobmanager.core</symbolicName>
+                                    <symbolicName>org.wso2.carbon.siddhi.editor.core</symbolicName>
                                     <version>${project.version}</version>
                                 </bundle>
                             </bundles>
@@ -78,8 +78,4 @@
             </plugin>
         </plugins>
     </build>
-	<properties>
-		<checkstyle.skip>true</checkstyle.skip>
-        <findbugs.skip>true</findbugs.skip>
-    </properties>
 </project>
