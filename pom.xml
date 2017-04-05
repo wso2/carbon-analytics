@@ -38,6 +38,12 @@
         <module>components/org.wso2.carbon.event.simulator.core</module>
         <module>components/org.wso2.carbon.das.jobmanager.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
+        <module>features/org.wso2.carbon.stream.processor.core.feature</module>
+        <module>features/org.wso2.carbon.stream.processor.common.feature</module>
+        <module>features/org.wso2.carbon.event.simulator.core.feature</module>
+        <module>features/org.wso2.carbon.das.jobmanager.core.feature</module>
+        <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
+        <module>features/org.wso2.siddhi.feature</module>
         <!--<module>components/tcp-transport</module>-->
         <!--<module>components/analytics-data-commons</module>-->
         <!--<module>components/analytics-datasources</module>-->
