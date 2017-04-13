@@ -1,0 +1,7 @@
+strategy: "rdbms"
+rdbmsConfig:
+    heartbeatInterval: 1000
+    eventPollingInterval: 1000
+    taskThreadCount: 1
+zookeeperConfig:
+    connectionString: "localhost:2181"
