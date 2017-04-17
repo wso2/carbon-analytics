@@ -1,0 +1,2 @@
+instructions.configure = \
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.cluster.coordinator.service_${feature.version}/coordinatorConfig.yaml,target:${installFolder}/../../conf/coordinatorConfig.yaml,overwrite:true);\

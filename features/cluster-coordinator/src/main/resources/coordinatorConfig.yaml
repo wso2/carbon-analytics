@@ -1,4 +1,4 @@
-strategy: "org.wso2.carbon.cluster.coordinator.rdbms.RDBMSCoordinationStrategy"
+strategy: "org.wso2.carbon.cluster.coordinator.ZookeeperCoordinationStrategy"
 rdbmsConfig:
     heartbeatInterval: 1000
     eventPollingInterval: 1000

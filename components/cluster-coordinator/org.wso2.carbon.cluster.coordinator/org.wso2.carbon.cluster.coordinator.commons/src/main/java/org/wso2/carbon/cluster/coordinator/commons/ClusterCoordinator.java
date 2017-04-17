@@ -40,15 +40,8 @@ public class ClusterCoordinator {
         ClusterCoordinator.class.getClassLoader();
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         try {
-            if (coordinationStrategyConfiguration.getConfiguration().equals("zookeeper")) {
-                this.coordinationStrategy = (CoordinationStrategy) classLoader
-                        .loadClass(CoordinationPropertyNames.ZOOKEEPER_COORDINATION_STRATERGY)
-                        .newInstance();
-            } else {
-                this.coordinationStrategy = (CoordinationStrategy) classLoader
-                        .loadClass(CoordinationPropertyNames.RDBMS_COORDINATION_STRATERGY)
-                        .newInstance();
-            }
+            this.coordinationStrategy = (CoordinationStrategy) classLoader
+                    .loadClass(coordinationStrategyConfiguration.getConfiguration()).newInstance();
         } catch (ClassNotFoundException e) {
             throw new ClusterCoordinationException("Error when initializing coordinator strategy",
                     e);

@@ -17,7 +17,6 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.datasources</groupId>
@@ -95,7 +94,7 @@
                             org.wso2.carbon.cluster.coordinator.commons.configs.*,
                             org.wso2.carbon.cluster.coordinator.commons,
                             org.wso2.carbon.cluster.coordinator.commons.*
-                            com.google.common.*; version=[14.0, 19.0],
+                            com.google.common.*,
                             org.apache.commons.logging.*,
                             *;resolution:=optional
                         </Import-Package>

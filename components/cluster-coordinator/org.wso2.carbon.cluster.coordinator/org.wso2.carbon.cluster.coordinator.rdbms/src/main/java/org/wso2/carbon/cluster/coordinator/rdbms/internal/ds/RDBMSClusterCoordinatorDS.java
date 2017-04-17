@@ -25,14 +25,8 @@ import org.wso2.carbon.datasource.core.api.DataSourceService;
  */
 public class RDBMSClusterCoordinatorDS {
 
-    @Reference(
-            name = "carbon.datasource.service",
-            service = DataSourceService.class,
-            cardinality = ReferenceCardinality.AT_LEAST_ONE,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unsetDatasourceService"
-    )
-    protected void setDataSourceService(DataSourceService dataSourceService) {
+    @Reference(name = "carbon.datasource.service", service = DataSourceService.class, cardinality = ReferenceCardinality.AT_LEAST_ONE, policy = ReferencePolicy.DYNAMIC, unbind = "unsetDatasourceService") protected void setDataSourceService(
+            DataSourceService dataSourceService) {
         RDBMSClusterCoordinatorServiceHolder.setDataSourceService(dataSourceService);
     }
 

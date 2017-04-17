@@ -98,7 +98,8 @@ public class RDBMSCommunicationBusContextImpl implements CommunicationBusContext
         PreparedStatement preparedStatement = null;
         try {
             connection = getConnection();
-            preparedStatement = connection.prepareStatement(RDBMSConstants.CREATE_LEADER_STATUS_TABLE);
+            preparedStatement = connection
+                    .prepareStatement(RDBMSConstants.CREATE_LEADER_STATUS_TABLE);
             preparedStatement.execute();
             connection.commit();
         } catch (SQLException e) {
@@ -117,7 +118,8 @@ public class RDBMSCommunicationBusContextImpl implements CommunicationBusContext
         PreparedStatement preparedStatement = null;
         try {
             connection = getConnection();
-            preparedStatement = connection.prepareStatement(RDBMSConstants.CREATE_CLUSTER_NODE_STATUS_TABLE);
+            preparedStatement = connection
+                    .prepareStatement(RDBMSConstants.CREATE_CLUSTER_NODE_STATUS_TABLE);
             preparedStatement.execute();
             connection.commit();
         } catch (SQLException e) {
@@ -136,7 +138,8 @@ public class RDBMSCommunicationBusContextImpl implements CommunicationBusContext
         PreparedStatement preparedStatement = null;
         try {
             connection = getConnection();
-            preparedStatement = connection.prepareStatement(RDBMSConstants.CREATE_MEMBERSHIP_EVENT_TABLE);
+            preparedStatement = connection
+                    .prepareStatement(RDBMSConstants.CREATE_MEMBERSHIP_EVENT_TABLE);
             preparedStatement.execute();
             connection.commit();
         } catch (SQLException e) {
@@ -155,7 +158,8 @@ public class RDBMSCommunicationBusContextImpl implements CommunicationBusContext
         PreparedStatement preparedStatement = null;
         try {
             connection = getConnection();
-            preparedStatement = connection.prepareStatement(RDBMSConstants.CREATE_REMOVED_MEMBERS_TABLE);
+            preparedStatement = connection
+                    .prepareStatement(RDBMSConstants.CREATE_REMOVED_MEMBERS_TABLE);
             preparedStatement.execute();
             connection.commit();
         } catch (SQLException e) {

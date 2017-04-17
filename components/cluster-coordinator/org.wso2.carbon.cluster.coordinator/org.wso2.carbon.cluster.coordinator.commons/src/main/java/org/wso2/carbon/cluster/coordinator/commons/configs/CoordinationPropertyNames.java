@@ -22,13 +22,11 @@ public class CoordinationPropertyNames {
     /**
      * Name of the coordination strategy class.
      */
-    public static final String RDBMS_COORDINATION_STRATERGY =
-            "org.wso2.carbon.cluster.coordinator.rdbms.RDBMSCoordinationStrategy";
+    public static final String RDBMS_COORDINATION_STRATERGY = "org.wso2.carbon.cluster.coordinator.rdbms.RDBMSCoordinationStrategy";
     /**
      * Name of the coordination strategy class.
      */
-    public static final String ZOOKEEPER_COORDINATION_STRATERGY =
-            "org.wso2.carbon.cluster.coordinator.zookeeper.ZookeeperCoordinationStrategy";
+    public static final String ZOOKEEPER_COORDINATION_STRATERGY = "org.wso2.carbon.cluster.coordinator.zookeeper.ZookeeperCoordinationStrategy";
     /**
      * Coordination heartbeat interval property name which the nodes will be updating the database heartbeats.
      */
