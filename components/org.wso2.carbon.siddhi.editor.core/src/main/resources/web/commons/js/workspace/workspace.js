@@ -66,9 +66,10 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log', 'bootstrap', 'file_sav
             var filename = "untitled";
             var match = plan_regex.exec(code);
             if (match && match[1]) {
-                filename = match[1].replace(/ /g, "_") + ".siddhi";
+                filename = match[1].replace(/ /g, "_");
             }
             var filePath = prompt("Enter a directory (absolute path) to save the execution plan : ");
+            filename = filename + ".siddhi";
             filePath = (filePath.slice(-1) === '/') ? filePath + filename : filePath + '/' + filename;
             $.ajax({
                 type: "POST",
