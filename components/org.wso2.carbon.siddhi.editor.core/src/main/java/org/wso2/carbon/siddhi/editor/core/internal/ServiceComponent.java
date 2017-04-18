@@ -177,39 +177,6 @@ public class ServiceComponent implements Microservice {
             jsonString = new Gson().toJson(new GeneralResponse(Status.ERROR, t.getMessage()));
         }
         return Response.ok(jsonString, MediaType.APPLICATION_JSON)
-                .header("Access-Control-Allow-Origin", "*")
-                .build();
-    }
-
-    @POST
-    @Path("/save")
-    public Response saveExecutionPlan(String saveConfig) {
-        JSONObject jsonObject = new JSONObject(saveConfig);
-        String executionPlan = "", filePath = "";
-        try {
-            if (jsonObject.has("executionPlan") && !jsonObject.getString("executionPlan").isEmpty()) {
-                executionPlan = jsonObject.getString("executionPlan");
-            } else {
-                log.error("Execution Plan cannot be null or an empty value");
-            }
-            if (jsonObject.has("filePath") && !jsonObject.getString("filePath").isEmpty()) {
-                filePath = jsonObject.getString("filePath");
-            } else {
-                log.error("File Path cannot be null or an empty value");
-            }
-            if (!executionPlan.isEmpty() && !filePath.isEmpty()) {
-                try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-                        new FileOutputStream(filePath), "utf-8"))) {
-                    writer.write(executionPlan);
-                }
-                return Response.ok().entity("ok")
-                        .header("Access-Control-Allow-Origin", "*")
-                        .build();
-            }
-        } catch (Throwable ignored) {
-        }
-        return Response.serverError().entity("failed")
-                .header("Access-Control-Allow-Origin", "*")
                 .build();
     }
 
@@ -220,14 +187,16 @@ public class ServiceComponent implements Microservice {
         try {
             return Response.status(Response.Status.OK)
                     .entity(workspace.listRoots())
-                    .header("Access-Control-Allow-Origin", '*')
                     .type(MediaType.APPLICATION_JSON)
                     .build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed."+e.getMessage())
+                    .build();
         } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
         }
-        return Response.serverError().entity("failed")
-                .header("Access-Control-Allow-Origin", "*")
-                .build();
+
     }
 
     @GET
@@ -237,14 +206,15 @@ public class ServiceComponent implements Microservice {
         try {
             return Response.status(Response.Status.OK)
                     .entity(workspace.listDirectoriesInPath(new String(Base64.getDecoder().decode(path))))
-                    .header("Access-Control-Allow-Origin", '*')
                     .type(MediaType.APPLICATION_JSON)
                     .build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed."+e.getMessage())
+                    .build();
         } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
         }
-        return Response.serverError().entity("failed")
-                .header("Access-Control-Allow-Origin", "*")
-                .build();
     }
 
     @GET
@@ -254,14 +224,15 @@ public class ServiceComponent implements Microservice {
         try {
             return Response.status(Response.Status.OK)
                     .entity(workspace.exists(new String(Base64.getDecoder().decode(path))))
-                    .header("Access-Control-Allow-Origin", '*')
                     .type(MediaType.APPLICATION_JSON)
                     .build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed."+e.getMessage())
+                    .build();
         } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
         }
-        return Response.serverError().entity("failed")
-                .header("Access-Control-Allow-Origin", "*")
-                .build();
     }
 
     @GET
@@ -271,13 +242,14 @@ public class ServiceComponent implements Microservice {
         try {
             return Response.status(Response.Status.OK)
                     .entity(workspace.listFilesInPath(new String(Base64.getDecoder().decode(path))))
-                    .header("Access-Control-Allow-Origin", '*').type(MediaType.APPLICATION_JSON).build();
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed."+e.getMessage())
+                    .build();
         } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
         }
-        return Response.serverError().entity("failed")
-                .header("Access-Control-Allow-Origin", "*")
-                .build();
-
     }
 
     @POST
@@ -307,13 +279,15 @@ public class ServiceComponent implements Microservice {
                     + new String(base64ConfigName)), base64Config);
             JsonObject entity = new JsonObject();
             entity.addProperty(STATUS, SUCCESS);
-            return Response.status(Response.Status.OK).entity(entity).header("Access-Control-Allow-Origin", '*')
+            return Response.status(Response.Status.OK).entity(entity)
                     .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed."+e.getMessage())
+                    .build();
         } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
         }
-        return Response.serverError().entity("failed")
-                .header("Access-Control-Allow-Origin", "*")
-                .build();
     }
 
     @POST
@@ -323,12 +297,14 @@ public class ServiceComponent implements Microservice {
         try {
             return Response.status(Response.Status.OK)
                     .entity(workspace.read(new String(path)))
-                    .header("Access-Control-Allow-Origin", '*').type(MediaType.APPLICATION_JSON).build();
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed."+e.getMessage())
+                    .build();
         } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
         }
-        return Response.serverError().entity("failed")
-                .header("Access-Control-Allow-Origin", "*")
-                .build();
     }
 
     @GET
@@ -340,7 +316,6 @@ public class ServiceComponent implements Microservice {
 
         String jsonString = new Gson().toJson(response);
         return Response.ok(jsonString, MediaType.APPLICATION_JSON)
-                .header("Access-Control-Allow-Origin", "*")
                 .build();
     }
 

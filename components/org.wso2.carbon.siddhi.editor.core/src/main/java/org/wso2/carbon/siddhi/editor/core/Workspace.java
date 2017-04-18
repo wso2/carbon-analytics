@@ -23,25 +23,82 @@ import com.google.gson.JsonObject;
 import java.io.IOException;
 
 /**
- * Interface for the workspace.
+ * Interface for the workspace related functionality.
  */
 public interface Workspace {
 
+    /**
+     * List the roots of the system
+     * @return array of directories
+     * @throws IOException
+     */
       JsonArray listRoots() throws IOException;
 
+    /**
+     * List of directories in the path
+     * @param path provided path
+     * @return array of directories
+     * @throws IOException
+     */
       JsonArray listDirectoriesInPath(String path) throws IOException;
 
+    /**
+     * List of files in the path
+     * @param path provided path
+     * @return array of files
+     * @throws IOException
+     */
       JsonArray listFilesInPath(String path) throws IOException;
 
+    /**
+     * Whether file exist
+     * @param path provided path
+     * @return json object
+     * @throws IOException
+     */
       JsonObject exists(String path) throws IOException;
 
+    /**
+     * create file or directory
+     * @param path provided path
+     * @param type type of artifact eg:folder
+     * @throws IOException
+     */
       void create(String path, String type) throws IOException;
 
+    /**
+     * delete file or directory
+     * @param path provided path
+     * @param type type of artifact eg:folder
+     * @throws IOException
+     */
       void delete(String path, String type) throws IOException;
 
+    /**
+     * Write content
+     * @param path provided path
+     * @param content provided content to be saved
+     * @throws IOException
+     */
       void write(String path, String content) throws IOException;
 
+    /**
+     * Read content
+     * @param path provided path
+     * @return content read
+     * @throws IOException
+     */
       JsonObject read(String path) throws IOException;
 
+    /**
+     *
+     * @param logger
+     * @param timestamp
+     * @param level
+     * @param URL
+     * @param message
+     * @param layout
+     * @throws IOException
+     */
       void log(String logger, String timestamp, String level, String URL, String message, String layout) throws IOException;
 }
