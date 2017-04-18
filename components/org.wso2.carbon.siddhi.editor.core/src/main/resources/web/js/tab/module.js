@@ -15,24 +15,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-define(['require', 'backbone', 'app/source-editor/editor'],
-function (require, Backbone, SiddhiEditor) {
-
-    var SourceView = Backbone.View.extend({
-        initialize: function (options) {
-            this.options = options;
-            this.mainEditor = new SiddhiEditor({
-                divID: options.sourceContainer,
-                realTimeValidation: true,
-                autoCompletion: true
-            });
-        },
-        render: function (options) {
-            this.mainEditor.setContent(options.source);
-            $(this.options.sourceContainer).show();
+define(['./tab', './tab-list', './service-tab', './service-tab-list'],
+    function (Tab, TabList, ServiceTab, ServiceTabList) {
+        return  {
+            Tab: Tab,
+            TabList: TabList,
+            ServiceTab: ServiceTab,
+            ServiceTabList: ServiceTabList
         }
     });
 
-    return SourceView;
-});

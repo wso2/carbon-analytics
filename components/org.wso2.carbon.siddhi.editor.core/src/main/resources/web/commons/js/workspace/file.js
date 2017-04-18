@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -20,25 +20,97 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
     var File = Backbone.Model.extend(
         {
             defaults: {
-                path: 'unsaved/',
-                isTemp: true,
-                isPersisted: false
+                path: 'temp',
+                name: 'untitled',
+                content: undefined,
+                isPersisted: false,
+                lastPersisted: _.now(),
+                isDirty: true
             },
 
             initialize: function (attrs, options) {
                 var errMsg;
-                if (_.isEqual(this.get('isPersisted'), false)){
+                if (!this.get('isPersisted')){
                     if(!_.has(options, 'storage')){
                         errMsg = 'unable to find storage' + _.toString(attrs);
                         log.error(errMsg);
                         throw errMsg;
                     }
-                    var storage = _.get(options, 'storage');
-                    if(!_.isUndefined(storage.create(this))){
-                        this.set('isPersisted', true);
-                    }
+                    this._storage = _.get(options, 'storage');
+                    this._storage .create(this);
                 }
+            },
+
+            save: function(){
+                if(!_.isNil(this._storage.get(this.id))){
+                    this._storage.update(this);
+                } else {
+                    this._storage.create(this);
+                }
+                return this;
+            },
+
+            setPath: function(path){
+                this.set('path', path);
+                return this;
+            },
+
+            setStorage: function(storage){
+                this._storage = storage;
+                return this;
+            },
+
+            setPersisted: function(isPersisted){
+                this.set('isPersisted', isPersisted);
+                return this;
+            },
+
+            setLastPersisted: function(lsatPersisted){
+                this.set('lastPersisted', lsatPersisted);
+                return this;
+            },
+
+            setDirty: function(isDirty){
+                this.set('isDirty', isDirty);
+                this.trigger('dirty-state-change', isDirty);
+                return this;
+            },
+
+            setName: function(name){
+                this.set('name', name);
+                return this;
+            },
+
+            setContent: function(name){
+                this.set('content', name);
+                return this;
+            },
+
+            getPath: function(){
+                return this.get('path')
+            },
+
+            getName: function(){
+                return this.get('name')
+            },
+
+            getContent: function(){
+                return this.get('content')
+            },
+
+            getLastPersisted: function(){
+                return this.get('lastPersisted');
+            },
+
+
+            isPersisted: function(){
+                return this.get('isPersisted')
+            },
+
+            isDirty: function(){
+                return this.get('isDirty')
             }
+
         });
 
     return File;

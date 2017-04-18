@@ -16,23 +16,16 @@
  * under the License.
  */
 
-define(['require', 'backbone', 'app/source-editor/editor'],
-function (require, Backbone, SiddhiEditor) {
-
-    var SourceView = Backbone.View.extend({
-        initialize: function (options) {
-            this.options = options;
-            this.mainEditor = new SiddhiEditor({
-                divID: options.sourceContainer,
-                realTimeValidation: true,
-                autoCompletion: true
-            });
-        },
-        render: function (options) {
-            this.mainEditor.setContent(options.source);
-            $(this.options.sourceContainer).show();
-        }
-    });
-
-    return SourceView;
+define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog'],
+    function (SaveToFileDialog,ReplaceConfirmDialog,OpenFileDialog) {
+    return {
+        save_to_file_dialog: SaveToFileDialog,
+        //FolderOpenDialog: FolderOpenDialog,
+        //NewItemDialog: NewItemDialog,
+        //DeleteItemDialog: DeleteItemDialog,
+        open_file_dialog: OpenFileDialog,
+        //CloseConfirmDialog: CloseConfirmDialog,
+        ReplaceConfirmDialog: ReplaceConfirmDialog
+        //SettingsDialog: SettingsDialog
+    };
 });

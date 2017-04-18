@@ -113,8 +113,6 @@
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
         </carbon.component>
-        <checkstyle.skip>true</checkstyle.skip>
-        <findbugs.skip>true</findbugs.skip>
     </properties>
 
     <build>
@@ -127,6 +125,8 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+
     </build>
 
     <repositories>
