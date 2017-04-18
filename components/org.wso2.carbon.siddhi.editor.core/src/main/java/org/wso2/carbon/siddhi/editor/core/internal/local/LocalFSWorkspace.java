@@ -127,23 +127,30 @@ public class LocalFSWorkspace implements Workspace {
 
     @Override
     public void log(String loggerID, String timestamp, String level,
-                    String URL, String message, String layout) throws IOException {
+            String URL, String message, String layout) throws IOException {
         Logger frontEndLog = LoggerFactory.getLogger(loggerID);
         String logMessage = "client-timestamp: " + timestamp + ", page: " + URL + ", message: " + message;
-        switch (level){
-            case "TRACE"    : frontEndLog.trace(logMessage);
-                break;
-            case "DEBUG"    : frontEndLog.debug(logMessage);
-                break;
-            case "INFO"     : frontEndLog.info(logMessage);
-                break;
-            case "WARN"     : frontEndLog.warn(logMessage);
-                break;
-            case "ERROR"    : frontEndLog.error(logMessage);
-                break;
-            case "FATAL"    : frontEndLog.error(logMessage);
-                break;
-                default     : frontEndLog.debug(logMessage);
+        switch (level) {
+        case "TRACE":
+            frontEndLog.trace(logMessage);
+            break;
+        case "DEBUG":
+            frontEndLog.debug(logMessage);
+            break;
+        case "INFO":
+            frontEndLog.info(logMessage);
+            break;
+        case "WARN":
+            frontEndLog.warn(logMessage);
+            break;
+        case "ERROR":
+            frontEndLog.error(logMessage);
+            break;
+        case "FATAL":
+            frontEndLog.error(logMessage);
+            break;
+        default:
+            frontEndLog.debug(logMessage);
         }
 
     }
