@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.internal;
 
-
+import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
@@ -29,11 +29,13 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.response.GeneralResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.MetaDataResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
 import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResponse;
+import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.MetaDataHolder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
@@ -53,14 +55,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -76,7 +84,15 @@ import com.google.gson.Gson;
 @Path("/editor")
 public class ServiceComponent implements Microservice {
     private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
+    private static final String FILE_SEPARATOR = "file.separator";
+    private static final String STATUS = "status";
+    private static final String SUCCESS = "success";
     private ServiceRegistration serviceRegistration;
+    private Workspace workspace;
+
+    public ServiceComponent(){
+        workspace = new LocalFSWorkspace();
+    }
 
     private File getResourceAsFile(String resourcePath) {
         try {
@@ -190,6 +206,124 @@ public class ServiceComponent implements Microservice {
                         .header("Access-Control-Allow-Origin", "*")
                         .build();
             }
+        } catch (Throwable ignored) {
+        }
+        return Response.serverError().entity("failed")
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
+    }
+
+    @GET
+    @Path("/workspace/root")
+    @Produces("application/json")
+    public Response root() {
+        try {
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.listRoots())
+                    .header("Access-Control-Allow-Origin", '*')
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (Throwable ignored) {
+        }
+        return Response.serverError().entity("failed")
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
+    }
+
+    @GET
+    @Path("/workspace/list")
+    @Produces("application/json")
+    public Response directoriesInPath(@QueryParam("path") String path) {
+        try {
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.listDirectoriesInPath(new String(Base64.getDecoder().decode(path))))
+                    .header("Access-Control-Allow-Origin", '*')
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (Throwable ignored) {
+        }
+        return Response.serverError().entity("failed")
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
+    }
+
+    @GET
+    @Path("/workspace/exists")
+    @Produces("application/json")
+    public Response pathExists(@QueryParam("path") String path) {
+        try {
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.exists(new String(Base64.getDecoder().decode(path))))
+                    .header("Access-Control-Allow-Origin", '*')
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (Throwable ignored) {
+        }
+        return Response.serverError().entity("failed")
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
+    }
+
+    @GET
+    @Path("/workspace/listFiles")
+    @Produces("application/json")
+    public Response filesInPath(@QueryParam("path") String path) {
+        try {
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.listFilesInPath(new String(Base64.getDecoder().decode(path))))
+                    .header("Access-Control-Allow-Origin", '*').type(MediaType.APPLICATION_JSON).build();
+        } catch (Throwable ignored) {
+        }
+        return Response.serverError().entity("failed")
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
+
+    }
+
+    @POST
+    @Path("/workspace/write")
+    @Produces("application/json")
+    public Response write(String payload) {
+        try {
+            String location = "";
+            String configName = "";
+            String config = "";
+            Matcher locationMatcher = Pattern.compile("location=(.*?)&configName").matcher(payload);
+            while (locationMatcher.find()) {
+                location = locationMatcher.group(1);
+            }
+            Matcher configNameMatcher = Pattern.compile("configName=(.*?)&").matcher(payload);
+            while (configNameMatcher.find()) {
+                configName = configNameMatcher.group(1);
+            }
+            String[] splitConfigContent = payload.split("config=");
+            if (splitConfigContent.length > 1){
+                config = splitConfigContent[1];
+            }
+            byte[] base64Config = Base64.getDecoder().decode(config);
+            byte[] base64ConfigName = Base64.getDecoder().decode(configName);
+            byte[] base64Location = Base64.getDecoder().decode(location);
+            Files.write(Paths.get(new String(base64Location) + System.getProperty(FILE_SEPARATOR)
+                    + new String(base64ConfigName)), base64Config);
+            JsonObject entity = new JsonObject();
+            entity.addProperty(STATUS, SUCCESS);
+            return Response.status(Response.Status.OK).entity(entity).header("Access-Control-Allow-Origin", '*')
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (Throwable ignored) {
+        }
+        return Response.serverError().entity("failed")
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
+    }
+
+    @POST
+    @Path("/workspace/read")
+    @Produces("application/json")
+    public Response read(String path) {
+        try {
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.read(new String(path)))
+                    .header("Access-Control-Allow-Origin", '*').type(MediaType.APPLICATION_JSON).build();
         } catch (Throwable ignored) {
         }
         return Response.serverError().entity("failed")

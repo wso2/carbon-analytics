@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,9 +16,9 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'backbone', 'lodash','log','./design', "./source"],
+define(['require', 'jquery', 'backbone', 'lodash','log','./design', "./source",'ace/ace','../constants'],
 
-    function (require, $, Backbone,  _, log, DesignView, SourceView) {
+    function (require, $, Backbone,  _, log, DesignView, SourceView,ace,constants) {
 
     var ServicePreview = Backbone.View.extend(
         /** @lends ServicePreview.prototype */
@@ -40,6 +40,7 @@ define(['require', 'jquery', 'backbone', 'lodash','log','./design', "./source"],
             }
             this._$parent_el = container;
             this.options = options;
+            this.editor = undefined;
 
          },
 
@@ -61,8 +62,11 @@ define(['require', 'jquery', 'backbone', 'lodash','log','./design', "./source"],
             //use this line to assign dynamic id for canvas and pass the canvas id to initialize jsplumb
             canvasContainer.attr('id', 'canvasId1');
 
+            var dynamicId = sourceContainer.attr('id') + this._$parent_el.attr('id');
+            sourceContainer.attr("id",dynamicId);
+
             var sourceViewOptions = {
-                sourceContainer: sourceContainer.attr('id')
+                sourceContainer: dynamicId
             };
 
             var sourceView = new SourceView(sourceViewOptions);
@@ -72,7 +76,18 @@ define(['require', 'jquery', 'backbone', 'lodash','log','./design', "./source"],
             toolPallette.addClass('hide-div');
             tabContentContainer.removeClass('tab-content-default');
             sourceView.render(sourceViewOptions);
+
+            var editor = ace.edit(dynamicId);
+            editor.setValue(constants.INITIAL_SOURCE_INSTRUCTIONS);
+            editor.resize(true);
+            this.editor = editor;
+        },
+
+        getContent: function () {
+            var editor = this.editor;
+            return editor.getValue();
         }
+
     });
     return ServicePreview;
 });

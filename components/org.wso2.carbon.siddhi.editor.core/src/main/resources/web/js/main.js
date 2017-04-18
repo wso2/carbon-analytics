@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,69 +18,73 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','workspace','app/tab/service-tab-list','app/tool-palette/tool-palette'
 
-    /* void modules */ ],
+        /* void modules */ ],
 
     function (require, log, $, _, Backbone, MenuBar,CommandManager,Workspace,TabController,ToolPalette) {
 
-    var Application = Backbone.View.extend(
-    /** @lends Application.prototype */
-    {
-        /**
-         * @augments Backbone.View
-         * @constructs
-         * @class Application wraps all the application logic and it is the main starting point.
-         * @param {Object} config configuration options for the application
-         */
-        initialize: function (config) {
-            //this.validateConfig(config);
-            this.config = config;
-            this.initComponents();
-        },
+        var Application = Backbone.View.extend(
+            /** @lends Application.prototype */
+            {
+                /**
+                 * @augments Backbone.View
+                 * @constructs
+                 * @class Application wraps all the application logic and it is the main starting point.
+                 * @param {Object} config configuration options for the application
+                 */
+                initialize: function (config) {
+                    //this.validateConfig(config);
+                    this.config = config;
+                    this.initComponents();
+                },
 
-        initComponents: function(){
+                initComponents: function(){
 
-            // init command manager
-            this.commandManager = new CommandManager();
+                    // init command manager
+                    this.commandManager = new CommandManager(this);
 
-            //init workspace manager
-            this.workspaceManager = new Workspace.Manager(this);
+                    //init menu bar
+                    var menuBarOpts = _.get(this.config, "menu_bar");
+                    _.set(menuBarOpts, 'application', this);
+                    this.menuBar = new MenuBar(menuBarOpts);
 
-            // init breadcrumbs controller
-            //this.breadcrumbController = new BreadcrumbController(_.get(this.config, "breadcrumbs"));
+                    //init workspace manager
+                    this.workspaceManager = new Workspace.Manager(this);
 
-            //init file browser
+                    this.browserStorage = new Workspace.BrowserStorage('dasToolingTempStorage');
+
+
+
+                    // init breadcrumbs controller
+                    //this.breadcrumbController = new BreadcrumbController(_.get(this.config, "breadcrumbs"));
+
+                    //init file browser
 //            var fileBrowserOpts = _.get(this.config, "file_browser");
 //            _.set(fileBrowserOpts, 'application', this);
 //            this.fileBrowser = new FileBrowser(fileBrowserOpts);
 
-            //init tool palette
-            var toolPaletteOpts = _.get(this.config, "tab_controller.tool_palette");
-            _.set(toolPaletteOpts, 'application', this);
+                    //init tool palette
+                    var toolPaletteOpts = _.get(this.config, "tab_controller.tool_palette");
+                    _.set(toolPaletteOpts, 'application', this);
 
 
-            this.toolPalette = new ToolPalette(toolPaletteOpts);
+                    this.toolPalette = new ToolPalette(toolPaletteOpts);
 
-            //init tab controller
-            var tabControlOpts = _.get(this.config, "tab_controller");
-            _.set(tabControlOpts, 'application', this);
+                    //init tab controller
+                    var tabControlOpts = _.get(this.config, "tab_controller");
+                    _.set(tabControlOpts, 'application', this);
 
-            // tab controller will take care of rendering tool palette
-            _.set(tabControlOpts, 'toolPalette', this.toolPalette);
-            this.tabController = new TabController(tabControlOpts);
+                    // tab controller will take care of rendering tool palette
+                    _.set(tabControlOpts, 'toolPalette', this.toolPalette);
+                    this.tabController = new TabController(tabControlOpts);
 
-            //init tab controller
+                    //init tab controller
 //            var tabControlOpts = _.get(this.config, "tab_controller");
 //            _.set(tabControlOpts, 'application', this);
 //            // tab controller will take care of rendering tool palette
 //            _.set(tabControlOpts, 'toolPalette', this.toolPalette);
 //            this.eventManager = new Event();
 //            this.tabController = new TabController(tabControlOpts);
-
-            //init menu bar
-            var menuBarOpts = _.get(this.config, "menu_bar");
-            _.set(menuBarOpts, 'application', this);
-            this.menuBar = new MenuBar(menuBarOpts);
-        },
+                },
 
 //        validateConfig: function(config){
 //            if(!_.has(config, 'services.workspace.endpoint')){
@@ -102,14 +106,14 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
 //            }
 //        },
 
-        render: function () {
-            log.debug("start: rendering menu_bar control");
-            this.menuBar.render();
-            log.debug("end: rendering menu_bar control");
+                render: function () {
+                    log.debug("start: rendering menu_bar control");
+                    this.menuBar.render();
+                    log.debug("end: rendering menu_bar control");
 
-            log.debug("start: rendering tab controller");
-            this.tabController.render();
-            log.debug("end: rendering tab controller");
+                    log.debug("start: rendering tab controller");
+                    this.tabController.render();
+                    log.debug("end: rendering tab controller");
 
 //            log.debug("start: rendering breadcrumbs control");
 //            this.breadcrumbController.render();
@@ -122,23 +126,48 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
 //            log.debug("start: rendering tab controller");
 //            this.tabController.render();
 //            log.debug("end: rendering tab controller");
-//
+
 //            var tab = this.tabController.newTab();
 //            this.tabController.newTab();
-        },
+                },
 
-        applicationConstants: function() {
-            var constants = {
-                messageLinkType: {
-                    OutOnly : 1,
-                    InOut : 2
+                getOperatingSystem: function(){
+                    var operatingSystem = "Unknown OS";
+                    if (navigator.appVersion.indexOf("Win") != -1) {
+                        operatingSystem = "Windows";
+                    }
+                    else if (navigator.appVersion.indexOf("Mac") != -1) {
+                        operatingSystem = "MacOS";
+                    }
+                    else if (navigator.appVersion.indexOf("X11") != -1) {
+                        operatingSystem = "UNIX";
+                    }
+                    else if (navigator.appVersion.indexOf("Linux") != -1) {
+                        operatingSystem = "Linux";
+                    }
+                    return operatingSystem;
+                },
+
+                isRunningOnMacOS: function(){
+                    return _.isEqual(this.getOperatingSystem(), 'MacOS');
+                },
+
+                getPathSeperator: function(){
+                    return _.isEqual(this.getOperatingSystem(), 'Windows') ? '\\' : '/' ;
+                },
+
+                applicationConstants: function() {
+                    var constants = {
+                        messageLinkType: {
+                            OutOnly : 1,
+                            InOut : 2
+                        }
+                    };
+
+                    return constants;
                 }
-            };
 
-            return constants;
-        }
+            });
 
+        return Application;
     });
-
-    return Application;
-});

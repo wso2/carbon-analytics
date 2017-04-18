@@ -16,23 +16,18 @@
  * under the License.
  */
 
-define(['require', 'backbone', 'app/source-editor/editor'],
-function (require, Backbone, SiddhiEditor) {
+define(function() {
 
-    var SourceView = Backbone.View.extend({
-        initialize: function (options) {
-            this.options = options;
-            this.mainEditor = new SiddhiEditor({
-                divID: options.sourceContainer,
-                realTimeValidation: true,
-                autoCompletion: true
-            });
-        },
-        render: function (options) {
-            this.mainEditor.setContent(options.source);
-            $(this.options.sourceContainer).show();
-        }
-    });
+    "use strict";   // JS strict mode
 
-    return SourceView;
+    /**
+     * Constants used by the tool - editor
+     */
+    var constants = {
+        INITIAL_SOURCE_INSTRUCTIONS: "@Plan:name(\"ExecutionPlan\")\n\n" +
+            "-- Please refer to https://docs.wso2.com/display/DAS400/Quick+Start+Guide " +
+            "on getting started with DAS editor. \n\n"
+    };
+
+    return constants;
 });

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['lodash', 'backbone', 'log'], function (_, Backbone, log) {
+define(['lodash', 'backbone', 'log', 'mousetrap'], function (_, Backbone, log, Mousetrap) {
 
     // command manager constructor
     /**
@@ -26,7 +26,7 @@ define(['lodash', 'backbone', 'log'], function (_, Backbone, log) {
         // not reinventing the wheel - reusing event-bus impl provided in backbone models
         var CommandBus = Backbone.Model.extend({}),
             commandBus = new CommandBus(),
-            commands = {};
+            commands = [];
 
         /**
          * Register a command.
@@ -35,11 +35,24 @@ define(['lodash', 'backbone', 'log'], function (_, Backbone, log) {
          * @param options key-bindings etc.
          */
         this.registerCommand = function (cmd, options) {
-            if (!_.has(commands, cmd)) {
-                _.set(commands, cmd, options);
+            if (_.isEqual(_.findIndex(commands,  ['id', cmd.id]), -1)) {
+                var command = {id: cmd};
+                if(_.has(options, 'shortcuts')){
+                    _.set(command, 'shortcuts', _.get(options, 'shortcuts'))
+                }
+                commands.push(command);
                 log.debug("Command: " + cmd +
                     " is registered.");
-                //TODO: create key-bindings etc. for the command
+                // do shortcut key bindings
+                if(_.has(options, 'shortcuts')){
+                    var shortcuts = _.get(options, 'shortcuts'),
+                        key = app.isRunningOnMacOS() ? shortcuts.mac.key : shortcuts.other.key;
+                    Mousetrap.bind(key, function(e) {
+                        commandBus.trigger(cmd);
+                        e.preventDefault();
+                        e.stopPropagation();
+                    });
+                }
             } else {
                 log.error("Command: " + cmd +
                     " is already registered. ");
@@ -53,8 +66,8 @@ define(['lodash', 'backbone', 'log'], function (_, Backbone, log) {
          *
          */
         this.unRegisterCommand = function (cmd) {
-            if (_.has(commands, cmd)) {
-                _.unset(commands, cmd);
+            if (!_.isEqual(_.findIndex(commands,  ['id', cmd.id]), -1)) {
+                _.remove(commands, ['id', cmd.id]);
                 //remove all handlers for the command
                 commandBus.off(cmd, null, app);
                 log.debug("Command: " + cmd +
@@ -70,14 +83,14 @@ define(['lodash', 'backbone', 'log'], function (_, Backbone, log) {
          *
          * @param cmd  String command ID
          * @param handler
+         * @param context this context for the handler, default is app instance
          */
-        this.registerHandler = function (cmd, handler) {
-            if(!_.has(commands, cmd)){
-                var error = "No such registered command found. Command: " + cmd;
-                log.error(error);
-                throw error;
+        this.registerHandler = function (cmd, handler, context) {
+            if(_.isEqual(_.findIndex(commands,  ['id', cmd]), -1)){
+                var message = "No such registered command found. Command: " + cmd;
+                log.debug(message);
             }
-            commandBus.on(cmd, handler, app);
+            commandBus.on(cmd, handler, context || app);
         };
 
         /**
@@ -108,6 +121,10 @@ define(['lodash', 'backbone', 'log'], function (_, Backbone, log) {
                 var triggerFn = commandBus.trigger;
                 triggerFn.apply(commandBus, triggerArgs);
             }
+        };
+
+        this.getCommands = function(){
+            return commands;
         };
     }
 });

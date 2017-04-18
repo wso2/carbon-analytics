@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -79,6 +79,9 @@ define(['log', 'backbone'], function (log, Backbone) {
         getHeader: function(){
             return this._tabHeader;
         },
+        getContentContainer: function(){
+            return this.$el.get(0);
+        },
         getParent: function(){
             return this._parentTabList;
         },
@@ -86,7 +89,11 @@ define(['log', 'backbone'], function (log, Backbone) {
             this._parentTabList = parentTabList;
         },
         getTitle: function(){
-            return "untitled";
+            return _.isNil(this._title) ? "untitled" : this._title;
+        },
+        setTitle: function(title){
+            this._title = title;
+            this.trigger('title-changed', title);
         }
     });
 

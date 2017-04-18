@@ -16,23 +16,11 @@
  * under the License.
  */
 
-define(['require', 'backbone', 'app/source-editor/editor'],
-function (require, Backbone, SiddhiEditor) {
+define(['file_menu', 'edit_menu'], function (FileMenu, EditMenu) {
+    var menuBar = {};
 
-    var SourceView = Backbone.View.extend({
-        initialize: function (options) {
-            this.options = options;
-            this.mainEditor = new SiddhiEditor({
-                divID: options.sourceContainer,
-                realTimeValidation: true,
-                autoCompletion: true
-            });
-        },
-        render: function (options) {
-            this.mainEditor.setContent(options.source);
-            $(this.options.sourceContainer).show();
-        }
-    });
+    menuBar[FileMenu.id] = FileMenu;
+    menuBar[EditMenu.id] = EditMenu;
 
-    return SourceView;
+    return menuBar;
 });
