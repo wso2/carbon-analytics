@@ -83,7 +83,7 @@ define(function() {
         SNIPPET_MANAGER: "ace/snippets",
         LANG_TOOLS: "ace/ext/language_tools",
         SIDDHI_MODE: "ace/mode/siddhi",
-        DEFAULT_THEME: "ace/theme/crimson_editor",
+        DEFAULT_THEME: "ace/theme/twilight",
         ACE_RANGE: "ace/range",
         LANG_LIB: "ace/lib/lang",
         TOKEN_TOOLTIP: "ace/token/tooltips"
