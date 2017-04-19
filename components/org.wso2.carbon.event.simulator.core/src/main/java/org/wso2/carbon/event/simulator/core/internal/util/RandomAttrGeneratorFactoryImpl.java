@@ -7,6 +7,7 @@ import org.wso2.carbon.event.simulator.core.internal.generator.random.util.Custo
 import org.wso2.carbon.event.simulator.core.internal.generator.random.util.PrimitiveBasedAttrGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.util.PropertyBasedAttrGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.util.RegexBasedAttrGenerator;
+import org.wso2.siddhi.query.api.definition.Attribute;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
@@ -15,7 +16,8 @@ import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperation
  */
 public class RandomAttrGeneratorFactoryImpl implements RandomAttrGeneratorFactory {
     @Override
-    public RandomAttributeGenerator getRandomAttrGenerator(JSONObject attributeConfig) throws InvalidConfigException {
+    public RandomAttributeGenerator getRandomAttrGenerator(JSONObject attributeConfig, Attribute.Type attrType) throws
+            InvalidConfigException {
         if (checkAvailability(attributeConfig, EventSimulatorConstants.RANDOM_DATA_GENERATOR_TYPE)) {
             RandomAttributeGenerator.RandomDataGeneratorType type;
             /*
@@ -40,7 +42,7 @@ public class RandomAttrGeneratorFactoryImpl implements RandomAttrGeneratorFactor
                     randomAttributeGenerator = new CustomBasedAttrGenerator(attributeConfig);
                     break;
                 case PRIMITIVE_BASED:
-                    randomAttributeGenerator = new PrimitiveBasedAttrGenerator(attributeConfig);
+                    randomAttributeGenerator = new PrimitiveBasedAttrGenerator(attributeConfig, attrType);
                     break;
                 case PROPERTY_BASED:
                     randomAttributeGenerator = new PropertyBasedAttrGenerator(attributeConfig);

@@ -89,4 +89,9 @@ public class RegexBasedAttrGenerator implements RandomAttributeGenerator {
         Generex generex = new Generex(regexBasedAttrConfig.getPattern());
         return generex.random();
     }
+
+    @Override
+    public String getAttributeConfiguration() {
+        return regexBasedAttrConfig.toString();
+    }
 }

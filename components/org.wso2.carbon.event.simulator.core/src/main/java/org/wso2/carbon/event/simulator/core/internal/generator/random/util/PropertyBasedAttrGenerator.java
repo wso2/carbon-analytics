@@ -262,6 +262,11 @@ public class PropertyBasedAttrGenerator implements RandomAttributeGenerator {
         return dataValue;
     }
 
+    @Override
+    public String getAttributeConfiguration() {
+        return propertyBasedAttrConfig.toString();
+    }
+
     /**
      * Property enum specifies the attributes that can be randomly generates using the random data generator library
      */

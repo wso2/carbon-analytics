@@ -22,13 +22,13 @@ package org.wso2.carbon.event.simulator.core.internal.util;
  */
 public class EventSimulatorConstants {
     public static final String DIRECTORY_NAME = "eventSimulator";
+    public static final String DIRECTORY_SIMULATION_CONFIGS = "simulationConfigs";
 
     public static final String EVENT_SIMULATION_PROPERTIES = "properties";
     public static final String EVENT_SIMULATION_NAME = "simulationName";
     public static final String EVENT_SIMULATION_SOURCES = "sources";
-    public static final String TIMESTAMP_ATTRIBUTE = "timestampAttribute";
-    public static final String TIMESTAMP_START_TIME = "timestampStartTime";
-    public static final String TIMESTAMP_END_TIME = "timestampEndTime";
+    public static final String START_TIMESTAMP = "startTimestamp";
+    public static final String END_TIMESTAMP = "endTimestamp";
     public static final String SIMULATION_TIME_INTERVAL = "timeInterval";
     public static final String NUMBER_OF_EVENTS_REQUIRED = "noOfEvents";
 
@@ -39,13 +39,12 @@ public class EventSimulatorConstants {
     public static final String SINGLE_EVENT_TIMESTAMP = "timestamp";
     public static final String SINGLE_EVENT_DATA = "data";
 
-
-    //RandomDataSimulation constants
+    // source configuration constants
     public static final String EVENT_SIMULATION_TYPE = "simulationType";
     public static final String STREAM_NAME = "streamName";
-    public static final String TIME_INTERVAL = "timeInterval";
-    public static final String ATTRIBUTE_CONFIGURATION = "attributeConfiguration";
     public static final String EXECUTION_PLAN_NAME = "executionPlanName";
+    public static final String TIMESTAMP_ATTRIBUTE = "timestampAttribute";
+    public static final String TIMESTAMP_INTERVAL = "timestampInterval";
 
     //file simulation constants
     public static final String FILE_NAME = "fileName";
@@ -54,14 +53,15 @@ public class EventSimulatorConstants {
 
 
     //Random data simulation constants
+    public static final String ATTRIBUTE_CONFIGURATION = "attributeConfiguration";
     public static final String RANDOM_DATA_GENERATOR_TYPE = "type";
-    public static final String PROPERTY_BASED_ATTRIBUTE_PROPERTY = "property";
-    public static final String REGEX_BASED_ATTRIBUTE_PATTERN = "pattern";
-    public static final String PRIMITIVE_BASED_ATTRIBUTE_TYPE = "primitiveType";
+    public static final String CUSTOM_DATA_BASED_ATTRIBUTE_LIST = "list";
     public static final String PRIMITIVE_BASED_ATTRIBUTE_MIN = "min";
     public static final String PRIMITIVE_BASED_ATTRIBUTE_MAX = "max";
     public static final String PRIMITIVE_BASED_ATTRIBUTE_LENGTH = "length";
-    public static final String CUSTOM_DATA_BASED_ATTRIBUTE_LIST = "list";
+    public static final String PRIMITIVE_BASED_ATTRIBUTE_PRECISION = "precision";
+    public static final String PROPERTY_BASED_ATTRIBUTE_PROPERTY = "property";
+    public static final String REGEX_BASED_ATTRIBUTE_PATTERN = "pattern";
 
     //    Database simulation constants
     public static final String DRIVER = "driver";

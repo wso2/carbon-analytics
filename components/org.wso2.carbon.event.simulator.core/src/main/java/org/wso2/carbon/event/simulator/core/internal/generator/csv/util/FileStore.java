@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
-import org.wso2.msf4j.formparam.FileInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +38,6 @@ import java.util.stream.Collectors;
  * @see FileUploader
  */
 public class FileStore {
-
     private static final Logger log = LoggerFactory.getLogger(FileStore.class);
     private static final FileStore fileStore = new FileStore();
     /**
@@ -56,7 +54,6 @@ public class FileStore {
              * if the 'tmp' directory doesn't already have a directory called 'eventSimulator', create new directory
              * load all the names of csv files in 'tmp/eventSimulator' to fileNameList
              * */
-//          todo  use url dont upload, check size
             boolean dirCreated = new File(Paths.get(System.getProperty("java.io.tmpdir"),
                     EventSimulatorConstants.DIRECTORY_NAME).toString()).mkdirs();
             if (dirCreated && log.isDebugEnabled()) {
@@ -94,10 +91,10 @@ public class FileStore {
     /**
      * Method to add file data into in memory
      *
-     * @param fileInfo FileInfo Object which holds the details of file
+     * @param filename name of file uploaded
      */
-    public void addFile(FileInfo fileInfo) {
-        fileNameList.add(fileInfo.getFileName());
+    public void addFile(String filename) {
+        fileNameList.add(filename);
     }
 
     /**

@@ -85,4 +85,14 @@ public class DBSimulationDTO extends StreamConfigurationDTO {
         this.columnNames = columns;
     }
 
+    @Override
+    public String toString() {
+        return getStreamConfiguration() +
+                "\n driver : " + driver +
+                "\n dataSourceLocation : " + dataSourceLocation +
+                "\n username : " + username +
+                "\n password : " + password +
+                "\n tableName : " + tableName +
+                "\n columnNames : " + columnNames + "\n";
+    }
 }

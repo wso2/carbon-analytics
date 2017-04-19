@@ -56,4 +56,12 @@ public class CSVSimulationDTO extends StreamConfigurationDTO {
     public void setIsOrdered(boolean ordered) {
         isOrdered = ordered;
     }
+
+    @Override
+    public String toString() {
+        return getStreamConfiguration() +
+                "\n fileName : " + fileName +
+                "\n delimiter : " + delimiter +
+                "\n isOrdered : " + isOrdered + "\n";
+    }
 }

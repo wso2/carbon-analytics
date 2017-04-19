@@ -9,8 +9,8 @@ public class SimulationPropertiesDTO {
     private String simulationName;
     private long timeInterval;
     private int noOfEventsRequired;
-    private long timestampStartTime;
-    private long timestampEndTime;
+    private long startTimestamp;
+    private long endTimestamp;
 
     public String getSimulationName() {
         return simulationName;
@@ -36,19 +36,20 @@ public class SimulationPropertiesDTO {
         this.noOfEventsRequired = noOfEventsRequired;
     }
 
-    public long getTimestampStartTime() {
-        return timestampStartTime;
+    public long getStartTimestamp() {
+        return startTimestamp;
     }
 
-    public void setTimestampStartTime(long timestampStartTime) {
-        this.timestampStartTime = timestampStartTime;
+    public void setStartTimestamp(long startTimestamp) {
+        this.startTimestamp = startTimestamp;
     }
 
-    public long getTimestampEndTime() {
-        return timestampEndTime;
+    public long getEndTimestamp() {
+        return endTimestamp;
     }
 
-    public void setTimestampEndTime(long timestampEndTime) {
-        this.timestampEndTime = timestampEndTime;
+    public void setEndTimestamp(long endTimestamp) {
+        this.endTimestamp = endTimestamp;
     }
+
 }

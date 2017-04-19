@@ -53,7 +53,7 @@ public class CustomBasedAttrGenerator implements RandomAttributeGenerator {
             Gson gson = new Gson();
             ArrayList dataValues = gson.fromJson(attributeConfig.
                     getJSONArray(EventSimulatorConstants.CUSTOM_DATA_BASED_ATTRIBUTE_LIST).toString(), ArrayList.class);
-            customBasedAttrConfig.setCustomData(dataValues.toArray(new String[dataValues.size()]));
+            customBasedAttrConfig.setCustomData(dataValues);
             if (log.isDebugEnabled()) {
                 log.debug("Set data list for custom based random simulation.");
             }
@@ -65,9 +65,7 @@ public class CustomBasedAttrGenerator implements RandomAttributeGenerator {
     }
 
     /**
-     * Generate data with in given data list
-     * <p>
-     * Initialize Random to select random element from array
+     * generateAttribute() generate data with in given data list
      *
      * @return generated data from custom data list
      */
@@ -78,7 +76,17 @@ public class CustomBasedAttrGenerator implements RandomAttributeGenerator {
          * the data element in the randomElementSelector's position will be assigned to result and returned
          * */
         Random random = new Random();
-        int randomElementSelector = random.nextInt(customBasedAttrConfig.getCustomDataList().length);
-        return customBasedAttrConfig.getCustomDataList()[randomElementSelector];
+        int randomElementSelector = random.nextInt(customBasedAttrConfig.getCustomDataList().size());
+        return customBasedAttrConfig.getCustomDataList().get(randomElementSelector);
+    }
+
+    /**
+     * getAttributeConfiguration(0 returns attribute configuration used for custom based attribute configuration
+     *
+     * @return attribute configuration
+     * */
+    @Override
+    public String getAttributeConfiguration() {
+        return customBasedAttrConfig.toString();
     }
 }

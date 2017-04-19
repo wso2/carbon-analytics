@@ -82,10 +82,6 @@
             <groupId>org.json.wso2</groupId>
             <artifactId>json</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.org.antlr</groupId>
-            <artifactId>antlr4-runtime</artifactId>
-        </dependency>
 
         <!-- Dependencies for CSV event simulation begins here-->
         <dependency>
@@ -100,11 +96,7 @@
 
         <!--Dependencies for random event simulation begins here-->
         <dependency>
-            <groupId>com.github.javafaker</groupId>
-            <artifactId>javafaker</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.azakordonets</groupId>
+            <groupId>com.github.azakordonets.wso2</groupId>
             <artifactId>fabricator_2.10</artifactId>
         </dependency>
         <!--Dependencies for random event simulation ends here-->
@@ -135,7 +127,7 @@
         </import.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
-            osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="8"
+            osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="7"
         </carbon.component>
     </properties>
 

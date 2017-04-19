@@ -95,4 +95,12 @@ public class PrimitiveBasedAttributeDTO implements RandomAttributeDTO {
         this.length = length;
     }
 
+    @Override
+    public String toString() {
+        return "Primitive based attribute generation {" +
+                "\n type : " + attrType +
+                "\n min : " + min +
+                "\n max : " + max +
+                "\n length : " + length + "\n}\n";
+    }
 }

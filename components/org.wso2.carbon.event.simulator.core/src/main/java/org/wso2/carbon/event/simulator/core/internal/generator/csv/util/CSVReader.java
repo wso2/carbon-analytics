@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
+import org.wso2.carbon.event.simulator.core.internal.bean.CSVSimulationDTO;
 import org.wso2.carbon.event.simulator.core.internal.util.EventConverter;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.siddhi.core.event.Event;
@@ -52,7 +53,6 @@ public class CSVReader {
     private Reader fileReader = null;
     private BufferedReader bufferedReader = null;
     private CSVParser csvParser = null;
-    private String fileName;
     private long lineNumber = 0;
 
     /**
@@ -62,7 +62,6 @@ public class CSVReader {
      */
     public CSVReader(String fileName, Boolean isOrdered) {
         try {
-            this.fileName = fileName;
             if (new File(String.valueOf(Paths.get(System.getProperty("java" +
                     ".io.tmpdir"), EventSimulatorConstants.DIRECTORY_NAME, fileName))).length() == 0) {
                 throw new EventGenerationException("File '" + fileName + "' is empty.");
@@ -77,7 +76,7 @@ public class CSVReader {
             }
         } catch (IOException e) {
             log.error("Error occurred when initializing file reader for CSV file '" + fileName + "' : ", e);
-            closeParser(isOrdered);
+            closeParser(fileName, isOrdered);
             throw new SimulatorInitializationException("Error occurred when initializing file reader for CSV file '" +
                     fileName + "' : ", e);
         }
@@ -87,24 +86,22 @@ public class CSVReader {
     /**
      * If the CSV file is ordered by timestamp, this method reads the next line and produces an event
      *
-     * @param streamName         stream being simulated
+     * @param csvConfig configuration of CSV simulation
      * @param streamAttributes   list of attributes of the stream to which events are produced
-     * @param delimiter          delimiter to be used when parsing CSV file
-     * @param timestampPosition  column to be used as timestamp
      * @param timestampStartTime start timestamp of event simulation
      * @param timestampEndTime   end timestamp of event simulation
      * @return event produced
      */
-    public Event getNextEvent(String streamName, List<Attribute> streamAttributes, String delimiter,
-                              int timestampPosition, long timeInterval, long timestampStartTime,
+    public Event getNextEvent(CSVSimulationDTO csvConfig, List<Attribute> streamAttributes, long timestampStartTime,
                               long timestampEndTime) {
         Event event = null;
+        int timestampPosition = Integer.parseInt(csvConfig.getTimestampAttribute());
         try {
             while (true) {
                 lineNumber++;
                 String line = bufferedReader.readLine();
                 if (line != null) {
-                    ArrayList<String> attributes = new ArrayList<>(Arrays.asList(line.split(delimiter)));
+                    ArrayList<String> attributes = new ArrayList<>(Arrays.asList(line.split(csvConfig.getDelimiter())));
                     long timestamp;
 //                    if the line does not have sufficient data to produce an event, move to next line
                     if (timestampPosition == -1) {
@@ -113,11 +110,15 @@ public class CSVReader {
                              * if timestamp attribute is not specified, take timestampStartTime as the first event
                              * timestamp and the successive timestamps will be lastTimetstamp + timeInterval
                              * */
-                            timestamp = timestampStartTime + (lineNumber - 1) * timeInterval;
+                            timestamp = timestampStartTime + (lineNumber - 1) * csvConfig.getTimestampInterval();
+                            if (timestampEndTime != -1 && timestamp > timestampEndTime) {
+                                break;
+                            }
                         } else {
-                            log.warn("Simulation of stream '" + streamName + "' requires " + streamAttributes.size() +
-                                    " attribute(s) but number of attributes found in line " + lineNumber + " of " +
-                                    "file '" + fileName + "' is " + attributes.size() + ". Line content : '" +
+                            log.warn("Simulation of stream '" + csvConfig.getStreamName() + "' using source " +
+                                    "configuration " + csvConfig.toString() + "requires " + streamAttributes.size() +
+                                    " attribute(s) but number of attributes found in line " + lineNumber + " of file '"
+                                    + csvConfig.getFileName() + "' is " + attributes.size() + ". Line content : '" +
                                     attributes + "'. Ignore line and read next line.");
                             continue;
                         }
@@ -141,27 +142,36 @@ public class CSVReader {
                                 continue;
                             }
                         } else {
-                            log.warn("Simulation of stream '" + streamName + "' requires " +
+                            log.warn("Simulation of stream '" + csvConfig.getStreamName() + "' using source " +
+                                    "configuration : " + csvConfig.toString() + "requires " +
                                     (streamAttributes.size() + 1) + " attribute(s) but number of attributes found in " +
-                                    "line " + lineNumber + " of file '" + fileName + "' is " + attributes.size() + "" +
-                                    ". Line content : '" + attributes + "'. Ignore line and read " +
+                                    "line " + lineNumber + " of file '" + csvConfig.getFileName() + "' is " +
+                                    attributes.size() + ". Line content : '" + attributes + "'. Ignore line and read " +
                                     "next line.");
                             continue;
                         }
                     }
                     String[] eventAttributes = attributes.toArray(new String[streamAttributes.size()]);
-                    event = EventConverter.eventConverter(streamAttributes, eventAttributes, timestamp);
+                    try {
+                        event = EventConverter.eventConverter(streamAttributes, eventAttributes, timestamp);
+                    } catch (EventGenerationException e) {
+                        log.error("Error occurred when generating event using CSV event " +
+                                "generator to simulate stream '" + csvConfig.getStreamName() + "' using source " +
+                                "configuration : " + csvConfig.toString() + ". Drop event and create next event. ", e);
+                        continue;
+                    }
                     break;
                 } else {
                     break;
                 }
             }
         } catch (IOException e) {
-            log.error("Error occurred when reading CSV file '" + fileName + "' to simulate stream '" + streamName +
-                    "' :", e);
-            closeParser(true);
-            throw new EventGenerationException("Error occurred when reading CSV file '" + fileName + "' to simulate" +
-                    " stream '" + streamName + "' :", e);
+            log.error("Error occurred when reading CSV file '" + csvConfig.getFileName() + "' to simulate stream '" +
+                    csvConfig.getStreamName() + "' using source configuration : " + csvConfig.toString(), e);
+            closeParser(csvConfig.getFileName(), true);
+            throw new EventGenerationException("Error occurred when reading CSV file '" + csvConfig.getFileName() +
+                    "' to simulate stream '" + csvConfig.getStreamName() + "' using source configuration : " +
+                    csvConfig.toString(), e);
         }
         return event;
     }
@@ -170,27 +180,27 @@ public class CSVReader {
     /**
      * If the CSV is not ordered by timestamp, getEventsMap() method is used to create a treeMap of events.
      *
-     * @param delimiter          delimiter to be used when parsing CSV file
-     * @param streamName         stream being simulated
+     * @param csvConfig configuration of csv simulation
      * @param streamAttributes   list of attributes of the stream to which events are produced
-     * @param timestampPosition  column to be used as timestamp
      * @param timestampStartTime start timestamp of event simulation
      * @param timestampEndTime   end timestamp of event simulation
      * @return treeMap of events
      */
-    public TreeMap<Long, ArrayList<Event>> getEventsMap(String delimiter, String streamName,
-                                                        List<Attribute> streamAttributes, int timestampPosition,
+    public TreeMap<Long, ArrayList<Event>> getEventsMap(CSVSimulationDTO csvConfig, List<Attribute> streamAttributes,
                                                         long timestampStartTime, long timestampEndTime) {
         try {
-            csvParser = parseFile(delimiter);
-            return createEventsMap(streamName, streamAttributes, timestampPosition, timestampStartTime,
+            csvParser = parseFile(csvConfig.getDelimiter());
+            return createEventsMap(csvConfig, streamAttributes, timestampStartTime,
                     timestampEndTime);
         } catch (IOException e) {
-            log.error("Error occurred when initializing CSVParser for CSV file '" + fileName + "' : ", e);
-            throw new EventGenerationException("Error occurred when initializing CSVParser for CSV file '" + fileName +
-                    "' : ", e);
+            log.error("Error occurred when initializing CSVParser for CSV file '" + csvConfig.getFileName() + "' to " +
+                            "simulate stream '" + csvConfig.getStreamName() + "' using source configuration : " +
+                            csvConfig.toString(), e);
+            throw new EventGenerationException("Error occurred when initializing CSVParser for CSV file '" +
+                    csvConfig.getFileName() + "' to simulate stream '" + csvConfig.getStreamName() + "' using source " +
+                    "configuration : " + csvConfig.toString(), e);
         } finally {
-            closeParser(false);
+            closeParser(csvConfig.getFileName(), false);
         }
     }
 
@@ -220,18 +230,20 @@ public class CSVReader {
      * The key of the treeMap will be the event timestamp and the value will be an array list of events belonging to
      * the timestamp.
      *
-     * @param streamName         stream being simulated
+     * @param csvConfig configuration of csv simulation
      * @param streamAttributes   list of attributes of the stream to which events are produced
-     * @param timestampPosition  column to be used as timestamp
      * @param timestampStartTime start timestamp of event simulation
      * @param timestampEndTime   end timestamp of event simulation
      * @return a treeMap of events
      */
-    private TreeMap<Long, ArrayList<Event>> createEventsMap(String streamName, List<Attribute> streamAttributes,
-                                                            int timestampPosition, long timestampStartTime, long
-                                                                    timestampEndTime) {
+    private TreeMap<Long, ArrayList<Event>> createEventsMap(CSVSimulationDTO csvConfig,
+                                                            List<Attribute> streamAttributes,
+                                                            long timestampStartTime, long timestampEndTime) {
         TreeMap<Long, ArrayList<Event>> eventsMap = new TreeMap<>();
+
+        int timestampPosition = Integer.parseInt(csvConfig.getTimestampAttribute());
         long lineNumber;
+        Event event;
         if (csvParser != null) {
             for (CSVRecord record : csvParser) {
                 lineNumber = csvParser.getCurrentLineNumber();
@@ -254,7 +266,14 @@ public class CSVReader {
                         if (timestampEndTime == -1 || timestamp <= timestampEndTime) {
                             attributes.remove(timestampPosition);
                             String[] eventData = attributes.toArray(new String[streamAttributes.size()]);
-                            Event event = EventConverter.eventConverter(streamAttributes, eventData, timestamp);
+                            try {
+                                event = EventConverter.eventConverter(streamAttributes, eventData, timestamp);
+                            } catch (EventGenerationException e) {
+                                log.error("Error occurred when generating event using CSV event generator to simulate" +
+                                        " stream '" + csvConfig.getStreamName() + "' using source configuration : " +
+                                        csvConfig.toString() + ". Drop event and create next event. ", e);
+                                continue;
+                            }
                             if (!eventsMap.containsKey(timestamp)) {
                                 eventsMap.put(timestamp, new ArrayList<>(Collections.singletonList(event)));
                             } else {
@@ -263,16 +282,17 @@ public class CSVReader {
                         }
                     }
                 } else {
-                    log.warn("Simulation of stream '" + streamName + "' requires " + (streamAttributes.size() + 1) +
-                            " attributes. Number of attributes in line " + lineNumber + " of CSV file '" +
-                            fileName + "' is " + record.size() + ". Line content : " + record.toString() + ". " +
-                            "Ignore line an read next line");
+                    log.warn("Simulation of stream '" + csvConfig.getStreamName() + "' using source configuration " +
+                            csvConfig.toString() + "requires " + (streamAttributes.size() + 1) + " attributes." +
+                            " Number of attributes in line " + lineNumber + " of CSV file '" + csvConfig.getFileName() +
+                            "' is " + record.size() + ". Line content : " + record.toString() + ". Ignore line an " +
+                            "read next line");
                 }
             }
         }
         if (log.isDebugEnabled()) {
-            log.debug("Create an ordered events map from CSV file '" + fileName + "' to simulate stream '" +
-                    streamName + "'.");
+            log.debug("Create an ordered events map from CSV file '" + csvConfig.getFileName() + "' to simulate " +
+                    "stream '" + csvConfig.getStreamName() + "'.");
         }
         return eventsMap;
     }
@@ -283,7 +303,7 @@ public class CSVReader {
      *
      * @param isOrdered bool indicating whether the entries in CSV file are ordered or not
      */
-    public void closeParser(Boolean isOrdered) {
+    public void closeParser(String fileName, boolean isOrdered) {
         try {
             if (fileReader != null) {
                 fileReader.close();

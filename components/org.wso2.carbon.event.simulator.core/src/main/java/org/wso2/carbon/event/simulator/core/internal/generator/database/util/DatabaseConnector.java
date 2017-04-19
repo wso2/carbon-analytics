@@ -157,7 +157,6 @@ public class DatabaseConnector {
              * else close resources and throw an exception indicating that the table is not available in the data source
              * if an SQL exception occurs while checking whether the table exists close resources and throw an exception
              * */
-//            todo R check about the schema
             ResultSet tableResults = metaData.getTables(null, null, tableName, null);
             if (tableResults.isBeforeFirst()) {
                 if (log.isDebugEnabled()) {
@@ -197,22 +196,19 @@ public class DatabaseConnector {
              * if not, close resources used and throw exception
              * if an SQL exception occurs while validating column names, close resources and throw an exception
              * */
-//            todo R check about the schema and check whether the getcolumns.isbeforefirst is needed
             ResultSet columnResults =
                     metaData.getColumns(null, null, tableName, null);
-            if (columnResults.isBeforeFirst()) {
-                List<String> resulsetColumns = new ArrayList<>();
-                while (columnResults.next()) {
-                    resulsetColumns.add(columnResults.getString("COLUMN_NAME"));
-                }
-                columnNames.forEach(columnName -> {
-                    if (!resulsetColumns.contains(columnName)) {
-                        closeConnection();
-                        throw new EventGenerationException("Column '" + columnName + "' does not exist in table '" +
-                                tableName + "' in data source '" + dataSourceLocation + "'.");
-                    }
-                });
+            List<String> resulsetColumns = new ArrayList<>();
+            while (columnResults.next()) {
+                resulsetColumns.add(columnResults.getString("COLUMN_NAME"));
             }
+            columnNames.forEach(columnName -> {
+                if (!resulsetColumns.contains(columnName)) {
+                    closeConnection();
+                    throw new EventGenerationException("Column '" + columnName + "' does not exist in table '" +
+                            tableName + "' in data source '" + dataSourceLocation + "'.");
+                }
+            });
         } catch (SQLException e) {
             log.error("Error occurred when validating whether the columns ' " +
                     columnNames + "' exists in table '" + tableName + "' in the data source '" +

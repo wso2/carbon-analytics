@@ -13,10 +13,12 @@ public interface RandomAttributeGenerator {
 
     Object generateAttribute();
 
+    String getAttributeConfiguration();
+
     /**
      * enum RandomDataGeneratorType specifies the random simulation types supported
      **/
-    public enum RandomDataGeneratorType {
+    enum RandomDataGeneratorType {
         PRIMITIVE_BASED, PROPERTY_BASED, REGEX_BASED, CUSTOM_DATA_BASED
     }
 

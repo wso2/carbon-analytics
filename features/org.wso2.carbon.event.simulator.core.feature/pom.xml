@@ -92,20 +92,17 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
-            <version>${apache.commons.csv.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
         </dependency>
         <!-- Dependencies for CSV event simulations ends here-->
 
         <!--Dependencies for random event simulation begins here-->
         <dependency>
-            <groupId>com.github.javafaker</groupId>
-            <artifactId>javafaker</artifactId>
-            <version>${javafaker.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.azakordonets</groupId>
+            <groupId>com.github.azakordonets.wso2</groupId>
             <artifactId>fabricator_2.10</artifactId>
-            <version>${fabricator.wso2v1.version}</version>
         </dependency>
         <!--Dependencies for random event simulation ends here-->
 
@@ -113,7 +110,6 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.connector.version}</version>
         </dependency>
 
     </dependencies>
@@ -230,6 +226,10 @@
                                 <bundle>
                                     <symbolicName>org.apache.commons.csv</symbolicName>
                                     <version>${apache.commons.csv.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.apache.commons.fileupload</symbolicName>
+                                    <version>${apache.commons.fileupload.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>com.mysql.jdbc</symbolicName>

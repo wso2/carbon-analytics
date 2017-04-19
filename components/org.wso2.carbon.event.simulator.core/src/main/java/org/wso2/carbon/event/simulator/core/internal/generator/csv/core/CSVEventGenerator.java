@@ -97,6 +97,10 @@ public class CSVEventGenerator implements EventGenerator {
                         " stream '" + csvConfiguration.getStreamName() + "'.");
             }
         } else {
+            log.error("Error occurred when initializing CSV event generator" +
+                    " for file '" + csvConfiguration.getFileName() + "' to simulate stream '"
+                    + csvConfiguration.getStreamName() + "'. Execution plan '" +
+                    csvConfiguration.getExecutionPlanName() + "' has not been deployed.");
             throw new SimulatorInitializationException("Error occurred when initializing CSV event generator" +
                     " for file '" + csvConfiguration.getFileName() + "' to simulate stream '"
                     + csvConfiguration.getStreamName() + "'. Execution plan '" +
@@ -116,14 +120,12 @@ public class CSVEventGenerator implements EventGenerator {
          * and assign the first event of the least timestamp as the nextEvent of the generator
          * */
         if (csvConfiguration.getIsOrdered()) {
-            nextEvent = csvReader.getNextEvent(csvConfiguration.getStreamName(), streamAttributes,
-                    csvConfiguration.getDelimiter(), Integer.parseInt(csvConfiguration.getTimestampAttribute()),
-                    csvConfiguration.getTimeInterval(), timestampStartTime, timestampEndTime);
+            nextEvent = csvReader.getNextEvent(csvConfiguration, streamAttributes, timestampStartTime,
+                    timestampEndTime);
         } else {
             currentTimestampEvents = new ArrayList<>();
             eventsMap = new TreeMap<>();
-            eventsMap = csvReader.getEventsMap(csvConfiguration.getDelimiter(), csvConfiguration.getStreamName(),
-                    streamAttributes, Integer.parseInt(csvConfiguration.getTimestampAttribute()), timestampStartTime,
+            eventsMap = csvReader.getEventsMap(csvConfiguration, streamAttributes, timestampStartTime,
                     timestampEndTime);
             currentTimestampEvents = eventsMap.pollFirstEntry().getValue();
             nextEvent = currentTimestampEvents.get(0);
@@ -141,7 +143,7 @@ public class CSVEventGenerator implements EventGenerator {
      */
     @Override
     public void stop() {
-        csvReader.closeParser(csvConfiguration.getIsOrdered());
+        csvReader.closeParser(csvConfiguration.getFileName(), csvConfiguration.getIsOrdered());
         if (log.isDebugEnabled()) {
             log.debug("Stop CSV generator for file '" + csvConfiguration.getFileName() + "' for stream '" +
                     csvConfiguration.getStreamName() + "'.");
@@ -212,9 +214,8 @@ public class CSVEventGenerator implements EventGenerator {
          * else, assign the next event with current timestamp as nextEvent of generator
          */
         if (csvConfiguration.getIsOrdered()) {
-            nextEvent = csvReader.getNextEvent(csvConfiguration.getStreamName(), streamAttributes,
-                    csvConfiguration.getDelimiter(), Integer.parseInt(csvConfiguration.getTimestampAttribute()),
-                    csvConfiguration.getTimeInterval(), timestampStartTime, timestampEndTime);
+            nextEvent = csvReader.getNextEvent(csvConfiguration, streamAttributes, timestampStartTime,
+                    timestampEndTime);
         } else {
             getNextEventForCurrentTimestamp();
         }
@@ -316,7 +317,7 @@ public class CSVEventGenerator implements EventGenerator {
          * if both timestamp attribute and time interval are not specified set time interval to 1 second
          * */
         String timestampAttribute = "-1";
-        long timeInterval = -1;
+        long timestampInterval = -1;
         /**
          * since the isOrdered timestamp will be retrieved only if the timestamp attribute is specified, set the
          * isOrdered = true, since if the CSV file doesnt have a timestamp attribute, then the default value of the
@@ -338,9 +339,9 @@ public class CSVEventGenerator implements EventGenerator {
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid source " +
                         "configuration : " + sourceConfig.toString());
             }
-        } else if (checkAvailability(sourceConfig, EventSimulatorConstants.TIME_INTERVAL)) {
-            timeInterval = sourceConfig.getLong(EventSimulatorConstants.TIME_INTERVAL);
-            if (timeInterval < 0) {
+        } else if (checkAvailability(sourceConfig, EventSimulatorConstants.TIMESTAMP_INTERVAL)) {
+            timestampInterval = sourceConfig.getLong(EventSimulatorConstants.TIMESTAMP_INTERVAL);
+            if (timestampInterval < 0) {
                 throw new InvalidConfigException("Time interval for CSV simulation of stream '" +
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' must be positive. " +
                         "Invalid source configuration : " + sourceConfig.toString());
@@ -349,7 +350,7 @@ public class CSVEventGenerator implements EventGenerator {
             log.warn("Either timestamp end time or time interval is required for CSV simulation of stream '" +
                     sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Time interval will " +
                     "be set to 1 second for source configuration : " + sourceConfig.toString());
-            timeInterval = 1000;
+            timestampInterval = 1000;
         }
         if (!checkAvailability(sourceConfig, EventSimulatorConstants.DELIMITER)) {
             throw new InvalidConfigException("Delimiter is required for CSV simulation of stream '" +
@@ -374,9 +375,14 @@ public class CSVEventGenerator implements EventGenerator {
         csvSimulationConfig.setExecutionPlanName(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME));
         csvSimulationConfig.setFileName(sourceConfig.getString(EventSimulatorConstants.FILE_NAME));
         csvSimulationConfig.setTimestampAttribute(timestampAttribute);
-        csvSimulationConfig.setTimeInterval(timeInterval);
+        csvSimulationConfig.setTimestampInterval(timestampInterval);
         csvSimulationConfig.setDelimiter((String) sourceConfig.get(EventSimulatorConstants.DELIMITER));
         csvSimulationConfig.setIsOrdered(isOrdered);
         return csvSimulationConfig;
+    }
+
+    @Override
+    public String toString() {
+        return csvConfiguration.toString();
     }
 }

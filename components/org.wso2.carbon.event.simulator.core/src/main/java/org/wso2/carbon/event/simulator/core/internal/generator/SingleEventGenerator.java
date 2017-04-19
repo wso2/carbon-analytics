@@ -48,6 +48,7 @@ public class SingleEventGenerator {
                 .getStreamAttributes(singleEventConfig.getExecutionPlanName(),
                         singleEventConfig.getStreamName());
         if (streamAttributes == null) {
+            log.error("Execution plan '" + singleEventConfig.getExecutionPlanName() + "' has not been deployed");
             throw new EventGenerationException("Execution plan '" + singleEventConfig.getExecutionPlanName()
                     + "' has not been deployed");
         }
@@ -61,18 +62,20 @@ public class SingleEventGenerator {
          * else, throw an exception
          * */
         if (singleEventConfig.getAttributeValues().length == streamAttributes.size()) {
-            Event event;
             try {
-                event = EventConverter.eventConverter(streamAttributes,
+                Event event = EventConverter.eventConverter(streamAttributes,
                         singleEventConfig.getAttributeValues(),
                         singleEventConfig.getTimestamp());
                 EventSimulatorDataHolder.getInstance().getEventStreamService().pushEvent(
                         singleEventConfig.getExecutionPlanName(),
                         singleEventConfig.getStreamName(), event);
             } catch (EventGenerationException e) {
-                log.error("Error occurred during single event simulation of stream '" +
+                log.error("Event dropped due to an error that occurred during single event simulation of stream '" +
                         singleEventConfig.getStreamName() + "' for configuration '" + singleEventConfig.toString() +
-                        "'. " + e.getMessage(), e);
+                        "'. ", e);
+                throw new EventGenerationException("Event dropped due to an error that occurred during single event " +
+                        "simulation of stream '" + singleEventConfig.getStreamName() + "' for configuration '" +
+                        singleEventConfig.toString() + "'. ", e);
             }
         } else {
             throw new InsufficientAttributesException("Simulation of stream '" + singleEventConfig
@@ -117,14 +120,16 @@ public class SingleEventGenerator {
                             "'. Invalid configuration provided : " + singleEventConfig.toString());
                 }
             } else {
-                throw new InvalidConfigException("Timestamp value is required for single event simulation of stream '"
+                log.warn("Timestamp value is required for single event simulation of stream '"
                         + singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid " +
                         "configuration provided : " + singleEventConfig.toString());
+                timestamp = System.currentTimeMillis();
             }
-            Object[] attributeValues;
+            ArrayList dataValues;
             if (checkAvailabilityOfArray(singleEventConfig, EventSimulatorConstants.SINGLE_EVENT_DATA)) {
-                attributeValues = (new Gson().fromJson(singleEventConfig.getJSONArray(EventSimulatorConstants
-                        .SINGLE_EVENT_DATA).toString(), ArrayList.class)).toArray();
+
+                dataValues = new Gson().fromJson(singleEventConfig.getJSONArray(EventSimulatorConstants
+                        .SINGLE_EVENT_DATA).toString(), ArrayList.class);
             } else {
                 throw new InvalidConfigException("Single event simulation requires a attribute value for " +
                         "stream '" + singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid " +
@@ -135,7 +140,7 @@ public class SingleEventGenerator {
             singleEventSimulationDTO.setExecutionPlanName(singleEventConfig
                     .getString(EventSimulatorConstants.EXECUTION_PLAN_NAME));
             singleEventSimulationDTO.setTimestamp(timestamp);
-            singleEventSimulationDTO.setAttributeValues(attributeValues);
+            singleEventSimulationDTO.setAttributeValues(dataValues.toArray());
             return singleEventSimulationDTO;
         } catch (JSONException e) {
             log.error("Error occurred when accessing stream configuration. ", e);

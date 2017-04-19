@@ -51,7 +51,8 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
      * @param attributeConfig JSON object of the primitive based attribute configuration
      * @throws InvalidConfigException if attribute configuration provided is invalid
      */
-    public PrimitiveBasedAttrGenerator(JSONObject attributeConfig) throws InvalidConfigException {
+    public PrimitiveBasedAttrGenerator(JSONObject attributeConfig, Attribute.Type attrType) throws
+            InvalidConfigException {
         /**
          * retrieve the primitive type that need to be produced by primitive based random data
          * generator.
@@ -68,17 +69,6 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
          * since Min and mx values are used by 4 primitive types, its saved as a string so that it could
          * later be parsed to the required primitive type
          **/
-        Attribute.Type attrType;
-        try {
-            attrType = Attribute.Type.valueOf(
-                    attributeConfig.getString(EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_TYPE));
-        } catch (IllegalArgumentException e) {
-            throw new InvalidConfigException("Invalid attribute type '" +
-                    attributeConfig.getString(EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_TYPE)
-                    + "' specified in attribute configuration for " +
-                    RandomAttributeGenerator.RandomDataGeneratorType.PRIMITIVE_BASED + "' simulation. Invalid " +
-                    "attribute configuration provided : " + attributeConfig.toString());
-        }
         primitiveBasedAttrConfig.setAttrType(attrType);
         switch (attrType) {
             case BOOL:
@@ -117,14 +107,13 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
                 if (checkAvailability(attributeConfig, EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_MIN)
                         && checkAvailability(attributeConfig, EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_MAX)
                         && checkAvailability(attributeConfig,
-                        EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_LENGTH)) {
+                        EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_PRECISION)) {
                     primitiveBasedAttrConfig.setMin(attributeConfig
                             .getString(EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_MIN));
                     primitiveBasedAttrConfig.setMax(attributeConfig
                             .getString(EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_MAX));
                     primitiveBasedAttrConfig.setLength(attributeConfig
-                            .getInt(EventSimulatorConstants
-                                    .PRIMITIVE_BASED_ATTRIBUTE_LENGTH));
+                            .getInt(EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_PRECISION));
                 } else {
                     throw new InvalidConfigException("Properties 'Min','Max' and 'Length' are " +
                             "required for generation of attributes of type '" + attrType + "' in " +
@@ -203,5 +192,10 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
                     primitiveBasedAttrConfig.toString() + "'. ", e);
         }
         return dataValue;
+    }
+
+    @Override
+    public String getAttributeConfiguration() {
+        return primitiveBasedAttrConfig.toString();
     }
 }
