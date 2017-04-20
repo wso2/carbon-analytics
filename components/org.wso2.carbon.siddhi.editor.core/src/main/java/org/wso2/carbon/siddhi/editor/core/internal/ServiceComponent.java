@@ -18,10 +18,8 @@
 
 package org.wso2.carbon.siddhi.editor.core.internal;
 
-import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -52,18 +50,15 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.Arrays;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
@@ -85,6 +80,7 @@ import javax.ws.rs.core.Response;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 
 @Component(
@@ -107,7 +103,7 @@ public class ServiceComponent implements Microservice {
                             .build()
             );
 
-    public ServiceComponent(){
+    public ServiceComponent() {
         workspace = new LocalFSWorkspace();
     }
 
@@ -207,7 +203,7 @@ public class ServiceComponent implements Microservice {
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -226,7 +222,7 @@ public class ServiceComponent implements Microservice {
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -244,7 +240,7 @@ public class ServiceComponent implements Microservice {
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -261,7 +257,7 @@ public class ServiceComponent implements Microservice {
                     .entity(workspace.listFilesInPath(new String(Base64.getDecoder().decode(path))))
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -286,7 +282,7 @@ public class ServiceComponent implements Microservice {
                 configName = configNameMatcher.group(1);
             }
             String[] splitConfigContent = payload.split("config=");
-            if (splitConfigContent.length > 1){
+            if (splitConfigContent.length > 1) {
                 config = splitConfigContent[1];
             }
             byte[] base64Config = Base64.getDecoder().decode(config);
@@ -299,7 +295,7 @@ public class ServiceComponent implements Microservice {
             return Response.status(Response.Status.OK).entity(entity)
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -316,7 +312,7 @@ public class ServiceComponent implements Microservice {
                     .entity(workspace.read(new String(path)))
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
