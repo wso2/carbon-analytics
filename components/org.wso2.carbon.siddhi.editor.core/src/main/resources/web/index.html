@@ -16,6 +16,7 @@
     <link href="/editor/commons/css/styles.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/menu-bar.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/tab-styles.css" rel="stylesheet" type="text/css"/>
+    <link href="/editor/commons/css/fileDialog.css" rel="stylesheet" type="text/css"/>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -87,17 +88,17 @@
                         <div class="row">
                             <!-- Start: service tabs -->
                             <div id="tabs-container" class="col-sm-12">
-                                <div class="tab-headers">
+                                <div class="tab-headers tab-headers-bar">
                                 </div>
-                                <div id="tab-content-wrapper" style="height: 100%;">
+                                <div id="tab-content-wrapper" class="grid-background" style="height: calc(100% - 20px);">
                                     <!-- Start: tool-palette -->
                                     <div id="tool-palette-container" style="display: none"></div>
                                     <!-- End: tool-palette -->
-                                    <div class="tab-content tab-content-default col-sm-12" style="height: 100%"></div>
-                                    <div class="notification-container" id="notification-container"
-                                         style="display: none"></div>
+                                    <div class="tab-content tab-content-default "></div>
+                                    <div class="notification-container" id="notification-container"></div>
                                 </div>
                             </div>
+
                         </div>
                         <!-- End: service tabs -->
                     </div>
@@ -307,78 +308,96 @@
 
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
 <script type="text/javascript">
-    requirejs.config({
+requirejs.config({
 //        baseUrl: window.location.protocol + "//" + window.location.host + window.location.pathname.split("/").slice(0, -1).join("/"),
-        baseUrl: window.location.protocol + "//" + window.location.host + '/editor',
-        paths: {
-            lib: "commons/lib",
-            app: "js",
-            commons_app: "commons",
-            /////////////////////////
-            // third party modules //
-            ////////////////////////
-            jquery: "commons/lib/jquery_v1.9.1/jquery-1.9.1.min",
-            jquery_ui: "commons/lib/jquery-ui_v1.12.1/jquery-ui",
-            bootstrap: "commons/lib/bootstrap_v3.3.6/js/bootstrap",
-            log4javascript: "commons/lib/log4javascript-1.4.13/log4javascript",
-            lodash: "commons/lib/lodash_v4.13.1/lodash",
-            backbone: "commons/lib/backbone_v1.3.3/backbone",
-            jsplumb: "commons/lib/jsplumb_v2.2.6/jsPlumb-2.2.6-min",
-            file_saver: "commons/lib/file_saver/FileSaver",
+    baseUrl: window.location.protocol + "//" + window.location.host + '/editor',
+    paths: {
+        lib: "commons/lib",
+        app: "js",
+        commons_app: "commons",
+        /////////////////////////
+        // third party modules //
+        ////////////////////////
+        jquery: "commons/lib/jquery_v1.9.1/jquery-1.9.1.min",
+        jquery_ui: "commons/lib/jquery-ui_v1.12.1/jquery-ui",
+        bootstrap: "commons/lib/bootstrap_v3.3.6/js/bootstrap",
+        log4javascript: "commons/lib/log4javascript-1.4.13/log4javascript",
+        lodash: "commons/lib/lodash_v4.13.1/lodash",
+        backbone: "commons/lib/backbone_v1.3.3/backbone",
+        jsplumb: "commons/lib/jsplumb_v2.2.6/jsPlumb-2.2.6-min",
+        file_saver: "commons/lib/file_saver/FileSaver",
+        mousetrap: "commons/lib/mousetrap_v1.6.0/mousetrap.min",
+        js_tree: "commons/lib/js-tree-v3.3.2/jstree",
 
-            //svg_pan_zoom: "commons/lib/svg-panNZoom/jquery.svg.pan.zoom",
-            //js_tree: "commons/lib/js-tree-v3.3.2/jstree",
-            //nano_scroller: "commons/lib/nanoscroller_0.8.7/jquery.nanoscroller.min",
-            theme_wso2: "commons/lib/theme-wso2_1.0/js/theme-wso2",
-            ace: "commons/lib/ace-editor",
-            //beautify: "commons/lib/beautify",
-            ///////////////////////
-            // custom modules ////
-            //////////////////////
-            log: "commons/js/log/log",
-            menu_bar_provider: "commons/js/stream-processor-menu-bar/module",
-            file_menu: "commons/js/stream-processor-menu-bar/file-menu",
-            edit_menu: "commons/js/stream-processor-menu-bar/edit-menu",
-            menu_bar: "commons/js/menu-bar/menu-bar",
-            tool_palette: "js/tool-palette/module",
-            tab: "js/tab/",
-            toolEditor: "js/tool-editor/module",
-            //d3utils: "commons/js/utils/d3-utils",
-            //diagram_core: "commons/js/diagram-core/module",
-            command: "commons/js/command/command",
-            workspace: "commons/js/workspace/workspace"
-            //event: "commons/js/event/event",
-            //main_elements: "commons/js/main-elements/module",
-            //processors: "commons/js/processors/module" ,
-            //tool_palette: "commons/js/tool-palette/module",
-            //file_browser: "commons/js/file-browser/file-browser",
+        //svg_pan_zoom: "commons/lib/svg-panNZoom/jquery.svg.pan.zoom",
+        //js_tree: "commons/lib/js-tree-v3.3.2/jstree",
+        //nano_scroller: "commons/lib/nanoscroller_0.8.7/jquery.nanoscroller.min",
+        theme_wso2: "commons/lib/theme-wso2_1.0/js/theme-wso2",
+        ace: "commons/lib/ace-editor",
+        //beautify: "commons/lib/beautify",
+        ///////////////////////
+        // custom modules ////
+        //////////////////////
+        log: "commons/js/log/log",
+        //menu_bar_provider: "commons/js/stream-processor-menu-bar/module",
+        //file_menu: "commons/js/stream-processor-menu-bar/file-menu",
+        //edit_menu: "commons/js/stream-processor-menu-bar/edit-menu",
+        menu_bar: "commons/js/menu-bar/menu-bar",
+        tool_palette: "js/tool-palette/module",
+        tab: "js/tab/",
+        toolEditor: "js/tool-editor/module",
+        //d3utils: "commons/js/utils/d3-utils",
+        //diagram_core: "commons/js/diagram-core/module",
+        command: "commons/js/command/command",
+        workspace: "commons/js/workspace/workspace",
+        event_channel: "commons/js/event/channel",
+        menu_group: "commons/js/menu-bar/menu-group",
+        menu_definitions: "commons/js/menu-bar/menu-definitions",
+        file_menu: "commons/js/menu-bar/file-menu",
+        edit_menu: "commons/js/menu-bar/edit-menu",
+        menu_item: "commons/js/menu-bar/menu-item",
+        file_browser: "commons/js/file-browser/file-browser"
+        //event: "commons/js/event/event",
+        //main_elements: "commons/js/main-elements/module",
+        //processors: "commons/js/processors/module" ,
+        //tool_palette: "commons/js/tool-palette/module",
 
-            //tool_bar: "commons/js/tool-bar/tool-bar",
-            //tab: "commons/js/tab/",
-            //alerts: "commons/js/utils/alerts",
-            //breadcrumbs: "commons/js/breadcrumbs/breadcrumbs",
-            //tree_node: "commons/js/ast/node"
+        //tool_bar: "commons/js/tool-bar/tool-bar",
+        //tab: "commons/js/tab/",
+        //alerts: "commons/js/utils/alerts",
+        //breadcrumbs: "commons/js/breadcrumbs/breadcrumbs",
+        //tree_node: "commons/js/ast/node"
+    },
+    map: {
+        "*": {
+            // use lodash instead of underscore
+            underscore: "lodash",
+            jQuery: "jquery"
+        }
+    },
+    packages: [
+        {
+            name: 'workspace',
+            location: 'commons/js/workspace',
+            main: 'module'
         },
-        map: {
-            "*": {
-                // use lodash instead of underscore
-                underscore: "lodash",
-                jQuery: "jquery"
+        {
+            name: 'dialogs',
+            location: 'commons/js/dialog',
+            main: 'module'
+        }
+    ]
+});
+
+require(['app/main'], function (Application) {
+    var app, config;
+    config = {
+        container: "#page-content",
+        services:   {
+            workspace:  {
+                endpoint: "http://localhost:9090/editor/workspace"
             }
         },
-        packages: [
-            {
-                name: 'workspace',
-                location: 'commons/js/workspace',
-                main: 'module'
-            }
-        ]
-    });
-
-    require(['app/main'], function (Application) {
-        var app, config;
-        config = {
-            container: "#page-content",
 //            services:   {
 //                workspace:  {
 //                    endpoint: "http://localhost:8289/service/workspace"
@@ -392,74 +411,130 @@
 //            tool_bar: {
 //                container: ""
 //            },
-            menu_bar: {
-                container: "#menu-bar-container",
+        menu_bar: {
+            container: "#menu-bar-container",
+            menu_group: {
+                menu_item: {
+                    cssClass: {
+                        label: "menu-label pull-left",
+                        shortcut: "shortcut-label pull-right",
+                        active: "menu-item-enabled",
+                        inactive: "menu-item-disabled"
+                    }
+                },
                 cssClass: {
-                    active: "active",
-                    menu: "dropdown-menu",
-                    item: "dropdown-toggle",
-                    menu_group: "menu-group"
+                    group: "menu-group file-menu-group",
+                    menu: "dropdown-menu file-dropdown-menu",
+                    toggle: "dropdown-toggle"
                 }
             },
-            tab_controller: {
-                container: "#tabs-container",
+            cssClass: {
+                menu_bar: "dropdown-menu file-dropdown-menu",
+                active: "active",
+                menu: "dropdown-menu",
+                item: "dropdown-toggle",
+                menu_group: "menu-group"
+            }
+        },
+        tab_controller: {
+            container: "#tabs-container",
 
-                headers: {
-                    // relative selector within container for tab controller
-                    container: ".tab-headers",
+            headers: {
+                // relative selector within container for tab controller
+                container: ".tab-headers",
+                cssClass: {
+                    list: 'nav nav-tabs',
+                    item: 'nav-tab-header',
+                    active: 'active'
+                }
+            },
+            tabs: {
+                // relative selector within container for tab controller
+                container: ".tab-content",
+                tab: {
+                    template: "#tab-template",
                     cssClass: {
-                        list: 'nav nav-tabs',
-                        item: 'nav-tab-header',
-                        active: 'active'
-                    }
-                },
-                tabs: {
-                    // relative selector within container for tab controller
-                    container: ".tab-content",
-                    tab: {
-                        template: "#tab-template",
-                        cssClass: {
-                            tab: 'tab-pane',
-                            tab_active: 'active',
-                            tab_close_btn: 'close closeTab pull-right'
+                        tab: 'tab-pane',
+                        tab_active: 'active',
+                        tab_close_btn: 'close closeTab pull-right'
+                    },
+                    das_editor: {
+                        canvas: {
+                            // relative selector within container for a tab
+                            container: '.canvas-container'
                         },
-                        service_editor: {
-                            canvas: {
-                                // relative selector within container for a tab
-                                container: '.canvas-container'
-                            },
-                            preview: {
-                                // relative selector within container for a tab
-                                container: '.preview-container'
-                            },
-                            source: {
-                                // relative selector within container for a tab
-                                container: '.source-container'
-                            },
-                            toggle_controls: {
-                                // relative selector within container for a tab
-                                container: '.toggle-controls-container',
-                                sourceIcon: '.toggle-to-source',
-                                designIcon: '.toggle-to-design'
-                            },
-                            notifications: {
-                                container: '#notification-container'
-                            }
+                        source: {
+                            // relative selector within container for a tab
+                            container: '.source-container'
+                        },
+                        toggle_controls: {
+                            // relative selector within container for a tab
+                            container: '.toggle-controls-container',
+                            sourceIcon: '.toggle-to-source',
+                            designIcon: '.toggle-to-design'
+                        },
+                        notifications: {
+                            container: '#notification-container'
+                        },
+                        source_view: {
+                            // relative selector within container for a tab
+                            container: '.source-view-container',
+                            theme: 'ace/theme/twilight',
+                            font_size: '14pt',
+                            scroll_margin: '20',
+                            mode: 'ace/mode/siddhi'
+                        },
+                        cssClass:{
+                            text_editor_class: 'text-editor',
+                            outer_box: 'outer-box',
+                            svg_container: 'svg-container',
+                            outer_div: 'panel panel-default container-outer-div',
+                            panel_title: 'panel-title',
+                            panel_icon: 'panel-icon',
+                            service_icon: 'fw fw-service fw-inverse',
+                            struct_icon: 'fw fw-struct fw-inverse',
+                            connector_icon:'fw fw-connector fw-inverse',
+                            function_icon:'fw fw-function fw-inverse',
+                            main_function_icon:'fw fw-main-function fw-inverse',
+                            title_link:'collapsed canvas-title',
+                            panel_right_icon:'fw fw-up pull-right right-icon-clickable collapser hoverable',
+                            head_div: 'canvas-heading',
+                            body_div:'panel-collapse collapse',
+                            canvas: 'panel-body collapse in',
+                            design_view_drop: 'design-view-hover',
+                            canvas_container: 'canvas-container',
+                            canvas_top_controls_container: 'canvas-top-controls-container',
+                            canvas_top_control_package_define: 'package-definition-wrapper',
+                            canvas_top_control_packages_import: 'package-imports-wrapper',
+                            canvas_top_control_constants_define: 'constants-definition-wrapper',
+                            panel_delete_icon: 'fw fw-delete pull-right right-icon-clickable delete-icon hoverable',
+                            panel_annotation_icon: 'fw fw-annotation pull-right right-icon-clickable hoverable',
+                            panel_args_icon: 'fw fw-import pull-right right-icon-clickable hoverable',
+                            type_mapper_icon: 'fw fw-type-converter fw-inverse',
+                            type_struct_icon: 'fw fw-dgm-service fw-inverse',
+                            canvas_heading_new: 'canvas-heading-new'
+                        },
+                        backend:{
+                            url:"http://localhost:8289/ballerina/model/content"
+                        },
+                        dialog_boxes:{
+                            parser_error: "#parserErrorModel"
                         }
                     }
-                },
-                tool_palette: {
-                    // relative selector within container for tab controller
-                    container: "#tool-palette-container",
-                    search_bar: {
-                        cssClass: {
-                            search_box: 'search-bar',
-                            search_icon: 'fw fw-search searchIcon',
-                            search_input: 'search-input'
-                        }
+                }
+            },
+            tool_palette: {
+                // relative selector within container for tab controller
+                container: "#tool-palette-container",
+                search_bar: {
+                    cssClass: {
+                        search_box: 'search-bar',
+                        search_icon: 'fw fw-search searchIcon',
+                        search_input: 'search-input'
                     }
                 }
             }
+        }
 //            breadcrumbs:{
 //                container: "#breadcrumb-container",
 //                cssClass:  {
@@ -521,10 +596,10 @@
 //            file_browser: {
 //                container: "#file-browser"
 //            }
-        };
-        app = new Application(config);
-        app.render();
-    });
+    };
+    app = new Application(config);
+    app.render();
+});
 
 </script>
 </body>

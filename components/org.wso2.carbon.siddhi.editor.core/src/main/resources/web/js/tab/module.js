@@ -15,10 +15,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-define(['./tool-editor'],
-    function (ToolEditor) {
-        var views = {};
-        views.ToolEditor = ToolEditor;
-        return views;
+define(['./tab', './tab-list', './service-tab', './service-tab-list'],
+    function (Tab, TabList, ServiceTab, ServiceTabList) {
+        return  {
+            Tab: Tab,
+            TabList: TabList,
+            ServiceTab: ServiceTab,
+            ServiceTabList: ServiceTabList
+        }
     });
+

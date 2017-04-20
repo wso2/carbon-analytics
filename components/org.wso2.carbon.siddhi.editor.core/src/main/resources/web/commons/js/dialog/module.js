@@ -16,9 +16,16 @@
  * under the License.
  */
 
-define(['./tool-editor'],
-    function (ToolEditor) {
-        var views = {};
-        views.ToolEditor = ToolEditor;
-        return views;
-    });
+define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog'],
+    function (SaveToFileDialog,ReplaceConfirmDialog,OpenFileDialog) {
+    return {
+        save_to_file_dialog: SaveToFileDialog,
+        //FolderOpenDialog: FolderOpenDialog,
+        //NewItemDialog: NewItemDialog,
+        //DeleteItemDialog: DeleteItemDialog,
+        open_file_dialog: OpenFileDialog,
+        //CloseConfirmDialog: CloseConfirmDialog,
+        ReplaceConfirmDialog: ReplaceConfirmDialog
+        //SettingsDialog: SettingsDialog
+    };
+});

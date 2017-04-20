@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -60,7 +60,7 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, log) {
 
         update: function(model) {
             this.localStorage().setItem(this.name+"-"+model.id, JSON.stringify(model));
-            if (!_.include(this.records, model.id.toString()))
+            if (!_.includes(this.records, model.id.toString()))
                 this.records.push(model.id.toString()); this.save();
             return this.find(model);
         },

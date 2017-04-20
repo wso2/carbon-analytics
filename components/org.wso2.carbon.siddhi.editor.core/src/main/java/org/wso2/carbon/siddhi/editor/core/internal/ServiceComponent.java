@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.internal;
 
-
+import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.response.DebugRuntimeResponse;
@@ -39,6 +40,7 @@ import org.wso2.carbon.siddhi.editor.core.commons.response.GeneralResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.MetaDataResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
 import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResponse;
+import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.MetaDataHolder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
@@ -60,11 +62,16 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Arrays;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -88,13 +95,21 @@ import com.google.gson.Gson;
 @Path("/editor")
 public class ServiceComponent implements Microservice {
     private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
+    private static final String FILE_SEPARATOR = "file.separator";
+    private static final String STATUS = "status";
+    private static final String SUCCESS = "success";
     private ServiceRegistration serviceRegistration;
+    private Workspace workspace;
     private ExecutorService executorService = Executors
             .newScheduledThreadPool(
                     5, new ThreadFactoryBuilder()
                             .setNameFormat("Debugger-scheduler-thread-%d")
                             .build()
             );
+
+    public ServiceComponent(){
+        workspace = new LocalFSWorkspace();
+    }
 
     private File getResourceAsFile(String resourcePath) {
         try {
@@ -179,40 +194,134 @@ public class ServiceComponent implements Microservice {
             jsonString = new Gson().toJson(new GeneralResponse(Status.ERROR, t.getMessage()));
         }
         return Response.ok(jsonString, MediaType.APPLICATION_JSON)
-                .header("Access-Control-Allow-Origin", "*")
                 .build();
     }
 
-    @POST
-    @Path("/save")
-    public Response saveExecutionPlan(String saveConfig) {
-        JSONObject jsonObject = new JSONObject(saveConfig);
-        String executionPlan = "", filePath = "";
+    @GET
+    @Path("/workspace/root")
+    @Produces("application/json")
+    public Response root() {
         try {
-            if (jsonObject.has("executionPlan") && !jsonObject.getString("executionPlan").isEmpty()) {
-                executionPlan = jsonObject.getString("executionPlan");
-            } else {
-                log.error("Execution Plan cannot be null or an empty value");
-            }
-            if (jsonObject.has("filePath") && !jsonObject.getString("filePath").isEmpty()) {
-                filePath = jsonObject.getString("filePath");
-            } else {
-                log.error("File Path cannot be null or an empty value");
-            }
-            if (!executionPlan.isEmpty() && !filePath.isEmpty()) {
-                try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-                        new FileOutputStream(filePath), "utf-8"))) {
-                    writer.write(executionPlan);
-                }
-                return Response.ok().entity("ok")
-                        .header("Access-Control-Allow-Origin", "*")
-                        .build();
-            }
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.listRoots())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed."+e.getMessage())
+                    .build();
         } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
         }
-        return Response.serverError().entity("failed")
-                .header("Access-Control-Allow-Origin", "*")
-                .build();
+
+    }
+
+    @GET
+    @Path("/workspace/list")
+    @Produces("application/json")
+    public Response directoriesInPath(@QueryParam("path") String path) {
+        try {
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.listDirectoriesInPath(new String(Base64.getDecoder().decode(path))))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed."+e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("/workspace/exists")
+    @Produces("application/json")
+    public Response pathExists(@QueryParam("path") String path) {
+        try {
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.exists(new String(Base64.getDecoder().decode(path))))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed."+e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("/workspace/listFiles")
+    @Produces("application/json")
+    public Response filesInPath(@QueryParam("path") String path) {
+        try {
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.listFilesInPath(new String(Base64.getDecoder().decode(path))))
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed."+e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/workspace/write")
+    @Produces("application/json")
+    public Response write(String payload) {
+        try {
+            String location = "";
+            String configName = "";
+            String config = "";
+            Matcher locationMatcher = Pattern.compile("location=(.*?)&configName").matcher(payload);
+            while (locationMatcher.find()) {
+                location = locationMatcher.group(1);
+            }
+            Matcher configNameMatcher = Pattern.compile("configName=(.*?)&").matcher(payload);
+            while (configNameMatcher.find()) {
+                configName = configNameMatcher.group(1);
+            }
+            String[] splitConfigContent = payload.split("config=");
+            if (splitConfigContent.length > 1){
+                config = splitConfigContent[1];
+            }
+            byte[] base64Config = Base64.getDecoder().decode(config);
+            byte[] base64ConfigName = Base64.getDecoder().decode(configName);
+            byte[] base64Location = Base64.getDecoder().decode(location);
+            Files.write(Paths.get(new String(base64Location) + System.getProperty(FILE_SEPARATOR)
+                    + new String(base64ConfigName)), base64Config);
+            JsonObject entity = new JsonObject();
+            entity.addProperty(STATUS, SUCCESS);
+            return Response.status(Response.Status.OK).entity(entity)
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed."+e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/workspace/read")
+    @Produces("application/json")
+    public Response read(String path) {
+        try {
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.read(new String(path)))
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed."+e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
     }
 
     @GET
@@ -223,7 +332,6 @@ public class ServiceComponent implements Microservice {
         response.setExtensions(SourceEditorUtils.getExtensionProcessorMetaData());
         String jsonString = new Gson().toJson(response);
         return Response.ok(jsonString, MediaType.APPLICATION_JSON)
-                .header("Access-Control-Allow-Origin", "*")
                 .build();
     }
 

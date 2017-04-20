@@ -16,9 +16,18 @@
  * under the License.
  */
 
-define(['./tool-editor'],
-    function (ToolEditor) {
-        var views = {};
-        views.ToolEditor = ToolEditor;
-        return views;
-    });
+define(function() {
+
+    "use strict";   // JS strict mode
+
+    /**
+     * Constants used by the tool - editor
+     */
+    var constants = {
+        INITIAL_SOURCE_INSTRUCTIONS: "@Plan:name(\"ExecutionPlan\")\n\n" +
+            "-- Please refer to https://docs.wso2.com/display/DAS400/Quick+Start+Guide " +
+            "on getting started with DAS editor. \n\n"
+    };
+
+    return constants;
+});

@@ -16,9 +16,11 @@
  * under the License.
  */
 
-define(['./tool-editor'],
-    function (ToolEditor) {
-        var views = {};
-        views.ToolEditor = ToolEditor;
-        return views;
-    });
+define(['file_menu', 'edit_menu'], function (FileMenu, EditMenu) {
+    var menuBar = {};
+
+    menuBar[FileMenu.id] = FileMenu;
+    menuBar[EditMenu.id] = EditMenu;
+
+    return menuBar;
+});
