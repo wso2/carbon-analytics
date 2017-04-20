@@ -28,6 +28,7 @@ import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationExc
 import org.wso2.carbon.event.simulator.core.internal.bean.CSVSimulationDTO;
 import org.wso2.carbon.event.simulator.core.internal.util.EventConverter;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
+import org.wso2.carbon.utils.Utils;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
@@ -61,13 +62,26 @@ public class CSVReader {
      * If the CSV file is ordered by timestamp it will create a bufferedReader for the file reader.
      */
     public CSVReader(String fileName, Boolean isOrdered) {
+      initFileReader(fileName,isOrdered);
+    }
+
+
+    /**
+     * initFileReader() is used to initialize a file reader to read the CSV file
+     *
+     * @param fileName name of file being read
+     * @param isOrdered flag indicating whether the file is ordered by timestamp attribute
+     * */
+    public void initFileReader(String fileName, Boolean isOrdered) {
         try {
-            if (new File(String.valueOf(Paths.get(System.getProperty("java" +
-                    ".io.tmpdir"), EventSimulatorConstants.DIRECTORY_NAME, fileName))).length() == 0) {
+            if (new File(String.valueOf(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                    .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName)))
+                    .length() == 0) {
                 throw new EventGenerationException("File '" + fileName + "' is empty.");
             }
-            fileReader = new InputStreamReader(new FileInputStream(String.valueOf(Paths.get(System.getProperty("java" +
-                    ".io.tmpdir"), EventSimulatorConstants.DIRECTORY_NAME, fileName))), "UTF-8");
+            fileReader = new InputStreamReader(new FileInputStream(String.valueOf(Paths.get(Utils.getCarbonHome()
+                            .toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                    EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName))), "UTF-8");
             if (log.isDebugEnabled()) {
                 log.debug("Initialize a File reader for CSV file '" + fileName + "'.");
             }
@@ -82,11 +96,10 @@ public class CSVReader {
         }
     }
 
-
     /**
      * If the CSV file is ordered by timestamp, this method reads the next line and produces an event
      *
-     * @param csvConfig configuration of CSV simulation
+     * @param csvConfig          configuration of CSV simulation
      * @param streamAttributes   list of attributes of the stream to which events are produced
      * @param timestampStartTime start timestamp of event simulation
      * @param timestampEndTime   end timestamp of event simulation
@@ -180,7 +193,7 @@ public class CSVReader {
     /**
      * If the CSV is not ordered by timestamp, getEventsMap() method is used to create a treeMap of events.
      *
-     * @param csvConfig configuration of csv simulation
+     * @param csvConfig          configuration of csv simulation
      * @param streamAttributes   list of attributes of the stream to which events are produced
      * @param timestampStartTime start timestamp of event simulation
      * @param timestampEndTime   end timestamp of event simulation
@@ -194,8 +207,8 @@ public class CSVReader {
                     timestampEndTime);
         } catch (IOException e) {
             log.error("Error occurred when initializing CSVParser for CSV file '" + csvConfig.getFileName() + "' to " +
-                            "simulate stream '" + csvConfig.getStreamName() + "' using source configuration : " +
-                            csvConfig.toString(), e);
+                    "simulate stream '" + csvConfig.getStreamName() + "' using source configuration : " +
+                    csvConfig.toString(), e);
             throw new EventGenerationException("Error occurred when initializing CSVParser for CSV file '" +
                     csvConfig.getFileName() + "' to simulate stream '" + csvConfig.getStreamName() + "' using source " +
                     "configuration : " + csvConfig.toString(), e);
@@ -230,7 +243,7 @@ public class CSVReader {
      * The key of the treeMap will be the event timestamp and the value will be an array list of events belonging to
      * the timestamp.
      *
-     * @param csvConfig configuration of csv simulation
+     * @param csvConfig          configuration of csv simulation
      * @param streamAttributes   list of attributes of the stream to which events are produced
      * @param timestampStartTime start timestamp of event simulation
      * @param timestampEndTime   end timestamp of event simulation

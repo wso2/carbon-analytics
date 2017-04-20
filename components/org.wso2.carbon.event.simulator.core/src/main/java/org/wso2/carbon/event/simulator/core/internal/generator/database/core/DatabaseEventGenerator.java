@@ -85,10 +85,7 @@ public class DatabaseEventGenerator implements EventGenerator {
             currentTimestamp = timestampStartTime;
         }
         columnNames = dbSimulationConfig.getColumnNames();
-        databaseConnection = new DatabaseConnector();
-        databaseConnection.connectToDatabase(dbSimulationConfig.getDriver(),
-                dbSimulationConfig.getDataSourceLocation(), dbSimulationConfig.getUsername(),
-                dbSimulationConfig.getPassword());
+        initDBConnection();
     }
 
     /**
@@ -112,9 +109,9 @@ public class DatabaseEventGenerator implements EventGenerator {
             }
         } catch (SQLException e) {
             log.error("Error occurred when retrieving resultset from database ' " +
-                    dbSimulationConfig.getDataSourceLocation() + "' to simulate to simulate stream '" +
-                    dbSimulationConfig.getStreamName() + "' using source configuration " + dbSimulationConfig.toString()
-                    , e);
+                            dbSimulationConfig.getDataSourceLocation() + "' to simulate to simulate stream '" +
+                            dbSimulationConfig.getStreamName() + "' using source configuration " +
+                            dbSimulationConfig.toString(), e);
             throw new EventGenerationException("Error occurred when retrieving resultset from database ' " +
                     dbSimulationConfig.getDataSourceLocation() + "' to simulate to simulate stream '" +
                     dbSimulationConfig.getStreamName() + "' using source configuration " + dbSimulationConfig.toString()
@@ -191,8 +188,8 @@ public class DatabaseEventGenerator implements EventGenerator {
                     if (dbSimulationConfig.getTimestampAttribute() != null) {
                         timestamp = resultSet.getLong(dbSimulationConfig.getTimestampAttribute());
                     } else if (timestampEndTime == -1 || currentTimestamp <= timestampEndTime) {
-                            timestamp = currentTimestamp;
-                            currentTimestamp += dbSimulationConfig.getTimestampInterval();
+                        timestamp = currentTimestamp;
+                        currentTimestamp += dbSimulationConfig.getTimestampInterval();
                     }
                     if (timestamp != -1) {
                         int i = 0;
@@ -264,6 +261,24 @@ public class DatabaseEventGenerator implements EventGenerator {
     }
 
     /**
+     * reinitializeResources() is used to reestablish the database connection when restarting  astopped simulation
+     * */
+    @Override
+    public void reinitializeResources() {
+        initDBConnection();
+    }
+
+    /**
+     * initDBConnection() is used to establish a database connection
+     * */
+    private void initDBConnection() {
+        databaseConnection = new DatabaseConnector();
+        databaseConnection.connectToDatabase(dbSimulationConfig.getDriver(),
+                dbSimulationConfig.getDataSourceLocation(), dbSimulationConfig.getUsername(),
+                dbSimulationConfig.getPassword());
+    }
+
+    /**
      * validateDBConfiguration() method parses the database simulation configuration into a DBSimulationDTO object
      *
      * @param sourceConfig JSON object containing configuration required to simulate stream
@@ -301,10 +316,10 @@ public class DatabaseEventGenerator implements EventGenerator {
          * */
         if (streamAttributes != null) {
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.DRIVER)) {
-            throw new InvalidConfigException("A driver name is required for database simulation of stream '" +
-                    sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid source configuration : " +
-                    sourceConfig.toString());
-        }
+                throw new InvalidConfigException("A driver name is required for database simulation of stream '" +
+                        sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid source" +
+                        " configuration : " + sourceConfig.toString());
+            }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.DATA_SOURCE_LOCATION)) {
                 throw new InvalidConfigException("Data source location is required for database simulation of" +
                         " stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid " +

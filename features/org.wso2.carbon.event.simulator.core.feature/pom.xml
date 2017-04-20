@@ -87,6 +87,10 @@
             <groupId>org.wso2.orbit.org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.utils</groupId>
+            <artifactId>carbon-utils</artifactId>
+        </dependency>
 
         <!-- Dependencies for CSV event simulations begins here-->
         <dependency>
@@ -234,6 +238,10 @@
                                 <bundle>
                                     <symbolicName>com.mysql.jdbc</symbolicName>
                                     <version>${mysql.connector.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>carbon-utils</symbolicName>
+                                    <version>${carbon.utils.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>

@@ -29,11 +29,6 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
     @Override
     public EventGenerator getEventGenerator(JSONObject sourceConfig, long timestampStartTime, long
             timestampEndTime) throws InvalidConfigException, InsufficientAttributesException {
-        /*
-         * check whether the source configuration has a simulation type specified
-         * if the generator type is either DB, CSV, or Random retrieve type
-         * else throw an exception
-         * */
         if (checkAvailability(sourceConfig, EventSimulatorConstants.EVENT_SIMULATION_TYPE)) {
             EventGenerator.GeneratorType generatorType;
             try {

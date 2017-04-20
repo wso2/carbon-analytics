@@ -203,6 +203,13 @@ public class CSVEventGenerator implements EventGenerator {
         return csvConfiguration.getExecutionPlanName();
     }
 
+    /**
+     * reinitializeResources() is used to create a file reader when restarting a stopped simulation
+     * */
+    @Override
+    public void reinitializeResources() {
+        csvReader.initFileReader(csvConfiguration.getFileName(), csvConfiguration.getIsOrdered());
+    }
 
     /**
      * getNextEvent() is used to obtain the next event with least timestamp

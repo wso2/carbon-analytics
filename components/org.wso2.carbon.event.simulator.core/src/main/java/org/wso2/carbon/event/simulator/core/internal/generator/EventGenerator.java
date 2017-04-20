@@ -39,6 +39,8 @@ public interface EventGenerator {
 
     String getExecutionPlanName();
 
+    void reinitializeResources();
+
     /**
      * Generator type for an input stream can be
      * 1. Random Data Simulation

@@ -1,12 +1,11 @@
 package org.wso2.carbon.event.simulator.core.internal.util;
 
-
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
-import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
+import org.wso2.carbon.utils.Utils;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
@@ -22,9 +21,13 @@ public class SimulationConfigUploader {
     private static final Logger log = Logger.getLogger(SimulationConfigUploader.class);
     private static final SimulationConfigUploader configUploader =
             new SimulationConfigUploader(SimulationConfigStore.getSimulationConfigStore());
+    /**
+     * SimulationConfigStore object which holds details of uploaded simulation configurations
+     */
+    private SimulationConfigStore simulationConfigStore;
 
     private SimulationConfigUploader(SimulationConfigStore simulationConfigStore) {
-        EventSimulatorDataHolder.getInstance().setSimulationConfigStore(simulationConfigStore);
+        this.simulationConfigStore = simulationConfigStore;
     }
 
     /**
@@ -38,6 +41,7 @@ public class SimulationConfigUploader {
 
     /**
      * Method to upload a simulation configuration.
+     *
      * @param simulationConfig simulation configuration being uploaded
      * @throws FileAlreadyExistsException if the file exists in 'tmp/simulationConfigs' directory
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
@@ -58,36 +62,42 @@ public class SimulationConfigUploader {
                     EventSimulatorConstants.EVENT_SIMULATION_NAME)) {
                 String simulationName = configuration.getJSONObject(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)
                         .getString(EventSimulatorConstants.EVENT_SIMULATION_NAME);
-                if (!EventSimulatorDataHolder.getInstance().getSimulationConfigStore().checkExists(simulationName)) {
+                if (!simulationConfigStore.checkExists(simulationName)) {
                     if (log.isDebugEnabled()) {
-                    log.debug("Initialize a File writer for simulation configuration '" + simulationName + "'.");
+                        log.debug("Initialize a File writer for simulation configuration '" + simulationName + "'.");
                     }
-                    try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(System.getProperty("java.io.tmpdir"),
-                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS, simulationName))) {
+                    try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(Utils.getCarbonHome().toString(),
+                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS, (simulationName + ".json")))) {
                         writer.write(simulationConfig);
-                        EventSimulatorDataHolder.getInstance().getSimulationConfigStore()
-                                .addSimulationConfig(simulationName);
+                        simulationConfigStore.addSimulationConfig(simulationName);
                         if (log.isDebugEnabled()) {
                             log.debug("Successfully uploaded simulation configuration '" + simulationName + "' to " +
-                                    "directory " + (Paths.get(System.getProperty("java.io.tmpdir"),
-                                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
+                                    "directory '" + (Paths.get(Utils.getCarbonHome().toString(),
+                                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'");
                         }
                     } catch (IOException e) {
                         log.error("Error occurred while copying the file '" + simulationName + "' to " +
-                                "location '" + Paths.get(System.getProperty("java.io.tmpdir"),
-                                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS, simulationName).toString() +
+                                "directory '" + Paths.get(Utils.getCarbonHome().toString(),
+                                EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                                EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS, simulationName).toString() +
                                 "'. ", e);
                         throw new FileOperationsException("Error occurred while copying the file '" + simulationName +
-                            "' to location '" + Paths.get(System.getProperty("java.io.tmpdir"), EventSimulatorConstants
-                            .DIRECTORY_NAME, simulationName).toString() + "'. ", e);
+                                "' to directory '" + Paths.get(Utils.getCarbonHome().toString(),
+                                EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                                EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS, simulationName).toString() +
+                                "'. ", e);
                     }
                 } else {
-                    log.error("Simulation configuration '" + simulationName + "' already exists in " +
-                            (Paths.get(System.getProperty("java.io.tmpdir"),
-                                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
+                    log.error("Simulation configuration '" + simulationName + "' already exists in directory '" +
+                            (Paths.get(Utils.getCarbonHome().toString(),
+                                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'");
                     throw new FileAlreadyExistsException("Simulation configuration '" + simulationName + "'" +
-                            " already exists in " + (Paths.get(System.getProperty("java.io.tmpdir"),
-                                EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
+                            " already exists in directory '" + (Paths.get(Utils.getCarbonHome().toString(),
+                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'");
                 }
             } else {
                 throw new InvalidConfigException("Simulation name is required for event simulation. Invalid " +
@@ -107,39 +117,52 @@ public class SimulationConfigUploader {
      */
     public boolean deleteSimulationConfig(String simulationName) throws FileOperationsException {
         try {
-            if (EventSimulatorDataHolder.getInstance().getSimulationConfigStore().checkExists(simulationName)) {
-                EventSimulatorDataHolder.getInstance().getSimulationConfigStore().
-                        removeSimulationConfig(simulationName);
-                Files.deleteIfExists(Paths.get(System.getProperty("java.io.tmpdir"),
-                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS, simulationName));
+            if (simulationConfigStore.checkExists(simulationName)) {
+                simulationConfigStore.removeSimulationConfig(simulationName);
+                Files.deleteIfExists(Paths.get(Utils.getCarbonHome().toString(),
+                        EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS, (simulationName + ".json")));
                 if (log.isDebugEnabled()) {
-                    log.debug("Deleted simulation configuration '" + simulationName + "'");
+                    log.debug("Deleted simulation configuration '" + simulationName + "' from directory '" +
+                            (Paths.get(Utils.getCarbonHome().toString(),
+                                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'");
                 }
                 return true;
             } else {
                 return false;
             }
         } catch (IOException e) {
-            log.error("Error occurred while deleting the simulation configuration '" +
-                    simulationName + "'. ", e);
+            log.error("Error occurred while deleting the simulation configuration '" + simulationName +
+                    "' from directory '" + (Paths.get(Utils.getCarbonHome().toString(),
+                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'", e);
             throw new FileOperationsException("Error occurred while deleting the simulation configuration '" +
-                    simulationName + "'. ", e);
+                    simulationName + "' from directory '" + (Paths.get(Utils.getCarbonHome().toString(),
+                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'", e);
         }
     }
 
     public String getSimulationConfig(String simulationName) throws FileOperationsException {
         try {
-            if (EventSimulatorDataHolder.getInstance().getSimulationConfigStore().checkExists(simulationName)) {
-                return new String(Files.readAllBytes(Paths.get(System.getProperty("java.io.tmpdir"),
-                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS, simulationName)), "UTF-8");
+            if (simulationConfigStore.checkExists(simulationName)) {
+                return new String(Files.readAllBytes(Paths.get(Utils.getCarbonHome().toString(),
+                        EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS, (simulationName + ".json"))),
+                        "UTF-8");
             } else {
                 return null;
             }
         } catch (IOException e) {
             log.error("Error occurred while reading the simulation configuration '" +
-                    simulationName + "'. ", e);
+                    simulationName + "' from directory '" + (Paths.get(Utils.getCarbonHome().toString(),
+                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'", e);
             throw new FileOperationsException("Error occurred while reading the simulation configuration '" +
-                    simulationName + "'. ", e);
+                    simulationName + "' from directory '" + (Paths.get(Utils.getCarbonHome().toString(),
+                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'", e);
         }
     }
 }

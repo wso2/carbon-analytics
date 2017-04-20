@@ -67,6 +67,10 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.stream.processor.common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.utils</groupId>
+            <artifactId>carbon-utils</artifactId>
+        </dependency>
 
         <!--Dependencies for event simulation begins here-->
 
@@ -127,7 +131,7 @@
         </import.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
-            osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="7"
+            osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="8"
         </carbon.component>
     </properties>
 

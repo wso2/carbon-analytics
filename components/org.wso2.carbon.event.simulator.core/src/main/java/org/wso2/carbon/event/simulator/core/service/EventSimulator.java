@@ -55,7 +55,7 @@ public class EventSimulator implements Runnable {
     /**
      * EventSimulator() constructor initializes an EventSimulator object
      *
-     * @param simulationName unique identifies of simulation
+     * @param simulationName          unique identifies of simulation
      * @param simulationConfiguration a string containing the simulation configuration
      * @throws InsufficientAttributesException is a configuration does not produce data for all stream attributes
      * @throws InvalidConfigException          if the simulation configuration is invalid
@@ -119,35 +119,38 @@ public class EventSimulator implements Runnable {
                     /**
                      * 1. for each event generator peek the next event (i.e. the next event with least timestamp)
                      * 2. take the first event generator will a not null nextEvent as the first refferal value for
-                     * generator with minimum timestamp event, and take the events timestamp as the minimum timestamp
-                     * refferal value
-                     * 3. then compare the timestamp of the remaining not null nextEvents with the minimum timestamp and
-                     * update the minimum timestamp refferal value accordingly.
-                     * 4. once all generators are iterated and the event with minimum timestamp if obtained, send event.
+                     * generator with minimum timestamp event, and take the events timestamp as the minimum
+                     * timestamp refferal value
+                     * 3. then compare the timestamp of the remaining not null nextEvents with the minimum timestamp
+                     * and update the minimum timestamp refferal value accordingly.
+                     * 4. once all generators are iterated and the event with minimum timestamp if obtained, send
+                     * event.
                      * 5. if all generators has nextEvent == null, then stop event simulation
                      * */
-                    for (EventGenerator eventGenerator : generators) {
-                        if (eventGenerator.peek() != null) {
-                            if (minTimestamp == -1L) {
-                                minTimestamp = eventGenerator.peek().getTimestamp();
-                                generator = eventGenerator;
-                            } else if (eventGenerator.peek().getTimestamp() < minTimestamp) {
-                                minTimestamp = eventGenerator.peek().getTimestamp();
-                                generator = eventGenerator;
+                    synchronized (this) {
+                        for (EventGenerator eventGenerator : generators) {
+                            if (eventGenerator.peek() != null) {
+                                if (minTimestamp == -1L) {
+                                    minTimestamp = eventGenerator.peek().getTimestamp();
+                                    generator = eventGenerator;
+                                } else if (eventGenerator.peek().getTimestamp() < minTimestamp) {
+                                    minTimestamp = eventGenerator.peek().getTimestamp();
+                                    generator = eventGenerator;
+                                }
                             }
                         }
-                    }
-                    if (minTimestamp >= 0L && generator != null) {
-                        log.info("Input Event (" + simulationName + ") : "
-                                + Arrays.deepToString(generator.peek().getData()));
-                        EventSimulatorDataHolder.getInstance().getEventStreamService()
-                                .pushEvent(generator.getExecutionPlanName(), generator.getStreamName(),
-                                        generator.poll());
-                    } else {
-                        break;
-                    }
-                    if (eventsRemaining > 0) {
-                        eventsRemaining--;
+                        if (minTimestamp >= 0L && generator != null) {
+                            log.info("Input Event (" + simulationName + ") : "
+                                    + Arrays.deepToString(generator.peek().getData()));
+                            EventSimulatorDataHolder.getInstance().getEventStreamService()
+                                    .pushEvent(generator.getExecutionPlanName(), generator.getStreamName(),
+                                            generator.poll());
+                        } else {
+                            break;
+                        }
+                        if (eventsRemaining > 0) {
+                            eventsRemaining--;
+                        }
                     }
                     Thread.sleep(simulationProperties.getTimeInterval());
                 } else {
@@ -216,21 +219,21 @@ public class EventSimulator implements Runnable {
                     timestampStartTime = simulationPropertiesConfig
                             .getLong(EventSimulatorConstants.START_TIMESTAMP);
                     if (timestampStartTime < 0) {
-                        throw new InvalidConfigException("TimestampStartTime must be a positive value for simulation " +
+                        throw new InvalidConfigException("StartTimestamp must be a positive value for simulation " +
                                 "'" + simulationPropertiesConfig.getString(EventSimulatorConstants
                                 .EVENT_SIMULATION_NAME) + "'. Invalid simulation properties configuration provided : "
                                 + simulationPropertiesConfig.toString());
                     }
                 } else {
-                    throw new InvalidConfigException("TimestampStartTime is required for simulation '" +
+                    throw new InvalidConfigException("StartTimestamp is required for simulation '" +
                             simulationPropertiesConfig.getString(EventSimulatorConstants.EVENT_SIMULATION_NAME)
                             + "'. Invalid simulation properties configuration provided : "
                             + simulationPropertiesConfig.toString());
                 }
             } else {
-                log.warn("TimestampStartTime is required for simulation '" +
+                log.warn("StartTimestamp is required for simulation '" +
                         simulationPropertiesConfig.getString(EventSimulatorConstants.EVENT_SIMULATION_NAME)
-                        + "'. TimestampStartTime is set to current system time for simulation : " +
+                        + "'. StartTimestamp is set to current system time for simulation : " +
                         simulationPropertiesConfig.toString());
                 timestampStartTime = System.currentTimeMillis();
             }
@@ -247,15 +250,15 @@ public class EventSimulator implements Runnable {
                         .isEmpty()) {
                     timestampEndTime = simulationPropertiesConfig.getLong(EventSimulatorConstants.END_TIMESTAMP);
                     if (timestampEndTime < 0) {
-                        throw new InvalidConfigException("TimestampEndTime must be a positive value for simulation " +
+                        throw new InvalidConfigException("EndTimestamp must be a positive value for simulation " +
                                 "'" + simulationPropertiesConfig.getString(EventSimulatorConstants
                                 .EVENT_SIMULATION_NAME) + "'. Invalid simulation properties configuration provided : "
                                 + simulationPropertiesConfig.toString());
                     }
                 } else {
-                    throw new InvalidConfigException("TimestampEndTime is required for simulation '" +
+                    throw new InvalidConfigException("EndTimestamp is required for simulation '" +
                             simulationPropertiesConfig.getString(EventSimulatorConstants.EVENT_SIMULATION_NAME) +
-                            "'. TimestampEndTime must be either specified or set to null. Invalid simulation " +
+                            "'. EndTimestamp must be either specified or set to null. Invalid simulation " +
                             "properties configuration provided : " + simulationPropertiesConfig.toString());
                 }
             }
@@ -316,8 +319,12 @@ public class EventSimulator implements Runnable {
      */
     @Override
     public void run() {
-        isPaused = false;
-        isStopped = false;
+        if (isStopped()) {
+            isPaused = false;
+            isStopped = false;
+            generators.forEach(EventGenerator::reinitializeResources);
+
+        }
         try {
             generators.forEach(EventGenerator::start);
             if (log.isDebugEnabled()) {
@@ -384,32 +391,36 @@ public class EventSimulator implements Runnable {
 
     /**
      * isPaused() is used to check whether a simulation is paused or not
-     *
+     * <p>
      * return true of simulation is paused else return false
-     * */
+     */
     public boolean isPaused() {
         return isPaused;
     }
+
     /**
      * isStopped() is used to check whether a simulation is stopped or not
-     *
+     * <p>
      * return true of simulation is stopped else return false
-     * */
+     */
     public boolean isStopped() {
         return isStopped;
     }
+
     /**
      * getSimulationName() is required to retrieve the simulation name of the simulation when pausing, resuming and
      * stopping simulations
      *
      * @return simulation name
-     * */
+     */
     public String getSimulationName() {
         return simulationProperties.getSimulationName();
     }
 
     /**
      * Action class specifies the possible actions user can take for a given simulation
-     * */
-    public enum Action { RUN, PAUSE, RESUME, STOP}
+     */
+    public enum Action {
+        RUN, PAUSE, RESUME, STOP
+    }
 }

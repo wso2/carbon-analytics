@@ -184,6 +184,15 @@ public class RandomEventGenerator implements EventGenerator {
     }
 
     /**
+     * reinitializeResources() is used to reinitialize resources used for simulation when restarting a stopped
+     * simulation
+     * */
+    @Override
+    public void reinitializeResources() {
+//        this method is not needed for random event generation
+    }
+
+    /**
      * validateRandomConfiguration() method parses the database simulation configuration into a DBSimulationDTO object
      *
      * @param sourceConfig JSON object containing configuration required to simulate stream

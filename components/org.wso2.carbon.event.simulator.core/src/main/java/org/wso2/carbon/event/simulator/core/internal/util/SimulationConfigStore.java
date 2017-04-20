@@ -3,6 +3,7 @@ package org.wso2.carbon.event.simulator.core.internal.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
+import org.wso2.carbon.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,33 +28,34 @@ public class SimulationConfigStore {
 
     private SimulationConfigStore() {
         try {
-            /*
-             * if the 'tmp' directory doesn't already have a directory called 'simulationConfigs', create new directory
-             * load all the names of simulation configurations in 'tmp/simulationConfigs' to fileNameList
-             * */
-            boolean dirCreated = new File(Paths.get(System.getProperty("java.io.tmpdir"),
-                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString()).mkdirs();
+            boolean dirCreated = new File(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                    .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)
+                    .toString()).mkdirs();
             if (dirCreated && log.isDebugEnabled()) {
-                log.debug("Successfully created directory 'tmp/simulationConfigs' ");
+                log.debug("Successfully created directory 'deployment/simulator/simulationConfigs' ");
             }
-//            create a list of files with '.csv' extension
-            List<File> simulationNames = Files.walk(Paths.get(System.getProperty("java.io.tmpdir"),
-                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).filter(Files::isRegularFile)
-                    .filter(file -> file.toString().endsWith(".txt"))
+//            load the names of files available in tmp/simulationConfigs
+            List<File> fileNames = Files.walk(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                    .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS))
+                    .filter(Files::isRegularFile)
+                    .filter(file -> file.toString().endsWith(".json"))
                     .map(Path::toFile).collect(Collectors.toList());
             if (log.isDebugEnabled()) {
-                log.debug("Retrieved files in temp directory " + Paths.get(System.getProperty("java.io.tmpdir"),
-                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString());
+                log.debug("Retrieved files in directory '" + Paths.get(Utils.getCarbonHome().toString(),
+                        EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString() + "'");
             }
-//            add each file in list of CSV files to fileNames
-            for (File file : simulationNames) {
-                simulationNamesList.add(file.getName());
+            for (File file : fileNames) {
+                simulationNamesList.add(file.getName().substring(0, file.getName().length() - 5));
             }
         } catch (IOException e) {
             throw new SimulatorInitializationException("Error occurred when loading simulation configuration names " +
-                    "to simulationNamesList ", e);
+                    "available in directory '" + Paths.get(Utils.getCarbonHome().toString(),
+                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString() + "'", e);
         }
     }
+
     /**
      * Method to return Singleton Object of SimulationConfigStore
      *
@@ -78,13 +80,12 @@ public class SimulationConfigStore {
      *
      * @param simulationName name of simulation being removes
      * @throws IOException it throws IOException if anything occurred while
-     *                     delete the simulation config from temp directory and in memory
+     *                     delete the simulation config
      */
     public void removeSimulationConfig(String simulationName) throws IOException {
-        // delete the file from directory
-        Files.deleteIfExists(Paths.get(System.getProperty("java.io.tmpdir"),
+        Files.deleteIfExists(Paths.get(Utils.getCarbonHome().toString(),
+                EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
                 EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS, simulationName));
-        //delete the file from in memory
         simulationNamesList.remove(simulationName);
     }
 

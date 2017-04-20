@@ -84,7 +84,7 @@ public class CustomBasedAttrGenerator implements RandomAttributeGenerator {
      * getAttributeConfiguration(0 returns attribute configuration used for custom based attribute configuration
      *
      * @return attribute configuration
-     * */
+     */
     @Override
     public String getAttributeConfiguration() {
         return customBasedAttrConfig.toString();

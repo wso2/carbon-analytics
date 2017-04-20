@@ -23,6 +23,7 @@ import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.ValidatedInputStream;
+import org.wso2.carbon.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,53 +57,54 @@ public class FileUploader {
 
     /**
      * Method to upload a CSV file.
+     *
      * @param fileName name of file being uploaded
      * @param filePath location of the file
-     * @throws FileAlreadyExistsException if the file exists in 'tmp/eventSimulator' directory
+     * @throws FileAlreadyExistsException if the file exists in 'deployment/simulator/csvFiles' directory
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
-     *                                    'tmp/eventSimulator' directory
+     *                                    'tmp/csvFiles' directory
      */
     public void uploadFile(String fileName, String filePath) throws FileAlreadyExistsException,
             FileOperationsException {
         // Validate file extension
         if (fileName.endsWith(".csv")) {
-            /**
-             * check whether the file already exists.
-             * if so log it exists.
-             * else, add the file
-             * */
             if (!fileStore.checkExists(fileName)) {
-//                use ValidatedInputStream to check whether the file size is less than the maximum size allowed
+//                use ValidatedInputStream to check whether the file size is less than the maximum size allowed ie 8MB
                 try (ValidatedInputStream inputStream = new ValidatedInputStream(FileUtils.openInputStream(new
-                        File(filePath)), 200)) {
-//                    8388608
+                        File(filePath)), 8388608)) {
                     if (log.isDebugEnabled()) {
                         log.debug("Initialize a File reader for CSV file '" + fileName + "'.");
                     }
                     Files.copy(inputStream,
-                            Paths.get(System.getProperty("java.io.tmpdir"), EventSimulatorConstants.DIRECTORY_NAME,
-                                    fileName));
+                            Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                                            .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES
+                                    , fileName));
                     if (log.isDebugEnabled()) {
-                        log.debug("Successfully uploaded CSV file '" + fileName + "' to directory " +
-                                (Paths.get(System.getProperty("java.io.tmpdir"),
-                                        EventSimulatorConstants.DIRECTORY_NAME)).toString());
+                        log.debug("Successfully uploaded CSV file '" + fileName + "' to directory '" +
+                                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                                                .DIRECTORY_DEPLOYMENT_SIMULATOR,
+                                        EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString() + "'");
                     }
                     fileStore.addFile(fileName);
                 } catch (IOException e) {
-                    log.error("Error occurred while copying the file '" + fileName + "' to location '" +
-                            Paths.get(System.getProperty("java.io.tmpdir"), EventSimulatorConstants.DIRECTORY_NAME,
-                                    fileName).toString() + "'. ", e);
+                    log.error("Error occurred while copying the file '" + fileName + "' to directory '" +
+                            Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                                            .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES
+                                    , fileName).toString() + "'. ", e);
                     throw new FileOperationsException("Error occurred while copying the file '" + fileName + "' to " +
-                            "location '" + Paths.get(System.getProperty("java.io.tmpdir"), EventSimulatorConstants
-                            .DIRECTORY_NAME, fileName).toString() + "'. ", e);
+                            "directory '" + Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                                    .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES,
+                            fileName).toString() + "'. ", e);
                 }
             } else {
-                log.error("File '" + fileName + "' already exists in " +
-                        (Paths.get(System.getProperty("java.io.tmpdir"), EventSimulatorConstants.DIRECTORY_NAME))
-                                .toString());
-                throw new FileAlreadyExistsException("File '" + fileName + "' already exists in " +
-                        (Paths.get(System.getProperty("java.io.tmpdir"), EventSimulatorConstants.DIRECTORY_NAME))
-                                .toString());
+                log.error("File '" + fileName + "' already exists in directory '" +
+                        (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                                .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES))
+                                .toString() + "'");
+                throw new FileAlreadyExistsException("File '" + fileName + "' already exists in directory '" +
+                        (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                                .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES))
+                                .toString() + "'");
             }
         } else {
             log.error("File '" + fileName + " has an invalid content type. Please upload a valid CSV file .");
@@ -122,18 +124,27 @@ public class FileUploader {
         try {
             if (fileStore.checkExists(fileName)) {
                 fileStore.removeFile(fileName);
-                Files.deleteIfExists(Paths.get(System.getProperty("java.io.tmpdir"),
-                        EventSimulatorConstants.DIRECTORY_NAME, fileName));
+                Files.deleteIfExists(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                                .DIRECTORY_DEPLOYMENT_SIMULATOR,
+                        EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName));
                 if (log.isDebugEnabled()) {
-                    log.debug("Deleted file '" + fileName + "'");
+                    log.debug("Deleted file '" + fileName + "' from directory '" + (Paths.get(Utils.getCarbonHome().
+                                    toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                            EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString() + "'");
                 }
                 return true;
             } else {
                 return false;
             }
         } catch (IOException e) {
-            log.error("Error occurred while deleting the file '" + fileName + "'. ", e);
-            throw new FileOperationsException("Error occurred while deleting the file '" + fileName + "'. ", e);
+            log.error("Error occurred while deleting the file '" + fileName + "' from directory '" +
+                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                            .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES))
+                            .toString() + "'", e);
+            throw new FileOperationsException("Error occurred while deleting the file '" + fileName + "' from " +
+                    "directory '" + (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                    .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES))
+                    .toString() + "'", e);
         }
     }
 

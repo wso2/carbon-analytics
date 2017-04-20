@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
+import org.wso2.carbon.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,35 +47,34 @@ public class FileStore {
     private final List<String> fileNameList = Collections.synchronizedList(new ArrayList<>());
 
     /**
-     * FileStore() loads the name of csv files in '/tmp/eventSimulator' directory into file info map
+     * FileStore() loads the name of csv files in 'deployment/simulator/csvFiles' directory into file info map
      */
     private FileStore() {
         try {
-            /*
-             * if the 'tmp' directory doesn't already have a directory called 'eventSimulator', create new directory
-             * load all the names of csv files in 'tmp/eventSimulator' to fileNameList
-             * */
-            boolean dirCreated = new File(Paths.get(System.getProperty("java.io.tmpdir"),
-                    EventSimulatorConstants.DIRECTORY_NAME).toString()).mkdirs();
+            boolean dirCreated = new File(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                    .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES).toString()).mkdirs();
             if (dirCreated && log.isDebugEnabled()) {
-                log.debug("Successfully created directory 'tmp/eventSimulator' ");
+                log.debug("Successfully created directory 'deployment/simulator/csvFiles' ");
             }
 //            create a list of files with '.csv' extension
-            List<File> filesInFolder = Files.walk(Paths.get(System.getProperty("java.io.tmpdir"),
-                    EventSimulatorConstants.DIRECTORY_NAME)).filter(Files::isRegularFile)
+            List<File> filesInFolder = Files.walk(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                    .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES))
+                    .filter(Files::isRegularFile)
                     .filter(file -> file.toString().endsWith(".csv"))
                     .map(Path::toFile).collect(Collectors.toList());
             if (log.isDebugEnabled()) {
-                log.debug("Retrieved files in temp directory " + Paths.get(System.getProperty("java.io.tmpdir"),
-                        EventSimulatorConstants.DIRECTORY_NAME).toString());
+                log.debug("Retrieved files in directory " + Paths.get(Utils.getCarbonHome().toString(),
+                        EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                        EventSimulatorConstants.DIRECTORY_CSV_FILES).toString());
             }
-//            add each file in list of CSV files to fileNames
             for (File file : filesInFolder) {
                 fileNameList.add(file.getName());
             }
         } catch (IOException e) {
-            throw new SimulatorInitializationException("Error occurred when loading CSV file names to " +
-                    "fileNamesList : ", e);
+            throw new SimulatorInitializationException("Error occurred when loading CSV file names available in " +
+                    "directory '" + Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                    .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES).toString() +
+                    "'", e);
         }
     }
 
@@ -105,10 +105,8 @@ public class FileStore {
      *                     delete the file from temp directory and in memory
      */
     public void removeFile(String fileName) throws IOException {
-        // delete the file from directory
-        Files.deleteIfExists(Paths.get(System.getProperty("java.io.tmpdir"), EventSimulatorConstants.DIRECTORY_NAME,
-                fileName));
-        //delete the file from in memory
+        Files.deleteIfExists(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName));
         fileNameList.remove(fileName);
     }
 

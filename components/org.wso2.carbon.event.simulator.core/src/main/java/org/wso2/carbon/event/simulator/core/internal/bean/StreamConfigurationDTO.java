@@ -70,9 +70,9 @@ public abstract class StreamConfigurationDTO {
 
     public String getStreamConfiguration() {
         return "\n stream name : " + streamName +
-            "\n execution plan name : " + executionPlanName +
-            "\n timestamp attribute : " + timestampAttribute +
-            "\n timestamp interval : " + timestampInterval;
+                "\n execution plan name : " + executionPlanName +
+                "\n timestamp attribute : " + timestampAttribute +
+                "\n timestamp interval : " + timestampInterval;
     }
 }
 

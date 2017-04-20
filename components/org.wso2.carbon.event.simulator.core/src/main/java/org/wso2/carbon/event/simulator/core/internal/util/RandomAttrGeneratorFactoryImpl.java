@@ -20,11 +20,6 @@ public class RandomAttrGeneratorFactoryImpl implements RandomAttrGeneratorFactor
             InvalidConfigException {
         if (checkAvailability(attributeConfig, EventSimulatorConstants.RANDOM_DATA_GENERATOR_TYPE)) {
             RandomAttributeGenerator.RandomDataGeneratorType type;
-            /*
-             * for each attribute configuration, check whether a valid attribute generation type is provided.
-             * if yes create respective attribute generators
-             * else throw an exception
-             * */
             try {
                 type = RandomAttributeGenerator.RandomDataGeneratorType.valueOf(attributeConfig
                         .getString(EventSimulatorConstants.RANDOM_DATA_GENERATOR_TYPE));

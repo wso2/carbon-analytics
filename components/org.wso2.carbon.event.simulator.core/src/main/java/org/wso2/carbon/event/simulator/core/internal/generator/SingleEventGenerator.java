@@ -44,6 +44,7 @@ public class SingleEventGenerator {
     public static void sendEvent(String singleEventConfiguration)
             throws InvalidConfigException, InsufficientAttributesException {
         SingleEventSimulationDTO singleEventConfig = validateSingleEvent(singleEventConfiguration);
+//        todo check the null pointer exception if stream name is incorrect
         List<Attribute> streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
                 .getStreamAttributes(singleEventConfig.getExecutionPlanName(),
                         singleEventConfig.getStreamName());
@@ -143,8 +144,9 @@ public class SingleEventGenerator {
             singleEventSimulationDTO.setAttributeValues(dataValues.toArray());
             return singleEventSimulationDTO;
         } catch (JSONException e) {
-            log.error("Error occurred when accessing stream configuration. ", e);
-            throw new InvalidConfigException("Error occurred when accessing stream configuration. ", e);
+            log.error("Error occurred when accessing single event simulation configuration. ", e);
+            throw new InvalidConfigException("Error occurred when accessing single event simulation configuration. ",
+                    e);
         }
     }
 }
