@@ -366,7 +366,7 @@ public class ServiceComponent implements Microservice {
 
     @GET
     @Produces("application/json")
-    @Path("/state/{runtimeId}/{queryName}")
+    @Path("/{runtimeId}/{queryName}/state")
     public Response getQueryState(@PathParam("runtimeId") String runtimeId,
                                   @PathParam("queryName") String queryName) {
         return Response
