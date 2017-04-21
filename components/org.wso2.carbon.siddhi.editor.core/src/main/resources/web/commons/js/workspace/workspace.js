@@ -195,11 +195,6 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
 
             app.commandManager.registerHandler('open-replace-file-confirm-dialog', this.openReplaceFileConfirmDialog, this);
 
-//        app.commandManager.registerCommand("create-new-tab", {key: ""});
-//        app.commandManager.registerHandler('create-new-tab', this.createNewTab);
-//
-//        app.commandManager.registerCommand("save-to-file", {key: ""});
-//        app.commandManager.registerHandler('save-to-file', this.saveFile);
 
         }
 

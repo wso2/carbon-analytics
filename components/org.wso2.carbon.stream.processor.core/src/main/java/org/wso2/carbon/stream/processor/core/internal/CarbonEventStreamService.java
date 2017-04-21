@@ -70,7 +70,6 @@ public class CarbonEventStreamService implements EventStreamService {
                 } else {
                     return null;
                 }
-
             }
         }
         return null;

@@ -16,78 +16,94 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'backbone', 'lodash','log','./design', "./source",'ace/ace','../constants'],
+define(['require', 'jquery', 'backbone', 'lodash','log','./design', "./source",'../constants'],
 
-    function (require, $, Backbone,  _, log, DesignView, SourceView,ace,constants) {
+    function (require, $, Backbone,  _, log, DesignView, SourceView,constants) {
 
-    var ServicePreview = Backbone.View.extend(
-        /** @lends ServicePreview.prototype */
-        {
-            /**
-             * @augments Backbone.View
-             * @constructs
-             * @class ServicePreview Represents the view for siddhi samples
-             * @param {Object} options Rendering options for the view
-             */
-        initialize: function (options) {
-            if(!_.has(options, 'container')) {
-                throw "container is not defined."
-            }
-            var container = $(_.get(options, 'container'));
-            var toolPallete = $(_.get(options, 'toolPalette'));
-            if(!container.length > 0) {
-                throw "container not found."
-            }
-            this._$parent_el = container;
-            this.options = options;
-            this.editor = undefined;
+        var ServicePreview = Backbone.View.extend(
+            /** @lends ServicePreview.prototype */
+            {
+                /**
+                 * @augments Backbone.View
+                 * @constructs
+                 * @class ServicePreview Represents the view for siddhi samples
+                 * @param {Object} options Rendering options for the view
+                 */
+                initialize: function (options) {
+                    if(!_.has(options, 'container')) {
+                        throw "container is not defined."
+                    }
+                    var container = $(_.get(options, 'container'));
+                    var toolPallete = $(_.get(options, 'toolPalette'));
+                    if(!container.length > 0) {
+                        throw "container not found."
+                    }
+                    this._$parent_el = container;
+                    this.options = options;
+                    this._file = _.get(options, 'file');
 
-         },
+                },
 
-        render: function () {
-            var canvasContainer = this._$parent_el.find(_.get(this.options, 'canvas.container'));
-            var previewContainer = this._$parent_el.find(_.get(this.options, 'preview.container'));
-            var sourceContainer = this._$parent_el.find(_.get(this.options, 'source.container'));
-            var tabContentContainer = $(_.get(this.options, 'tabs_container'));
-            var toolPallette = _.get(this.options, 'toolPalette._$parent_el');
+                render: function () {
+                    var self = this;
+                    var canvasContainer = this._$parent_el.find(_.get(this.options, 'canvas.container'));
+                    var previewContainer = this._$parent_el.find(_.get(this.options, 'preview.container'));
+                    var sourceContainer = this._$parent_el.find(_.get(this.options, 'source.container'));
+                    var tabContentContainer = $(_.get(this.options, 'tabs_container'));
+                    var toolPallette = _.get(this.options, 'toolPalette._$parent_el');
 
-            if(!canvasContainer.length > 0){
-                var errMsg = 'cannot find container to render svg';
-                log.error(errMsg);
-                throw errMsg;
-            }
-            var designViewOpts = {};
-            _.set(designViewOpts, 'container', canvasContainer.get(0));
+                    if(!canvasContainer.length > 0){
+                        var errMsg = 'cannot find container to render svg';
+                        log.error(errMsg);
+                        throw errMsg;
+                    }
+                    var designViewOpts = {};
+                    _.set(designViewOpts, 'container', canvasContainer.get(0));
 
-            //use this line to assign dynamic id for canvas and pass the canvas id to initialize jsplumb
-            canvasContainer.attr('id', 'canvasId1');
+                    //use this line to assign dynamic id for canvas and pass the canvas id to initialize jsplumb
+                    canvasContainer.attr('id', 'canvasId1');
 
-            var dynamicId = sourceContainer.attr('id') + this._$parent_el.attr('id');
-            sourceContainer.attr("id",dynamicId);
+                    var dynamicId = sourceContainer.attr('id') + this._$parent_el.attr('id');
+                    sourceContainer.attr("id",dynamicId);
 
-            var sourceViewOptions = {
-                sourceContainer: dynamicId
-            };
+                    var sourceViewOptions = {
+                        sourceContainer: dynamicId,
+                        source: constants.INITIAL_SOURCE_INSTRUCTIONS
+                    };
 
-            var sourceView = new SourceView(sourceViewOptions);
-            canvasContainer.removeClass('show-div').addClass('hide-div');
-            previewContainer.removeClass('show-div').addClass('hide-div');
-            sourceContainer.removeClass('source-view-disabled').addClass('source-view-enabled');
-            toolPallette.addClass('hide-div');
-            tabContentContainer.removeClass('tab-content-default');
-            sourceView.render(sourceViewOptions);
+                    this._sourceView = new SourceView(sourceViewOptions);
+                    canvasContainer.removeClass('show-div').addClass('hide-div');
+                    previewContainer.removeClass('show-div').addClass('hide-div');
+                    sourceContainer.removeClass('source-view-disabled').addClass('source-view-enabled');
+                    toolPallette.addClass('hide-div');
+                    tabContentContainer.removeClass('tab-content-default');
 
-            var editor = ace.edit(dynamicId);
-            editor.setValue(constants.INITIAL_SOURCE_INSTRUCTIONS);
-            editor.resize(true);
-            this.editor = editor;
-        },
+                    this._sourceView.on('modified', function (changeEvent) {
+                        //todo do undo stuff here
+                        _.set(changeEvent, 'editor', self);
+                        self.trigger('content-modified');
+                    });
 
-        getContent: function () {
-            var editor = this.editor;
-            return editor.getValue();
-        }
+                    this._sourceView.on('dispatch-command', function (id) {
+                        self.trigger('dispatch-command', id);
+                    });
 
+                    this._sourceView.render(sourceViewOptions);
+                    if(self._file.getContent() !== undefined){
+                        self._sourceView.setContent(self._file.getContent());
+                    }
+                },
+
+                getContent: function () {
+                    var self = this;
+                    return self._sourceView.getContent();
+                },
+
+                getSourceView: function(){
+                    return this._sourceView;
+                }
+
+
+            });
+        return ServicePreview;
     });
-    return ServicePreview;
-});
