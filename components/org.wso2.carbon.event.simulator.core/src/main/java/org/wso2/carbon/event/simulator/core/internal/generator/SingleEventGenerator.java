@@ -1,6 +1,7 @@
 package org.wso2.carbon.event.simulator.core.internal.generator;
 
-import com.google.gson.Gson;
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,11 +17,10 @@ import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.gson.Gson;
 
 
 /**
@@ -44,14 +44,12 @@ public class SingleEventGenerator {
     public static void sendEvent(String singleEventConfiguration)
             throws InvalidConfigException, InsufficientAttributesException {
         SingleEventSimulationDTO singleEventConfig = validateSingleEvent(singleEventConfiguration);
-//        todo check the null pointer exception if stream name is incorrect
         List<Attribute> streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
                 .getStreamAttributes(singleEventConfig.getExecutionPlanName(),
                         singleEventConfig.getStreamName());
         if (streamAttributes == null) {
-            log.error("Execution plan '" + singleEventConfig.getExecutionPlanName() + "' has not been deployed");
-            throw new EventGenerationException("Execution plan '" + singleEventConfig.getExecutionPlanName()
-                    + "' has not been deployed");
+            log.error("Stream '" + singleEventConfig.getStreamName() + "' does not exist.");
+            throw new EventGenerationException("Stream '" + singleEventConfig.getStreamName() + "' does not exist.");
         }
         if (log.isDebugEnabled()) {
             log.debug("Retrieve stream attribute definitions for stream '" +

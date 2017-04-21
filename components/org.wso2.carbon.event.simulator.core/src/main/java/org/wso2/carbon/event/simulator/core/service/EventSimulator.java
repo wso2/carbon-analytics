@@ -322,8 +322,7 @@ public class EventSimulator implements Runnable {
         if (isStopped()) {
             isPaused = false;
             isStopped = false;
-            generators.forEach(EventGenerator::reinitializeResources);
-
+            generators.forEach(EventGenerator::initializeResources);
         }
         try {
             generators.forEach(EventGenerator::start);
@@ -405,16 +404,6 @@ public class EventSimulator implements Runnable {
      */
     public boolean isStopped() {
         return isStopped;
-    }
-
-    /**
-     * getSimulationName() is required to retrieve the simulation name of the simulation when pausing, resuming and
-     * stopping simulations
-     *
-     * @return simulation name
-     */
-    public String getSimulationName() {
-        return simulationProperties.getSimulationName();
     }
 
     /**

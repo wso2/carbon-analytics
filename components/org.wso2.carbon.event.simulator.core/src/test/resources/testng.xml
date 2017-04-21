@@ -19,6 +19,10 @@
 
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="wso2sp-test-suite">
-
+<suite name="Event-Simulator_Test-Suite">
+    <test name="event-simulator-core-unit-tests" preserve-order="true" parallel="false">
+        <classes>
+            <class name="org.wso2.carbon.event.simulator.core.internal.generator.csv.core.CSVEventGeneratorTest"/>
+        </classes>
+    </test>
 </suite>

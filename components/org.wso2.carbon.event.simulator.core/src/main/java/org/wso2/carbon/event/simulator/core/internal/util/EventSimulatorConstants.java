@@ -48,7 +48,7 @@ public class EventSimulatorConstants {
     public static final String TIMESTAMP_ATTRIBUTE = "timestampAttribute";
     public static final String TIMESTAMP_INTERVAL = "timestampInterval";
 
-    //file simulation constants
+    //CSV simulation constants
     public static final String FILE_NAME = "fileName";
     public static final String DELIMITER = "delimiter";
     public static final String IS_ORDERED = "isOrdered";

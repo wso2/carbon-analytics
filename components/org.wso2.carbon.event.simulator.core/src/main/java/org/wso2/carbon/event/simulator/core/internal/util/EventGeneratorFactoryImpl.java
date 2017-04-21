@@ -36,7 +36,7 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
                         getString(EventSimulatorConstants.EVENT_SIMULATION_TYPE));
             } catch (IllegalArgumentException e) {
                 throw new InvalidConfigException("Simulation type must be " +
-                        "either '" + EventGenerator.GeneratorType.FILE_SIMULATION + "' or '" +
+                        "either '" + EventGenerator.GeneratorType.CSV_SIMULATION + "' or '" +
                         EventGenerator.GeneratorType.DATABASE_SIMULATION + "' or '" +
                         EventGenerator.GeneratorType.RANDOM_DATA_SIMULATION + "'. Invalid source configuration " +
                         "provided : " + sourceConfig.toString());
@@ -46,7 +46,7 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
              * */
             EventGenerator eventGenerator = null;
             switch (generatorType) {
-                case FILE_SIMULATION:
+                case CSV_SIMULATION:
                     eventGenerator = new CSVEventGenerator(sourceConfig, timestampStartTime,
                             timestampEndTime);
                     break;
@@ -62,7 +62,7 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
             return eventGenerator;
         } else {
             throw new InvalidConfigException("Simulation type must" +
-                    " be either '" + EventGenerator.GeneratorType.FILE_SIMULATION + "' or '" +
+                    " be either '" + EventGenerator.GeneratorType.CSV_SIMULATION + "' or '" +
                     EventGenerator.GeneratorType.DATABASE_SIMULATION + "' or '" +
                     EventGenerator.GeneratorType.RANDOM_DATA_SIMULATION + "'. Invalid source configuration " +
                     "provided : " + sourceConfig.toString());

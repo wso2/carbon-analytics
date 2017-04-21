@@ -85,7 +85,7 @@ public class DatabaseEventGenerator implements EventGenerator {
             currentTimestamp = timestampStartTime;
         }
         columnNames = dbSimulationConfig.getColumnNames();
-        initDBConnection();
+        initializeResources();
     }
 
     /**
@@ -261,17 +261,10 @@ public class DatabaseEventGenerator implements EventGenerator {
     }
 
     /**
-     * reinitializeResources() is used to reestablish the database connection when restarting  astopped simulation
+     * initializeResources() is used to establish the database connection
      * */
     @Override
-    public void reinitializeResources() {
-        initDBConnection();
-    }
-
-    /**
-     * initDBConnection() is used to establish a database connection
-     * */
-    private void initDBConnection() {
+    public void initializeResources() {
         databaseConnection = new DatabaseConnector();
         databaseConnection.connectToDatabase(dbSimulationConfig.getDriver(),
                 dbSimulationConfig.getDataSourceLocation(), dbSimulationConfig.getUsername(),
@@ -421,13 +414,13 @@ public class DatabaseEventGenerator implements EventGenerator {
             return dbSimulationDTO;
         } else {
             log.error("Error occurred when initializing database event generator to simulate stream '" +
-                    dbSimulationConfig.getStreamName() + "' using source configuration " +
-                    dbSimulationConfig.toString() + "Execution plan '" + dbSimulationConfig.getExecutionPlanName() +
-                    "' has not been deployed.");
-            throw new SimulatorInitializationException("Error occurred when initializing database event generator" +
-                    " to simulate stream '" + dbSimulationConfig.getStreamName() + "' using source configuration " +
-                    dbSimulationConfig.toString() + "Execution plan '" + dbSimulationConfig.getExecutionPlanName() +
-                    "' has not been deployed.");
+                    sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Stream '" +
+                    sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' does not exist. Invalid source " +
+                    "configuration : " + sourceConfig.toString());
+            throw new SimulatorInitializationException("Error occurred when initializing database event generator " +
+                    "to simulate stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. " +
+                    "Stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' does not exist. " +
+                    "Invalid source configuration : " + sourceConfig.toString());
         }
 
     }

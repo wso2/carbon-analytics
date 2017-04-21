@@ -39,17 +39,17 @@ public interface EventGenerator {
 
     String getExecutionPlanName();
 
-    void reinitializeResources();
+    void initializeResources();
 
     /**
      * Generator type for an input stream can be
      * 1. Random Data Simulation
-     * 2. File Simulation
+     * 2. CSV Simulation
      * 3. Database Simulation
      * 4. Single Event Simulation
      */
     enum GeneratorType {
-        FILE_SIMULATION, RANDOM_DATA_SIMULATION, DATABASE_SIMULATION
+        CSV_SIMULATION, RANDOM_DATA_SIMULATION, DATABASE_SIMULATION
     }
 
 }

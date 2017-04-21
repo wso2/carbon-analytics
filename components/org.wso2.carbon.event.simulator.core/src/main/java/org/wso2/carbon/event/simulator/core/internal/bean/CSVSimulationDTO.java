@@ -19,7 +19,7 @@ package org.wso2.carbon.event.simulator.core.internal.bean;
 
 
 /**
- * CSVSimulationDTO returns the configuration for file simulation
+ * CSVSimulationDTO returns the configuration for CSV simulation
  */
 public class CSVSimulationDTO extends StreamConfigurationDTO {
 

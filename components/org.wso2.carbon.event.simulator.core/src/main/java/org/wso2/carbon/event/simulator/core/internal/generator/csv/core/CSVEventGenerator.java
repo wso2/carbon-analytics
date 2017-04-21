@@ -97,14 +97,14 @@ public class CSVEventGenerator implements EventGenerator {
                         " stream '" + csvConfiguration.getStreamName() + "'.");
             }
         } else {
-            log.error("Error occurred when initializing CSV event generator" +
-                    " for file '" + csvConfiguration.getFileName() + "' to simulate stream '"
-                    + csvConfiguration.getStreamName() + "'. Execution plan '" +
-                    csvConfiguration.getExecutionPlanName() + "' has not been deployed.");
+            log.error("Error occurred when initializing CSV event generator for file '" + csvConfiguration
+                    .getFileName() + "' to simulate stream '" + csvConfiguration.getStreamName() + "'. Stream '" +
+                    csvConfiguration.getStreamName() + "' does not exist. Invalid source configuration : " +
+                    csvConfiguration.toString());
             throw new SimulatorInitializationException("Error occurred when initializing CSV event generator" +
                     " for file '" + csvConfiguration.getFileName() + "' to simulate stream '"
-                    + csvConfiguration.getStreamName() + "'. Execution plan '" +
-                    csvConfiguration.getExecutionPlanName() + "' has not been deployed.");
+                    + csvConfiguration.getStreamName() + "'. Stream '" + csvConfiguration.getStreamName() + "' does " +
+                    "not exist. Invalid source configuration : " + csvConfiguration.toString());
         }
     }
 
@@ -204,10 +204,10 @@ public class CSVEventGenerator implements EventGenerator {
     }
 
     /**
-     * reinitializeResources() is used to create a file reader when restarting a stopped simulation
-     * */
+     * initializeResources() is used to create a file reader
+     */
     @Override
-    public void reinitializeResources() {
+    public void initializeResources() {
         csvReader.initFileReader(csvConfiguration.getFileName(), csvConfiguration.getIsOrdered());
     }
 

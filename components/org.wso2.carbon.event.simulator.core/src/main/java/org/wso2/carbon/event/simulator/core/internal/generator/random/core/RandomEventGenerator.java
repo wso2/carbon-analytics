@@ -186,9 +186,9 @@ public class RandomEventGenerator implements EventGenerator {
     /**
      * reinitializeResources() is used to reinitialize resources used for simulation when restarting a stopped
      * simulation
-     * */
+     */
     @Override
-    public void reinitializeResources() {
+    public void initializeResources() {
 //        this method is not needed for random event generation
     }
 
@@ -290,13 +290,13 @@ public class RandomEventGenerator implements EventGenerator {
             return randomSimulationDTO;
         } else {
             log.error("Error occurred when initializing random event generator to simulate stream '" +
-                    sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' using source configuration" +
-                    sourceConfig.toString() + ". Execution plan '" +
-                    sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME) + "' has not been deployed.");
-            throw new SimulatorInitializationException("Error occurred when initializing random event "
-                    + "generator to simulate stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) +
-                    "' using source configuration" + sourceConfig.toString() + ". Execution plan '" +
-                    sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME) + "' has not been deployed.");
+                    sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Stream '" +
+                    sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' does not exist. " +
+                    "Invalid source configuration : " + sourceConfig.toString());
+            throw new SimulatorInitializationException("Error occurred when initializing random event generator to " +
+                    "simulate stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Stream '" +
+                    sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' does not exist. " +
+                    "Invalid source configuration : " + sourceConfig.toString());
         }
     }
 
