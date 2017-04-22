@@ -31,7 +31,7 @@
     <artifactId>org.wso2.carbon.event.simulator.core</artifactId>
     <packaging>bundle</packaging>
 
-    <name>WSO2 Data Analytics Server - Simulator</name>
+    <name>WSO2 Data Analytics Server - Event Simulator</name>
     <url>http://wso2.org</url>
 
     <dependencies>

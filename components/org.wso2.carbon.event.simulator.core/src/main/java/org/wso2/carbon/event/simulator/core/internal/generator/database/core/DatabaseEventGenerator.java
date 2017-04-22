@@ -109,9 +109,9 @@ public class DatabaseEventGenerator implements EventGenerator {
             }
         } catch (SQLException e) {
             log.error("Error occurred when retrieving resultset from database ' " +
-                            dbSimulationConfig.getDataSourceLocation() + "' to simulate to simulate stream '" +
-                            dbSimulationConfig.getStreamName() + "' using source configuration " +
-                            dbSimulationConfig.toString(), e);
+                    dbSimulationConfig.getDataSourceLocation() + "' to simulate to simulate stream '" +
+                    dbSimulationConfig.getStreamName() + "' using source configuration " +
+                    dbSimulationConfig.toString(), e);
             throw new EventGenerationException("Error occurred when retrieving resultset from database ' " +
                     dbSimulationConfig.getDataSourceLocation() + "' to simulate to simulate stream '" +
                     dbSimulationConfig.getStreamName() + "' using source configuration " + dbSimulationConfig.toString()
@@ -262,7 +262,7 @@ public class DatabaseEventGenerator implements EventGenerator {
 
     /**
      * initializeResources() is used to establish the database connection
-     * */
+     */
     @Override
     public void initializeResources() {
         databaseConnection = new DatabaseConnector();

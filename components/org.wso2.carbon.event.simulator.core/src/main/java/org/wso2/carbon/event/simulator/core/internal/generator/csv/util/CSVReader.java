@@ -61,18 +61,18 @@ public class CSVReader {
      * Initialize a file reader for the CSV file.
      * If the CSV file is ordered by timestamp it will create a bufferedReader for the file reader.
      */
-    public CSVReader(String fileName, Boolean isOrdered) {
-      initFileReader(fileName,isOrdered);
+    public CSVReader(String fileName, boolean isOrdered) {
+        initFileReader(fileName, isOrdered);
     }
 
 
     /**
      * initFileReader() is used to initialize a file reader to read the CSV file
      *
-     * @param fileName name of file being read
+     * @param fileName  name of file being read
      * @param isOrdered flag indicating whether the file is ordered by timestamp attribute
-     * */
-    public void initFileReader(String fileName, Boolean isOrdered) {
+     */
+    public void initFileReader(String fileName, boolean isOrdered) {
         try {
             if (new File(String.valueOf(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
                     .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName)))

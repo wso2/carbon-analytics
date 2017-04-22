@@ -115,7 +115,7 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
                     primitiveBasedAttrConfig.setLength(attributeConfig
                             .getInt(EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_PRECISION));
                 } else {
-                    throw new InvalidConfigException("Properties 'Min','Max' and 'Length' are " +
+                    throw new InvalidConfigException("Properties 'Min','Max' and 'Precision' are " +
                             "required for generation of attributes of type '" + attrType + "' in " +
                             RandomAttributeGenerator.RandomDataGeneratorType.PRIMITIVE_BASED +
                             " attribute generation. Invalid attribute configuration provided : " +

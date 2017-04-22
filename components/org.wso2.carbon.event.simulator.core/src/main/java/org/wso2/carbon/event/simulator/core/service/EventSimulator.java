@@ -98,7 +98,7 @@ public class EventSimulator implements Runnable {
      * Events will be sent at time intervals equal to the delay
      */
     private void eventSimulation() {
-        Long minTimestamp;
+        long minTimestamp;
         EventGenerator generator;
         int eventsRemaining = simulationProperties.getNoOfEventsRequired();
         try {
@@ -140,7 +140,7 @@ public class EventSimulator implements Runnable {
                             }
                         }
                         if (minTimestamp >= 0L && generator != null) {
-                            log.info("Input Event (" + simulationName + ") : "
+                            log.info("Input Event (Simulation : '" + simulationName + "') : "
                                     + Arrays.deepToString(generator.peek().getData()));
                             EventSimulatorDataHolder.getInstance().getEventStreamService()
                                     .pushEvent(generator.getExecutionPlanName(), generator.getStreamName(),
@@ -204,21 +204,21 @@ public class EventSimulator implements Runnable {
                 timeInterval = 1000;
             }
             /**
-             * if timestampStartTime no provided or is set to null it implies the current system time must be taken as
+             * if startTimestamp no provided or is set to null it implies the current system time must be taken as
              * the timestamp start time
-             * if null, set timestampStartTime to system current time
-             * else if timestampStartTime is specified, and that value is positive use that value as least possible
+             * if null, set startTimestamp to system current time
+             * else if startTimestamp is specified, and that value is positive use that value as least possible
              * timestamp value
              * */
-            long timestampStartTime;
+            long startTimestamp;
             if (simulationPropertiesConfig.has(EventSimulatorConstants.START_TIMESTAMP)) {
                 if (simulationPropertiesConfig.isNull(EventSimulatorConstants.START_TIMESTAMP)) {
-                    timestampStartTime = System.currentTimeMillis();
+                    startTimestamp = System.currentTimeMillis();
                 } else if (!simulationPropertiesConfig.getString(EventSimulatorConstants.START_TIMESTAMP)
                         .isEmpty()) {
-                    timestampStartTime = simulationPropertiesConfig
+                    startTimestamp = simulationPropertiesConfig
                             .getLong(EventSimulatorConstants.START_TIMESTAMP);
-                    if (timestampStartTime < 0) {
+                    if (startTimestamp < 0) {
                         throw new InvalidConfigException("StartTimestamp must be a positive value for simulation " +
                                 "'" + simulationPropertiesConfig.getString(EventSimulatorConstants
                                 .EVENT_SIMULATION_NAME) + "'. Invalid simulation properties configuration provided : "
@@ -231,25 +231,25 @@ public class EventSimulator implements Runnable {
                             + simulationPropertiesConfig.toString());
                 }
             } else {
+                startTimestamp = System.currentTimeMillis();
                 log.warn("StartTimestamp is required for simulation '" +
                         simulationPropertiesConfig.getString(EventSimulatorConstants.EVENT_SIMULATION_NAME)
-                        + "'. StartTimestamp is set to current system time for simulation : " +
+                        + "'. StartTimestamp is set to current system time '" + startTimestamp + "' for simulation : " +
                         simulationPropertiesConfig.toString());
-                timestampStartTime = System.currentTimeMillis();
             }
             /**
-             * if timestampEndTime is null set timestampEndTime property as -1. it implies that there is no bound
+             * if endTimestamp is null set endTimestamp property as -1. it implies that there is no bound
              * for maximum timestamp possible for an event.
              * */
-            long timestampEndTime = -1;
+            long endTimestamp = -1;
             int noOfEventsRequired = -1;
             if (simulationPropertiesConfig.has(EventSimulatorConstants.END_TIMESTAMP)) {
                 if (simulationPropertiesConfig.isNull(EventSimulatorConstants.END_TIMESTAMP)) {
-                    timestampEndTime = -1;
+                    endTimestamp = -1;
                 } else if (!simulationPropertiesConfig.getString(EventSimulatorConstants.END_TIMESTAMP)
                         .isEmpty()) {
-                    timestampEndTime = simulationPropertiesConfig.getLong(EventSimulatorConstants.END_TIMESTAMP);
-                    if (timestampEndTime < 0) {
+                    endTimestamp = simulationPropertiesConfig.getLong(EventSimulatorConstants.END_TIMESTAMP);
+                    if (endTimestamp < 0) {
                         throw new InvalidConfigException("EndTimestamp must be a positive value for simulation " +
                                 "'" + simulationPropertiesConfig.getString(EventSimulatorConstants
                                 .EVENT_SIMULATION_NAME) + "'. Invalid simulation properties configuration provided : "
@@ -285,9 +285,9 @@ public class EventSimulator implements Runnable {
                             simulationPropertiesConfig.toString());
                 }
             }
-            if (timestampEndTime != -1 && timestampEndTime < timestampStartTime) {
-                throw new InvalidConfigException("Either the timestampEndTime must be set to null " +
-                        "or the timestampStartTime must be less than or equal the timestampEndTime. Invalid " +
+            if (endTimestamp != -1 && endTimestamp < startTimestamp) {
+                throw new InvalidConfigException("Either the EndTimestamp must be set to null " +
+                        "or the startTimestamp must be less than or equal the EndTimestamp. Invalid " +
                         "simulation properties configuration provided : " + simulationPropertiesConfig.toString());
             }
 //            create simulationPropertiesDTO object
@@ -295,8 +295,8 @@ public class EventSimulator implements Runnable {
             simulationPropertiesDTO.setSimulationName(simulationPropertiesConfig
                     .getString(EventSimulatorConstants.EVENT_SIMULATION_NAME));
             simulationPropertiesDTO.setTimeInterval(timeInterval);
-            simulationPropertiesDTO.setStartTimestamp(timestampStartTime);
-            simulationPropertiesDTO.setEndTimestamp(timestampEndTime);
+            simulationPropertiesDTO.setStartTimestamp(startTimestamp);
+            simulationPropertiesDTO.setEndTimestamp(endTimestamp);
             simulationPropertiesDTO.setNoOfEventsRequired(noOfEventsRequired);
             return simulationPropertiesDTO;
         } catch (JSONException e) {

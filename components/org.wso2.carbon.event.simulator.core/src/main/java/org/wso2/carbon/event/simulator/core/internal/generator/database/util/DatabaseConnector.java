@@ -148,7 +148,7 @@ public class DatabaseConnector {
      * @param tableName name of table from which data must be retrieved
      * @return true if table exists in the database
      */
-    private Boolean checkTableExists(String tableName) {
+    private boolean checkTableExists(String tableName) {
         try {
             DatabaseMetaData metaData = dbConnection.getMetaData();
             /**
@@ -186,7 +186,7 @@ public class DatabaseConnector {
      * @param columnNames list of columns to be retrieved
      * @return true if columns exists
      */
-    private Boolean validateColumns(String tableName, List<String> columnNames) {
+    private boolean validateColumns(String tableName, List<String> columnNames) {
         try {
             DatabaseMetaData metaData = dbConnection.getMetaData();
             /**

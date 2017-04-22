@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.event.simulator.core.internal.generator.csv.util;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
@@ -60,7 +61,7 @@ public class FileStore {
             List<File> filesInFolder = Files.walk(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
                     .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES))
                     .filter(Files::isRegularFile)
-                    .filter(file -> file.toString().endsWith(".csv"))
+                    .filter(file -> FilenameUtils.getExtension(file.toString()).equals("csv"))
                     .map(Path::toFile).collect(Collectors.toList());
             if (log.isDebugEnabled()) {
                 log.debug("Retrieved files in directory " + Paths.get(Utils.getCarbonHome().toString(),
@@ -104,9 +105,8 @@ public class FileStore {
      * @throws IOException it throws IOException if anything occurred while
      *                     delete the file from temp directory and in memory
      */
-    public void removeFile(String fileName) throws IOException {
-        Files.deleteIfExists(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
-                .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName));
+    public void removeFile(String fileName, String destination) throws IOException {
+        Files.deleteIfExists(Paths.get(destination, fileName));
         fileNameList.remove(fileName);
     }
 
@@ -116,7 +116,7 @@ public class FileStore {
      * @param fileName File name of the file
      * @return true if exist false if not exist
      */
-    public Boolean checkExists(String fileName) {
+    public boolean checkExists(String fileName) {
         return fileNameList.contains(fileName);
     }
 }

@@ -1,7 +1,6 @@
 package org.wso2.carbon.event.simulator.core.internal.generator;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,10 +16,11 @@ import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.google.gson.Gson;
 
 
 /**
@@ -44,6 +44,7 @@ public class SingleEventGenerator {
     public static void sendEvent(String singleEventConfiguration)
             throws InvalidConfigException, InsufficientAttributesException {
         SingleEventSimulationDTO singleEventConfig = validateSingleEvent(singleEventConfiguration);
+        log.info(singleEventConfiguration);
         List<Attribute> streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
                 .getStreamAttributes(singleEventConfig.getExecutionPlanName(),
                         singleEventConfig.getStreamName());
@@ -77,6 +78,9 @@ public class SingleEventGenerator {
                         singleEventConfig.toString() + "'. ", e);
             }
         } else {
+            log.error("Simulation of stream '" + singleEventConfig.getStreamName() + "' requires " +
+                    streamAttributes.size() + " attribute(s). Single event configuration only contains values for " +
+                    singleEventConfig.getAttributeValues().length + " attribute(s)");
             throw new InsufficientAttributesException("Simulation of stream '" + singleEventConfig
                     .getStreamName() + "' requires " + streamAttributes.size() + " attribute(s). Single" +
                     "event configuration only contains values for " + singleEventConfig.getAttributeValues()
@@ -126,7 +130,6 @@ public class SingleEventGenerator {
             }
             ArrayList dataValues;
             if (checkAvailabilityOfArray(singleEventConfig, EventSimulatorConstants.SINGLE_EVENT_DATA)) {
-
                 dataValues = new Gson().fromJson(singleEventConfig.getJSONArray(EventSimulatorConstants
                         .SINGLE_EVENT_DATA).toString(), ArrayList.class);
             } else {

@@ -43,7 +43,7 @@ public class CustomBasedAttributeDTO implements RandomAttributeDTO {
     /**
      * List of custom data value given by user
      */
-    private ArrayList customDataList = null;
+    private ArrayList customDataList;
 
     public CustomBasedAttributeDTO() {
     }

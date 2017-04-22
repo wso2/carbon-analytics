@@ -56,7 +56,7 @@ public class SingleEventSimulationDTO extends StreamConfigurationDTO {
     @Override
     public String toString() {
         return "\n stream name : " + getStreamName() +
-                "\n siddhi application : " + getExecutionPlanName() +
+                "\n execution plan name : " + getExecutionPlanName() +
                 "\n event timestamp : " + getTimestamp() +
                 "\n event data : " + Arrays.toString(getAttributeValues());
     }

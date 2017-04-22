@@ -82,10 +82,8 @@ public class SimulationConfigStore {
      * @throws IOException it throws IOException if anything occurred while
      *                     delete the simulation config
      */
-    public void removeSimulationConfig(String simulationName) throws IOException {
-        Files.deleteIfExists(Paths.get(Utils.getCarbonHome().toString(),
-                EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS, simulationName));
+    public void removeSimulationConfig(String simulationName, String destination) throws IOException {
+        Files.deleteIfExists(Paths.get(destination, simulationName + ".json"));
         simulationNamesList.remove(simulationName);
     }
 
@@ -95,7 +93,7 @@ public class SimulationConfigStore {
      * @param simulationName name of the simulation
      * @return true if exist false if not exist
      */
-    public Boolean checkExists(String simulationName) {
+    public boolean checkExists(String simulationName) {
         return simulationNamesList.contains(simulationName);
     }
 }

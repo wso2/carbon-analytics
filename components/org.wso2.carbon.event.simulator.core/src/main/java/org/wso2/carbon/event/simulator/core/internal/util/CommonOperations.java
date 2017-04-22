@@ -20,7 +20,7 @@ public class CommonOperations {
      * @param key           name of key
      * @return true if checks are successful, else false
      */
-    public static Boolean checkAvailability(JSONObject configuration, String key) {
+    public static boolean checkAvailability(JSONObject configuration, String key) {
 
         return configuration.has(key)
                 && !configuration.isNull(key)
@@ -38,7 +38,7 @@ public class CommonOperations {
      * @param key           name of key
      * @return true if checks are successful, else false
      */
-    public static Boolean checkAvailabilityOfArray(JSONObject configuration, String key) {
+    public static boolean checkAvailabilityOfArray(JSONObject configuration, String key) {
 
         return configuration.has(key)
                 && !configuration.isNull(key)

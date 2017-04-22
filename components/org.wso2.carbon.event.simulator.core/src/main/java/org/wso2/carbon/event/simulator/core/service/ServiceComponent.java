@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.event.simulator.core.service;
 
+import org.apache.commons.io.FilenameUtils;
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -39,7 +40,6 @@ import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.utils.Utils;
 import org.wso2.msf4j.Microservice;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -78,7 +78,7 @@ public class ServiceComponent implements Microservice {
      *                 "executionPlanName" : "TestExecutionPlan",
      *                 "timestamp" : "1488615136958"
      *                 "attributeValues":["WSO2","345", "45"]}'
-     *  http://localhost:9090/eventSimulation/singleEventSimulation
+     *  http://localhost:9090/simulation/single
      * </pre>
      *
      * @param singleEventConfiguration jsonString to be converted to SingleEventSimulationDTO object.
@@ -104,7 +104,7 @@ public class ServiceComponent implements Microservice {
     /**
      * service used to upload feed simulation configuration to the system
      * <p>
-     * http://localhost:9090/eventSimulation/feedSimulation
+     * http://localhost:9090/simulation/feed
      *
      * @param simulationConfiguration jsonString to be converted to EventSimulationDto object
      * @return Response
@@ -118,10 +118,13 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response uploadFeedSimulationConfig(String simulationConfiguration)
             throws InvalidConfigException, FileAlreadyExistsException, FileOperationsException {
-        SimulationConfigUploader.getConfigUploader().uploadSimulationConfig(simulationConfiguration);
+        SimulationConfigUploader.getConfigUploader().uploadSimulationConfig(simulationConfiguration,
+                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
         return Response.status(Response.Status.CREATED).entity(
-                new ResponseMapper(Response.Status.CREATED, "Successfully uploaded simulation configuration" +
-                        " to directory '" + (Paths.get(Utils.getCarbonHome().toString(),
+                new ResponseMapper(Response.Status.CREATED, "Successfully uploaded simulation configuration " +
+                        "'" + SimulationConfigUploader.getConfigUploader().getSimulationName(simulationConfiguration) +
+                        "' to directory '" + (Paths.get(Utils.getCarbonHome().toString(),
                         EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
                         EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'")).build();
     }
@@ -143,7 +146,9 @@ public class ServiceComponent implements Microservice {
     public Response updateFeedSimulationConfig(@PathParam("simulationName") String simulationName, String
             simulationConfigDetails) throws InvalidConfigException, FileOperationsException,
             FileAlreadyExistsException {
-        boolean deleted = SimulationConfigUploader.getConfigUploader().deleteSimulationConfig(simulationName);
+        boolean deleted = SimulationConfigUploader.getConfigUploader().deleteSimulationConfig(simulationName,
+                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
         if (deleted) {
             if (EventSimulatorDataHolder.getInstance().getSimulatorMap().containsKey(simulationName)) {
                 if (!EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).isStopped()) {
@@ -151,7 +156,9 @@ public class ServiceComponent implements Microservice {
                 }
                 EventSimulatorDataHolder.getInstance().getSimulatorMap().remove(simulationName);
             }
-            SimulationConfigUploader.getConfigUploader().uploadSimulationConfig(simulationConfigDetails);
+            SimulationConfigUploader.getConfigUploader().uploadSimulationConfig(simulationConfigDetails,
+                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
             return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully updated " +
                     "simulation configuration '" + simulationName + "' available in directory '" +
                     (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
@@ -178,7 +185,9 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response getFeedSimulationConfig(@PathParam("simulationName") String simulationName) throws
             FileOperationsException {
-        String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig(simulationName);
+        String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig(simulationName,
+                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
         if (simulationConfig != null) {
             return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
                     "retrieved the configuration of simulation '" + simulationName + "' available in directory '" +
@@ -208,7 +217,9 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response deleteFeedSimulationConfig(@PathParam("simulationName") String simulationName) throws
             FileOperationsException {
-        boolean deleted = SimulationConfigUploader.getConfigUploader().deleteSimulationConfig(simulationName);
+        boolean deleted = SimulationConfigUploader.getConfigUploader().deleteSimulationConfig(simulationName,
+                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
         if (deleted) {
             if (EventSimulatorDataHolder.getInstance().getSimulatorMap().containsKey(simulationName)) {
                 if (!EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).isStopped()) {
@@ -312,7 +323,10 @@ public class ServiceComponent implements Microservice {
             }
         } else {
 //            else check whether the simulation has been uploaded
-            String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig(simulationName);
+            String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig(simulationName,
+                    (Paths.get(Utils.getCarbonHome().toString(),
+                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
             if (simulationConfig != null) {
                 EventSimulator simulator = new EventSimulator(simulationName, simulationConfig);
                 EventSimulatorDataHolder.getInstance().getSimulatorMap().put(simulationName, simulator);
@@ -392,7 +406,6 @@ public class ServiceComponent implements Microservice {
      * @param simulationName name of simulation being started
      * @return response
      */
-//    todo IOexception of closing input stream when close method is called.
     private Response stop(String simulationName) {
         if (EventSimulatorDataHolder.getInstance().getSimulatorMap().containsKey(simulationName)) {
             if (!EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).isStopped()) {
@@ -428,8 +441,10 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response uploadFile(String filePath)
             throws FileAlreadyExistsException, FileOperationsException {
-        String fileName = new File(filePath).getName();
-        FileUploader.getFileUploaderInstance().uploadFile(fileName, filePath);
+        String fileName = FilenameUtils.getName(filePath);
+        FileUploader.getFileUploaderInstance().uploadFile(filePath,
+                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                        EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
         return Response.status(Response.Status.CREATED).entity(
                 new ResponseMapper(Response.Status.CREATED, "Successfully uploaded " +
                         "file '" + fileName + "' to directory '" + (Paths.get(Utils.getCarbonHome().toString(),
@@ -457,9 +472,13 @@ public class ServiceComponent implements Microservice {
     public Response updateFile(@PathParam("fileName") String fileName, String filePath)
             throws FileAlreadyExistsException, FileOperationsException {
         FileUploader fileUploader = FileUploader.getFileUploaderInstance();
-        boolean deleted = fileUploader.deleteFile(fileName);
+        boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
+                EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
         if (deleted) {
-            fileUploader.uploadFile(new File(filePath).getName(), filePath);
+            fileUploader.uploadFile(filePath, (Paths.get(Utils.getCarbonHome().toString(),
+                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                    EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
             return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully updated " +
                     "file '" + fileName + "' available in  directory '" + (Paths.get(Utils.getCarbonHome().toString(),
                     EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
@@ -487,7 +506,9 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response deleteFile(@PathParam("fileName") String fileName) throws FileOperationsException {
         FileUploader fileUploader = FileUploader.getFileUploaderInstance();
-        boolean deleted = fileUploader.deleteFile(fileName);
+        boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
+                EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
         if (deleted) {
             return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
                     "deleted file '" + fileName + "' from directory '" + Paths.get(Utils.getCarbonHome().toString(),
