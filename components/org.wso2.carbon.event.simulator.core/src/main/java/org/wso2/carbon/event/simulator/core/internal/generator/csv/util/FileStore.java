@@ -21,8 +21,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
-import org.wso2.carbon.event.simulator.core.internal.util.DirectoryDestinationUtil;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
+import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  */
 public class FileStore {
     private static final Logger log = LoggerFactory.getLogger(FileStore.class);
-    private static final FileStore fileStore = new FileStore(DirectoryDestinationUtil.getDirectoryPath());
+    private static final FileStore fileStore = new FileStore(EventSimulatorDataHolder.getDirectoryDestination());
     /**
      * Concurrent list that holds names of uploaded CSV files
      */

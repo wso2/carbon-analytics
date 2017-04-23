@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class EventSimulatorDataHolder {
     private static EventSimulatorDataHolder instance = new EventSimulatorDataHolder();
+    private static String directoryDestination;
     private final Map<String, EventSimulator> simulatorMap = new ConcurrentHashMap<>();
     private EventStreamService eventStreamService;
 
@@ -43,6 +44,14 @@ public class EventSimulatorDataHolder {
 
     public static EventSimulatorDataHolder getInstance() {
         return instance;
+    }
+
+    public static String getDirectoryDestination() {
+        return directoryDestination;
+    }
+
+    public static void setDirectoryDestination(String directoryDestination) {
+        EventSimulatorDataHolder.directoryDestination = directoryDestination;
     }
 
     public Map<String, EventSimulator> getSimulatorMap() {

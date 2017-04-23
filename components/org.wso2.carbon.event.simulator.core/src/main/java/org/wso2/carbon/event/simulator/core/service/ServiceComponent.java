@@ -34,7 +34,6 @@ import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesExce
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.internal.generator.SingleEventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileUploader;
-import org.wso2.carbon.event.simulator.core.internal.util.DirectoryDestinationUtil;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
@@ -443,11 +442,9 @@ public class ServiceComponent implements Microservice {
     public Response uploadFile(String filePath)
             throws FileAlreadyExistsException, FileOperationsException {
         String fileName = FilenameUtils.getName(filePath);
-        DirectoryDestinationUtil.setDirectoryPath("/home/ruwini/abc");
-        FileUploader.getFileUploaderInstance().uploadFile(filePath, "/home/ruwini/abc/csvFiles");
-//        FileUploader.getFileUploaderInstance().uploadFile(filePath,
-//                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-//                        EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
+        FileUploader.getFileUploaderInstance().uploadFile(filePath,
+                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                        EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
         return Response.status(Response.Status.CREATED).entity(
                 new ResponseMapper(Response.Status.CREATED, "Successfully uploaded " +
                         "file '" + fileName + "' to directory '" + (Paths.get(Utils.getCarbonHome().toString(),
@@ -560,6 +557,8 @@ public class ServiceComponent implements Microservice {
     )
     protected void eventStreamService(EventStreamService eventStreamService) {
         EventSimulatorDataHolder.getInstance().setEventStreamService(eventStreamService);
+        EventSimulatorDataHolder.setDirectoryDestination((Paths.get(Utils.getCarbonHome().toString(),
+                EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR)).toString());
         if (log.isDebugEnabled()) {
             log.info("@Reference(bind) EventStreamService");
         }
