@@ -21,8 +21,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
+import org.wso2.carbon.event.simulator.core.internal.util.DirectoryDestinationUtil;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
-import org.wso2.carbon.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  */
 public class FileStore {
     private static final Logger log = LoggerFactory.getLogger(FileStore.class);
-    private static final FileStore fileStore = new FileStore();
+    private static final FileStore fileStore = new FileStore(DirectoryDestinationUtil.getDirectoryPath());
     /**
      * Concurrent list that holds names of uploaded CSV files
      */
@@ -50,22 +50,21 @@ public class FileStore {
     /**
      * FileStore() loads the name of csv files in 'deployment/simulator/csvFiles' directory into file info map
      */
-    private FileStore() {
+    private FileStore(String directoryDestination) {
         try {
-            boolean dirCreated = new File(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
-                    .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES).toString()).mkdirs();
+            boolean dirCreated = new File(Paths.get(directoryDestination,
+                    EventSimulatorConstants.DIRECTORY_CSV_FILES).toString()).mkdirs();
             if (dirCreated && log.isDebugEnabled()) {
                 log.debug("Successfully created directory 'deployment/simulator/csvFiles' ");
             }
 //            create a list of files with '.csv' extension
-            List<File> filesInFolder = Files.walk(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
-                    .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES))
+            List<File> filesInFolder = Files.walk(Paths.get(directoryDestination,
+                    EventSimulatorConstants.DIRECTORY_CSV_FILES))
                     .filter(Files::isRegularFile)
                     .filter(file -> FilenameUtils.getExtension(file.toString()).equals("csv"))
                     .map(Path::toFile).collect(Collectors.toList());
             if (log.isDebugEnabled()) {
-                log.debug("Retrieved files in directory " + Paths.get(Utils.getCarbonHome().toString(),
-                        EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                log.debug("Retrieved files in directory " + Paths.get(directoryDestination,
                         EventSimulatorConstants.DIRECTORY_CSV_FILES).toString());
             }
             for (File file : filesInFolder) {
@@ -73,9 +72,8 @@ public class FileStore {
             }
         } catch (IOException e) {
             throw new SimulatorInitializationException("Error occurred when loading CSV file names available in " +
-                    "directory '" + Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
-                    .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES).toString() +
-                    "'", e);
+                    "directory '" + Paths.get(directoryDestination,
+                    EventSimulatorConstants.DIRECTORY_CSV_FILES).toString() + "'", e);
         }
     }
 
