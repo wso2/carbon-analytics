@@ -148,6 +148,10 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     return operatingSystem;
                 },
 
+                displayInitialView: function () {
+                    this.workspaceManager.displayInitialTab();
+                },
+
                 isRunningOnMacOS: function(){
                     return _.isEqual(this.getOperatingSystem(), 'MacOS');
                 },
