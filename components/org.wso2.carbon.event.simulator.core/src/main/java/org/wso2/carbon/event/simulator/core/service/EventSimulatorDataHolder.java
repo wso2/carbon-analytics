@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EventSimulatorDataHolder {
     private static EventSimulatorDataHolder instance = new EventSimulatorDataHolder();
     private static String directoryDestination;
+    private static long maximumFileSize;
     private final Map<String, EventSimulator> simulatorMap = new ConcurrentHashMap<>();
     private EventStreamService eventStreamService;
 
@@ -52,6 +53,14 @@ public class EventSimulatorDataHolder {
 
     public static void setDirectoryDestination(String directoryDestination) {
         EventSimulatorDataHolder.directoryDestination = directoryDestination;
+    }
+
+    public static long getMaximumFileSize() {
+        return maximumFileSize;
+    }
+
+    public static void setMaximumFileSize(long maximumFileSize) {
+        EventSimulatorDataHolder.maximumFileSize = maximumFileSize;
     }
 
     public Map<String, EventSimulator> getSimulatorMap() {

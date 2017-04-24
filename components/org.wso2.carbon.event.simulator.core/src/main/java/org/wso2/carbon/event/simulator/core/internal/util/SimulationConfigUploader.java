@@ -1,12 +1,13 @@
 package org.wso2.carbon.event.simulator.core.internal.util;
 
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
+
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
-
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -50,9 +51,6 @@ public class SimulationConfigUploader {
             FileOperationsException, InvalidConfigException {
         String simulationName = getSimulationName(simulationConfig);
         if (!simulationConfigStore.checkExists(simulationName)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Initialize a File writer for simulation configuration '" + simulationName + "'.");
-            }
             try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(destination, (simulationName +
                     ".json")))) {
                 writer.write(simulationConfig);
@@ -105,10 +103,10 @@ public class SimulationConfigUploader {
      * getSimulationConfig() is used to retrieve an uploaded simulation configuration
      *
      * @param simulationName name of simulation to be retrieved
-     * @param destination where the simulation configuration is stored
+     * @param destination    where the simulation configuration is stored
      * @return simulation configuration
      * @throws FileOperationsException is an error occurs when reading simulation configuration file
-     * */
+     */
     public String getSimulationConfig(String simulationName, String destination) throws FileOperationsException {
         try {
             if (simulationConfigStore.checkExists(simulationName)) {
@@ -131,22 +129,26 @@ public class SimulationConfigUploader {
      * @param simulationConfig simulation configuration
      * @return simulation configuration name
      * @throws InvalidConfigException if the simulation configuration doesnt contain a simulation name
-     * */
+     */
     public String getSimulationName(String simulationConfig) throws InvalidConfigException {
-        JSONObject configuration = new JSONObject(simulationConfig);
-        if (configuration.has(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)
-                && !configuration.isNull(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)) {
-            if (checkAvailability(configuration.getJSONObject(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES),
-                    EventSimulatorConstants.EVENT_SIMULATION_NAME)) {
-                return configuration.getJSONObject(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)
-                        .getString(EventSimulatorConstants.EVENT_SIMULATION_NAME);
+        try {
+            JSONObject configuration = new JSONObject(simulationConfig);
+            if (configuration.has(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)
+                    && !configuration.isNull(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)) {
+                if (checkAvailability(configuration.getJSONObject(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES),
+                        EventSimulatorConstants.EVENT_SIMULATION_NAME)) {
+                    return configuration.getJSONObject(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)
+                            .getString(EventSimulatorConstants.EVENT_SIMULATION_NAME);
+                } else {
+                    throw new InvalidConfigException("Simulation name is required for event simulation. Invalid " +
+                            "simulation configuration provided : " + configuration.toString());
+                }
             } else {
-                throw new InvalidConfigException("Simulation name is required for event simulation. Invalid " +
+                throw new InvalidConfigException("Simulation properties are required for event simulation. Invalid " +
                         "simulation configuration provided : " + configuration.toString());
             }
-        } else {
-            throw new InvalidConfigException("Simulation properties are required for event simulation. Invalid " +
-                    "simulation configuration provided : " + configuration.toString());
+        } catch (JSONException e) {
+            throw new InvalidConfigException("Invalid simulation configuration provided : " + simulationConfig, e);
         }
     }
 }

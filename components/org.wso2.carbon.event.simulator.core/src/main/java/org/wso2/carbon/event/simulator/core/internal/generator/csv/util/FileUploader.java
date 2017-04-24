@@ -22,9 +22,12 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
+import org.wso2.carbon.event.simulator.core.exception.InvalidFileException;
 import org.wso2.carbon.event.simulator.core.internal.util.ValidatedInputStream;
+import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -62,16 +65,17 @@ public class FileUploader {
      * @throws FileAlreadyExistsException if the file exists in 'deployment/simulator/csvFiles' directory
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
      *                                    'deployment/simulator//csvFiles' directory
+     * @throws InvalidFileException if the file being uploaded is not a csv file
      */
     public void uploadFile(String source, String destination) throws FileAlreadyExistsException,
-            FileOperationsException {
+            FileOperationsException, InvalidFileException {
         String fileName = FilenameUtils.getName(source);
         // Validate file extension
-        if (FilenameUtils.getExtension(fileName).equals("csv")) {
+        if (FilenameUtils.isExtension(fileName, "csv")) {
             if (!fileStore.checkExists(fileName)) {
 //                use ValidatedInputStream to check whether the file size is less than the maximum size allowed ie 8MB
                 try (ValidatedInputStream inputStream = new ValidatedInputStream(FileUtils.openInputStream(new
-                        File(source)), 8388608)) {
+                        File(source)), EventSimulatorDataHolder.getMaximumFileSize())) {
                     if (log.isDebugEnabled()) {
                         log.debug("Initialize a File reader for CSV file '" + fileName + "'.");
                     }
@@ -81,6 +85,9 @@ public class FileUploader {
                                 + "'");
                     }
                     fileStore.addFile(fileName);
+                } catch (FileNotFoundException e) {
+                    log.error("File '" + source + "' does not exist.", e);
+                    throw new InvalidFileException("File '" + source + "' does not exist.", e);
                 } catch (IOException e) {
                     log.error("Error occurred while copying the file '" + fileName + "' to directory '" +
                             destination + "'. ", e);
@@ -94,7 +101,7 @@ public class FileUploader {
             }
         } else {
             log.error("File '" + fileName + " has an invalid content type. Please upload a valid CSV file .");
-            throw new FileOperationsException("File '" + fileName + " has an invalid content type."
+            throw new InvalidFileException("File '" + fileName + " has an invalid content type."
                     + " Please upload a valid CSV file .");
         }
 

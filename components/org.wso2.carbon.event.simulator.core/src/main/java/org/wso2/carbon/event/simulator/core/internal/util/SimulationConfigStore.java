@@ -1,9 +1,10 @@
 package org.wso2.carbon.event.simulator.core.internal.util;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
-import org.wso2.carbon.utils.Utils;
+import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,38 +21,37 @@ import java.util.stream.Collectors;
  */
 public class SimulationConfigStore {
     private static final Logger log = LoggerFactory.getLogger(SimulationConfigStore.class);
-    private static final SimulationConfigStore simulationConfigStore = new SimulationConfigStore();
+    private static final SimulationConfigStore simulationConfigStore = new SimulationConfigStore
+            (EventSimulatorDataHolder.getDirectoryDestination());
     /**
      * Concurrent list that holds names of simulations
      */
     private final List<String> simulationNamesList = Collections.synchronizedList(new ArrayList<>());
 
-    private SimulationConfigStore() {
+    private SimulationConfigStore(String destination) {
         try {
-            boolean dirCreated = new File(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
-                    .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)
+            boolean dirCreated = new File(Paths.get(destination, EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)
                     .toString()).mkdirs();
             if (dirCreated && log.isDebugEnabled()) {
-                log.debug("Successfully created directory 'deployment/simulator/simulationConfigs' ");
+                log.debug("Successfully created directory '" + Paths.get(destination,
+                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString() + "'");
             }
 //            load the names of files available in tmp/simulationConfigs
-            List<File> fileNames = Files.walk(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
-                    .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS))
+            List<File> fileNames = Files.walk(Paths.get(destination,
+                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS))
                     .filter(Files::isRegularFile)
-                    .filter(file -> file.toString().endsWith(".json"))
+                    .filter(file -> FilenameUtils.isExtension(file.toString(), "json"))
                     .map(Path::toFile).collect(Collectors.toList());
             if (log.isDebugEnabled()) {
-                log.debug("Retrieved files in directory '" + Paths.get(Utils.getCarbonHome().toString(),
-                        EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                log.debug("Retrieved files in directory '" + Paths.get(destination,
                         EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString() + "'");
             }
             for (File file : fileNames) {
-                simulationNamesList.add(file.getName().substring(0, file.getName().length() - 5));
+                simulationNamesList.add(FilenameUtils.getBaseName(file.getName()));
             }
         } catch (IOException e) {
             throw new SimulatorInitializationException("Error occurred when loading simulation configuration names " +
-                    "available in directory '" + Paths.get(Utils.getCarbonHome().toString(),
-                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                    "available in directory '" + Paths.get(destination,
                     EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString() + "'", e);
         }
     }

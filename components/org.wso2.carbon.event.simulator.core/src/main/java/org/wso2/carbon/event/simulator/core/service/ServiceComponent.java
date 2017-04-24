@@ -19,7 +19,6 @@
 package org.wso2.carbon.event.simulator.core.service;
 
 import org.apache.commons.io.FilenameUtils;
-import org.json.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -32,6 +31,7 @@ import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
+import org.wso2.carbon.event.simulator.core.exception.InvalidFileException;
 import org.wso2.carbon.event.simulator.core.internal.generator.SingleEventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileUploader;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
@@ -189,12 +189,17 @@ public class ServiceComponent implements Microservice {
                 (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
                         EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
         if (simulationConfig != null) {
-            return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
-                    "retrieved the configuration of simulation '" + simulationName + "' available in directory '" +
+//            todo - fix the json payload
+            return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully retrieved" +
+                    " the configuration of simulation '" + simulationName + "' available in directory '" +
                     (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'. Simulation " +
-                    "configuration : " +
-                    new JSONObject(simulationConfig))).build();
+                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'", simulationConfig))
+                    .build();
+//            return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
+//                    "retrieved the configuration of simulation '" + simulationName + "' available in directory '" +
+//                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+//                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'. Simulation " +
+//                    "configuration : " + new JSONObject(simulationConfig))).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity(
                     new ResponseMapper(Response.Status.NOT_FOUND, "No simulation configuration" +
@@ -287,9 +292,10 @@ public class ServiceComponent implements Microservice {
             }
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ResponseMapper(
-                    Response.Status.BAD_REQUEST, " Please specify an action for the simulation '" + simulationName
-                    + "'. Actions supported  are " + EventSimulator.Action.RUN + ", " + EventSimulator.Action.PAUSE +
-                    ", " + EventSimulator.Action.RESUME + ", " + EventSimulator.Action.STOP + ".")).build();
+                    Response.Status.BAD_REQUEST, " Please specify an action for the simulation '" +
+                    simulationName + "'. Actions supported  are " + EventSimulator.Action.RUN + ", " +
+                    EventSimulator.Action.PAUSE + ", " + EventSimulator.Action.RESUME + ", "
+                    + EventSimulator.Action.STOP + ".")).build();
 
         }
     }
@@ -324,8 +330,7 @@ public class ServiceComponent implements Microservice {
         } else {
 //            else check whether the simulation has been uploaded
             String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig(simulationName,
-                    (Paths.get(Utils.getCarbonHome().toString(),
-                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
                             EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
             if (simulationConfig != null) {
                 EventSimulator simulator = new EventSimulator(simulationName, simulationConfig);
@@ -440,7 +445,7 @@ public class ServiceComponent implements Microservice {
     @Path("/files")
     @Produces("application/json")
     public Response uploadFile(String filePath)
-            throws FileAlreadyExistsException, FileOperationsException {
+            throws FileAlreadyExistsException, FileOperationsException, InvalidFileException {
         String fileName = FilenameUtils.getName(filePath);
         FileUploader.getFileUploaderInstance().uploadFile(filePath,
                 (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
@@ -470,7 +475,7 @@ public class ServiceComponent implements Microservice {
     @Path("/files/{fileName}")
     @Produces("application/json")
     public Response updateFile(@PathParam("fileName") String fileName, String filePath)
-            throws FileAlreadyExistsException, FileOperationsException {
+            throws FileAlreadyExistsException, FileOperationsException, InvalidFileException {
         FileUploader fileUploader = FileUploader.getFileUploaderInstance();
         boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
                 EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
@@ -559,6 +564,7 @@ public class ServiceComponent implements Microservice {
         EventSimulatorDataHolder.getInstance().setEventStreamService(eventStreamService);
         EventSimulatorDataHolder.setDirectoryDestination((Paths.get(Utils.getCarbonHome().toString(),
                 EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR)).toString());
+        EventSimulatorDataHolder.setMaximumFileSize(8388608);
         if (log.isDebugEnabled()) {
             log.info("@Reference(bind) EventStreamService");
         }

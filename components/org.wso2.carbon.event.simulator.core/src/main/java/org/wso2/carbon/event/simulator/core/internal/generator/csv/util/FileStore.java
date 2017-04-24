@@ -55,17 +55,18 @@ public class FileStore {
             boolean dirCreated = new File(Paths.get(directoryDestination,
                     EventSimulatorConstants.DIRECTORY_CSV_FILES).toString()).mkdirs();
             if (dirCreated && log.isDebugEnabled()) {
-                log.debug("Successfully created directory 'deployment/simulator/csvFiles' ");
+                log.debug("Successfully created directory '" + Paths.get(directoryDestination,
+                        EventSimulatorConstants.DIRECTORY_CSV_FILES).toString() + "'");
             }
 //            create a list of files with '.csv' extension
             List<File> filesInFolder = Files.walk(Paths.get(directoryDestination,
                     EventSimulatorConstants.DIRECTORY_CSV_FILES))
                     .filter(Files::isRegularFile)
-                    .filter(file -> FilenameUtils.getExtension(file.toString()).equals("csv"))
+                    .filter(file -> FilenameUtils.isExtension(file.toString(), "csv"))
                     .map(Path::toFile).collect(Collectors.toList());
             if (log.isDebugEnabled()) {
-                log.debug("Retrieved files in directory " + Paths.get(directoryDestination,
-                        EventSimulatorConstants.DIRECTORY_CSV_FILES).toString());
+                log.debug("Retrieved files in directory '" + Paths.get(directoryDestination,
+                        EventSimulatorConstants.DIRECTORY_CSV_FILES).toString() + "'");
             }
             for (File file : filesInFolder) {
                 fileNameList.add(file.getName());
