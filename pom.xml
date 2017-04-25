@@ -50,47 +50,6 @@
         <!--<module>components/analytics-api</module>-->
      </modules>
 
-
-    <profiles>
-        <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-            </modules>
-        </profile>
-        <profile>
-            <id>builder</id>
-            <activation>
-                <property>
-                    <name>builder</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <modules>
-            </modules>
-        </profile>
-        <profile>
-            <id>sonar-profile</id>
-            <activation>
-                <property>
-                    <name>bamboo</name>
-                    <value>sonar</value>
-                </property>
-            </activation>
-            <modules>
-            </modules>
-        </profile>
-    </profiles>
-
-    <scm>
-        <url>https://github.com/wso2/carbon-analytics.git</url>
-        <developerConnection>scm:git:https://github.com/wso2/carbon-analytics.git</developerConnection>
-        <connection>scm:git:https://github.com/wso2/carbon-analytics.git</connection>
-        <tag>HEAD</tag>
-    </scm>
-
     <build>
         <extensions>
             <extension>
@@ -182,7 +141,6 @@
         </pluginManagement>
 
         <plugins>
-
             <!-- Disabling the Maven checkstyle and FindBugs plugins till the code could be fully migrated -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -225,6 +183,46 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+            </modules>
+        </profile>
+        <profile>
+            <id>builder</id>
+            <activation>
+                <property>
+                    <name>builder</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <modules>
+            </modules>
+        </profile>
+        <profile>
+            <id>sonar-profile</id>
+            <activation>
+                <property>
+                    <name>bamboo</name>
+                    <value>sonar</value>
+                </property>
+            </activation>
+            <modules>
+            </modules>
+        </profile>
+    </profiles>
+
+    <scm>
+        <url>https://github.com/wso2/carbon-analytics.git</url>
+        <developerConnection>scm:git:https://github.com/wso2/carbon-analytics.git</developerConnection>
+        <connection>scm:git:https://github.com/wso2/carbon-analytics.git</connection>
+        <tag>HEAD</tag>
+    </scm>
 
     <dependencyManagement>
         <dependencies>
