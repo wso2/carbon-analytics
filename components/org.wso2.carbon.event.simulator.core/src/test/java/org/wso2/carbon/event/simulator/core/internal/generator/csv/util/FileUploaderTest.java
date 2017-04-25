@@ -29,8 +29,8 @@ public class FileUploaderTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-        EventSimulatorDataHolder.setDirectoryDestination(DIRECTORY_LOCATION);
-        EventSimulatorDataHolder.setMaximumFileSize(200);
+        EventSimulatorDataHolder.getInstance().setDirectoryDestination(DIRECTORY_LOCATION);
+        EventSimulatorDataHolder.getInstance().setMaximumFileSize(200);
         File file = new File(DIRECTORY_LOCATION);
         if (file.exists()) {
             FileUtils.forceDelete(file);
@@ -39,8 +39,8 @@ public class FileUploaderTest {
 
     @AfterClass
     public void tearDown() throws Exception {
-        EventSimulatorDataHolder.setDirectoryDestination(null);
-        EventSimulatorDataHolder.setMaximumFileSize(-1);
+        EventSimulatorDataHolder.getInstance().setDirectoryDestination(null);
+        EventSimulatorDataHolder.getInstance().setMaximumFileSize(-1);
         File file = new File(DIRECTORY_LOCATION);
         if (file.exists()) {
             FileUtils.forceDelete(file);

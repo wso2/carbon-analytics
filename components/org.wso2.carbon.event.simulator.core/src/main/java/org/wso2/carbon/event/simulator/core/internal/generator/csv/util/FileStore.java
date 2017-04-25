@@ -41,7 +41,8 @@ import java.util.stream.Collectors;
  */
 public class FileStore {
     private static final Logger log = LoggerFactory.getLogger(FileStore.class);
-    private static final FileStore fileStore = new FileStore(EventSimulatorDataHolder.getDirectoryDestination());
+    private static final FileStore fileStore = new FileStore(EventSimulatorDataHolder.getInstance()
+            .getDirectoryDestination());
     /**
      * Concurrent list that holds names of uploaded CSV files
      */

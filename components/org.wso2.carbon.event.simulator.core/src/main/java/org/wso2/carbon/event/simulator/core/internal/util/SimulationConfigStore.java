@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class SimulationConfigStore {
     private static final Logger log = LoggerFactory.getLogger(SimulationConfigStore.class);
     private static final SimulationConfigStore simulationConfigStore = new SimulationConfigStore
-            (EventSimulatorDataHolder.getDirectoryDestination());
+            (EventSimulatorDataHolder.getInstance().getDirectoryDestination());
     /**
      * Concurrent list that holds names of simulations
      */

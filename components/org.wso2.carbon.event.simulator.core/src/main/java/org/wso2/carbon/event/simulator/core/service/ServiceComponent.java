@@ -92,9 +92,6 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response singleEventSimulation(String singleEventConfiguration)
             throws InvalidConfigException, InsufficientAttributesException {
-        if (log.isDebugEnabled()) {
-            log.debug("Single Event Simulation");
-        }
         SingleEventGenerator.sendEvent(singleEventConfiguration);
         return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Single Event simulation " +
                 "started successfully")).build();
@@ -535,6 +532,9 @@ public class ServiceComponent implements Microservice {
      */
     @Activate
     protected void start() throws Exception {
+        EventSimulatorDataHolder.getInstance().setDirectoryDestination((Paths.get(Utils.getCarbonHome().toString(),
+                EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR)).toString());
+        EventSimulatorDataHolder.getInstance().setMaximumFileSize(8388608);
         log.info("Event Simulator service component is activated");
     }
 
@@ -562,9 +562,6 @@ public class ServiceComponent implements Microservice {
     )
     protected void eventStreamService(EventStreamService eventStreamService) {
         EventSimulatorDataHolder.getInstance().setEventStreamService(eventStreamService);
-        EventSimulatorDataHolder.setDirectoryDestination((Paths.get(Utils.getCarbonHome().toString(),
-                EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR)).toString());
-        EventSimulatorDataHolder.setMaximumFileSize(8388608);
         if (log.isDebugEnabled()) {
             log.info("@Reference(bind) EventStreamService");
         }

@@ -75,7 +75,7 @@ public class FileUploader {
             if (!fileStore.checkExists(fileName)) {
 //                use ValidatedInputStream to check whether the file size is less than the maximum size allowed ie 8MB
                 try (ValidatedInputStream inputStream = new ValidatedInputStream(FileUtils.openInputStream(new
-                        File(source)), EventSimulatorDataHolder.getMaximumFileSize())) {
+                        File(source)), EventSimulatorDataHolder.getInstance().getMaximumFileSize())) {
                     if (log.isDebugEnabled()) {
                         log.debug("Initialize a File reader for CSV file '" + fileName + "'.");
                     }
