@@ -57,10 +57,9 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                 var mainWelcomeDiv = $('<div></div>');
                 var headingDiv = $('<div></div>');
                 var headingTitleSpan = $('<span></span>');
-                var headingImage = $('<img>');
+                var headingTitleSpan2 = $('<span></span>');
                 var headingGroup1 = $('<div></div>');
                 var wrapTitle = $('<div></div>');
-                var wrapImage = $('<div></div>');
 
                 var bodyDiv = $('<div></div>');
                 var newButton = $('<button></button>');
@@ -74,8 +73,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                 mainWelcomeDiv.addClass(_.get(this._options, 'cssClass.outer'));
                 headingDiv.addClass(_.get(this._options, 'cssClass.heading'));
                 headingTitleSpan.addClass(_.get(this._options, 'cssClass.headingTitle'));
-                headingImage.addClass(_.get(this._options, 'cssClass.headingIcon'));
-                headingImage.attr('src', 'editor/commons/images/Ballerina.svg');
+                headingTitleSpan2.addClass(_.get(this._options, 'cssClass.headingTitle'));
                 newButton.addClass(_.get(this._options, 'cssClass.buttonNew'));
                 openButton.addClass(_.get(this._options, 'cssClass.buttonOpen'));
                 headingGroup1.addClass(_.get(this._options, 'cssClass.headingTop'));
@@ -91,12 +89,12 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                 openButton.text("Open");
 
                 headingTitleSpan.text("Welcome to");
+                headingTitleSpan2.text("Data Analytics Composer");
 //                bodyTitleSpan.text("Try out our samples / Templates");
 
                 wrapTitle.append(headingTitleSpan);
+                wrapTitle.append(headingTitleSpan2);
                 headingGroup1.append(wrapTitle);
-                wrapImage.append(headingImage);
-                headingGroup1.append(wrapImage);
 
                 buttonGroup1.append(newButton);
                 buttonGroup1.append(openButton);
