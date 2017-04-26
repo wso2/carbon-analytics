@@ -10,7 +10,9 @@ import org.wso2.carbon.event.simulator.core.internal.generator.EventGenerator;
  */
 public interface EventGeneratorFactory {
 
-    EventGenerator getEventGenerator(JSONObject sourceConfig, long timestampStartTime, long timestampEndTime)
-            throws InvalidConfigException, InsufficientAttributesException;
+    EventGenerator createEventGenerator(JSONObject sourceConfig, long startTimestamp, long endTimestamp)
+            throws InvalidConfigException;
 
+    void validateGeneratorConfiguration(JSONObject sourceConfig) throws InvalidConfigException,
+            InsufficientAttributesException;
 }

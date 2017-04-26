@@ -17,12 +17,6 @@ public class ResponseMapper {
         this.message = message;
     }
 
-    public ResponseMapper(Response.Status status, String message, String data) {
-        this.status = status;
-        this.message = message;
-        this.data = new JSONObject(data);
-    }
-
     public Response.Status getStatus() {
         return status;
     }

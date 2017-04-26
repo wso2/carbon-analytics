@@ -69,25 +69,22 @@ public class PropertyBasedAttrGenerator implements RandomAttributeGenerator {
     private static final Words words = Fabricator.words();
     private PropertyBasedAttributeDTO propertyBasedAttrConfig = new PropertyBasedAttributeDTO();
 
+    public PropertyBasedAttrGenerator() {
+
+    }
+
     /**
-     * PropertyBasedAttrGenerator() constructor validates the property based attribute configuration provided and
-     * creates a PropertyBasedAttributeDTO object containing Property base attribute generation configuration
+     * validateAttributeConfiguration() validates the attribute configuration provided for property base attribute
+     * generation
      *
-     * @param attributeConfig JSON object of the property based attribute configuration
-     * @throws InvalidConfigException if attribute configuration is invalid
-     */
-    public PropertyBasedAttrGenerator(JSONObject attributeConfig) throws InvalidConfigException {
-        /**
-         * check whether the property based attribute generation has a property name specified
-         * if not throw an exception
-         * else check whether the property value provided is valid
-         * if yes set property value to PropertyBasedAttributeDTO
-         * else throw an exception
-         * */
+     * @param attributeConfig the attribute configuration for property based attribute generation
+     * @throws InvalidConfigException if the attribute configuration contains an invalid propertyType*/
+    @Override
+    public void validateAttributeConfiguration(JSONObject attributeConfig) throws InvalidConfigException {
         if (checkAvailability(attributeConfig, EventSimulatorConstants.PROPERTY_BASED_ATTRIBUTE_PROPERTY)) {
             try {
-                propertyBasedAttrConfig.setProperty(PropertyType.valueOf(attributeConfig
-                        .getString(EventSimulatorConstants.PROPERTY_BASED_ATTRIBUTE_PROPERTY)));
+                PropertyType.valueOf(attributeConfig
+                        .getString(EventSimulatorConstants.PROPERTY_BASED_ATTRIBUTE_PROPERTY));
             } catch (IllegalArgumentException e) {
                 throw new EventGenerationException("Invalid property type '" + propertyBasedAttrConfig.getProperty() +
                         "' provided for random event generation using " +
@@ -99,6 +96,17 @@ public class PropertyBasedAttrGenerator implements RandomAttributeGenerator {
                     + RandomAttributeGenerator.RandomDataGeneratorType.PROPERTY_BASED + " attribute generation. " +
                     "Invalid attribute configuration provided : " + attributeConfig.toString());
         }
+    }
+
+    /**
+     * createRandomAttributeDTO() creates PropertyBasedAttributeDTO using the attribute configuration provided
+     *
+     * @param attributeConfig attribute configuration for property based attribute generation
+     * */
+    @Override
+    public void createRandomAttributeDTO(JSONObject attributeConfig) {
+        propertyBasedAttrConfig.setProperty(PropertyType.valueOf(attributeConfig
+                .getString(EventSimulatorConstants.PROPERTY_BASED_ATTRIBUTE_PROPERTY)));
     }
 
     /**

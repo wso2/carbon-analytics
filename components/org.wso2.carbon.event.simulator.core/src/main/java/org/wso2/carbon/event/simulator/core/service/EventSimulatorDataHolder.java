@@ -30,7 +30,6 @@ public class EventSimulatorDataHolder {
     private static EventSimulatorDataHolder instance = new EventSimulatorDataHolder();
     private String directoryDestination;
     private long maximumFileSize;
-    private final Map<String, EventSimulator> simulatorMap = new ConcurrentHashMap<>();
     private EventStreamService eventStreamService;
 
 
@@ -61,10 +60,6 @@ public class EventSimulatorDataHolder {
 
     public void setMaximumFileSize(long maximumFileSize) {
         this.maximumFileSize = maximumFileSize;
-    }
-
-    public Map<String, EventSimulator> getSimulatorMap() {
-        return simulatorMap;
     }
 
     public EventStreamService getEventStreamService() {

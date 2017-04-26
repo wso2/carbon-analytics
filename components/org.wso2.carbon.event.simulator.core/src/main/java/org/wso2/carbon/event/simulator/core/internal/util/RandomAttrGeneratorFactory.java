@@ -10,6 +10,10 @@ import org.wso2.siddhi.query.api.definition.Attribute;
  */
 public interface RandomAttrGeneratorFactory {
 
-    RandomAttributeGenerator getRandomAttrGenerator(JSONObject attributeConfig, Attribute.Type attrType) throws
+    RandomAttributeGenerator createRandomAttrGenerator(JSONObject attributeConfig, Attribute.Type attrType) throws
             InvalidConfigException;
+
+    void validateRandomAttrGenerator(JSONObject attributeConfig, Attribute.Type attrType) throws
+            InvalidConfigException;
+
 }

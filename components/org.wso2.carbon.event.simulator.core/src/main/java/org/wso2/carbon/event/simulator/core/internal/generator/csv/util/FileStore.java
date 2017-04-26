@@ -49,7 +49,7 @@ public class FileStore {
     private final List<String> fileNameList = Collections.synchronizedList(new ArrayList<>());
 
     /**
-     * FileStore() loads the name of csv files in 'deployment/simulator/csvFiles' directory into file info map
+     * FileStore() loads the name of csv files in 'deployment/csvFiles' directory into file info map
      */
     private FileStore(String directoryDestination) {
         try {
@@ -59,7 +59,7 @@ public class FileStore {
                 log.debug("Successfully created directory '" + Paths.get(directoryDestination,
                         EventSimulatorConstants.DIRECTORY_CSV_FILES).toString() + "'");
             }
-//            create a list of files with '.csv' extension
+//            create a list of files with 'csv' extension
             List<File> filesInFolder = Files.walk(Paths.get(directoryDestination,
                     EventSimulatorConstants.DIRECTORY_CSV_FILES))
                     .filter(Files::isRegularFile)
@@ -73,9 +73,7 @@ public class FileStore {
                 fileNameList.add(file.getName());
             }
         } catch (IOException e) {
-            throw new SimulatorInitializationException("Error occurred when loading CSV file names available in " +
-                    "directory '" + Paths.get(directoryDestination,
-                    EventSimulatorConstants.DIRECTORY_CSV_FILES).toString() + "'", e);
+            throw new SimulatorInitializationException("Error occurred when loading CSV file names", e);
         }
     }
 
@@ -102,8 +100,7 @@ public class FileStore {
      * Method to remove the file from in memory
      *
      * @param fileName File Name of uploaded CSV file
-     * @throws IOException it throws IOException if anything occurred while
-     *                     delete the file from temp directory and in memory
+     * @throws IOException if anything occurred when deleting the file
      */
     public void removeFile(String fileName, String destination) throws IOException {
         Files.deleteIfExists(Paths.get(destination, fileName));

@@ -38,30 +38,36 @@ import java.util.Random;
  * This class implements interface RandomAttributeGenerator
  */
 public class CustomBasedAttrGenerator implements RandomAttributeGenerator {
-    private static final Logger log = LoggerFactory.getLogger(CustomBasedAttrGenerator.class);
     private CustomBasedAttributeDTO customBasedAttrConfig = new CustomBasedAttributeDTO();
 
+    public CustomBasedAttrGenerator() {}
+
     /**
-     * CustomBasedAttrGenerator() constructor validates the custom data attribute configuration provided and creates a
-     * CustomBasedAttributeDTO object containing custom based attribute generation configuration
+     * validateAttributeConfiguration() validates the attribute configuration provided for custom data based random
+     * simulation
      *
-     * @param attributeConfig JSON object of the custom data attribute configuration
-     * @throws InvalidConfigException if attribute configuration is invalid
-     */
-    public CustomBasedAttrGenerator(JSONObject attributeConfig) throws InvalidConfigException {
-        if (checkAvailabilityOfArray(attributeConfig, EventSimulatorConstants.CUSTOM_DATA_BASED_ATTRIBUTE_LIST)) {
-            Gson gson = new Gson();
-            ArrayList dataValues = gson.fromJson(attributeConfig.
-                    getJSONArray(EventSimulatorConstants.CUSTOM_DATA_BASED_ATTRIBUTE_LIST).toString(), ArrayList.class);
-            customBasedAttrConfig.setCustomData(dataValues);
-            if (log.isDebugEnabled()) {
-                log.debug("Set data list for custom based random simulation.");
-            }
-        } else {
+     * @param attributeConfig attribute configuration for custom data based random simulation
+     * @throws InvalidConfigException if a custom data list is not provided
+     * */
+    @Override
+    public void validateAttributeConfiguration(JSONObject attributeConfig) throws InvalidConfigException{
+        if (!checkAvailabilityOfArray(attributeConfig, EventSimulatorConstants.CUSTOM_DATA_BASED_ATTRIBUTE_LIST)) {
             throw new InvalidConfigException("Data list is not given for " +
-                    RandomAttributeGenerator.RandomDataGeneratorType.CUSTOM_DATA_BASED + " simulation. Invalid " +
+                    RandomDataGeneratorType.CUSTOM_DATA_BASED + " simulation. Invalid " +
                     "attribute configuration provided : " + attributeConfig.toString());
         }
+    }
+
+    /**
+     * createRandomAttributeDTO() creates a CustomBasedAttributeDTO for custom attribute generator
+     *
+     * @param attributeConfig is the attribute configuration
+     * */
+    @Override
+    public void createRandomAttributeDTO(JSONObject attributeConfig) {
+        Gson gson = new Gson();
+        customBasedAttrConfig.setCustomData(gson.fromJson(attributeConfig.
+                getJSONArray(EventSimulatorConstants.CUSTOM_DATA_BASED_ATTRIBUTE_LIST).toString(), ArrayList.class));
     }
 
     /**
@@ -89,4 +95,6 @@ public class CustomBasedAttrGenerator implements RandomAttributeGenerator {
     public String getAttributeConfiguration() {
         return customBasedAttrConfig.toString();
     }
+
+
 }

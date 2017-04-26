@@ -11,6 +11,7 @@ import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -20,15 +21,9 @@ import java.nio.file.Paths;
 public class SimulationConfigUploader {
     private static final Logger log = Logger.getLogger(SimulationConfigUploader.class);
     private static final SimulationConfigUploader configUploader =
-            new SimulationConfigUploader(SimulationConfigStore.getSimulationConfigStore());
-    /**
-     * SimulationConfigStore object which holds details of uploaded simulation configurations
-     */
-    private SimulationConfigStore simulationConfigStore;
+            new SimulationConfigUploader();
 
-    private SimulationConfigUploader(SimulationConfigStore simulationConfigStore) {
-        this.simulationConfigStore = simulationConfigStore;
-    }
+    private SimulationConfigUploader() {}
 
     /**
      * getConfigUploader() returns Singleton configUploader object
@@ -43,33 +38,23 @@ public class SimulationConfigUploader {
      * Method to upload a simulation configuration.
      *
      * @param simulationConfig simulation configuration being uploaded
-     * @throws FileAlreadyExistsException if the file exists in 'deployment/simulator/simulationConfigs' directory
+     * @param destination destination where the simulation configuration must be stored
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
-     *                                    'deployment/simulator/simulationConfigs' directory
+     *                                    'deployment/simulationConfigs' directory
      */
-    public void uploadSimulationConfig(String simulationConfig, String destination) throws FileAlreadyExistsException,
-            FileOperationsException, InvalidConfigException {
+    public void uploadSimulationConfig(String simulationConfig, String destination) throws FileOperationsException,
+            InvalidConfigException {
         String simulationName = getSimulationName(simulationConfig);
-        if (!simulationConfigStore.checkExists(simulationName)) {
-            try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(destination, (simulationName +
-                    ".json")))) {
-                writer.write(simulationConfig);
-                simulationConfigStore.addSimulationConfig(simulationName);
-                if (log.isDebugEnabled()) {
-                    log.debug("Successfully uploaded simulation configuration '" + simulationName + "' to " +
-                            "directory '" + destination + "'");
-                }
-            } catch (IOException e) {
-                log.error("Error occurred while copying the file '" + simulationName + "' to " +
-                        "directory '" + destination + "'. ", e);
-                throw new FileOperationsException("Error occurred while copying the file '" + simulationName +
-                        "' to directory '" + Paths.get(destination).toString() + "'. ", e);
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(destination, (simulationName +
+                ".json")))) {
+            writer.write(simulationConfig);
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully uploaded simulation configuration '" + simulationName + "'.");
             }
-        } else {
-            log.error("Simulation configuration '" + simulationName + "' already exists in directory '" +
-                    destination + "'");
-            throw new FileAlreadyExistsException("Simulation configuration '" + simulationName + "'" +
-                    " already exists in directory '" + destination + "'");
+        } catch (IOException e) {
+            log.error("Error occurred while copying the file '" + simulationName + "'.", e);
+            throw new FileOperationsException("Error occurred while copying the file '" + simulationName +
+                    "'. ", e);
         }
     }
 
@@ -77,25 +62,20 @@ public class SimulationConfigUploader {
      * Method to delete an uploaded simulation configuration.
      *
      * @param simulationName name of simulation to be deleted
+     * @param destination location where the simulation is saved
      * @throws FileOperationsException if an IOException occurs while deleting file
      */
-    public boolean deleteSimulationConfig(String simulationName, String destination) throws FileOperationsException {
+    public void deleteSimulationConfig(String simulationName, String destination) throws FileOperationsException {
         try {
-            if (simulationConfigStore.checkExists(simulationName)) {
-                simulationConfigStore.removeSimulationConfig(simulationName, destination);
-                if (log.isDebugEnabled()) {
-                    log.debug("Deleted simulation configuration '" + simulationName + "' from directory '" +
-                            destination + "'");
-                }
-                return true;
-            } else {
-                return false;
+            Files.deleteIfExists(Paths.get(destination, simulationName + ".json"));
+            if (log.isDebugEnabled()) {
+                log.debug("Deleted simulation configuration '" + simulationName + "'.");
             }
         } catch (IOException e) {
             log.error("Error occurred while deleting the simulation configuration '" + simulationName +
-                    "' from directory '" + destination + "'", e);
+                    "'.", e);
             throw new FileOperationsException("Error occurred while deleting the simulation configuration '" +
-                    simulationName + "' from directory '" + destination + "'", e);
+                    simulationName + "'.'", e);
         }
     }
 
@@ -109,17 +89,13 @@ public class SimulationConfigUploader {
      */
     public String getSimulationConfig(String simulationName, String destination) throws FileOperationsException {
         try {
-            if (simulationConfigStore.checkExists(simulationName)) {
-                return new String(Files.readAllBytes(Paths.get(destination, (simulationName + ".json"))),
-                        "UTF-8");
-            } else {
-                return null;
-            }
+            return new String(Files.readAllBytes(Paths.get(destination, (simulationName + ".json"))),
+                    StandardCharsets.UTF_8);
         } catch (IOException e) {
             log.error("Error occurred while reading the simulation configuration '" +
-                    simulationName + "' from directory '" + destination + "'", e);
+                    simulationName + "'.", e);
             throw new FileOperationsException("Error occurred while reading the simulation configuration '" +
-                    simulationName + "' from directory '" + destination + "'", e);
+                    simulationName + "'.", e);
         }
     }
 

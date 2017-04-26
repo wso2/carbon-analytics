@@ -19,6 +19,7 @@
 package org.wso2.carbon.event.simulator.core.service;
 
 import org.apache.commons.io.FilenameUtils;
+import org.json.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -106,6 +107,8 @@ public class ServiceComponent implements Microservice {
      * @param simulationConfiguration jsonString to be converted to EventSimulationDto object
      * @return Response
      * @throws InvalidConfigException     if the simulation configuration does not contain a simulation name
+     * @throws InsufficientAttributesException if the source configuration cannot generate values for all them stream
+     * attributes
      * @throws FileAlreadyExistsException if a configuration already exists in the system under the given simulation
      *                                    name
      * @throws FileOperationsException    if an IOException occurs while uploading the simulation configuration
@@ -114,59 +117,62 @@ public class ServiceComponent implements Microservice {
     @Path("/feed")
     @Produces("application/json")
     public Response uploadFeedSimulationConfig(String simulationConfiguration)
-            throws InvalidConfigException, FileAlreadyExistsException, FileOperationsException {
-        SimulationConfigUploader.getConfigUploader().uploadSimulationConfig(simulationConfiguration,
-                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
-        return Response.status(Response.Status.CREATED).entity(
-                new ResponseMapper(Response.Status.CREATED, "Successfully uploaded simulation configuration " +
-                        "'" + SimulationConfigUploader.getConfigUploader().getSimulationName(simulationConfiguration) +
-                        "' to directory '" + (Paths.get(Utils.getCarbonHome().toString(),
-                        EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'")).build();
+            throws InvalidConfigException, InsufficientAttributesException, FileOperationsException {
+        EventSimulator.validateSimulationConfig(simulationConfiguration);
+        SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
+        if (!EventSimulationMap.getSimulatorMap().containsKey(simulationConfigUploader
+                .getSimulationName(simulationConfiguration))) {
+            simulationConfigUploader.uploadSimulationConfig(simulationConfiguration,
+                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
+            return Response.status(Response.Status.CREATED).entity(
+                    new ResponseMapper(Response.Status.CREATED, "Successfully uploaded simulation " +
+                            "configuration '" + simulationConfigUploader.getSimulationName(simulationConfiguration) +
+                            "'")).build();
+        } else {
+            return Response.status(Response.Status.CONFLICT).entity(
+                    new ResponseMapper(Response.Status.CREATED, "A simulation already exists under the name " +
+                            "'" + simulationConfigUploader.getSimulationName(simulationConfiguration) + "'")).build();
+        }
     }
 
-    /**
+    /** SimulationConfigUploader.getConfigUploader().uploadSimulationConfig(simulationConfiguration,
+                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
      * service used to update an uploaded simulation configuration
      *
      * @param simulationName          unique identifies of the simulation configuration
      * @param simulationConfigDetails new simulation configuration
      * @return response
      * @throws InvalidConfigException     if the simulation configuration does not contain a simulation name
-     * @throws FileAlreadyExistsException if a configuration already exists in the system under the given simulation
-     *                                    name
      * @throws FileOperationsException    if an IOException occurs while uploading the simulation configuration
+     * @throws InsufficientAttributesException if a configuration cannot generate values for all stream attributes
      */
     @PUT
     @Path("/feed/{simulationName}")
     @Produces("application/json")
     public Response updateFeedSimulationConfig(@PathParam("simulationName") String simulationName, String
             simulationConfigDetails) throws InvalidConfigException, FileOperationsException,
-            FileAlreadyExistsException {
-        boolean deleted = SimulationConfigUploader.getConfigUploader().deleteSimulationConfig(simulationName,
-                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
-        if (deleted) {
-            if (EventSimulatorDataHolder.getInstance().getSimulatorMap().containsKey(simulationName)) {
-                if (!EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).isStopped()) {
-                    EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).stop();
-                }
-                EventSimulatorDataHolder.getInstance().getSimulatorMap().remove(simulationName);
+            InsufficientAttributesException {
+        if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
+            EventSimulator eventSimulator = EventSimulationMap.getSimulatorMap().get(simulationName);
+            if (!eventSimulator.getStatus().equals(EventSimulator.Status.STOP)) {
+                eventSimulator.stop();
             }
-            SimulationConfigUploader.getConfigUploader().uploadSimulationConfig(simulationConfigDetails,
-                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+            SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
+            simulationConfigUploader.deleteSimulationConfig(simulationName,
+                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
+            EventSimulator.validateSimulationConfig(simulationConfigDetails);
+            simulationConfigUploader.uploadSimulationConfig(simulationConfigDetails,
+                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                             EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
             return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully updated " +
-                    "simulation configuration '" + simulationName + "' available in directory '" +
-                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'")).build();
+                    "simulation configuration '" + simulationName + "'.")).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity(
                     new ResponseMapper(Response.Status.NOT_FOUND, "No event simulation configuration " +
-                            "available under simulation name '" + simulationName + "' in directory '" +
-                            (Paths.get(Utils.getCarbonHome().toString(),
-                                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'")).build();
+                            "available under simulation name '" + simulationName + "'")).build();
         }
     }
 
@@ -182,28 +188,16 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response getFeedSimulationConfig(@PathParam("simulationName") String simulationName) throws
             FileOperationsException {
-        String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig(simulationName,
-                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
-        if (simulationConfig != null) {
-//            todo - fix the json payload
-            return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully retrieved" +
-                    " the configuration of simulation '" + simulationName + "' available in directory '" +
-                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'", simulationConfig))
-                    .build();
-//            return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
-//                    "retrieved the configuration of simulation '" + simulationName + "' available in directory '" +
-//                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-//                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'. Simulation " +
-//                    "configuration : " + new JSONObject(simulationConfig))).build();
+        if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
+            return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Simulation " +
+                    "configuration : " + new JSONObject(SimulationConfigUploader.getConfigUploader()
+                    .getSimulationConfig(simulationName, (Paths.get(Utils.getCarbonHome().toString(),
+                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString())))).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity(
                     new ResponseMapper(Response.Status.NOT_FOUND, "No simulation configuration" +
-                            "available under simulation name '" + simulationName + "' in directory '" +
-                            (Paths.get(Utils.getCarbonHome().toString(),
-                                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'")).build();
+                            "available under simulation name '" + simulationName + "'")).build();
         }
     }
 
@@ -219,27 +213,21 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response deleteFeedSimulationConfig(@PathParam("simulationName") String simulationName) throws
             FileOperationsException {
-        boolean deleted = SimulationConfigUploader.getConfigUploader().deleteSimulationConfig(simulationName,
-                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
-        if (deleted) {
-            if (EventSimulatorDataHolder.getInstance().getSimulatorMap().containsKey(simulationName)) {
-                if (!EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).isStopped()) {
-                    EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).stop();
-                }
-                EventSimulatorDataHolder.getInstance().getSimulatorMap().remove(simulationName);
+//        todo hot deployement - remove only from directory and fromm that hot deployment gets triggered.
+        if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
+            EventSimulator eventSimulator = EventSimulationMap.getSimulatorMap().get(simulationName);
+            if (!eventSimulator.getStatus().equals(EventSimulator.Status.STOP)) {
+                eventSimulator.stop();
             }
+            SimulationConfigUploader.getConfigUploader().deleteSimulationConfig(simulationName,
+                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
             return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
-                    "deleted simulation configuration '" + simulationName + "' available in directory '" +
-                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'")).build();
+                    "deleted simulation configuration '" + simulationName + "'")).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity(
                     new ResponseMapper(Response.Status.NOT_FOUND, "No event simulation configuration " +
-                            "available under simulation name '" + simulationName + "' in directory '" +
-                            (Paths.get(Utils.getCarbonHome().toString(),
-                                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'")).build();
+                            "available under simulation name '" + simulationName + "'")).build();
         }
     }
 
@@ -283,16 +271,16 @@ public class ServiceComponent implements Microservice {
             } catch (IllegalArgumentException e) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(new ResponseMapper(
                         Response.Status.BAD_REQUEST, "Invalid action '" + action + "' specified for " +
-                        "simulation '" + simulationName + "'. Actions supported are " + EventSimulator.Action.RUN + ", "
-                        + EventSimulator.Action.PAUSE + ", " + EventSimulator.Action.RESUME + ", " +
-                        EventSimulator.Action.STOP + ".")).build();
+                        "simulation '" + simulationName + "'. Actions supported are '" + EventSimulator.Action.RUN +
+                        "', '" + EventSimulator.Action.PAUSE + "', '" + EventSimulator.Action.RESUME + "', '" +
+                        EventSimulator.Action.STOP + "'.")).build();
             }
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ResponseMapper(
-                    Response.Status.BAD_REQUEST, " Please specify an action for the simulation '" +
-                    simulationName + "'. Actions supported  are " + EventSimulator.Action.RUN + ", " +
-                    EventSimulator.Action.PAUSE + ", " + EventSimulator.Action.RESUME + ", "
-                    + EventSimulator.Action.STOP + ".")).build();
+                    Response.Status.BAD_REQUEST,  "Invalid action '" + action + "' specified for " +
+                    "simulation '" + simulationName + "'. Actions supported are '" + EventSimulator.Action.RUN +
+                    "', '" + EventSimulator.Action.PAUSE + "', '" + EventSimulator.Action.RESUME + "', '" +
+                    EventSimulator.Action.STOP + "'.")).build();
 
         }
     }
@@ -309,39 +297,36 @@ public class ServiceComponent implements Microservice {
      */
     private Response run(String simulationName) throws FileOperationsException, InvalidConfigException,
             InsufficientAttributesException {
-//        check whether the simulation had been played before
-        if (EventSimulatorDataHolder.getInstance().getSimulatorMap().containsKey(simulationName)) {
-            if (EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).isStopped()) {
-                executorServices.execute(EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName));
-                return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully started " +
-                        "simulation '" + simulationName + "'")).build();
-            } else if (EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).isPaused()) {
-                return Response.status(Response.Status.FORBIDDEN).entity(new ResponseMapper(Response.Status.FORBIDDEN,
-                        "Simulation '" + simulationName + "' is currently paused and cannot be restarted"))
-                        .build();
-            } else {
-                return Response.status(Response.Status.CONFLICT).entity(new ResponseMapper(Response.Status.CONFLICT,
-                        "Simulation '" + simulationName + "' is currently in progress and cannot be restarted"))
-                        .build();
+        if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
+            EventSimulator eventSimulator = EventSimulationMap.getSimulatorMap().get(simulationName);
+            switch (eventSimulator.getStatus()) {
+                case STOP:
+                    executorServices.execute(eventSimulator);
+                    return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully started" +
+                            " simulation '" + simulationName + "'.")).build();
+                case PAUSE:
+                    return Response.status(Response.Status.FORBIDDEN).entity(new ResponseMapper(
+                            Response.Status.FORBIDDEN, "Simulation '" + simulationName + "' is currently" +
+                            " paused and cannot be restarted.")).build();
+                case RUN:
+                    return Response.status(Response.Status.CONFLICT).entity(new ResponseMapper(Response.Status.CONFLICT,
+                            "Simulation '" + simulationName + "' is currently in progress and cannot be " +
+                                    "restarted.")).build();
+                default:
+                    /**
+                     *  this statement is never reached since status is an enum. Nevertheless a response is added
+                     *  since the method signature mandates it
+                     */
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ResponseMapper(
+                            Response.Status.INTERNAL_SERVER_ERROR, "Invalid status '" +
+                            eventSimulator.getStatus() + "' allocated for simulation '" + simulationName +
+                            "'. Valid statuses are '" + EventSimulator.Status.RUN + "', '" + EventSimulator.Status.PAUSE
+                            + "', '" + EventSimulator.Status.STOP + "'.")).build();
             }
         } else {
-//            else check whether the simulation has been uploaded
-            String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig(simulationName,
-                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
-            if (simulationConfig != null) {
-                EventSimulator simulator = new EventSimulator(simulationName, simulationConfig);
-                EventSimulatorDataHolder.getInstance().getSimulatorMap().put(simulationName, simulator);
-                executorServices.execute(simulator);
-                return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully started " +
-                        "simulation '" + simulationName + "'")).build();
-            } else {
-                return Response.status(Response.Status.NOT_FOUND).entity(new ResponseMapper(Response.Status.NOT_FOUND,
-                        "No event simulation configuration available under '" + simulationName + "' in" +
-                                " directory '" + (Paths.get(Utils.getCarbonHome().toString(),
-                                EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                                EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString() + "'")).build();
-            }
+            return Response.status(Response.Status.NOT_FOUND).entity(new ResponseMapper(Response.Status.NOT_FOUND,
+                    "No event simulation configuration available under simulation name '" + simulationName +
+                            "'.")).build();
         }
     }
 
@@ -352,24 +337,35 @@ public class ServiceComponent implements Microservice {
      * @return response
      */
     private Response pause(String simulationName) {
-        if (EventSimulatorDataHolder.getInstance().getSimulatorMap().containsKey(simulationName)) {
-            if (!EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).isStopped()) {
-                if (!EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).isPaused()) {
-                    EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).pause();
+        if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
+            EventSimulator eventSimulator = EventSimulationMap.getSimulatorMap().get(simulationName);
+            switch (eventSimulator.getStatus()) {
+                case RUN:
+                    eventSimulator.pause();
                     return Response.ok().entity(new ResponseMapper(Response.Status.OK,
                             "Successfully paused event simulation '" + simulationName + "'")).build();
-                } else {
+                case PAUSE:
                     return Response.status(Response.Status.CONFLICT).entity(new ResponseMapper(Response.Status.CONFLICT,
-                            "Simulation '" + simulationName + "' is already paused")).build();
-                }
-            } else {
-                return Response.status(Response.Status.FORBIDDEN).entity(new ResponseMapper(Response.Status.FORBIDDEN,
-                        "Simulation '" + simulationName + "' is currently stopped, hence it cannot be paused"))
-                        .build();
+                            "Simulation '" + simulationName + "' is already paused.")).build();
+                case STOP:
+                    return Response.status(Response.Status.FORBIDDEN).entity(new ResponseMapper(
+                            Response.Status.FORBIDDEN, "Simulation '" + simulationName + "' is currently" +
+                            " stopped, hence it cannot be paused.")).build();
+                default:
+                    /**
+                     *  this statement is never reached since status is an enum. Nevertheless a response is added
+                     *  since the method signature mandates it
+                     */
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ResponseMapper(
+                            Response.Status.INTERNAL_SERVER_ERROR, "Invalid status '" +
+                            eventSimulator.getStatus() + "' allocated for simulation '" + simulationName +
+                            "'. Valid statuses are '" + EventSimulator.Status.RUN + "', '" + EventSimulator.Status.PAUSE
+                            + "', '" + EventSimulator.Status.STOP + "'.")).build();
             }
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity(new ResponseMapper(Response.Status.NOT_FOUND,
-                    "No event simulation available under simulation name '" + simulationName + "'")).build();
+                    "No event simulation configuration available under simulation name '" + simulationName +
+                            "'.")).build();
         }
     }
 
@@ -379,26 +375,38 @@ public class ServiceComponent implements Microservice {
      * @param simulationName name of simulation being started
      * @return response
      */
+//    todo state diagram for each state
     private Response resume(String simulationName) {
-        if (EventSimulatorDataHolder.getInstance().getSimulatorMap().containsKey(simulationName)) {
-            if (!EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).isStopped()) {
-                if (EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).isPaused()) {
-                    EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).resume();
+        if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
+            EventSimulator eventSimulator = EventSimulationMap.getSimulatorMap().get(simulationName);
+            switch (eventSimulator.getStatus()) {
+                case PAUSE:
+                    eventSimulator.resume();
                     return Response.ok().entity(new ResponseMapper(Response.Status.OK,
-                            "Successfully resumed event simulation '" + simulationName + "'")).build();
-                } else {
+                            "Successfully resumed event simulation '" + simulationName + "'.")).build();
+                case RUN:
                     return Response.status(Response.Status.CONFLICT).entity(new ResponseMapper(Response.Status.CONFLICT,
                             "Event simulation '" + simulationName + "' is currently in progress, hence " +
-                                    "it cannot be resumed")).build();
-                }
-            } else {
-                return Response.status(Response.Status.FORBIDDEN).entity(new ResponseMapper(Response.Status.FORBIDDEN,
-                        "Simulation '" + simulationName + "' is currently stopped, hence it cannot be " +
-                                "resumed")).build();
+                                    "it cannot be resumed.")).build();
+                case STOP:
+                    return Response.status(Response.Status.FORBIDDEN).entity(new ResponseMapper(
+                            Response.Status.FORBIDDEN, "Event simulation '" + simulationName + "' is " +
+                            "currently stopped, hence it cannot be resumed.")).build();
+                default:
+                    /**
+                     *  this statement is never reached since status is an enum. Nevertheless a response is added
+                     *  since the method signature mandates it
+                     */
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ResponseMapper(
+                            Response.Status.INTERNAL_SERVER_ERROR, "Invalid status '" +
+                            eventSimulator.getStatus() + "' allocated for simulation '" + simulationName +
+                            "'. Valid statuses are '" + EventSimulator.Status.RUN + "', '" + EventSimulator.Status.PAUSE
+                            + "', '" + EventSimulator.Status.STOP + "'.")).build();
             }
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity(new ResponseMapper(Response.Status.NOT_FOUND,
-                    "No event simulation available under simulation name '" + simulationName + "'")).build();
+                    "No event simulation configuration available under simulation name '" + simulationName +
+                            "'.")).build();
         }
     }
 
@@ -409,24 +417,37 @@ public class ServiceComponent implements Microservice {
      * @return response
      */
     private Response stop(String simulationName) {
-        if (EventSimulatorDataHolder.getInstance().getSimulatorMap().containsKey(simulationName)) {
-            if (!EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).isStopped()) {
-                EventSimulatorDataHolder.getInstance().getSimulatorMap().get(simulationName).stop();
-                return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
-                        "stopped event simulation '" + simulationName + "'")).build();
-            } else {
-                return Response.status(Response.Status.CONFLICT).entity(
-                        new ResponseMapper(Response.Status.CONFLICT, "Event simulation '" + simulationName +
-                                "' is already stopped")).build();
+        if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
+            EventSimulator eventSimulator = EventSimulationMap.getSimulatorMap().get(simulationName);
+            switch (eventSimulator.getStatus()) {
+                case RUN:
+                case PAUSE:
+                    eventSimulator.stop();
+                    return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
+                            "stopped event simulation '" + simulationName + "'.")).build();
+                case STOP:
+                    return Response.status(Response.Status.CONFLICT).entity(
+                            new ResponseMapper(Response.Status.CONFLICT, "Event simulation '" + simulationName
+                                    + "' is already stopped.")).build();
+                default:
+                    /**
+                     *  this statement is never reached since status is an enum. Nevertheless a response is added
+                     *  since the method signature mandates it
+                     */
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ResponseMapper(
+                            Response.Status.INTERNAL_SERVER_ERROR, "Invalid status '" +
+                            eventSimulator.getStatus() + "' allocated for simulation '" + simulationName +
+                            "'. Valid statuses are '" + EventSimulator.Status.RUN + "', '" + EventSimulator.Status.PAUSE
+                            + "', '" + EventSimulator.Status.STOP + "'.")).build();
             }
         } else {
-            return Response.status(Response.Status.NOT_FOUND).entity(
-                    new ResponseMapper(Response.Status.NOT_FOUND, "No event simulation available under " +
-                            "simulation name '" + simulationName + "'")).build();
+            return Response.status(Response.Status.NOT_FOUND).entity(new ResponseMapper(Response.Status.NOT_FOUND,
+                    "No event simulation configuration available under simulation name '" + simulationName +
+                            "'.")).build();
         }
     }
 
-
+//todo class reference for simulatorMAp
     /**
      * service to upload csv files
      * <p>
@@ -434,9 +455,9 @@ public class ServiceComponent implements Microservice {
      *
      * @param filePath location of file being uploaded
      * @return Response
-     * @throws FileAlreadyExistsException if the file exists in 'temp/csvFiles' directory
+     * @throws FileAlreadyExistsException if the file exists in 'deployment/csvFiles' directory
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
-     *                                    'temp/csvFiles' directory
+     *                                    'deployment/csvFiles' directory
      */
     @POST
     @Path("/files")
@@ -445,13 +466,11 @@ public class ServiceComponent implements Microservice {
             throws FileAlreadyExistsException, FileOperationsException, InvalidFileException {
         String fileName = FilenameUtils.getName(filePath);
         FileUploader.getFileUploaderInstance().uploadFile(filePath,
-                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                         EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
         return Response.status(Response.Status.CREATED).entity(
                 new ResponseMapper(Response.Status.CREATED, "Successfully uploaded " +
-                        "file '" + fileName + "' to directory '" + (Paths.get(Utils.getCarbonHome().toString(),
-                        EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                        EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString() + "'")).build();
+                        "file '" + fileName + "'")).build();
     }
 
     /**
@@ -466,7 +485,7 @@ public class ServiceComponent implements Microservice {
      *                                    in the method signature as it is a checked exception used when uploading a
      *                                    file
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
-     *                                    'temp/csvFiles' directory
+     *                                    'deployment/csvFiles' directory
      */
     @PUT
     @Path("/files/{fileName}")
@@ -475,22 +494,19 @@ public class ServiceComponent implements Microservice {
             throws FileAlreadyExistsException, FileOperationsException, InvalidFileException {
         FileUploader fileUploader = FileUploader.getFileUploaderInstance();
         boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
-                EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                 EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
         if (deleted) {
             fileUploader.uploadFile(filePath, (Paths.get(Utils.getCarbonHome().toString(),
-                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                     EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
-            return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully updated " +
-                    "file '" + fileName + "' available in  directory '" + (Paths.get(Utils.getCarbonHome().toString(),
-                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                    EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString() + "'")).build();
+//            todo dont include the directory location
+            return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully updated CSV" +
+                    "file '" + fileName + "'")).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity(
-                    new ResponseMapper(Response.Status.NOT_FOUND, "File '" + fileName +
-                            "' is not found in  directory '" + Paths.get(Utils.getCarbonHome().toString(),
-                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                            EventSimulatorConstants.DIRECTORY_CSV_FILES).toString() + "'")).build();
+                    new ResponseMapper(Response.Status.NOT_FOUND, "File '" + fileName + "' does not exist"))
+                    .build();
         }
     }
 
@@ -509,19 +525,15 @@ public class ServiceComponent implements Microservice {
     public Response deleteFile(@PathParam("fileName") String fileName) throws FileOperationsException {
         FileUploader fileUploader = FileUploader.getFileUploaderInstance();
         boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
-                EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
+                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                 EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
         if (deleted) {
             return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
-                    "deleted file '" + fileName + "' from directory '" + Paths.get(Utils.getCarbonHome().toString(),
-                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                    EventSimulatorConstants.DIRECTORY_CSV_FILES).toString() + "'")).build();
+                    "deleted file '" + fileName + "'")).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity(
                     new ResponseMapper(Response.Status.NOT_FOUND, "File '" + fileName +
-                            "' is not found in  directory '" + Paths.get(Utils.getCarbonHome().toString(),
-                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                            EventSimulatorConstants.DIRECTORY_CSV_FILES).toString() + "'")).build();
+                            "' does not exist")).build();
         }
     }
 
@@ -532,8 +544,11 @@ public class ServiceComponent implements Microservice {
      */
     @Activate
     protected void start() throws Exception {
+//        set directory location to 'deployment/simulator'
+//        todo save to 'deployment' not 'deployment/simulator'
         EventSimulatorDataHolder.getInstance().setDirectoryDestination((Paths.get(Utils.getCarbonHome().toString(),
-                EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR)).toString());
+                EventSimulatorConstants.DIRECTORY_DEPLOYMENT)).toString());
+//        set maximum csv file size to 8MB
         EventSimulatorDataHolder.getInstance().setMaximumFileSize(8388608);
         log.info("Event Simulator service component is activated");
     }
@@ -546,7 +561,7 @@ public class ServiceComponent implements Microservice {
      */
     @Deactivate
     protected void stop() throws Exception {
-        EventSimulatorDataHolder.getInstance().getSimulatorMap().forEach((s, simulator) -> simulator.stop());
+        EventSimulationMap.getSimulatorMap().forEach((s, simulator) -> simulator.stop());
         log.info("Simulator service component is deactivated");
     }
 

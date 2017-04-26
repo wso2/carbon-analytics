@@ -38,6 +38,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,26 +63,15 @@ public class CSVReader {
      * If the CSV file is ordered by timestamp it will create a bufferedReader for the file reader.
      */
     public CSVReader(String fileName, boolean isOrdered) {
-        initFileReader(fileName, isOrdered);
-    }
-
-
-    /**
-     * initFileReader() is used to initialize a file reader to read the CSV file
-     *
-     * @param fileName  name of file being read
-     * @param isOrdered flag indicating whether the file is ordered by timestamp attribute
-     */
-    public void initFileReader(String fileName, boolean isOrdered) {
         try {
             if (new File(String.valueOf(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
-                    .DIRECTORY_DEPLOYMENT_SIMULATOR, EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName)))
+                    .DIRECTORY_DEPLOYMENT, EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName)))
                     .length() == 0) {
                 throw new EventGenerationException("File '" + fileName + "' is empty.");
             }
             fileReader = new InputStreamReader(new FileInputStream(String.valueOf(Paths.get(Utils.getCarbonHome()
-                            .toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT_SIMULATOR,
-                    EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName))), "UTF-8");
+                            .toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                    EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName))), StandardCharsets.UTF_8);
             if (log.isDebugEnabled()) {
                 log.debug("Initialize a File reader for CSV file '" + fileName + "'.");
             }

@@ -40,21 +40,18 @@ public class RegexBasedAttrGenerator implements RandomAttributeGenerator {
     private static final Logger log = LoggerFactory.getLogger(RegexBasedAttrGenerator.class);
     private RegexBasedAttributeDTO regexBasedAttrConfig = new RegexBasedAttributeDTO();
 
+
+    public RegexBasedAttrGenerator() {
+    }
+
     /**
-     * RegexBasedAttrGenerator() constructor validates the regex based attribute configuration provided and creates a
-     * RegexBasedAttributeDTO object containing random attribute generation configuration
+     * validateAttributeConfiguration() validates the regex based attribute configuration provided a
      *
      * @param attributeConfig JSON object of the custom data attribute configuration
      * @throws InvalidConfigException if the regex provided is incorrect
      */
-    public RegexBasedAttrGenerator(JSONObject attributeConfig) throws InvalidConfigException {
-        /**
-         * check whether the attribute generation has a regex specified
-         * if not throw exception
-         * else validate regex pattern.
-         * if pattern is valid, create a RegexBasedAttributeDTO object
-         * else, throw an exception
-         * */
+    @Override
+    public void validateAttributeConfiguration(JSONObject attributeConfig) throws InvalidConfigException {
         if (checkAvailability(attributeConfig, EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN)) {
             try {
                 Pattern.compile(attributeConfig.getString(EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN));
@@ -68,13 +65,22 @@ public class RegexBasedAttrGenerator implements RandomAttributeGenerator {
                         RandomAttributeGenerator.RandomDataGeneratorType.REGEX_BASED + " attribute generation. " +
                         "Invalid attribute configuration : " + attributeConfig.toString() + "'. ", e);
             }
-            regexBasedAttrConfig.setPattern(attributeConfig
-                    .getString(EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN));
         } else {
             throw new InvalidConfigException("Pattern is required for " +
                     RandomAttributeGenerator.RandomDataGeneratorType.REGEX_BASED + " simulation. Invalid attribute " +
                     "configuration : " + attributeConfig.toString());
         }
+    }
+
+    /**
+     * createRandomAttributeDTO() creates PropertyBasedAttributeDTO using the attribute configuration provided
+     *
+     * @param attributeConfig attribute configuration for regex based attribute generation
+     */
+    @Override
+    public void createRandomAttributeDTO(JSONObject attributeConfig) {
+        regexBasedAttrConfig.setPattern(attributeConfig
+                .getString(EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN));
     }
 
     /**

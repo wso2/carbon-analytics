@@ -61,10 +61,10 @@ public class FileUploader {
      * Method to upload a CSV file.
      *
      * @param source      location of the file
-     * @param destination destination where the file should be copied to i.e. deployment/simulator/csvFiles
-     * @throws FileAlreadyExistsException if the file exists in 'deployment/simulator/csvFiles' directory
+     * @param destination destination where the file should be copied to i.e. deployment/csvFiles
+     * @throws FileAlreadyExistsException if the file exists in 'deployment/csvFiles' directory
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
-     *                                    'deployment/simulator//csvFiles' directory
+     *                                    'deployment/csvFiles' directory
      * @throws InvalidFileException if the file being uploaded is not a csv file
      */
     public void uploadFile(String source, String destination) throws FileAlreadyExistsException,
@@ -89,15 +89,12 @@ public class FileUploader {
                     log.error("File '" + source + "' does not exist.", e);
                     throw new InvalidFileException("File '" + source + "' does not exist.", e);
                 } catch (IOException e) {
-                    log.error("Error occurred while copying the file '" + fileName + "' to directory '" +
-                            destination + "'. ", e);
-                    throw new FileOperationsException("Error occurred while copying the file '" + fileName + "' to " +
-                            "directory '" + destination + "'. ", e);
+                    log.error("Error occurred while copying the file '" + fileName + "'. ", e);
+                    throw new FileOperationsException("Error occurred while copying the file '" + fileName + "'. ", e);
                 }
             } else {
-                log.error("File '" + fileName + "' already exists in directory '" + destination + "'");
-                throw new FileAlreadyExistsException("File '" + fileName + "' already exists in directory '" +
-                        destination + "'");
+                log.error("File '" + fileName + "' already exists.");
+                throw new FileAlreadyExistsException("File '" + fileName + "' already exists.");
             }
         } else {
             log.error("File '" + fileName + " has an invalid content type. Please upload a valid CSV file .");
@@ -118,17 +115,15 @@ public class FileUploader {
             if (fileStore.checkExists(fileName)) {
                 fileStore.removeFile(fileName, destination);
                 if (log.isDebugEnabled()) {
-                    log.debug("Deleted file '" + fileName + "' from directory '" + destination + "'");
+                    log.debug("Deleted file '" + fileName + "'");
                 }
                 return true;
             } else {
                 return false;
             }
         } catch (IOException e) {
-            log.error("Error occurred while deleting the file '" + fileName + "' from directory '" +
-                    destination + "'", e);
-            throw new FileOperationsException("Error occurred while deleting the file '" + fileName + "' from " +
-                    "directory '" + destination + "'", e);
+            log.error("Error occurred while deleting the file '" + fileName + "'", e);
+            throw new FileOperationsException("Error occurred while deleting the file '" + fileName + "'", e);
         }
     }
 

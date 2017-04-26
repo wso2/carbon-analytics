@@ -243,6 +243,10 @@
                                     <symbolicName>carbon-utils</symbolicName>
                                     <version>${carbon.utils.version}</version>
                                 </bundle>
+                                <bundle>
+                                    <symbolicName>fabricator_2.10</symbolicName>
+                                    <version>${fabricator.wso2v1.version}</version>
+                                </bundle>
                             </bundles>
                         </configuration>
                     </execution>
