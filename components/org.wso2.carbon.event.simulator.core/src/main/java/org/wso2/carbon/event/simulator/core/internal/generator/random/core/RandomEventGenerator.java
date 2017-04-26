@@ -272,7 +272,7 @@ public class RandomEventGenerator implements EventGenerator {
              * default time interval
              * */
             if (checkAvailability(sourceConfig, EventSimulatorConstants.TIMESTAMP_INTERVAL)) {
-                if (sourceConfig.getLong(EventSimulatorConstants.TIMESTAMP_INTERVAL) <= 0) {
+                if (sourceConfig.getLong(EventSimulatorConstants.TIMESTAMP_INTERVAL) < 0) {
                     throw new InvalidConfigException("Time interval between timestamps of 2 consecutive events" +
                             " must be a positive value.");
                 }

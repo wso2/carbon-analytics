@@ -26,6 +26,9 @@ public class EventSimulatorConstants {
     public static final String DIRECTORY_SIMULATION_CONFIGS = "simulationConfigs";
     public static final String DIRECTORY_DEPLOYMENT = "deployment";
 
+    public static final String SIMULATION_FILE_EXTENSION = "json";
+    public static final String CSV_FILE_EXTENSION = "csv";
+
     public static final String EVENT_SIMULATION_PROPERTIES = "properties";
     public static final String EVENT_SIMULATION_NAME = "simulationName";
     public static final String EVENT_SIMULATION_SOURCES = "sources";

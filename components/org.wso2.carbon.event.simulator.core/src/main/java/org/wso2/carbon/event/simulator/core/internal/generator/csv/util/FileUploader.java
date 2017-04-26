@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidFileException;
+import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.ValidatedInputStream;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 
@@ -71,20 +72,16 @@ public class FileUploader {
             FileOperationsException, InvalidFileException {
         String fileName = FilenameUtils.getName(source);
         // Validate file extension
-        if (FilenameUtils.isExtension(fileName, "csv")) {
+        if (FilenameUtils.isExtension(fileName, EventSimulatorConstants.CSV_FILE_EXTENSION)) {
             if (!fileStore.checkExists(fileName)) {
 //                use ValidatedInputStream to check whether the file size is less than the maximum size allowed ie 8MB
                 try (ValidatedInputStream inputStream = new ValidatedInputStream(FileUtils.openInputStream(new
                         File(source)), EventSimulatorDataHolder.getInstance().getMaximumFileSize())) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Initialize a File reader for CSV file '" + fileName + "'.");
-                    }
                     Files.copy(inputStream, Paths.get(destination, fileName));
                     if (log.isDebugEnabled()) {
                         log.debug("Successfully uploaded CSV file '" + fileName + "' to directory '" + destination
                                 + "'");
                     }
-                    fileStore.addFile(fileName);
                 } catch (FileNotFoundException e) {
                     log.error("File '" + source + "' does not exist.", e);
                     throw new InvalidFileException("File '" + source + "' does not exist.", e);
@@ -113,7 +110,7 @@ public class FileUploader {
     public boolean deleteFile(String fileName, String destination) throws FileOperationsException {
         try {
             if (fileStore.checkExists(fileName)) {
-                fileStore.removeFile(fileName, destination);
+                Files.deleteIfExists(Paths.get(destination, fileName));
                 if (log.isDebugEnabled()) {
                     log.debug("Deleted file '" + fileName + "'");
                 }

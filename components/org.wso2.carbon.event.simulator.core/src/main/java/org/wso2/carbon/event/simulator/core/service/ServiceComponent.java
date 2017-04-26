@@ -118,10 +118,10 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response uploadFeedSimulationConfig(String simulationConfiguration)
             throws InvalidConfigException, InsufficientAttributesException, FileOperationsException {
-        EventSimulator.validateSimulationConfig(simulationConfiguration);
         SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
         if (!EventSimulationMap.getSimulatorMap().containsKey(simulationConfigUploader
                 .getSimulationName(simulationConfiguration))) {
+            EventSimulator.validateSimulationConfig(simulationConfiguration);
             simulationConfigUploader.uploadSimulationConfig(simulationConfiguration,
                     (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                             EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
@@ -131,8 +131,8 @@ public class ServiceComponent implements Microservice {
                             "'")).build();
         } else {
             return Response.status(Response.Status.CONFLICT).entity(
-                    new ResponseMapper(Response.Status.CREATED, "A simulation already exists under the name " +
-                            "'" + simulationConfigUploader.getSimulationName(simulationConfiguration) + "'")).build();
+                    new ResponseMapper(Response.Status.CONFLICT, "A simulation already exists under the name "
+                            + "'" + simulationConfigUploader.getSimulationName(simulationConfiguration) + "'")).build();
         }
     }
 
@@ -160,10 +160,10 @@ public class ServiceComponent implements Microservice {
                 eventSimulator.stop();
             }
             SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
+            EventSimulator.validateSimulationConfig(simulationConfigDetails);
             simulationConfigUploader.deleteSimulationConfig(simulationName,
                     (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                             EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
-            EventSimulator.validateSimulationConfig(simulationConfigDetails);
             simulationConfigUploader.uploadSimulationConfig(simulationConfigDetails,
                     (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                             EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
@@ -464,13 +464,12 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response uploadFile(String filePath)
             throws FileAlreadyExistsException, FileOperationsException, InvalidFileException {
-        String fileName = FilenameUtils.getName(filePath);
         FileUploader.getFileUploaderInstance().uploadFile(filePath,
                 (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                         EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
         return Response.status(Response.Status.CREATED).entity(
                 new ResponseMapper(Response.Status.CREATED, "Successfully uploaded " +
-                        "file '" + fileName + "'")).build();
+                        "file '" + FilenameUtils.getName(filePath) + "'")).build();
     }
 
     /**
@@ -544,10 +543,6 @@ public class ServiceComponent implements Microservice {
      */
     @Activate
     protected void start() throws Exception {
-//        set directory location to 'deployment/simulator'
-//        todo save to 'deployment' not 'deployment/simulator'
-        EventSimulatorDataHolder.getInstance().setDirectoryDestination((Paths.get(Utils.getCarbonHome().toString(),
-                EventSimulatorConstants.DIRECTORY_DEPLOYMENT)).toString());
 //        set maximum csv file size to 8MB
         EventSimulatorDataHolder.getInstance().setMaximumFileSize(8388608);
         log.info("Event Simulator service component is activated");

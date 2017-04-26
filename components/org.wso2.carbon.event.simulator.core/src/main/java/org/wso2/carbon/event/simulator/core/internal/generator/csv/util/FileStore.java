@@ -41,41 +41,13 @@ import java.util.stream.Collectors;
  */
 public class FileStore {
     private static final Logger log = LoggerFactory.getLogger(FileStore.class);
-    private static final FileStore fileStore = new FileStore(EventSimulatorDataHolder.getInstance()
-            .getDirectoryDestination());
+    private static final FileStore fileStore = new FileStore();
     /**
      * Concurrent list that holds names of uploaded CSV files
      */
     private final List<String> fileNameList = Collections.synchronizedList(new ArrayList<>());
 
-    /**
-     * FileStore() loads the name of csv files in 'deployment/csvFiles' directory into file info map
-     */
-    private FileStore(String directoryDestination) {
-        try {
-            boolean dirCreated = new File(Paths.get(directoryDestination,
-                    EventSimulatorConstants.DIRECTORY_CSV_FILES).toString()).mkdirs();
-            if (dirCreated && log.isDebugEnabled()) {
-                log.debug("Successfully created directory '" + Paths.get(directoryDestination,
-                        EventSimulatorConstants.DIRECTORY_CSV_FILES).toString() + "'");
-            }
-//            create a list of files with 'csv' extension
-            List<File> filesInFolder = Files.walk(Paths.get(directoryDestination,
-                    EventSimulatorConstants.DIRECTORY_CSV_FILES))
-                    .filter(Files::isRegularFile)
-                    .filter(file -> FilenameUtils.isExtension(file.toString(), "csv"))
-                    .map(Path::toFile).collect(Collectors.toList());
-            if (log.isDebugEnabled()) {
-                log.debug("Retrieved files in directory '" + Paths.get(directoryDestination,
-                        EventSimulatorConstants.DIRECTORY_CSV_FILES).toString() + "'");
-            }
-            for (File file : filesInFolder) {
-                fileNameList.add(file.getName());
-            }
-        } catch (IOException e) {
-            throw new SimulatorInitializationException("Error occurred when loading CSV file names", e);
-        }
-    }
+    private FileStore() {}
 
     /**
      * Method to return Singleton Object of FileStore
@@ -85,7 +57,6 @@ public class FileStore {
     public static FileStore getFileStore() {
         return fileStore;
     }
-
 
     /**
      * Method to add file data into in memory
@@ -97,17 +68,6 @@ public class FileStore {
     }
 
     /**
-     * Method to remove the file from in memory
-     *
-     * @param fileName File Name of uploaded CSV file
-     * @throws IOException if anything occurred when deleting the file
-     */
-    public void removeFile(String fileName, String destination) throws IOException {
-        Files.deleteIfExists(Paths.get(destination, fileName));
-        fileNameList.remove(fileName);
-    }
-
-    /**
      * Method to check whether the File Name  already exists in directory
      *
      * @param fileName File name of the file
@@ -116,4 +76,14 @@ public class FileStore {
     public boolean checkExists(String fileName) {
         return fileNameList.contains(fileName);
     }
+
+    /**
+     * deleteFile() is used to delete a file name from csv file store
+     *
+     * @param fileName name of file being deleted
+     * */
+    public void deleteFile(String fileName) {
+        fileNameList.remove(fileName);
+    }
+
 }

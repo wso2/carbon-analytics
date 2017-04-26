@@ -56,10 +56,11 @@ public class EventSimulator implements Runnable {
      * EventSimulator() constructor initializes an EventSimulator object
      *
      * @param simulationConfiguration a string containing the simulation configuration
+     * @param simulationName name of simulation
      * @throws InsufficientAttributesException is a configuration does not produce data for all stream attributes
      * @throws InvalidConfigException          if the simulation configuration is invalid
      */
-    public EventSimulator(String simulationConfiguration)
+    public EventSimulator(String simulationName, String simulationConfiguration)
             throws InsufficientAttributesException, InvalidConfigException {
 //        validate simulation configuration
         validateSimulationConfig(simulationConfiguration);
@@ -67,7 +68,7 @@ public class EventSimulator implements Runnable {
         JSONObject simulationConfig = new JSONObject(simulationConfiguration);
         simulationProperties = createSimulationPropertiesDTO(simulationConfig.getJSONObject(
                 EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES));
-        this.simulationName = simulationProperties.getSimulationName();
+        this.simulationName = simulationName;
         JSONArray sourceConfig = simulationConfig.getJSONArray(EventSimulatorConstants.EVENT_SIMULATION_SOURCES);
         EventGeneratorFactoryImpl generatorFactory = new EventGeneratorFactoryImpl();
         for (int i = 0; i < sourceConfig.length(); i++) {
@@ -405,6 +406,7 @@ public class EventSimulator implements Runnable {
             throw new SimulatorInitializationException("Error occurred when initializing event generators for " +
                     "simulation '" + simulationProperties.getSimulationName() + "'. ", e);
         }
+        status = Status.RUN;
         eventSimulation();
     }
 

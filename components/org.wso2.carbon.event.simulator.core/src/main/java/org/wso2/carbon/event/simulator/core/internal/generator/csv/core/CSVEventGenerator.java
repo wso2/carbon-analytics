@@ -310,6 +310,11 @@ public class CSVEventGenerator implements EventGenerator {
                  * check for the availability of the flag isOrdered only if the timestampAttribute is specified since
                  * isOrdered flag indicates whether a csv file is ordered by the timestamp attribute or not
                  * */
+                if (sourceConfig.getInt(EventSimulatorConstants.TIMESTAMP_ATTRIBUTE) < 0) {
+                    throw new InvalidConfigException("Timestamp attribute for CSV simulation of stream '" +
+                            sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' must be positive. " +
+                            "Invalid source configuration : " + sourceConfig.toString());
+                }
                 if (!sourceConfig.has(EventSimulatorConstants.IS_ORDERED)
                         || sourceConfig.isNull(EventSimulatorConstants.IS_ORDERED)) {
                     throw new InvalidConfigException("isOrdered flag is required for CSV simulation of stream '" +

@@ -45,8 +45,8 @@ public class SimulationConfigUploader {
     public void uploadSimulationConfig(String simulationConfig, String destination) throws FileOperationsException,
             InvalidConfigException {
         String simulationName = getSimulationName(simulationConfig);
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(destination, (simulationName +
-                ".json")))) {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(destination, (simulationName + "." +
+                        EventSimulatorConstants.SIMULATION_FILE_EXTENSION)))) {
             writer.write(simulationConfig);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully uploaded simulation configuration '" + simulationName + "'.");
@@ -67,7 +67,8 @@ public class SimulationConfigUploader {
      */
     public void deleteSimulationConfig(String simulationName, String destination) throws FileOperationsException {
         try {
-            Files.deleteIfExists(Paths.get(destination, simulationName + ".json"));
+            Files.deleteIfExists(Paths.get(destination, simulationName +  "." +
+                    EventSimulatorConstants.SIMULATION_FILE_EXTENSION));
             if (log.isDebugEnabled()) {
                 log.debug("Deleted simulation configuration '" + simulationName + "'.");
             }
@@ -89,7 +90,8 @@ public class SimulationConfigUploader {
      */
     public String getSimulationConfig(String simulationName, String destination) throws FileOperationsException {
         try {
-            return new String(Files.readAllBytes(Paths.get(destination, (simulationName + ".json"))),
+            return new String(Files.readAllBytes(Paths.get(destination, (simulationName +  "." +
+                    EventSimulatorConstants.SIMULATION_FILE_EXTENSION))),
                     StandardCharsets.UTF_8);
         } catch (IOException e) {
             log.error("Error occurred while reading the simulation configuration '" +

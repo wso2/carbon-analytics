@@ -64,19 +64,24 @@ public class CSVReader {
      */
     public CSVReader(String fileName, boolean isOrdered) {
         try {
-            if (new File(String.valueOf(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
-                    .DIRECTORY_DEPLOYMENT, EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName)))
-                    .length() == 0) {
-                throw new EventGenerationException("File '" + fileName + "' is empty.");
-            }
-            fileReader = new InputStreamReader(new FileInputStream(String.valueOf(Paths.get(Utils.getCarbonHome()
-                            .toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                    EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName))), StandardCharsets.UTF_8);
-            if (log.isDebugEnabled()) {
-                log.debug("Initialize a File reader for CSV file '" + fileName + "'.");
-            }
-            if (isOrdered) {
-                bufferedReader = new BufferedReader(fileReader);
+            File csvFile = new File(String.valueOf(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
+                    .DIRECTORY_DEPLOYMENT, EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName)));
+            if (csvFile.exists()) {
+                if (csvFile.length() != 0) {
+                    fileReader = new InputStreamReader(new FileInputStream(String.valueOf(Paths.get(Utils
+                                    .getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                            EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName))), StandardCharsets.UTF_8);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Initialize a File reader for CSV file '" + fileName + "'.");
+                    }
+                    if (isOrdered) {
+                        bufferedReader = new BufferedReader(fileReader);
+                    }
+                } else {
+                    throw new EventGenerationException("File '" + fileName + "' is empty.");
+                }
+            } else {
+                throw new EventGenerationException("File '" + fileName + "' cannot be found.");
             }
         } catch (IOException e) {
             log.error("Error occurred when initializing file reader for CSV file '" + fileName + "' : ", e);
