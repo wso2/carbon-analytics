@@ -14,6 +14,7 @@
     <link href="/editor/commons/lib/nanoscroller_0.8.7/nanoscroller.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/layout.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/styles.css" rel="stylesheet" type="text/css"/>
+    <link href="/editor/commons/css/welcome-screen.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/menu-bar.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/tab-styles.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/fileDialog.css" rel="stylesheet" type="text/css"/>
@@ -26,10 +27,10 @@
     <![endif]-->
 
     <!--<link rel="stylesheet" type="text/css" href="commons/css/sequence_diagram/sequenced-styles.css"/>-->
-    <link rel="stylesheet" type="text/css" href="/editor/commons/css/tool-palette.css"/>
+    <link rel="stylesheet" type="text/css" href="/editor/commons//css/tool-palette.css"/>
     <!--<link rel="stylesheet" type="text/css" href="commons/css/diagram/preview-pane.css"/>-->
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/styles.css"/>
-    <link rel="stylesheet" type="text/css" href="/editor/css/styles.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css"/>
     <title>Data Analytics Server Tooling</title>
 </head>
 
@@ -375,6 +376,16 @@ requirejs.config({
     },
     packages: [
         {
+            name: 'welcome-page',
+            location: 'commons/js/welcome-page',
+            main: 'module'
+        },
+        {
+            name: 'tab',
+            location: 'js/tab',
+            main: 'module'
+        },
+        {
             name: 'workspace',
             location: 'commons/js/workspace',
             main: 'module'
@@ -391,6 +402,23 @@ require(['app/main'], function (Application) {
     var app, config;
     config = {
         container: "#page-content",
+        welcome:{
+            container:"#welcome-container",
+            cssClass :{
+                parent: "initial-background-container",
+                outer: "initial-welcome-container",
+                heading: "heading-welcome-container",
+                headingTitle: "welcome-title",
+                body: "body-welcome-container",
+                bodyTitle: "welcome-body-title",
+                headingIcon: "welcome-icon",
+                buttonNew: " btn btn-block new-welcome-button",
+                buttonOpen: " btn btn-block open-welcome-button",
+                samples: "welcome-samples",
+                headingTop: "top-heading",
+                btnWrap1: "btn-wrap"
+            }
+        },
         services:   {
             workspace:  {
                 endpoint: "http://localhost:9090/editor/workspace"
@@ -597,6 +625,7 @@ require(['app/main'], function (Application) {
     };
     app = new Application(config);
     app.render();
+    app.displayInitialView();
 });
 
 </script>
