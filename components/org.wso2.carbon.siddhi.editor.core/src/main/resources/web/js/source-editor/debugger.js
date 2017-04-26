@@ -39,7 +39,6 @@ function DebugClient() {
                     callback(data)
             },
             error: function (msg) {
-                console.error(JSON.stringify(msg));
                 if (typeof error === 'function')
                     error(msg)
             }
@@ -56,7 +55,6 @@ function DebugClient() {
                     callback(data)
             },
             error: function (msg) {
-                console.error(JSON.stringify(msg));
                 if (typeof error === 'function')
                     error(msg)
             }
@@ -68,13 +66,12 @@ function DebugClient() {
             async: true,
             url: this.serverUrl + "/" + runtimeId + "/acquire",
             type: HTTP_GET,
-            data: { queryName: queryName, queryTerminal: queryTerminal },
+            data: {queryName: queryName, queryTerminal: queryTerminal},
             success: function (data) {
                 if (typeof callback === 'function')
                     callback(data)
             },
             error: function (msg) {
-                console.error(JSON.stringify(msg));
                 if (typeof error === 'function')
                     error(msg)
             }
@@ -86,30 +83,12 @@ function DebugClient() {
             async: true,
             url: this.serverUrl + "/" + runtimeId + "/release",
             type: HTTP_GET,
-            data: { queryName: queryName, queryTerminal: queryTerminal },
+            data: {queryName: queryName, queryTerminal: queryTerminal},
             success: function (data) {
                 if (typeof callback === 'function')
                     callback(data)
             },
             error: function (msg) {
-                console.error(JSON.stringify(msg));
-                if (typeof error === 'function')
-                    error(msg)
-            }
-        });
-    };
-
-    this.pollState = function (runtimeId, callback, error) {
-        jQuery.ajax({
-            async: true,
-            url: this.serverUrl + "/" + runtimeId + "/poll",
-            type: HTTP_GET,
-            success: function (data) {
-                if (typeof callback === 'function')
-                    callback(data)
-            },
-            error: function (msg) {
-                console.error(JSON.stringify(msg));
                 if (typeof error === 'function')
                     error(msg)
             }
@@ -126,7 +105,6 @@ function DebugClient() {
                     callback(data)
             },
             error: function (msg) {
-                console.error(JSON.stringify(msg));
                 if (typeof error === 'function')
                     error(msg)
             }
@@ -143,24 +121,22 @@ function DebugClient() {
                     callback(data)
             },
             error: function (msg) {
-                console.error(JSON.stringify(msg));
                 if (typeof error === 'function')
                     error(msg)
             }
         });
     };
 
-    this.getQueryState = function (runtimeId, queryName, callback, error) {
+    this.state = function (runtimeId, callback, error) {
         jQuery.ajax({
             async: true,
-            url: this.serverUrl + "/" + runtimeId + "/" + queryName + "/state",
+            url: this.serverUrl + "/" + runtimeId + "/state",
             type: HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
                     callback(data)
             },
             error: function (msg) {
-                console.error(JSON.stringify(msg));
                 if (typeof error === 'function')
                     error(msg)
             }
@@ -178,7 +154,6 @@ function DebugClient() {
                     callback(data)
             },
             error: function (msg) {
-                console.error(JSON.stringify(msg));
                 if (typeof error === 'function')
                     error(msg)
             }
@@ -193,9 +168,183 @@ function DebugClient() {
  */
 DebugClient.prototype.init = function (svrUrl) {
     if (svrUrl) {
-        this.serverUrl = "http://localhost:9090/editor";
-    } else {
         this.serverUrl = svrUrl;
+    } else {
+        this.serverUrl = "http://localhost:9090/editor/";
     }
     return this;
 };
+
+function Debugger(executionPlan) {
+    var self = this;
+    self._pollingInterval = 1000;
+    self._pollingLock = false;
+    self._pollingJob = null;
+    self.executionPlan = executionPlan;
+    self.debugger = new DebugClient().init();
+    self.runtimeId = null;
+    self.streams = null;
+    self.queries = null;
+
+    this.start = function () {
+        this.debugger.startDebug(
+            this.executionPlan,
+            function (data) {
+                self.runtimeId = data['runtimeId'];
+                self.streams = data['streams'];
+                self.queries = data['queries'];
+                if (self.streams == null || self.streams.length == 0) {
+                    console.warn("Streams cannot be empty.");
+                }
+                if (self.queries == null || self.queries.length == 0) {
+                    console.warn("Queries cannot be empty.");
+                }
+                if (self.streams != null && self.streams.length > 0 &&
+                    self.queries != null && self.queries.length > 0) {
+                    self._pollingJob = setInterval(function () {
+                        if (!self._pollingLock) {
+                            self.state();
+                        }
+                    }, self._pollingInterval);
+                }
+                console.info(JSON.stringify(data));
+            },
+            function (error) {
+                console.error(JSON.stringify(error));
+            }
+        );
+    };
+
+    this.stop = function () {
+        if (this._pollingJob != null) {
+            clearInterval(this._pollingJob);
+        }
+        if (this.runtimeId != null) {
+            this.debugger.stopDebug(
+                this.runtimeId,
+                function (data) {
+                    console.info(JSON.stringify(data));
+                },
+                function (error) {
+                    console.error(JSON.stringify(error));
+                }
+            );
+        } else {
+            console.log("Debugger has not been started yet.")
+        }
+    };
+
+    this.acquire = function (queryName, pointer) {
+        if (this.runtimeId != null && queryName != null && pointer != null) {
+            if (this.queries.indexOf(queryName) !== -1) {
+                this.debugger.acquireBreakPoint(
+                    this.runtimeId,
+                    queryName,
+                    pointer,
+                    function (data) {
+                        console.info(JSON.stringify(data));
+                    },
+                    function (error) {
+                        console.error(JSON.stringify(error));
+                    }
+                );
+            } else {
+                console.warn("No such query : " + queryName);
+            }
+        } else {
+            console.log("Debugger has not been started yet.")
+        }
+    };
+
+    this.release = function (queryName, pointer) {
+        if (this.runtimeId != null && queryName != null && pointer != null) {
+            if (this.queries.indexOf(queryName) !== -1) {
+                this.debugger.releaseBreakPoint(
+                    this.runtimeId,
+                    queryName,
+                    pointer,
+                    function (data) {
+                        console.info(JSON.stringify(data));
+                    },
+                    function (error) {
+                        console.error(JSON.stringify(error));
+                    }
+                );
+            } else {
+                console.warn("No such query : " + queryName);
+            }
+        } else {
+            console.log("Debugger has not been started yet.")
+        }
+    };
+
+    this.next = function () {
+        if (this.runtimeId != null) {
+            this.debugger.next(
+                this.runtimeId,
+                function (data) {
+                    console.info(JSON.stringify(data));
+                },
+                function (error) {
+                    console.error(JSON.stringify(error));
+                }
+            );
+        } else {
+            console.log("Debugger has not been started yet.")
+        }
+    };
+
+    this.play = function () {
+        if (this.runtimeId != null) {
+            this.debugger.play(
+                this.runtimeId,
+                function (data) {
+                    console.info(JSON.stringify(data));
+                },
+                function (error) {
+                    console.error(JSON.stringify(error));
+                }
+            );
+        } else {
+            console.log("Debugger has not been started yet.")
+        }
+    };
+
+    this.state = function () {
+        self._pollingLock = true;
+        if (this.runtimeId != null) {
+            this.debugger.state(
+                this.runtimeId,
+                function (data) {
+                    console.info(JSON.stringify(data));
+                    if (data[''])
+                    self._pollingLock = false;
+                },
+                function (error) {
+                    console.error(JSON.stringify(error));
+                    self._pollingLock = false;
+                }
+            );
+        } else {
+            console.log("Debugger has not been started yet.")
+        }
+    };
+
+    this.sendEvent = function (queryName, streamId, event) {
+        if (this.runtimeId != null && queryName != null) {
+            this.debugger.sendEvent(
+                this.runtimeId,
+                streamId,
+                event,
+                function (data) {
+                    console.info(JSON.stringify(data));
+                },
+                function (error) {
+                    console.error(JSON.stringify(error));
+                }
+            );
+        } else {
+            console.log("Debugger has not been started yet.")
+        }
+    };
+}

@@ -20,7 +20,7 @@
 package org.wso2.carbon.siddhi.editor.core.internal;
 
 
-import org.wso2.carbon.siddhi.editor.core.commons.metadata.DebugCallbackEvent;
+import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
@@ -41,6 +41,7 @@ public class DebugProcessorService {
     private Map<String, ExecutionPlanRuntime> executionPlanRunTimeMap = new ConcurrentHashMap<>();
     private Map<String, SiddhiDebugger> siddhiDebuggerMap = new ConcurrentHashMap<>();
     private Map<String, Set<String>> runtimeSpecificStreamsMap = new ConcurrentHashMap<>();
+    private Map<String, Set<String>> runtimeSpecificQueriesMap = new ConcurrentHashMap<>();
     private Map<String, Map<String, InputHandler>> runtimeSpecificInputHandlerMap = new ConcurrentHashMap<>();
     private Map<String, LinkedBlockingQueue<DebugCallbackEvent>> runtimeSpecificCallbackMap = new ConcurrentHashMap<>();
 
@@ -67,6 +68,7 @@ public class DebugProcessorService {
             executionPlanRunTimeMap.put(runtimeId, runtime);
             siddhiDebuggerMap.put(runtimeId, debugger);
             runtimeSpecificStreamsMap.put(runtimeId, streamNames);
+            runtimeSpecificQueriesMap.put(runtimeId, runtime.getQueryNames());
             runtimeSpecificInputHandlerMap.put(runtimeId, inputHandlerMap);
             runtimeSpecificCallbackMap.put(runtimeId, new LinkedBlockingQueue<>(10));
             return runtimeId;
@@ -109,6 +111,10 @@ public class DebugProcessorService {
 
     public Map<String, Set<String>> getRuntimeSpecificStreamsMap() {
         return runtimeSpecificStreamsMap;
+    }
+
+    public Map<String, Set<String>> getRuntimeSpecificQueriesMap() {
+        return runtimeSpecificQueriesMap;
     }
 
     public Map<String, LinkedBlockingQueue<DebugCallbackEvent>> getRuntimeSpecificCallbackMap() {

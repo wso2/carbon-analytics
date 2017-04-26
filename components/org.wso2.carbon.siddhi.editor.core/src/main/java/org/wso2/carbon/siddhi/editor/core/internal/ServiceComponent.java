@@ -31,7 +31,6 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
-import org.wso2.carbon.siddhi.editor.core.commons.metadata.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.response.DebugRuntimeResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.GeneralResponse;
@@ -39,6 +38,8 @@ import org.wso2.carbon.siddhi.editor.core.commons.response.MetaDataResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
 import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResponse;
 import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
+import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
+import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
 import org.wso2.carbon.siddhi.editor.core.util.MetaDataHolder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
@@ -60,6 +61,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -342,9 +344,13 @@ public class ServiceComponent implements Microservice {
                 .getDebugProcessorService()
                 .getRuntimeSpecificStreamsMap()
                 .get(runtimeId);
+        Set<String> queries = EditorDataHolder
+                .getDebugProcessorService()
+                .getRuntimeSpecificQueriesMap()
+                .get(runtimeId);
         return Response
                 .status(Response.Status.OK)
-                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, runtimeId, streams)).build();
+                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, runtimeId, streams, queries)).build();
     }
 
     @GET
@@ -387,21 +393,6 @@ public class ServiceComponent implements Microservice {
                     .entity(new GeneralResponse(Status.ERROR, "Missing Parameters"))
                     .build();
         }
-    }
-
-    @GET
-    @Produces("application/json")
-    @Path("/{runtimeId}/poll")
-    public Response pollState(@PathParam("runtimeId") String runtimeId) throws InterruptedException {
-        DebugCallbackEvent event = EditorDataHolder
-                .getDebugProcessorService()
-                .getRuntimeSpecificCallbackMap()
-                .get(runtimeId)
-                .poll(5, TimeUnit.SECONDS);
-        return Response
-                .status(Response.Status.OK)
-                .entity(event)
-                .build();
     }
 
     @GET
@@ -466,6 +457,35 @@ public class ServiceComponent implements Microservice {
                 .status(Response.Status.OK)
                 .entity("{'status':'ok'}")
                 .build();
+    }
+
+    @GET
+    @Produces("application/json")
+    @Path("/{runtimeId}/state")
+    public Response getQueryState(@PathParam("runtimeId") String runtimeId) throws InterruptedException {
+        DebugCallbackEvent event = EditorDataHolder
+                .getDebugProcessorService()
+                .getRuntimeSpecificCallbackMap()
+                .get(runtimeId)
+                .poll(5, TimeUnit.SECONDS);
+
+        Map<String, Map<String, Object>> queryState = new HashMap<>();
+        Set<String> queries = EditorDataHolder
+                .getDebugProcessorService()
+                .getRuntimeSpecificStreamsMap()
+                .get(runtimeId);
+
+        for (String query : queries) {
+            queryState.put(query, EditorDataHolder
+                    .getDebugProcessorService()
+                    .getSiddhiDebuggerMap()
+                    .get(runtimeId)
+                    .getQueryState(query)
+            );
+        }
+        return Response
+                .status(Response.Status.OK)
+                .entity(new DebugStateHolder(event, queryState)).build();
     }
 
     @GET
