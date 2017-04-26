@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.0</version>
+    <version>2.0.1-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
 
     <modules>
@@ -220,7 +220,7 @@
         <url>https://github.com/wso2/carbon-analytics.git</url>
         <developerConnection>scm:git:https://github.com/wso2/carbon-analytics.git</developerConnection>
         <connection>scm:git:https://github.com/wso2/carbon-analytics.git</connection>
-        <tag>v2.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencyManagement>
@@ -1062,7 +1062,7 @@
         <junit.version>4.10</junit.version>
 
 
-        <sp.version>2.0.0</sp.version>
+        <sp.version>2.0.1-SNAPSHOT</sp.version>
         <sp.package.export.version>2.0.0</sp.package.export.version>
 
         <!-- Maven plugins -->
