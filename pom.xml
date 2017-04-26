@@ -834,7 +834,7 @@
                 <version>${siddhi.version}</version>
             </dependency>
 
-            <!--- Dependencies for Siddhi related jars -->
+            <!-- Dependencies for Siddhi related jars -->
             <dependency>
                 <groupId>org.wso2.orbit.com.lmax</groupId>
                 <artifactId>disruptor</artifactId>
