@@ -91,6 +91,10 @@
             <groupId>org.wso2.carbon.utils</groupId>
             <artifactId>carbon-utils</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.deployment</groupId>
+            <artifactId>org.wso2.carbon.deployment.engine</artifactId>
+        </dependency>
 
         <!-- Dependencies for CSV event simulations begins here-->
         <dependency>
@@ -242,6 +246,10 @@
                                 <bundle>
                                     <symbolicName>carbon-utils</symbolicName>
                                     <version>${carbon.utils.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.wso2.carbon.deployment.engine</symbolicName>
+                                    <version>${carbon.deployment.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>fabricator_2.10</symbolicName>

@@ -31,6 +31,7 @@ public class EventSimulatorConstants {
 
     public static final String EVENT_SIMULATION_PROPERTIES = "properties";
     public static final String EVENT_SIMULATION_NAME = "simulationName";
+    public static final String EVENT_SIMULATION_DESCRIPTION = "description";
     public static final String EVENT_SIMULATION_SOURCES = "sources";
     public static final String START_TIMESTAMP = "startTimestamp";
     public static final String END_TIMESTAMP = "endTimestamp";

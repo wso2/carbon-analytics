@@ -7,6 +7,7 @@ package org.wso2.carbon.event.simulator.core.internal.bean;
 public class SimulationPropertiesDTO {
 
     private String simulationName;
+    private String description;
     private long timeInterval;
     private int noOfEventsRequired;
     private long startTimestamp;
@@ -18,6 +19,14 @@ public class SimulationPropertiesDTO {
 
     public void setSimulationName(String simulationName) {
         this.simulationName = simulationName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public long getTimeInterval() {

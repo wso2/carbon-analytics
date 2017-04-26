@@ -322,6 +322,11 @@ public class EventSimulator implements Runnable {
          * if checks are successful create simulationPropertiesDTO object
          * */
         try {
+            String description = null;
+            if (checkAvailability(simulationPropertiesConfig, EventSimulatorConstants.EVENT_SIMULATION_DESCRIPTION)) {
+                description = simulationPropertiesConfig.getString(
+                        EventSimulatorConstants.EVENT_SIMULATION_DESCRIPTION);
+            }
             long timeInterval;
             if (checkAvailability(simulationPropertiesConfig, EventSimulatorConstants.SIMULATION_TIME_INTERVAL)) {
                 timeInterval = simulationPropertiesConfig.getLong(EventSimulatorConstants.SIMULATION_TIME_INTERVAL);
@@ -362,6 +367,7 @@ public class EventSimulator implements Runnable {
             SimulationPropertiesDTO simulationPropertiesDTO = new SimulationPropertiesDTO();
             simulationPropertiesDTO.setSimulationName(simulationPropertiesConfig
                     .getString(EventSimulatorConstants.EVENT_SIMULATION_NAME));
+            simulationPropertiesDTO.setDescription(description);
             simulationPropertiesDTO.setTimeInterval(timeInterval);
             simulationPropertiesDTO.setStartTimestamp(startTimestamp);
             simulationPropertiesDTO.setEndTimestamp(endTimestamp);
