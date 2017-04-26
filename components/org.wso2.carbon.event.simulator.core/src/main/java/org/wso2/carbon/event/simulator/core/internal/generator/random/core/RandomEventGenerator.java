@@ -18,9 +18,6 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator.random.core;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -38,6 +35,9 @@ import org.wso2.carbon.event.simulator.core.internal.util.RandomAttrGeneratorFac
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
+
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class RandomEventGenerator implements EventGenerator {
      * @param sourceConfig   JSON object containing configuration for random event generation
      * @param startTimestamp least possible value for timestamp
      * @param endTimestamp   maximum possible value for timestamp
-     * @throws InvalidConfigException          if random stream simulation configuration is invalid
+     * @throws InvalidConfigException if random stream simulation configuration is invalid
      */
     @Override
     public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp) throws InvalidConfigException {
@@ -232,8 +232,8 @@ public class RandomEventGenerator implements EventGenerator {
                         "Invalid source configuration : " + sourceConfig.toString());
                 throw new SimulatorInitializationException("Error occurred when initializing random event generator " +
                         "to simulate stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. " +
-                        "Stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' does not exist. " +
-                        "Invalid source configuration : " + sourceConfig.toString());
+                        "Stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' does not exist. "
+                        + "Invalid source configuration : " + sourceConfig.toString());
             }
             if (checkAvailabilityOfArray(sourceConfig, EventSimulatorConstants.ATTRIBUTE_CONFIGURATION)) {
                 if (streamAttributes.size() ==
@@ -289,7 +289,7 @@ public class RandomEventGenerator implements EventGenerator {
     }
 
     /**
-     * createRandomConfiguration() method creates DBSimulationDTO object using the database simulation configuration
+     * createRandomConfiguration() method creates RandomSimulationDTO object using the random source configuration
      *
      * @param sourceConfig JSON object containing configuration required to simulate stream
      * @return RandomSimulationDTO containing random source configuration

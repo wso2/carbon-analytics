@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator.database.core;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -36,6 +34,8 @@ import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstant
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
+
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -59,14 +59,15 @@ public class DatabaseEventGenerator implements EventGenerator {
     private List<Attribute> streamAttributes;
     private List<String> columnNames;
 
-    public DatabaseEventGenerator() {}
+    public DatabaseEventGenerator() {
+    }
 
     /**
      * init() initializes database event generator and set the timestamp start and end time.
      *
-     * @param sourceConfig JSON object containing configuration for database event generation
-     * @param startTimestamp  least possible value for timestamp
-     * @param endTimestamp    maximum possible value for timestamp
+     * @param sourceConfig   JSON object containing configuration for database event generation
+     * @param startTimestamp least possible value for timestamp
+     * @param endTimestamp   maximum possible value for timestamp
      * @throws InvalidConfigException if the database source configuration is invalid
      */
     @Override
@@ -362,15 +363,15 @@ public class DatabaseEventGenerator implements EventGenerator {
                                     sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid" +
                                     " source configuration : " + sourceConfig.toString());
                         } else if (columns.size() != streamAttributes.size()) {
-                            log.error("Stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) +
-                                    "' has " + streamAttributes.size() + " attribute(s) but random source" +
-                                    " configuration " + sourceConfig.toString() + "contains values for only " +
-                                    columns.size() + " attribute(s).");
+                            log.error("Stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'" +
+                                    " has " + streamAttributes.size() + " attribute(s) but database source " +
+                                    "configuration contains values for only " + columns.size() + " attribute(s). " +
+                                    "Invalid source configuration : " + sourceConfig.toString() + "'");
                             throw new InsufficientAttributesException("Stream '" +
                                     sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' has "
-                                    + streamAttributes.size() + " attribute(s) but random source configuration " +
-                                    sourceConfig.toString() + "contains values for only " + columns.size() +
-                                    " attribute(s).");
+                                    + streamAttributes.size() + " attribute(s) but database source configuration " +
+                                    "contains values for only " + columns.size() + " attribute(s). Invalid source " +
+                                    "configuration : " + sourceConfig.toString() + "'");
                         }
                     } else {
                         throw new InvalidConfigException("Column names list is required for database simulation" +

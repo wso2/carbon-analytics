@@ -123,11 +123,11 @@ public class CSVReader {
                                 break;
                             }
                         } else {
-                            log.warn("Simulation of stream '" + csvConfig.getStreamName() + "' using source " +
-                                    "configuration " + csvConfig.toString() + "requires " + streamAttributes.size() +
-                                    " attribute(s) but number of attributes found in line " + lineNumber + " of file '"
-                                    + csvConfig.getFileName() + "' is " + attributes.size() + ". Line content : '" +
-                                    attributes + "'. Ignore line and read next line.");
+                            log.warn("Simulation of stream '" + csvConfig.getStreamName() + "' requires " +
+                                    streamAttributes.size() + " attribute(s) but number of attributes found in line " +
+                                    lineNumber + " of file '" + csvConfig.getFileName() + "' is " + attributes.size() +
+                                    ". Line content : '" + attributes + "'. Ignore line and read next line. " +
+                                    "Source configuration : " + csvConfig.toString());
                             continue;
                         }
                     } else {
@@ -150,12 +150,11 @@ public class CSVReader {
                                 continue;
                             }
                         } else {
-                            log.warn("Simulation of stream '" + csvConfig.getStreamName() + "' using source " +
-                                    "configuration : " + csvConfig.toString() + "requires " +
+                            log.warn("Simulation of stream '" + csvConfig.getStreamName() + "' requires " +
                                     (streamAttributes.size() + 1) + " attribute(s) but number of attributes found in " +
                                     "line " + lineNumber + " of file '" + csvConfig.getFileName() + "' is " +
-                                    attributes.size() + ". Line content : '" + attributes + "'. Ignore line and read " +
-                                    "next line.");
+                                    attributes.size() + ". Line content : '" + attributes + "'. Ignore line and" +
+                                    " read next line. Source configuration : " + csvConfig.toString());
                             continue;
                         }
                     }
@@ -290,11 +289,11 @@ public class CSVReader {
                         }
                     }
                 } else {
-                    log.warn("Simulation of stream '" + csvConfig.getStreamName() + "' using source configuration " +
-                            csvConfig.toString() + "requires " + (streamAttributes.size() + 1) + " attributes." +
-                            " Number of attributes in line " + lineNumber + " of CSV file '" + csvConfig.getFileName() +
-                            "' is " + record.size() + ". Line content : " + record.toString() + ". Ignore line an " +
-                            "read next line");
+                    log.warn("Simulation of stream '" + csvConfig.getStreamName() + "' requires " +
+                            (streamAttributes.size() + 1) + " attributes. Number of attributes in line " + lineNumber
+                            + " of CSV file '" + csvConfig.getFileName() + "' is " + record.size() + ". Line content : "
+                            + record.toString() + ". Ignore line and read next line. Source configuration : " +
+                            csvConfig.toString() + ".");
                 }
             }
         }

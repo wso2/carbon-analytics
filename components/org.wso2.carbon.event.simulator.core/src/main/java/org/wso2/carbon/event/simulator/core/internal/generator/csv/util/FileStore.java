@@ -17,22 +17,12 @@
  */
 package org.wso2.carbon.event.simulator.core.internal.generator.csv.util;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
-import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
-import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * FileStore keeps a record of all CSV files that have been uploaded to the system
@@ -47,7 +37,8 @@ public class FileStore {
      */
     private final List<String> fileNameList = Collections.synchronizedList(new ArrayList<>());
 
-    private FileStore() {}
+    private FileStore() {
+    }
 
     /**
      * Method to return Singleton Object of FileStore
@@ -81,7 +72,7 @@ public class FileStore {
      * deleteFile() is used to delete a file name from csv file store
      *
      * @param fileName name of file being deleted
-     * */
+     */
     public void deleteFile(String fileName) {
         fileNameList.remove(fileName);
     }

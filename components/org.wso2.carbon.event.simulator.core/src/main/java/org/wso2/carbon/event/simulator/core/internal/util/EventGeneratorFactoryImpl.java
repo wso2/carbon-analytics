@@ -44,15 +44,17 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
             switch (generatorType) {
                 case CSV_SIMULATION:
                     eventGenerator = new CSVEventGenerator();
+                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp);
                     break;
                 case DATABASE_SIMULATION:
                     eventGenerator = new DatabaseEventGenerator();
+                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp);
                     break;
                 case RANDOM_DATA_SIMULATION:
                     eventGenerator = new RandomEventGenerator();
+                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp);
                     break;
             }
-            eventGenerator.init(sourceConfig, startTimestamp, endTimestamp);
             return eventGenerator;
         } else {
             throw new InvalidConfigException("Simulation type must be specified as either '" +

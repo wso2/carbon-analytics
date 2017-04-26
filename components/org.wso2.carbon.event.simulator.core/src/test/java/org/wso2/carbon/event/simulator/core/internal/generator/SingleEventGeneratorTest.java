@@ -24,19 +24,23 @@ public class SingleEventGeneratorTest {
         StreamProcessorUtil streamProcessorUtil = (StreamProcessorUtil) EventSimulatorDataHolder.getInstance()
                 .getEventStreamService();
         streamProcessorUtil.addStreamAttributes("TestExecutionPlan", "FooStream",
-                new ArrayList<Attribute>() { {
-                    add(new Attribute("symbol", Attribute.Type.STRING));
-                    add(new Attribute("price", Attribute.Type.FLOAT));
-                    add(new Attribute("volume", Attribute.Type.LONG));
-                    
-                }});
-        streamProcessorUtil.addStreamAttributes("TestExecutionPlan1", "FooStream1",
-                new ArrayList<Attribute>() { {
-                    add(new Attribute("symbol", Attribute.Type.STRING));
-                    add(new Attribute("price", Attribute.Type.FLOAT));
-                    add(new Attribute("volume", Attribute.Type.LONG));
+                new ArrayList<Attribute>() {
+                    {
+                        add(new Attribute("symbol", Attribute.Type.STRING));
+                        add(new Attribute("price", Attribute.Type.FLOAT));
+                        add(new Attribute("volume", Attribute.Type.LONG));
 
-                }});
+                    }
+                });
+        streamProcessorUtil.addStreamAttributes("TestExecutionPlan1", "FooStream1",
+                new ArrayList<Attribute>() {
+                    {
+                        add(new Attribute("symbol", Attribute.Type.STRING));
+                        add(new Attribute("price", Attribute.Type.FLOAT));
+                        add(new Attribute("volume", Attribute.Type.LONG));
+
+                    }
+                });
     }
 
     @Test
@@ -67,7 +71,7 @@ public class SingleEventGeneratorTest {
                 .getExecutionPlanName(), " Execution plan names equal");
         Assert.assertEquals("FooStream", streamProcessorUtil.getEventsReceived().get(0).getStreamName(),
                 "Stream name is equal");
-        Object[] data = new Object[] {null, 9f, 45L};
+        Object[] data = new Object[]{null, 9f, 45L};
         Assert.assertEquals(1488615136958L, streamProcessorUtil.getEventsReceived().get(0).getEvent()
                 .getTimestamp(), "Event timestamp is equal");
         Assert.assertEquals(Arrays.deepToString(data), Arrays.deepToString(streamProcessorUtil.getEventsReceived()
@@ -92,7 +96,7 @@ public class SingleEventGeneratorTest {
                 .getExecutionPlanName(), " Execution plan names equal");
         Assert.assertEquals("FooStream", streamProcessorUtil.getEventsReceived().get(0).getStreamName(),
                 "Stream name is equal");
-        Object[] data = new Object[] {null, 9f, 45L};
+        Object[] data = new Object[]{null, 9f, 45L};
 //        todo cant check since cant get the system time of when the event is created
         Assert.assertEquals(System.currentTimeMillis(), streamProcessorUtil.getEventsReceived().get(0).getEvent()
                 .getTimestamp(), "Event timestamp is equal");
@@ -101,7 +105,7 @@ public class SingleEventGeneratorTest {
 
     }
 
-     @Test
+    @Test
     public void testEventWithoutTimestamp2() throws Exception {
         SingleEventGenerator.sendEvent("{\n" +
                 "  \"streamName\": \"FooStream\",\n" +
@@ -118,7 +122,7 @@ public class SingleEventGeneratorTest {
                 .getExecutionPlanName(), " Execution plan names equal");
         Assert.assertEquals("FooStream", streamProcessorUtil.getEventsReceived().get(0).getStreamName(),
                 "Stream name is equal");
-        Object[] data = new Object[] {null, 9f, 45L};
+        Object[] data = new Object[]{null, 9f, 45L};
 //        todo cant check since cant get the system time of when the event is created
         Assert.assertEquals(System.currentTimeMillis(), streamProcessorUtil.getEventsReceived().get(0).getEvent()
                 .getTimestamp(), "Event timestamp is equal");

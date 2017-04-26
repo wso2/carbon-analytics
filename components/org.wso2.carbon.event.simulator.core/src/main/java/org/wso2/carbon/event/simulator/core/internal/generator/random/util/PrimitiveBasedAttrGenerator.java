@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator.random.util;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
+import fabricator.Alphanumeric;
+import fabricator.Fabricator;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -30,10 +31,9 @@ import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttr
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
-import java.text.DecimalFormat;
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
-import fabricator.Alphanumeric;
-import fabricator.Fabricator;
+import java.text.DecimalFormat;
 
 /**
  * PrimitiveBasedAttrGenerator class is responsible for generating an attribute of primitive type
@@ -59,7 +59,7 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
      *
      * @param attributeConfig the attribute configuration
      * @throws InvalidConfigException if the attribute configuration doesn't contain all the required data
-     * */
+     */
     @Override
     public void validateAttributeConfiguration(JSONObject attributeConfig) throws InvalidConfigException {
         /**
@@ -85,22 +85,22 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
             case STRING:
                 if (!checkAvailability(attributeConfig,
                         EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_LENGTH)) {
-                            throw new InvalidConfigException("Property 'Length' is required for generation of" +
-                                    " attributes of type '" + attributeType + "' in " + RandomDataGeneratorType
-                                    .PRIMITIVE_BASED + " attribute generation. Invalid attribute configuration " +
-                                    "provided : " + attributeConfig.toString());
-                        }
+                    throw new InvalidConfigException("Property 'Length' is required for generation of" +
+                            " attributes of type '" + attributeType + "' in " + RandomDataGeneratorType
+                            .PRIMITIVE_BASED + " attribute generation. Invalid attribute configuration " +
+                            "provided : " + attributeConfig.toString());
+                }
                 break;
             case INT:
             case LONG:
                 if (!checkAvailability(attributeConfig, EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_MIN)
                         || !checkAvailability(attributeConfig, EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_MAX)) {
-                            throw new InvalidConfigException("Properties 'Min' and 'Max' are required " +
-                                    "for generation of attributes of  type '" + attributeType + "' in" +
-                                    RandomDataGeneratorType.PRIMITIVE_BASED +
-                                    " attribute generation. Invalid attribute configuration provided" +
-                                    ": " + attributeConfig.toString());
-                        }
+                    throw new InvalidConfigException("Properties 'Min' and 'Max' are required " +
+                            "for generation of attributes of  type '" + attributeType + "' in" +
+                            RandomDataGeneratorType.PRIMITIVE_BASED +
+                            " attribute generation. Invalid attribute configuration provided" +
+                            ": " + attributeConfig.toString());
+                }
                 break;
             case FLOAT:
             case DOUBLE:
@@ -108,12 +108,12 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
                         || !checkAvailability(attributeConfig, EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_MAX)
                         || !checkAvailability(attributeConfig,
                         EventSimulatorConstants.PRIMITIVE_BASED_ATTRIBUTE_PRECISION)) {
-                            throw new InvalidConfigException("Properties 'Min','Max' and 'Precision' are " +
-                                    "required for generation of attributes of type '" + attributeType + "' in " +
-                                    RandomDataGeneratorType.PRIMITIVE_BASED +
-                                    " attribute generation. Invalid attribute configuration provided : " +
-                                    attributeConfig.toString());
-                        }
+                    throw new InvalidConfigException("Properties 'Min','Max' and 'Precision' are " +
+                            "required for generation of attributes of type '" + attributeType + "' in " +
+                            RandomDataGeneratorType.PRIMITIVE_BASED +
+                            " attribute generation. Invalid attribute configuration provided : " +
+                            attributeConfig.toString());
+                }
                 break;
             default:
 //                this statement is never reached since attribute type is an enum
@@ -124,7 +124,7 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
      * createRandomAttributeDTO() creates a primitiveBasedAttributeDTo for the attribute configuration provided
      *
      * @param attributeConfig the attribute configuration for primitive based attribute generation
-     * */
+     */
     @Override
     public void createRandomAttributeDTO(JSONObject attributeConfig) {
         primitiveBasedAttrConfig.setAttrType(attributeType);
@@ -133,7 +133,7 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
                 break;
             case STRING:
                 primitiveBasedAttrConfig.setLength(attributeConfig.getInt(EventSimulatorConstants.
-                                PRIMITIVE_BASED_ATTRIBUTE_LENGTH));
+                        PRIMITIVE_BASED_ATTRIBUTE_LENGTH));
                 break;
             case INT:
             case LONG:

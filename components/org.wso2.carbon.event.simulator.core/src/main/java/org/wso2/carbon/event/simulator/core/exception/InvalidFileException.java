@@ -18,9 +18,9 @@ public class InvalidFileException extends Exception {
      * Throws customizes exception for uploading invalid files
      *
      * @param message Error Message
-     * @param e       exception that caused the InvalidConfigException
+     * @param cause   Throwable that caused the InvalidConfigException
      */
-    public InvalidFileException(String message, Exception e) {
-        super(message, e);
+    public InvalidFileException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

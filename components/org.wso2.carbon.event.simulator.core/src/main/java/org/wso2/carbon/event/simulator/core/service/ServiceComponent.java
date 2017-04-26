@@ -106,18 +106,19 @@ public class ServiceComponent implements Microservice {
      *
      * @param simulationConfiguration jsonString to be converted to EventSimulationDto object
      * @return Response
-     * @throws InvalidConfigException     if the simulation configuration does not contain a simulation name
+     * @throws InvalidConfigException          if the simulation configuration does not contain a simulation name
      * @throws InsufficientAttributesException if the source configuration cannot generate values for all them stream
-     * attributes
-     * @throws FileAlreadyExistsException if a configuration already exists in the system under the given simulation
-     *                                    name
-     * @throws FileOperationsException    if an IOException occurs while uploading the simulation configuration
+     *                                         attributes
+     * @throws FileAlreadyExistsException      if a configuration already exists in the system under the given
+     *                                         simulation name
+     * @throws FileOperationsException         if an IOException occurs while uploading the simulation configuration
      */
     @POST
     @Path("/feed")
     @Produces("application/json")
     public Response uploadFeedSimulationConfig(String simulationConfiguration)
-            throws InvalidConfigException, InsufficientAttributesException, FileOperationsException {
+            throws InvalidConfigException, InsufficientAttributesException, FileOperationsException,
+            FileAlreadyExistsException {
         SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
         if (!EventSimulationMap.getSimulatorMap().containsKey(simulationConfigUploader
                 .getSimulationName(simulationConfiguration))) {
@@ -136,34 +137,31 @@ public class ServiceComponent implements Microservice {
         }
     }
 
-    /** SimulationConfigUploader.getConfigUploader().uploadSimulationConfig(simulationConfiguration,
-                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
+    /**
+     * SimulationConfigUploader.getConfigUploader().uploadSimulationConfig(simulationConfiguration,
+     * (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+     * EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
      * service used to update an uploaded simulation configuration
      *
      * @param simulationName          unique identifies of the simulation configuration
      * @param simulationConfigDetails new simulation configuration
      * @return response
-     * @throws InvalidConfigException     if the simulation configuration does not contain a simulation name
-     * @throws FileOperationsException    if an IOException occurs while uploading the simulation configuration
+     * @throws InvalidConfigException          if the simulation configuration does not contain a simulation name
+     * @throws FileOperationsException         if an IOException occurs while uploading the simulation configuration
      * @throws InsufficientAttributesException if a configuration cannot generate values for all stream attributes
      */
     @PUT
     @Path("/feed/{simulationName}")
     @Produces("application/json")
     public Response updateFeedSimulationConfig(@PathParam("simulationName") String simulationName, String
-            simulationConfigDetails) throws InvalidConfigException, FileOperationsException,
-            InsufficientAttributesException {
-        if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
-            EventSimulator eventSimulator = EventSimulationMap.getSimulatorMap().get(simulationName);
-            if (!eventSimulator.getStatus().equals(EventSimulator.Status.STOP)) {
-                eventSimulator.stop();
-            }
-            SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
-            EventSimulator.validateSimulationConfig(simulationConfigDetails);
-            simulationConfigUploader.deleteSimulationConfig(simulationName,
-                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
+            simulationConfigDetails) throws InvalidConfigException, InsufficientAttributesException,
+            FileOperationsException, FileAlreadyExistsException {
+        EventSimulator.validateSimulationConfig(simulationConfigDetails);
+        SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
+        boolean deleted = simulationConfigUploader.deleteSimulationConfig(simulationName,
+                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
+        if (deleted) {
             simulationConfigUploader.uploadSimulationConfig(simulationConfigDetails,
                     (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                             EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
@@ -213,15 +211,10 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response deleteFeedSimulationConfig(@PathParam("simulationName") String simulationName) throws
             FileOperationsException {
-//        todo hot deployement - remove only from directory and fromm that hot deployment gets triggered.
-        if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
-            EventSimulator eventSimulator = EventSimulationMap.getSimulatorMap().get(simulationName);
-            if (!eventSimulator.getStatus().equals(EventSimulator.Status.STOP)) {
-                eventSimulator.stop();
-            }
-            SimulationConfigUploader.getConfigUploader().deleteSimulationConfig(simulationName,
-                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
+        boolean deleted = SimulationConfigUploader.getConfigUploader().deleteSimulationConfig(simulationName,
+                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
+        if (deleted) {
             return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
                     "deleted simulation configuration '" + simulationName + "'")).build();
         } else {
@@ -277,7 +270,7 @@ public class ServiceComponent implements Microservice {
             }
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ResponseMapper(
-                    Response.Status.BAD_REQUEST,  "Invalid action '" + action + "' specified for " +
+                    Response.Status.BAD_REQUEST, "Invalid action '" + action + "' specified for " +
                     "simulation '" + simulationName + "'. Actions supported are '" + EventSimulator.Action.RUN +
                     "', '" + EventSimulator.Action.PAUSE + "', '" + EventSimulator.Action.RESUME + "', '" +
                     EventSimulator.Action.STOP + "'.")).build();
@@ -375,7 +368,6 @@ public class ServiceComponent implements Microservice {
      * @param simulationName name of simulation being started
      * @return response
      */
-//    todo state diagram for each state
     private Response resume(String simulationName) {
         if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
             EventSimulator eventSimulator = EventSimulationMap.getSimulatorMap().get(simulationName);
@@ -447,7 +439,6 @@ public class ServiceComponent implements Microservice {
         }
     }
 
-//todo class reference for simulatorMAp
     /**
      * service to upload csv files
      * <p>
@@ -491,20 +482,26 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response updateFile(@PathParam("fileName") String fileName, String filePath)
             throws FileAlreadyExistsException, FileOperationsException, InvalidFileException {
-        FileUploader fileUploader = FileUploader.getFileUploaderInstance();
-        boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
-                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
-        if (deleted) {
-            fileUploader.uploadFile(filePath, (Paths.get(Utils.getCarbonHome().toString(),
+        if (!FilenameUtils.getName(filePath).isEmpty()) {
+            FileUploader fileUploader = FileUploader.getFileUploaderInstance();
+            fileUploader.validateFileSource(filePath);
+            boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
                     EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                     EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
-//            todo dont include the directory location
-            return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully updated CSV" +
-                    "file '" + fileName + "'")).build();
+            if (deleted) {
+                fileUploader.uploadFile(filePath, (Paths.get(Utils.getCarbonHome().toString(),
+                        EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                        EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
+                return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully updated CSV" +
+                        "file '" + fileName + "'")).build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND).entity(
+                        new ResponseMapper(Response.Status.NOT_FOUND, "File '" + fileName + "' does not exist"))
+                        .build();
+            }
         } else {
-            return Response.status(Response.Status.NOT_FOUND).entity(
-                    new ResponseMapper(Response.Status.NOT_FOUND, "File '" + fileName + "' does not exist"))
+            return Response.status(Response.Status.BAD_REQUEST).entity(
+                    new ResponseMapper(Response.Status.BAD_REQUEST, "File name cannot be empty."))
                     .build();
         }
     }
@@ -522,10 +519,9 @@ public class ServiceComponent implements Microservice {
     @Path("/files/{fileName}")
     @Produces("application/json")
     public Response deleteFile(@PathParam("fileName") String fileName) throws FileOperationsException {
-        FileUploader fileUploader = FileUploader.getFileUploaderInstance();
-        boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
-                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
+        boolean deleted = FileUploader.getFileUploaderInstance().deleteFile(fileName,
+                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                        EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
         if (deleted) {
             return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
                     "deleted file '" + fileName + "'")).build();

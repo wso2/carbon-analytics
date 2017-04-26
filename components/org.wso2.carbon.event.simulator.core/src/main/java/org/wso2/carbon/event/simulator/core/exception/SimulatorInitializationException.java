@@ -17,9 +17,9 @@ public class SimulatorInitializationException extends RuntimeException {
      * Throws customizes Simulator Initialization exception
      *
      * @param message Error Message
-     * @param e       exception which caused the Simulator Initialization exception
+     * @param cause   Throwable which caused the Simulator Initialization exception
      */
-    public SimulatorInitializationException(String message, Exception e) {
-        super(message, e);
+    public SimulatorInitializationException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

@@ -19,7 +19,7 @@ public class SimulationConfigDeploymentMapper implements ExceptionMapper<Simulat
     @Override
     public Response toResponse(SimulationConfigDeploymentException e) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-                entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage())).
+                entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage())).
                 build();
     }
 }

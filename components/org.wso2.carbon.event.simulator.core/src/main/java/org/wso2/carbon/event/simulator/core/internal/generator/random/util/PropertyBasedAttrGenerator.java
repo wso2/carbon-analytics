@@ -78,7 +78,8 @@ public class PropertyBasedAttrGenerator implements RandomAttributeGenerator {
      * generation
      *
      * @param attributeConfig the attribute configuration for property based attribute generation
-     * @throws InvalidConfigException if the attribute configuration contains an invalid propertyType*/
+     * @throws InvalidConfigException if the attribute configuration contains an invalid propertyType
+     */
     @Override
     public void validateAttributeConfiguration(JSONObject attributeConfig) throws InvalidConfigException {
         if (checkAvailability(attributeConfig, EventSimulatorConstants.PROPERTY_BASED_ATTRIBUTE_PROPERTY)) {
@@ -102,7 +103,7 @@ public class PropertyBasedAttrGenerator implements RandomAttributeGenerator {
      * createRandomAttributeDTO() creates PropertyBasedAttributeDTO using the attribute configuration provided
      *
      * @param attributeConfig attribute configuration for property based attribute generation
-     * */
+     */
     @Override
     public void createRandomAttributeDTO(JSONObject attributeConfig) {
         propertyBasedAttrConfig.setProperty(PropertyType.valueOf(attributeConfig

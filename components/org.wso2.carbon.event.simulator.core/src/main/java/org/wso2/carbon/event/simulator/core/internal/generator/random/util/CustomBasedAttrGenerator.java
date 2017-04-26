@@ -21,8 +21,6 @@ package org.wso2.carbon.event.simulator.core.internal.generator.random.util;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.internal.bean.CustomBasedAttributeDTO;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttributeGenerator;
@@ -40,7 +38,8 @@ import java.util.Random;
 public class CustomBasedAttrGenerator implements RandomAttributeGenerator {
     private CustomBasedAttributeDTO customBasedAttrConfig = new CustomBasedAttributeDTO();
 
-    public CustomBasedAttrGenerator() {}
+    public CustomBasedAttrGenerator() {
+    }
 
     /**
      * validateAttributeConfiguration() validates the attribute configuration provided for custom data based random
@@ -48,9 +47,9 @@ public class CustomBasedAttrGenerator implements RandomAttributeGenerator {
      *
      * @param attributeConfig attribute configuration for custom data based random simulation
      * @throws InvalidConfigException if a custom data list is not provided
-     * */
+     */
     @Override
-    public void validateAttributeConfiguration(JSONObject attributeConfig) throws InvalidConfigException{
+    public void validateAttributeConfiguration(JSONObject attributeConfig) throws InvalidConfigException {
         if (!checkAvailabilityOfArray(attributeConfig, EventSimulatorConstants.CUSTOM_DATA_BASED_ATTRIBUTE_LIST)) {
             throw new InvalidConfigException("Data list is not given for " +
                     RandomDataGeneratorType.CUSTOM_DATA_BASED + " simulation. Invalid " +
@@ -62,7 +61,7 @@ public class CustomBasedAttrGenerator implements RandomAttributeGenerator {
      * createRandomAttributeDTO() creates a CustomBasedAttributeDTO for custom attribute generator
      *
      * @param attributeConfig is the attribute configuration
-     * */
+     */
     @Override
     public void createRandomAttributeDTO(JSONObject attributeConfig) {
         Gson gson = new Gson();

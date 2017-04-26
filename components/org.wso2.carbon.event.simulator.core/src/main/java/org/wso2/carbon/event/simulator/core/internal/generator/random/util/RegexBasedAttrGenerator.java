@@ -32,7 +32,6 @@ import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperation
 
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 /**
  * RegexBasedAttrGenerator is used to generate random data using regex provided
  */

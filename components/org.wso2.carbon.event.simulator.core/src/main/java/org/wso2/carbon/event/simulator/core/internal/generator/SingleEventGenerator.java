@@ -43,8 +43,7 @@ public class SingleEventGenerator {
      */
     public static void sendEvent(String singleEventConfiguration)
             throws InvalidConfigException, InsufficientAttributesException {
-        SingleEventSimulationDTO singleEventConfig = validateSingleEvent(singleEventConfiguration);
-        log.info(singleEventConfiguration);
+        SingleEventSimulationDTO singleEventConfig = createSingleEventDTO(singleEventConfiguration);
         List<Attribute> streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
                 .getStreamAttributes(singleEventConfig.getExecutionPlanName(),
                         singleEventConfig.getStreamName());
@@ -89,16 +88,16 @@ public class SingleEventGenerator {
     }
 
     /**
-     * validateSingleEvent() is used to validate single event simulation provided and create a
+     * createSingleEventDTO() is used to validate single event simulation provided and create a
      * SingleEventSimulationDTO object containing simulation configuration
      *
      * @param singleEventConfiguration SingleEventSimulationDTO containing single event simulation configuration
      * @return SingleEventSimulationDTO if required configuration is provided
      */
-    private static SingleEventSimulationDTO validateSingleEvent(String singleEventConfiguration)
+    private static SingleEventSimulationDTO createSingleEventDTO(String singleEventConfiguration)
             throws InvalidConfigException {
-        JSONObject singleEventConfig = new JSONObject(singleEventConfiguration);
         try {
+            JSONObject singleEventConfig = new JSONObject(singleEventConfiguration);
             if (!checkAvailability(singleEventConfig, EventSimulatorConstants.STREAM_NAME)) {
                 throw new InvalidConfigException("Stream name is required for single event simulation. Invalid " +
                         "configuration provided : " + singleEventConfig.toString());
@@ -108,25 +107,20 @@ public class SingleEventGenerator {
                         "stream '" + singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME) + ". " +
                         "Invalid configuration provided : " + singleEventConfig.toString());
             }
-            /*
-             * if timestamp is set to null, take current system time as the timestamp of the event
-             * */
-            long timestamp;
+//            if timestamp is set to null, take current system time as the timestamp of the event
+            long timestamp = System.currentTimeMillis();
             if (singleEventConfig.has(EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP)) {
-                if (singleEventConfig.isNull(EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP)) {
-                    timestamp = System.currentTimeMillis();
-                } else if (singleEventConfig.getLong(EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP) > 0) {
-                    timestamp = singleEventConfig.getLong(EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP);
-                } else {
-                    throw new InvalidConfigException("Timestamp must be a positive value for single event simulation " +
-                            "of stream '" + singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME) +
-                            "'. Invalid configuration provided : " + singleEventConfig.toString());
+                if (!singleEventConfig.isNull(EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP)) {
+                    if (!singleEventConfig.getString(EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP).isEmpty()) {
+                        timestamp = singleEventConfig.getLong(EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP);
+                        if (timestamp < 0) {
+                            throw new InvalidConfigException("Timestamp must be a positive value for single event" +
+                                    " simulation of stream '" + singleEventConfig.getString(EventSimulatorConstants
+                                    .STREAM_NAME) + "'. Invalid configuration provided : " +
+                                    singleEventConfig.toString());
+                        }
+                    }
                 }
-            } else {
-                log.warn("Timestamp value is required for single event simulation of stream '"
-                        + singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid " +
-                        "configuration provided : " + singleEventConfig.toString());
-                timestamp = System.currentTimeMillis();
             }
             ArrayList dataValues;
             if (checkAvailabilityOfArray(singleEventConfig, EventSimulatorConstants.SINGLE_EVENT_DATA)) {

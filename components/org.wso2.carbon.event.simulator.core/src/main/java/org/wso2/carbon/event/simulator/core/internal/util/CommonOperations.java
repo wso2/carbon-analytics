@@ -1,13 +1,6 @@
 package org.wso2.carbon.event.simulator.core.internal.util;
 
 import org.json.JSONObject;
-import org.wso2.carbon.stream.processor.core.internal.exception.ExecutionPlanDeploymentException;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 
 /**
  * CommonOperations class is used to perform functions common to all generators such as

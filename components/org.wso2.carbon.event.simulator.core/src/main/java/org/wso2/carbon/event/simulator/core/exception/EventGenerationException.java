@@ -18,9 +18,10 @@ public class EventGenerationException extends RuntimeException {
      * Throws customizes event generation exception
      *
      * @param message Error Message
-     * @param e       exception which caused the event generation exception
+     * @param cause   throwable which caused the event generation exception
      */
-    public EventGenerationException(String message, Exception e) {
-        super(message, e);
+    public EventGenerationException(String message, Throwable cause) {
+        super(message, cause);
     }
+
 }

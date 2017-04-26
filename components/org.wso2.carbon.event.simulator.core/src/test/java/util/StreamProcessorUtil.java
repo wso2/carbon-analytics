@@ -20,8 +20,8 @@ public class StreamProcessorUtil implements EventStreamService {
 
     @Override
     public List<String> getStreamNames(String streamName) {
-        List<String> streamNames =  new ArrayList<>();
-        streamAttributesMap.forEach((executionPlan, streamMap)-> {
+        List<String> streamNames = new ArrayList<>();
+        streamAttributesMap.forEach((executionPlan, streamMap) -> {
             if (streamMap.containsKey(streamName)) {
                 streamMap.get(streamName).forEach(attribute -> streamNames.add(attribute.getName()));
             }
@@ -76,10 +76,11 @@ public class StreamProcessorUtil implements EventStreamService {
         if (streamAttributesMap.containsKey(executionPlanName)) {
             streamAttributesMap.get(executionPlanName).put(streamName, attributes);
         } else {
-            streamAttributesMap.put(executionPlanName, new HashMap<String, List<Attribute>>()
-            { {
-                put(streamName, attributes);
-            }});
+            streamAttributesMap.put(executionPlanName, new HashMap<String, List<Attribute>>() {
+                {
+                    put(streamName, attributes);
+                }
+            });
         }
     }
 }

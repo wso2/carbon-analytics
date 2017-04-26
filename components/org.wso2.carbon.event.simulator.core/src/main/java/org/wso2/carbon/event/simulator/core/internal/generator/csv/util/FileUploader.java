@@ -28,7 +28,6 @@ import org.wso2.carbon.event.simulator.core.internal.util.ValidatedInputStream;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -62,43 +61,41 @@ public class FileUploader {
      * Method to upload a CSV file.
      *
      * @param source      location of the file
-     * @param destination destination where the file should be copied to i.e. deployment/csvFiles
-     * @throws FileAlreadyExistsException if the file exists in 'deployment/csvFiles' directory
+     * @param destination destination where the file should be copied to i.e. destination
+     * @throws FileAlreadyExistsException if the file exists in 'destination' directory
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
-     *                                    'deployment/csvFiles' directory
-     * @throws InvalidFileException if the file being uploaded is not a csv file
+     *                                    'destination' directory
+     * @throws InvalidFileException       if the file being uploaded is not a csv file
      */
     public void uploadFile(String source, String destination) throws FileAlreadyExistsException,
             FileOperationsException, InvalidFileException {
         String fileName = FilenameUtils.getName(source);
         // Validate file extension
-        if (FilenameUtils.isExtension(fileName, EventSimulatorConstants.CSV_FILE_EXTENSION)) {
-            if (!fileStore.checkExists(fileName)) {
+        validateFileSource(source);
+        if (!fileStore.checkExists(fileName)) {
 //                use ValidatedInputStream to check whether the file size is less than the maximum size allowed ie 8MB
-                try (ValidatedInputStream inputStream = new ValidatedInputStream(FileUtils.openInputStream(new
-                        File(source)), EventSimulatorDataHolder.getInstance().getMaximumFileSize())) {
-                    Files.copy(inputStream, Paths.get(destination, fileName));
-                    if (log.isDebugEnabled()) {
-                        log.debug("Successfully uploaded CSV file '" + fileName + "' to directory '" + destination
-                                + "'");
-                    }
-                } catch (FileNotFoundException e) {
-                    log.error("File '" + source + "' does not exist.", e);
-                    throw new InvalidFileException("File '" + source + "' does not exist.", e);
-                } catch (IOException e) {
-                    log.error("Error occurred while copying the file '" + fileName + "'. ", e);
-                    throw new FileOperationsException("Error occurred while copying the file '" + fileName + "'. ", e);
+            try (ValidatedInputStream inputStream = new ValidatedInputStream(FileUtils.openInputStream(new
+                    File(source)), EventSimulatorDataHolder.getInstance().getMaximumFileSize())) {
+                Files.copy(inputStream, Paths.get(destination, fileName));
+                if (log.isDebugEnabled()) {
+                    log.debug("Successfully uploaded CSV file '" + fileName + "' to directory '" + destination
+                            + "'");
                 }
-            } else {
+            } catch (java.nio.file.FileAlreadyExistsException e) {
+                /**
+                 * since the deployer takes about 15 seconds to update the fileStore, 2 consecutive requests
+                 * upload the same csv file will result in java.nio.file.FileAlreadyExistsException
+                 */
                 log.error("File '" + fileName + "' already exists.");
                 throw new FileAlreadyExistsException("File '" + fileName + "' already exists.");
+            } catch (IOException e) {
+                log.error("Error occurred while copying the file '" + fileName + "'. ", e);
+                throw new FileOperationsException("Error occurred while copying the file '" + fileName + "'. ", e);
             }
         } else {
-            log.error("File '" + fileName + " has an invalid content type. Please upload a valid CSV file .");
-            throw new InvalidFileException("File '" + fileName + " has an invalid content type."
-                    + " Please upload a valid CSV file .");
+            log.error("File '" + fileName + "' already exists.");
+            throw new FileAlreadyExistsException("File '" + fileName + "' already exists.");
         }
-
     }
 
     /**
@@ -109,18 +106,32 @@ public class FileUploader {
      */
     public boolean deleteFile(String fileName, String destination) throws FileOperationsException {
         try {
-            if (fileStore.checkExists(fileName)) {
-                Files.deleteIfExists(Paths.get(destination, fileName));
-                if (log.isDebugEnabled()) {
-                    log.debug("Deleted file '" + fileName + "'");
-                }
-                return true;
-            } else {
-                return false;
-            }
+            fileStore.deleteFile(fileName);
+            return Files.deleteIfExists(Paths.get(destination, fileName));
         } catch (IOException e) {
             log.error("Error occurred while deleting the file '" + fileName + "'", e);
             throw new FileOperationsException("Error occurred while deleting the file '" + fileName + "'", e);
+        }
+    }
+
+    /**
+     * validateFileSource() is used to validate that the file exists and its a csv file.
+     *
+     * @param source file path of source
+     * @throws InvalidFileException if the file doesn't exists or doesn't have '.csv' extension
+     */
+    public void validateFileSource(String source) throws InvalidFileException {
+        File csvFile = new File(source);
+        String fileName = csvFile.getName();
+        if (!csvFile.exists()) {
+            throw new InvalidFileException("File '" + source + "' does not exist.");
+        } else {
+            if (!FilenameUtils.isExtension(fileName, EventSimulatorConstants.CSV_FILE_EXTENSION)) {
+                log.error("File '" + fileName + " has an invalid content type. File type supported is '." +
+                        EventSimulatorConstants.CSV_FILE_EXTENSION + "'.");
+                throw new InvalidFileException("File '" + fileName + " has an invalid content type. File type " +
+                        "supported is '." + EventSimulatorConstants.CSV_FILE_EXTENSION + "'.");
+            }
         }
     }
 

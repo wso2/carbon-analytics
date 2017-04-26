@@ -20,7 +20,11 @@ package org.wso2.carbon.event.simulator.core.service;
 
 import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.deployment.engine.Artifact;
@@ -28,16 +32,12 @@ import org.wso2.carbon.deployment.engine.ArtifactType;
 import org.wso2.carbon.deployment.engine.Deployer;
 import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
 import org.wso2.carbon.event.simulator.core.exception.SimulationConfigDeploymentException;
-import org.wso2.carbon.event.simulator.core.internal.util.CommonOperations;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.utils.Utils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -69,9 +69,8 @@ public class SimulationConfigDeployer implements Deployer {
                 EventSimulationMap.getSimulatorMap().put(simulationName, simulator);
             }
         } else {
-            throw new SimulationConfigDeploymentException("Error: File extension not supported for file name "
-                    + file.getName() + ". Support only '." + EventSimulatorConstants.SIMULATION_FILE_EXTENSION + "'" +
-                    " .");
+            throw new SimulationConfigDeploymentException("Simulation '" + file.getName() + "' has an invalid content" +
+                    " type. File type supported is '." + EventSimulatorConstants.SIMULATION_FILE_EXTENSION + "'.");
         }
     }
 

@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator.csv.core;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -33,6 +31,8 @@ import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstant
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
+
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,8 @@ public class CSVEventGenerator implements EventGenerator {
     private TreeMap<Long, ArrayList<Event>> eventsMap;
 
 
-    public CSVEventGenerator() {}
+    public CSVEventGenerator() {
+    }
 
     /**
      * init() is used to initialize a CSV event generator
@@ -68,9 +69,9 @@ public class CSVEventGenerator implements EventGenerator {
      * An even will be sent only if its timestamp falls within the boundaries of the timestamp start timestamp and
      * end time.
      *
-     * @param sourceConfig source configuration object containing configuration for csv simulation
+     * @param sourceConfig   source configuration object containing configuration for csv simulation
      * @param startTimestamp starting value for timestamp
-     * @param endTimestamp maximum possible event timestamp
+     * @param endTimestamp   maximum possible event timestamp
      * @throws InvalidConfigException if invalid configuration is provided for CSV event generation
      */
     @Override
@@ -87,7 +88,7 @@ public class CSVEventGenerator implements EventGenerator {
         this.startTimestamp = startTimestamp;
         this.endTimestamp = endTimestamp;
         if (log.isDebugEnabled()) {
-            log.debug("Timestamp range initiated for random event generator for stream '" +
+            log.debug("Timestamp range initiated for CSV event generator for stream '" +
                     csvConfiguration.getStreamName() + "'. Timestamp start time : " + startTimestamp + " and" +
                     " timestamp end time : " + endTimestamp);
         }
@@ -309,6 +310,7 @@ public class CSVEventGenerator implements EventGenerator {
                 /**
                  * check for the availability of the flag isOrdered only if the timestampAttribute is specified since
                  * isOrdered flag indicates whether a csv file is ordered by the timestamp attribute or not
+                 * since timestampAttribute specifies a column index, verify that its > 0
                  * */
                 if (sourceConfig.getInt(EventSimulatorConstants.TIMESTAMP_ATTRIBUTE) < 0) {
                     throw new InvalidConfigException("Timestamp attribute for CSV simulation of stream '" +
