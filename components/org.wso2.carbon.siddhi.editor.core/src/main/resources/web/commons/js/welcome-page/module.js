@@ -15,17 +15,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+define(['require','./first-launch-welcome', './regular-welcome'],
+    function (require, FirstLaunchWelcomePage, RegularWelcomePage) {
+        return  {
+            FirstLaunchWelcomePage: FirstLaunchWelcomePage,
+            RegularWelcomePage: RegularWelcomePage
+        }
+    });
 
-define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog','./close-confirm-dialog'],
-    function (SaveToFileDialog,ReplaceConfirmDialog,OpenFileDialog,CloseConfirmDialog) {
-    return {
-        save_to_file_dialog: SaveToFileDialog,
-        //FolderOpenDialog: FolderOpenDialog,
-        //NewItemDialog: NewItemDialog,
-        //DeleteItemDialog: DeleteItemDialog,
-        open_file_dialog: OpenFileDialog,
-        CloseConfirmDialog: CloseConfirmDialog,
-        ReplaceConfirmDialog: ReplaceConfirmDialog
-        //SettingsDialog: SettingsDialog
-    };
-});
