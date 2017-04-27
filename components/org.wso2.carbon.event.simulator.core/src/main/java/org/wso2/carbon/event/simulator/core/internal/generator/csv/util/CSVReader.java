@@ -94,14 +94,14 @@ public class CSVReader {
     /**
      * If the CSV file is ordered by timestamp, this method reads the next line and produces an event
      *
-     * @param csvConfig          configuration of CSV simulation
-     * @param streamAttributes   list of attributes of the stream to which events are produced
-     * @param timestampStartTime start timestamp of event simulation
-     * @param timestampEndTime   end timestamp of event simulation
+     * @param csvConfig        configuration of CSV simulation
+     * @param streamAttributes list of attributes of the stream to which events are produced
+     * @param startTimestamp   start timestamp of event simulation
+     * @param endTimestamp     end timestamp of event simulation
      * @return event produced
      */
-    public Event getNextEvent(CSVSimulationDTO csvConfig, List<Attribute> streamAttributes, long timestampStartTime,
-                              long timestampEndTime) {
+    public Event getNextEvent(CSVSimulationDTO csvConfig, List<Attribute> streamAttributes, long startTimestamp,
+                              long endTimestamp) {
         Event event = null;
         int timestampPosition = Integer.parseInt(csvConfig.getTimestampAttribute());
         try {
@@ -115,11 +115,11 @@ public class CSVReader {
                     if (timestampPosition == -1) {
                         if (attributes.size() == streamAttributes.size()) {
                             /**
-                             * if timestamp attribute is not specified, take timestampStartTime as the first event
+                             * if timestamp attribute is not specified, take startTimestamp as the first event
                              * timestamp and the successive timestamps will be lastTimetstamp + timeInterval
                              * */
-                            timestamp = timestampStartTime + (lineNumber - 1) * csvConfig.getTimestampInterval();
-                            if (timestampEndTime != -1 && timestamp > timestampEndTime) {
+                            timestamp = startTimestamp + (lineNumber - 1) * csvConfig.getTimestampInterval();
+                            if (endTimestamp != -1 && timestamp > endTimestamp) {
                                 break;
                             }
                         } else {
@@ -140,8 +140,8 @@ public class CSVReader {
                              * 3. remove the value at the timestamp position in the list
                              * */
                             timestamp = Long.parseLong(attributes.get(timestampPosition));
-                            if (timestamp >= timestampStartTime) {
-                                if (timestampEndTime == -1 || timestamp <= timestampEndTime) {
+                            if (timestamp >= startTimestamp) {
+                                if (endTimestamp == -1 || timestamp <= endTimestamp) {
                                     attributes.remove(timestampPosition);
                                 } else {
                                     continue;
@@ -187,18 +187,18 @@ public class CSVReader {
     /**
      * If the CSV is not ordered by timestamp, getEventsMap() method is used to create a treeMap of events.
      *
-     * @param csvConfig          configuration of csv simulation
-     * @param streamAttributes   list of attributes of the stream to which events are produced
-     * @param timestampStartTime start timestamp of event simulation
-     * @param timestampEndTime   end timestamp of event simulation
+     * @param csvConfig        configuration of csv simulation
+     * @param streamAttributes list of attributes of the stream to which events are produced
+     * @param startTimestamp   start timestamp of event simulation
+     * @param endTimestamp     end timestamp of event simulation
      * @return treeMap of events
      */
     public TreeMap<Long, ArrayList<Event>> getEventsMap(CSVSimulationDTO csvConfig, List<Attribute> streamAttributes,
-                                                        long timestampStartTime, long timestampEndTime) {
+                                                        long startTimestamp, long endTimestamp) {
         try {
             csvParser = parseFile(csvConfig.getDelimiter());
-            return createEventsMap(csvConfig, streamAttributes, timestampStartTime,
-                    timestampEndTime);
+            return createEventsMap(csvConfig, streamAttributes, startTimestamp,
+                    endTimestamp);
         } catch (IOException e) {
             log.error("Error occurred when initializing CSVParser for CSV file '" + csvConfig.getFileName() + "' to " +
                     "simulate stream '" + csvConfig.getStreamName() + "' using source configuration : " +
@@ -237,17 +237,16 @@ public class CSVReader {
      * The key of the treeMap will be the event timestamp and the value will be an array list of events belonging to
      * the timestamp.
      *
-     * @param csvConfig          configuration of csv simulation
-     * @param streamAttributes   list of attributes of the stream to which events are produced
-     * @param timestampStartTime start timestamp of event simulation
-     * @param timestampEndTime   end timestamp of event simulation
+     * @param csvConfig        configuration of csv simulation
+     * @param streamAttributes list of attributes of the stream to which events are produced
+     * @param startTimestamp   start timestamp of event simulation
+     * @param endTimestamp     end timestamp of event simulation
      * @return a treeMap of events
      */
     private TreeMap<Long, ArrayList<Event>> createEventsMap(CSVSimulationDTO csvConfig,
                                                             List<Attribute> streamAttributes,
-                                                            long timestampStartTime, long timestampEndTime) {
+                                                            long startTimestamp, long endTimestamp) {
         TreeMap<Long, ArrayList<Event>> eventsMap = new TreeMap<>();
-
         int timestampPosition = Integer.parseInt(csvConfig.getTimestampAttribute());
         long lineNumber;
         Event event;
@@ -263,14 +262,14 @@ public class CSVReader {
                  * timestamp.
                  * if sufficient data is not found in record log a warning and proceed to next record
                  * retrieve the value at the position specified by timestamp attribute as the timestamp
-                 * if the timestamp is within the range specified by the timestampStartTime and timestampEndTime,
+                 * if the timestamp is within the range specified by the startTimestamp and endTimestamp,
                  * remove timestamp attribute from the 'attributes' list and proceed to creating an event
                  * else ignore record and proceed to next record
                  * */
                 if (record.size() == (streamAttributes.size() + 1)) {
                     long timestamp = Long.parseLong(attributes.get(timestampPosition));
-                    if (timestamp >= timestampStartTime) {
-                        if (timestampEndTime == -1 || timestamp <= timestampEndTime) {
+                    if (timestamp >= startTimestamp) {
+                        if (endTimestamp == -1 || timestamp <= endTimestamp) {
                             attributes.remove(timestampPosition);
                             String[] eventData = attributes.toArray(new String[streamAttributes.size()]);
                             try {
@@ -292,7 +291,7 @@ public class CSVReader {
                     log.warn("Simulation of stream '" + csvConfig.getStreamName() + "' requires " +
                             (streamAttributes.size() + 1) + " attributes. Number of attributes in line " + lineNumber
                             + " of CSV file '" + csvConfig.getFileName() + "' is " + record.size() + ". Line content : "
-                            + record.toString() + ". Ignore line and read next line. Source configuration : " +
+                            + attributes.toString() + ". Ignore line and read next line. Source configuration : " +
                             csvConfig.toString() + ".");
                 }
             }

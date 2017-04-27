@@ -114,9 +114,14 @@ public class CSVEventGenerator implements EventGenerator {
             eventsMap = new TreeMap<>();
             eventsMap = csvReader.getEventsMap(csvConfiguration, streamAttributes, startTimestamp,
                     endTimestamp);
-            currentTimestampEvents = eventsMap.pollFirstEntry().getValue();
-            nextEvent = currentTimestampEvents.get(0);
-            currentTimestampEvents.remove(0);
+            if (!eventsMap.isEmpty()) {
+                currentTimestampEvents = eventsMap.pollFirstEntry().getValue();
+                nextEvent = currentTimestampEvents.get(0);
+                currentTimestampEvents.remove(0);
+            } else {
+                currentTimestampEvents = null;
+                nextEvent = null;
+            }
         }
         if (log.isDebugEnabled()) {
             log.debug("Start CSV generator for file '" + csvConfiguration.getFileName() + "' for simulation of stream" +
