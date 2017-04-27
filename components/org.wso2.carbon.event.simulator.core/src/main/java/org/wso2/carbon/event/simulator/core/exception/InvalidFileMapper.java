@@ -20,6 +20,7 @@ public class InvalidFileMapper implements ExceptionMapper<InvalidFileException> 
     public Response toResponse(InvalidFileException e) {
         return Response.status(Response.Status.BAD_REQUEST).
                 entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage())).
+                type("application/json").
                 build();
     }
 }

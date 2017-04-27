@@ -38,17 +38,23 @@ import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperation
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * EventSimulator starts the simulation execution for single Event and
  * Feed Simulation
  */
+@NotThreadSafe
 public class EventSimulator implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(EventSimulator.class);
     private List<EventGenerator> generators = new ArrayList<>();
     private SimulationPropertiesDTO simulationProperties;
     private String simulationName;
     private Status status = Status.STOP;
+    private final ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lockStop = new ReentrantLock();
 
 
     /**
@@ -203,18 +209,19 @@ public class EventSimulator implements Runnable {
      * order of their timestamps
      * Events will be sent at time intervals equal to the delay
      */
-    private void eventSimulation() {
+    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("SWL_SLEEP_WITH_LOCK_HELD")
+    private synchronized void eventSimulation() {
         long minTimestamp;
         EventGenerator generator;
         int eventsRemaining = simulationProperties.getNoOfEventsRequired();
         try {
             while (!status.equals(Status.STOP)) {
 //                if the simulator is paused, wait till it is resumed
-                synchronized (this) {
-                    while (status.equals(Status.PAUSE)) {
-                        wait();
-                    }
+                if (status.equals(Status.PAUSE)) {
+                    lock.lock();
+                    lock.unlock();
                 }
+
                 /**
                  * if there is no limit to the number of events to be sent or is the number of event remaining to be
                  * sent is > 0, send an event, else stop event simulation
@@ -233,7 +240,8 @@ public class EventSimulator implements Runnable {
                      * event.
                      * 5. if all generators has nextEvent == null, then stop event simulation
                      * */
-                    synchronized (this) {
+                    lockStop.lock();
+                    try {
                         for (EventGenerator eventGenerator : generators) {
                             if (eventGenerator.peek() != null) {
                                 if (minTimestamp == -1L) {
@@ -259,6 +267,8 @@ public class EventSimulator implements Runnable {
                         if (eventsRemaining > 0) {
                             eventsRemaining--;
                         }
+                    } finally {
+                        lockStop.unlock();
                     }
                     Thread.sleep(simulationProperties.getTimeInterval());
                 } else {
@@ -399,10 +409,15 @@ public class EventSimulator implements Runnable {
      */
     public synchronized void stop() {
         if (!status.equals(Status.STOP)) {
-            status = Status.STOP;
-            generators.forEach(EventGenerator::stop);
-            if (log.isDebugEnabled()) {
-                log.debug("Stop simulation '" + simulationName + "'");
+            lockStop.lock();
+            try {
+                status = Status.STOP;
+                generators.forEach(EventGenerator::stop);
+                if (log.isDebugEnabled()) {
+                    log.debug("Stop simulation '" + simulationName + "'");
+                }
+            } finally {
+                lockStop.unlock();
             }
         }
     }
@@ -415,6 +430,7 @@ public class EventSimulator implements Runnable {
      */
     public synchronized void pause() {
         if (!status.equals(Status.PAUSE)) {
+            lock.lock();
             status = Status.PAUSE;
             if (log.isDebugEnabled()) {
                 log.debug("Pause event simulation '" + simulationName + "'");
@@ -430,8 +446,8 @@ public class EventSimulator implements Runnable {
      */
     public synchronized void resume() {
         if (status.equals(Status.PAUSE)) {
+            lock.unlock();
             status = Status.RUN;
-            notifyAll();
             if (log.isDebugEnabled()) {
                 log.debug("Resume event simulation '" + simulationName + "'");
             }
@@ -451,7 +467,7 @@ public class EventSimulator implements Runnable {
 
     /**
      * Status class specifies the possible statuses a simulator can be in
-     * */
+     */
     public enum Status {
         RUN, PAUSE, STOP
     }

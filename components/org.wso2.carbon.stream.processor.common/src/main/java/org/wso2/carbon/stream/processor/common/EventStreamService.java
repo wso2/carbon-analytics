@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.stream.processor.common;
 
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
@@ -30,7 +31,8 @@ public interface EventStreamService {
 
     public List<String> getStreamNames(String executionPlanName);
 
-    public List<Attribute> getStreamAttributes(String executionPlanName, String streamName);
+    public List<Attribute> getStreamAttributes(String executionPlanName, String streamName) throws
+            ResourceNotFoundException;
 
     public void pushEvent(String executionPlanName, String streamName, Event event);
 }

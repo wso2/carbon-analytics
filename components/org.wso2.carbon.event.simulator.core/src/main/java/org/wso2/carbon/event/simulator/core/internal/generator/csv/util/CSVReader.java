@@ -27,8 +27,7 @@ import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
 import org.wso2.carbon.event.simulator.core.internal.bean.CSVSimulationDTO;
 import org.wso2.carbon.event.simulator.core.internal.util.EventConverter;
-import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
-import org.wso2.carbon.utils.Utils;
+import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
@@ -56,6 +55,7 @@ public class CSVReader {
     private BufferedReader bufferedReader = null;
     private CSVParser csvParser = null;
     private long lineNumber = 0;
+    private long eventNumber = 0;
 
     /**
      * Constructor CSVReader is used to initialize an instance of class CSVReader
@@ -64,13 +64,12 @@ public class CSVReader {
      */
     public CSVReader(String fileName, boolean isOrdered) {
         try {
-            File csvFile = new File(String.valueOf(Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants
-                    .DIRECTORY_DEPLOYMENT, EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName)));
+            String csvFileDirectory = EventSimulatorDataHolder.getInstance().getCsvFileDirectory();
+            File csvFile = new File(Paths.get(csvFileDirectory, fileName).toString());
             if (csvFile.exists()) {
                 if (csvFile.length() != 0) {
-                    fileReader = new InputStreamReader(new FileInputStream(String.valueOf(Paths.get(Utils
-                                    .getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                            EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName))), StandardCharsets.UTF_8);
+                    fileReader = new InputStreamReader(new FileInputStream(Paths.get(csvFileDirectory,
+                            fileName).toString()), StandardCharsets.UTF_8);
                     if (log.isDebugEnabled()) {
                         log.debug("Initialize a File reader for CSV file '" + fileName + "'.");
                     }
@@ -118,7 +117,7 @@ public class CSVReader {
                              * if timestamp attribute is not specified, take startTimestamp as the first event
                              * timestamp and the successive timestamps will be lastTimetstamp + timeInterval
                              * */
-                            timestamp = startTimestamp + (lineNumber - 1) * csvConfig.getTimestampInterval();
+                            timestamp = startTimestamp + eventNumber * csvConfig.getTimestampInterval();
                             if (endTimestamp != -1 && timestamp > endTimestamp) {
                                 break;
                             }
@@ -167,6 +166,7 @@ public class CSVReader {
                                 "configuration : " + csvConfig.toString() + ". Drop event and create next event. ", e);
                         continue;
                     }
+                    eventNumber++;
                     break;
                 } else {
                     break;

@@ -26,6 +26,7 @@ import org.wso2.carbon.stream.processor.common.EventStreamService;
 public class EventSimulatorDataHolder {
     private static EventSimulatorDataHolder instance = new EventSimulatorDataHolder();
     private long maximumFileSize;
+    private String csvFileDirectory;
     private EventStreamService eventStreamService;
 
 
@@ -58,4 +59,11 @@ public class EventSimulatorDataHolder {
         this.eventStreamService = eventStreamService;
     }
 
+    public String getCsvFileDirectory() {
+        return csvFileDirectory;
+    }
+
+    public void setCsvFileDirectory(String csvFileDirectory) {
+        this.csvFileDirectory = csvFileDirectory;
+    }
 }

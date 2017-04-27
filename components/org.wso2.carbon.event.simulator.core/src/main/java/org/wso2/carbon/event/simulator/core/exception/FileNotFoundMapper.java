@@ -7,18 +7,19 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 /**
- * customized exception class for when size of file uploaded exceeds the size limit
+ * Exception mapper that maps customized FileNotFoundException to customized HTTP responses
  */
 @Component(
-        name = "FileLimitExceededMapper",
+        name = "FileNotFoundMapper",
         service = ExceptionMapper.class,
         immediate = true
 )
-public class FileLimitExceededMapper implements ExceptionMapper<FileLimitExceededException> {
+public class FileNotFoundMapper implements ExceptionMapper<FileNotFoundException> {
+
     @Override
-    public Response toResponse(FileLimitExceededException e) {
-        return Response.status(Response.Status.FORBIDDEN).
-                entity(new ResponseMapper(Response.Status.FORBIDDEN, e.getMessage())).
+    public Response toResponse(FileNotFoundException e) {
+        return Response.status(Response.Status.NOT_FOUND).
+                entity(new ResponseMapper(Response.Status.NOT_FOUND, e.getMessage())).
                 type("application/json").
                 build();
     }

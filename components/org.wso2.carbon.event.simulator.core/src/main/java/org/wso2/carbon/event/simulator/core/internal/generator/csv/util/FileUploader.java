@@ -21,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
+import org.wso2.carbon.event.simulator.core.exception.FileNotFoundException;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidFileException;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
@@ -66,9 +67,10 @@ public class FileUploader {
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
      *                                    'destination' directory
      * @throws InvalidFileException       if the file being uploaded is not a csv file
+     * @throws FileNotFoundException if the file does not exists
      */
     public void uploadFile(String source, String destination) throws FileAlreadyExistsException,
-            FileOperationsException, InvalidFileException {
+            FileOperationsException, InvalidFileException, FileNotFoundException {
         String fileName = FilenameUtils.getName(source);
         // Validate file extension
         validateFileSource(source);
@@ -106,8 +108,16 @@ public class FileUploader {
      */
     public boolean deleteFile(String fileName, String destination) throws FileOperationsException {
         try {
-            fileStore.deleteFile(fileName);
-            return Files.deleteIfExists(Paths.get(destination, fileName));
+            if (fileStore.checkExists(fileName)) {
+                /**
+                 * since the deployer takes about 15 seconds to update the fileStore, a request to update a csv file may
+                 * fail if the filename isn't deleted from the filestore
+                 * */
+                fileStore.deleteFile(fileName);
+                return Files.deleteIfExists(Paths.get(destination, fileName));
+            } else {
+                return false;
+            }
         } catch (IOException e) {
             log.error("Error occurred while deleting the file '" + fileName + "'", e);
             throw new FileOperationsException("Error occurred while deleting the file '" + fileName + "'", e);
@@ -119,20 +129,23 @@ public class FileUploader {
      *
      * @param source file path of source
      * @throws InvalidFileException if the file doesn't exists or doesn't have '.csv' extension
+     * @throws FileNotFoundException if the file does not exists
      */
-    public void validateFileSource(String source) throws InvalidFileException {
+    public void validateFileSource(String source) throws InvalidFileException, FileNotFoundException {
         File csvFile = new File(source);
         String fileName = csvFile.getName();
-        if (!csvFile.exists()) {
-            throw new InvalidFileException("File '" + source + "' does not exist.");
-        } else {
-            if (!FilenameUtils.isExtension(fileName, EventSimulatorConstants.CSV_FILE_EXTENSION)) {
-                log.error("File '" + fileName + " has an invalid content type. File type supported is '." +
-                        EventSimulatorConstants.CSV_FILE_EXTENSION + "'.");
-                throw new InvalidFileException("File '" + fileName + " has an invalid content type. File type " +
-                        "supported is '." + EventSimulatorConstants.CSV_FILE_EXTENSION + "'.");
+        if (FilenameUtils.isExtension(fileName, EventSimulatorConstants.CSV_FILE_EXTENSION)) {
+            if (!csvFile.exists()) {
+                log.error("File '" + fileName + "' does not exist.");
+                throw new FileNotFoundException("File '" + fileName + "' does not exist.");
             }
+        } else {
+            log.error("File '" + fileName + " has an invalid content type. File type supported is '." +
+                    EventSimulatorConstants.CSV_FILE_EXTENSION + "'.");
+            throw new InvalidFileException("File '" + fileName + " has an invalid content type. File type " +
+                    "supported is '." + EventSimulatorConstants.CSV_FILE_EXTENSION + "'.");
         }
+
     }
 
 }

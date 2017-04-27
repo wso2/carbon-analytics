@@ -21,6 +21,7 @@ public class CSVFileDeploymentMapper implements ExceptionMapper<CSVFileDeploymen
     public Response toResponse(CSVFileDeploymentException e) {
         return Response.status(Response.Status.BAD_REQUEST).
                 entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage())).
+                type("application/json").
                 build();
     }
 }

@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
+import org.wso2.carbon.event.simulator.core.exception.FileNotFoundException;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
@@ -72,15 +73,6 @@ public class ServiceComponent implements Microservice {
 
     /**
      * Send single event for simulation
-     * <p>
-     * http://localhost:9090/simulation/single
-     * <pre>
-     * curl -X POST -d'{"streamName":"FooStream",
-     *                 "executionPlanName" : "TestExecutionPlan",
-     *                 "timestamp" : "1488615136958"
-     *                 "attributeValues":["WSO2","345", "45"]}'
-     *  http://localhost:9090/simulation/single
-     * </pre>
      *
      * @param singleEventConfiguration jsonString to be converted to SingleEventSimulationDTO object.
      * @return response
@@ -101,8 +93,6 @@ public class ServiceComponent implements Microservice {
 
     /**
      * service used to upload feed simulation configuration to the system
-     * <p>
-     * http://localhost:9090/simulation/feed
      *
      * @param simulationConfiguration jsonString to be converted to EventSimulationDto object
      * @return Response
@@ -441,20 +431,18 @@ public class ServiceComponent implements Microservice {
 
     /**
      * service to upload csv files
-     * <p>
-     * http://localhost:9090/simulation/files
      *
      * @param filePath location of file being uploaded
      * @return Response
-     * @throws FileAlreadyExistsException if the file exists in 'deployment/csvFiles' directory
+     * @throws FileAlreadyExistsException if the file exists in 'deployment/csv-files' directory
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
-     *                                    'deployment/csvFiles' directory
+     *                                    'deployment/csv-files' directory
      */
     @POST
     @Path("/files")
     @Produces("application/json")
-    public Response uploadFile(String filePath)
-            throws FileAlreadyExistsException, FileOperationsException, InvalidFileException {
+    public Response uploadFile(String filePath) throws FileAlreadyExistsException, FileOperationsException,
+            InvalidFileException, FileNotFoundException {
         FileUploader.getFileUploaderInstance().uploadFile(filePath,
                 (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                         EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
@@ -465,8 +453,6 @@ public class ServiceComponent implements Microservice {
 
     /**
      * service to modify an uploaded csv files
-     * <p>
-     * http://localhost:9090/simulation/files
      *
      * @param filePath location of file being uploaded
      * @return Response
@@ -475,15 +461,19 @@ public class ServiceComponent implements Microservice {
      *                                    in the method signature as it is a checked exception used when uploading a
      *                                    file
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
-     *                                    'deployment/csvFiles' directory
+     *                                    'deployment/csv-files' directory
+     * @throws FileNotFoundException      if the file does not exists
      */
     @PUT
     @Path("/files/{fileName}")
     @Produces("application/json")
     public Response updateFile(@PathParam("fileName") String fileName, String filePath)
-            throws FileAlreadyExistsException, FileOperationsException, InvalidFileException {
+            throws FileAlreadyExistsException, FileOperationsException, InvalidFileException, FileNotFoundException {
         if (!FilenameUtils.getName(filePath).isEmpty()) {
             FileUploader fileUploader = FileUploader.getFileUploaderInstance();
+            fileUploader.validateFileSource(FilenameUtils.concat(Paths.get(Utils.getCarbonHome().toString(),
+                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                    EventSimulatorConstants.DIRECTORY_CSV_FILES).toString(), fileName));
             fileUploader.validateFileSource(filePath);
             boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
                     EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
@@ -508,20 +498,24 @@ public class ServiceComponent implements Microservice {
 
     /**
      * Delete the file
-     * <p>
-     * http://localhost:9090/simulation/files/{fileName}
      *
      * @param fileName File Name
      * @return Response
      * @throws FileOperationsException if an IOException occurs while deleting file
+     * @throws FileNotFoundException   if the file does not exists
      */
     @DELETE
     @Path("/files/{fileName}")
     @Produces("application/json")
-    public Response deleteFile(@PathParam("fileName") String fileName) throws FileOperationsException {
-        boolean deleted = FileUploader.getFileUploaderInstance().deleteFile(fileName,
-                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                        EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
+    public Response deleteFile(@PathParam("fileName") String fileName) throws FileOperationsException,
+            InvalidFileException, FileNotFoundException {
+        FileUploader fileUploader = FileUploader.getFileUploaderInstance();
+        fileUploader.validateFileSource(FilenameUtils.concat(Paths.get(Utils.getCarbonHome().toString(),
+                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                EventSimulatorConstants.DIRECTORY_CSV_FILES).toString(), fileName));
+        boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
+                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
         if (deleted) {
             return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
                     "deleted file '" + fileName + "'")).build();
@@ -541,6 +535,8 @@ public class ServiceComponent implements Microservice {
     protected void start() throws Exception {
 //        set maximum csv file size to 8MB
         EventSimulatorDataHolder.getInstance().setMaximumFileSize(8388608);
+        EventSimulatorDataHolder.getInstance().setCsvFileDirectory(Paths.get(Utils.getCarbonHome().toString(),
+                EventSimulatorConstants.DIRECTORY_DEPLOYMENT, EventSimulatorConstants.DIRECTORY_CSV_FILES).toString());
         log.info("Event Simulator service component is activated");
     }
 

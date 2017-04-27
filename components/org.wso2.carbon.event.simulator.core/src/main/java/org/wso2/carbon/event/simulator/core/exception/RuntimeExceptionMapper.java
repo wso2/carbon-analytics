@@ -38,6 +38,7 @@ public class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException>
     public Response toResponse(RuntimeException e) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                 entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage())).
+                type("application/json").
                 build();
     }
 }

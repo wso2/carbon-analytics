@@ -19,6 +19,7 @@ public class EventGenerationMapper implements ExceptionMapper<EventGenerationExc
     public Response toResponse(EventGenerationException e) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                 entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage())).
+                type("application/json").
                 build();
     }
 }

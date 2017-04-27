@@ -13,6 +13,7 @@ import org.wso2.carbon.event.simulator.core.internal.bean.SingleEventSimulationD
 import org.wso2.carbon.event.simulator.core.internal.util.EventConverter;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
@@ -21,6 +22,7 @@ import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperation
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -43,59 +45,51 @@ public class SingleEventGenerator {
      */
     public static void sendEvent(String singleEventConfiguration)
             throws InvalidConfigException, InsufficientAttributesException {
+        validateSingleEventConfig(singleEventConfiguration);
         SingleEventSimulationDTO singleEventConfig = createSingleEventDTO(singleEventConfiguration);
-        List<Attribute> streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
-                .getStreamAttributes(singleEventConfig.getExecutionPlanName(),
-                        singleEventConfig.getStreamName());
-        if (streamAttributes == null) {
-            log.error("Stream '" + singleEventConfig.getStreamName() + "' does not exist.");
-            throw new EventGenerationException("Stream '" + singleEventConfig.getStreamName() + "' does not exist.");
+        List<Attribute> streamAttributes;
+        try {
+            streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
+                    .getStreamAttributes(singleEventConfig.getExecutionPlanName(),
+                            singleEventConfig.getStreamName());
+        } catch (ResourceNotFoundException e) {
+            log.error(e.getResourceType().toString().toLowerCase(Locale.ENGLISH).replace("_", " ") + " '" +
+                    e.getResourceName() +
+                    "' "
+                    + "specified for single event simulation does not exist. Invalid single event simulation " +
+                    "configuration : " + singleEventConfig.toString(), e);
+            throw new EventGenerationException(e.getResourceType().toString().toLowerCase(Locale.ENGLISH)
+                    .replace("_", " ") + " '" + e.getResourceName() + "' " + "specified for single event simulation" +
+                    " does not exist. Invalid single event simulation configuration : " + singleEventConfig.toString(),
+                    e);
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Retrieve stream attribute definitions for stream '" +
-                    singleEventConfig.getStreamName() + "' for single event simulation");
-        }
-        /**
-         * check whether the number of attribute values specified is the number of stream attributes
-         * if yes, proceed with sending single event
-         * else, throw an exception
-         * */
-        if (singleEventConfig.getAttributeValues().length == streamAttributes.size()) {
-            try {
-                Event event = EventConverter.eventConverter(streamAttributes,
-                        singleEventConfig.getAttributeValues(),
-                        singleEventConfig.getTimestamp());
-                EventSimulatorDataHolder.getInstance().getEventStreamService().pushEvent(
-                        singleEventConfig.getExecutionPlanName(),
-                        singleEventConfig.getStreamName(), event);
-            } catch (EventGenerationException e) {
-                log.error("Event dropped due to an error that occurred during single event simulation of stream '" +
-                        singleEventConfig.getStreamName() + "' for configuration '" + singleEventConfig.toString() +
-                        "'. ", e);
-                throw new EventGenerationException("Event dropped due to an error that occurred during single event " +
-                        "simulation of stream '" + singleEventConfig.getStreamName() + "' for configuration '" +
-                        singleEventConfig.toString() + "'. ", e);
-            }
-        } else {
-            log.error("Simulation of stream '" + singleEventConfig.getStreamName() + "' requires " +
-                    streamAttributes.size() + " attribute(s). Single event configuration only contains values for " +
-                    singleEventConfig.getAttributeValues().length + " attribute(s)");
-            throw new InsufficientAttributesException("Simulation of stream '" + singleEventConfig
-                    .getStreamName() + "' requires " + streamAttributes.size() + " attribute(s). Single" +
-                    "event configuration only contains values for " + singleEventConfig.getAttributeValues()
-                    .length + " attribute(s)");
+        try {
+            Event event = EventConverter.eventConverter(streamAttributes,
+                    singleEventConfig.getAttributeValues(),
+                    singleEventConfig.getTimestamp());
+            EventSimulatorDataHolder.getInstance().getEventStreamService().pushEvent(
+                    singleEventConfig.getExecutionPlanName(),
+                    singleEventConfig.getStreamName(), event);
+        } catch (EventGenerationException e) {
+            log.error("Event dropped due to an error that occurred during single event simulation of stream '" +
+                    singleEventConfig.getStreamName() + "' for configuration '" + singleEventConfig.toString() +
+                    "'. ", e);
+            throw new EventGenerationException("Event dropped due to an error that occurred during single event " +
+                    "simulation of stream '" + singleEventConfig.getStreamName() + "' for configuration '" +
+                    singleEventConfig.toString() + "'. ", e);
         }
     }
 
     /**
-     * createSingleEventDTO() is used to validate single event simulation provided and create a
-     * SingleEventSimulationDTO object containing simulation configuration
+     * validateSingleEventConfig() is used to validate single event simulation provided a
      *
      * @param singleEventConfiguration SingleEventSimulationDTO containing single event simulation configuration
-     * @return SingleEventSimulationDTO if required configuration is provided
+     * @throws InvalidConfigException          if the single even simulation configuration contains invalid entries
+     * @throws InsufficientAttributesException if the number of attributes specified for the event is not equal to
+     *                                         the number of stream attributes
      */
-    private static SingleEventSimulationDTO createSingleEventDTO(String singleEventConfiguration)
-            throws InvalidConfigException {
+    private static void validateSingleEventConfig(String singleEventConfiguration)
+            throws InvalidConfigException, InsufficientAttributesException {
         try {
             JSONObject singleEventConfig = new JSONObject(singleEventConfiguration);
             if (!checkAvailability(singleEventConfig, EventSimulatorConstants.STREAM_NAME)) {
@@ -107,30 +101,79 @@ public class SingleEventGenerator {
                         "stream '" + singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME) + ". " +
                         "Invalid configuration provided : " + singleEventConfig.toString());
             }
-//            if timestamp is set to null, take current system time as the timestamp of the event
-            long timestamp = System.currentTimeMillis();
-            if (singleEventConfig.has(EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP)) {
-                if (!singleEventConfig.isNull(EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP)) {
-                    if (!singleEventConfig.getString(EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP).isEmpty()) {
-                        timestamp = singleEventConfig.getLong(EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP);
-                        if (timestamp < 0) {
-                            throw new InvalidConfigException("Timestamp must be a positive value for single event" +
-                                    " simulation of stream '" + singleEventConfig.getString(EventSimulatorConstants
-                                    .STREAM_NAME) + "'. Invalid configuration provided : " +
-                                    singleEventConfig.toString());
-                        }
-                    }
+            List<Attribute> streamAttributes;
+            try {
+                streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
+                        .getStreamAttributes(singleEventConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
+                                singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME));
+            } catch (ResourceNotFoundException e) {
+                log.error(e.getResourceType().toString().toLowerCase(Locale.ENGLISH).replace("_", " ") + " '" +
+                        e.getResourceName() + "'" + " specified for single event simulation does not exist. Invalid" +
+                        " single event simulation configuration : " + singleEventConfig.toString(), e);
+                throw new InvalidConfigException(e.getResourceType().toString().toLowerCase(Locale.ENGLISH)
+                        .replace("_", " ") + " '" + e.getResourceName() + "' " + "specified for single event" +
+                        " simulation does not exist. Invalid single event simulation configuration : " +
+                        singleEventConfig.toString(), e);
+            }
+            if (checkAvailability(singleEventConfig, EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP)) {
+                long timestamp = singleEventConfig.getLong(EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP);
+                if (timestamp < 0) {
+                    throw new InvalidConfigException("Timestamp must be a positive value for single event" +
+                            " simulation of stream '" + singleEventConfig.getString(EventSimulatorConstants
+                            .STREAM_NAME) + "'. Invalid configuration provided : " +
+                            singleEventConfig.toString());
                 }
             }
-            ArrayList dataValues;
             if (checkAvailabilityOfArray(singleEventConfig, EventSimulatorConstants.SINGLE_EVENT_DATA)) {
-                dataValues = new Gson().fromJson(singleEventConfig.getJSONArray(EventSimulatorConstants
+                ArrayList dataValues = new Gson().fromJson(singleEventConfig.getJSONArray(EventSimulatorConstants
                         .SINGLE_EVENT_DATA).toString(), ArrayList.class);
+                if (dataValues.size() != streamAttributes.size()) {
+                    log.error("Simulation of stream '" + singleEventConfig.getString(EventSimulatorConstants
+                            .STREAM_NAME) + "' requires " +
+                            streamAttributes.size() + " attribute(s). Single event configuration only contains " +
+                            "values for " + dataValues.size() + " attribute(s)");
+                    throw new InsufficientAttributesException("Simulation of stream '" +
+                            singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' requires " +
+                            streamAttributes.size() + " attribute(s). Single event configuration only contains" +
+                            " values for " + dataValues.size() + " attribute(s)");
+                }
             } else {
                 throw new InvalidConfigException("Single event simulation requires a attribute value for " +
                         "stream '" + singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid " +
                         "configuration provided : " + singleEventConfig.toString());
             }
+        } catch (JSONException e) {
+            log.error("Error occurred when accessing single event simulation configuration. ", e);
+            throw new InvalidConfigException("Error occurred when accessing single event simulation configuration. ",
+                    e);
+        }
+    }
+
+    /**
+     * createSingleEventDTO() is used create a SingleEventSimulationDTO object containing simulation configuration
+     *
+     * @param singleEventConfiguration SingleEventSimulationDTO containing single event simulation configuration
+     * @return SingleEventSimulationDTO if required configuration is provided
+     * @throws InvalidConfigException if the single even simulation configuration contains invalid entries
+     */
+    private static SingleEventSimulationDTO createSingleEventDTO(String singleEventConfiguration)
+            throws InvalidConfigException {
+        try {
+            JSONObject singleEventConfig = new JSONObject(singleEventConfiguration);
+//            if timestamp is set to null, take current system time as the timestamp of the event
+            long timestamp = System.currentTimeMillis();
+            if (checkAvailability(singleEventConfig, EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP)) {
+                timestamp = singleEventConfig.getLong(EventSimulatorConstants.SINGLE_EVENT_TIMESTAMP);
+                if (timestamp < 0) {
+                    throw new InvalidConfigException("Timestamp must be a positive value for single event" +
+                            " simulation of stream '" + singleEventConfig.getString(EventSimulatorConstants
+                            .STREAM_NAME) + "'. Invalid configuration provided : " +
+                            singleEventConfig.toString());
+                }
+            }
+            ArrayList dataValues = new Gson().fromJson(singleEventConfig.getJSONArray(EventSimulatorConstants
+                    .SINGLE_EVENT_DATA).toString(), ArrayList.class);
+//            create SingleEventSimulationDTO
             SingleEventSimulationDTO singleEventSimulationDTO = new SingleEventSimulationDTO();
             singleEventSimulationDTO.setStreamName(singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME));
             singleEventSimulationDTO.setExecutionPlanName(singleEventConfig
@@ -144,4 +187,5 @@ public class SingleEventGenerator {
                     e);
         }
     }
+
 }

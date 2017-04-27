@@ -22,8 +22,8 @@ package org.wso2.carbon.event.simulator.core.internal.util;
  * constants related to Event Simulator
  */
 public class EventSimulatorConstants {
-    public static final String DIRECTORY_CSV_FILES = "csvFiles";
-    public static final String DIRECTORY_SIMULATION_CONFIGS = "simulationConfigs";
+    public static final String DIRECTORY_CSV_FILES = "csv-files";
+    public static final String DIRECTORY_SIMULATION_CONFIGS = "simulation-configs";
     public static final String DIRECTORY_DEPLOYMENT = "deployment";
 
     public static final String SIMULATION_FILE_EXTENSION = "json";

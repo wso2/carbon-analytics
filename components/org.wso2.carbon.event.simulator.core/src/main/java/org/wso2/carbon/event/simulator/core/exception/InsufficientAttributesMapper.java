@@ -20,6 +20,7 @@ public class InsufficientAttributesMapper implements ExceptionMapper<Insufficien
     public Response toResponse(InsufficientAttributesException e) {
         return Response.status(Response.Status.BAD_REQUEST).
                 entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage())).
+                type("application/json").
                 build();
     }
 }

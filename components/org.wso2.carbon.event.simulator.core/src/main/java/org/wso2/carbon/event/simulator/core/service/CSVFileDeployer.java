@@ -41,9 +41,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * {@link CSVFileDeployer} is responsible for all simulation related CSV deployment tasks
+ * CSVFileDeployer is responsible for all simulation related CSV deployment tasks
  *
- * @since 1.0.0
  */
 @Component(
         name = "csv-file-deployer",
@@ -56,11 +55,13 @@ public class CSVFileDeployer implements Deployer {
     private URL directoryLocation;
 
     private void deployCSVFile(File file) throws Exception {
-        if (FilenameUtils.isExtension(file.getName(), EventSimulatorConstants.CSV_FILE_EXTENSION)) {
-            FileStore.getFileStore().addFile(file.getName());
-        } else {
-            throw new CSVFileDeploymentException("Error: File extension not supported for file name "
-                    + file.getName() + ". Support only ." + EventSimulatorConstants.CSV_FILE_EXTENSION + " .");
+        if (!file.getName().startsWith(".")) {
+            if (FilenameUtils.isExtension(file.getName(), EventSimulatorConstants.CSV_FILE_EXTENSION)) {
+                FileStore.getFileStore().addFile(file.getName());
+            } else {
+                throw new CSVFileDeploymentException("Error: File extension not supported for file name "
+                        + file.getName() + ". Support only ." + EventSimulatorConstants.CSV_FILE_EXTENSION + " .");
+            }
         }
     }
 

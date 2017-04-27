@@ -43,9 +43,8 @@ import java.net.URL;
 import java.nio.file.Paths;
 
 /**
- * {@link SimulationConfigDeployer} is responsible for all simulation config deployment tasks
+ * SimulationConfigDeployer is responsible for all simulation config deployment tasks
  *
- * @since 1.0.0
  */
 @Component(
         name = "simulation-config-deployer",
@@ -58,19 +57,22 @@ public class SimulationConfigDeployer implements Deployer {
     private URL directoryLocation;
 
     private void deployConfigFile(File file) throws Exception {
-        if (FilenameUtils.isExtension(file.getName(), EventSimulatorConstants.SIMULATION_FILE_EXTENSION)) {
-            String simulationName = FilenameUtils.getBaseName(file.getName());
-            String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig
-                    (simulationName, (Paths.get(Utils.getCarbonHome().toString(),
-                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
-            if (!simulationConfig.isEmpty()) {
-                EventSimulator simulator = new EventSimulator(simulationName, simulationConfig);
-                EventSimulationMap.getSimulatorMap().put(simulationName, simulator);
+        if (!file.getName().startsWith(".")) {
+            if (FilenameUtils.isExtension(file.getName(), EventSimulatorConstants.SIMULATION_FILE_EXTENSION)) {
+                String simulationName = FilenameUtils.getBaseName(file.getName());
+                String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig
+                        (simulationName, (Paths.get(Utils.getCarbonHome().toString(),
+                                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                                EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
+                if (!simulationConfig.isEmpty()) {
+                    EventSimulator simulator = new EventSimulator(simulationName, simulationConfig);
+                    EventSimulationMap.getSimulatorMap().put(simulationName, simulator);
+                }
+            } else {
+                throw new SimulationConfigDeploymentException("Simulation '" + file.getName() + "' has an invalid " +
+                        "content type. File type supported is '." + EventSimulatorConstants.SIMULATION_FILE_EXTENSION
+                        + "'.");
             }
-        } else {
-            throw new SimulationConfigDeploymentException("Simulation '" + file.getName() + "' has an invalid content" +
-                    " type. File type supported is '." + EventSimulatorConstants.SIMULATION_FILE_EXTENSION + "'.");
         }
     }
 

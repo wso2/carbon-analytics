@@ -1,8 +1,7 @@
 {
   "properties": {
-    "simulationName": "sampleSimulationCSV",
-    "startTimestamp": "1488615136957",
-    "endTimestamp": "1488615143957",
+    "simulationName": "",
+    "startTimestamp": "1488615136957", 
     "timeInterval": "1000"
   },
   "sources": [

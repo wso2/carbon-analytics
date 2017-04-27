@@ -32,6 +32,7 @@ import org.wso2.carbon.event.simulator.core.internal.generator.database.util.Dat
 import org.wso2.carbon.event.simulator.core.internal.util.EventConverter;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
@@ -42,6 +43,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -73,9 +75,18 @@ public class DatabaseEventGenerator implements EventGenerator {
     @Override
     public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp) throws InvalidConfigException {
 //        retrieve stream attributes
-        streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
-                .getStreamAttributes(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
-                        sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
+        try {
+            streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
+                    .getStreamAttributes(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
+                            sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
+        } catch (ResourceNotFoundException e) {
+            log.error(e.getResourceType().toString().toLowerCase(Locale.ENGLISH).replace("_", " ") + " '" +
+                    e.getResourceName() + "' specified for database simulation does not exist. Invalid source " +
+                    "configuration : " + sourceConfig.toString(), e);
+            throw new SimulatorInitializationException(e.getResourceType().toString().toLowerCase(Locale.ENGLISH)
+                    .replace("_", " ") + " '" + e.getResourceName() + "' " + "specified for database simulation does " +
+                    "not exist. Invalid source configuration : " + sourceConfig.toString(), e);
+        }
         dbSimulationConfig = createDBConfiguration(sourceConfig);
 //        set timestamp boundary
         this.startTimestamp = startTimestamp;
@@ -271,7 +282,9 @@ public class DatabaseEventGenerator implements EventGenerator {
      * validateDBConfiguration() method validates the database simulation source configuration
      *
      * @param sourceConfig JSON object containing configuration required dor database simulation
-     * @throws InvalidConfigException if the stream configuration is invalid
+     * @throws InvalidConfigException          if the stream configuration is invalid
+     * @throws InsufficientAttributesException if the number of columns specified is not equal to number of stream
+     *                                         attributes
      */
     @Override
     public void validateSourceConfiguration(JSONObject sourceConfig) throws InvalidConfigException,
@@ -295,22 +308,17 @@ public class DatabaseEventGenerator implements EventGenerator {
                         " configuration : " + sourceConfig.toString());
             }
 //            retrieve the stream definition
-            streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
-                    .getStreamAttributes(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
-                            sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
-            /**
-             * check whether the execution plan has been deployed.
-             * if streamAttributes == null, it implies that execution plan has not been deployed yet
-             * */
-            if (streamAttributes == null) {
-                log.error("Error occurred when initializing database event generator to simulate stream '" +
-                        sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Stream '" +
-                        sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' does not exist." +
-                        " Invalid source configuration : " + sourceConfig.toString());
-                throw new SimulatorInitializationException("Error occurred when initializing database event" +
-                        " generator to simulate stream '" + sourceConfig.getString(EventSimulatorConstants
-                        .STREAM_NAME) + "'. Stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) +
-                        "' does not exist. Invalid source configuration : " + sourceConfig.toString());
+            try {
+                streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
+                        .getStreamAttributes(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
+                                sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
+            } catch (ResourceNotFoundException e) {
+                log.error(e.getResourceType().toString().toLowerCase(Locale.ENGLISH).replace("_", " ") + " '" +
+                        e.getResourceName() + "' specified for database simulation does not exist. Invalid source " +
+                        "configuration : " + sourceConfig.toString(), e);
+                throw new InvalidConfigException(e.getResourceType().toString().toLowerCase(Locale.ENGLISH)
+                        .replace("_", " ") + " '" + e.getResourceName() + "' " + "specified for database simulation" +
+                        " does not exist. Invalid source configuration : " + sourceConfig.toString(), e);
             }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.DRIVER)) {
                 throw new InvalidConfigException("A driver name is required for database simulation of stream '" +

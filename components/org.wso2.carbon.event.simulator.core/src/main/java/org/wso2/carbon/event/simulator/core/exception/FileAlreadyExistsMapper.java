@@ -21,6 +21,7 @@ public class FileAlreadyExistsMapper implements ExceptionMapper<FileAlreadyExist
     public Response toResponse(FileAlreadyExistsException e) {
         return Response.status(Response.Status.CONFLICT).
                 entity(new ResponseMapper(Response.Status.CONFLICT, e.getMessage())).
+                type("application/json").
                 build();
     }
 }

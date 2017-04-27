@@ -3,12 +3,9 @@ package org.wso2.carbon.event.simulator.core.internal.util;
 import org.json.JSONObject;
 
 /**
- * CommonOperations class is used to perform functions common to all generators such as
- * 1. cast the streamConfigurationDto object to the respective simulation type object
- * 2. check whether the number of attributes generated is equal to the number of stream attributes.
+ * CommonOperations class is used to perform functions common to all validations
  */
 public class CommonOperations {
-
 
     /**
      * checkAvailability() performs the following checks on the the json object and key provided
@@ -21,7 +18,6 @@ public class CommonOperations {
      * @return true if checks are successful, else false
      */
     public static boolean checkAvailability(JSONObject configuration, String key) {
-
         return configuration.has(key)
                 && !configuration.isNull(key)
                 && !configuration.getString(key).isEmpty();
@@ -39,7 +35,6 @@ public class CommonOperations {
      * @return true if checks are successful, else false
      */
     public static boolean checkAvailabilityOfArray(JSONObject configuration, String key) {
-
         return configuration.has(key)
                 && !configuration.isNull(key)
                 && configuration.getJSONArray(key).length() > 0;

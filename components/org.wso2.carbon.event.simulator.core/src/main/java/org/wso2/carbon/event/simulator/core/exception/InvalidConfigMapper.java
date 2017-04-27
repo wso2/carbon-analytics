@@ -20,6 +20,7 @@ public class InvalidConfigMapper implements ExceptionMapper<InvalidConfigExcepti
     public Response toResponse(InvalidConfigException e) {
         return Response.status(Response.Status.BAD_REQUEST).
                 entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage())).
+                type("application/json").
                 build();
     }
 }

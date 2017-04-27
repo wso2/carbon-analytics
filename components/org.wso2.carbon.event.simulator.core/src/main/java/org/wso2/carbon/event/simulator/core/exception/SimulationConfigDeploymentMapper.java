@@ -20,6 +20,7 @@ public class SimulationConfigDeploymentMapper implements ExceptionMapper<Simulat
     public Response toResponse(SimulationConfigDeploymentException e) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                 entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage())).
+                type("application/json").
                 build();
     }
 }
