@@ -832,6 +832,16 @@
                 <artifactId>siddhi-extension-text-input-mapper</artifactId>
                 <version>${siddhi.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.siddhi</groupId>
+                <artifactId>siddhi-extension-xml-input-mapper</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.siddhi</groupId>
+                <artifactId>siddhi-extension-xml-output-mapper</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
 
             <!-- Dependencies for Siddhi related jars -->
             <dependency>

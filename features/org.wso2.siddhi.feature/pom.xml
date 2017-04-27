@@ -103,6 +103,14 @@
             <groupId>org.wso2.siddhi</groupId>
             <artifactId>siddhi-extension-text-input-mapper</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-extension-xml-input-mapper</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-extension-xml-output-mapper</artifactId>
+        </dependency>
 
         <!-- Dependency jars for Siddhi Components -->
         <dependency>
