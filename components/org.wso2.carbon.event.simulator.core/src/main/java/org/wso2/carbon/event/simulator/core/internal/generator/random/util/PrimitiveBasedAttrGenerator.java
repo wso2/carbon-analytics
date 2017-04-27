@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator.random.util;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
-
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +26,8 @@ import org.wso2.carbon.event.simulator.core.internal.bean.PrimitiveBasedAttribut
 import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttributeGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.siddhi.query.api.definition.Attribute;
+
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
 /**
  * PrimitiveBasedAttrGenerator class is responsible for generating an attribute of primitive type
@@ -208,10 +208,13 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
 //            }
 //        } catch (NumberFormatException e) {
 //            log.error("Error occurred when creating a primitive based random data attribute " +
-//                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute configuration :" +
+//                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute configuration
+// :" +
 //                    primitiveBasedAttrConfig.toString() + "'. ", e);
-//            throw new EventGenerationException("Error occurred when creating a primitive based random data attribute " +
-//                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute configuration :" +
+//            throw new EventGenerationException("Error occurred when creating a primitive based random data attribute
+// " +
+//                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute configuration
+// :" +
 //                    primitiveBasedAttrConfig.toString() + "'. ", e);
 //        }
         return dataValue;

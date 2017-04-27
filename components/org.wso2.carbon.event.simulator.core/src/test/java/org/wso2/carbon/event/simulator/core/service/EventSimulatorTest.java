@@ -4,7 +4,6 @@ package org.wso2.carbon.event.simulator.core.service;
 import org.apache.commons.io.FilenameUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.siddhi.query.api.definition.Attribute;
 

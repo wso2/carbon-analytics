@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.event.simulator.core.service;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,8 +43,6 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.concurrent.NotThreadSafe;
-
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 
 /**
  * EventSimulator starts the simulation execution for single Event and
