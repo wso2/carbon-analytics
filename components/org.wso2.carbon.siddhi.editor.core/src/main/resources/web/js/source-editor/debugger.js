@@ -177,9 +177,10 @@ DebugClient.prototype.init = function (svrUrl) {
 
 function Debugger(executionPlan) {
     var self = this;
-    self._pollingInterval = 1000;
-    self._pollingLock = false;
-    self._pollingJob = null;
+    self.__pollingInterval = 1000;
+    self.__pollingLock = false;
+    self.__pollingJob = null;
+    self.__callback = null;
     self.executionPlan = executionPlan;
     self.debugger = new DebugClient().init();
     self.runtimeId = null;
@@ -201,11 +202,11 @@ function Debugger(executionPlan) {
                 }
                 if (self.streams != null && self.streams.length > 0 &&
                     self.queries != null && self.queries.length > 0) {
-                    self._pollingJob = setInterval(function () {
-                        if (!self._pollingLock) {
+                    self.__pollingJob = setInterval(function () {
+                        if (!self.__pollingLock) {
                             self.state();
                         }
-                    }, self._pollingInterval);
+                    }, self.__pollingInterval);
                 }
                 console.info(JSON.stringify(data));
             },
@@ -216,8 +217,8 @@ function Debugger(executionPlan) {
     };
 
     this.stop = function () {
-        if (this._pollingJob != null) {
-            clearInterval(this._pollingJob);
+        if (this.__pollingJob != null) {
+            clearInterval(this.__pollingJob);
         }
         if (this.runtimeId != null) {
             this.debugger.stopDebug(
@@ -311,18 +312,21 @@ function Debugger(executionPlan) {
     };
 
     this.state = function () {
-        self._pollingLock = true;
+        self.__pollingLock = true;
         if (this.runtimeId != null) {
             this.debugger.state(
                 this.runtimeId,
                 function (data) {
-                    console.info(JSON.stringify(data));
-                    if (data[''])
-                    self._pollingLock = false;
+                    if (data.hasOwnProperty('eventState')) {
+                        if (typeof self.__callback === 'function') {
+                            self.__callback(data);
+                        }
+                    }
+                    self.__pollingLock = false;
                 },
                 function (error) {
                     console.error(JSON.stringify(error));
-                    self._pollingLock = false;
+                    self.__pollingLock = false;
                 }
             );
         } else {
@@ -346,5 +350,9 @@ function Debugger(executionPlan) {
         } else {
             console.log("Debugger has not been started yet.")
         }
+    };
+
+    this.setOnUpdateCallback = function (onUpdateCallback) {
+        this.__callback = onUpdateCallback;
     };
 }
