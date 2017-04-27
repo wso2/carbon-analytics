@@ -29,7 +29,7 @@
     <artifactId>org.wso2.carbon.event.simulator.core</artifactId>
     <packaging>bundle</packaging>
 
-    <name>WSO2 Data Analytics Server - Simulator</name>
+    <name>WSO2 Data Analytics Server - Event Simulator</name>
     <url>http://wso2.org</url>
 
     <dependencies>
@@ -65,6 +65,14 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.stream.processor.common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.utils</groupId>
+            <artifactId>carbon-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.deployment</groupId>
+            <artifactId>org.wso2.carbon.deployment.engine</artifactId>
+        </dependency>
 
         <!--Dependencies for event simulation begins here-->
 
@@ -80,10 +88,6 @@
             <groupId>org.json.wso2</groupId>
             <artifactId>json</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.org.antlr</groupId>
-            <artifactId>antlr4-runtime</artifactId>
-        </dependency>
 
         <!-- Dependencies for CSV event simulation begins here-->
         <dependency>
@@ -97,14 +101,10 @@
         <!-- Dependencies for CSV event simulation ends here-->
 
         <!--Dependencies for random event simulation begins here-->
-        <dependency>
-            <groupId>com.github.javafaker</groupId>
-            <artifactId>javafaker</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.azakordonets</groupId>
-            <artifactId>fabricator_2.10</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.github.azakordonets.wso2</groupId>-->
+            <!--<artifactId>fabricator_2.10</artifactId>-->
+        <!--</dependency>-->
         <!--Dependencies for random event simulation ends here-->
 
         <!--Dependencies for database feed simulation begins here-->
@@ -113,6 +113,11 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
         <!--Dependencies for  database feed simulation ends here-->
+
+        <dependency>
+            <groupId>findbugs</groupId>
+            <artifactId>findbugs</artifactId>
+        </dependency>
 
     </dependencies>
 
@@ -133,7 +138,8 @@
         </import.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
-            osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="8"
+            osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="9",
+            osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer";serviceCount="2"
         </carbon.component>
     </properties>
 

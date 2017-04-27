@@ -22,6 +22,7 @@ package org.wso2.carbon.stream.processor.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
@@ -57,7 +58,8 @@ public class CarbonEventStreamService implements EventStreamService {
     }
 
     @Override
-    public List<Attribute> getStreamAttributes(String executionPlanName, String streamName) {
+    public List<Attribute> getStreamAttributes(String executionPlanName, String streamName) throws
+            ResourceNotFoundException {
 
         Map<String, ExecutionPlanRuntime> executionPlanRunTimeMap = StreamProcessorDataHolder.
                 getStreamProcessorService().getExecutionPlanRunTimeMap();
@@ -68,11 +70,18 @@ public class CarbonEventStreamService implements EventStreamService {
                     AbstractDefinition streamDefinition = executionPlanRuntime.getStreamDefinitionMap().get(streamName);
                     return streamDefinition.getAttributeList();
                 } else {
-                    return null;
+                    throw new ResourceNotFoundException("Execution plan '" + executionPlanName + "' does not contain " +
+                            "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM_NAME,
+                            streamName);
                 }
+            } else {
+                throw new ResourceNotFoundException("Execution plan '" + executionPlanName + "' does not contain " +
+                        "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM_NAME, streamName);
             }
+        } else {
+            throw new ResourceNotFoundException("Execution plan '" + executionPlanName + "' does not exist.",
+                    ResourceNotFoundException.ResourceType.EXECUTION_PLAN_NAME, executionPlanName);
         }
-        return null;
     }
 
     @Override

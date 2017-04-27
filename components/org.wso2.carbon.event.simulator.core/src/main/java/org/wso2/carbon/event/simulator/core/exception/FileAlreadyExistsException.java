@@ -13,4 +13,14 @@ public class FileAlreadyExistsException extends Exception {
     public FileAlreadyExistsException(String message) {
         super(message);
     }
+
+    /**
+     * Throws customizes extensions for duplicate files uploaded
+     *
+     * @param message Error Message
+     * @param cause   Throwable which caused the FileAlreadyExistsException
+     */
+    public FileAlreadyExistsException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

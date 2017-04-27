@@ -952,7 +952,11 @@
             </dependency>
 
             <!--Event simulator related-->
-
+            <dependency>
+                <groupId>org.wso2.carbon.utils</groupId>
+                <artifactId>carbon-utils</artifactId>
+                <version>${carbon.utils.version}</version>
+            </dependency>
             <!-- Dependencies for CSV event simulation begins here-->
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -967,16 +971,11 @@
             <!-- Dependencies for CSV event simulations ends here-->
 
             <!--Dependencies for random event simulation begins here-->
-            <dependency>
-                <groupId>com.github.javafaker</groupId>
-                <artifactId>javafaker</artifactId>
-                <version>${javafaker.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.azakordonets</groupId>
-                <artifactId>fabricator_2.10</artifactId>
-                <version>${fabricator.wso2v1.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>com.github.azakordonets.wso2</groupId>-->
+                <!--<artifactId>fabricator_2.10</artifactId>-->
+                <!--<version>${fabricator.wso2v1.version}</version>-->
+            <!--</dependency>-->
             <!--Dependencies for random event simulation ends here-->
 
             <!--Dependencies for database feed simulation begins here-->
@@ -1019,6 +1018,11 @@
                 <type>zip</type>
             </dependency>
 
+            <dependency>
+                <groupId>findbugs</groupId>
+                <artifactId>findbugs</artifactId>
+                <version>1.0.0</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -1163,7 +1167,7 @@
         <common.collections4.version>4.0</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.3.0-m1</msf4j.version>
+        <msf4j.version>2.3.0-m2</msf4j.version>
         <msf4j.import.version.range>[2.0.0, 3.0.0)</msf4j.import.version.range>
         <com.fasterxml.jackson.core.version>2.7.4</com.fasterxml.jackson.core.version>
         <io.swagger.version>1.5.10</io.swagger.version>
@@ -1177,8 +1181,8 @@
         <apache.httpcomponents.version>4.3.1.wso2v1</apache.httpcomponents.version>
         <apache.commons.csv.version>1.4</apache.commons.csv.version>
         <apache.commons.fileupload.version>1.3.2</apache.commons.fileupload.version>
-        <javafaker.version>0.12</javafaker.version>
-        <fabricator.wso2v1.version>2.1.4</fabricator.wso2v1.version>
+        <carbon.utils.version>1.2.0</carbon.utils.version>
+        <fabricator.wso2v1.version>2.1.4.wso2v1</fabricator.wso2v1.version>
         <mysql.connector.version>5.1.38</mysql.connector.version>
         <kafka.version>0.9.0.0</kafka.version>
         <google.collections.version>1.0</google.collections.version>
