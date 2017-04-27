@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="rdbms" verbose="1" >
+    <test name="Coordination event flow rdbms" >
+        <packages>
+            <package name="org.wso2.carbon.cluster.coordinator.rdbms.test" />
+        </packages>
+    </test>
+</suite>

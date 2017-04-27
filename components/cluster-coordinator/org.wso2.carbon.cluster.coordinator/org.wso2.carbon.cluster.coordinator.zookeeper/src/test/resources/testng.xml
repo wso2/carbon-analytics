@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="zookeeper" verbose="1" >
+    <test name="Coordination event flow" >
+        <packages>
+            <package name="org.wso2.carbon.cluster.coordinator.zookeeper.test" />
+        </packages>
+    </test>
+</suite>

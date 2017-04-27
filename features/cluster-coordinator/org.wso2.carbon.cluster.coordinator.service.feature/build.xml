@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="copy-config" default="copy-file" basedir="../../..//">
+
+    <property name="project-name" value="${ant.project.name}"/>
+    <property name="res-dir" value="../src/main/resources"/>
+    <property name="target-dir" value="target"/>
+    <property name="config-dir" value="src/main/config"/>
+
+    <target name="clean">
+        <delete dir="${target-dir}"/>
+    </target>
+
+    <target name="copy-file">
+        <mkdir dir="${target-dir}"/>
+        <copy file="${config-dir}/coordinatorConfig.yaml" todir="${res-dir}"/>
+    </target>
+
+</project>

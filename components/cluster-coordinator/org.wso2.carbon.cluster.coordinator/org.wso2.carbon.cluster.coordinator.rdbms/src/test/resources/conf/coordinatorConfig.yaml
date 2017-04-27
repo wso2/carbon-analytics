@@ -1,0 +1,7 @@
+strategy: "org.wso2.carbon.cluster.coordinator.rdbms.RDBMSCoordinationStrategy"
+rdbmsConfig:
+    heartbeatInterval: 1000
+    eventPollingInterval: 1000
+    taskThreadCount: 1
+zookeeperConfig:
+    connectionString: "localhost:2181"
