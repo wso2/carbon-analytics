@@ -140,9 +140,9 @@ public class FileUploader {
                 throw new FileNotFoundException("File '" + fileName + "' does not exist.");
             }
         } else {
-            log.error("File '" + fileName + " has an invalid content type. File type supported is '." +
+            log.error("File '" + fileName + "' has an invalid content type. File type supported is '." +
                     EventSimulatorConstants.CSV_FILE_EXTENSION + "'.");
-            throw new InvalidFileException("File '" + fileName + " has an invalid content type. File type " +
+            throw new InvalidFileException("File '" + fileName + "' has an invalid content type. File type " +
                     "supported is '." + EventSimulatorConstants.CSV_FILE_EXTENSION + "'.");
         }
 
