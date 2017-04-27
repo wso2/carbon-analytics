@@ -409,7 +409,7 @@ public class EventSimulator implements Runnable {
      * @see ServiceComponent#stop(String)
      * @see EventGenerator#stop()
      */
-    public synchronized void stop() {
+    public void stop() {
         if (!status.equals(Status.STOP)) {
             lockStop.lock();
             try {
@@ -430,7 +430,7 @@ public class EventSimulator implements Runnable {
      *
      * @see ServiceComponent#pause(String)
      */
-    public synchronized void pause() {
+    public void pause() {
         if (!status.equals(Status.PAUSE)) {
             lock.lock();
             status = Status.PAUSE;
@@ -446,7 +446,7 @@ public class EventSimulator implements Runnable {
      *
      * @see ServiceComponent#resume(String)
      */
-    public synchronized void resume() {
+    public void resume() {
         if (status.equals(Status.PAUSE)) {
             lock.unlock();
             status = Status.RUN;
