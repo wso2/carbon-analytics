@@ -18,29 +18,23 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator.random.util;
 
-import fabricator.Alphanumeric;
-import fabricator.Fabricator;
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.internal.bean.PrimitiveBasedAttributeDTO;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttributeGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
-
-import java.text.DecimalFormat;
-
 /**
  * PrimitiveBasedAttrGenerator class is responsible for generating an attribute of primitive type
  */
 public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
     private static final Logger log = LoggerFactory.getLogger(PrimitiveBasedAttrGenerator.class);
-    private static final Alphanumeric alpha = Fabricator.alphaNumeric();
+//    private static final Alphanumeric alpha = Fabricator.alphaNumeric();
     private PrimitiveBasedAttributeDTO primitiveBasedAttrConfig = new PrimitiveBasedAttributeDTO();
     private Attribute.Type attributeType;
 
@@ -165,61 +159,61 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
     @Override
     public Object generateAttribute() {
         Object dataValue = null;
-        try {
-            switch (primitiveBasedAttrConfig.getAttrType()) {
-                case INT:
-//                    generate a random integer between the minimum and maximum value specified
-                    dataValue = alpha.randomInt(Integer.parseInt(primitiveBasedAttrConfig.getMin()),
-                            Integer.parseInt(primitiveBasedAttrConfig.getMax()));
-                    break;
-                case LONG:
-//                    generate a random long between the minimum and maximum value specified
-                    dataValue = alpha.randomLong(Long.parseLong(primitiveBasedAttrConfig.getMin()),
-                            Long.parseLong(primitiveBasedAttrConfig.getMax()));
-                    break;
-                case FLOAT:
-                    /**
-                     * generate a random float between the minimum and maximum value specified.
-                     * the length defines the number of decimal places the float will have.
-                     * */
-                    DecimalFormat format = new DecimalFormat();
-                    format.setMaximumFractionDigits(primitiveBasedAttrConfig.getLength());
-//                    Format value to given no of decimals
-                    dataValue = (format.format(alpha.randomFloat(Float.parseFloat(primitiveBasedAttrConfig.getMin()),
-                            Float.parseFloat(primitiveBasedAttrConfig.getMax())))).replace(",", "");
-                    break;
-                case DOUBLE:
-                    /**
-                     * generate a random float between the minimum and maximum value specified.
-                     * the length defines the number of decimal places the float will have.
-                     * the float value will then be parsed to a double
-                     * */
-                    DecimalFormat formatDouble = new DecimalFormat();
-                    formatDouble.setMaximumFractionDigits(primitiveBasedAttrConfig.getLength());
-//                    Format value to given no of decimals
-                    dataValue = (formatDouble.format(alpha.randomDouble(
-                            Double.parseDouble(primitiveBasedAttrConfig.getMin()),
-                            Double.parseDouble(primitiveBasedAttrConfig.getMax())))).replace(",", "");
-                    break;
-                case STRING:
-//                    generate a random string of length specified
-                    dataValue = alpha.randomString(primitiveBasedAttrConfig.getLength());
-                    break;
-                case BOOL:
-//                    generate a random boolean
-                    dataValue = alpha.randomBoolean();
-                    break;
-                default:
-//                    this statement is never reached since attribute type is an enum
-            }
-        } catch (NumberFormatException e) {
-            log.error("Error occurred when creating a primitive based random data attribute " +
-                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute configuration :" +
-                    primitiveBasedAttrConfig.toString() + "'. ", e);
-            throw new EventGenerationException("Error occurred when creating a primitive based random data attribute " +
-                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute configuration :" +
-                    primitiveBasedAttrConfig.toString() + "'. ", e);
-        }
+//        try {
+//            switch (primitiveBasedAttrConfig.getAttrType()) {
+//                case INT:
+////                    generate a random integer between the minimum and maximum value specified
+//                    dataValue = alpha.randomInt(Integer.parseInt(primitiveBasedAttrConfig.getMin()),
+//                            Integer.parseInt(primitiveBasedAttrConfig.getMax()));
+//                    break;
+//                case LONG:
+////                    generate a random long between the minimum and maximum value specified
+//                    dataValue = alpha.randomLong(Long.parseLong(primitiveBasedAttrConfig.getMin()),
+//                            Long.parseLong(primitiveBasedAttrConfig.getMax()));
+//                    break;
+//                case FLOAT:
+//                    /**
+//                     * generate a random float between the minimum and maximum value specified.
+//                     * the length defines the number of decimal places the float will have.
+//                     * */
+//                    DecimalFormat format = new DecimalFormat();
+//                    format.setMaximumFractionDigits(primitiveBasedAttrConfig.getLength());
+////                    Format value to given no of decimals
+//                    dataValue = (format.format(alpha.randomFloat(Float.parseFloat(primitiveBasedAttrConfig.getMin()),
+//                            Float.parseFloat(primitiveBasedAttrConfig.getMax())))).replace(",", "");
+//                    break;
+//                case DOUBLE:
+//                    /**
+//                     * generate a random float between the minimum and maximum value specified.
+//                     * the length defines the number of decimal places the float will have.
+//                     * the float value will then be parsed to a double
+//                     * */
+//                    DecimalFormat formatDouble = new DecimalFormat();
+//                    formatDouble.setMaximumFractionDigits(primitiveBasedAttrConfig.getLength());
+////                    Format value to given no of decimals
+//                    dataValue = (formatDouble.format(alpha.randomDouble(
+//                            Double.parseDouble(primitiveBasedAttrConfig.getMin()),
+//                            Double.parseDouble(primitiveBasedAttrConfig.getMax())))).replace(",", "");
+//                    break;
+//                case STRING:
+////                    generate a random string of length specified
+//                    dataValue = alpha.randomString(primitiveBasedAttrConfig.getLength());
+//                    break;
+//                case BOOL:
+////                    generate a random boolean
+//                    dataValue = alpha.randomBoolean();
+//                    break;
+//                default:
+////                    this statement is never reached since attribute type is an enum
+//            }
+//        } catch (NumberFormatException e) {
+//            log.error("Error occurred when creating a primitive based random data attribute " +
+//                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute configuration :" +
+//                    primitiveBasedAttrConfig.toString() + "'. ", e);
+//            throw new EventGenerationException("Error occurred when creating a primitive based random data attribute " +
+//                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute configuration :" +
+//                    primitiveBasedAttrConfig.toString() + "'. ", e);
+//        }
         return dataValue;
     }
 

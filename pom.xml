@@ -961,11 +961,11 @@
             <!-- Dependencies for CSV event simulations ends here-->
 
             <!--Dependencies for random event simulation begins here-->
-            <dependency>
-                <groupId>com.github.azakordonets.wso2</groupId>
-                <artifactId>fabricator_2.10</artifactId>
-                <version>${fabricator.wso2v1.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>com.github.azakordonets.wso2</groupId>-->
+                <!--<artifactId>fabricator_2.10</artifactId>-->
+                <!--<version>${fabricator.wso2v1.version}</version>-->
+            <!--</dependency>-->
             <!--Dependencies for random event simulation ends here-->
 
             <!--Dependencies for database feed simulation begins here-->
@@ -1008,6 +1008,11 @@
                 <type>zip</type>
             </dependency>
 
+            <dependency>
+                <groupId>findbugs</groupId>
+                <artifactId>findbugs</artifactId>
+                <version>1.0.0</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>

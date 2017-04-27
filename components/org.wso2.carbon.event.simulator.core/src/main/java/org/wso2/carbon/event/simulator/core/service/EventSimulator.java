@@ -42,6 +42,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+
 /**
  * EventSimulator starts the simulation execution for single Event and
  * Feed Simulation
@@ -209,7 +211,7 @@ public class EventSimulator implements Runnable {
      * order of their timestamps
      * Events will be sent at time intervals equal to the delay
      */
-    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("SWL_SLEEP_WITH_LOCK_HELD")
+    @SuppressWarnings("SWL_SLEEP_WITH_LOCK_HELD")
     private synchronized void eventSimulation() {
         long minTimestamp;
         EventGenerator generator;

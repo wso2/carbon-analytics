@@ -101,10 +101,10 @@
         <!-- Dependencies for CSV event simulation ends here-->
 
         <!--Dependencies for random event simulation begins here-->
-        <dependency>
-            <groupId>com.github.azakordonets.wso2</groupId>
-            <artifactId>fabricator_2.10</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.github.azakordonets.wso2</groupId>-->
+            <!--<artifactId>fabricator_2.10</artifactId>-->
+        <!--</dependency>-->
         <!--Dependencies for random event simulation ends here-->
 
         <!--Dependencies for database feed simulation begins here-->
@@ -113,6 +113,11 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
         <!--Dependencies for  database feed simulation ends here-->
+
+        <dependency>
+            <groupId>findbugs</groupId>
+            <artifactId>findbugs</artifactId>
+        </dependency>
 
     </dependencies>
 

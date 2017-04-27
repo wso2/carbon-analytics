@@ -18,26 +18,14 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator.random.util;
 
-import fabricator.Calendar;
-import fabricator.Contact;
-import fabricator.Fabricator;
-import fabricator.Finance;
-import fabricator.Internet;
-import fabricator.Location;
-import fabricator.Words;
-import fabricator.enums.DateFormat;
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
-import org.joda.time.DateTime;
 import org.json.JSONObject;
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.internal.bean.PropertyBasedAttributeDTO;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttributeGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
-
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
-
-import java.util.Random;
 
 /**
  * PropertyBasedAttrGenerator class is responsible for generating attribute values for a given property type
@@ -46,27 +34,27 @@ public class PropertyBasedAttrGenerator implements RandomAttributeGenerator {
     /**
      * Initialize contact to generate contact related data
      */
-    private static final Contact contact = Fabricator.contact();
-    /**
-     * Initialize calendar to generate calendar related data
-     */
-    private static final Calendar calendar = Fabricator.calendar();
-    /**
-     * Initialize Finance to generate finance related data
-     */
-    private static final Finance finance = Fabricator.finance();
-    /**
-     * Initialize internet to generate internet related data
-     */
-    private static final Internet internet = Fabricator.internet();
-    /**
-     * Initialize location to generate location related data
-     */
-    private static final Location location = Fabricator.location();
-    /**
-     * Initialize words to generate words related data
-     */
-    private static final Words words = Fabricator.words();
+//    private static final Contact contact = Fabricator.contact();
+//    /**
+//     * Initialize calendar to generate calendar related data
+//     */
+//    private static final Calendar calendar = Fabricator.calendar();
+//    /**
+//     * Initialize Finance to generate finance related data
+//     */
+//    private static final Finance finance = Fabricator.finance();
+//    /**
+//     * Initialize internet to generate internet related data
+//     */
+//    private static final Internet internet = Fabricator.internet();
+//    /**
+//     * Initialize location to generate location related data
+//     */
+//    private static final Location location = Fabricator.location();
+//    /**
+//     * Initialize words to generate words related data
+//     */
+//    private static final Words words = Fabricator.words();
     private PropertyBasedAttributeDTO propertyBasedAttrConfig = new PropertyBasedAttributeDTO();
 
     public PropertyBasedAttrGenerator() {
@@ -119,6 +107,7 @@ public class PropertyBasedAttrGenerator implements RandomAttributeGenerator {
     @Override
     public Object generateAttribute() {
         Object dataValue = null;
+        /*
         switch (propertyBasedAttrConfig.getProperty()) {
             case TIME_12H:
                 dataValue = calendar.time12h();
@@ -268,6 +257,7 @@ public class PropertyBasedAttrGenerator implements RandomAttributeGenerator {
                 dataValue = words.sentence();
                 break;
         }
+        */
         return dataValue;
     }
 

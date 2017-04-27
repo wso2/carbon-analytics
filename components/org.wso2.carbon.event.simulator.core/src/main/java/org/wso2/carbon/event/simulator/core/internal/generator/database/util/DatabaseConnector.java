@@ -31,6 +31,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+
 
 /**
  * DatabaseConnector is a utility class performs the following tasks
@@ -230,7 +232,7 @@ public class DatabaseConnector {
      * @param timestampStartTime least possible value for timestamp
      * @param timestampEndTime   maximum possible value for timestamp
      */
-    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING")
+    @SuppressWarnings("SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING")
     private void prepareSQLstatement(String tableName, List<String> columnNames, String timestampAttribute,
                                      long timestampStartTime, long timestampEndTime) {
         /**

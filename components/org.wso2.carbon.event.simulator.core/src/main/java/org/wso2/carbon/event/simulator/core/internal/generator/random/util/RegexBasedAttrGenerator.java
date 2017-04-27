@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator.random.util;
 
-import com.mifmif.common.regex.Generex;
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -28,10 +28,9 @@ import org.wso2.carbon.event.simulator.core.internal.bean.RegexBasedAttributeDTO
 import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttributeGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
-
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 /**
  * RegexBasedAttrGenerator is used to generate random data using regex provided
  */
@@ -91,8 +90,9 @@ public class RegexBasedAttrGenerator implements RandomAttributeGenerator {
      */
     @Override
     public String generateAttribute() {
-        Generex generex = new Generex(regexBasedAttrConfig.getPattern());
-        return generex.random();
+//        Generex generex = new Generex(regexBasedAttrConfig.getPattern());
+//        return generex.random();
+        return null;
     }
 
     @Override
