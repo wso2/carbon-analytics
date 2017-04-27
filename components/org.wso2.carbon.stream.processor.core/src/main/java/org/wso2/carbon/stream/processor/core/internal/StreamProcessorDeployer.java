@@ -71,7 +71,8 @@ public class StreamProcessorDeployer implements Deployer {
             inputStream = new FileInputStream(file);
             if (file.getName().endsWith(FILE_EXTENSION)) {
                 String executionPlan = getStringFromInputStream(inputStream);
-                StreamProcessorDataHolder.getStreamProcessorService().deployExecutionPlan(executionPlan);
+                StreamProcessorDataHolder.getStreamProcessorService().deployExecutionPlan(executionPlan,
+                                                                                          file.getName());
             } else {
                 throw new ExecutionPlanDeploymentException(("Error: File extension not supported for file name "
                                                             + file.getName() + ". Support only"
@@ -104,9 +105,8 @@ public class StreamProcessorDeployer implements Deployer {
         try {
             br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             while ((line = br.readLine()) != null) {
-                sb.append(" ").append(line);
+                sb.append(System.getProperty("line.separator")).append(line);
             }
-
         } catch (IOException e) {
             throw new ExecutionPlanDeploymentException("Exception when reading the Siddhi QL file", e);
         } finally {
