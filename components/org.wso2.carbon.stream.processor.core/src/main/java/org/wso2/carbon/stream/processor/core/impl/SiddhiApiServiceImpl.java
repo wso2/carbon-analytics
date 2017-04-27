@@ -55,7 +55,7 @@ public class SiddhiApiServiceImpl extends SiddhiApiService {
         log.info("ExecutionPlan = " + executionPlan);
         String jsonString = new Gson().toString();
         try {
-            if (StreamProcessorDataHolder.getStreamProcessorService().deployExecutionPlan(executionPlan)) {
+            if (StreamProcessorDataHolder.getStreamProcessorService().deployExecutionPlan(executionPlan, null)) {
                 jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.OK,
                                                                       "Execution Plan is deployed " +
                                                                       "and runtime is created"));

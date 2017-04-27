@@ -105,7 +105,7 @@ public class ServiceComponent implements Microservice {
             FileOutputStream out = new FileOutputStream(tempFile);
             IOUtils.copy(in, out);
             return tempFile;
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.warn("Couldn't load requested resource: " + resourcePath);
             return null;
         }
@@ -377,8 +377,7 @@ public class ServiceComponent implements Microservice {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        log.info("Service Component is activated");
-
+        log.info("Editor Started on : http://localhost:9090/editor");
         // Create Stream Processor Service
         EditorDataHolder.setDebugProcessorService(new DebugProcessorService());
         EditorDataHolder.setSiddhiManager(new SiddhiManager());
