@@ -15,8 +15,7 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.wso2</groupId>
@@ -28,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.0.1-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
 
     <modules>
@@ -834,7 +833,7 @@
                 <version>${siddhi.version}</version>
             </dependency>
 
-            <!--- Dependencies for Siddhi related jars -->
+            <!-- Dependencies for Siddhi related jars -->
             <dependency>
                 <groupId>org.wso2.orbit.com.lmax</groupId>
                 <artifactId>disruptor</artifactId>
@@ -1063,7 +1062,7 @@
         <junit.version>4.10</junit.version>
 
 
-        <sp.version>2.0.0-SNAPSHOT</sp.version>
+        <sp.version>2.0.1-SNAPSHOT</sp.version>
         <sp.package.export.version>2.0.0</sp.package.export.version>
 
         <!-- Maven plugins -->
@@ -1141,7 +1140,7 @@
         <mockito.version>1.9.0</mockito.version>
 
         <!-- Stream Processor Dependencies -->
-        <siddhi.version>4.0.0-SNAPSHOT</siddhi.version>
+        <siddhi.version>4.0.0-M1</siddhi.version>
         <disruptor.version>3.3.2.wso2v2</disruptor.version>
         <guava.version>20.0</guava.version>
         <guava.bundle.version>20.0.0</guava.bundle.version>

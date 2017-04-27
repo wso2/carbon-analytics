@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -112,6 +112,10 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'], function (
                 tabHeaderLink.attr('href', '#' + tab.cid);
                 tabHeaderLink.text(tab.getTitle());
 
+                tabHeader.setText = function(text){
+                    tabHeaderLink.text(text);
+                };
+
                 var self = this;
                 tabHeaderLink.click(function(e){
                     tabHeaderLink.tab('show');
@@ -121,12 +125,16 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'], function (
                 });
 
                 var tabCloseBtn = $('<button type="button" >×</button>');
-                tabHeaderLink.append(tabCloseBtn);
+                tabHeader.append(tabCloseBtn);
                 tabCloseBtn.addClass( _.get(this.options, 'tabs.tab.cssClass.tab_close_btn'));
                 tabCloseBtn.click(function(e){
                     self.removeTab(tab);
                     e.preventDefault();
                     e.stopPropagation();
+                });
+
+                tab.on('title-changed', function(title){
+                    tabHeaderLink.text(title);
                 });
 
                 tab.setHeader(tabHeader);
@@ -237,6 +245,9 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'], function (
             getActiveTab: function () {
                 return this.activeTab;
             },
+            getTabList: function() {
+                return this._tabs;
+            },
             /**
              * Creates a new tab.
              * @param opts
@@ -253,7 +264,15 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'], function (
                 _.assign(tabOptions, _.get(this.options, 'tabs.tab'));
                 _.set(tabOptions, 'tabs_container',_.get(this.options, 'tabs.container'));
                 _.set(tabOptions, 'parent', this);
-                var newTab = new this.TabModel(tabOptions);
+                var newTab;
+                // user provided a custom tab type
+                if (_.has(opts, 'tabModel')) {
+                    var TabModel = _.get(opts, 'tabModel');
+                    newTab = new TabModel(tabOptions);
+                } else {
+                    newTab = new this.TabModel(tabOptions);
+                    _.set(newTab, '_title', _.get(tabOptions, 'title'))
+                }
                 this.addTab(newTab);
                 // check whether switch to new tab set to false
                 if (_.has(opts, 'switchToNewTab')) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -19,22 +19,6 @@
 define(['./tool-editor'],
     function (ToolEditor) {
         var views = {};
-//        views.MessageView = MessageView;
-//        views.ActivationView = ActivationView;
-//        views.LifeLineView = LifeLineView;
-//        views.ProcessorView = ProcessorView;
-//        views.MessageLinkView = MessageLinkView;
-//        views.ContainableProcessorElementView = ContainableProcessorElementView;
-//        views.UnitProcessorView = UnitProcessorView;
-//        views.ComplexProcessorView = ComplexProcessorView;
-//        views.DynamicContainableProcessorView = DynamicContainableProcessorView;
-//        views.CustomProcessorView = CustomProcessorView;
-//        views.ResourceView = ResourceView;
-//        views.ServiceView = ServiceView;
-//        views.ServiceOutlineView = ServiceOutlineView;
-//        views.ServicePreview = ServicePreview;
-//        views.SourceView = SourceView;
-       // views.DesignView = DesignView;
         views.ToolEditor = ToolEditor;
         return views;
     });
