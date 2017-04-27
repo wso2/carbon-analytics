@@ -198,7 +198,7 @@
                                 </bundle>
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.event.simulator.core</symbolicName>
-                                    <version>${sp.version}</version>
+                                    <version>${carbon.analytics.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>slf4j.api</symbolicName>
@@ -218,7 +218,7 @@
                                 </bundle>
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.stream.processor.core</symbolicName>
-                                    <version>${sp.version}</version>
+                                    <version>${carbon.analytics.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>msf4j-core</symbolicName>
