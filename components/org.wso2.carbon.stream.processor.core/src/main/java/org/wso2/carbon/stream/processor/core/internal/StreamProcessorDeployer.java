@@ -78,12 +78,6 @@ public class StreamProcessorDeployer implements Deployer {
                                                             + file.getName() + ". Support only"
                                                             + FILE_EXTENSION + " ."));
             }
-        } catch (ExecutionPlanDeploymentException e) {
-            StreamProcessorDataHolder.getInstance().setRuntimeMode(Constants.RuntimeMode.ERROR);
-            throw e;
-        } catch (Exception e) {
-            StreamProcessorDataHolder.getInstance().setRuntimeMode(Constants.RuntimeMode.ERROR);
-            throw new Exception("Execption when deploying Execution Plan", e);
         } finally {
             if (inputStream != null) {
                 try {
