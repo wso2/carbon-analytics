@@ -212,7 +212,7 @@ public class EventSimulator implements Runnable {
      * Events will be sent at time intervals equal to the delay
      */
     @SuppressWarnings("SWL_SLEEP_WITH_LOCK_HELD")
-    private synchronized void eventSimulation() {
+    private void eventSimulation() {
         long minTimestamp;
         EventGenerator generator;
         int eventsRemaining = simulationProperties.getNoOfEventsRequired();
