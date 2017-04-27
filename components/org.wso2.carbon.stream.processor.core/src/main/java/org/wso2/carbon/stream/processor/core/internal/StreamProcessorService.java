@@ -44,12 +44,13 @@ public class StreamProcessorService {
     private Map<String, ExecutionPlanRuntime> executionPlanRunTimeMap = new ConcurrentHashMap<>();
     private Map<String, Map<String, InputHandler>> executionPlanSpecificInputHandlerMap = new ConcurrentHashMap<>();
     private Map<String, ExecutionPlanConfiguration> executionPlanConfigurationMap = new ConcurrentHashMap<>();
+    private Map<String, String> executionPlanFileMap = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(StreamProcessorService.class);
 
-    public boolean deployExecutionPlan(String executionPlan) {
+    public boolean deployExecutionPlan(String executionPlan, String executionPlanFileName) {
         ExecutionPlan parsedExecutionPlan = SiddhiCompiler.parse(executionPlan);
         Element nameAnnotation = AnnotationHelper.getAnnotationElement(EventProcessorConstants.ANNOTATION_NAME_NAME,
-                null, parsedExecutionPlan.getAnnotations());
+                                                                       null, parsedExecutionPlan.getAnnotations());
 
         if (nameAnnotation == null || nameAnnotation.getValue().isEmpty()) {
             throw new ExecutionPlanValidationException("Execution plan name must be provided as @Plan:name('name').");
@@ -57,15 +58,11 @@ public class StreamProcessorService {
         String executionPlanName = nameAnnotation.getValue();
 
         if (!executionPlanRunTimeMap.containsKey(executionPlanName)) {
-
             SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
-            //Check this and have a separate config
             ExecutionPlanConfiguration executionPlanConfiguration = new ExecutionPlanConfiguration();
-
             executionPlanConfiguration.setName(executionPlanName);
             executionPlanConfiguration.setExecutionPlan(executionPlan);
             executionPlanConfigurationMap.put(executionPlanName, executionPlanConfiguration);
-
             ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
 
             if (executionPlanRuntime != null) {
@@ -78,9 +75,14 @@ public class StreamProcessorService {
 
                 executionPlanSpecificInputHandlerMap.put(executionPlanName, inputHandlerMap);
                 executionPlanRunTimeMap.put(executionPlanName, executionPlanRuntime);
+                if (executionPlanFileName != null) {
+                    executionPlanFileMap.put(executionPlanFileName, executionPlanName);
+                } else {
+                    executionPlanFileMap.put(executionPlanName, executionPlanName);
+                }
+
                 executionPlanRuntime.start();
                 log.info("Execution plan " + executionPlanName + " deployed successfully.");
-
                 return true;
             }
         }
@@ -88,11 +90,23 @@ public class StreamProcessorService {
 
     }
 
-    public boolean undeployExecutionPlan(String executionPlanName) {
-        if (executionPlanRunTimeMap.containsKey(executionPlanName)) {
-            executionPlanRunTimeMap.remove(executionPlanName);
-            executionPlanConfigurationMap.remove(executionPlanName);
-            executionPlanSpecificInputHandlerMap.remove(executionPlanName);
+    public boolean undeployExecutionPlan(String executionPlanFileName) {
+
+        if (executionPlanFileMap.containsKey(executionPlanFileName)) {
+            String executionPlanName = executionPlanFileMap.get(executionPlanFileName);
+
+            if (executionPlanRunTimeMap.containsKey(executionPlanName)) {
+                executionPlanRunTimeMap.remove(executionPlanName);
+            }
+
+            if (executionPlanConfigurationMap.containsKey(executionPlanName)) {
+                executionPlanConfigurationMap.remove(executionPlanName);
+            }
+
+            if (executionPlanSpecificInputHandlerMap.containsKey(executionPlanName)) {
+                executionPlanSpecificInputHandlerMap.remove(executionPlanName);
+            }
+
             log.info("Execution plan " + executionPlanName + " undeployed successfully.");
             return true;
         }
