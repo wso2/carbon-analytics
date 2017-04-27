@@ -97,6 +97,7 @@ public class StreamProcessorService {
             executionPlanFileMap.remove(executionPlanFileName);
 
             if (executionPlanRunTimeMap.containsKey(executionPlanName)) {
+                executionPlanRunTimeMap.get(executionPlanName).shutdown();
                 executionPlanRunTimeMap.remove(executionPlanName);
             }
 
