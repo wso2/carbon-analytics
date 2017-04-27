@@ -105,9 +105,8 @@ public class StreamProcessorDeployer implements Deployer {
         try {
             br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             while ((line = br.readLine()) != null) {
-                sb.append(" ").append(line);
+                sb.append(System.getProperty("line.separator")).append(line);
             }
-
         } catch (IOException e) {
             throw new ExecutionPlanDeploymentException("Exception when reading the Siddhi QL file", e);
         } finally {
