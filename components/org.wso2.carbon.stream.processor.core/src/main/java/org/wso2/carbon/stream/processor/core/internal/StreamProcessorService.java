@@ -93,7 +93,7 @@ public class StreamProcessorService {
             executionPlanRunTimeMap.remove(executionPlanName);
             executionPlanConfigurationMap.remove(executionPlanName);
             executionPlanSpecificInputHandlerMap.remove(executionPlanName);
-
+            log.info("Execution plan " + executionPlanName + " undeployed successfully.");
             return true;
         }
         return false;

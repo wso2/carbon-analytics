@@ -28,6 +28,7 @@ import org.wso2.siddhi.annotation.ReturnAttribute;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
+import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -147,7 +148,7 @@ public class SourceEditorUtils {
     public static List<AbstractDefinition> getStreamDefinitions(ExecutionPlanRuntime executionPlanRuntime,
                                                                 List<String> missingStreams) {
         List<AbstractDefinition> streamDefinitions = new ArrayList<>();
-        Map<String, AbstractDefinition> streamDefinitionMap = executionPlanRuntime.getStreamDefinitionMap();
+        Map<String, StreamDefinition> streamDefinitionMap = executionPlanRuntime.getStreamDefinitionMap();
         for (String stream : missingStreams) {
             AbstractDefinition streamDefinition = streamDefinitionMap.get(stream);
             if (streamDefinition != null) {
