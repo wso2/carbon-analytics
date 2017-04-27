@@ -18,10 +18,10 @@
 
 package org.wso2.carbon.siddhi.editor.core.internal;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -30,13 +30,13 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
+import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.response.GeneralResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.MetaDataResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
 import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResponse;
 import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
-import org.wso2.carbon.siddhi.editor.core.util.MetaDataHolder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
@@ -46,15 +46,11 @@ import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
@@ -62,18 +58,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import com.google.gson.Gson;
 
 
 @Component(
@@ -90,7 +74,7 @@ public class ServiceComponent implements Microservice {
     private ServiceRegistration serviceRegistration;
     private Workspace workspace;
 
-    public ServiceComponent(){
+    public ServiceComponent() {
         workspace = new LocalFSWorkspace();
     }
 
@@ -190,7 +174,7 @@ public class ServiceComponent implements Microservice {
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -209,7 +193,7 @@ public class ServiceComponent implements Microservice {
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -227,7 +211,7 @@ public class ServiceComponent implements Microservice {
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -244,7 +228,7 @@ public class ServiceComponent implements Microservice {
                     .entity(workspace.listFilesInPath(new String(Base64.getDecoder().decode(path))))
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -269,7 +253,7 @@ public class ServiceComponent implements Microservice {
                 configName = configNameMatcher.group(1);
             }
             String[] splitConfigContent = payload.split("config=");
-            if (splitConfigContent.length > 1){
+            if (splitConfigContent.length > 1) {
                 config = splitConfigContent[1];
             }
             byte[] base64Config = Base64.getDecoder().decode(config);
@@ -282,7 +266,7 @@ public class ServiceComponent implements Microservice {
             return Response.status(Response.Status.OK).entity(entity)
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -299,7 +283,7 @@ public class ServiceComponent implements Microservice {
                     .entity(workspace.read(new String(path)))
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -311,9 +295,9 @@ public class ServiceComponent implements Microservice {
     @Path("/metadata")
     public Response getMetaData() {
         MetaDataResponse response = new MetaDataResponse(Status.SUCCESS);
-        response.setInBuilt(MetaDataHolder.getInBuiltProcessorMetaData());
-        response.setExtensions(SourceEditorUtils.getExtensionProcessorMetaData());
-
+        Map<String, MetaData> extensions = SourceEditorUtils.getExtensionProcessorMetaData();
+        response.setInBuilt(extensions.remove(""));
+        response.setExtensions(extensions);
         String jsonString = new Gson().toJson(response);
         return Response.ok(jsonString, MediaType.APPLICATION_JSON)
                 .build();
