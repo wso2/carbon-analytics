@@ -15,8 +15,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-client'],
-    function (ace, $, _, Backbone, log,Dialogs,ServiceClient) {
+define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-client','welcome-page'],
+    function (ace, $, _, Backbone, log,Dialogs,ServiceClient,WelcomePages) {
 
         // workspace manager constructor
         /**
@@ -174,12 +174,55 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
 
             };
 
+            this.displayInitialTab = function () {
+                //TODO : remove this if else condition
+                // display first launch welcome page tab
+                if (!this.passedFirstLaunch()) {
+                    // create a generic tab - without ballerina editor components
+                    var tab = app.tabController.newTab({
+                        tabOptions:{title: 'welcome-page'}
+                    });
+                    var opts = _.get(app.config, 'welcome');
+                    _.set(opts, 'application', app);
+                    _.set(opts, 'tab', tab);
+                    this.welcomePage = new WelcomePages.FirstLaunchWelcomePage(opts);
+                    this.welcomePage.render();
+                } else {
+                    // user has no active tabs from last session
+                    if (!app.tabController.hasFilesInWorkingSet()) {
+                        // create a generic tab - without ballerina editor components
+                        var tab = app.tabController.newTab({
+                            tabOptions:{title: 'welcome-page'}
+                        });
+                        // Showing FirstLaunchWelcomePage instead of regularWelcomePage
+                        var opts = _.get(app.config, 'welcome');
+                        _.set(opts, 'application', app);
+                        _.set(opts, 'tab', tab);
+                        this.welcomePage = new WelcomePages.FirstLaunchWelcomePage(opts);
+                        this.welcomePage.render();
+                    }
+                }
+            };
+
+            this.passedFirstLaunch = function(){
+                return app.browserStorage.get("pref:passedFirstLaunch") || false;
+            };
+
             this.openFileOpenDialog = function openFileOpenDialog() {
                 if(_.isNil(this._openFileDialog)){
                     this._openFileDialog = new Dialogs.open_file_dialog(app);
                 }
                 this._openFileDialog.render();
                 this._openFileDialog.show();
+            };
+
+            this.openCloseFileConfirmDialog = function(options) {
+                if(_.isNil(this._closeFileConfirmDialog)){
+                    this._closeFileConfirmDialog = new Dialogs.CloseConfirmDialog();
+                    this._closeFileConfirmDialog.render();
+                }
+
+                this._closeFileConfirmDialog.askConfirmation(options);
             };
 
 
@@ -194,6 +237,8 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
             app.commandManager.registerHandler('open-file-open-dialog', this.openFileOpenDialog, this);
 
             app.commandManager.registerHandler('open-replace-file-confirm-dialog', this.openReplaceFileConfirmDialog, this);
+
+            app.commandManager.registerHandler('open-close-file-confirm-dialog', this.openCloseFileConfirmDialog, this);
 
 
         }

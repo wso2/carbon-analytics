@@ -64,9 +64,12 @@ public class CarbonEventStreamService implements EventStreamService {
         ExecutionPlanRuntime executionPlanRuntime = executionPlanRunTimeMap.get(executionPlanName);
         if (executionPlanRuntime != null) {
             if (executionPlanRuntime.getStreamDefinitionMap().size() != 0) {
-                AbstractDefinition streamDefinition = executionPlanRuntime.getStreamDefinitionMap().get(streamName);
-                return streamDefinition.getAttributeList();
-
+                if (executionPlanRuntime.getStreamDefinitionMap().containsKey(streamName)) {
+                    AbstractDefinition streamDefinition = executionPlanRuntime.getStreamDefinitionMap().get(streamName);
+                    return streamDefinition.getAttributeList();
+                } else {
+                    return null;
+                }
             }
         }
         return null;
