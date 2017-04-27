@@ -253,10 +253,6 @@
                                     <version>${geronimo.activation}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>org.apache.geronimo.specs.geronimo-stax-api_1.0_spec</symbolicName>
-                                    <version>${geronimo.stax}</version>
-                                </bundle>
-                                <bundle>
                                     <symbolicName>jaxen</symbolicName>
                                     <version>${jaxen.version}</version>
                                 </bundle>
