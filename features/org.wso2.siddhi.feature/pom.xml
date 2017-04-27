@@ -114,6 +114,14 @@
 
         <!-- Dependency jars for Siddhi Components -->
         <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-impl</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.orbit.com.lmax</groupId>
             <artifactId>disruptor</artifactId>
         </dependency>
@@ -314,6 +322,22 @@
                                 <bundle>
                                     <symbolicName>siddhi-extension-text-input-mapper</symbolicName>
                                     <version>${siddhi.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>siddhi-extension-xml-output-mapper</symbolicName>
+                                    <version>${siddhi.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>siddhi-extension-xml-input-mapper</symbolicName>
+                                    <version>${siddhi.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.apache.ws.commons.axiom.axiom-api</symbolicName>
+                                    <version>${orbit.version.axiom}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.apache.ws.commons.axiom.axiom-impl</symbolicName>
+                                    <version>${orbit.version.axiom}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>disruptor</symbolicName>
