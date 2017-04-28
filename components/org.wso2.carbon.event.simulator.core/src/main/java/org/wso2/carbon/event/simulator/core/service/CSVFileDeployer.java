@@ -42,7 +42,6 @@ import java.net.URL;
 
 /**
  * CSVFileDeployer is responsible for all simulation related CSV deployment tasks
- *
  */
 @Component(
         name = "csv-file-deployer",
@@ -55,9 +54,11 @@ public class CSVFileDeployer implements Deployer {
     private URL directoryLocation;
 
     private void deployCSVFile(File file) throws Exception {
-        if (!file.getName().startsWith(".")) {
-            if (FilenameUtils.isExtension(file.getName(), EventSimulatorConstants.CSV_FILE_EXTENSION)) {
-                FileStore.getFileStore().addFile(file.getName());
+        String fileName = file.getName();
+        if (!fileName.startsWith(".")) {
+            if (FilenameUtils.isExtension(fileName, EventSimulatorConstants.CSV_FILE_EXTENSION)) {
+                FileStore.getFileStore().addFile(fileName);
+                log.info("Successfully deployed CSV file '" + fileName + "'.");
             } else {
                 throw new CSVFileDeploymentException("Error: File extension not supported for file name "
                         + file.getName() + ". Support only ." + EventSimulatorConstants.CSV_FILE_EXTENSION + " .");
@@ -97,6 +98,7 @@ public class CSVFileDeployer implements Deployer {
             String fileName = (String) key;
             if (FileStore.getFileStore().checkExists(fileName)) {
                 FileStore.getFileStore().deleteFile(fileName);
+                log.info("Successfully undeployed CSV file '" + fileName + "'.");
             }
         } catch (Exception e) {
             throw new CarbonDeploymentException(e.getMessage(), e);

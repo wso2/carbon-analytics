@@ -42,7 +42,6 @@ import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperation
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * RandomEventGenerator class implements interface EventGenerator.
@@ -76,12 +75,11 @@ public class RandomEventGenerator implements EventGenerator {
                     .getStreamAttributes(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
                             sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
         } catch (ResourceNotFoundException e) {
-            log.error(e.getResourceType().toString().toLowerCase(Locale.ENGLISH).replace("_", " ") + " '" +
-                    e.getResourceName() + "' specified for random simulation does not exist. Invalid source " +
-                    "configuration : " + sourceConfig.toString(), e);
-            throw new SimulatorInitializationException(e.getResourceType().toString().toLowerCase(Locale.ENGLISH)
-                    .replace("_", " ") + " '" + e.getResourceName() + "' " + "specified for random simulation does " +
-                    "not exist. Invalid source configuration : " + sourceConfig.toString(), e);
+            log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' specified for random simulation" +
+                    " does not exist. Invalid source configuration : " + sourceConfig.toString(), e);
+            throw new SimulatorInitializationException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
+                    "specified for random simulation does not exist. Invalid source configuration : " + sourceConfig
+                    .toString(), e);
         }
         randomSimulationConfig = createRandomConfiguration(sourceConfig);
 //        set timestamp boundary for event generation
@@ -238,12 +236,11 @@ public class RandomEventGenerator implements EventGenerator {
                         .getStreamAttributes(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
                                 sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
             } catch (ResourceNotFoundException e) {
-                log.error(e.getResourceType().toString().toLowerCase(Locale.ENGLISH).replace("_", " ") + " '" +
-                        e.getResourceName() + "' specified for random simulation does not exist. Invalid source" +
-                        " configuration : " + sourceConfig.toString(), e);
-                throw new InvalidConfigException(e.getResourceType().toString().toLowerCase(Locale.ENGLISH)
-                        .replace("_", "") + " '" + e.getResourceName() + "' " + "specified for random simulation" +
-                        " does not exist. Invalid source configuration : " + sourceConfig.toString(), e);
+                log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' specified for random " +
+                        "simulation does not exist. Invalid source configuration : " + sourceConfig.toString(), e);
+                throw new InvalidConfigException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
+                        "specified for random simulation does not exist. Invalid source configuration : " +
+                        sourceConfig.toString(), e);
             }
             if (checkAvailabilityOfArray(sourceConfig, EventSimulatorConstants.ATTRIBUTE_CONFIGURATION)) {
                 if (streamAttributes.size() ==

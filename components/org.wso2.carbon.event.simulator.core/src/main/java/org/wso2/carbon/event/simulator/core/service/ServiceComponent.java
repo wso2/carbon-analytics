@@ -39,6 +39,7 @@ import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileUplo
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.carbon.utils.Utils;
 import org.wso2.msf4j.Microservice;
 
@@ -79,12 +80,13 @@ public class ServiceComponent implements Microservice {
      * @throws InvalidConfigException          if the simulation configuration contains invalid data
      * @throws InsufficientAttributesException if the number of attributes specified for the event is not equal to
      *                                         the number of stream attributes
+     * @throws ResourceNotFoundException       if a resource required for simulation is not found
      */
     @POST
     @Path("/single")
     @Produces("application/json")
     public Response singleEventSimulation(String singleEventConfiguration)
-            throws InvalidConfigException, InsufficientAttributesException {
+            throws InvalidConfigException, InsufficientAttributesException, ResourceNotFoundException {
         SingleEventGenerator.sendEvent(singleEventConfiguration);
         return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Single Event simulation " +
                 "started successfully")).build();
@@ -102,13 +104,14 @@ public class ServiceComponent implements Microservice {
      * @throws FileAlreadyExistsException      if a configuration already exists in the system under the given
      *                                         simulation name
      * @throws FileOperationsException         if an IOException occurs while uploading the simulation configuration
+     * @throws ResourceNotFoundException       if a resource required for simulation is not found
      */
     @POST
     @Path("/feed")
     @Produces("application/json")
     public Response uploadFeedSimulationConfig(String simulationConfiguration)
             throws InvalidConfigException, InsufficientAttributesException, FileOperationsException,
-            FileAlreadyExistsException {
+            ResourceNotFoundException, FileAlreadyExistsException {
         SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
         if (!EventSimulationMap.getSimulatorMap().containsKey(simulationConfigUploader
                 .getSimulationName(simulationConfiguration))) {
@@ -139,13 +142,14 @@ public class ServiceComponent implements Microservice {
      * @throws InvalidConfigException          if the simulation configuration does not contain a simulation name
      * @throws FileOperationsException         if an IOException occurs while uploading the simulation configuration
      * @throws InsufficientAttributesException if a configuration cannot generate values for all stream attributes
+     * @throws ResourceNotFoundException       if a resource required for simulation is not found
      */
     @PUT
     @Path("/feed/{simulationName}")
     @Produces("application/json")
     public Response updateFeedSimulationConfig(@PathParam("simulationName") String simulationName, String
             simulationConfigDetails) throws InvalidConfigException, InsufficientAttributesException,
-            FileOperationsException, FileAlreadyExistsException {
+            ResourceNotFoundException, FileOperationsException, FileAlreadyExistsException {
         EventSimulator.validateSimulationConfig(simulationConfigDetails);
         SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
         boolean deleted = simulationConfigUploader.deleteSimulationConfig(simulationName,

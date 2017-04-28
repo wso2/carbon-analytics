@@ -38,7 +38,6 @@ import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperation
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.TreeMap;
 
 /**
@@ -77,21 +76,22 @@ public class CSVEventGenerator implements EventGenerator {
      * @param endTimestamp   maximum possible event timestamp
      * @throws InvalidConfigException           if invalid configuration is provided for CSV event generation
      * @throws SimulatorInitializationException if the stream or execution plan doesn't exists
+     * @throws ResourceNotFoundException if a resource required for simulation is not available
      */
     @Override
-    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp) throws InvalidConfigException {
+    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp) throws InvalidConfigException,
+            ResourceNotFoundException {
         csvConfiguration = createCSVConfiguration(sourceConfig);
 //            retrieve stream attributes of the stream being simulated
         try {
             streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
                     .getStreamAttributes(csvConfiguration.getExecutionPlanName(), csvConfiguration.getStreamName());
         } catch (ResourceNotFoundException e) {
-            log.error(e.getResourceType().toString().toLowerCase(Locale.ENGLISH).replace("_", " ") + " '" +
-                    e.getResourceName() + "' specified for CSV simulation does not exist. Invalid source " +
-                    "configuration : " + csvConfiguration.toString(), e);
-            throw new SimulatorInitializationException(e.getResourceType().toString().toLowerCase(Locale.ENGLISH)
-                    .replace("_", " ") + " '" + e.getResourceName() + "' " + "specified for CSV simulation does" +
-                    " not exist. Invalid source configuration : " + csvConfiguration.toString(), e);
+            log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' specified for CSV simulation " +
+                    "does not exist. Invalid source configuration : " + csvConfiguration.toString(), e);
+            throw new ResourceNotFoundException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
+                    "specified for CSV simulation does not exist. Invalid source configuration : " + csvConfiguration
+                    .toString(), e.getResourceType(), e.getResourceName(), e);
         }
         if (log.isDebugEnabled()) {
             log.debug("Initialize CSV generator for file '" + csvConfiguration.getFileName() + "' to simulate" +
@@ -286,9 +286,11 @@ public class CSVEventGenerator implements EventGenerator {
      *
      * @param sourceConfig JSON object containing configuration required for csv simulation
      * @throws InvalidConfigException if configuration is invalid
+     * @throws ResourceNotFoundException if a resource required for simulation is not available
      */
     @Override
-    public void validateSourceConfiguration(JSONObject sourceConfig) throws InvalidConfigException {
+    public void validateSourceConfiguration(JSONObject sourceConfig) throws InvalidConfigException,
+            ResourceNotFoundException {
         try {
             /*
              * Perform the following checks prior to setting the properties.
@@ -315,12 +317,14 @@ public class CSVEventGenerator implements EventGenerator {
                         sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
             } catch (ResourceNotFoundException e) {
-                log.error(e.getResourceType().toString().toLowerCase(Locale.ENGLISH).replace("_", " ") + " '" +
-                        e.getResourceName() + "' specified for CSV simulation does not exist. Invalid source" +
-                        " configuration : " + sourceConfig.toString(), e);
-                throw new InvalidConfigException(e.getResourceType().toString().toLowerCase(Locale.ENGLISH)
-                        .replace("_", " ") + " '" + e.getResourceName() + "' " + "specified for CSV simulation does" +
-                        " not exist. Invalid source configuration : " + sourceConfig.toString(), e);
+                log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' specified for CSV simulation" +
+                        " of stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' " +
+                        "does not exist. Invalid source configuration : " + sourceConfig.toString(), e);
+                throw new ResourceNotFoundException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
+                        "specified for CSV simulation of stream '" +
+                        sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'does not exist. Invalid" +
+                        " source configuration : " + sourceConfig.toString(), e.getResourceType(), e.getResourceName()
+                        , e);
             }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.FILE_NAME)) {
                 throw new InvalidConfigException("File name is required for CSV simulation of stream '" +
@@ -338,8 +342,10 @@ public class CSVEventGenerator implements EventGenerator {
                             sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' must be positive. " +
                             "Invalid source configuration : " + sourceConfig.toString());
                 }
-                if (!sourceConfig.has(EventSimulatorConstants.IS_ORDERED)
-                        || sourceConfig.isNull(EventSimulatorConstants.IS_ORDERED)) {
+                if (sourceConfig.has(EventSimulatorConstants.IS_ORDERED)
+                        && !sourceConfig.isNull(EventSimulatorConstants.IS_ORDERED)) {
+                    sourceConfig.getBoolean(EventSimulatorConstants.IS_ORDERED);
+                } else {
                     throw new InvalidConfigException("isOrdered flag is required for CSV simulation of stream '" +
                             sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid source " +
                             "configuration : " + sourceConfig.toString());
@@ -357,10 +363,12 @@ public class CSVEventGenerator implements EventGenerator {
                         "configuration : " + sourceConfig.toString());
             }
             if (!FileStore.getFileStore().checkExists(sourceConfig.getString(EventSimulatorConstants.FILE_NAME))) {
-                throw new InvalidConfigException("File '" + sourceConfig.getString(EventSimulatorConstants.FILE_NAME)
-                        + "' required for simulation of stream '" +
+                throw new ResourceNotFoundException("CSV file '" + sourceConfig.getString(EventSimulatorConstants
+                        .FILE_NAME) + "' required for simulation of stream '" +
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' has not been " +
-                        "uploaded. Invalid source config : " + sourceConfig.toString());
+                        "uploaded. Invalid source config : " + sourceConfig.toString(), ResourceNotFoundException
+                        .ResourceType.CSV_FILE, sourceConfig.getString(EventSimulatorConstants
+                        .FILE_NAME));
             }
         } catch (JSONException e) {
             log.error("Error occurred when accessing CSV simulation configuration of stream '" +

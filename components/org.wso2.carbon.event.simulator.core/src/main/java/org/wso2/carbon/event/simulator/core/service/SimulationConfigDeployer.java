@@ -44,7 +44,6 @@ import java.nio.file.Paths;
 
 /**
  * SimulationConfigDeployer is responsible for all simulation config deployment tasks
- *
  */
 @Component(
         name = "simulation-config-deployer",
@@ -67,6 +66,7 @@ public class SimulationConfigDeployer implements Deployer {
                 if (!simulationConfig.isEmpty()) {
                     EventSimulator simulator = new EventSimulator(simulationName, simulationConfig);
                     EventSimulationMap.getSimulatorMap().put(simulationName, simulator);
+                    log.info("Successfully deployed simulation '" + simulationName + "'.");
                 }
             } else {
                 throw new SimulationConfigDeploymentException("Simulation '" + file.getName() + "' has an invalid " +
@@ -109,6 +109,7 @@ public class SimulationConfigDeployer implements Deployer {
             if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
                 EventSimulationMap.getSimulatorMap().get(simulationName).stop();
                 EventSimulationMap.getSimulatorMap().remove(simulationName);
+                log.info("Successfully undeployed simulation '" + simulationName + "'.");
             }
         } catch (Exception e) {
             throw new CarbonDeploymentException(e.getMessage(), e);

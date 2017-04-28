@@ -50,7 +50,12 @@
         </export.package>
         <import.package>
             *;resolution:=optional
+            javax.management.*,
+            javax.ws.rs.*;version="0.0.0",
         </import.package>
+        <carbon.component>
+            osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="1"
+        </carbon.component>
     </properties>
 
 </project>

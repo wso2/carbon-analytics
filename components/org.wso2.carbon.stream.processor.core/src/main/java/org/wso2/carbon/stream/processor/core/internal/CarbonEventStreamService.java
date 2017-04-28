@@ -71,16 +71,16 @@ public class CarbonEventStreamService implements EventStreamService {
                     return streamDefinition.getAttributeList();
                 } else {
                     throw new ResourceNotFoundException("Execution plan '" + executionPlanName + "' does not contain " +
-                            "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM_NAME,
+                            "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM,
                             streamName);
                 }
             } else {
                 throw new ResourceNotFoundException("Execution plan '" + executionPlanName + "' does not contain " +
-                        "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM_NAME, streamName);
+                        "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM, streamName);
             }
         } else {
             throw new ResourceNotFoundException("Execution plan '" + executionPlanName + "' does not exist.",
-                    ResourceNotFoundException.ResourceType.EXECUTION_PLAN_NAME, executionPlanName);
+                    ResourceNotFoundException.ResourceType.EXECUTION_PLAN, executionPlanName);
         }
     }
 

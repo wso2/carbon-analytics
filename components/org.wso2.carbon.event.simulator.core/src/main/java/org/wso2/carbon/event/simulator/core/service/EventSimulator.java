@@ -33,6 +33,7 @@ import org.wso2.carbon.event.simulator.core.internal.bean.SimulationPropertiesDT
 import org.wso2.carbon.event.simulator.core.internal.generator.EventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventGeneratorFactoryImpl;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
@@ -40,6 +41,7 @@ import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperation
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -55,7 +57,7 @@ public class EventSimulator implements Runnable {
     private SimulationPropertiesDTO simulationProperties;
     private String simulationName;
     private Status status = Status.STOP;
-    private final ReentrantLock lock = new ReentrantLock();
+    private final Semaphore lock = new Semaphore(1, true);
     private final ReentrantLock lockStop = new ReentrantLock();
 
 
@@ -66,9 +68,10 @@ public class EventSimulator implements Runnable {
      * @param simulationName          name of simulation
      * @throws InsufficientAttributesException is a configuration does not produce data for all stream attributes
      * @throws InvalidConfigException          if the simulation configuration is invalid
+     * @throws ResourceNotFoundException       if a resource required for simulation is not found
      */
     public EventSimulator(String simulationName, String simulationConfiguration)
-            throws InsufficientAttributesException, InvalidConfigException {
+            throws InsufficientAttributesException, InvalidConfigException, ResourceNotFoundException {
 //        validate simulation configuration
         validateSimulationConfig(simulationConfiguration);
 //        create generators and configurationDTO's
@@ -87,8 +90,16 @@ public class EventSimulator implements Runnable {
         }
     }
 
+    /**
+     * validateSimulationConfig() validates a simulation configuraiton provided
+     *
+     * @param simulationConfiguration simulation configuration
+     * @throws InsufficientAttributesException is a configuration does not produce data for all stream attributes
+     * @throws InvalidConfigException          if the simulation configuration is invalid
+     * @throws ResourceNotFoundException       if a resource required for simulation is not found
+     */
     public static void validateSimulationConfig(String simulationConfiguration) throws InvalidConfigException,
-            InsufficientAttributesException {
+            InsufficientAttributesException, ResourceNotFoundException {
         try {
             JSONObject simulationConfig = new JSONObject(simulationConfiguration);
 //        first create a simulation properties object
@@ -220,8 +231,8 @@ public class EventSimulator implements Runnable {
             while (!status.equals(Status.STOP)) {
 //                if the simulator is paused, wait till it is resumed
                 if (status.equals(Status.PAUSE)) {
-                    lock.lock();
-                    lock.unlock();
+                    lock.acquire();
+                    lock.release();
                 }
 
                 /**
@@ -432,10 +443,14 @@ public class EventSimulator implements Runnable {
      */
     public void pause() {
         if (!status.equals(Status.PAUSE)) {
-            lock.lock();
-            status = Status.PAUSE;
-            if (log.isDebugEnabled()) {
-                log.debug("Pause event simulation '" + simulationName + "'");
+            try {
+                lock.acquire();
+                status = Status.PAUSE;
+                if (log.isDebugEnabled()) {
+                    log.debug("Pause event simulation '" + simulationName + "'");
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -448,7 +463,7 @@ public class EventSimulator implements Runnable {
      */
     public void resume() {
         if (status.equals(Status.PAUSE)) {
-            lock.unlock();
+            lock.release();
             status = Status.RUN;
             if (log.isDebugEnabled()) {
                 log.debug("Resume event simulation '" + simulationName + "'");
