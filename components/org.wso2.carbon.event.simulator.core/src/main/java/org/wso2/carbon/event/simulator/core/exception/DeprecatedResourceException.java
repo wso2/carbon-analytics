@@ -15,7 +15,7 @@ public class DeprecatedResourceException extends RuntimeException {
     Resources.ResourceType resourceType;
     String resourceName;
     /**
-     * Throws customizes event generation exception
+     * Throws customizes deprecated resource exception
      *
      * @param message Error Message
      */
@@ -24,7 +24,7 @@ public class DeprecatedResourceException extends RuntimeException {
     }
 
     /**
-     * Throws customizes event generation exception
+     * Throws customizes deprecated resource exception
      *
      * @param message Error Message
      * @param cause   throwable which caused the event generation exception

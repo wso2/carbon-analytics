@@ -56,6 +56,7 @@ public class EventSimulatorConstants {
     public static final String FILE_NAME = "fileName";
     public static final String DELIMITER = "delimiter";
     public static final String IS_ORDERED = "isOrdered";
+    public static final String INDICES = "indices";
 
 
     //Random data simulation constants

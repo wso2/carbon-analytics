@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
-import org.wso2.carbon.event.simulator.core.internal.resourceManager.util.ResourceManagerFactoryImpl;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.event.simulator.core.service.EventSimulationMap;
@@ -68,8 +67,7 @@ public class ResourceDependencyResolver implements ExecutionPlanDeployerReceiver
             ResourceManager resourceManager = resourceManagers.get(resourceType);
             resourceManager.add(resourceName, simulationName);
         } else {
-            ResourceManagerFactoryImpl resourceManagerFactory = new ResourceManagerFactoryImpl();
-            ResourceManager resourceManager = resourceManagerFactory.createResourceManager(resourceType);
+            ResourceManager resourceManager = new ResourceManager();
             resourceManager.add(resourceName, simulationName);
             resourceManagers.put(resourceType, resourceManager);
         }
@@ -84,7 +82,7 @@ public class ResourceDependencyResolver implements ExecutionPlanDeployerReceiver
      * stream processor
      */
     @Reference(
-            name = "event.stream.service",
+            name = "resource.dependency.resolver",
             service = ExecutionPlanDeployerReceiver.class,
             cardinality = ReferenceCardinality.OPTIONAL,
             policy = ReferencePolicy.DYNAMIC,

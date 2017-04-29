@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.DeprecatedResourceException;
+import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
 import org.wso2.carbon.event.simulator.core.internal.bean.CSVSimulationDTO;
@@ -39,6 +40,7 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -296,10 +298,12 @@ public class CSVEventGenerator implements EventGenerator {
      * @param sourceConfig JSON object containing configuration required for csv simulation
      * @throws InvalidConfigException if configuration is invalid
      * @throws ResourceNotFoundException if a resource required for simulation is not available
+     * @throws InsufficientAttributesException if the number of indices specified is not equal to number of stream
+     *                                         attributes
      */
     @Override
     public void validateSourceConfiguration(JSONObject sourceConfig) throws InvalidConfigException,
-            ResourceNotFoundException {
+            ResourceNotFoundException, InsufficientAttributesException {
         try {
             /*
              * Perform the following checks prior to setting the properties.
@@ -316,13 +320,8 @@ public class CSVEventGenerator implements EventGenerator {
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid source " +
                         "configuration : " + sourceConfig.toString());
             }
-            /*
-             * check whether the execution plan has been deployed.
-             * if streamAttributes == null, it implies that execution plan has not been deployed yet or the stream
-             * name does not exist in the execution plan
-             */
             try {
-                EventSimulatorDataHolder.getInstance().getEventStreamService().getStreamAttributes(
+                streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService().getStreamAttributes(
                         sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
             } catch (ResourceNotFoundException e) {
@@ -371,6 +370,38 @@ public class CSVEventGenerator implements EventGenerator {
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid source " +
                         "configuration : " + sourceConfig.toString());
             }
+            if(checkAvailability(sourceConfig, EventSimulatorConstants.INDICES)) {
+                List<String> indices = Arrays.asList(sourceConfig.getString(
+                    EventSimulatorConstants.INDICES).split("\\s*,\\s*"));
+                if (indices.size() == streamAttributes.size()) {
+                    try {
+                        indices.forEach(index -> {
+                            int i = Integer.parseInt(index);
+                            if (i < 0) {
+                                throw new SimulatorInitializationException("Invalid index '" + index + "'.");
+                            }
+                        });
+                    } catch (NumberFormatException e) {
+                        throw new InvalidConfigException("Invalid column indices specified for CSV simulation of " +
+                                "stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'." +
+                                " Invalid source configuration : " + sourceConfig.toString(), e);
+                    } catch (SimulatorInitializationException e) {
+                        throw new InvalidConfigException("Invalid column indices specified for CSV simulation " +
+                                "of stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) +
+                                "'. Invalid source configuration : " + sourceConfig.toString(), e);
+                    }
+                } else {
+                    log.error("Stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'" +
+                            " has " + streamAttributes.size() + " attribute(s) but CSV source " +
+                            "configuration contains values for only " + indices.size() + " attribute(s). " +
+                            "Invalid source configuration : " + sourceConfig.toString() + "'");
+                    throw new InsufficientAttributesException("Stream '" +
+                            sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' has "
+                            + streamAttributes.size() + " attribute(s) but CSV source configuration " +
+                            "contains values for only " + indices.size() + " attribute(s). Invalid source " +
+                            "configuration : " + sourceConfig.toString() + "'");
+                }
+            }
             if (!FileStore.getFileStore().checkExists(sourceConfig.getString(EventSimulatorConstants.FILE_NAME))) {
                 throw new ResourceNotFoundException("CSV file '" + sourceConfig.getString(EventSimulatorConstants
                         .FILE_NAME) + "' required for simulation of stream '" +
@@ -393,9 +424,26 @@ public class CSVEventGenerator implements EventGenerator {
      *
      * @param sourceConfig JSON object containing configuration required to simulate stream
      * @return CSVSimulationDTO containing csv simulation configuration
+     * @throws InsufficientAttributesException if the number of indices specified is not equal to number of stream
+     *                                         attributes
      */
-    private CSVSimulationDTO createCSVConfiguration(JSONObject sourceConfig) throws InvalidConfigException {
+    private CSVSimulationDTO createCSVConfiguration(JSONObject sourceConfig) throws InvalidConfigException,
+            ResourceNotFoundException {
         try {
+            try {
+                streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService().getStreamAttributes(
+                        sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
+                        sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
+            } catch (ResourceNotFoundException e) {
+                log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' specified for CSV simulation" +
+                        " of stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' " +
+                        "does not exist. Invalid source configuration : " + sourceConfig.toString(), e);
+                throw new ResourceNotFoundException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
+                        "specified for CSV simulation of stream '" +
+                        sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'does not exist. Invalid" +
+                        " source configuration : " + sourceConfig.toString(), e.getResourceType(), e.getResourceName()
+                        , e);
+            }
             /*
              * either a timestamp attribute must be specified or the timeInterval between timestamps of 2 consecutive
              * events must be specified.
@@ -421,6 +469,35 @@ public class CSVEventGenerator implements EventGenerator {
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Time interval will " +
                         "be set to 1 second for source configuration : " + sourceConfig.toString());
             }
+            List<Integer> indices = new ArrayList<>();
+            if (checkAvailability(sourceConfig, EventSimulatorConstants.INDICES)) {
+                List<String> indexList = Arrays.asList(sourceConfig.getString(
+                        EventSimulatorConstants.INDICES).split("\\s*,\\s*"));
+                indexList.forEach(index -> indices.add(Integer.parseInt(index)));
+            } else {
+                /**
+                 * if the indices are not specified, it implies that all indices of the csv record must be considered
+                 * */
+                if (timestampAttribute.equals("-1")) {
+                    /**
+                     * if timestamp attribute is not specified, the number of data elements in a csv record must be
+                     * the number of stream attributes
+                     */
+                    for (int i = 0; i < streamAttributes.size(); i++) {
+                        indices.add(i);
+                    }
+                } else {
+                    /**
+                     * if timestamp attribute is specified, the number of data elements in a csv record must be
+                     * the number of stream attributes + 1 (for timestamp).
+                     * hence remove the timestamp attribute index to obtain the indices to be used as event data
+                     */
+                    for (int i = 0; i < (streamAttributes.size() + 1) ; i++) {
+                        indices.add(i);
+                    }
+                    indices.remove(Integer.parseInt(timestampAttribute));
+                }
+            }
 //        create CSVSimulationDTO containing csv simulation configuration
             CSVSimulationDTO csvSimulationConfig = new CSVSimulationDTO();
             csvSimulationConfig.setStreamName(sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
@@ -431,6 +508,7 @@ public class CSVEventGenerator implements EventGenerator {
             csvSimulationConfig.setTimestampInterval(timestampInterval);
             csvSimulationConfig.setDelimiter((String) sourceConfig.get(EventSimulatorConstants.DELIMITER));
             csvSimulationConfig.setIsOrdered(isOrdered);
+            csvSimulationConfig.setIndices(indices);
             return csvSimulationConfig;
         } catch (JSONException e) {
             log.error("Error occurred when accessing CSV simulation configuration of stream '" +
