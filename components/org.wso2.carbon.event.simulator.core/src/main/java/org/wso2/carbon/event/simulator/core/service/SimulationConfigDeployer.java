@@ -32,9 +32,11 @@ import org.wso2.carbon.deployment.engine.ArtifactType;
 import org.wso2.carbon.deployment.engine.Deployer;
 import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
 import org.wso2.carbon.event.simulator.core.exception.SimulationConfigDeploymentException;
+import org.wso2.carbon.event.simulator.core.internal.resourceManager.ResourceDependencyResolver;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.carbon.utils.Utils;
 
 import java.io.File;
@@ -59,14 +61,19 @@ public class SimulationConfigDeployer implements Deployer {
         if (!file.getName().startsWith(".")) {
             if (FilenameUtils.isExtension(file.getName(), EventSimulatorConstants.SIMULATION_FILE_EXTENSION)) {
                 String simulationName = FilenameUtils.getBaseName(file.getName());
-                String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig
-                        (simulationName, (Paths.get(Utils.getCarbonHome().toString(),
-                                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                                EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
-                if (!simulationConfig.isEmpty()) {
-                    EventSimulator simulator = new EventSimulator(simulationName, simulationConfig);
-                    EventSimulationMap.getSimulatorMap().put(simulationName, simulator);
-                    log.info("Successfully deployed simulation '" + simulationName + "'.");
+                try {
+                    String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig
+                            (simulationName, (Paths.get(Utils.getCarbonHome().toString(),
+                                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
+                    if (!simulationConfig.isEmpty()) {
+                        EventSimulator simulator = new EventSimulator(simulationName, simulationConfig);
+                        EventSimulationMap.getSimulatorMap().put(simulationName, simulator);
+                        log.info("Successfully deployed simulation '" + simulationName + "'.");
+                    }
+                } catch (ResourceNotFoundException e) {
+                    ResourceDependencyResolver.getInstance().addResourceDependency(e.getResourceType(), e
+                            .getResourceName(), simulationName);
                 }
             } else {
                 throw new SimulationConfigDeploymentException("Simulation '" + file.getName() + "' has an invalid " +

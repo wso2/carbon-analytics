@@ -22,6 +22,7 @@ package org.wso2.carbon.stream.processor.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.Resources;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.event.Event;
@@ -71,16 +72,16 @@ public class CarbonEventStreamService implements EventStreamService {
                     return streamDefinition.getAttributeList();
                 } else {
                     throw new ResourceNotFoundException("Execution plan '" + executionPlanName + "' does not contain " +
-                            "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM,
+                            "stream '" + streamName + "'.", Resources.ResourceType.STREAM,
                             streamName);
                 }
             } else {
                 throw new ResourceNotFoundException("Execution plan '" + executionPlanName + "' does not contain " +
-                        "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM, streamName);
+                        "stream '" + streamName + "'.", Resources.ResourceType.STREAM, streamName);
             }
         } else {
             throw new ResourceNotFoundException("Execution plan '" + executionPlanName + "' does not exist.",
-                    ResourceNotFoundException.ResourceType.EXECUTION_PLAN, executionPlanName);
+                    Resources.ResourceType.EXECUTION_PLAN, executionPlanName);
         }
     }
 

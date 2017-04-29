@@ -22,6 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.event.simulator.core.exception.DeprecatedResourceException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
 import org.wso2.carbon.event.simulator.core.internal.bean.CSVSimulationDTO;
@@ -30,6 +31,7 @@ import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.CSVReade
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileStore;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
+import org.wso2.carbon.stream.processor.common.Resources;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -111,34 +113,41 @@ public class CSVEventGenerator implements EventGenerator {
      * start() method begins event simulation by creating the first event
      */
     @Override
-    public void start() {
+    public void start()  {
         /*
          * if the CSV file is ordered by timestamp, create the first event and assign it as the nextEvent of
          * the generator.
          * else, create a treeMap of events. Retrieve the list of events with least timestamp as currentTimestampEvents
          * and assign the first event of the least timestamp as the nextEvent of the generator
          * */
-        csvReader = new CSVReader(csvConfiguration.getFileName(), csvConfiguration.getIsOrdered());
-        if (csvConfiguration.getIsOrdered()) {
-            nextEvent = csvReader.getNextEvent(csvConfiguration, streamAttributes, startTimestamp,
-                    endTimestamp);
-        } else {
-            currentTimestampEvents = new ArrayList<>();
-            eventsMap = new TreeMap<>();
-            eventsMap = csvReader.getEventsMap(csvConfiguration, streamAttributes, startTimestamp,
-                    endTimestamp);
-            if (!eventsMap.isEmpty()) {
-                currentTimestampEvents = eventsMap.pollFirstEntry().getValue();
-                nextEvent = currentTimestampEvents.get(0);
-                currentTimestampEvents.remove(0);
+        try {
+            csvReader = new CSVReader(csvConfiguration.getFileName(), csvConfiguration.getIsOrdered());
+            if (csvConfiguration.getIsOrdered()) {
+                nextEvent = csvReader.getNextEvent(csvConfiguration, streamAttributes, startTimestamp,
+                        endTimestamp);
             } else {
-                currentTimestampEvents = null;
-                nextEvent = null;
+                currentTimestampEvents = new ArrayList<>();
+                eventsMap = new TreeMap<>();
+                eventsMap = csvReader.getEventsMap(csvConfiguration, streamAttributes, startTimestamp,
+                        endTimestamp);
+                if (!eventsMap.isEmpty()) {
+                    currentTimestampEvents = eventsMap.pollFirstEntry().getValue();
+                    nextEvent = currentTimestampEvents.get(0);
+                    currentTimestampEvents.remove(0);
+                } else {
+                    currentTimestampEvents = null;
+                    nextEvent = null;
+                }
             }
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("Start CSV generator for file '" + csvConfiguration.getFileName() + "' for simulation of stream" +
-                    " '" + csvConfiguration.getStreamName() + "'.");
+            if (log.isDebugEnabled()) {
+                log.debug("Start CSV generator for file '" + csvConfiguration.getFileName() + "' for simulation of" +
+                        " stream '" + csvConfiguration.getStreamName() + "'.");
+            }
+        } catch (ResourceNotFoundException e) {
+            throw new DeprecatedResourceException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
+                    "required for simulation of stream '" + csvConfiguration.getStreamName() + "' cannot be found. " +
+                    "Source configuration : " + csvConfiguration.toString(), Resources.ResourceType.CSV_FILE,
+                    csvConfiguration.getFileName(), e);
         }
     }
 
@@ -366,9 +375,8 @@ public class CSVEventGenerator implements EventGenerator {
                 throw new ResourceNotFoundException("CSV file '" + sourceConfig.getString(EventSimulatorConstants
                         .FILE_NAME) + "' required for simulation of stream '" +
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' has not been " +
-                        "uploaded. Invalid source config : " + sourceConfig.toString(), ResourceNotFoundException
-                        .ResourceType.CSV_FILE, sourceConfig.getString(EventSimulatorConstants
-                        .FILE_NAME));
+                        "uploaded. Invalid source config : " + sourceConfig.toString(), Resources.ResourceType.CSV_FILE,
+                        sourceConfig.getString(EventSimulatorConstants.FILE_NAME));
             }
         } catch (JSONException e) {
             log.error("Error occurred when accessing CSV simulation configuration of stream '" +

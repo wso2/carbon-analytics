@@ -1,26 +1,25 @@
 package org.wso2.carbon.stream.processor.common.exception;
 
+import org.wso2.carbon.stream.processor.common.Resources;
+
 import java.util.Locale;
 
 /**
  * ResourceNotFoundException is used when a resource required is not found
  */
 public class ResourceNotFoundException extends Exception {
-    /**
-     * ResourceType specifies types of resources
-     * */
-    public enum ResourceType { EXECUTION_PLAN, STREAM, CSV_FILE}
 
     private String resourceName;
-    private ResourceType resourceType;
+    private Resources.ResourceType resourceType;
 
-    public ResourceNotFoundException(String message, ResourceType resourceType, String resourceName) {
+    public ResourceNotFoundException(String message, Resources.ResourceType resourceType, String resourceName) {
         super(message);
         this.resourceType = resourceType;
         this.resourceName = resourceName;
     }
 
-    public ResourceNotFoundException(String message,  ResourceType resourceType, String resourceName, Throwable cause) {
+    public ResourceNotFoundException(String message,  Resources.ResourceType resourceType, String resourceName,
+                                     Throwable cause) {
         super(message, cause);
         this.resourceType = resourceType;
         this.resourceName = resourceName;
@@ -34,7 +33,7 @@ public class ResourceNotFoundException extends Exception {
         return resourceName;
     }
 
-    public ResourceType getResourceType() {
+    public Resources.ResourceType getResourceType() {
         return resourceType;
     }
 

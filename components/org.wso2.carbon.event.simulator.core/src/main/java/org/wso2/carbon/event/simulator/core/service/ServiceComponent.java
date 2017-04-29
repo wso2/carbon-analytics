@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.event.simulator.core.exception.DeprecatedResourceException;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
 import org.wso2.carbon.event.simulator.core.exception.FileNotFoundException;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
@@ -40,6 +41,7 @@ import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstant
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
 import org.wso2.carbon.utils.Utils;
 import org.wso2.msf4j.Microservice;
 
@@ -289,8 +291,8 @@ public class ServiceComponent implements Microservice {
             switch (eventSimulator.getStatus()) {
                 case STOP:
                     executorServices.execute(eventSimulator);
-                    return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully started" +
-                            " simulation '" + simulationName + "'.")).build();
+                    return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
+                            "started simulation '" + simulationName + "'.")).build();
                 case PAUSE:
                     return Response.status(Response.Status.FORBIDDEN).entity(new ResponseMapper(
                             Response.Status.FORBIDDEN, "Simulation '" + simulationName + "' is currently" +
@@ -557,7 +559,8 @@ public class ServiceComponent implements Microservice {
     }
 
     /**
-     * This bind method will be called when EventStreamService method of stream processor is called
+     * This bind method will be called when a class is registered against EventStreamService interface of stream
+     * processor
      */
     @Reference(
             name = "event.stream.service",

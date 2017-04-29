@@ -1,4 +1,4 @@
-package org.wso2.carbon.event.simulator.core.service;
+package org.wso2.carbon.stream.processor.common.exception;
 
 import org.json.JSONObject;
 

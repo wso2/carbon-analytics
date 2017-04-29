@@ -25,12 +25,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.event.simulator.core.exception.DeprecatedResourceException;
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
 import org.wso2.carbon.event.simulator.core.internal.bean.SimulationPropertiesDTO;
 import org.wso2.carbon.event.simulator.core.internal.generator.EventGenerator;
+import org.wso2.carbon.event.simulator.core.internal.resourceManager.ResourceDependencyResolver;
 import org.wso2.carbon.event.simulator.core.internal.util.EventGeneratorFactoryImpl;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
@@ -57,7 +59,9 @@ public class EventSimulator implements Runnable {
     private SimulationPropertiesDTO simulationProperties;
     private String simulationName;
     private Status status = Status.STOP;
+//    lock is used to pause a simulation
     private final Semaphore lock = new Semaphore(1, true);
+//    lockStop is used to ensure that stop() will not be called in the middle of an event generation(avoid IOException)
     private final ReentrantLock lockStop = new ReentrantLock();
 
 
@@ -72,21 +76,27 @@ public class EventSimulator implements Runnable {
      */
     public EventSimulator(String simulationName, String simulationConfiguration)
             throws InsufficientAttributesException, InvalidConfigException, ResourceNotFoundException {
+        if (!simulationConfiguration.isEmpty()) {
 //        validate simulation configuration
-        validateSimulationConfig(simulationConfiguration);
+            validateSimulationConfig(simulationConfiguration);
 //        create generators and configurationDTO's
-        JSONObject simulationConfig = new JSONObject(simulationConfiguration);
-        simulationProperties = createSimulationPropertiesDTO(simulationConfig.getJSONObject(
-                EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES));
-        this.simulationName = simulationName;
-        JSONArray sourceConfig = simulationConfig.getJSONArray(EventSimulatorConstants.EVENT_SIMULATION_SOURCES);
-        EventGeneratorFactoryImpl generatorFactory = new EventGeneratorFactoryImpl();
-        for (int i = 0; i < sourceConfig.length(); i++) {
-            generators.add(generatorFactory.createEventGenerator(sourceConfig.getJSONObject(i), simulationProperties
-                    .getStartTimestamp(), simulationProperties.getEndTimestamp()));
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully created simulator for simulation configuration '" + simulationName + "'");
+            JSONObject simulationConfig = new JSONObject(simulationConfiguration);
+            simulationProperties = createSimulationPropertiesDTO(simulationConfig.getJSONObject(
+                    EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES));
+            this.simulationName = simulationName;
+            JSONArray sourceConfig = simulationConfig.getJSONArray(EventSimulatorConstants.EVENT_SIMULATION_SOURCES);
+            EventGeneratorFactoryImpl generatorFactory = new EventGeneratorFactoryImpl();
+            for (int i = 0; i < sourceConfig.length(); i++) {
+                generators.add(generatorFactory.createEventGenerator(sourceConfig.getJSONObject(i), simulationProperties
+                        .getStartTimestamp(), simulationProperties.getEndTimestamp()));
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully created simulator for simulation configuration '" + simulationName + "'");
+            }
+        } else {
+            log.error("Simulation '" + simulationName + "' does not have a configuration specified.");
+            throw new InvalidConfigException("Simulation '" + simulationName + "' does not have a configuration" +
+                    " specified.");
         }
     }
 
@@ -401,7 +411,9 @@ public class EventSimulator implements Runnable {
             if (log.isDebugEnabled()) {
                 log.debug("Event generators started. Begin event simulation of '" + simulationName + "'");
             }
-        } catch (SimulatorInitializationException e) {
+            status = Status.RUN;
+            eventSimulation();
+        }  catch (SimulatorInitializationException e) {
             /**
              * catch exception so that any resources opened could be closed and rethrow an exception indicating which
              * simulation failed
@@ -409,9 +421,16 @@ public class EventSimulator implements Runnable {
             stop();
             throw new SimulatorInitializationException("Error occurred when initializing event generators for " +
                     "simulation '" + simulationProperties.getSimulationName() + "'. ", e);
+        } catch (DeprecatedResourceException e) {
+            EventSimulationMap.getSimulatorMap().get(simulationName).stop();
+            EventSimulationMap.getSimulatorMap().remove(simulationName);
+            ResourceDependencyResolver.getInstance().addResourceDependency(e.getResourceType(), e.getResourceName()
+                    , simulationName);
+            log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' required for simulation '" +
+                    simulationName + "' cannot be found.", e);
+            throw new DeprecatedResourceException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
+                    "required for simulation '" + simulationName + "' cannot be found.", e);
         }
-        status = Status.RUN;
-        eventSimulation();
     }
 
     /**

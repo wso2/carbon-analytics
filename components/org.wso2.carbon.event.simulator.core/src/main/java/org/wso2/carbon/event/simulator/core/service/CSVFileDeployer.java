@@ -33,8 +33,10 @@ import org.wso2.carbon.deployment.engine.Deployer;
 import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
 import org.wso2.carbon.event.simulator.core.exception.CSVFileDeploymentException;
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileStore;
+import org.wso2.carbon.event.simulator.core.internal.resourceManager.ResourceDependencyResolver;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.Resources;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -59,6 +61,8 @@ public class CSVFileDeployer implements Deployer {
             if (FilenameUtils.isExtension(fileName, EventSimulatorConstants.CSV_FILE_EXTENSION)) {
                 FileStore.getFileStore().addFile(fileName);
                 log.info("Successfully deployed CSV file '" + fileName + "'.");
+                ResourceDependencyResolver.getInstance().resolveResourceDependency(Resources.ResourceType.CSV_FILE,
+                        fileName);
             } else {
                 throw new CSVFileDeploymentException("Error: File extension not supported for file name "
                         + file.getName() + ". Support only ." + EventSimulatorConstants.CSV_FILE_EXTENSION + " .");

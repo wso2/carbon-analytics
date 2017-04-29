@@ -28,6 +28,8 @@ import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationExc
 import org.wso2.carbon.event.simulator.core.internal.bean.CSVSimulationDTO;
 import org.wso2.carbon.event.simulator.core.internal.util.EventConverter;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
+import org.wso2.carbon.stream.processor.common.Resources;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
@@ -61,8 +63,9 @@ public class CSVReader {
      * Constructor CSVReader is used to initialize an instance of class CSVReader
      * Initialize a file reader for the CSV file.
      * If the CSV file is ordered by timestamp it will create a bufferedReader for the file reader.
+     * @throws ResourceNotFoundException if the CSV file is not found
      */
-    public CSVReader(String fileName, boolean isOrdered) {
+    public CSVReader(String fileName, boolean isOrdered) throws ResourceNotFoundException {
         try {
             String csvFileDirectory = EventSimulatorDataHolder.getInstance().getCsvFileDirectory();
             File csvFile = new File(Paths.get(csvFileDirectory, fileName).toString());
@@ -80,7 +83,8 @@ public class CSVReader {
                     throw new EventGenerationException("File '" + fileName + "' is empty.");
                 }
             } else {
-                throw new EventGenerationException("File '" + fileName + "' cannot be found.");
+                throw new ResourceNotFoundException("File '" + fileName + "' cannot be found.",
+                        Resources.ResourceType.CSV_FILE, fileName);
             }
         } catch (IOException e) {
             log.error("Error occurred when initializing file reader for CSV file '" + fileName + "' : ", e);

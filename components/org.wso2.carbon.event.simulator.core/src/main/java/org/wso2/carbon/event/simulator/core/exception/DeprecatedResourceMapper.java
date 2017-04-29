@@ -7,17 +7,16 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 /**
- * Exception mapper that maps customized FileNotFoundException to customized HTTP responses
+ * Exception mapper that maps customized DeprecatedResourceException to customized HTTP responses
  */
 @Component(
-        name = "FileNotFoundMapper",
+        name = "DeprecatedResourceMapper",
         service = ExceptionMapper.class,
         immediate = true
 )
-public class FileNotFoundMapper implements ExceptionMapper<FileNotFoundException> {
-
+public class DeprecatedResourceMapper implements ExceptionMapper<EventGenerationException> {
     @Override
-    public Response toResponse(FileNotFoundException e) {
+    public Response toResponse(EventGenerationException e) {
         return Response.status(Response.Status.NOT_FOUND).
                 entity(new ResponseMapper(Response.Status.NOT_FOUND, e.getMessage())).
                 type("application/json").
