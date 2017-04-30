@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.siddhi.editor.core.internal;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
@@ -43,7 +41,6 @@ import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResp
 import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
-import org.wso2.carbon.siddhi.editor.core.util.MetaDataHolder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
