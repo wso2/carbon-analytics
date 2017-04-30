@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator.database.util;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+
 import org.apache.log4j.Logger;
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
@@ -148,7 +150,7 @@ public class DatabaseConnector {
      * @param tableName name of table from which data must be retrieved
      * @return true if table exists in the database
      */
-    private Boolean checkTableExists(String tableName) {
+    private boolean checkTableExists(String tableName) {
         try {
             DatabaseMetaData metaData = dbConnection.getMetaData();
             /**
@@ -157,7 +159,6 @@ public class DatabaseConnector {
              * else close resources and throw an exception indicating that the table is not available in the data source
              * if an SQL exception occurs while checking whether the table exists close resources and throw an exception
              * */
-//            todo R check about the schema
             ResultSet tableResults = metaData.getTables(null, null, tableName, null);
             if (tableResults.isBeforeFirst()) {
                 if (log.isDebugEnabled()) {
@@ -187,7 +188,7 @@ public class DatabaseConnector {
      * @param columnNames list of columns to be retrieved
      * @return true if columns exists
      */
-    private Boolean validateColumns(String tableName, List<String> columnNames) {
+    private boolean validateColumns(String tableName, List<String> columnNames) {
         try {
             DatabaseMetaData metaData = dbConnection.getMetaData();
             /**
@@ -197,22 +198,19 @@ public class DatabaseConnector {
              * if not, close resources used and throw exception
              * if an SQL exception occurs while validating column names, close resources and throw an exception
              * */
-//            todo R check about the schema and check whether the getcolumns.isbeforefirst is needed
             ResultSet columnResults =
                     metaData.getColumns(null, null, tableName, null);
-            if (columnResults.isBeforeFirst()) {
-                List<String> resulsetColumns = new ArrayList<>();
-                while (columnResults.next()) {
-                    resulsetColumns.add(columnResults.getString("COLUMN_NAME"));
-                }
-                columnNames.forEach(columnName -> {
-                    if (!resulsetColumns.contains(columnName)) {
-                        closeConnection();
-                        throw new EventGenerationException("Column '" + columnName + "' does not exist in table '" +
-                                tableName + "' in data source '" + dataSourceLocation + "'.");
-                    }
-                });
+            List<String> resulsetColumns = new ArrayList<>();
+            while (columnResults.next()) {
+                resulsetColumns.add(columnResults.getString("COLUMN_NAME"));
             }
+            columnNames.forEach(columnName -> {
+                if (!resulsetColumns.contains(columnName)) {
+                    closeConnection();
+                    throw new EventGenerationException("Column '" + columnName + "' does not exist in table '" +
+                            tableName + "' in data source '" + dataSourceLocation + "'.");
+                }
+            });
         } catch (SQLException e) {
             log.error("Error occurred when validating whether the columns ' " +
                     columnNames + "' exists in table '" + tableName + "' in the data source '" +
@@ -234,7 +232,7 @@ public class DatabaseConnector {
      * @param timestampStartTime least possible value for timestamp
      * @param timestampEndTime   maximum possible value for timestamp
      */
-    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING")
+    @SuppressWarnings("SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING")
     private void prepareSQLstatement(String tableName, List<String> columnNames, String timestampAttribute,
                                      long timestampStartTime, long timestampEndTime) {
         /**

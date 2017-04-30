@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.siddhi.editor.core.internal;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
@@ -31,6 +33,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
+import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.response.DebugRuntimeResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.GeneralResponse;
@@ -120,7 +123,7 @@ public class ServiceComponent implements Microservice {
             FileOutputStream out = new FileOutputStream(tempFile);
             IOUtils.copy(in, out);
             return tempFile;
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.warn("Couldn't load requested resource: " + resourcePath);
             return null;
         }
@@ -326,8 +329,9 @@ public class ServiceComponent implements Microservice {
     @Path("/metadata")
     public Response getMetaData() {
         MetaDataResponse response = new MetaDataResponse(Status.SUCCESS);
-        response.setInBuilt(MetaDataHolder.getInBuiltProcessorMetaData());
-        response.setExtensions(SourceEditorUtils.getExtensionProcessorMetaData());
+        Map<String, MetaData> extensions = SourceEditorUtils.getExtensionProcessorMetaData();
+        response.setInBuilt(extensions.remove(""));
+        response.setExtensions(extensions);
         String jsonString = new Gson().toJson(response);
         return Response.ok(jsonString, MediaType.APPLICATION_JSON)
                 .build();
@@ -542,8 +546,7 @@ public class ServiceComponent implements Microservice {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        log.info("Service Component is activated");
-
+        log.info("Editor Started on : http://localhost:9090/editor");
         // Create Stream Processor Service
         EditorDataHolder.setDebugProcessorService(new DebugProcessorService());
         EditorDataHolder.setSiddhiManager(new SiddhiManager());

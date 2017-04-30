@@ -18,16 +18,6 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator.random.util;
 
-import fabricator.Calendar;
-import fabricator.Contact;
-import fabricator.Fabricator;
-import fabricator.Finance;
-import fabricator.Internet;
-import fabricator.Location;
-import fabricator.Words;
-import fabricator.enums.DateFormat;
-
-import org.joda.time.DateTime;
 import org.json.JSONObject;
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
@@ -37,8 +27,6 @@ import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstant
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
-import java.util.Random;
-
 /**
  * PropertyBasedAttrGenerator class is responsible for generating attribute values for a given property type
  */
@@ -46,48 +34,46 @@ public class PropertyBasedAttrGenerator implements RandomAttributeGenerator {
     /**
      * Initialize contact to generate contact related data
      */
-    private static final Contact contact = Fabricator.contact();
-    /**
-     * Initialize calendar to generate calendar related data
-     */
-    private static final Calendar calendar = Fabricator.calendar();
-    /**
-     * Initialize Finance to generate finance related data
-     */
-    private static final Finance finance = Fabricator.finance();
-    /**
-     * Initialize internet to generate internet related data
-     */
-    private static final Internet internet = Fabricator.internet();
-    /**
-     * Initialize location to generate location related data
-     */
-    private static final Location location = Fabricator.location();
-    /**
-     * Initialize words to generate words related data
-     */
-    private static final Words words = Fabricator.words();
+//    private static final Contact contact = Fabricator.contact();
+//    /**
+//     * Initialize calendar to generate calendar related data
+//     */
+//    private static final Calendar calendar = Fabricator.calendar();
+//    /**
+//     * Initialize Finance to generate finance related data
+//     */
+//    private static final Finance finance = Fabricator.finance();
+//    /**
+//     * Initialize internet to generate internet related data
+//     */
+//    private static final Internet internet = Fabricator.internet();
+//    /**
+//     * Initialize location to generate location related data
+//     */
+//    private static final Location location = Fabricator.location();
+//    /**
+//     * Initialize words to generate words related data
+//     */
+//    private static final Words words = Fabricator.words();
     private PropertyBasedAttributeDTO propertyBasedAttrConfig = new PropertyBasedAttributeDTO();
 
+    public PropertyBasedAttrGenerator() {
+
+    }
+
     /**
-     * PropertyBasedAttrGenerator() constructor validates the property based attribute configuration provided and
-     * creates a PropertyBasedAttributeDTO object containing Property base attribute generation configuration
+     * validateAttributeConfiguration() validates the attribute configuration provided for property base attribute
+     * generation
      *
-     * @param attributeConfig JSON object of the property based attribute configuration
-     * @throws InvalidConfigException if attribute configuration is invalid
+     * @param attributeConfig the attribute configuration for property based attribute generation
+     * @throws InvalidConfigException if the attribute configuration contains an invalid propertyType
      */
-    public PropertyBasedAttrGenerator(JSONObject attributeConfig) throws InvalidConfigException {
-        /**
-         * check whether the property based attribute generation has a property name specified
-         * if not throw an exception
-         * else check whether the property value provided is valid
-         * if yes set property value to PropertyBasedAttributeDTO
-         * else throw an exception
-         * */
+    @Override
+    public void validateAttributeConfiguration(JSONObject attributeConfig) throws InvalidConfigException {
         if (checkAvailability(attributeConfig, EventSimulatorConstants.PROPERTY_BASED_ATTRIBUTE_PROPERTY)) {
             try {
-                propertyBasedAttrConfig.setProperty(PropertyType.valueOf(attributeConfig
-                        .getString(EventSimulatorConstants.PROPERTY_BASED_ATTRIBUTE_PROPERTY)));
+                PropertyType.valueOf(attributeConfig
+                        .getString(EventSimulatorConstants.PROPERTY_BASED_ATTRIBUTE_PROPERTY));
             } catch (IllegalArgumentException e) {
                 throw new EventGenerationException("Invalid property type '" + propertyBasedAttrConfig.getProperty() +
                         "' provided for random event generation using " +
@@ -102,6 +88,17 @@ public class PropertyBasedAttrGenerator implements RandomAttributeGenerator {
     }
 
     /**
+     * createRandomAttributeDTO() creates PropertyBasedAttributeDTO using the attribute configuration provided
+     *
+     * @param attributeConfig attribute configuration for property based attribute generation
+     */
+    @Override
+    public void createRandomAttributeDTO(JSONObject attributeConfig) {
+        propertyBasedAttrConfig.setProperty(PropertyType.valueOf(attributeConfig
+                .getString(EventSimulatorConstants.PROPERTY_BASED_ATTRIBUTE_PROPERTY)));
+    }
+
+    /**
      * generateAttribute() generated an attribute value based on the property specified in the
      * propertyBasedAttributeDto configuration
      *
@@ -110,6 +107,7 @@ public class PropertyBasedAttrGenerator implements RandomAttributeGenerator {
     @Override
     public Object generateAttribute() {
         Object dataValue = null;
+        /*
         switch (propertyBasedAttrConfig.getProperty()) {
             case TIME_12H:
                 dataValue = calendar.time12h();
@@ -259,7 +257,13 @@ public class PropertyBasedAttrGenerator implements RandomAttributeGenerator {
                 dataValue = words.sentence();
                 break;
         }
+        */
         return dataValue;
+    }
+
+    @Override
+    public String getAttributeConfiguration() {
+        return propertyBasedAttrConfig.toString();
     }
 
     /**

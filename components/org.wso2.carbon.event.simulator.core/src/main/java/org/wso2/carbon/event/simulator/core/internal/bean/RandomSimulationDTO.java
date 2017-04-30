@@ -64,17 +64,12 @@ package org.wso2.carbon.event.simulator.core.internal.bean;
  */
 public class RandomSimulationDTO extends StreamConfigurationDTO {
 
-    private long timeInterval;
-
     public RandomSimulationDTO() {
     }
 
-    public long getTimeInterval() {
-        return timeInterval;
-    }
-
-    public void setTimeInterval(long timeInterval) {
-        this.timeInterval = timeInterval;
+    @Override
+    public String toString() {
+        return getStreamConfiguration();
     }
 
 }

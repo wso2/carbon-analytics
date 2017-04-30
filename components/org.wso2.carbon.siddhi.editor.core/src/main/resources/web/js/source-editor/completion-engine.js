@@ -122,8 +122,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "\tdefine function ${1:function_name}[${2:lang_name}] return ${3:return_type} { \n" +
             "\t\t${4:function_body} \n" +
             "\t};\n" +
-            "snippet annotation-IndexedBy\n" +
-            "\t@IndexedBy('${1:attribute_name}')\n" +
+            "snippet annotation-Index\n" +
+            "\t@Index('${1:attribute_name}')\n" +
+            "snippet annotation-PrimaryKey\n" +
+            "\t@PrimaryKey('${1:attribute_name}')\n" +
             "snippet annotation-PlanName\n" +
             "\t@Plan:name(\"${1:Plan_Name}\")\n" +
             "snippet annotation-PlanDesc\n" +
@@ -232,6 +234,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     'Plan:trace(\'true|false\')',
                     'Plan:statistics(\'true|false\')',
                     'Import(\'StreamName\')',
+                    'Index(\'attribute_name\')',
+                    'PrimaryKey(\'attribute_name\')',
                     'Export(\'StreamName\')',
                     'Config(async=true)',
                     'Config(async=true)',

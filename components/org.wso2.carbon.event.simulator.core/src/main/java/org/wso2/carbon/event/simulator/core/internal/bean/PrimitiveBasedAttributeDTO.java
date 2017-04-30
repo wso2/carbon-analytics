@@ -22,7 +22,7 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 
 /**
  * PrimitiveBasedAttributeDTO represents configuration for  the Random data generator based on primitive data types
- * such as String,Integer,Float,Double,String,Boolean
+ * such as String,int,Float,Double,String,Boolean
  * It extends RandomAttributeDTO class
  * <p>
  * Eg for json string for configuration
@@ -45,17 +45,17 @@ public class PrimitiveBasedAttributeDTO implements RandomAttributeDTO {
      * Minimum value for numeric values to be generate.
      * Min value is stored as a String because it may be needed to be parsed into Int, Long, and Float types.
      */
-    private String min = null;
+    private String min;
     /**
      * Maximum value for numeric values to be generated.
      * Max value is stored as a String because it may be needed to be parsed into Int, Long, and Float types.
      */
-    private String max = null;
+    private String max;
     /**
      * If attribute type is string length indicates length of the string to be generated
      * If attribute type is Float or Double length indicates no of digits after the decimal point
      */
-    private Integer length = null;
+    private int length;
 
     /**
      * Initialize PrimitiveBasedAttributeDTO with parent class
@@ -87,12 +87,20 @@ public class PrimitiveBasedAttributeDTO implements RandomAttributeDTO {
         this.max = max;
     }
 
-    public Integer getLength() {
+    public int getLength() {
         return length;
     }
 
-    public void setLength(Integer length) {
+    public void setLength(int length) {
         this.length = length;
     }
 
+    @Override
+    public String toString() {
+        return "Primitive based attribute generation {" +
+                "\n type : " + attrType +
+                "\n min : " + min +
+                "\n max : " + max +
+                "\n length : " + length + "\n}\n";
+    }
 }

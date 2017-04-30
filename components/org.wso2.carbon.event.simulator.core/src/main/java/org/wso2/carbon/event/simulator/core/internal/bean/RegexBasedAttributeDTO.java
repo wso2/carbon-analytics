@@ -46,4 +46,9 @@ public class RegexBasedAttributeDTO implements RandomAttributeDTO {
         this.pattern = pattern;
     }
 
+    @Override
+    public String toString() {
+        return "Regex based attribute generation {" +
+                "\n pattern : " + pattern + "\n}\n";
+    }
 }
