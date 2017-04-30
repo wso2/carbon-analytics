@@ -18,8 +18,8 @@
  * This module contains the integration code segment of Siddhi editor.
  * This will set the options of ACE editor, attach client side parser and attach SiddhiCompletion Engine with the editor
  */
-define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip", "ace/ext/language_tools"],
-    function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip, aceExtLangTools) {
+define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip", "ace/ext/language_tools", "./debug-rest-client"],
+    function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip, aceExtLangTools, DebugRESTClient) {
 
         "use strict";   // JS strict mode
 
@@ -96,7 +96,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             /* Debug points */
             var $breakpoints = [];
 
-            aceEditor.on("guttermousedown", function(e) {
+            aceEditor.on("guttermousedown", function (e) {
                 var target = e.domEvent.target;
                 if (target.className.indexOf("ace_gutter-cell") == -1)
                     return;
@@ -107,7 +107,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
                 var breakpoints = e.editor.session.getBreakpoints(row, 0);
                 var row = e.getDocumentPosition().row;
-                if(typeof breakpoints[row] === typeof undefined) {
+                if (typeof breakpoints[row] === typeof undefined) {
                     $breakpoints[row] = true;
                     e.editor.session.setBreakpoint(row);
                 } else {
@@ -118,7 +118,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 e.stop();
             })
 
-            aceEditor.on("change", function(e) {
+            aceEditor.on("change", function (e) {
                 var len, firstRow;
 
                 if (e.end.row == e.start.row) {
@@ -128,7 +128,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                     // new line or remove line
                     if (e.action == "insert") {
                         len = e.end.row - e.start.row;
-                        firstRow = e.start.column == 0 ? e.start.row: e.start.row + 1;
+                        firstRow = e.start.column == 0 ? e.start.row : e.start.row + 1;
                     } else if (e.action == "remove") {
                         len = e.start.row - e.end.row
                         firstRow = e.start.row;
@@ -140,9 +140,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         $breakpoints.splice.apply($breakpoints, args);
                     } else if (len < 0) {
                         var rem = $breakpoints.splice(firstRow + 1, -len);
-                        if(!$breakpoints[firstRow]){
+                        if (!$breakpoints[firstRow]) {
                             for (var oldBP in rem) {
-                                if (rem[oldBP]){
+                                if (rem[oldBP]) {
                                     $breakpoints[firstRow] = rem[oldBP]
                                     break
                                 }
@@ -212,6 +212,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * Also this will enable the antlr tasks to run without blocking the UI thread
              */
             var siddhiWorker = new SiddhiWorker(new MessageHandler(self));
+
+            var siddhiDebugger = new Debugger(aceEditor);
 
             /**
              * Returns the ace editor object
@@ -524,6 +526,198 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
         }
 
         /**
+         * Siddhi Debugger prototype
+         * Siddhi Debugger is used to debug current query in the editor
+         *
+         * @param {object} aceEditor The Ace Editor object
+         * @return {Debugger} Siddhi Debugger instance
+         * @constructor
+         */
+        function Debugger(aceEditor) {
+            var self = this;
+            self.__pollingInterval = 1000;
+            self.__pollingLock = false;
+            self.__pollingJob = null;
+            self.__callback = null;
+            self.executionPlan = aceEditor.getValue();
+            self.__client = DebugRESTClient;
+            self.runtimeId = null;
+            self.streams = null;
+            self.queries = null;
+
+            self.start = function () {
+                self.__client.startDebug(
+                    self.executionPlan,
+                    function (data) {
+                        self.runtimeId = data['runtimeId'];
+                        self.streams = data['streams'];
+                        self.queries = data['queries'];
+                        if (self.streams == null || self.streams.length == 0) {
+                            console.warn("Streams cannot be empty.");
+                        }
+                        if (self.queries == null || self.queries.length == 0) {
+                            console.warn("Queries cannot be empty.");
+                        }
+                        if (self.streams != null && self.streams.length > 0 &&
+                            self.queries != null && self.queries.length > 0) {
+                            self.__pollingJob = setInterval(function () {
+                                if (!self.__pollingLock) {
+                                    self.state();
+                                }
+                            }, self.__pollingInterval);
+                        }
+                        console.info(JSON.stringify(data));
+                    },
+                    function (error) {
+                        console.error(JSON.stringify(error));
+                    }
+                );
+            };
+
+            self.stop = function () {
+                if (self.__pollingJob != null) {
+                    clearInterval(self.__pollingJob);
+                }
+                if (self.runtimeId != null) {
+                    self.__client.stopDebug(
+                        self.runtimeId,
+                        function (data) {
+                            console.info(JSON.stringify(data));
+                        },
+                        function (error) {
+                            console.error(JSON.stringify(error));
+                        }
+                    );
+                } else {
+                    console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.acquire = function (queryName, pointer) {
+                if (self.runtimeId != null && queryName != null && pointer != null) {
+                    if (self.queries.indexOf(queryName) !== -1) {
+                        self.__client.acquireBreakPoint(
+                            self.runtimeId,
+                            queryName,
+                            pointer,
+                            function (data) {
+                                console.info(JSON.stringify(data));
+                            },
+                            function (error) {
+                                console.error(JSON.stringify(error));
+                            }
+                        );
+                    } else {
+                        console.warn("No such query : " + queryName);
+                    }
+                } else {
+                    console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.release = function (queryName, pointer) {
+                if (self.runtimeId != null && queryName != null && pointer != null) {
+                    if (self.queries.indexOf(queryName) !== -1) {
+                        self.__client.releaseBreakPoint(
+                            self.runtimeId,
+                            queryName,
+                            pointer,
+                            function (data) {
+                                console.info(JSON.stringify(data));
+                            },
+                            function (error) {
+                                console.error(JSON.stringify(error));
+                            }
+                        );
+                    } else {
+                        console.warn("No such query : " + queryName);
+                    }
+                } else {
+                    console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.next = function () {
+                if (self.runtimeId != null) {
+                    self.__client.next(
+                        self.runtimeId,
+                        function (data) {
+                            console.info(JSON.stringify(data));
+                        },
+                        function (error) {
+                            console.error(JSON.stringify(error));
+                        }
+                    );
+                } else {
+                    console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.play = function () {
+                if (self.runtimeId != null) {
+                    self.__client.play(
+                        self.runtimeId,
+                        function (data) {
+                            console.info(JSON.stringify(data));
+                        },
+                        function (error) {
+                            console.error(JSON.stringify(error));
+                        }
+                    );
+                } else {
+                    console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.state = function () {
+                self.__pollingLock = true;
+                if (self.runtimeId != null) {
+                    self.__client.state(
+                        self.runtimeId,
+                        function (data) {
+                            if (data.hasOwnProperty('eventState')) {
+                                if (typeof self.__callback === 'function') {
+                                    self.__callback(data);
+                                }
+                            }
+                            self.__pollingLock = false;
+                        },
+                        function (error) {
+                            console.error(JSON.stringify(error));
+                            self.__pollingLock = false;
+                        }
+                    );
+                } else {
+                    console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.sendEvent = function (queryName, streamId, event) {
+                if (self.runtimeId != null && queryName != null) {
+                    self.__client.sendEvent(
+                        self.runtimeId,
+                        streamId,
+                        event,
+                        function (data) {
+                            console.info(JSON.stringify(data));
+                        },
+                        function (error) {
+                            console.error(JSON.stringify(error));
+                        }
+                    );
+                } else {
+                    console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.setOnUpdateCallback = function (onUpdateCallback) {
+                self.__callback = onUpdateCallback;
+            };
+
+            return self;
+        }
+
+        /**
          * Message handler prototype
          * Message handler is used by the siddhi worker
          *
@@ -615,7 +809,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * @param {int} row The row at which the target token is at
              * @param {int} column The column at which the target token is at
              */
-            updater.update = function(tooltipType, tooltipData, row, column) {
+            updater.update = function (tooltipType, tooltipData, row, column) {
                 switch (tooltipType) {
                     case constants.FUNCTION_OPERATION:
                         updateFunctionOperationTooltip(tooltipData, row, column);
@@ -638,7 +832,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * @param {int} row The row at which the target token is at
              * @param {int} column The column at which the target token is at
              */
-            function updateFunctionOperationTooltip (tooltipData, row, column) {
+            function updateFunctionOperationTooltip(tooltipData, row, column) {
                 var processorName = tooltipData.processorName;
                 var namespace = tooltipData.namespace;
 
